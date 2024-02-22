@@ -2956,6 +2956,9 @@ export default {
 
         // update Form After  advanced Booked seat
         async updateBookedSeat(data) {
+            console.log(this.selectedSeats);
+            console.log(this.selectedBookedSeats);
+            console.log(this.advanceSeat);
             if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
                 let index = this.advanceSeat.indexOf(data.seatNo);
                 if (index != -1) {

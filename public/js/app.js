@@ -31214,6 +31214,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context23.prev = _context23.next) {
               case 0:
+                console.log(_this24.selectedSeats);
+                console.log(_this24.selectedBookedSeats);
+                console.log(_this24.advanceSeat);
+
                 if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
                   index = _this24.advanceSeat.indexOf(data.seatNo);
 
@@ -31248,7 +31252,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
                 if (!(_this24.addForm.alreadyBookedId.length > 0 && _this24.selectedBookedSeats.length != _this24.addForm.alreadyBookedId.length)) {
-                  _context23.next = 5;
+                  _context23.next = 8;
                   break;
                 }
 
@@ -31263,7 +31267,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 5:
+              case 8:
               case "end":
                 return _context23.stop();
             }
