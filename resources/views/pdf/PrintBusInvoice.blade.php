@@ -200,11 +200,13 @@
         @endforeach
         @php $refundAmount = 0;  @endphp
         @foreach($refundTerminal as $refund)
-        <tr>
-            <th colspan="8">{{ $refund['terminal'] }} refund</th>
-            <th colspan="3">{{ $refund['amount'] }}</th>
-            @php $refundAmount += $refund['amount'] @endphp
-        </tr>
+            @if($refund['amount'] != 0)
+            <tr>
+                <th colspan="8">{{ $refund['terminal'] }} refund</th>
+                <th colspan="3">{{ $refund['amount'] }}</th>
+                @php $refundAmount += $refund['amount'] @endphp
+            </tr>
+            @endif
         @endforeach
         <tr>
             <th colspan="8">Gross Sale</th>
