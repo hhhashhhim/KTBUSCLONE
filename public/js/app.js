@@ -28978,6 +28978,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _popup_DetailsModal_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./popup/DetailsModal.vue */ "./resources/js/pages/booking/popup/DetailsModal.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -29148,6 +29156,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       pointsValidation: "",
       pointsUsage: "",
       checkedUsagePoints: false,
+      checkSameType: [],
       loadingRevertButton: false,
       depLoading: false,
       desLoading: false,
@@ -31055,6 +31064,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                   _this23.selectedBookedSeats.splice(index, 1);
 
+                  _this23.checkSameType.splice(index, 1);
+
                   _this23.bookedSeats = _this23.bookedSeats.filter(function (seat) {
                     if (seat.seatNo != seatNo) {
                       return seat;
@@ -31063,6 +31074,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this23.addForm.totalFare -= parseFloat(_this23.schedule.bus_class.seat_map[row][col].fare);
                 } else {
                   _this23.schedule.bus_class.seat_map[row][col].selected = true;
+
+                  _this23.checkSameType.push(_this23.schedule.bus_class.seat_map[row][col].type);
 
                   _this23.selectedBookedSeats.push(seatNo);
 
@@ -31114,8 +31127,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 break;
 
               case 19:
-                _this23.fetchScheduleData(); //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
-
+                _this23.fetchScheduleData();
 
                 _this23.resetArrays();
 
@@ -31153,7 +31165,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _this23.addForm.selectedBookedOverIssueSeats = _this23.selectedBookedOverIssueSeats;
-                _context22.next = 38;
+                _context22.next = 37;
                 break;
 
               case 28:
@@ -31175,14 +31187,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _this23.addForm.selectedOverIssueSeats = _this23.selectedOverIssueSeats;
-                _context22.next = 38;
+                _context22.next = 37;
                 break;
 
               case 34:
-                console.log('a');
-
-                _this23.fetchScheduleData(); //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
-
+                _this23.fetchScheduleData();
 
                 _this23.resetArrays();
 
@@ -31193,7 +31202,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 38:
+              case 37:
               case "end":
                 return _context22.stop();
             }
@@ -31206,7 +31215,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this24 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee23() {
-        var index;
+        var index, uniqueArray;
         return _regeneratorRuntime().wrap(function _callee23$(_context23) {
           while (1) {
             switch (_context23.prev = _context23.next) {
@@ -31241,21 +31250,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                     _this24.addForm.flag = 1;
                   }
-                } // this validation is only for it different types of seat is in loop like user select advance and booked also
-                // if(this.addForm.alreadyBookedId.length > 0 && (this.selectedBookedSeats.length != this.addForm.alreadyBookedId.length))
-                // {
-                //     this.fetchScheduleData();
-                //     this.resetArrays();
-                //     return swal({
-                //         title: "Oops",
-                //         text: "Invalid Seat Combination",
-                //         icon: "error",
-                //         timer: 2000
-                //     });
-                // }
+                } // this validation only for if types is different selected liked booked or advance booking mixed
 
 
-              case 1:
+                uniqueArray = _toConsumableArray(new Set(_this24.checkSameType));
+
+                if (!(uniqueArray.length > 1)) {
+                  _context23.next = 6;
+                  break;
+                }
+
+                _this24.fetchScheduleData();
+
+                _this24.resetArrays();
+
+                return _context23.abrupt("return", swal({
+                  title: "Oops",
+                  text: "Invalid Seat Combination",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 6:
               case "end":
                 return _context23.stop();
             }
@@ -31612,6 +31628,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this26.schedule = [];
                 _this26.selectedSeatsFare = [];
                 _this26.selectedSeatsClass = [];
+                _this26.checkSameType = [];
                 _this26.selectedBookedSeats = [];
                 _this26.selectedOverIssueSeats = [];
                 _this26.selectedBookedOverIssueSeats = [];
@@ -31624,7 +31641,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this26.bookedSeats = [];
                 _this26.bookedOverIssueSeats = [];
 
-              case 15:
+              case 16:
               case "end":
                 return _context25.stop();
             }

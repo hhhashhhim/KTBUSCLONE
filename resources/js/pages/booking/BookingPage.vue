@@ -1593,6 +1593,7 @@ export default {
             pointsValidation: "",
             pointsUsage: "",
             checkedUsagePoints: false,
+            checkSameType: [],
             loadingRevertButton: false,
             depLoading: false,
             desLoading: false,
@@ -2852,6 +2853,7 @@ export default {
                    
                     this.schedule.bus_class.seat_map[row][col].selected = false;
                     this.selectedBookedSeats.splice(index, 1);
+                    this.checkSameType.splice(index, 1);
                     this.bookedSeats = this.bookedSeats.filter((seat) => {
                         if (seat.seatNo != seatNo) {
                             return seat;
@@ -2861,6 +2863,7 @@ export default {
                 } else {
                     
                     this.schedule.bus_class.seat_map[row][col].selected = true;
+                    this.checkSameType.push(this.schedule.bus_class.seat_map[row][col].type);
                     this.selectedBookedSeats.push(seatNo);
                     this.bookedSeats.push(this.schedule.bus_class.seat_map[row][col]);
                     this.addForm.totalFare += parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
@@ -2894,10 +2897,7 @@ export default {
             } else {
              
                 this.fetchScheduleData();
-                //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
-            
                 this.resetArrays();
-                
                 return swal({
                     title: "Oops",
                     text: "Invalid Seat Combination",
@@ -2936,12 +2936,8 @@ export default {
                 }
                 this.addForm.selectedOverIssueSeats = this.selectedOverIssueSeats;
             } else {
-                console.log('a');
                 this.fetchScheduleData();
-                //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
-                
                 this.resetArrays();
-              
                 return swal({
                     title: "Oops",
                     text: "Invalid Seat Combination",
@@ -2954,7 +2950,7 @@ export default {
 
         // update Form After  advanced Booked seat
         async updateBookedSeat(data) {
-            
+           
             if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
                 let index = this.advanceSeat.indexOf(data.seatNo);
                 if (index != -1) {
@@ -2980,18 +2976,21 @@ export default {
                    
                 }
             }
-            // this validation is only for it different types of seat is in loop like user select advance and booked also
-            // if(this.addForm.alreadyBookedId.length > 0 && (this.selectedBookedSeats.length != this.addForm.alreadyBookedId.length))
-            // {
-            //     this.fetchScheduleData();
-            //     this.resetArrays();
-            //     return swal({
-            //         title: "Oops",
-            //         text: "Invalid Seat Combination",
-            //         icon: "error",
-            //         timer: 2000
-            //     });
-            // }
+            
+            // this validation only for if types is different selected liked booked or advance booking mixed
+            const uniqueArray = [...new Set(this.checkSameType)];
+            if(uniqueArray.length > 1)
+            {
+                this.fetchScheduleData();
+                this.resetArrays();
+                return swal({
+                    title: "Oops",
+                    text: "Invalid Seat Combination",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+           
         },
 
         reScheduleSelectSeat: function (row, col, data) {
@@ -3304,8 +3303,9 @@ export default {
         async resetArrays() {
             this.selectedSeats = [];
             this.schedule = [];
-            this.selectedSeatsFare = []
-            this.selectedSeatsClass = []
+            this.selectedSeatsFare = [];
+            this.selectedSeatsClass = [];
+            this.checkSameType = [];
             this.selectedBookedSeats = [];
             this.selectedOverIssueSeats = [];
             this.selectedBookedOverIssueSeats = [];
