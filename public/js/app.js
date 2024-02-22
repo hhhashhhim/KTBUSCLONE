@@ -31164,7 +31164,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _this23.addForm.selectedBookedOverIssueSeats = _this23.selectedBookedOverIssueSeats;
-                _context22.next = 45;
+                _context22.next = 46;
                 break;
 
               case 36:
@@ -31186,10 +31186,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _this23.addForm.selectedOverIssueSeats = _this23.selectedOverIssueSeats;
-                _context22.next = 45;
+                _context22.next = 46;
                 break;
 
               case 42:
+                console.log('a');
+
                 _this23.fetchScheduleData(); //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
 
 
@@ -31203,7 +31205,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 45:
+              case 46:
               case "end":
                 return _context22.stop();
             }
@@ -31260,9 +31262,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
                 if (!(_this24.addForm.alreadyBookedId.length > 0 && _this24.selectedBookedSeats.length != _this24.addForm.alreadyBookedId.length)) {
-                  _context23.next = 9;
+                  _context23.next = 10;
                   break;
                 }
+
+                console.log('b');
 
                 _this24.fetchScheduleData();
 
@@ -31275,7 +31279,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 9:
+              case 10:
               case "end":
                 return _context23.stop();
             }

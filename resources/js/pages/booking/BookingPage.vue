@@ -2944,6 +2944,7 @@ export default {
                 }
                 this.addForm.selectedOverIssueSeats = this.selectedOverIssueSeats;
             } else {
+                console.log('a');
                 this.fetchScheduleData();
                 //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
                 setTimeout(() => {
@@ -2993,6 +2994,7 @@ export default {
             // this validation is only for it different types of seat is in loop like user select advance and booked also
             if(this.addForm.alreadyBookedId.length > 0 && (this.selectedBookedSeats.length != this.addForm.alreadyBookedId.length))
             {
+                console.log('b');
                 this.fetchScheduleData();
                 this.resetArrays();
                 return swal({
