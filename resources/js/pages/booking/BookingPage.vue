@@ -2894,7 +2894,10 @@ export default {
             } else {
              
                 this.fetchScheduleData();
-                this.resetArrays();
+                //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
+                setTimeout(() => {
+                    this.resetArrays();
+                }, 1000);
                 return swal({
                     title: "Oops",
                     text: "Invalid Seat Combination",
@@ -2903,7 +2906,6 @@ export default {
                 });
             }
 
-           
             /*Over Issue Seats*/
             if (this.schedule.bus_class.seat_map[row][col].over_issue && this.selectedOverIssueSeats.length == 0) {
                 let index = this.selectedBookedOverIssueSeats.indexOf(seatNo);
@@ -2934,7 +2936,10 @@ export default {
                 this.addForm.selectedOverIssueSeats = this.selectedOverIssueSeats;
             } else {
                 this.fetchScheduleData();
-                this.resetArrays();
+                //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
+                setTimeout(() => {
+                    this.resetArrays();
+                }, 1000);
                 return swal({
                     title: "Oops",
                     text: "Invalid Seat Combination",
@@ -2971,6 +2976,18 @@ export default {
                     this.addForm.flag = 1;
                    
                 }
+            }
+            // this validation is only for it different types of seat is in loop like user select advance and booked also
+            if(this.addForm.alreadyBookedId.length > 0 && (this.selectedBookedSeats.length != this.addForm.alreadyBookedId.length))
+            {
+                this.fetchScheduleData();
+                this.resetArrays();
+                return swal({
+                    title: "Oops",
+                    text: "Invalid Seat Combination",
+                    icon: "error",
+                    timer: 2000
+                });
             }
         },
 
@@ -3292,6 +3309,8 @@ export default {
             this.addForm.selectedSeats = [];
             this.addForm.selectedBookedSeats = [];
             this.addForm.selectedOverIssueSeats = [];
+            this.addForm.alreadyBookedId = [];
+            this.advanceSeat = [];
             this.addForm.selectedBookedOverIssueSeats = [];
             this.bookedSeats = [];
             this.bookedOverIssueSeats = [];

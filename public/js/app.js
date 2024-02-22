@@ -31114,10 +31114,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 break;
 
               case 19:
-                _this23.fetchScheduleData();
+                _this23.fetchScheduleData(); //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
 
-                _this23.resetArrays();
 
+                setTimeout(function () {
+                  _this23.resetArrays();
+                }, 1000);
                 return _context22.abrupt("return", swal({
                   title: "Oops",
                   text: "Invalid Seat Combination",
@@ -31178,10 +31180,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 break;
 
               case 34:
-                _this23.fetchScheduleData();
+                _this23.fetchScheduleData(); //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
 
-                _this23.resetArrays();
 
+                setTimeout(function () {
+                  _this23.resetArrays();
+                }, 1000);
                 return _context22.abrupt("return", swal({
                   title: "Oops",
                   text: "Invalid Seat Combination",
@@ -31237,9 +31241,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                     _this24.addForm.flag = 1;
                   }
+                } // this validation is only for it different types of seat is in loop like user select advance and booked also
+
+
+                if (!(_this24.addForm.alreadyBookedId.length > 0 && _this24.selectedBookedSeats.length != _this24.addForm.alreadyBookedId.length)) {
+                  _context23.next = 5;
+                  break;
                 }
 
-              case 1:
+                _this24.fetchScheduleData();
+
+                _this24.resetArrays();
+
+                return _context23.abrupt("return", swal({
+                  title: "Oops",
+                  text: "Invalid Seat Combination",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 5:
               case "end":
                 return _context23.stop();
             }
@@ -31602,11 +31623,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this26.addForm.selectedSeats = [];
                 _this26.addForm.selectedBookedSeats = [];
                 _this26.addForm.selectedOverIssueSeats = [];
+                _this26.addForm.alreadyBookedId = [];
+                _this26.advanceSeat = [];
                 _this26.addForm.selectedBookedOverIssueSeats = [];
                 _this26.bookedSeats = [];
                 _this26.bookedOverIssueSeats = [];
 
-              case 13:
+              case 15:
               case "end":
                 return _context25.stop();
             }
