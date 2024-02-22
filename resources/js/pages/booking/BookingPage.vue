@@ -2837,6 +2837,10 @@ export default {
         async selectSeat(row, col, seatNo, fare, colClass) {
             this.validationErrors = [];
            
+            console.log(this.selectedSeats);
+            console.log(this.selectedBookedSeats);
+            console.log(this.advanceSeat);
+            
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
                     title: "Ops",

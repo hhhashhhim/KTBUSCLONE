@@ -31029,9 +31029,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context22.prev = _context22.next) {
               case 0:
                 _this23.validationErrors = [];
+                console.log(_this23.selectedSeats);
+                console.log(_this23.selectedBookedSeats);
+                console.log(_this23.advanceSeat);
 
                 if (!(_this23.addForm.oldBookings == 1 && !_this23.schedule.bus_class.seat_map[row][col].type)) {
-                  _context22.next = 3;
+                  _context22.next = 6;
                   break;
                 }
 
@@ -31042,9 +31045,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 3:
+              case 6:
                 if (!(_this23.schedule.bus_class.seat_map[row][col].type && _this23.selectedSeats.length == 0)) {
-                  _context22.next = 10;
+                  _context22.next = 13;
                   break;
                 }
 
@@ -31073,12 +31076,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 _this23.addForm.totalAmount = _this23.addForm.totalFare;
                 _this23.addForm.selectedBookedSeats = _this23.selectedBookedSeats;
-                _context22.next = 22;
+                _context22.next = 25;
                 break;
 
-              case 10:
+              case 13:
                 if (!(!_this23.schedule.bus_class.seat_map[row][col].type && _this23.selectedBookedSeats.length == 0)) {
-                  _context22.next = 19;
+                  _context22.next = 22;
                   break;
                 }
 
@@ -31110,10 +31113,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this23.addForm.selectedSeats = _this23.selectedSeats;
                 _this23.addForm.selectedSeatsFare = _this23.selectedSeatsFare;
                 _this23.addForm.selectedSeatsClass = _this23.selectedSeatsClass;
-                _context22.next = 22;
+                _context22.next = 25;
                 break;
 
-              case 19:
+              case 22:
                 _this23.fetchScheduleData(); //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
 
 
@@ -31127,9 +31130,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 22:
+              case 25:
                 if (!(_this23.schedule.bus_class.seat_map[row][col].over_issue && _this23.selectedOverIssueSeats.length == 0)) {
-                  _context22.next = 28;
+                  _context22.next = 31;
                   break;
                 }
 
@@ -31154,12 +31157,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _this23.addForm.selectedBookedOverIssueSeats = _this23.selectedBookedOverIssueSeats;
-                _context22.next = 37;
+                _context22.next = 40;
                 break;
 
-              case 28:
+              case 31:
                 if (!(!_this23.schedule.bus_class.seat_map[row][col].over_issue && _this23.selectedBookedOverIssueSeats.length == 0)) {
-                  _context22.next = 34;
+                  _context22.next = 37;
                   break;
                 }
 
@@ -31176,10 +31179,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _this23.addForm.selectedOverIssueSeats = _this23.selectedOverIssueSeats;
-                _context22.next = 37;
+                _context22.next = 40;
                 break;
 
-              case 34:
+              case 37:
                 _this23.fetchScheduleData(); //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
 
 
@@ -31193,7 +31196,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 37:
+              case 40:
               case "end":
                 return _context22.stop();
             }
