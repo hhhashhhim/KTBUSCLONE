@@ -2836,11 +2836,6 @@ export default {
 
         async selectSeat(row, col, seatNo, fare, colClass) {
             this.validationErrors = [];
-           
-            console.log(this.selectedSeats);
-            console.log(this.selectedBookedSeats);
-            console.log(this.advanceSeat);
-            console.log(this.addForm.alreadyBookedId);
             
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
@@ -2911,10 +2906,7 @@ export default {
                 });
             }
 
-            console.log(this.selectedSeats);
-            console.log(this.selectedBookedSeats);
-            console.log(this.advanceSeat);
-            console.log(this.addForm.alreadyBookedId);
+            
             /*Over Issue Seats*/
             if (this.schedule.bus_class.seat_map[row][col].over_issue && this.selectedOverIssueSeats.length == 0) {
                 let index = this.selectedBookedOverIssueSeats.indexOf(seatNo);
@@ -2947,9 +2939,9 @@ export default {
                 console.log('a');
                 this.fetchScheduleData();
                 //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
-                setTimeout(() => {
-                    this.resetArrays();
-                }, 1000);
+                
+                this.resetArrays();
+              
                 return swal({
                     title: "Oops",
                     text: "Invalid Seat Combination",
@@ -2962,10 +2954,7 @@ export default {
 
         // update Form After  advanced Booked seat
         async updateBookedSeat(data) {
-            console.log(this.selectedSeats);
-            console.log(this.selectedBookedSeats);
-            console.log(this.advanceSeat);
-            console.log(this.addForm.alreadyBookedId);
+            
             if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
                 let index = this.advanceSeat.indexOf(data.seatNo);
                 if (index != -1) {
@@ -2992,18 +2981,17 @@ export default {
                 }
             }
             // this validation is only for it different types of seat is in loop like user select advance and booked also
-            if(this.addForm.alreadyBookedId.length > 0 && (this.selectedBookedSeats.length != this.addForm.alreadyBookedId.length))
-            {
-                console.log('b');
-                this.fetchScheduleData();
-                this.resetArrays();
-                return swal({
-                    title: "Oops",
-                    text: "Invalid Seat Combination",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+            // if(this.addForm.alreadyBookedId.length > 0 && (this.selectedBookedSeats.length != this.addForm.alreadyBookedId.length))
+            // {
+            //     this.fetchScheduleData();
+            //     this.resetArrays();
+            //     return swal({
+            //         title: "Oops",
+            //         text: "Invalid Seat Combination",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // }
         },
 
         reScheduleSelectSeat: function (row, col, data) {

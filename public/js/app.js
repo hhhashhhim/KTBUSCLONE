@@ -31029,13 +31029,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context22.prev = _context22.next) {
               case 0:
                 _this23.validationErrors = [];
-                console.log(_this23.selectedSeats);
-                console.log(_this23.selectedBookedSeats);
-                console.log(_this23.advanceSeat);
-                console.log(_this23.addForm.alreadyBookedId);
 
                 if (!(_this23.addForm.oldBookings == 1 && !_this23.schedule.bus_class.seat_map[row][col].type)) {
-                  _context22.next = 7;
+                  _context22.next = 3;
                   break;
                 }
 
@@ -31046,9 +31042,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 7:
+              case 3:
                 if (!(_this23.schedule.bus_class.seat_map[row][col].type && _this23.selectedSeats.length == 0)) {
-                  _context22.next = 14;
+                  _context22.next = 10;
                   break;
                 }
 
@@ -31077,12 +31073,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 _this23.addForm.totalAmount = _this23.addForm.totalFare;
                 _this23.addForm.selectedBookedSeats = _this23.selectedBookedSeats;
-                _context22.next = 26;
+                _context22.next = 22;
                 break;
 
-              case 14:
+              case 10:
                 if (!(!_this23.schedule.bus_class.seat_map[row][col].type && _this23.selectedBookedSeats.length == 0)) {
-                  _context22.next = 23;
+                  _context22.next = 19;
                   break;
                 }
 
@@ -31114,10 +31110,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this23.addForm.selectedSeats = _this23.selectedSeats;
                 _this23.addForm.selectedSeatsFare = _this23.selectedSeatsFare;
                 _this23.addForm.selectedSeatsClass = _this23.selectedSeatsClass;
-                _context22.next = 26;
+                _context22.next = 22;
                 break;
 
-              case 23:
+              case 19:
                 _this23.fetchScheduleData(); //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
 
 
@@ -31131,15 +31127,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 26:
-                console.log(_this23.selectedSeats);
-                console.log(_this23.selectedBookedSeats);
-                console.log(_this23.advanceSeat);
-                console.log(_this23.addForm.alreadyBookedId);
-                /*Over Issue Seats*/
-
+              case 22:
                 if (!(_this23.schedule.bus_class.seat_map[row][col].over_issue && _this23.selectedOverIssueSeats.length == 0)) {
-                  _context22.next = 36;
+                  _context22.next = 28;
                   break;
                 }
 
@@ -31164,12 +31154,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _this23.addForm.selectedBookedOverIssueSeats = _this23.selectedBookedOverIssueSeats;
-                _context22.next = 46;
+                _context22.next = 38;
                 break;
 
-              case 36:
+              case 28:
                 if (!(!_this23.schedule.bus_class.seat_map[row][col].over_issue && _this23.selectedBookedOverIssueSeats.length == 0)) {
-                  _context22.next = 42;
+                  _context22.next = 34;
                   break;
                 }
 
@@ -31186,18 +31176,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _this23.addForm.selectedOverIssueSeats = _this23.selectedOverIssueSeats;
-                _context22.next = 46;
+                _context22.next = 38;
                 break;
 
-              case 42:
+              case 34:
                 console.log('a');
 
                 _this23.fetchScheduleData(); //  this timeout function is applied becaut updateSeat function run after this in case of invalid function so it did reset array then again update so this is wrong.
 
 
-                setTimeout(function () {
-                  _this23.resetArrays();
-                }, 1000);
+                _this23.resetArrays();
+
                 return _context22.abrupt("return", swal({
                   title: "Oops",
                   text: "Invalid Seat Combination",
@@ -31205,7 +31194,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 46:
+              case 38:
               case "end":
                 return _context22.stop();
             }
@@ -31223,11 +31212,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context23.prev = _context23.next) {
               case 0:
-                console.log(_this24.selectedSeats);
-                console.log(_this24.selectedBookedSeats);
-                console.log(_this24.advanceSeat);
-                console.log(_this24.addForm.alreadyBookedId);
-
                 if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
                   index = _this24.advanceSeat.indexOf(data.seatNo);
 
@@ -31259,27 +31243,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     _this24.addForm.flag = 1;
                   }
                 } // this validation is only for it different types of seat is in loop like user select advance and booked also
+                // if(this.addForm.alreadyBookedId.length > 0 && (this.selectedBookedSeats.length != this.addForm.alreadyBookedId.length))
+                // {
+                //     this.fetchScheduleData();
+                //     this.resetArrays();
+                //     return swal({
+                //         title: "Oops",
+                //         text: "Invalid Seat Combination",
+                //         icon: "error",
+                //         timer: 2000
+                //     });
+                // }
 
 
-                if (!(_this24.addForm.alreadyBookedId.length > 0 && _this24.selectedBookedSeats.length != _this24.addForm.alreadyBookedId.length)) {
-                  _context23.next = 10;
-                  break;
-                }
-
-                console.log('b');
-
-                _this24.fetchScheduleData();
-
-                _this24.resetArrays();
-
-                return _context23.abrupt("return", swal({
-                  title: "Oops",
-                  text: "Invalid Seat Combination",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 10:
+              case 1:
               case "end":
                 return _context23.stop();
             }
