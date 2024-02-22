@@ -188,7 +188,7 @@
             <th>{{ ((($totalSale + $totalElt) - $totalDiscount) - $totalCommission) - $totalAdjustCommission }}</th>
         </tr>
         @foreach($mainData as $terminal)
-            @if($terminal->first()[0]->commission)
+            @if($terminal->first()[0]->commission && $terminal->first()[0]->commission->fix_commission != 0)
             <tr>
                 <th colspan="8">{{ $terminal->first()[0]->terminal->name }} Fix Commission</th>
                 <td colspan="3">{{ $fixCommission = $terminal->first()[0]->commission ? intVal($terminal->first()[0]->commission->fix_commission) : 0 }}</td>
