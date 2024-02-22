@@ -2840,6 +2840,7 @@ export default {
             console.log(this.selectedSeats);
             console.log(this.selectedBookedSeats);
             console.log(this.advanceSeat);
+            console.log(this.addForm.alreadyBookedId);
             
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
@@ -2959,6 +2960,7 @@ export default {
             console.log(this.selectedSeats);
             console.log(this.selectedBookedSeats);
             console.log(this.advanceSeat);
+            console.log(this.addForm.alreadyBookedId);
             if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
                 let index = this.advanceSeat.indexOf(data.seatNo);
                 if (index != -1) {
