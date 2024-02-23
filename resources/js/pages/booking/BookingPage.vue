@@ -1604,7 +1604,7 @@ export default {
                 customerCNIC: "",
                 id: 0,
                 schedule: 0,
-                variation_time: 0,
+                departure_time: "",
                 totalFare: 0,
                 destinationCity: 0,
                 departureCity: 0,
@@ -1624,7 +1624,7 @@ export default {
                 rescheduleSchedule: 0,
                 rescheduleDate: '',
                 id: "0",
-                variation_time: 0,
+                departure_time: "",
                 rescheduleDestinationCity: 0,
                 dataDepartureCity: 0,
             },
@@ -1824,6 +1824,7 @@ export default {
                     date: this.addForm.date,
                     departureCity: this.addForm.departureCity,
                     destinationCity: this.addForm.destinationCity,
+                    departure_time: this.addForm.departure_time,
 
                 }
                 this.selectedSeatDataBackEnd = [];
@@ -1957,12 +1958,12 @@ export default {
         },
         
         setScheduleValue(event) {
-            this.addForm.variation_time = this.allSchedules[event.target.selectedIndex-1].variation_time;
+            this.addForm.departure_time = this.allSchedules[event.target.selectedIndex-1].departure_time;
             this.addForm.schedule = this.allSchedules[event.target.selectedIndex-1].schedule_id;
         },
         
         setRescheduleValue(event) {
-            this.rescheduleData.variation_time = this.allReSchedules[event.target.selectedIndex-1].variation_time;
+            this.rescheduleData.departure_time = this.allReSchedules[event.target.selectedIndex-1].departure_time;
             this.rescheduleData.rescheduleSchedule = this.allReSchedules[event.target.selectedIndex-1].schedule_id;
         },
 
@@ -2517,7 +2518,7 @@ export default {
                     departureCity: this.addForm.departureCity,
                     destinationCity: this.addForm.destinationCity,
                     dropTerminal: this.addForm.terminalId,
-                    variation_time: this.addForm.variation_time,
+                    departure_time: this.addForm.departure_time,
                 });
                 if (resSelected.status == 200) {
                     this.loading = false
@@ -2806,7 +2807,7 @@ export default {
                 departureCity: parseInt(this.rescheduleData.dataDepartureCity),
                 destinationCity: this.rescheduleData.rescheduleDestinationCity,
                 dropTerminal: this.addForm.terminalId,
-                variation_time: this.rescheduleData.variation_time,
+                departure_time: this.rescheduleData.departure_time,
             });
             if (res.status == 200) {
                 this.seatMapReschedule = true;
@@ -3233,7 +3234,7 @@ export default {
                     hideAfter: 1000
                 });
                 const bookType = this.addForm.type;
-                const variationTime = this.addForm.variation_time;
+                const departureTime = this.addForm.departure_time;
                 const date = this.addForm.date;
                 this.addForm = {
                     totalAmount: 0,
@@ -3255,7 +3256,7 @@ export default {
                 this.addForm.terminalId = resTicket.data.authTerminalId;
                 this.addForm.gender = 1;
                 this.addForm.type = bookType;
-                this.addForm.variation_time = variationTime;
+                this.addForm.departure_time = departureTime;
                 this.addForm.schedule = resTicket.data.ticket[0].schedule_id;
                 this.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
                 this.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
@@ -3773,6 +3774,7 @@ export default {
                 single.rescheduleDiscount = this.rescheduleDiscount;
                 single.dataDepartureCity = parseInt(this.rescheduleData.dataDepartureCity);
                 single.dataDestination = this.rescheduleData.rescheduleDestinationCity;
+                single.departure_time = this.rescheduleData.departure_time;
             });
             this.loadingRescheduleButton = true;
             const resReschedule = await this.callApi("post", "booking/reschedule", {'data': this.mainAllRescheduleData});

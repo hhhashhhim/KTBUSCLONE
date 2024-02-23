@@ -29167,7 +29167,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         customerCNIC: "",
         id: 0,
         schedule: 0,
-        variation_time: 0,
+        departure_time: "",
         totalFare: 0,
         destinationCity: 0,
         departureCity: 0,
@@ -29187,7 +29187,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         rescheduleSchedule: 0,
         rescheduleDate: '',
         id: "0",
-        variation_time: 0,
+        departure_time: "",
         rescheduleDestinationCity: 0,
         dataDepartureCity: 0
       },
@@ -29442,7 +29442,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   scheduleId: _this4.addForm.schedule,
                   date: _this4.addForm.date,
                   departureCity: _this4.addForm.departureCity,
-                  destinationCity: _this4.addForm.destinationCity
+                  destinationCity: _this4.addForm.destinationCity,
+                  departure_time: _this4.addForm.departure_time
                 };
                 _this4.selectedSeatDataBackEnd = [];
                 _context3.next = 11;
@@ -29641,11 +29642,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return year + '-' + month + '-' + day;
     },
     setScheduleValue: function setScheduleValue(event) {
-      this.addForm.variation_time = this.allSchedules[event.target.selectedIndex - 1].variation_time;
+      this.addForm.departure_time = this.allSchedules[event.target.selectedIndex - 1].departure_time;
       this.addForm.schedule = this.allSchedules[event.target.selectedIndex - 1].schedule_id;
     },
     setRescheduleValue: function setRescheduleValue(event) {
-      this.rescheduleData.variation_time = this.allReSchedules[event.target.selectedIndex - 1].variation_time;
+      this.rescheduleData.departure_time = this.allReSchedules[event.target.selectedIndex - 1].departure_time;
       this.rescheduleData.rescheduleSchedule = this.allReSchedules[event.target.selectedIndex - 1].schedule_id;
     },
     getDestinationCity: function getDestinationCity() {
@@ -30592,7 +30593,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   departureCity: _this19.addForm.departureCity,
                   destinationCity: _this19.addForm.destinationCity,
                   dropTerminal: _this19.addForm.terminalId,
-                  variation_time: _this19.addForm.variation_time
+                  departure_time: _this19.addForm.departure_time
                 });
 
               case 27:
@@ -30989,7 +30990,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   departureCity: parseInt(_this22.rescheduleData.dataDepartureCity),
                   destinationCity: _this22.rescheduleData.rescheduleDestinationCity,
                   dropTerminal: _this22.addForm.terminalId,
-                  variation_time: _this22.rescheduleData.variation_time
+                  departure_time: _this22.rescheduleData.departure_time
                 });
 
               case 14:
@@ -31390,7 +31391,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this25 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee24() {
-        var resTicket, bookType, variationTime, date;
+        var resTicket, bookType, departureTime, date;
         return _regeneratorRuntime().wrap(function _callee24$(_context24) {
           while (1) {
             switch (_context24.prev = _context24.next) {
@@ -31543,7 +31544,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     hideAfter: 1000
                   });
                   bookType = _this25.addForm.type;
-                  variationTime = _this25.addForm.variation_time;
+                  departureTime = _this25.addForm.departure_time;
                   date = _this25.addForm.date;
                   _this25.addForm = {
                     totalAmount: 0,
@@ -31564,7 +31565,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this25.addForm.terminalId = resTicket.data.authTerminalId;
                   _this25.addForm.gender = 1;
                   _this25.addForm.type = bookType;
-                  _this25.addForm.variation_time = variationTime;
+                  _this25.addForm.departure_time = departureTime;
                   _this25.addForm.schedule = resTicket.data.ticket[0].schedule_id;
                   _this25.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
                   _this25.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
@@ -32339,6 +32340,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   single.rescheduleDiscount = _this35.rescheduleDiscount;
                   single.dataDepartureCity = parseInt(_this35.rescheduleData.dataDepartureCity);
                   single.dataDestination = _this35.rescheduleData.rescheduleDestinationCity;
+                  single.departure_time = _this35.rescheduleData.departure_time;
                 });
 
                 _this35.loadingRescheduleButton = true;
@@ -88257,6 +88259,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     return {
       validationErrors: []
     };
+  },
+  created: function created() {
+    $('.modal').remove();
   },
   methods: {
     callApi: function callApi(method, url, data) {

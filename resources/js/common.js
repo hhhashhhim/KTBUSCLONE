@@ -6,6 +6,9 @@ export default {
             validationErrors: []
         }
     },
+    created() {
+        $('.modal').remove();
+    },
     methods: {
 
         async callApi(method, url, data) {
