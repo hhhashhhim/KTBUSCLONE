@@ -460,6 +460,7 @@ class BookingController extends Controller
                 $sub = $terminalTime->time_difference * 60;
             }
 
+            $single->departure_city_time = $single->departure_time;
             $exactDate = date("Y-m-d h:i A", strtotime($single->departure_date . ' ' . $single->departure_time) + $sub);
             $single->departure_date_time = date("Y-m-d H:i:s",strtotime($exactDate));
             $single->departure_date = date("m/d/Y", strtotime($exactDate));
