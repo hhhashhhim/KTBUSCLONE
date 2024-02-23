@@ -115,7 +115,7 @@ class BookingApiController extends Controller
                 $terminalId = Auth::user()->terminal_id;
                 // Data
                 $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
-                $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id','schedule.bus_class:id,name',"departure_city:id,name","destination_city:id,name")->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date","variation_time"]);
+                $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id','schedule.bus_class:id,name',"departure_city:id,name","destination_city:id,name")->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
                 
                 
                 $data->map(function($single,$key) use ($data,$companyId,$terminalId){
@@ -212,6 +212,7 @@ class BookingApiController extends Controller
                     $single->total_fare = $original_fare;
                     $single->final_fare = $discounted_fare;
                     $single->departure_date_time = date("Y-m-d H:i:s", strtotime($single->departure_date . ' ' . $single->departure_time));
+                    $single->variation_time = $single->departure_time;
                     
                 });
                 
@@ -288,7 +289,7 @@ class BookingApiController extends Controller
                     'departure_date' => $request->date,
                     'departure_id' => $request->departure_city_id,
                     'destination_id' => $request->destination_city_id,
-                    'variation_time' => $request->variation_time,
+                    'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
                 ])->first(['schedule_date']);
                 // Getting Already Booked Tickets
                 $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
@@ -599,6 +600,7 @@ class BookingApiController extends Controller
                     ->where('schedule_id', $request->schedule_id)
                     ->where('departure_date', $request->date)
                     ->where('company_id', $companyId)
+                    ->where('departure_time', date("H:i:s",strtotime($request->departure_time)),)
                     ->first();
                 $existingTicket = Ticket::where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
                 
