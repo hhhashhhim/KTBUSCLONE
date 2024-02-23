@@ -29642,11 +29642,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return year + '-' + month + '-' + day;
     },
     setScheduleValue: function setScheduleValue(event) {
-      this.addForm.departure_time = this.allSchedules[event.target.selectedIndex - 1].departure_time;
+      this.addForm.departure_time = this.allSchedules[event.target.selectedIndex - 1].departure_city_time;
       this.addForm.schedule = this.allSchedules[event.target.selectedIndex - 1].schedule_id;
     },
     setRescheduleValue: function setRescheduleValue(event) {
-      this.rescheduleData.departure_time = this.allReSchedules[event.target.selectedIndex - 1].departure_time;
+      this.rescheduleData.departure_time = this.allReSchedules[event.target.selectedIndex - 1].departure_city_time;
       this.rescheduleData.rescheduleSchedule = this.allReSchedules[event.target.selectedIndex - 1].schedule_id;
     },
     getDestinationCity: function getDestinationCity() {

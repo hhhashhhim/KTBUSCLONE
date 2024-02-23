@@ -1958,12 +1958,12 @@ export default {
         },
         
         setScheduleValue(event) {
-            this.addForm.departure_time = this.allSchedules[event.target.selectedIndex-1].departure_time;
+            this.addForm.departure_time = this.allSchedules[event.target.selectedIndex-1].departure_city_time;
             this.addForm.schedule = this.allSchedules[event.target.selectedIndex-1].schedule_id;
         },
         
         setRescheduleValue(event) {
-            this.rescheduleData.departure_time = this.allReSchedules[event.target.selectedIndex-1].departure_time;
+            this.rescheduleData.departure_time = this.allReSchedules[event.target.selectedIndex-1].departure_city_time;
             this.rescheduleData.rescheduleSchedule = this.allReSchedules[event.target.selectedIndex-1].schedule_id;
         },
 
