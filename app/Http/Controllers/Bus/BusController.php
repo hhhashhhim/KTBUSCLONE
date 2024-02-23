@@ -39,22 +39,22 @@ class BusController extends Controller
     {
 
 
-        $data = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_date"=>"2024-02-25","schedule_id"=>330])->get();
+        // $data = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_date"=>"2024-02-25","schedule_id"=>330])->get();
         
-        foreach($data as $single)
-        {
-            ScheduleDetail::create([
-                'company_id' => $single->company_id,
-                'added_by' => $single->added_by,
-                'schedule_id' => $single->schedule_id,
-                'departure_id' => $single->departure_id,
-                'destination_id' => $single->destination_id,
-                'departure_time' => date('H:i', strtotime($single->departure_time)),
-                'departure_date' => date('Y-m-d', strtotime($single->departure_date) + 86400),
-                'schedule_date' => "2024-02-26", // schedule departure date
-            ]);
-        }
-        return 'helo';
+        // foreach($data as $single)
+        // {
+        //     ScheduleDetail::create([
+        //         'company_id' => $single->company_id,
+        //         'added_by' => $single->added_by,
+        //         'schedule_id' => $single->schedule_id,
+        //         'departure_id' => $single->departure_id,
+        //         'destination_id' => $single->destination_id,
+        //         'departure_time' => date('H:i', strtotime($single->departure_time)),
+        //         'departure_date' => date('Y-m-d', strtotime($single->departure_date) + 86400),
+        //         'schedule_date' => "2024-02-26", // schedule departure date
+        //     ]);
+        // }
+        // return 'helo';
         try {
                 DB::beginTransaction();
                 $rules = [
