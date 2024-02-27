@@ -14,6 +14,7 @@ use App\Models\Route\RouteFare;
 use App\Models\ActivityLog;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleTerminalVisibility;
+use App\Models\Schedule\ScheduleTerminalDiscount;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Schedule\ScheduleTerminalSequence;
 use App\Models\Surcharge\Surcharge;
@@ -112,7 +113,7 @@ class ScheduleController extends Controller
                     'added_by' => Auth::user()->id,
                 ]);
 
-                foreach ($request->terminals as $single) {
+                foreach ($request->terminals??[] as $single) {
                     ScheduleTerminalVisibility::create([
                         'route_id' => $request->route,
                         'schedule_id' => $schedule->id,
@@ -121,6 +122,19 @@ class ScheduleController extends Controller
                         'company_id' => Auth::user()->company_id,
                         'added_by' => Auth::user()->id,
                     ]);
+                }
+                
+                if($request->discount != 0)
+                {
+                    foreach ($request->discountTerminals??[] as $single) {
+                        ScheduleTerminalDiscount::create([
+                            'schedule_id' => $schedule->id,
+                            'discount_id' => $request->discount,
+                            'terminal_id' => $single,
+                            'company_id' => Auth::user()->company_id,
+                            'added_by' => Auth::user()->id,
+                        ]);
+                    }
                 }
                 
                 $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
@@ -146,6 +160,7 @@ class ScheduleController extends Controller
                             'company_id' => Auth::user()->company_id,
                             'added_by' => Auth::user()->id,
                             'schedule_id' => $schedule->id,
+                            'bus_class_id' => $request->busClass,
                             'departure_id' => $detail->departure_city_id,
                             'destination_id' => $detail->destination_city_id,
                             'departure_time' => date('H:i', strtotime($departureTime)),
@@ -178,9 +193,11 @@ class ScheduleController extends Controller
     {
         $schedule = Schedule::find($request->id);
         $visibilities = ScheduleTerminalVisibility::where("schedule_id",$schedule->id)->pluck("terminal_id");
+        $discountTerminals = ScheduleTerminalDiscount::where("schedule_id",$schedule->id)->pluck("terminal_id");
         return [
             'schedules' => $schedule,
             'visibilities' => $visibilities,
+            'discountTerminals' => $discountTerminals,
         ];
     }
 
@@ -242,8 +259,8 @@ class ScheduleController extends Controller
                     'route_city_terminal' => $req['route_city_terminal'] ?? [],
                 ]);
                 
+                
                 ScheduleTerminalVisibility::where("schedule_id",$req['id'])->delete();
-
                 foreach ($request->terminals as $single) {
                     ScheduleTerminalVisibility::create([
                         'route_id' => $req['route_id'],
@@ -254,7 +271,20 @@ class ScheduleController extends Controller
                         'added_by' => Auth::user()->id,
                     ]);
                 }
-                
+
+                ScheduleTerminalDiscount::where("schedule_id",$req['id'])->delete();
+                if($req['discount_id'] != "0")
+                {
+                    foreach ($request->discountTerminals??[] as $single) {
+                        ScheduleTerminalDiscount::create([
+                            'schedule_id' => $req['id'],
+                            'discount_id' => $req['discount_id'],
+                            'terminal_id' => $single,
+                            'company_id' => Auth::user()->company_id,
+                            'added_by' => Auth::user()->id,
+                        ]);
+                    }
+                }
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
                     "message" => Auth::user()->name." | updated schedule (".$req['name']." ".$req['id'].")",

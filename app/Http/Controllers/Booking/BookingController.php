@@ -752,7 +752,12 @@ class BookingController extends Controller
             ->select('id', 'route_id', 'bus_class_id', 'time', 'discount_id', 'surcharge_id')
             ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')
             ->first();
-        $scheduleDiscount = Discount::where('id', $schedule->discount_id)->where('is_active', 1)->first();
+        $scheduleDiscount = Discount::where('id', $schedule->discount_id)
+        ->where('is_active', 1)
+        ->whereHas("discount_terminals", function ($q) use ($request) {
+            $q->where("terminal_id", $request->dropTerminal);
+        })
+        ->first();
         $scheduleSurcharge = Surcharge::where('id', $schedule->surcharge_id)->where('is_active', 1)->first();
         $fareForAllClasses = FareTable::where('from_city_id', $request->departureCity)->where('to_city_id', $request->destinationCity)
             ->where('company_id', Auth::user()->company_id)

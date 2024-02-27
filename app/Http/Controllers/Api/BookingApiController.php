@@ -175,7 +175,12 @@ class BookingApiController extends Controller
                         $original_fare[$name] = (int)$fare; 
                         
                         // this is for discounted price
-                        $scheduleDiscount = Discount::where('id', $single->schedule->discount_id)->where('is_active', 1)->first();
+                        $scheduleDiscount = Discount::where('id', $single->schedule->discount_id)
+                        ->where('is_active', 1)
+                        ->whereHas("discount_terminals", function ($q) use ($terminalId) {
+                            $q->where("terminal_id", $terminalId);
+                        })
+                        ->first();
                         $scheduleSurcharge = Surcharge::where('id', $single->schedule->surcharge_id)->where('is_active', 1)->first();
                         $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $single->schedule->route_id])->where('start_date', '<=', date("Y-m-d"))
                         ->where('end_date', '>=', date("Y-m-d"))->first();
@@ -301,7 +306,12 @@ class BookingApiController extends Controller
                     ->select('id', 'route_id', 'bus_class_id', 'time', 'discount_id', 'surcharge_id')
                     ->with('bus_class:id,seat_map', 'route:id,name,online_seat_choices', 'route.fares:id,route_id,departure_city_id,destination_city_id')
                     ->first();
-                $scheduleDiscount = Discount::where('id', $schedule->discount_id)->where('is_active', 1)->first();
+                $scheduleDiscount = Discount::where('id', $schedule->discount_id)
+                ->where('is_active', 1)
+                ->whereHas("discount_terminals", function ($q) use ($terminalId) {
+                    $q->where("terminal_id", $terminalId);
+                })
+                ->first();
                 $scheduleSurcharge = Surcharge::where('id', $schedule->surcharge_id)->where('is_active', 1)->first();
                 $fareForAllClasses = FareTable::where('from_city_id', $request->departure_city_id)->where('to_city_id', $request->destination_city_id)
                     ->where('company_id', $companyId)
