@@ -348,4 +348,12 @@ const router = createRouter({
     routes,
 })
 
+router.beforeEach((to, from, next) => {
+    // Remove all opened modals before leaving the current route
+    $('.modal').remove();
+  
+    // Continue with the navigation
+    next();
+  });
+
 export default router

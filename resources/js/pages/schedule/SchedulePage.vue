@@ -445,6 +445,21 @@
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col-md-12 class form-group">
+                            <label for="route">Select Terminal For Discount </label>
+                            <button class="btn btn-success btn-sm m-1" @click="selectAllDiscountTerminals">Select All</button>
+                            <button class="btn btn-danger btn-sm " @click="deselectAllDiscountTerminals">Deselect All</button>
+                            <select
+                                class="form-control"
+                                id="terminal-discount" multiple
+                            >
+                                <option v-for="(terminal, i) in allTerminals" :value="terminal.id" :key="i">
+                                    {{ terminal.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <button
                                 class="btn btn-info back2 float-left"
@@ -620,6 +635,22 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-md-12 class form-group">
+                        <label for="route">Select Terminal For Discount </label>
+                        <button class="btn btn-success btn-sm m-1" @click="selectAllEditDiscountTerminals">Select All</button>
+                        <button class="btn btn-danger btn-sm " @click="deselectAllEditDiscountTerminals">Deselect All</button>
+                        <select
+                            class="form-control"
+                            id="edit-terminal-discount" multiple
+                            v-model="dataEdit.discountTerminals"
+                        >
+                            <option v-for="(terminal, i) in allTerminals" :value="terminal.id" :key="i">
+                                {{ terminal.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6 class form-group">
                         <label for="DiscountName">Routes <span class="text-danger ml-1">*</span></label>
                         <select
@@ -657,21 +688,21 @@
                     </div>
                 </div>
                 <div class="row">
-                        <div class="col-md-12 class form-group">
-                            <label for="route">Terminals </label>
-                            <button class="btn btn-success btn-sm m-1" @click="selectAllEditTerminals">Select All</button>
-                            <button class="btn btn-danger btn-sm " @click="deselectAllEditTerminals">Deselect All</button>
-                            <select
-                                class="form-control"
-                                id="editTerminal" multiple
-                                v-model="dataEdit.terminals"
-                            >
-                                <option v-for="(terminal, i) in allTerminals" :value="terminal.id" :key="i">
-                                    {{ terminal.name }}
-                                </option>
-                            </select>
-                        </div>
+                    <div class="col-md-12 class form-group">
+                        <label for="route">Terminal Visibilities </label>
+                        <button class="btn btn-success btn-sm m-1" @click="selectAllEditTerminals">Select All</button>
+                        <button class="btn btn-danger btn-sm " @click="deselectAllEditTerminals">Deselect All</button>
+                        <select
+                            class="form-control"
+                            id="editTerminal" multiple
+                            v-model="dataEdit.terminals"
+                        >
+                            <option v-for="(terminal, i) in allTerminals" :value="terminal.id" :key="i">
+                                {{ terminal.name }}
+                            </option>
+                        </select>
                     </div>
+                </div>
                 <template v-slot:button>
                     <button id="submitFormButton" class="btn btn-success" @click="updateSchedule"
                             :disabled="loading"> {{ loading ? 'Loading...' : 'Update Schedule' }}
@@ -760,11 +791,13 @@ export default {
                 busClass: 0,
                 fareClass: 0,
                 terminals: [],
+                discountTerminals: [],
             },
             dataEdit: {
                 schedules: [],
                 cities: [],
                 terminals: [],
+                discountTerminals: [],
             },
             dataEditTime: {
                 start_date: "",
@@ -792,13 +825,21 @@ export default {
     mounted() {
         setTimeout(() => {
             const terminal = $('#terminal');
+            const terminalDiscount = $('#terminal-discount');
             const editTerminal = $('#editTerminal');
+            const editTerminalDiscount = $('#edit-terminal-discount');
 
             // Initialize Select2
             terminal.select2({
                 closeOnSelect: false
             });
+            terminalDiscount.select2({
+                closeOnSelect: false
+            });
             editTerminal.select2({
+                closeOnSelect: false
+            });
+            editTerminalDiscount.select2({
                 closeOnSelect: false
             });
 
@@ -809,9 +850,17 @@ export default {
                 const selectedValues = $(this).val();
                 self.data.terminals = selectedValues;
             });
+            terminalDiscount.on('change', function() {
+                const selectedValues = $(this).val();
+                self.data.discountTerminals = selectedValues;
+            });
             editTerminal.on('change', function() {
                 const selectedValues = $(this).val();
                 self.dataEdit.terminals = selectedValues;
+            });
+            editTerminalDiscount.on('change', function() {
+                const selectedValues = $(this).val();
+                self.dataEdit.discountTerminals = selectedValues;
             });
         }, 1000);
     },
@@ -827,6 +876,26 @@ export default {
         deselectAllTerminals() {
             $("#terminal > option").prop("selected", false);
             $("#terminal").trigger("change");
+        },
+        
+        selectAllDiscountTerminals() {
+            $("#terminal-discount > option").prop("selected", true);
+            $("#terminal-discount").trigger("change"); 
+        },
+
+        deselectAllDiscountTerminals() {
+            $("#terminal-discount > option").prop("selected", false);
+            $("#terminal-discount").trigger("change");
+        },
+        
+        selectAllEditDiscountTerminals() {
+            $("#edit-terminal-discount > option").prop("selected", true);
+            $("#edit-terminal-discount").trigger("change"); 
+        },
+
+        deselectAllEditDiscountTerminals() {
+            $("#edit-terminal-discount > option").prop("selected", false);
+            $("#edit-terminal-discount").trigger("change");
         },
         
         selectAllEditTerminals() {
@@ -1286,8 +1355,12 @@ export default {
             if (resEditSchedule.status == 200) {
                 this.dataEdit.schedules = resEditSchedule.data.schedules;
                 this.dataEdit.terminals = resEditSchedule.data.visibilities;
+                this.dataEdit.discountTerminals = resEditSchedule.data.discountTerminals;
                 setTimeout(() => {
                     $("#editTerminal").select2({
+                        closeOnSelect: false
+                    });
+                    $("#edit-terminal-discount").select2({
                         closeOnSelect: false
                     });
                 }, 200);
