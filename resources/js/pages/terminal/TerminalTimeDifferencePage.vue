@@ -129,6 +129,7 @@ import {mapGetters} from "vuex";
 export default {
     name: "TerminalTimeDifference",
     created() {
+        $('.modal').remove();
         this.getCities();
     },
     components: {

@@ -264,6 +264,7 @@ export default {
         };
     },
     created() {
+        $('.modal').remove();
         this.fetchData();
         this.permissions = this.$store.state.permissions;
     },

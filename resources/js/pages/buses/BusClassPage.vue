@@ -724,6 +724,7 @@ export default {
         };
     },
     async created() {
+        $('.modal').remove();
         await this.fetchBussClasses();
 
         this.permissions = this.$store.state.permissions;

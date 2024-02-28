@@ -229,6 +229,7 @@ import vueMask from "vue-jquery-mask";
 export default {
     name: "FareTable",
     created() {
+        $('.modal').remove();
         this.getCitiesClasses();
     },
     components: {

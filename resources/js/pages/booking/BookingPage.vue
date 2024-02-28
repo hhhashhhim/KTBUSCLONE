@@ -1646,6 +1646,7 @@ export default {
         };
     },
     async created() {
+        $('.modal').remove();
         this.fetchAllSchedules();
         this.showBookingDiv = false;
         this.permissions = this.$store.state.permissions;

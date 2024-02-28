@@ -286,6 +286,7 @@ export default {
         };
     },
     async created() {
+        $('.modal').remove();
         await this.fetchDiscount();
 
         this.permissions = this.$store.state.permissions;

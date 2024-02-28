@@ -417,6 +417,7 @@ export default {
         };
     },
     created() {
+        $('.modal').remove();
         this.fetchCities();
         this.permissions = this.$store.state.permissions;
 

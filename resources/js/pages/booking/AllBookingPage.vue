@@ -267,7 +267,7 @@ export default {
         };
     },
     async created() {
-
+        $('.modal').remove();
         this.fetchRoutes();
         this.fetchTerminals();
         this.fetchBus();

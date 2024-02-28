@@ -141,6 +141,7 @@ export default {
         }
     },
     async created() {
+        $('.modal').remove();
         this.fetchHeadersData();
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {

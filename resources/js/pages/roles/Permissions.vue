@@ -170,6 +170,7 @@ export default {
         };
     },
     async created() {
+        $('.modal').remove();
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {
             window.addEventListener('keydown', this.enterKey);

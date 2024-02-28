@@ -351,6 +351,7 @@ export default {
         };
     },
     async created() {
+        $('.modal').remove();
         await this.fetchBuses()
 
         this.permissions = this.$store.state.permissions;

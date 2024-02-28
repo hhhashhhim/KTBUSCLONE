@@ -143,6 +143,7 @@ export default {
         }
     },
     async created() {
+        $('.modal').remove();
         await this.fetchData();
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {

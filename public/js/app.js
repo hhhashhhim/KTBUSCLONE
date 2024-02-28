@@ -26621,6 +26621,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
+
               _this.fetchFilters();
 
               currentRouteName = _this.$route.name;
@@ -26633,7 +26635,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 3:
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -26784,6 +26786,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -26802,7 +26805,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 $("#header_table").DataTable();
               }, 300);
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -27017,6 +27020,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
+
               _this.fetchHeadersData();
 
               currentRouteName = _this.$route.name;
@@ -27029,7 +27034,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 3:
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -27295,6 +27300,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
+
               _this.fetchFilters();
 
               _this.permissions = _this.$store.state.permissions;
@@ -27314,7 +27321,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
               }, 300);
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -27570,6 +27577,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
+
               _this.fetchFilters();
 
               _this.permissions = _this.$store.state.permissions;
@@ -27589,7 +27598,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
               }, 300);
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -27798,6 +27807,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
+
               _this.fetchHeadersData();
 
               currentRouteName = _this.$route.name;
@@ -27810,7 +27821,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 3:
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -27912,6 +27923,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
+
               _this.fetchDailySummaryReport();
 
               currentRouteName = _this.$route.name;
@@ -27924,7 +27937,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 3:
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -28091,6 +28104,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               return _this.fetchCategories();
 
             case 2:
+              $('.modal').remove();
               _this.permissions = _this.$store.state.permissions;
               currentRouteName = _this.$route.name;
 
@@ -28102,7 +28116,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -28808,6 +28822,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
+
               _this.fetchRoutes();
 
               _this.fetchTerminals();
@@ -28826,7 +28842,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 7:
+            case 8:
             case "end":
               return _context.stop();
           }
@@ -29215,6 +29231,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
+
               _this.fetchAllSchedules();
 
               _this.showBookingDiv = false;
@@ -29229,7 +29247,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -33887,10 +33905,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
+              $('.modal').remove();
+              _context.next = 3;
               return _this.fetchBussClasses();
 
-            case 2:
+            case 3:
               _this.permissions = _this.$store.state.permissions;
               currentRouteName = _this.$route.name;
 
@@ -33902,7 +33921,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -34867,10 +34886,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
+              $('.modal').remove();
+              _context.next = 3;
               return _this.fetchBuses();
 
-            case 2:
+            case 3:
               _this.permissions = _this.$store.state.permissions;
               currentRouteName = _this.$route.name;
 
@@ -34882,7 +34902,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -35233,10 +35253,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
+              $('.modal').remove();
+              _context.next = 3;
               return _this.fetchCities();
 
-            case 2:
+            case 3:
               _this.permissions = _this.$store.state.permissions;
               currentRouteName = _this.$route.name;
 
@@ -35248,7 +35269,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -36192,6 +36213,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
+
               _this.fetchCompany();
 
               $("input[type='search']").attr("autocomplete", "off");
@@ -36205,7 +36228,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 4:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -36750,10 +36773,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
+              $('.modal').remove();
+              _context.next = 3;
               return _this.fetchDiscount();
 
-            case 2:
+            case 3:
               _this.permissions = _this.$store.state.permissions;
               currentRouteName = _this.$route.name;
 
@@ -36765,7 +36789,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -37218,10 +37242,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
+              $('.modal').remove();
+              _context.next = 3;
               return _this.fetchCounterExpenses();
 
-            case 2:
+            case 3:
               _this.permissions = _this.$store.state.permissions;
               currentRouteName = _this.$route.name;
 
@@ -37233,7 +37258,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -37540,10 +37565,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
+              $('.modal').remove();
+              _context.next = 3;
               return _this.fetchData();
 
-            case 2:
+            case 3:
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -37554,7 +37580,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 4:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -37863,6 +37889,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -37887,7 +37914,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return parseFloat(a) + parseFloat(b);
               }, 0);
 
-            case 7:
+            case 8:
             case "end":
               return _context.stop();
           }
@@ -38207,10 +38234,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
+              $('.modal').remove();
+              _context.next = 3;
               return _this.fetchCounterExpenses();
 
-            case 2:
+            case 3:
               _this.permissions = _this.$store.state.permissions;
               currentRouteName = _this.$route.name;
 
@@ -38222,7 +38250,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -38561,6 +38589,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -38571,15 +38600,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _context.next = 4;
+              _context.next = 5;
               return _this.fetchFareClasses();
 
-            case 4:
+            case 5:
               // window.removeEventListener('keydown', this.enter);
               // window.removeEventListener('keydown', this.altM);
               _this.permissions = _this.$store.state.permissions;
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -38920,6 +38949,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "FareTable",
   created: function created() {
+    $('.modal').remove();
     this.getCitiesClasses();
   },
   components: {
@@ -39403,6 +39433,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -39413,10 +39444,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _context.next = 4;
+              _context.next = 5;
               return _this.fetchDepartments();
 
-            case 4:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -39780,6 +39811,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -39790,10 +39822,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _context.next = 4;
+              _context.next = 5;
               return _this.fetchDesignations();
 
-            case 4:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -40416,6 +40448,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -40426,13 +40459,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _context.next = 4;
+              _context.next = 5;
               return _this.fetchEmployees();
 
-            case 4:
+            case 5:
               _this.permissions = _this.$store.state.permissions;
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -41744,6 +41777,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -41756,7 +41790,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.fetchLeaves();
 
-            case 3:
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -42257,6 +42291,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -42271,7 +42306,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.permissions = _this.$store.state.permissions;
 
-            case 4:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -42816,6 +42851,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -42830,7 +42866,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.permissions = _this.$store.state.permissions;
 
-            case 4:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -43315,6 +43351,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     };
   },
   created: function created() {
+    $('.modal').remove();
     this.fetchData();
     this.permissions = this.$store.state.permissions;
   },
@@ -43694,6 +43731,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     };
   },
   created: function created() {
+    $('.modal').remove();
     this.fetchData();
     this.permissions = this.$store.state.permissions;
   },
@@ -44199,6 +44237,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -44209,13 +44248,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _context.next = 4;
+              _context.next = 5;
               return _this.fetchParts();
 
-            case 4:
+            case 5:
               _this.permissions = _this.$store.state.permissions;
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -44493,6 +44532,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     };
   },
   created: function created() {
+    $('.modal').remove();
     this.fetchData();
     this.permissions = this.$store.state.permissions;
   },
@@ -44800,6 +44840,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -44810,21 +44851,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _context.next = 4;
+              _context.next = 5;
               return _this.setData();
 
-            case 4:
-              _context.next = 6;
+            case 5:
+              _context.next = 7;
               return _this.fetchData();
 
-            case 6:
-              _context.next = 8;
+            case 7:
+              _context.next = 9;
               return _this.fetchFoods();
 
-            case 8:
+            case 9:
               _this.permissions = _this.$store.state.permissions;
 
-            case 9:
+            case 10:
             case "end":
               return _context.stop();
           }
@@ -45322,6 +45363,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -45332,17 +45374,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _context.next = 4;
+              _context.next = 5;
               return _this.setData();
 
-            case 4:
-              _context.next = 6;
+            case 5:
+              _context.next = 7;
               return _this.fetchData();
 
-            case 6:
+            case 7:
               _this.permissions = _this.$store.state.permissions;
 
-            case 7:
+            case 8:
             case "end":
               return _context.stop();
           }
@@ -45699,6 +45741,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -45709,16 +45752,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _context.next = 4;
+              _context.next = 5;
               return _this.fetchData();
 
-            case 4:
+            case 5:
               _this.permissions = _this.$store.state.permissions;
               setTimeout(function () {
                 $("#hotel_table").DataTable();
               }, 500);
 
-            case 6:
+            case 7:
             case "end":
               return _context.stop();
           }
@@ -46149,6 +46192,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     };
   },
   created: function created() {
+    $('.modal').remove();
     this.fetchData();
     this.permissions = this.$store.state.permissions;
   },
@@ -46736,6 +46780,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -46746,12 +46791,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _context.next = 4;
+              _context.next = 5;
               return _this.callApi("post", "role/get", {
                 id: _this.$route.params.id
               });
 
-            case 4:
+            case 5:
               res = _context.sent;
 
               if (res.status == 200) {
@@ -46761,7 +46806,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 console.log(res);
               }
 
-            case 6:
+            case 7:
             case "end":
               return _context.stop();
           }
@@ -46890,6 +46935,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -46900,13 +46946,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _context.next = 4;
+              _context.next = 5;
               return _this.fetchRoles();
 
-            case 4:
+            case 5:
               _this.permissions = _this.$store.state.permissions;
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -47241,6 +47287,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     };
   },
   created: function created() {
+    $('.modal').remove();
     this.fetchCities();
     this.permissions = this.$store.state.permissions;
   },
@@ -48000,6 +48047,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -48014,7 +48062,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.permissions = _this.$store.state.permissions;
 
-            case 4:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -48618,6 +48666,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -48632,7 +48681,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.permissions = _this.$store.state.permissions;
 
-            case 4:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -48914,6 +48963,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -48928,7 +48978,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.permissions = _this.$store.state.permissions;
 
-            case 4:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -49937,6 +49987,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -49951,7 +50002,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.permissions = _this.$store.state.permissions;
 
-            case 4:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -50180,6 +50231,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -50192,7 +50244,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.permissions = _this.$store.state.permissions;
 
-            case 3:
+            case 4:
             case "end":
               return _context.stop();
           }
@@ -50731,6 +50783,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -50741,13 +50794,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _context.next = 4;
+              _context.next = 5;
               return _this.fetchSurcharges();
 
-            case 4:
+            case 5:
               _this.permissions = _this.$store.state.permissions;
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -51241,6 +51294,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -51255,7 +51309,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.permissions = _this.$store.state.permissions;
 
-            case 4:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -51828,6 +51882,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -51848,7 +51903,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 $("#commission_table").DataTable();
               }, 300);
 
-            case 6:
+            case 7:
             case "end":
               return _context.stop();
           }
@@ -52182,6 +52237,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -52193,19 +52249,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               }
 
               $(".modal").click();
-              _context.next = 5;
+              _context.next = 6;
               return _this.fetchData();
 
-            case 5:
-              _context.next = 7;
+            case 6:
+              _context.next = 8;
               return _this.existingDiscounts();
 
-            case 7:
+            case 8:
               setTimeout(function () {
                 $("#discount_table").DataTable();
               }, 300);
 
-            case 8:
+            case 9:
             case "end":
               return _context.stop();
           }
@@ -52483,6 +52539,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "TerminalTimeDifference",
   created: function created() {
+    $('.modal').remove();
     this.getCities();
   },
   components: {
@@ -52781,6 +52838,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -52792,19 +52850,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               }
 
               $(".modal").click();
-              _context.next = 5;
+              _context.next = 6;
               return _this.fetchData();
 
-            case 5:
-              _context.next = 7;
+            case 6:
+              _context.next = 8;
               return _this.existingTimes();
 
-            case 7:
+            case 8:
               setTimeout(function () {
                 $("#discount_table").DataTable();
               }, 300);
 
-            case 8:
+            case 9:
             case "end":
               return _context.stop();
           }
@@ -53129,6 +53187,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              $('.modal').remove();
               currentRouteName = _this.$route.name;
 
               if (currentRouteName == 'booking-page') {
@@ -53139,13 +53198,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _context.next = 4;
+              _context.next = 5;
               return _this.fetchUsers();
 
-            case 4:
+            case 5:
               _this.permissions = _this.$store.state.permissions;
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -88808,12 +88867,6 @@ var router = (0,vue_router__WEBPACK_IMPORTED_MODULE_56__.createRouter)({
   history: (0,vue_router__WEBPACK_IMPORTED_MODULE_56__.createWebHistory)(),
   mode: history,
   routes: routes
-});
-router.beforeEach(function (to, from, next) {
-  // Remove all opened modals before leaving the current route
-  $('.modal').remove(); // Continue with the navigation
-
-  next();
 });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (router);
 

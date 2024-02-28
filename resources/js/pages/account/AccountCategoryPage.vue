@@ -213,7 +213,7 @@ export default {
     },
     async created() {
         await this.fetchCategories();
-
+        $('.modal').remove();
         this.permissions = this.$store.state.permissions;
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {

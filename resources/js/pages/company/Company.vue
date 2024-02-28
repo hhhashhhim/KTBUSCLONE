@@ -873,6 +873,7 @@ export default {
         };
     },
     async created() {
+        $('.modal').remove();
         this.fetchCompany();
 
         $("input[type='search']").attr("autocomplete", "off");

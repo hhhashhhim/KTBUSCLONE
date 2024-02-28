@@ -336,6 +336,7 @@ export default {
         };
     },
     created() {
+        $('.modal').remove();
         this.fetchData();
     },
     methods: {

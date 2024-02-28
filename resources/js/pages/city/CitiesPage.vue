@@ -157,6 +157,7 @@ export default {
         }
     },
     async created() {
+        $('.modal').remove();
         await this.fetchCities();
         this.permissions = this.$store.state.permissions;
         const currentRouteName = this.$route.name;

@@ -130,6 +130,7 @@ export default {
         }
     },
     async created(){
+        $('.modal').remove();
         const res = await this.callApi("post",'role',{name:this.data.name});
         if (res.status==200) {
             this.roles=res.data

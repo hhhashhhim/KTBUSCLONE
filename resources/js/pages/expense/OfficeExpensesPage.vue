@@ -162,6 +162,7 @@ export default {
         }
     },
     async created() {
+        $('.modal').remove();
         await this.fetchCounterExpenses();
         this.permissions = this.$store.state.permissions;
         const currentRouteName = this.$route.name;
