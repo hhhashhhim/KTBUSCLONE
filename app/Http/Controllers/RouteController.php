@@ -198,7 +198,8 @@ class RouteController extends Controller
                 ]);
                 // now we will delete all route detail and will insert new one
                 RouteFare::where("route_id",$request->id)->delete();
-
+                TerminalVisibility::where("route_id",$request->id)->delete();
+                
                 $used_cities = [];//key can't be same
                 foreach ($request->cityIds as $index => $city) {
                     $used_cities[] = $city;
@@ -222,7 +223,7 @@ class RouteController extends Controller
                                 }
                             }
                             
-                            TerminalVisibility::where("route_id",$request->id)->delete();
+                            
 
                             TerminalVisibility::create([
                                 'route_id' => $request->id,
