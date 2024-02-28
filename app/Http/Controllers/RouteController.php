@@ -273,6 +273,7 @@ class RouteController extends Controller
                                     'added_by' => Auth::user()->id,
                                     'schedule_id' => $schedule->id,
                                     'departure_id' => $detail->departure_city_id,
+                                    'bus_class_id' => $schedule->bus_class_id,
                                     'destination_id' => $detail->destination_city_id,
                                     'departure_time' => date('H:i', strtotime($departureTime)),
                                     'departure_date' => date('Y-m-d', strtotime($departureTime)),
