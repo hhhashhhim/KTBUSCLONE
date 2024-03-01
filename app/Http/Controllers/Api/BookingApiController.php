@@ -104,64 +104,74 @@ class BookingApiController extends Controller
                     'destination_city_id' => 'required',
                     'date' => 'required',
                 ]);
-            
+
                 // if validation fails
                 if ($validator->fails())
                 {
                     return new ValidationResource($validator->errors());
                 }
-                
+
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
                 // Data
                 $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
-                $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id','schedule.bus_class:id,name',"departure_city:id,name","destination_city:id,name")->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
-                
-                
-                $data->map(function($single,$key) use ($data,$companyId,$terminalId){
+
+
+
+                $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
+                ->whereHas('schedule', function($q){$q->where("hide",0);})
+                ->with("departure_city:id,name","destination_city:id,name")
+                ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id',"schedule.bus_class:id,seat_map")
+                ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])
+                ->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
+
+
+                $bookedTickets = Ticket::where(["company_id"=>$companyId])->whereIn("schedule_id",$data->pluck("schedule_id"))->whereIn("schedule_date",$data->pluck("schedule_date"))->get(["id","schedule_id","schedule_date"]);
+
+                $data->map(function($single,$key) use ($data,$companyId,$terminalId,$bookedTickets){
+                    // this is for if some schedule is drooped then it should not be throw
                     $scheduleDrop = DropSchedule::where(["schedule_date"=>$single->schedule_date,"schedule_id"=>$single->schedule_id])->first();
                     if($scheduleDrop)
                     {
                         unset($data[$key]);
                     }
+                    // this is subroute visibility to check that this terminal if allow to fetch of specific subroute schedule
                     $visibility =TerminalVisibility::where(["departure_city_id"=>$single->departure_id,"destination_city_id"=>$single->destination_id,"route_id"=>$single->schedule->route_id])->first();
                     if(isset($visibility) && $visibility->online_visibilty == 1)
                     {
                         unset($data[$key]);
                     }
-                    $seat_map = BusClass::find($single->schedule->bus_class_id);
-                    $counter = 0;
-                    $bus_class_id = [];
-                    foreach ($seat_map->seat_map as $i => $iValue) {
-                        foreach ($iValue as $j => $column) {
-                            if($column['reserved'])
-                            {
-                                $fare = FareTable::where([
-                                    'from_city_id'=> $single->departure_id,
-                                    'to_city_id'=> $single->destination_id,
-                                    'fare_class'=> $column['class'],
-                                    'company_id'=> $companyId,
-                                    ])
-                                    ->first()->fare;
 
-                                if($column['type'] == 0)
-                                {
-                                    $counter++;
-                                }
-                                
-                                $bus_class_id[] = $column['class'];
-                                
-                            }
-                        }
-                    }
-                    $bookedTickets = Ticket::where(["company_id"=>$companyId,"schedule_id"=>$single->schedule_id,"schedule_date"=>$single->schedule_date])->get()->count();
-                    $single->total_seats = $counter;
-                    $single->available_seats = $counter - $bookedTickets;
-                    $single->total_fare = (int)$fare;
-                    $single->final_fare = (int)$fare;
-                    
+
+
+                    $counterData = array_merge(...$single->schedule->bus_class->seat_map);
+                    $filteredSeats = array_filter($counterData, function ($seat) {
+                        return isset($seat["reserved"]) && $seat["reserved"] && isset($seat["type"]) && $seat["type"] === 0;
+                    });
+                    $count = array_reduce($filteredSeats, function ($carry, $seat) {
+                        return $carry + 1;
+                    }, 0);
+
+
+                    $classData = array_merge(...$single->schedule->bus_class->seat_map);
+                    $uniqueClasses = array_unique(array_map(function ($seat) {
+                        return isset($seat["class"]) ? $seat["class"] : null;
+                    }, $classData));
+                    $uniqueClasses = array_filter($uniqueClasses, function ($class) {
+                        return $class !== null;
+                    });
+                    $class_id = array_values($uniqueClasses);
+
+                    unset($single->schedule->bus_class);
+
+                    $booked = $bookedTickets->where("schedule_id",$single->schedule_id)->where("schedule_date",$single->schedule_date)->count();
+
+                    $single->total_seats = $count;
+                    $single->available_seats = $count - $booked;
+
+
                     // this loop get all fare classes from seat map and fetch original fare and discount fare
-                    foreach($bus_class_id as $value)
+                    foreach($class_id as $value)
                     {
                         // orginal fare
                         $name = FareClass::find($value)->name;
@@ -172,8 +182,8 @@ class BookingApiController extends Controller
                             'company_id'=> $companyId,
                             ])
                             ->first()->fare;
-                        $original_fare[$name] = (int)$fare; 
-                        
+                        $original_fare[$name] = (int)$fare;
+
                         // this is for discounted price
                         $scheduleDiscount = Discount::where('id', $single->schedule->discount_id)
                         ->where('is_active', 1)
@@ -184,7 +194,7 @@ class BookingApiController extends Controller
                         $scheduleSurcharge = Surcharge::where('id', $single->schedule->surcharge_id)->where('is_active', 1)->first();
                         $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $single->schedule->route_id])->where('start_date', '<=', date("Y-m-d"))
                         ->where('end_date', '>=', date("Y-m-d"))->first();
-                    
+
                         $editFare = $fare;
                         if ($scheduleDiscount) {
                             if ($scheduleDiscount->type == "percentage") {
@@ -216,15 +226,15 @@ class BookingApiController extends Controller
 
                     $single->total_fare = $original_fare;
                     $single->final_fare = $discounted_fare;
+
                     $single->departure_date_time = date("Y-m-d H:i:s", strtotime($single->departure_date . ' ' . $single->departure_time));
-                    $single->variation_time = $single->departure_time;
-                    
+
                 });
-                
+
                 $data = $data->where("departure_date_time",'>',date("Y-m-d H:i:s",strtotime(date("Y-m-d H:i:s")) + 5400))->sortBy("departure_date_time");
                 $arrayData = json_decode($data, true);
                 $data = collect(array_values($arrayData));
-                
+
                 // data found | not found
                 if($data->count() > 0)
                 {
@@ -234,7 +244,7 @@ class BookingApiController extends Controller
                 {
                     return new EmptyResource($data);
                 }
-                
+
             } catch (\Exception $e) {
                 return new BreakResource($e->getMessage());
         }

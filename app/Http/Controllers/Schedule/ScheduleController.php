@@ -48,7 +48,7 @@ class ScheduleController extends Controller
                 }
             })
             ->where(['company_id'=> Auth::user()->company_id,"hide"=>0])
-            ->orderBy('id')
+            ->orderBy('time')
             ->get();
 
         return $schedules;
