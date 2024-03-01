@@ -37,16 +37,7 @@ class BusController extends Controller
 
     public function storeBus(Request $request)
     {
-
-
-        $det = ScheduleDetail::join("schedules","schedules.id","schedule_details.schedule_id")->select("schedule_details.id","schedule_details.bus_class_id","schedules.bus_class_id as old")->get();
-        foreach($det as $single)
-        {
-            $single->update([
-                "bus_class_id" => $single->old
-            ]);
-        }
-        return 'helo';
+        
         // $data = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_date"=>"2024-02-25","schedule_id"=>330])->get();
         
         // foreach($data as $single)
