@@ -321,6 +321,11 @@
                                                     Seat Details
                                                 </button>
                                                 <button
+                                                        class="btn btn-outline-secondary btn-sm text-dark mr-2"
+                                                        @click="busClass()">
+                                                    Bus class
+                                                </button>
+                                                <button
                                                     v-if="checkForSubmenuButtons('drop-schedule') && hideDivButtonsDrop"
                                                     class="btn btn-secondary btn-sm text-dark mr-2"
                                                     @click="scheduleDrop()" :disabled="dropScheduleButton">
@@ -1266,6 +1271,43 @@
                 </div>
             </div>
         </div>
+        
+        <div class="modal fade" id="busClassModal" tabindex="-1" aria-labelledby="seatAllDetailsModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="">Bus Class Update</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                @click="closeModal()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <!--loop for number of seats-->
+
+                        <div class="card-body">
+                            <div class="row">
+                                <div class=" form-group col-md-12">
+                                    <label for="city_id">Bus Class<span class="text-danger ml-1">*</span></label>
+                                    <select class="form-control" v-model="busClassData.bus_class">
+                                        <option value="0">Select Bus Class</option>
+                                        <option v-for="(bus_class,i) in bus_classes" :key="i" :value="bus_class.id">
+                                            {{ bus_class.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke br">
+                        <button type="button" class="btn btn-primary" @click="updateBusClass()">
+                            Update
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Close Schedule -->
         <Add
@@ -1469,6 +1511,7 @@ export default {
                 placeholder: "03xx-xxxxxxx",
             },
             buses: [],
+            bus_classes: [],
             permissions: [],
             drivers: [],
             hosts: [],
@@ -1597,6 +1640,9 @@ export default {
             loadingRevertButton: false,
             depLoading: false,
             desLoading: false,
+            busClassData: {
+                bus_class : "0",
+            },
             addForm: {
                 date: new Date().toISOString().substr(0, 10),
                 type: "booked",
@@ -2051,6 +2097,52 @@ export default {
                 }, 200);
             }
         },
+        
+        async busClass() {
+            if (this.addForm.departureCity == 0) {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Select Departure City First",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.addForm.destinationCity == 0) {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Select Destination City First",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.addForm.date == "" || typeof this.addForm.date == 'undefined') {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Select Date First ",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.addForm.schedule == 0) {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please Select Departure Time First ",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+
+            const resData = await this.callApi("post", "booking/getBusClasses", {
+                scheduleId: this.addForm.schedule,
+                date: this.addForm.date,
+                departureCity: this.addForm.departureCity,
+                destinationCity: this.addForm.destinationCity,
+            });
+            if (resData.status == 200) {
+                this.bus_classes = resData.data.bus_classes;
+                $('#busClassModal').modal('show');
+            }
+        },
 
         async closeSchedule() {
             this.validationErrors = [];
@@ -2191,6 +2283,63 @@ export default {
                 this.dataForClose.description = "";
                 this.closingData();
                 setTimeout(() => this.closeModal(), 1500);
+            } else {
+                if (res.status == 422) {
+                    this.loading = false;
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " +
+                                element +
+                                "\n"
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
+                    }
+                }
+            }
+        },
+        async updateBusClass() {
+            this.validationErrors = [];
+            if (this.busClassData.bus_class == 0)
+            {
+                return swal({
+                    title: "Required",
+                    text: "Bus Class is required",
+                    icon: 'error',
+                    timer: 2000
+                });
+            }
+          
+            const res = await this.callApi("post", "booking/busclass/update", {
+                    id: this.addForm.schedule,
+                    date: this.addForm.date,
+                    departureCity: this.addForm.departureCity,
+                    destinationCity: this.addForm.destinationCity,
+                    dropTerminal: this.addForm.terminalId,
+                    departure_time: this.addForm.departure_time,
+                    bus_class: this.busClassData.bus_class,
+                });
+            if (res.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.fetchScheduleData();
+                this.closeModal();
+                
+
+                
             } else {
                 if (res.status == 422) {
                     this.loading = false;

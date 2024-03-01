@@ -675,6 +675,7 @@
                             class="form-control"
                             id="busClassEdit"
                             v-model="dataEdit.schedules.bus_class_id"
+                            disabled
                         >
                             <option value="0" selected>Select Bus Class</option>
                             <option
