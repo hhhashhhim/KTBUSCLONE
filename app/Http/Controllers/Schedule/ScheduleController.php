@@ -162,7 +162,6 @@ class ScheduleController extends Controller
                             'schedule_id' => $schedule->id,
                             'bus_class_id' => $request->busClass,
                             'departure_id' => $detail->departure_city_id,
-                            'bus_class_id' => $schedule->bus_class_id,
                             'destination_id' => $detail->destination_city_id,
                             'departure_time' => date('H:i', strtotime($departureTime)),
                             'departure_date' => date('Y-m-d', strtotime($departureTime)),
@@ -376,7 +375,7 @@ class ScheduleController extends Controller
                 $lastEndDate = date("Y-m-d", strtotime($schedule->end_date) + 86400);
                 
                 $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
-                
+                $scheduleDetail = ScheduleDetail::where(["schedule_id"=>$schedule->id,"schedule_date"=>$schedule->end_date])->first();
                 // $days = $this->getDays($lastEndDate, $schedule->end_date);
                 $end_date = $schedule->end_date;
                 for ($i = 0; $i < $request->extended_days; $i++) {
@@ -400,7 +399,7 @@ class ScheduleController extends Controller
                             'company_id' => Auth::user()->company_id,
                             'added_by' => Auth::user()->id,
                             'schedule_id' => $schedule->id,
-                            'bus_class_id' => $schedule->bus_class_id,
+                            'bus_class_id' => $scheduleDetail->bus_class_id,
                             'departure_id' => $detail->departure_city_id,
                             'destination_id' => $detail->destination_city_id,
                             'departure_time' => date('H:i', strtotime($departureTime)),
@@ -438,7 +437,7 @@ class ScheduleController extends Controller
 
     public function allBuses(Request $request)
     {
-        $busClassId = Schedule::where(['company_id' => Auth::user()->company_id, 'id' => $request['id']])->first(['bus_class_id'])->bus_class_id;
+        $busClassId = ScheduleDetail::where(['company_id' => Auth::user()->company_id, 'schedule_id' => $request['id']])->first(['bus_class_id'])->bus_class_id;
         return Bus::where('company_id', Auth::user()->company_id)->where('fare_class_id', $busClassId)->get(['id', 'bus_number']);
     }
 

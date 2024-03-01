@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Models\City;
+use App\Models\Bus\BusClass;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -35,6 +36,9 @@ class ScheduleDetail extends Model
     }
     public function ticket(){
         return $this->hasMany( Ticket::class,'id','schedule_details_id');
+    }
+    public function bus_class(){
+        return $this->hasOne( BusClass::class,'id','bus_class_id');
     }
 
 

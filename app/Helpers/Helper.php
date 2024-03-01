@@ -236,7 +236,7 @@ if (!function_exists('updateAdvancedSeat')) {
             if($request->destinationCity)
             {
             // checking partial
-                $schedule = Schedule::where('id', $customer_id->schedule_id)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                $schedule = Schedule::where('id', $customer_id->schedule_id)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                 $departure_city_id = $schedule->route->fares->first()->departure_city_id;
                 $destination_city_id = $schedule->route->fares->last()->destination_city_id;
                 $isPartial = 0;
@@ -326,7 +326,7 @@ if (!function_exists('updateAdvancedSeatApi')) {
             if($request->destinationCity)
             {
             // checking partial
-                $schedule = Schedule::where('id', $customer_id->schedule_id)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                $schedule = Schedule::where('id', $customer_id->schedule_id)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                 $departure_city_id = $schedule->route->fares->first()->departure_city_id;
                 $destination_city_id = $schedule->route->fares->last()->destination_city_id;
                 $isPartial = 0;

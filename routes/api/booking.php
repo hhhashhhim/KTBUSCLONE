@@ -33,6 +33,8 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
     Route::post('/elt', [BookingController::class, 'bookingElt']);
     Route::post('/getPassenger', [BookingController::class, 'getPassengersList']);
     Route::post('/getClosingData', [BookingController::class, 'getClosingData']);
+    Route::post('/getBusClasses', [BookingController::class, 'getBusClasses']);
+    Route::post('/busclass/update', [BookingController::class, 'updateBusClass']);
     Route::post('/dropSchedule', [BookingController::class, 'dropSchedule']);
     Route::post('/revertDropSchedule', [BookingController::class, 'revertDropSchedule']);
     Route::post('/fare_class', [BookingController::class, 'getFareClass']);

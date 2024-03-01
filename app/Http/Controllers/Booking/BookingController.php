@@ -11,6 +11,7 @@ use App\Models\Booking\TicketIsPartial;
 use App\Models\Booking\TicketReschedule;
 use App\Models\Booking\TicketsOverIssue;
 use App\Models\Bus\Bus;
+use App\Models\Bus\BusClass;
 use App\Models\City;
 use App\Models\Discount\Discount;
 use App\Models\LoyaltyCard\CardAssign;
@@ -91,7 +92,7 @@ class BookingController extends Controller
                 ->where('company_id', Auth::user()->company_id)
                 ->where('departure_time', date("H:i:s",strtotime($request->departure_time)))
                 ->first();
-            $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+            $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
             
             $invoice = Invoice::create([
@@ -317,7 +318,7 @@ class BookingController extends Controller
                     'schedule_id' => $item['rescheduleSchedule'],
                     'departure_time' =>  date("H:i:s",strtotime($item['departure_time'])),
                 ])->first();
-                $schedule = Schedule::where('id', $ticket['schedule_id'])->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                $schedule = Schedule::where('id', $ticket['schedule_id'])->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                 
                 $invoice = Invoice::create([
                     "schedule_id" => $schedule->id,
@@ -734,23 +735,23 @@ class BookingController extends Controller
             echo "Error";
             return [];
         }
-        $uniqueDate = ScheduleDetail::where([
+        $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->id,
             'departure_date' => $request->date,
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
             'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
-        ])->first(['schedule_date']);
+        ])->first();
         // Getting Already Booked Tickets
         $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy' ,'updated_name')
             ->where('company_id', Auth::user()->company_id)->where('schedule_id', $request->id)
-            ->whereDate('schedule_date', $uniqueDate->schedule_date)->get();
+            ->whereDate('schedule_date', $scheduleDetail->schedule_date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
         $schedule = Schedule::where('id', $request->id)
             ->where('company_id', Auth::user()->company_id)
             ->select('id', 'route_id', 'bus_class_id', 'time', 'discount_id', 'surcharge_id')
-            ->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')
+            ->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')
             ->first();
         $scheduleDiscount = Discount::where('id', $schedule->discount_id)
         ->where('is_active', 1)
@@ -779,7 +780,7 @@ class BookingController extends Controller
         ->where('end_date', '>=', date("Y-m-d"))->first();
 
         // Looping Through the seat of the bus
-        $seatMap = $schedule->bus_class->seat_map;
+        $seatMap = $scheduleDetail->bus_class->seat_map;
         foreach ($seatMap as $i => $iValue) {
             foreach ($iValue as $j => $column) {
                 // adding fare to each seat
@@ -1080,6 +1081,39 @@ class BookingController extends Controller
             "infoData" => $infoData,
         ];
         return $data;
+    }
+    
+    public
+    function getBusClasses(Request $request)
+    {
+        $bus_classes =  BusClass::with('addedBy')->orderBy('id')->where(['company_id'=> Auth::user()->company_id,"hide" => 0])->get();
+    
+        $data = [
+            "bus_classes" => $bus_classes,
+        ];
+        return $data;
+    }
+    
+    function updateBusClass(Request $request)
+    {
+        try {
+                $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
+                    'company_id' => Auth::user()->company_id,
+                    'schedule_id' => $request->id,
+                    'departure_date' => $request->date,
+                    'departure_id' => $request->departureCity,
+                    'destination_id' => $request->destinationCity,
+                    'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
+                ])->first();
+                
+                ScheduleDetail::where(['company_id'=> Auth::user()->company_id,"schedule_id" => $scheduleDetail->schedule_id,"schedule_date"=>$scheduleDetail->schedule_date])->update([
+                    "bus_class_id" => $request->bus_class
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public

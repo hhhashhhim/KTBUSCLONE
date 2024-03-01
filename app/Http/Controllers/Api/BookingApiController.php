@@ -121,7 +121,7 @@ class BookingApiController extends Controller
                 $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
                 ->whereHas('schedule', function($q){$q->where("hide",0);})
                 ->with("departure_city:id,name","destination_city:id,name")
-                ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id',"schedule.bus_class:id,seat_map")
+                ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id',"bus_class:id,seat_map")
                 ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])
                 ->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
 
@@ -144,7 +144,7 @@ class BookingApiController extends Controller
 
 
 
-                    $counterData = array_merge(...$single->schedule->bus_class->seat_map);
+                    $counterData = array_merge(...$single->bus_class->seat_map);
                     $filteredSeats = array_filter($counterData, function ($seat) {
                         return isset($seat["reserved"]) && $seat["reserved"] && isset($seat["type"]) && $seat["type"] === 0;
                     });
@@ -153,7 +153,7 @@ class BookingApiController extends Controller
                     }, 0);
 
 
-                    $classData = array_merge(...$single->schedule->bus_class->seat_map);
+                    $classData = array_merge(...$single->bus_class->seat_map);
                     $uniqueClasses = array_unique(array_map(function ($seat) {
                         return isset($seat["class"]) ? $seat["class"] : null;
                     }, $classData));
@@ -298,23 +298,23 @@ class BookingApiController extends Controller
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
                 
-                $uniqueDate = ScheduleDetail::where([
+                $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
                     'company_id' => $companyId,
                     'schedule_id' => $request->schedule_id,
                     'departure_date' => $request->date,
                     'departure_id' => $request->departure_city_id,
                     'destination_id' => $request->destination_city_id,
                     'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
-                ])->first(['schedule_date']);
+                ])->first();
                 // Getting Already Booked Tickets
                 $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
                     ->where('company_id', $companyId)->where('schedule_id', $request->schedule_id)
-                    ->whereDate('schedule_date', $uniqueDate->schedule_date)->get();
+                    ->whereDate('schedule_date', $scheduleDetail->schedule_date)->get();
                 $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
                 $schedule = Schedule::where('id', $request->schedule_id)
                     ->where('company_id', $companyId)
                     ->select('id', 'route_id', 'bus_class_id', 'time', 'discount_id', 'surcharge_id')
-                    ->with('bus_class:id,seat_map', 'route:id,name,online_seat_choices', 'route.fares:id,route_id,departure_city_id,destination_city_id')
+                    ->with('route:id,name,online_seat_choices', 'route.fares:id,route_id,departure_city_id,destination_city_id')
                     ->first();
                 $scheduleDiscount = Discount::where('id', $schedule->discount_id)
                 ->where('is_active', 1)
@@ -342,7 +342,7 @@ class BookingApiController extends Controller
                 $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $schedule->route_id])->first();
                 $seatChoices =  $schedule->route->online_seat_choices ? explode(",",$schedule->route->online_seat_choices) : null;
                 // Looping Through the seat of the bus
-                $seatMap = $schedule->bus_class->seat_map;
+                $seatMap = $scheduleDetail->bus_class->seat_map;
                 foreach ($seatMap as $i => &$iValue) {
                     foreach ($iValue as $j => &$column) {
                         // adding fare to each seat
@@ -638,7 +638,7 @@ class BookingApiController extends Controller
 
                     // checking booking available with these seat selection
                     // check seat duplication 
-                    $schedule = Schedule::where('id', $request->schedule_id)->where('company_id', $companyId)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('bus_class:id,seat_map', 'route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                    $schedule = Schedule::where('id', $request->schedule_id)->where('company_id', $companyId)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                     $lastFare = $schedule->route->fares->last();
                     $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
                     array_push($allFaresOfRoute, $lastFare->destination_city_id);
