@@ -65,9 +65,9 @@ class TicketingApiController extends Controller
                 $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
                 ->whereHas('schedule', function($q){$q->where("hide",0);})
                 ->with("departure_city:id,name","destination_city:id,name")
-                ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id',"bus_class:id,seat_map")
-                ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])
-                ->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date"]);
+                ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id',"schedule.bus_class:id,name,seat_map")
+                ->where(['departure_id' => $depId, 'destination_id' => $desId, 'departure_date' => $request->date,'company_id' => $companyId])
+                ->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date","bus_class_id"]);
 
 
                 $bookedTickets = Ticket::where(["company_id"=>$companyId])->whereIn("schedule_id",$data->pluck("schedule_id"))->whereIn("schedule_date",$data->pluck("schedule_date"))->get(["id","schedule_id","schedule_date"]);
@@ -104,7 +104,7 @@ class TicketingApiController extends Controller
                     });
                     $class_id = array_values($uniqueClasses);
 
-                    unset($single->schedule->bus_class);
+                    // unset($single->schedule->bus_class);
 
                     $booked = $bookedTickets->where("schedule_id",$single->schedule_id)->where("schedule_date",$single->schedule_date)->count();
 
