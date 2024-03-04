@@ -120,8 +120,8 @@ class BookingApiController extends Controller
 
                 $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
                 ->whereHas('schedule', function($q){$q->where("hide",0);})
-                ->with("departure_city:id,name","destination_city:id,name")
-                ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id',"schedule.bus_class:id,name,seat_map")
+                ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name,seat_map")
+                ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id')
                 ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])
                 ->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date","bus_class_id"]);
 
@@ -144,7 +144,7 @@ class BookingApiController extends Controller
 
 
 
-                    $counterData = array_merge(...$single->schedule->bus_class->seat_map);
+                    $counterData = array_merge(...$single->bus_class->seat_map);
                     $filteredSeats = array_filter($counterData, function ($seat) {
                         return isset($seat["reserved"]) && $seat["reserved"] && isset($seat["type"]) && $seat["type"] === 0;
                     });
@@ -153,7 +153,7 @@ class BookingApiController extends Controller
                     }, 0);
 
 
-                    $classData = array_merge(...$single->schedule->bus_class->seat_map);
+                    $classData = array_merge(...$single->bus_class->seat_map);
                     $uniqueClasses = array_unique(array_map(function ($seat) {
                         return isset($seat["class"]) ? $seat["class"] : null;
                     }, $classData));
@@ -162,7 +162,7 @@ class BookingApiController extends Controller
                     });
                     $class_id = array_values($uniqueClasses);
 
-                    // unset($single->schedule->bus_class);
+                    unset($single->bus_class->seat_map);
 
                     $booked = $bookedTickets->where("schedule_id",$single->schedule_id)->where("schedule_date",$single->schedule_date)->count();
 
