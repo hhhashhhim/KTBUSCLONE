@@ -320,7 +320,7 @@
                                                         @click="seatDetails()">
                                                     Seat Details
                                                 </button>
-                                                <button
+                                                <button v-if="checkForSubmenuButtons('bus-class')"
                                                         class="btn btn-outline-secondary btn-sm text-dark mr-2"
                                                         @click="busClass()">
                                                     Bus class

@@ -365,6 +365,10 @@
                         "allow": true
                     },
                     {
+                        "name": "bus-class",
+                        "allow": true
+                    },
+                    {
                         "name": "drop-schedule",
                         "allow": true
                     },

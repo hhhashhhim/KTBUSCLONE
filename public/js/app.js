@@ -36079,6 +36079,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             name: "seat-details",
             allow: true
           }, {
+            name: "bus-class",
+            allow: true
+          }, {
             name: "drop-schedule",
             allow: true
           }, {
@@ -62406,13 +62409,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[33] || (_cache[33] = function ($event) {
       return $options.seatDetails();
     })
-  }, " Seat Details ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, " Seat Details ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('bus-class') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 2,
     "class": "btn btn-outline-secondary btn-sm text-dark mr-2",
     onClick: _cache[34] || (_cache[34] = function ($event) {
       return $options.busClass();
     })
-  }, " Bus class "), _ctx.checkForSubmenuButtons('drop-schedule') && $data.hideDivButtonsDrop ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-    key: 2,
+  }, " Bus class ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('drop-schedule') && $data.hideDivButtonsDrop ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 3,
     "class": "btn btn-secondary btn-sm text-dark mr-2",
     onClick: _cache[35] || (_cache[35] = function ($event) {
       return $options.scheduleDrop();
