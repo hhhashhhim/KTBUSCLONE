@@ -287,6 +287,7 @@ class BookingApiController extends Controller
                     'destination_city_id' => 'required',
                     'date' => 'required',
                     'schedule_id' => 'required',
+                    'departure_time' => 'required',
                 ]);
             
                 // if validation fails
@@ -570,6 +571,7 @@ class BookingApiController extends Controller
                     'customer_cnic' => 'required',
                     'contact' => 'required',
                     'schedule_id' => 'required',
+                    'departure_time' => 'required',
                 ]);
 
                 
@@ -620,7 +622,7 @@ class BookingApiController extends Controller
                     ->where('schedule_id', $request->schedule_id)
                     ->where('departure_date', $request->date)
                     ->where('company_id', $companyId)
-                    ->where('departure_time', date("H:i:s",strtotime($request->departure_time)),)
+                    ->where('departure_time', date("H:i:s",strtotime($request->departure_time)))
                     ->first();
                 $existingTicket = Ticket::where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
                 
