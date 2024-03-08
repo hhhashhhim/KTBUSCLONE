@@ -107,6 +107,13 @@ class BookingController extends Controller
 
             if (isset($request->flag) && $request->flag == 1) {
                 $allTicket = updateAdvancedSeat($request, $invoice);
+                
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | update ticket from advance to confirm | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->alreadyBookedId)." --- ".$request->totalFare,
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
             } else {
                 if (count($request->selectedSeats) == 0) {
                     return response()->json(["errors" => ["Error" => ["Please refresh your seat map you entered some wrong/duplicate entry"]]], 422);
@@ -274,13 +281,13 @@ class BookingController extends Controller
                     }
                     $allTicket[] = $ticket->id;
                 }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | stored ticket ($request->type) | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->selectedSeats)." --- ".json_encode($request->selectedSeatsFare),
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
             }
-            ActivityLog::create([
-                "activity_by" => Auth::user()->id,
-                "message" => Auth::user()->name." | stored ticket ($request->type) | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->selectedSeats),
-                "requested_host" => $request->ip(),
-                "company_id" => Auth::user()->company_id
-            ]);
             DB::commit();
             return [
                 'ids' => implode('-', $allTicket),

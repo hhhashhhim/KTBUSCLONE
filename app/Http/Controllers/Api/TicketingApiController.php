@@ -37,23 +37,23 @@ use Exception;
 
 class TicketingApiController extends Controller
 {
-    
+
     public function availableSchedules(Request $request)
     {
         try {
-            
+
                 $validator = Validator::make($request->all(), [
                     'departure_city_id' => 'required',
                     'destination_city_id' => 'required',
                     'date' => 'required',
                 ]);
-            
+
                 // if validation fails
                 if ($validator->fails())
                 {
                     return new ValidationResource($validator->errors());
                 }
-                
+
                 $depId = ($request->departure_city_id == 98) ? 1 : (($request->departure_city_id == 36) ? 3 : 0);
                 $desId = ($request->destination_city_id == 98) ? 1 : (($request->destination_city_id == 36) ? 3 : 0);
 
@@ -61,7 +61,7 @@ class TicketingApiController extends Controller
                 $terminalId = Auth::user()->terminal_id;
                 // Data
                 $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
-                
+
                 $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
                 ->whereHas('schedule', function($q){$q->where("hide",0);})
                 ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name,seat_map")
@@ -71,8 +71,8 @@ class TicketingApiController extends Controller
 
 
                 $bookedTickets = Ticket::where(["company_id"=>$companyId])->whereIn("schedule_id",$data->pluck("schedule_id"))->whereIn("schedule_date",$data->pluck("schedule_date"))->get(["id","schedule_id","schedule_date"]);
-                
-                
+
+
                 $data->map(function($single,$key) use ($data,$companyId,$terminalId,$bookedTickets){
                     $scheduleDrop = DropSchedule::where(["schedule_date"=>$single->schedule_date,"schedule_id"=>$single->schedule_id])->first();
                     if($scheduleDrop)
@@ -86,7 +86,7 @@ class TicketingApiController extends Controller
                     }
 
 
-                    $counterData = array_merge(...$single->bus_class->seat_map);
+                    $counterData = array_merge(...$single->schedule->bus_class->seat_map);
                     $filteredSeats = array_filter($counterData, function ($seat) {
                         return isset($seat["reserved"]) && $seat["reserved"] && isset($seat["type"]) && $seat["type"] === 0;
                     });
@@ -95,7 +95,7 @@ class TicketingApiController extends Controller
                     }, 0);
 
 
-                    $classData = array_merge(...$single->bus_class->seat_map);
+                    $classData = array_merge(...$single->schedule->bus_class->seat_map);
                     $uniqueClasses = array_unique(array_map(function ($seat) {
                         return isset($seat["class"]) ? $seat["class"] : null;
                     }, $classData));
@@ -122,8 +122,8 @@ class TicketingApiController extends Controller
                             'company_id'=> $companyId,
                             ])
                             ->first()->fare;
-                        $original_fare[$name] = (int)$fare; 
-                        
+                        $original_fare[$name] = (int)$fare;
+
                         // this is for discounted price
                         $scheduleDiscount = Discount::where('id', $single->schedule->discount_id)
                         ->where('is_active', 1)
@@ -134,7 +134,7 @@ class TicketingApiController extends Controller
                         $scheduleSurcharge = Surcharge::where('id', $single->schedule->surcharge_id)->where('is_active', 1)->first();
                         $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $single->schedule->route_id])->where('start_date', '<=', date("Y-m-d"))
                         ->where('end_date', '>=', date("Y-m-d"))->first();
-                    
+
                         $editFare = $fare;
                         if ($scheduleDiscount) {
                             if ($scheduleDiscount->type == "percentage") {
@@ -168,14 +168,14 @@ class TicketingApiController extends Controller
                     $single->final_fare = $discounted_fare;
                     $single->departure_date_time = date("Y-m-d H:i:s", strtotime($single->departure_date . ' ' . $single->departure_time));
                     $single->departure_time = date("h:i A", strtotime($single->departure_time));
-                  
-                    
+
+
                 });
-                
+
                 $data = $data->where("departure_date_time",'>',date("Y-m-d H:i:s",strtotime(date("Y-m-d H:i:s")) + 5400))->sortBy("departure_date_time");
                 $arrayData = json_decode($data, true);
                 $data = collect(array_values($arrayData));
-                
+
                 // data found | not found
                 if($data->count() > 0)
                 {
@@ -185,11 +185,11 @@ class TicketingApiController extends Controller
                 {
                     return new EmptyResource($data);
                 }
-                
+
             } catch (\Exception $e) {
                 return new BreakResource($e->getMessage());
         }
-        
+
     }
 
     public function previewSchedule(Request $request)
@@ -219,7 +219,7 @@ class TicketingApiController extends Controller
                             $seats[] = (int)$item;
                         }
                     }
-                    
+
                 }
 
                 $validator = Validator::make($request->all(), [
@@ -229,16 +229,16 @@ class TicketingApiController extends Controller
                     'schedule_id' => 'required',
                     'departure_time' => 'required',
                 ]);
-            
+
                 // if validation fails
                 if ($validator->fails())
                 {
                     return new ValidationResource($validator->errors());
                 }
-                
+
                 $depId = ($request->departure_city_id == 98) ? 1 : (($request->departure_city_id == 36) ? 3 : 0);
                 $desId = ($request->destination_city_id == 98) ? 1 : (($request->destination_city_id == 36) ? 3 : 0);
-                
+
                 if($depId == 0 || $desId == 0)
                 {
                     $error = ["Please Enter Valid City Id"];
@@ -247,7 +247,7 @@ class TicketingApiController extends Controller
 
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
-                
+
                 $scheduleDetail = ScheduleDetail::where([
                     'company_id' => $companyId,
                     'schedule_id' => $request->schedule_id,
@@ -301,7 +301,7 @@ class TicketingApiController extends Controller
                             unset($seatMap[$i][$j]);
                         }
                         if ($column['reserved']) {
-                            
+
                             $data = $fareForAllClasses->where('fare_class', $column['class'])->first();
                             $seatMap[$i][$j]['fare'] = (int)$data->fare;
                             if ($scheduleDiscount) {
@@ -381,19 +381,19 @@ class TicketingApiController extends Controller
                                     $seatMap[$i][$j]['destination_city_name'] = $tickets[$singlePartial]['destination_city']['name'];
                                     $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
                                     $seatMap[$i][$j]['fare'] = 0;
-        
+
                                     $before = (array_search($depId, $allFaresOfRoute, false) < array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
                                         array_search($depId, $allFaresOfRoute, false) < array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false) &&
                                         array_search($desId, $allFaresOfRoute, false) <= array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
                                         array_search($desId, $allFaresOfRoute, false) < array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false));
-        
+
                                     // Condition for validation that departure city and destination city in the request should be "After" the partial seat's targeted cities
                                     $after = (array_search($depId, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
                                         array_search($depId, $allFaresOfRoute, false) >= array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false) &&
                                         array_search($desId, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
                                         array_search($desId, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false)
                                     );
-        
+
                                     if ($before || $after) {
                                         // removing partial tag for that seats which fulfill the conditions
                                         unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
@@ -450,7 +450,7 @@ class TicketingApiController extends Controller
                 $data = $schedule->bus_class;
 
 
-                
+
                 // data found | not found
                 if($data->count() > 0)
                 {
@@ -460,7 +460,7 @@ class TicketingApiController extends Controller
                 {
                     return new EmptyResource($data);
                 }
-                
+
             } catch (\Exception $e) {
                 return new BreakResource($e->getMessage());
         }
@@ -473,7 +473,7 @@ class TicketingApiController extends Controller
                 $terminalId = Auth::user()->terminal_id;
 
                 // for reserved to confirm
-                if (isset($request->flag) && $request->flag == 1) 
+                if (isset($request->flag) && $request->flag == 1)
                 {
                     $validator = Validator::make($request->all(), [
                         'invoice_id' => 'required|integer',
@@ -497,14 +497,14 @@ class TicketingApiController extends Controller
                             "company_id" => Auth::user()->company_id
                         ]);
                         return new CreatedResource(["invoice_id"=>$request->invoice_id]);
-                       
+
                     }
                     else
                     {
                         $error = ["your seat combinations are not reserved for confirm booking"];
                         return new ConflictResource($error);
                     }
-                } 
+                }
 
                 // for new
                 $validator = Validator::make($request->all(), [
@@ -525,7 +525,7 @@ class TicketingApiController extends Controller
 
                 $depId = ($request->departure_city_id == 98) ? 1 : (($request->departure_city_id == 36) ? 3 : 0);
                 $desId = ($request->destination_city_id == 98) ? 1 : (($request->destination_city_id == 36) ? 3 : 0);
-                
+
                 if($request->book_type != "booked" && $request->book_type != "advance booking")
                 {
                     $error = ["Please Enter Type booked/advance booking"];
@@ -537,7 +537,7 @@ class TicketingApiController extends Controller
                     $error = ["Please Enter Valid City Id"];
                     return new ConflictResource($error);
                 }
-                
+
                 // if validation fails
                 if ($validator->fails())
                 {
@@ -567,11 +567,11 @@ class TicketingApiController extends Controller
                             $seats[] = (int)$item;
                         }
                     }
-                    
+
                 }
                 // Data
                 DB::beginTransaction();
-                
+
                 // this is for get actual schedule date
                 $detail = ScheduleDetail::where("departure_id", $depId)
                     ->where("destination_id", $desId)
@@ -581,7 +581,7 @@ class TicketingApiController extends Controller
                     ->where('company_id', $companyId)
                     ->first();
                 $existingTicket = Ticket::where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
-                
+
                 $allTicket = [];
                 // if (isset($request->flag) && $request->flag == 1) {
                 //     // checking only reserved seats will go through this process
@@ -700,7 +700,7 @@ class TicketingApiController extends Controller
                             'points_usage' => 0,
                         ]);
                         if ($isPartial == 1) {
-                            
+
                             TicketIsPartial::create([
                                 'company_id' => $companyId,
                                 'departure_city_id' => $ticket->departure_city_id,
@@ -745,9 +745,9 @@ class TicketingApiController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
-                
+
                 return new CreatedResource(["invoice_id"=>$invoice->id]);
-                
+
             } catch (\Exception $e) {
                 return new BreakResource($e->getMessage());
         }
