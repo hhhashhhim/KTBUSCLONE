@@ -227,7 +227,7 @@ class TicketingApiController extends Controller
                     'destination_city_id' => 'required',
                     'date' => 'required',
                     'schedule_id' => 'required',
-                    'departure_time' => 'required',
+                    // 'departure_time' => 'required',
                 ]);
 
                 // if validation fails
@@ -254,7 +254,7 @@ class TicketingApiController extends Controller
                     'departure_date' => $request->date,
                     'departure_id' => $depId,
                     'destination_id' => $desId,
-                    'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
+                    // 'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
                 ])->first();
                 // Getting Already Booked Tickets
                 $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
