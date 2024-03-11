@@ -110,7 +110,7 @@ class BookingController extends Controller
                 
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | update ticket from advance to confirm | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->alreadyBookedId)." --- ".$request->totalFare,
+                    "message" => Auth::user()->name." | update ticket from advance to confirm | time : $detail->schedule_date $detail->departure_time | ".json_encode($request->alreadyBookedId)." --- ".$request->totalFare,
                     "requested_host" => $request->ip(),
                     "company_id" => Auth::user()->company_id
                 ]);
@@ -129,7 +129,7 @@ class BookingController extends Controller
                 {
                     $ticketDepIndex = array_search($tkt->departure_city_id,$allFaresOfRoute);
                     $ticketDesIndex = array_search($tkt->destination_city_id,$allFaresOfRoute);
-                    if(($ticketDepIndex > $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
+                    if(($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
                     {
                         return response()->json(["errors" => ["Error" => ["One seat of your combination already booked"]]], 422);
                     }

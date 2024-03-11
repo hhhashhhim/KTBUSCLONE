@@ -95,6 +95,41 @@ class BookingApiController extends Controller
                 return new BreakResource($e->getMessage());
         }
     }
+    
+    public function checkTicketsStatus(Request $request)
+    {
+
+        try {
+
+                $validator = Validator::make($request->all(), [
+                    'invoice_id' => 'required',
+                ]);
+
+                // if validation fails
+                if ($validator->fails())
+                {
+                    return new ValidationResource($validator->errors());
+                }
+
+                $companyId = Auth::user()->company_id;
+                $terminalId = Auth::user()->terminal_id;
+                
+                // Data
+                $data = Ticket::where(['company_id'=> $companyId,"terminal_id"=>$terminalId,"invoice_id"=>$request->invoice_id])->get(["invoice_id","departure_city_id","destination_city_id","date","type","created_at"]);
+
+                if($data->count() > 0)
+                {
+                    return new SuccessResource($data);
+                }
+                else
+                {
+                    return new EmptyResource($data);
+                }
+
+            } catch (\Exception $e) {
+                return new BreakResource($e->getMessage());
+        }
+    }
 
     public function availableSchedules(Request $request)
     {
