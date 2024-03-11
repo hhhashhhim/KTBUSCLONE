@@ -520,7 +520,7 @@ class TicketingApiController extends Controller
                     'customer_cnic' => 'required',
                     'contact' => 'required',
                     'schedule_id' => 'required',
-                    'departure_time' => 'required',
+                    // 'departure_time' => 'required',
                 ]);
 
                 $depId = ($request->departure_city_id == 98) ? 1 : (($request->departure_city_id == 36) ? 3 : 0);
@@ -577,7 +577,7 @@ class TicketingApiController extends Controller
                     ->where("destination_id", $desId)
                     ->where('schedule_id', $request->schedule_id)
                     ->where('departure_date', $request->date)
-                    ->where('departure_time', date("H:i:s",strtotime($request->departure_time)))
+                    // ->where('departure_time', date("H:i:s",strtotime($request->departure_time)))
                     ->where('company_id', $companyId)
                     ->first();
                 $existingTicket = Ticket::where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
