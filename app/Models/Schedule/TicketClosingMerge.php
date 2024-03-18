@@ -13,6 +13,7 @@ use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
 use App\Models\User;
 use App\Models\Ticket;
+use App\Models\Expense\TicketMergeExpense;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,5 +42,10 @@ class TicketClosingMerge extends Model
     public function tickets()
     {
         return $this->hasMany( Ticket::class, 'ticket_merge_id', 'id' );
+    }
+    
+    public function expenses()
+    {
+        return $this->hasMany( TicketMergeExpense::class, 'ticket_merge_id', 'id' );
     }
 }
