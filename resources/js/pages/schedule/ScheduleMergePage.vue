@@ -49,7 +49,11 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="table-responsive">
+                                                <div v-if="tableLoading">
+                                                    <img class="loading-spinner" :src="$store.state.main_url + 'assets/img/loading-spinner.gif'">
+                                                </div>
                                                 <table
+                                                    v-else
                                                     class="table table-striped table-hover"
                                                     id="merge_table"
                                                 >
@@ -62,7 +66,9 @@
                                                         <th>Return Schedule</th>
                                                         <th>Closing Date</th>
                                                         <th>Merge Sale</th>
-                                                        <th v-if="checkForSubmenuButtons('add-expense')">Action</th>
+                                                        <th>Merge Expense</th>
+                                                        <th>Net Sale</th>
+                                                        <th width="200px" v-if="checkForSubmenuButtons('add-expense')">Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -85,8 +91,14 @@
                                                         <td>
                                                             {{ merge.closing_date??"N/A" }}
                                                         </td>
-                                                        <td class="bg-danger">
+                                                        <td>
                                                             {{ (merge.seat_fare) + (merge.elt) + (merge.refund) - (merge.discount) - (merge.commission) }}
+                                                        </td>
+                                                        <td>
+                                                            {{ parseInt(merge.expenses_sum_amount) }}
+                                                        </td>
+                                                        <td class="bg-danger">
+                                                            {{ (merge.seat_fare) + (merge.elt) + (merge.refund) - (merge.discount) - (merge.commission) - (merge.expenses_sum_amount) }}
                                                         </td>
                                                         <td v-if="checkForSubmenuButtons('add-expense')">
                                                             <router-link target="_blank" v-if="checkForSubmenuButtons('add-expense')"
@@ -110,6 +122,18 @@
                                                             >
                                                                 <i class="far fa-clock"></i>
                                                             </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="6"></td>
+                                                        <td>
+                                                            {{ totalSale }}
+                                                        </td>
+                                                        <td>
+                                                            {{ totalExpense }}
+                                                        </td>
+                                                        <td>
+                                                            {{ totalSale - totalExpense }}
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -181,7 +205,10 @@ export default {
     data() {
         return {
             loading: false,
+            tableLoading: true,
             validationErrors: "",
+            totalSale: 0,
+            totalExpense: 0,
             merges: [],
             buses: [],
             closingData: {
@@ -200,7 +227,7 @@ export default {
             permissions: [],
         };
     },
-    async created() {
+    created() {
         $('.modal').remove();
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {
@@ -223,10 +250,12 @@ export default {
             $("#date-modal").click();
         },
         async fetchData() {
+            this.tableLoading = true;
             const res = await this.callApi("post", "booking/close/schedule/merges");
             if (res.status == 200) {
                 this.merges = res.data.merges;
                 this.buses = res.data.buses;
+                this.tableLoading = false;
             } else {
                 console.log(res);
             }
@@ -237,9 +266,11 @@ export default {
             // }, 300);
         },
         async fetchMerges() {
+            this.tableLoading = true;
             const res = await this.callApi("post", "booking/close/schedule/merges",this.filterData);
             if (res.status == 200) {
                 this.merges = res.data.merges;
+                this.tableLoading = false;
             } else {
                 console.log(res);
             }
@@ -294,6 +325,15 @@ export default {
         ...mapGetters(["getDeletingObj"]),
     },
     watch: {
+        merges(){
+            this.totalSale = this.merges.reduce((sum, single) => {
+                return sum + parseInt(single.seat_fare) + parseInt(single.elt) + parseInt(single.refund) - parseInt(single.discount) - parseInt(single.commission);
+            }, 0);
+
+            this.totalExpense = this.merges.reduce((sum, single) => {
+                return sum + parseFloat(single.expenses_sum_amount);
+            }, 0);
+       },
         getDeletingObj(obj) {
             if (obj.isDeleted) {
                 this.buses.splice(obj.index, 1);
@@ -303,5 +343,11 @@ export default {
     },
 };
 </script>
-<style src="@vueform/multiselect/themes/default.css"></style>
+<style scoped>
+.loading-spinner {
+    display: block;
+    margin: 0 auto;
+    padding: 2em;
+  }
+</style>
 

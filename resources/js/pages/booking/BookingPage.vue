@@ -2561,14 +2561,14 @@ export default {
         async getCustomer(flag) {
             if (flag == 'addFormCNIC') {
                 if (this.addForm.customerCNIC != '' && this.addForm.customerCNIC != 'undefined') {
-                    this.addForm.contact = "";
-                    this.addForm.customerName = "";
+                    // this.addForm.contact = "";
+                    // this.addForm.customerName = "";
                     const resCnic = await this.callApi("post", "booking/getCNIC", {
                         cnicNumber: this.addForm.customerCNIC,
                         status: flag,
 
                     });
-                    if ((this.addForm.contact == '' || typeof this.addForm.contact == 'undefined') && (this.addForm.customerName == '' || typeof this.addForm.customerName == 'undefined')) {
+                    if (resCnic.data) {
                         this.addForm.contact = resCnic.data.contact;
                         this.addForm.customerName = resCnic.data.name;
                     }
@@ -2576,13 +2576,13 @@ export default {
             }
             if (flag == 'addFormContact') {
                 if (this.addForm.contact != '' && this.addForm.contact != 'undefined') {
-                    this.addForm.customerName = "";
-                    this.addForm.customerCNIC = "";
+                    // this.addForm.customerName = "";
+                    // this.addForm.customerCNIC = "";
                     const resCnic = await this.callApi("post", "booking/getCNIC", {
                         phoneNumber: this.addForm.contact,
                         status: flag,
                     });
-                    if ((this.addForm.customerName == '' || typeof this.addForm.customerName == 'undefined') && (this.addForm.customerCNIC == '' || typeof this.addForm.customerCNIC == 'undefined')) {
+                    if (resCnic.data) {
                         this.addForm.customerCNIC = resCnic.data.cnic;
                         this.addForm.customerName = resCnic.data.name;
                     }
