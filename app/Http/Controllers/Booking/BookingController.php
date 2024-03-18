@@ -77,7 +77,6 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-
         try {
             $lock = Cache::lock("tickets")->block(5, function () use ($request) {
             DB::beginTransaction();
@@ -288,6 +287,7 @@ class BookingController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
             }
+            
             DB::commit();
             return [
                 'ids' => implode('-', $allTicket),
@@ -302,6 +302,12 @@ class BookingController extends Controller
             return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
         }
     }
+
+    public function whatsappMessage(Request $request)
+    {
+        ticketConfirmedMessage(explode('-', $request->ticket_ids));
+    }
+
 
     public function singleReschedule(Request $request)
     {
@@ -1170,6 +1176,7 @@ class BookingController extends Controller
                         "requested_host" => $request->ip(),
                         "company_id" => Auth::user()->company_id
                     ]);
+                    
                     DB::commit();
                     return $ticketElt;
                 } else {
@@ -1471,7 +1478,6 @@ class BookingController extends Controller
         } else {
             $ids = [$request->ticket_id];
         }
-
         // return $ids;
         $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
         $tickets->map(function ($item) {
@@ -1494,6 +1500,7 @@ class BookingController extends Controller
             'format' => $format,
             'duplicate' => (int)$request->duplicate,
         ];
+        // return view('pdf/pdf', ['data' => $finalData]);
         return view('pdf/pdf', ['data' => $finalData]);
     }
 

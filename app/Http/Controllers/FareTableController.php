@@ -49,8 +49,15 @@ class FareTableController extends Controller
 
     public function record(Request $request)
     {
+        // whereHas query only for if city deleted then deleted city data should not be visible
         $fareTable = FareTable::
-            with("city_from:id,name","city_to:id,name","class:id,name")->where(["company_id"=>Auth::user()->company_id])
+            whereHas("city_from", function($q){
+                $q->where("hide",'=',0);
+            })
+            ->whereHas("city_to", function($q){
+                $q->where("hide",'=',0);
+            })
+            ->with("city_from:id,name","city_to:id,name","class:id,name")->where(["company_id"=>Auth::user()->company_id])
             ->when($request->class,function($q) use ($request){
                 $q->where("fare_class",$request->class);
             })

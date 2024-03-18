@@ -10,6 +10,7 @@ use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use App\Models\Schedule\Schedule;
 use App\Models\Booking\TicketIsPartial;
+use App\Models\Terminal\TerminalTimeDifference;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Schedule\TicketClosing;
 use App\Http\Resources\CreatedResource;
@@ -288,6 +289,75 @@ if (!function_exists('updateAdvancedSeat')) {
         //     'contact' => plainContactAndCnic($request->contact),
         // ]);
         return $request->alreadyBookedId;
+    }
+}
+
+//Updated Already advanced Booked Seat
+if (!function_exists('ticketConfirmedMessage')) {
+    function ticketConfirmedMessage($tickets)
+    {
+        $seats = implode(",",Ticket::whereIn("id",$tickets)->pluck("seat_no")->toArray());
+        $detail = Ticket::where("id",$tickets[0])->with("departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
+        
+        // this is for timing from different terminal
+        $html = "";
+        $terminalTime = TerminalTimeDifference::where(['company_id' => $detail->company_id, 'city_id' => $detail->departure_city_id, 'route_id' => $detail->route_id])->with("terminal:id,name")->get();
+        if($terminalTime->count() > 0)
+        {
+            foreach($terminalTime as $single)
+            {
+                $sub = 0;
+                $sub = $single->time_difference * 60;
+                $html .= "*".$single->terminal->name.":* ".date("h:i A", strtotime($detail->date . " " . $detail->schedule_time) + $sub)."\n";
+                $terminal_id = $single->terminal_id;
+            }
+            if($detail->terminal_id != $terminal_id)
+            {
+                $html .= "*".$detail->terminal->name.":* ".date("h:i A", strtotime($detail->schedule_time))."\n";
+            }
+        }
+        else
+        {
+            $html .= "*".$detail->terminal->name.":* ".date("h:i A", strtotime($detail->schedule_time))."\n";
+        }
+         
+        $url = "http://wa.sabtech.org/api/send.php";
+        $mobile = "92".substr($detail->customer->contact, -10);
+        $api_key = "923108886220-82ba8efe-cadc-49d0-8bb2-1f797d750399";
+        $message = "Dear *".$detail->customer->name."*,
+
+We are pleased to confirm your ticket booking from *".$detail->departure_city->name."* to *".$detail->destination_city->name."* on *".$detail->date."*. You've booked seat numbers *$seats*.
+Your departure times from different terminal are as follows:
+
+$html
+
+Please ensure you arrive at the bus terminal at least 30 minutes before departure.                           
+        
+For any assistance, feel free to reach out to us at 03-111-777-333.                           
+
+*Kainat Travels*";
+
+
+
+        $parameters = array("api_key" => "$api_key",
+                            "mobile" => "$mobile",
+                            "message" => "$message",
+                            "priority" => "0",
+                            "type" => 0
+                            );
+        
+        $ch = curl_init();
+        $timeout  =  30;
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $parameters);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+        $response = curl_exec($ch);
+        curl_close($ch);
     }
 }
 //Updated Already advanced Booked Seat Api
