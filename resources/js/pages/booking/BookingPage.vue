@@ -145,6 +145,7 @@
                                                 <div class="form-group mb-0">
                                                     <label>Contact <span class="text-danger ml-1">*</span></label>
                                                     <vue-mask
+                                                        v-on:blur="getCustomer('addFormContact')"
                                                         class="form-control"
                                                         v-model="addForm.contact"
                                                         mask="0000-0000000"
@@ -2573,7 +2574,7 @@ export default {
                     }
                 }
             }
-            if (flag == 'addFormContact' && (this.addForm.customerCNIC == '' || typeof this.addForm.customerCNIC == 'undefined') && (this.addForm.customerName == '' || typeof this.addForm.customerName === 'undefined')) {
+            if (flag == 'addFormContact') {
                 if (this.addForm.contact != '' && this.addForm.contact != 'undefined') {
                     this.addForm.customerName = "";
                     this.addForm.customerCNIC = "";
@@ -3414,6 +3415,7 @@ export default {
                 this.addForm.alreadyBookedId = [];           
                 this.fetchScheduleData();
                 this.resetArrays();
+
                  setTimeout(() => {
                     this.bookingLoading = false;
                 }, 1000);
@@ -3422,6 +3424,9 @@ export default {
                         this.$refs.refTicket.submit();
                     }
                 }, 700);
+
+                resBookingDetail = await this.callApi("post", "booking/whatsapp/message", {ticket_ids: resTicket.data.ids});
+
 
             } else {
                 if (resTicket.status == 422) {

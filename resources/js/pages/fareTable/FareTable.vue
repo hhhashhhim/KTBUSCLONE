@@ -95,7 +95,7 @@
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <div v-if="tableLoading">
-                                                    <img class="loading-spinner" src="http://www.digitisingascent.com/cpadmin/assets/admin/layout/img/loading-spinner-blue.gif" />
+                                                    <img class="loading-spinner" :src="$store.state.main_url + 'assets/img/loading-spinner.gif'">
                                                 </div>
                                                 <table v-else class="table table-striped table-hover" id=""
                                                 >

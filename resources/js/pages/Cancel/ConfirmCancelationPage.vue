@@ -59,7 +59,10 @@
                                             <div class="row mt-2">
                                                 <div class="col-md-12">
                                                     <div class="table-responsive">
-                                                        <table class="table text-center">
+                                                        <div v-if="tableLoading">
+                                                            <img class="loading-spinner" :src="$store.state.main_url + 'assets/img/loading-spinner.gif'">
+                                                        </div>
+                                                        <table class="table text-center" v-else>
                                                             <thead>
                                                             <tr>
                                                                 <th>Bus Time</th>
@@ -119,6 +122,7 @@ export default {
             terminals: [],
             filters: [],
             refundFilters: [],
+            tableLoading: true,
             filterCancel: {
                 terminal: 0,
                 fromDate: '',
@@ -129,6 +133,7 @@ export default {
     async created() {
         $('.modal').remove();
         this.fetchFilters();
+        this.CancelFilter();
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {
             window.addEventListener('keydown', this.enterKey);
@@ -148,10 +153,12 @@ export default {
 
         },
         async CancelFilter() {
+            this.tableLoading = true;
             const resFetchData = await this.callApi("post", 'confirm/cancellation/fetchFilterData', this.filterCancel);
             console.log(resFetchData);
             if (resFetchData.status == 200) {
                 this.filters = resFetchData.data;
+                this.tableLoading = false;
             }
 
         },
@@ -191,4 +198,10 @@ table, th, td {
 .green {
     background-color: #03b203;
 }
+
+.loading-spinner {
+    display: block;
+    margin: 0 auto;
+    padding: 2em;
+  }
 </style>
