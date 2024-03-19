@@ -88881,7 +88881,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _context.next = 3;
                 return axios__WEBPACK_IMPORTED_MODULE_0___default()({
                   method: method,
-                  url: _this.$store.state.api_url + "public/api/web/v1/" + url,
+                  url: _this.$store.state.api_url + "api/web/v1/" + url,
                   data: data,
                   headers: {
                     'Authorization': 'Bearer ' + _this.$store.state.token

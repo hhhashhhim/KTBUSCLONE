@@ -13,7 +13,7 @@ export default {
             try {
                 return await axios({
                     method: method,
-                    url: this.$store.state.api_url + "public/api/web/v1/" + url,
+                    url: this.$store.state.api_url + "api/web/v1/" + url,
                     data: data,
                     headers: {
                         'Authorization': 'Bearer ' + this.$store.state.token
