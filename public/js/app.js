@@ -55129,7 +55129,7 @@ var _hoisted_1 = {
   "class": "navbar navbar-expand-lg main-navbar sticky"
 };
 
-var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"form-inline mr-auto\"><ul class=\"navbar-nav mr-3\"><li><a href=\"#\" data-toggle=\"sidebar\" class=\"nav-link nav-link-lg collapse-btn\"><i data-feather=\"align-justify\"></i></a></li><li><a href=\"#\" class=\"nav-link nav-link-lg fullscreen-btn\"><i data-feather=\"maximize\"></i></a></li><li><!--                    &lt;form class=&quot;form-inline mr-auto&quot;&gt;--><!--                        &lt;div class=&quot;search-element&quot;&gt;--><!--                            &lt;input class=&quot;form-control&quot; type=&quot;search&quot; placeholder=&quot;Search&quot; aria-label=&quot;Search&quot;--><!--                                data-width=&quot;200&quot;&gt;--><!--                            &lt;button class=&quot;btn&quot; type=&quot;submit&quot;&gt;--><!--                                &lt;i class=&quot;fas fa-search&quot;&gt;&lt;/i&gt;--><!--                            &lt;/button&gt;--><!--                        &lt;/div&gt;--><!--                    &lt;/form&gt;--></li></ul></div>", 1);
+var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"form-inline mr-auto\"><ul class=\"navbar-nav mr-3\"><li><a href=\"#\" data-toggle=\"sidebar\" class=\"text-dark\"><i class=\"fas fa-bars\"></i></a></li><li><a href=\"#\" class=\"nav-link nav-link-lg fullscreen-btn\"><i data-feather=\"maximize\"></i></a></li><li><!--                    &lt;form class=&quot;form-inline mr-auto&quot;&gt;--><!--                        &lt;div class=&quot;search-element&quot;&gt;--><!--                            &lt;input class=&quot;form-control&quot; type=&quot;search&quot; placeholder=&quot;Search&quot; aria-label=&quot;Search&quot;--><!--                                data-width=&quot;200&quot;&gt;--><!--                            &lt;button class=&quot;btn&quot; type=&quot;submit&quot;&gt;--><!--                                &lt;i class=&quot;fas fa-search&quot;&gt;&lt;/i&gt;--><!--                            &lt;/button&gt;--><!--                        &lt;/div&gt;--><!--                    &lt;/form&gt;--></li></ul></div>", 1);
 
 var _hoisted_3 = {
   "class": "navbar-nav navbar-right"
@@ -55393,7 +55393,7 @@ var _hoisted_1 = {
   "class": "navbar navbar-expand-lg main-navbar sticky"
 };
 
-var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"form-inline mr-auto\"><ul class=\"navbar-nav mr-3\"><li><a href=\"#\" data-toggle=\"sidebar\" class=\"nav-link nav-link-lg collapse-btn\"><i data-feather=\"align-justify\"></i></a></li><li><a href=\"#\" class=\"nav-link nav-link-lg fullscreen-btn\"><i data-feather=\"maximize\"></i></a></li><li><!--                    &lt;form class=&quot;form-inline mr-auto&quot;&gt;--><!--                        &lt;div class=&quot;search-element&quot;&gt;--><!--                            &lt;input class=&quot;form-control&quot; type=&quot;search&quot; placeholder=&quot;Search&quot; aria-label=&quot;Search&quot;--><!--                                data-width=&quot;200&quot;&gt;--><!--                            &lt;button class=&quot;btn&quot; type=&quot;submit&quot;&gt;--><!--                                &lt;i class=&quot;fas fa-search&quot;&gt;&lt;/i&gt;--><!--                            &lt;/button&gt;--><!--                        &lt;/div&gt;--><!--                    &lt;/form&gt;--></li></ul></div>", 1);
+var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"form-inline mr-auto\"><ul class=\"navbar-nav mr-3\"><li><a href=\"#\" data-toggle=\"sidebar\" class=\"text-dark\"><i class=\"fas fa-bars\"></i></a></li><li><a href=\"#\" class=\"nav-link nav-link-lg fullscreen-btn\"><i data-feather=\"maximize\"></i></a></li><li><!--                    &lt;form class=&quot;form-inline mr-auto&quot;&gt;--><!--                        &lt;div class=&quot;search-element&quot;&gt;--><!--                            &lt;input class=&quot;form-control&quot; type=&quot;search&quot; placeholder=&quot;Search&quot; aria-label=&quot;Search&quot;--><!--                                data-width=&quot;200&quot;&gt;--><!--                            &lt;button class=&quot;btn&quot; type=&quot;submit&quot;&gt;--><!--                                &lt;i class=&quot;fas fa-search&quot;&gt;&lt;/i&gt;--><!--                            &lt;/button&gt;--><!--                        &lt;/div&gt;--><!--                    &lt;/form&gt;--></li></ul></div>", 1);
 
 var _hoisted_3 = {
   "class": "navbar-nav navbar-right"
@@ -89335,8 +89335,8 @@ var store = (0,vuex__WEBPACK_IMPORTED_MODULE_0__.createStore)({
       },
       user: JSON.parse(localStorage.getItem("user")),
       token: localStorage.getItem("token"),
-      main_url: "https://portal.kainattravels.net/",
-      api_url: "https://api.kainattravels.net/",
+      main_url: "http://localhost/kt-dev/",
+      api_url: "http://localhost/kt-api/",
       permissions: JSON.parse(localStorage.getItem("user")) && JSON.parse(localStorage.getItem("user")).role ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
       companyModules: false
     };
