@@ -152,7 +152,7 @@ class BookingApiController extends Controller
                 $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
 
 
-                
+
                 $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
                 ->whereHas('schedule', function($q){$q->where("hide",0);})
                 ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name,seat_map")
@@ -179,7 +179,7 @@ class BookingApiController extends Controller
 
 
 
-                    $counterData = array_merge(...$single->bus_class->seat_map);
+                    $counterData = array_merge(...$single->schedule->bus_class->seat_map);
                     $filteredSeats = array_filter($counterData, function ($seat) {
                         return isset($seat["reserved"]) && $seat["reserved"] && isset($seat["type"]) && $seat["type"] === 0;
                     });
@@ -188,7 +188,7 @@ class BookingApiController extends Controller
                     }, 0);
 
 
-                    $classData = array_merge(...$single->bus_class->seat_map);
+                    $classData = array_merge(...$single->schedule->bus_class->seat_map);
                     $uniqueClasses = array_unique(array_map(function ($seat) {
                         return isset($seat["class"]) ? $seat["class"] : null;
                     }, $classData));
