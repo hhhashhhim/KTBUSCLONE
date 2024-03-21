@@ -37,7 +37,7 @@
                                                            v-model="filterCancel.toDate" @change="CancelFilter()">
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <label for="terminalFilter">status</label>
+                                                    <label for="terminalFilter">Status</label>
                                                     <select id="terminalFilter" class="form-control"
                                                             v-model="filterCancel.type"
                                                             @change="CancelFilter()">
