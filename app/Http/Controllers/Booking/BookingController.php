@@ -832,6 +832,7 @@ class BookingController extends Controller
                     $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'] == null ? 'N/A' : $tickets[$result]['remarks'];
                     $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
                     $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
+                    $seatMap[$i][$j]['seat_fare'] = $tickets[$result]['seat_fare'] - $tickets[$result]['discount'];
                     $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
                     $seatMap[$i][$j]['online_terminal'] = $tickets[$result]['online_terminal'];
                     $seatMap[$i][$j]['booked_by'] = $tickets[$result]['updated_name']['name']??"N/A";
@@ -849,6 +850,7 @@ class BookingController extends Controller
                             $seatMap[$i][$j]['remarks'] = $tickets[$singlePartial]['remarks'] == null ? 'N/A' : $tickets[$singlePartial]['remarks'];
                             $seatMap[$i][$j]['customer_cnic'] = $tickets[$singlePartial]['customer']['cnic'];
                             $seatMap[$i][$j]['customer_name'] = $tickets[$singlePartial]['customer']['name'];
+                            $seatMap[$i][$j]['seat_fare'] = $tickets[$result]['seat_fare'] - $tickets[$result]['discount'];
                             $seatMap[$i][$j]['customer_phone'] = $tickets[$singlePartial]['customer']['contact'];
                             $seatMap[$i][$j]['online_terminal'] = $tickets[$singlePartial]['online_terminal'];
                             $seatMap[$i][$j]['booked_by'] = $tickets[$singlePartial]['updated_name']['name']??'N/A';
