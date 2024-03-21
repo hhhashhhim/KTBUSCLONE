@@ -3280,7 +3280,7 @@ export default {
 
         getTitle: function (col) {
             if (col.type == 'booked' || col.type == 'advance booking' || col.type == 'over-issue' || col.id) {
-                return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Seat Fare : " + col.fare + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
+                return "Name : " + col.customer_name + '\n' + "Phone : " + col.customer_phone + '\n' + "Seat Fare : " + col.seat_fare + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
             }
         },
 
