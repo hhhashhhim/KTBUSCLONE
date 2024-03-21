@@ -1248,6 +1248,7 @@ class BookingController extends Controller
                 if ($delElt) {
                     $delElt->delete();
                 }
+                $type = $ticket->type;
                 $ticket->update([
                     'type' => 'canceled',
                 ]);
@@ -1256,6 +1257,7 @@ class BookingController extends Controller
                     'ticket_id' => $ticket->id,
                     'percentage' => $request->percentage,
                     'reason' => $request->remarks,
+                    'type' => $type,
                     'added_by' => Auth::user()->id,
                 ]);
                 ActivityLog::create([
@@ -1286,6 +1288,7 @@ class BookingController extends Controller
                     if ($delElt) {
                         $delElt->delete();
                     }
+                    $type = $ticket->type;
                     $ticket->update([
                         'type' => 'canceled',
                     ]);
@@ -1294,6 +1297,7 @@ class BookingController extends Controller
                         'ticket_id' => $ticket->id,
                         'percentage' => $request->percentage,
                         'reason' => $request->reason,
+                        'type' => $type,
                         'added_by' => Auth::user()->id,
                     ]);
                     $ticket->delete();

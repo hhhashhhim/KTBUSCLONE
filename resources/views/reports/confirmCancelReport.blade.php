@@ -54,6 +54,7 @@
             <th>Terminal Name</th>
             <th>Cancel By</th>
             <th>Seat No</th>
+            <th>Type</th>
             <th>Passenger Name</th>
             <th>Cell NO</th>
             <th>Total Fare</th>
@@ -71,6 +72,7 @@
                 <td>{{ $single->terminal_name}}</td>
                 <td>{{ $single->cancel_by }}</td>
                 <td>{{ $single->seat_no}}</td>
+                <td>{{ $single->type}}</td>
                 <td>{{ $single->passenger_name}}</td>
                 <td>{{ $single->passenger_contact}}</td>
                 <td>{{ $single->total_fare}}</td>

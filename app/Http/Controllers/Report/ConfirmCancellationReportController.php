@@ -32,12 +32,23 @@ class ConfirmCancellationReportController extends Controller
             ->when($request->toDate != '', function ($query) use ($request) {
                 return $query->where('schedule_date', '<=', $request->toDate);
             })
+            ->whereHas('cancel_ticket', function ($query) use ($request) {
+                if ($request->type != 0) {
+                    $query->where('type', $request->type);
+                }
+                else
+                {
+                    // to show all
+                    $query->whereIn('type',["advance booking","booked"]);
+                }
+            })
             ->orderBy('id','DESC')
             ->limit(2000)
-            ->get(["id","terminal_name","schedule_id","schedule_date","customer_id","seat_fare","discount"]);
+            ->get(["id","terminal_name","schedule_id","schedule_date","customer_id","seat_fare","discount","seat_no"]);
 
         $tickets->map(function ($q) {
             $q->cancel_percentage = $q->cancel_ticket->percentage;
+            $q->type = $q->cancel_ticket->type;
             $q->cancel_reason = $q->cancel_ticket->reason;
             $q->cancel_by = User::find($q->cancel_ticket->added_by)->name??'N/A';
             $q->cancel_date = $q->cancel_ticket->time;
@@ -72,12 +83,23 @@ class ConfirmCancellationReportController extends Controller
             ->when($request->toDate != '', function ($query) use ($request) {
                 return $query->where('schedule_date', '<=', $request->toDate);
             })
+            ->whereHas('cancel_ticket', function ($query) use ($request) {
+                if ($request->type != 0) {
+                    $query->where('type', $request->type);
+                }
+                else
+                {
+                    // to show all
+                    $query->whereIn('type',["advance booking","booked"]);
+                }
+            })
             ->orderBy('id','DESC')
             ->limit(2000)
-            ->get(["id","terminal_name","schedule_id","schedule_date","customer_id","seat_fare","discount"]);
+            ->get(["id","terminal_name","schedule_id","schedule_date","customer_id","seat_fare","discount","seat_no"]);
 
         $tickets->map(function ($q) {
             $q->cancel_percentage = $q->cancel_ticket->percentage;
+            $q->type = $q->cancel_ticket->type;
             $q->cancel_reason = $q->cancel_ticket->reason;
             $q->cancel_by = User::find($q->cancel_ticket->added_by)->name??'N/A';
             $q->cancel_date = $q->cancel_ticket->time;

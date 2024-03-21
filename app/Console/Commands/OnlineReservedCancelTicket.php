@@ -53,6 +53,7 @@ class OnlineReservedCancelTicket extends Command
                 }
                 if($ticket->created_at < Carbon::now()->subMinutes($ticket->terminal->reservation_cancel))
                 {
+                    $type = $ticket->type;
                     $ticket->update([
                         'type' => 'canceled',
                     ]);
@@ -61,6 +62,7 @@ class OnlineReservedCancelTicket extends Command
                         'ticket_id' => $ticket->id,
                         'percentage' => 0,
                         'reason' => "auto cancel",
+                        'type' => $type,
                         'added_by' => 0,
                     ]);
                     ActivityLog::create([
