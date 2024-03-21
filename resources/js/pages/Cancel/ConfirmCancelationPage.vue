@@ -14,7 +14,7 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <label for="terminalFilter">Terminals</label>
                                                     <select id="terminalFilter" class="form-control"
                                                             v-model="filterCancel.terminal"
@@ -26,15 +26,25 @@
                                                         </option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <label for="fromDate">From Date </label>
                                                     <input id="fromDate" type="date" class="form-control"
                                                            v-model="filterCancel.fromDate" @change="CancelFilter()">
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <label for="toDate">To Date </label>
                                                     <input id="toDate" type="date" class="form-control"
                                                            v-model="filterCancel.toDate" @change="CancelFilter()">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label for="terminalFilter">Terminals</label>
+                                                    <select id="terminalFilter" class="form-control"
+                                                            v-model="filterCancel.type"
+                                                            @change="CancelFilter()">
+                                                        <option value="0">All</option>
+                                                        <option value="booked">booked</option>
+                                                        <option value="advance booking">advance booking</option>
+                                                    </select>
                                                 </div>
                                                 <div class="col-md-2">
                                                     <button class="btn btn-primary mt-4 py-2"
@@ -54,6 +64,8 @@
                                                            :value="this.filterCancel.fromDate">
                                                     <input type="hidden" name="toDate"
                                                            :value="this.filterCancel.toDate">
+                                                    <input type="hidden" name="type"
+                                                           :value="this.filterCancel.type">
                                                 </form>
                                             </div>
                                             <div class="row mt-2">
@@ -69,6 +81,7 @@
                                                                 <th>Terminal Name</th>
                                                                 <th>Cancel By</th>
                                                                 <th>Seat No</th>
+                                                                <th>Type</th>
                                                                 <th>Passenger Name</th>
                                                                 <th>Cell NO</th>
                                                                 <th>Total Fare</th>
@@ -87,6 +100,7 @@
                                                                 <td>{{ filter.terminal_name }}</td>
                                                                 <td>{{ filter.cancel_by }}</td>
                                                                 <td>{{ filter.seat_no }}</td>
+                                                                <td>{{ filter.type }}</td>
                                                                 <td>{{ filter.passenger_name }}</td>
                                                                 <td>{{ filter.passenger_contact }}</td>
                                                                 <td>{{ filter.total_fare }}</td>
@@ -127,6 +141,7 @@ export default {
                 terminal: 0,
                 fromDate: '',
                 toDate: '',
+                type: '0',
             },
         }
     },
@@ -163,14 +178,6 @@ export default {
 
         },
         getPdfPrint: function () {
-            if (this.filterCancel.terminal == 0 && this.filterCancel.fromDate == '' && this.filterCancel.toDate == '') {
-                return swal({
-                    title: "Required!",
-                    text: "At Least One Field is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
             this.$refs.refConfirmCancle.submit();
         }
     },
