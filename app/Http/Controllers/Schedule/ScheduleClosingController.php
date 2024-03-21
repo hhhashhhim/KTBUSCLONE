@@ -171,7 +171,7 @@ class ScheduleClosingController extends Controller
                 }
             })
             ->limit(20)
-            ->latest("schedule_departure_date")
+            ->orderBy("schedule_departure_date","DESC")
             ->get(["id","schedule_departure_date","schedule_return_date","bus_id","closing_date"]);
 
             

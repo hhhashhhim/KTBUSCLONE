@@ -227,8 +227,7 @@ class BookingApiController extends Controller
                         })
                         ->first();
                         $scheduleSurcharge = Surcharge::where('id', $single->schedule->surcharge_id)->where('is_active', 1)->first();
-                        $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $single->schedule->route_id])->where('start_date', '<=', date("Y-m-d"))
-                        ->where('end_date', '>=', date("Y-m-d"))->first();
+                        $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $single->schedule->route_id])->first();
 
                         $editFare = $fare;
                         if ($scheduleDiscount) {
