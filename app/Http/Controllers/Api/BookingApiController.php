@@ -658,6 +658,8 @@ class BookingApiController extends Controller
                     ->where('company_id', $companyId)
                     ->where('departure_time', date("H:i:s",strtotime($request->departure_time)))
                     ->first();
+                
+                $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$detail->schedule_id,"schedule_date"=>$detail->schedule_date])->first();
                 $existingTicket = Ticket::where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
 
                 $allTicket = [];
@@ -761,6 +763,7 @@ class BookingApiController extends Controller
                             'invoice_id' => $invoice->id,
                             'schedule_date' => $detail->schedule_date,
                             'schedule_time' => $detail->departure_time,
+                            'schedule_time_exact' => $schedule_time_exact->departure_time,
                             'date' => $request->date,
                             'customer_id' => $customer->id,
                             'schedule_id' => $schedule->id,

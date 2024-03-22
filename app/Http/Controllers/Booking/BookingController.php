@@ -91,6 +91,7 @@ class BookingController extends Controller
                 ->where('company_id', Auth::user()->company_id)
                 ->where('departure_time', date("H:i:s",strtotime($request->departure_time)))
                 ->first();
+            $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$detail->schedule_id,"schedule_date"=>$detail->schedule_date])->first();
             $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
             
@@ -223,6 +224,7 @@ class BookingController extends Controller
                         'invoice_id' => $invoice->id,
                         'schedule_date' => $detail->schedule_date,
                         'schedule_time' => $detail->departure_time,
+                        'schedule_time_exact' => $schedule_time_exact->departure_time,
                         'date' => $request->date,
                         'customer_id' => $customer->id,
                         'schedule_id' => $schedule->id,
@@ -331,6 +333,7 @@ class BookingController extends Controller
                     'schedule_id' => $item['rescheduleSchedule'],
                     'departure_time' =>  date("H:i:s",strtotime($item['departure_time'])),
                 ])->first();
+                $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$scheduleDetail->schedule_id,"schedule_date"=>$scheduleDetail->schedule_date])->first();
                 $schedule = Schedule::where('id', $ticket['schedule_id'])->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                 
                 $invoice = Invoice::create([
@@ -388,6 +391,7 @@ class BookingController extends Controller
                     'booking_no' => $bookingNo,
                     'schedule_date' => $scheduleDetail->schedule_date,
                     'schedule_time' => $scheduleDetail->departure_time,
+                    'schedule_time_exact' => $schedule_time_exact->departure_time,
                     'date' => $item['rescheduleDate'],
                     'schedule_details_id' => $scheduleDetail->id,
                     'customer_id' => $item['dataCustomer'],

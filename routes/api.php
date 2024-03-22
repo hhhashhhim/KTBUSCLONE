@@ -91,5 +91,7 @@ require_once('api/reports/scheduleDropReport.php');
 require_once('api/reports/reports.php');
 // Reports Advance sale Routes
 require_once('api/reports/advanceSalesReports.php');
+// Reports Terminal commission
+require_once('api/reports/terminalCommissionReports.php');
 // Reports Confirm Cancellation Routes
 require_once('api/reports/confirmCancellationReports.php');
