@@ -90,6 +90,11 @@
                                 <i class="fa fa-landmark"></i> Terminal Sales Report
                             </router-link>
                         </li>
+                        <li class="dropdown">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'terminal-commission-report' }">
+                                <i class="fa fa-landmark"></i> Terminal Commission
+                            </router-link>
+                        </li>
                         <li class="dropdown" v-if="checkForSubmenu('schedule-drop')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'schedule-drop-report' }">
                                 <i class="fa fa-landmark"></i> Schedule Drop Report
