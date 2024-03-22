@@ -296,6 +296,7 @@ if (!function_exists('updateAdvancedSeat')) {
 if (!function_exists('ticketConfirmedMessage')) {
     function ticketConfirmedMessage($tickets)
     {
+        
         $seats = implode(",",Ticket::whereIn("id",$tickets)->pluck("seat_no")->toArray());
         $detail = Ticket::where("id",$tickets[0])->with("departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
         
@@ -321,9 +322,8 @@ if (!function_exists('ticketConfirmedMessage')) {
             $html .= "*".$detail->terminal->name.":* ".date("h:i A", strtotime($detail->schedule_time))."\n";
         }
          
-        $url = "http://wa.sabtech.org/api/send.php";
+        $url = "http://cloud.selfieartworld.com:3000/api/sendText";
         $mobile = "92".substr($detail->customer->contact, -10);
-        $api_key = "923108886220-82ba8efe-cadc-49d0-8bb2-1f797d750399";
         $message = "Dear *".$detail->customer->name."*,
 
 We are pleased to confirm your ticket booking from *".$detail->departure_city->name."* to *".$detail->destination_city->name."* on *".$detail->date."*. You've booked seat numbers *$seats*.
@@ -338,26 +338,26 @@ For any assistance, feel free to reach out to us at 03-111-777-333.
 *Kainat Travels*";
 
 
+        $headers = array(
+            'accept: application/json',
+            'X-Api-Key: 03261594870As',
+            'Content-Type: application/json'
+        );
+        $data = array(
+            'chatId' => $mobile.'@c.us',
+            'text' => $message,
+            'session' => 'kainattravels'
+        );
 
-        $parameters = array("api_key" => "$api_key",
-                            "mobile" => "$mobile",
-                            "message" => "$message",
-                            "priority" => "0",
-                            "type" => 0
-                            );
-        
-        $ch = curl_init();
-        $timeout  =  30;
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  2);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $parameters);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
         $response = curl_exec($ch);
         curl_close($ch);
+
     }
 }
 //Updated Already advanced Booked Seat Api
