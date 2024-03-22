@@ -51,7 +51,7 @@ class ExpenseController extends Controller
                 $eltAmount += $ticket->elt->elt_price;
             }
             // commission
-            $terminalCommission = TerminalCommission::where(["terminal_id"=>$ticket->terminal_id,"route_id"=>$ticket->schedule->route_id,"company_id"=>Auth::user()->terminal_id])->first();
+            $terminalCommission = TerminalCommission::where(["terminal_id"=>$ticket->terminal_id,"route_id"=>$ticket->schedule->route_id,"company_id"=>Auth::user()->company_id])->first();
             if($terminalCommission)
             {    
                 if($merge->closing[0]->id == $ticket->ticket_closing_id)
