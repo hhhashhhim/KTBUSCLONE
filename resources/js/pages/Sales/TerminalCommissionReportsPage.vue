@@ -97,6 +97,9 @@
                                                                 <th>User Name</th>
                                                                 <th>Sale Amount</th>
                                                                 <th>ELT Amount</th>
+                                                                <th>Terminal Commission</th>
+                                                                <th>Fixed Commission</th>
+                                                                <th>Total Commission</th>
                                                             </tr>
                                                             </thead>
 
@@ -110,6 +113,9 @@
                                                                 <td>{{ data.user }}</td>
                                                                 <td>{{ data.sales }}</td>
                                                                 <td>{{ data.elt }}</td>
+                                                                <td>{{ data.terminal_commission }}</td>
+                                                                <td>{{ data.fix_commission }}</td>
+                                                                <td>{{ parseInt(data.terminal_commission) + parseInt(data.fix_commission) }}</td>
                                                             </tr>
                                                             <tr>
                                                                 <th colspan="3"></th>
@@ -117,6 +123,9 @@
                                                                 <th colspan="2"></th>
                                                                 <th>{{ totalSeatFare() ?? 0 }}</th>
                                                                 <th>{{ totalEltFare() ?? 0 }}</th>
+                                                                <th>{{ totalTerminalCommission() ?? 0 }}</th>
+                                                                <th>{{ totalFixedCommission() ?? 0 }}</th>
+                                                                <th>{{ totalTerminalCommission() + totalFixedCommission() }}</th>
                                                             </tr>
                                                             </tbody>
                                                         </table>
@@ -257,6 +266,20 @@ export default {
             if (this.filters.record) {
                 return this.filters.record.reduce((sum, single) => {
                     return sum += single.elt;
+                }, 0)
+            }
+        },
+        totalTerminalCommission: function () {
+            if (this.filters.record) {
+                return this.filters.record.reduce((sum, single) => {
+                    return sum += single.terminal_commission;
+                }, 0)
+            }
+        },
+        totalFixedCommission: function () {
+            if (this.filters.record) {
+                return this.filters.record.reduce((sum, single) => {
+                    return sum += single.fix_commission;
                 }, 0)
             }
         },
