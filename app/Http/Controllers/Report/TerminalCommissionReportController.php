@@ -52,10 +52,10 @@ class TerminalCommissionReportController extends Controller
                 return $query->whereIn('route_id', $request->route);
             })
             ->whereBetween('schedule_date', [date("Y-m-d",strtotime($request->fromDateTime)), date("Y-m-d",strtotime($request->toDateTime))])
-            ->whereBetween('schedule_time_exact', [date("H:i:s",strtotime($request->fromDateTime)), date("H:i:s",strtotime($request->toDateTime))])
+            
             ->get();
         
-        $tickets = $tickets->groupBy(['schedule_date_time','terminal_id']); 
+        $tickets = $tickets->whereBetween('schedule_date_time', [date("Y-m-d H:i:s",strtotime($request->fromDateTime)), date("Y-m-d H:i:s",strtotime($request->toDateTime))])->groupBy(['schedule_date_time','terminal_id']); 
 
         $sortData = [];
         foreach ($tickets as $time) {
