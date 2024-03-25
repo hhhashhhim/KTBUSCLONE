@@ -94,7 +94,6 @@
                                                                 <th>Bus Class</th>
                                                                 <th>No of Seat</th>
                                                                 <th>Terminal Name</th>
-                                                                <th>User Name</th>
                                                                 <th>Sale Amount</th>
                                                                 <th>ELT Amount</th>
                                                                 <th>Terminal Commission</th>
@@ -110,7 +109,6 @@
                                                                 <td>{{ data.bus_class }}</td>
                                                                 <td>{{ data.seats }}</td>
                                                                 <td>{{ data.terminal }}</td>
-                                                                <td>{{ data.user }}</td>
                                                                 <td>{{ data.sales }}</td>
                                                                 <td>{{ data.elt }}</td>
                                                                 <td>{{ data.terminal_commission }}</td>
@@ -120,7 +118,7 @@
                                                             <tr>
                                                                 <th colspan="3"></th>
                                                                 <th>{{ totalSeats() ?? 0 }}</th>
-                                                                <th colspan="2"></th>
+                                                                <th></th>
                                                                 <th>{{ totalSeatFare() ?? 0 }}</th>
                                                                 <th>{{ totalEltFare() ?? 0 }}</th>
                                                                 <th>{{ totalTerminalCommission() ?? 0 }}</th>

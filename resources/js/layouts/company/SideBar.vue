@@ -90,7 +90,7 @@
                                 <i class="fa fa-landmark"></i> Terminal Sales Report
                             </router-link>
                         </li>
-                        <li class="dropdown">
+                        <li class="dropdown" v-if="checkForSubmenu('commission')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'terminal-commission-report' }">
                                 <i class="fa fa-landmark"></i> Terminal Commission
                             </router-link>
