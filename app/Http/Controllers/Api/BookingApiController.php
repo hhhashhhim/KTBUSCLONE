@@ -409,7 +409,7 @@ class BookingApiController extends Controller
                             }
 
                             // allow seat manage terminal wise
-                            if(isset($seats) && !in_array($column['seatNo'], $seats))
+                            if(isset($seats) && !in_array(preg_replace("/[^0-9]/", "", $column['seatNo']), $seats))
                             {
                                 $column['terminal_allow'] = false;
                             }
@@ -421,7 +421,7 @@ class BookingApiController extends Controller
                             // allow seat manage route wise
                             if($seatChoices)
                             {
-                                if(in_array($column['seatNo'], $seatChoices) &&  $column['terminal_allow'] == true)
+                                if(in_array(preg_replace("/[^0-9]/", "", $column['seatNo']), $seatChoices) &&  $column['terminal_allow'] == true)
                                 {
                                     $column['terminal_allow'] = true;
                                 }
@@ -676,7 +676,7 @@ class BookingApiController extends Controller
 
                     // checking booking available with these seat selection
                     // check seat duplication
-                    $schedule = Schedule::where('id', $request->schedule_id)->where('company_id', $companyId)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                    $schedule = Schedule::where('id', $request->schedule_id)->where('company_id', $companyId)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name,online_seat_choices', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                     $lastFare = $schedule->route->fares->last();
                     $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
                     array_push($allFaresOfRoute, $lastFare->destination_city_id);
@@ -692,14 +692,24 @@ class BookingApiController extends Controller
                             return response()->json(["errors" => ["Error" => ["One seat of your combination already booked"]]], 422);
                         }
                     }
+                    $seatChoices =  $schedule->route->online_seat_choices ? explode(",",$schedule->route->online_seat_choices) : null;
                     // check allow seat
                     foreach($request->selected_seats as $seatNo)
                     {
                         // allow seat manage
-                        if(isset($seats) && !in_array($seatNo, $seats))
+                        if(isset($seats) && !in_array(preg_replace("/[^0-9]/", "", $seatNo), $seats))
                         {
                             $error = ["One seat of your combination is not allow to book"];
                             return new ConflictResource($error);
+                        }
+                        // allow seat manage route wise
+                        if($seatChoices)
+                        {
+                            if(!in_array(preg_replace("/[^0-9]/", "", $seatNo), $seatChoices))
+                            {
+                                $error = ["One seat of your combination is not allow to book"];
+                                return new ConflictResource($error);
+                            }
                         }
                     }
 
