@@ -575,6 +575,7 @@ class BookingApiController extends Controller
                         Ticket::where("invoice_id",$request->invoice_id)->update([
                             'type' => 'booked',
                             'updated_by' => Auth::user()->id,
+                            'booked_time' => date("Y-m-d H:i:s"),
                         ]);
                         ActivityLog::create([
                             "activity_by" => Auth::user()->id,
@@ -789,6 +790,7 @@ class BookingApiController extends Controller
                             'gender' => $request->gender[$i],
                             'type' => $request->book_type,
                             'discount_type' => null,
+                            'booked_time' => date("Y-m-d H:i:s"),
                             'added_by' => Auth::user()->id,
                             'updated_by' => Auth::user()->id,
                             'discount' => 0,

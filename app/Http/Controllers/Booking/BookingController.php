@@ -240,6 +240,7 @@ class BookingController extends Controller
                         'gender' => $request->gender,
                         'type' => $request->type,
                         'discount_type' => $request->usagePoints ? 'card' : null,
+                        'booked_time' => date("Y-m-d H:i:s"),
                         'added_by' => Auth::user()->id,
                         'updated_by' => Auth::user()->id,
                         'discount' => $request->discount ? round($request->discount / count($request->selectedSeats)) : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0),
@@ -405,6 +406,7 @@ class BookingController extends Controller
                     'added_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,
                     'discount' => $item['rescheduleDiscount'] ?? 0,
+                    'booked_time' => date("Y-m-d H:i:s"),
                 ]);
                 TicketReschedule::create([
                     'company_id' => Auth::user()->company_id,
@@ -636,7 +638,7 @@ class BookingController extends Controller
         foreach ($tickets as $key => $single) {
             foreach ($single as $key => $item) {
                 $checkCustomers[] = $item->customer_id;
-                $item->bookingDate = date('d/m/Y H:i A', strtotime($item->created_at));
+                $item->bookingDate = $item->booked_time ? date('d/m/Y H:i A', strtotime($item->booked_time)) : '---';
             }
         }
 

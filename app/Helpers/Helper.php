@@ -231,6 +231,7 @@ if (!function_exists('updateAdvancedSeat')) {
                 'remarks' => $request->remarks,
                 'customer_id' => $customerData->id,
                 'updated_by' => Auth::user()->id,
+                'booked_time' => date("Y-m-d H:i:s"),
             ]);
 
             // online terminal request will be differrent so it is in if condition
