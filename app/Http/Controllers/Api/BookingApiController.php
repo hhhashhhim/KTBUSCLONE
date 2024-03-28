@@ -217,7 +217,7 @@ class BookingApiController extends Controller
                             'company_id'=> $companyId,
                             ])
                             ->first()->fare;
-                        $original_fare[$name] = (int)$fare;
+                        $original_fare[] = ["name"=>$name,"fare"=>(int)$fare];
 
                         // this is for discounted price
                         $scheduleDiscount = Discount::where('id', $single->schedule->discount_id)
@@ -255,9 +255,15 @@ class BookingApiController extends Controller
                         /////////
 
                         // after discount
-                        $discounted_fare[$name] = customRound((int)$editFare);
+                        $discounted_fare[] = ["name"=>$name,"fare"=>customRound((int)$editFare)];
                     }
 
+                    $faresOriginal = array_column($original_fare, 'fare');
+                    array_multisort($faresOriginal, SORT_ASC, $original_fare);
+                    
+                    $faresDiscounted = array_column($discounted_fare, 'fare');
+                    array_multisort($faresDiscounted, SORT_ASC, $discounted_fare);
+                    
                     $single->total_fare = $original_fare;
                     $single->final_fare = $discounted_fare;
 

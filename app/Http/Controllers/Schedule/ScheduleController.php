@@ -229,7 +229,7 @@ class ScheduleController extends Controller
                 }
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | updated schedule time from $request->start_date to $request->end_date time ($request->time)",
+                    "message" => Auth::user()->name." | updated schedule time from $request->start_date to $request->end_date time ($request->time) | $request->schedule_id",
                     "requested_host" => $request->ip(),
                     "company_id" => Auth::user()->company_id
                 ]);
