@@ -157,7 +157,7 @@ class TicketingApiController extends Controller
 
                 $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
                 ->whereHas('schedule', function($q){$q->where("hide",0);})
-                ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name","bus_class_map:id,name_seat_map")
+                ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name","bus_class_map:id,name,seat_map")
                 ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id')
                 ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])
                 ->when($advanceBookingDays!=null, function($q) use ($advanceBookingDays){
