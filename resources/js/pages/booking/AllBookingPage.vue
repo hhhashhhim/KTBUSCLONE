@@ -129,7 +129,10 @@
                                             </div>
                                             <div>
                                                 <div class="table-responsive">
-                                                    <table style=" width:100%; margin:0; overflow:auto; font-size: 12px"
+                                                    <div v-if="tableLoading">
+                                                        <img class="loading-spinner" :src="$store.state.main_url + 'assets/img/loading-spinner.gif'">
+                                                    </div>
+                                                    <table v-else style=" width:100%; margin:0; overflow:auto; font-size: 12px"
                                                            class="table table-striped table-hover" id="filterTable">
                                                         <thead>
                                                         <tr>
@@ -179,7 +182,7 @@
                                                             <td>{{ parseFloat(record.seat_fare) - parseFloat(record.discount ?? 0) }}
                                                             </td>
                                                             <td>{{ record.created_at }}</td>
-                                                            <td>{{ record.type == "canceled" ? record.cancel_ticket.added_by_name.name : 'N/A' }}
+                                                            <td>{{ record.cancel_ticket.added_by_name ? record.cancel_ticket.added_by_name.name : 'N/A' }}
                                                             </td>
                                                             <td>{{ record.type == "canceled" ? record.cancel_ticket.created_at : 'N/A' }}
                                                             </td>
@@ -246,6 +249,7 @@ export default {
             },
             loading: false,
             showAllBooking: false,
+            tableLoading: true,
             routes: [],
             terminals: [],
             buses: [],
@@ -306,10 +310,12 @@ export default {
         },
 
         async filterFunction() {
+            this.tableLoading = true;
             const resFilter = await this.callApi("post", "allBooking/filter", this.filterForm);
             if (resFilter.status == 200) {
                 this.allRecords = resFilter.data.data;
                 this.totalFare = resFilter.data.total_fare;
+                this.tableLoading = false;
             }
         },
     },
@@ -325,4 +331,10 @@ export default {
     }
 };
 </script>
-<style scoped></style>
+<style scoped>
+.loading-spinner {
+    display: block;
+    margin: 0 auto;
+    padding: 2em;
+  }
+</style>
