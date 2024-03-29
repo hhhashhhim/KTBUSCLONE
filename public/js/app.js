@@ -31864,14 +31864,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                if (!((_this27.addForm.customerCNIC == '' || typeof _this27.addForm.customerCNIC == 'undefined') && _this27.addForm.type != 'advance booking')) {
+                if (!((_this27.addForm.customerCNIC == '' || _this27.addForm.customerCNIC.length != 15) && _this27.addForm.type != 'advance booking')) {
                   _context26.next = 10;
                   break;
                 }
 
                 return _context26.abrupt("return", swal({
                   title: "Required!",
-                  text: "CNIC is Required ",
+                  text: "13 Digit CNIC is Required ",
                   icon: "error",
                   timer: 2000
                 }));
@@ -31890,14 +31890,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 12:
-                if (!(!_this27.addForm.contact || typeof _this27.addForm.contact == 'undefined')) {
+                if (!(!_this27.addForm.contact || _this27.addForm.contact.length != 12)) {
                   _context26.next = 14;
                   break;
                 }
 
                 return _context26.abrupt("return", swal({
                   title: "Required!",
-                  text: "Customer Contact Number is required,",
+                  text: "11 Digit Contact Number is required,",
                   icon: "error",
                   timer: 2000
                 }));
