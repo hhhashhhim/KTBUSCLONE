@@ -76,6 +76,7 @@ export default {
     },
     async created() {
         $('.modal').remove();
+        this.fetchLogs();
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {
             window.addEventListener('keydown', this.enterKey);
@@ -86,21 +87,12 @@ export default {
         }
         this.permissions = this.$store.state.permissions;
     },
-    mounted() {
-        this.fetchLogs();
-
-            window.addEventListener('scroll', this.handleScroll);
-        },
-    destroyed() {
-        window.removeEventListener('scroll', this.handleScroll);
-    },
     methods: {
         async fetchLogs() {
             this.tableLoading = true;
-            const resLogs = await this.callApi("post", 'settings/activity/logs',this.data);
+            const resLogs = await this.callApi("post", 'settings/activity/logs');
             if (resLogs.status == 200) {
-                this.logs = [...this.logs, ...resLogs.data];
-                this.data.start_from += 20;
+                this.logs = resLogs.data;
                 this.tableLoading = false;
             }
             if (resLogs.status == 422) {
@@ -111,13 +103,6 @@ export default {
             // setTimeout(function () {
             //     $("#ticket_templates").DataTable();
             // }, 300);
-        },
-        handleScroll() {
-            let bottomOfPage = window.innerHeight + window.scrollY >= document.body.offsetHeight;
-
-            if (bottomOfPage) {
-                this.fetchLogs();
-            }
         },
     },
 };
