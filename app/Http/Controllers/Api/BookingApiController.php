@@ -156,7 +156,7 @@ class BookingApiController extends Controller
 
                 $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
                 ->whereHas('schedule', function($q){$q->where("hide",0);})
-                ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name,seat_map")
+                ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name","bus_class_map:id,name,seat_map")
                 ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id')
                 ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])
                 ->when($advanceBookingDays!=null, function($q) use ($advanceBookingDays){
@@ -183,25 +183,28 @@ class BookingApiController extends Controller
 
 
 
-                    $counterData = array_merge(...$single->schedule->bus_class->seat_map);
-                    $filteredSeats = array_filter($counterData, function ($seat) {
-                        return isset($seat["reserved"]) && $seat["reserved"] && isset($seat["type"]) && $seat["type"] === 0;
+                    $seatMap = $single->bus_class_map->seat_map;
+
+                    $flattenedSeatMap = array_merge(...$seatMap);
+                    $reservedSeatsOfType0 = array_filter($flattenedSeatMap, function($seat) {
+                        return isset($seat['reserved']) && $seat['reserved'] === true &&
+                            isset($seat['type']) && $seat['type'] === 0;
                     });
-                    $count = array_reduce($filteredSeats, function ($carry, $seat) {
+                    $count = array_reduce($reservedSeatsOfType0, function($carry, $seat) {
                         return $carry + 1;
                     }, 0);
 
 
-                    $classData = array_merge(...$single->schedule->bus_class->seat_map);
-                    $uniqueClasses = array_unique(array_map(function ($seat) {
-                        return isset($seat["class"]) ? $seat["class"] : null;
-                    }, $classData));
-                    $uniqueClasses = array_filter($uniqueClasses, function ($class) {
-                        return $class !== null;
-                    });
-                    $class_id = array_values($uniqueClasses);
+                    $flattenedSeatMap = array_merge(...$seatMap);
+                    $classes = array_reduce($flattenedSeatMap, function($carry, $seat) {
+                        if(isset($seat['class'])) {
+                            $carry[] = $seat['class'];
+                        }
+                        return $carry;
+                    }, []);
+                    $class_id = array_unique($classes);
 
-                    unset($single->bus_class->seat_map);
+                    unset($single->bus_class_map);
 
                     $booked = $bookedTickets->where("schedule_id",$single->schedule_id)->where("schedule_date",$single->schedule_date)->count();
 
