@@ -469,7 +469,18 @@ class BookingController extends Controller
             return "Date is Required";
         }
         $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
-        $allSchedules = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)->with('schedule')->whereHas('schedule', function($q){$q->where("hide",0);})->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => Auth::user()->company_id])->oldest("departure_time")->get();
+        $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
+        $advanceBookingDays = Terminal::where("id",Auth::user()->terminal_id)->first()->advance_booking;
+
+        $allSchedules = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
+        ->with('schedule')
+        ->whereHas('schedule', function($q){$q->where("hide",0);})
+        ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => Auth::user()->company_id])
+        ->oldest("departure_time")
+        ->when($advanceBookingDays!=null,function($q)use($advanceBookingDays){
+            $q->where("departure_date",'<',now()->addDays($advanceBookingDays)->format("Y-m-d"));
+        })
+        ->get();
         
         foreach ($allSchedules as $key => $single) {
             
