@@ -24,6 +24,9 @@ class BookingCancel extends Model
     public function addedBy(){
         return $this->hasOne( User::class,'id','added_by' );
     }
+    public function added_by_name(){
+        return $this->hasOne( User::class,'id','added_by' );
+    }
     public function updatedBy(){
         return $this->hasOne( User::class,'id','updated_by' );
     }
