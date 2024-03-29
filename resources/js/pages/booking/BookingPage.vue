@@ -3291,7 +3291,6 @@ export default {
         ,
 
         async add() {
-           
             if (this.addForm.departureCity == 0) {
                 return swal({
                     title: "Required!",
@@ -3324,7 +3323,7 @@ export default {
                     timer: 2000
                 });
             }
-            if ((this.addForm.customerCNIC == '' || this.addForm.customerCNIC.length != 15) && this.addForm.type != 'advance booking') {
+            if ((this.addForm.customerCNIC == '' || this.addForm.customerCNIC.length < 13) && this.addForm.type != 'advance booking') {
                 return swal({
                     title: "Required!",
                     text: "13 Digit CNIC is Required ",
@@ -3340,7 +3339,7 @@ export default {
                     timer: 2000
                 });
             }
-            if (!this.addForm.contact || this.addForm.contact.length != 12) {
+            if (!this.addForm.contact || this.addForm.contact.length < 11) {
                 return swal({
                     title: "Required!",
                     text: "11 Digit Contact Number is required,",

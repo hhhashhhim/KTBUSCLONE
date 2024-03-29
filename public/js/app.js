@@ -31867,7 +31867,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 8:
-                if (!((_this27.addForm.customerCNIC == '' || _this27.addForm.customerCNIC.length != 15) && _this27.addForm.type != 'advance booking')) {
+                if (!((_this27.addForm.customerCNIC == '' || _this27.addForm.customerCNIC.length < 13) && _this27.addForm.type != 'advance booking')) {
                   _context26.next = 10;
                   break;
                 }
@@ -31893,7 +31893,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 12:
-                if (!(!_this27.addForm.contact || _this27.addForm.contact.length != 12)) {
+                if (!(!_this27.addForm.contact || _this27.addForm.contact.length < 11)) {
                   _context26.next = 14;
                   break;
                 }
