@@ -179,7 +179,7 @@
                                                             <td>{{ parseFloat(record.seat_fare) - parseFloat(record.discount ?? 0) }}
                                                             </td>
                                                             <td>{{ record.created_at }}</td>
-                                                            <td>{{ record.type == "canceled" ? record.cancel_ticket.added_by.name : 'N/A' }}
+                                                            <td>{{ record.type == "canceled" ? record.cancel_ticket.added_by_name.name : 'N/A' }}
                                                             </td>
                                                             <td>{{ record.type == "canceled" ? record.cancel_ticket.created_at : 'N/A' }}
                                                             </td>
