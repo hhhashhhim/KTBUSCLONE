@@ -188,7 +188,7 @@
                         <label for="online_terminal_name">Online Terminal Name</label>
                         <input type="text" class="form-control" v-model="data.online_terminal_name">
                     </div>
-                    <div class="form-group col-md-2 d-flex align-items-center">
+                    <!-- <div class="form-group col-md-2 d-flex align-items-center">
                         <label class="mt-4" for="active">Online Availability</label>
                         <label class="colorinput mx-3 mt-3">
                             <span>
@@ -214,7 +214,7 @@
                                 <span class="colorinput-color bg-primary"></span>
                             </span>
                         </label>
-                    </div>
+                    </div> -->
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="loading" @click="add">
@@ -352,7 +352,7 @@
                         <label for="online_terminal_name">Online Terminal Name</label>
                         <input type="text" class="form-control" v-model="dataEdit.online_terminal_name">
                     </div>
-                    <div class="form-group col-md-2 d-flex align-items-center">
+                    <!-- <div class="form-group col-md-2 d-flex align-items-center">
                         <label class="mt-4" for="active">Online Availability </label>
                         <label class="colorinput mx-3 mt-3">
                             <span>
@@ -381,7 +381,7 @@
                                 <span class="colorinput-color bg-primary"></span>
                             </span>
                         </label>
-                    </div>
+                    </div> -->
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="loading" @click="update">
