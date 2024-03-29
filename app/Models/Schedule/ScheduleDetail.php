@@ -40,6 +40,9 @@ class ScheduleDetail extends Model
     public function bus_class(){
         return $this->hasOne( BusClass::class,'id','bus_class_id');
     }
+    public function bus_class_map(){
+        return $this->hasOne( BusClass::class,'id','bus_class_id');
+    }
 
 
 

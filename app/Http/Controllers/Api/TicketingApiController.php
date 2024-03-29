@@ -157,7 +157,7 @@ class TicketingApiController extends Controller
 
                 $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
                 ->whereHas('schedule', function($q){$q->where("hide",0);})
-                ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name,seat_map")
+                ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name","bus_class_map:id,name_seat_map")
                 ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id')
                 ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])
                 ->when($advanceBookingDays!=null, function($q) use ($advanceBookingDays){
@@ -182,7 +182,7 @@ class TicketingApiController extends Controller
                         unset($data[$key]);
                     }
 
-                    $seatMap = $single->bus_class->seat_map;
+                    $seatMap = $single->bus_class_map->seat_map;
 
                     $flattenedSeatMap = array_merge(...$seatMap);
                     $reservedSeatsOfType0 = array_filter($flattenedSeatMap, function($seat) {
@@ -203,7 +203,7 @@ class TicketingApiController extends Controller
                     }, []);
                     $class_id = array_unique($classes);
 
-                    unset($single->bus_class);
+                    unset($single->bus_class_map);
 
                     $booked = $bookedTickets->where("schedule_id",$single->schedule_id)->where("schedule_date",$single->schedule_date)->count();
 
