@@ -39,11 +39,11 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
    });
    
    Route::group(['prefix'=>'v1'],function(){
-      Route::post('/cities/departures',[BookingApiController::class,'departureCities']);
-      Route::post('/cities/destinations',[BookingApiController::class,'destinationCities']);
-      Route::post('/schedules/available',[BookingApiController::class,'availableSchedules']);
-      Route::post('/schedule/preview',[BookingApiController::class,'previewSchedule']);
-      Route::post('/new',[BookingApiController::class,'bookSeat']);
+      Route::post('/cities/departures',[TicketingApiController::class,'departureCities']);
+      Route::post('/cities/destinations',[TicketingApiController::class,'destinationCities']);
+      Route::post('/schedules/available',[TicketingApiController::class,'availableSchedules']);
+      Route::post('/schedule/preview',[TicketingApiController::class,'previewSchedule']);
+      Route::post('/new',[TicketingApiController::class,'bookSeat']);
    });
   
 });

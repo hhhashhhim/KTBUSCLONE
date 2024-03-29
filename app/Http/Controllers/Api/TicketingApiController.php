@@ -35,7 +35,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Resources\BreakResource;
 use Exception;
 
-class BookingApiController extends Controller
+class TicketingApiController extends Controller
 {
     public function departureCities(Request $request)
     {
