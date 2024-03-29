@@ -203,7 +203,7 @@ class TicketingApiController extends Controller
                     }, []);
                     $class_id = array_unique($classes);
 
-                    unset($single->bus_class->seat_map);
+                    unset($single->bus_class);
 
                     $booked = $bookedTickets->where("schedule_id",$single->schedule_id)->where("schedule_date",$single->schedule_date)->count();
 
