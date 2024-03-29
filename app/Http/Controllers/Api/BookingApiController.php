@@ -133,7 +133,7 @@ class BookingApiController extends Controller
 
     public function availableSchedules(Request $request)
     {
-        // try {
+        try {
                 $validator = Validator::make($request->all(), [
                     'departure_city_id' => 'required',
                     'destination_city_id' => 'required',
@@ -289,9 +289,9 @@ class BookingApiController extends Controller
                     return new EmptyResource($data);
                 }
 
-        //     } catch (\Exception $e) {
-        //         return new BreakResource($e->getMessage());
-        // }
+            } catch (\Exception $e) {
+                return new BreakResource($e->getMessage());
+        }
 
     }
 
