@@ -128,6 +128,7 @@
         <th>Dest City</th>
         <th>Elt Price</th>
         <th>Ticket Amount</th>
+        <th>Ticket Discount</th>
         <th>Terminal Name</th>
         <th>Ticket Booked By</th>
 
@@ -144,6 +145,7 @@
                 <td>{{ ucfirst($item->destination_city->name) }}</td>
                 <td>{{ $item->ticketElt == null ? 0 : $item->ticketElt->elt_price }}</td>
                 <td>{{ $item->seat_fare }}</td>
+                <td>{{ $item->discount }}</td>
                 <td>{{ ucfirst($item->terminal->name) }}</td>
                 <td>{{ ucfirst($item->updated_name->name??'N/A') }}</td>
 
