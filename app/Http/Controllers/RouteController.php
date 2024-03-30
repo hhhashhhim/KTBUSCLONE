@@ -252,8 +252,8 @@ class RouteController extends Controller
       
         
                         for ($i = 0; $i <= $days; $i++) {
-                            $date_wise_departure = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$schedule->id,"schedule_date"=>now()->addDays($i)->format("Y-m-d")])->orderBy("id","ASC")->first();
-                            ScheduleDetail::where("schedule_id",$schedule->id)->where("schedule_date", now()->addDays($i)->format("Y-m-d"))->delete();
+                            $date_wise_departure = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$schedule->id,"schedule_date"=>date("Y-m-d",strtotime(date("$start_date->schedule_date"))+($i * 86400))])->orderBy("id","ASC")->first();
+                            ScheduleDetail::where("schedule_id",$schedule->id)->where("schedule_date", date("Y-m-d",strtotime(date("$start_date->schedule_date"))+($i * 86400)))->delete();
                             $lastDepId = $routeDetails[0]->departure_city_id;
                             $totalTime = strtotime(date("$start_date->schedule_date $date_wise_departure->departure_time")) + ($i * 86400);
                             $scheduleStartDate = date("Y-m-d", $totalTime);
