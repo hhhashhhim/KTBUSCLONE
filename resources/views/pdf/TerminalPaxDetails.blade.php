@@ -82,7 +82,7 @@
                 style="font-weight:600">{{ isset($terminal->name) ? $terminal->name : "Main Terminal"}}</span>
         </div>
         <div style="padding-bottom: 5px;"><span><b>UAN(24/7) : </b> 03-111-777-333 </span></div>
-        <div><span><b>Phone # : </b>{{ isset( $terminal->phone) ? formatContact($terminal->contact) : "0310-8886286" }}</span>
+        <div><span><b>Phone # : </b>{{ isset( $terminal->contact) ? formatContact($terminal->contact) : "0310-8886286" }}</span>
         </div>
     </div>
 </div>
@@ -108,11 +108,11 @@
     </tr>
     <tr>
         <th style="text-align: start;">Bus Class:</th>
-        @if ($data)
-            <td style="text-align: end;">{{ $data['busNo']->bus_class->name}}</td>
-        @else
-            <td style="text-align: end;"></td>
-        @endif
+        <td style="text-align: end;">{{ $data['bus']->bus_class??"N/A"}}</td>
+    </tr>
+    <tr>
+        <th style="text-align: start;">Bus Number:</th>
+        <td style="text-align: end;">{{ $data['bus']->bus_no??"N/A"}}</td>
     </tr>
 </table>
 <br>

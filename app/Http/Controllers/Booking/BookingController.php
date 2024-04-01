@@ -1337,28 +1337,23 @@ class BookingController extends Controller
     public
     function terminalInvoice(Request $request)
     {
-        $uniqueDate = ScheduleDetail::where([
+        $scheduleDetail = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
             'departure_date' => $request->date,
             'departure_id' => $request->departure_city_id,
             'destination_id' => $request->destination_city_id,
-        ])->first()->schedule_date;
-        $scheduleTime = ScheduleDetail::where([
-            'company_id' => Auth::user()->company_id,
-            'schedule_id' => $request->schedule_id,
-            'schedule_date' => $uniqueDate,
-        ])->first()->departure_time;
+        ])->first();
 
         $passengerData = Ticket::with('customer:id,name,cnic,contact', 'addedBy:id,name','updated_name:id,name', 'terminal:id,name', 'elt:id,elt_price,ticket_id', 'destination_city:id,name', 'departure_city:id,name')->where([
             'company_id' => Auth::user()->company_id,
             'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id,
             'schedule_id' => $request->schedule_id,
-            'schedule_date' => $uniqueDate,
+            'schedule_date' => $scheduleDetail->schedule_date,
             'type' => "booked",
         ])
         ->get();
-
+       
         $routeId = Schedule::where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first()->route_id;
         $commission = TerminalCommission::where(["company_id" => Auth::user()->company_id, 'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id, "route_id" => $routeId])->first();
 
@@ -1366,8 +1361,11 @@ class BookingController extends Controller
         $hostInfo = getMembers($passengerData->first(), Auth::user()->company_id, 2) ?? [];
         $routeName = routeName($request->schedule_id);
         $routeId = Schedule::where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first()->route_id;
-        $busNo = Schedule::with('bus_class:id,name')->where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first('bus_class_id');
-        $date = date_format(date_create($uniqueDate . ' ' . $scheduleTime), "l") . ' , ' . date_format(date_create($uniqueDate . ' ' . $scheduleTime), "d F Y H:i:s A");
+        $bus = (object)[];
+        $bus->bus_class = BusClass::find($scheduleDetail->bus_class_id)->name??'N/A';
+        $bus->bus_no = $passengerData->count() > 0 ? Bus::find($passengerData[0]->bus_id)->bus_number??'N/A' : "N/A";
+        
+        $date = date_format(date_create($scheduleDetail->schedule_date . ' ' . $scheduleDetail->departure_time), "l") . ' , ' . date_format(date_create($scheduleDetail->schedule_date . ' ' . $scheduleDetail->departure_time), "d F Y H:i:s A");
         $eltAmount = 0;
         foreach ($passengerData as $passenger) {
             $eltAmount += $passenger->elt != null ? $passenger->elt->elt_price : 0;
@@ -1384,7 +1382,7 @@ class BookingController extends Controller
             'company_id' => Auth::user()->company_id,
             'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id,
             'schedule_id' => $request->schedule_id,
-            'schedule_date' => $uniqueDate,
+            'schedule_date' => $scheduleDetail->schedule_date,
         ])->onlyTrashed()->get(['id', 'seat_fare', 'discount']);
         $refundData = 0;
         foreach ($refunds as $single) {
@@ -1393,7 +1391,7 @@ class BookingController extends Controller
             $refundData += $final;
         }
         ;
-        $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'busNo' => $busNo, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount, 'commission' => $commission, 'refund' => round($refundData)];
+        $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'bus' => $bus, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount, 'commission' => $commission, 'refund' => round($refundData)];
         $terminal = Terminal::find(Auth::user()->terminal_id);
         return view('pdf/TerminalPaxDetails', ['data' => $passengerData, 'terminal' => $terminal]);
     }
