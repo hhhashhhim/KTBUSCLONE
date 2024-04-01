@@ -104,7 +104,7 @@ class BookingController extends Controller
                 "company_id" => Auth::user()->company_id,
                 "added_by" => Auth::user()->id,
             ]);
-
+            
             if (isset($request->flag) && $request->flag == 1) {
                 $allTicket = updateAdvancedSeat($request, $invoice);
                 

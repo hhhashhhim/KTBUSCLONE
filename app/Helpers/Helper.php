@@ -225,6 +225,7 @@ if (!function_exists('updateAdvancedSeat')) {
             $customer_id = Ticket::where('company_id', Auth::user()->company_id)->where('id', $single)->first();
             $customer_id->update([
                 'type' => 'booked',
+                'schedule_time' => $request->departure_time,
                 'invoice_id' => $invoice->id,
                 'seat_fare' => round($request->totalFare / count($request->alreadyBookedId)),
                 'discount' => $request->discount ? round($request->discount / count($request->alreadyBookedId)) : 0,
