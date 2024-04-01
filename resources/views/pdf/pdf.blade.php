@@ -136,7 +136,7 @@
 
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Booking Date :</p>
-                <p class="my-5 float-right">{{ date('d/m/Y H:i A', strtotime($data['tickets'][$key]['booked_time'])) }}</p>
+                <p class="my-5 float-right">{{ date('d/m/Y h:i A', strtotime($data['tickets'][$key]['booked_time'])) }}</p>
             </div>
 
             <div class="clear-both">
