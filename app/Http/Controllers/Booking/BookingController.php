@@ -941,6 +941,7 @@ class BookingController extends Controller
             }
         }
         $schedule->bus_class->seat_map = $seatMap;
+        $schedule->bus_no = $tickets->count() > 0 && $tickets[0]->bus_id ? Bus::find($tickets[0]->bus_id)->bus_number : "N/A";
         unset($schedule->route);
         return $schedule;
     }
@@ -1100,6 +1101,7 @@ class BookingController extends Controller
         $infoData->route_name = $schedule->schedule->route->name;
         $infoData->description = $checkAssign ? $checkAssign->description : '';
         $infoData->bus = $checkAssign ? $checkAssign->bus_id : '';
+        $infoData->bus_no = $checkAssign ? Bus::find($checkAssign->bus_id)->bus_number : 'N/A';
         $infoData->drivers = $checkAssign ? $checkAssign->members->where("type", 1)->pluck('user_id') : [];
         $infoData->hosts = $checkAssign ? $checkAssign->members->where("type", 2)->pluck('user_id') : [];
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
@@ -1626,17 +1628,18 @@ class BookingController extends Controller
     public
     function fetchOverIssueSeat(Request $request)
     {
-//        dd($request->all());
+
         $uniqueDate = ScheduleDetail::where("departure_id", $request->departureCity)
             ->where("destination_id", $request->destinationCity)
             ->where('schedule_id', $request->id)
             ->where('departure_date', $request->date)
             ->where('company_id', Auth::user()->company_id)
             ->first();
-        $tickets = Ticket::withTrashed()->with('overIssueSeats', 'scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'seatClass')->where(["schedule_date" => $uniqueDate->schedule_date, "schedule_id" => $uniqueDate->schedule_id, 'type' => 'over-issue'])->get();
+        $tickets = Ticket::withTrashed()->with('overIssueSeats','overIssueSeats.overissue_by', 'scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'seatClass')->where(["schedule_date" => $uniqueDate->schedule_date, "schedule_id" => $uniqueDate->schedule_id, 'type' => 'over-issue'])->get();
         foreach ($tickets as $key => $single) {
-            $single->bookingDate = date('d/m/Y H:i A', strtotime($single->created_at));
+            $single->bookingDate = date('d/m/Y H:i A', strtotime($single->booked_time));
             $single->OverIssueDate = date('d/m/Y H:i A', strtotime($single->overIssueSeats->time));
+            $single->overIssueBy = $single->overIssueSeats->overissue_by->name??"N/A";
         }
         return $tickets;
     }
