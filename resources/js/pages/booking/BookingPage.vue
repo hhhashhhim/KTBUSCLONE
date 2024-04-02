@@ -505,6 +505,10 @@
                                                 </div>
                                                 <div class="my-1 border-top w-100" v-if="showBookingDiv">
                                                     <br>
+                                                    <span>Bus: <span class="text-dark"
+                                                                        style="font-weight: 700 !important">{{
+                                                            this.BusNo
+                                                        }}</span> </span><br>
                                                     <span>Booked: <span class="text-dark"
                                                                         style="font-weight: 700 !important">{{
                                                             this.totalSeatsBooked
@@ -688,6 +692,16 @@
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Destination City : </p>
                                                         <p class="mb-0">{{ singleSeat.destination_city.name }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                </div>
+                                                <div class="col-md-4">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Overissue By :</p>
+                                                        <p class="mb-0">{{ singleSeat.overIssueBy }}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1512,6 +1526,7 @@ export default {
                 placeholder: "03xx-xxxxxxx",
             },
             buses: [],
+            BusNo: "N/A",
             bus_classes: [],
             permissions: [],
             drivers: [],
@@ -2079,6 +2094,7 @@ export default {
                 this.buses = resData.data.buses;
                 this.drivers = resData.data.drivers;
                 this.hosts = resData.data.hosts;
+                this.BusNo = resData.data.infoData.bus_no;
                 this.dataForClose.date = resData.data.infoData.schedule_date;
                 this.dataForClose.ticket_closing_id = resData.data.infoData.ticket_closing_id;
                 this.dataForClose.alreadyAssigned = resData.data.infoData.alreadyAssigned;
@@ -2676,6 +2692,7 @@ export default {
                     this.showBookingDiv = true;
                     this.schedule = resSelected.data;
                     this.totalSeats = 0;
+                    this.BusNo = resSelected.data.bus_no;
                     this.totalSeatsBooked = 0;
                     this.totalSeatsIssued = 0;
                     this.totalSeatsAvailable = 0;
