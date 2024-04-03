@@ -1407,7 +1407,6 @@ class BookingController extends Controller
             'departure_date' => $request->date,
             'departure_id' => $request->departure_city_id,
             'destination_id' => $request->destination_city_id,
-            'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
         ])->first()->schedule_date;
         $route = Schedule::where([
             'company_id' => Auth::user()->company_id,
