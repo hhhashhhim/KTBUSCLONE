@@ -1345,6 +1345,7 @@ class BookingController extends Controller
             'departure_date' => $request->date,
             'departure_id' => $request->departure_city_id,
             'destination_id' => $request->destination_city_id,
+            'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
         ])->first();
 
         $passengerData = Ticket::with('customer:id,name,cnic,contact', 'addedBy:id,name','updated_name:id,name', 'terminal:id,name', 'elt:id,elt_price,ticket_id', 'destination_city:id,name', 'departure_city:id,name')->where([
