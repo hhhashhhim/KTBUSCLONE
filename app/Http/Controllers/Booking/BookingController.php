@@ -1401,6 +1401,7 @@ class BookingController extends Controller
     public
     function busInvoice(Request $request)
     {
+        return $request;
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
