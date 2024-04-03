@@ -1401,13 +1401,13 @@ class BookingController extends Controller
     public
     function busInvoice(Request $request)
     {
-        return $request;
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
             'departure_date' => $request->date,
             'departure_id' => $request->departure_city_id,
             'destination_id' => $request->destination_city_id,
+            'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
         ])->first()->schedule_date;
         $route = Schedule::where([
             'company_id' => Auth::user()->company_id,
