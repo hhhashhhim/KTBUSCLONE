@@ -1339,6 +1339,7 @@ class BookingController extends Controller
     public
     function terminalInvoice(Request $request)
     {
+        return $request;
         $scheduleDetail = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
