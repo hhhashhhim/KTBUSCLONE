@@ -155,10 +155,11 @@
         <th>Destination City Name</th>
     </tr>
     @if($data)
+        @php $count = 1; @endphp
         @foreach($data as $key => $item)
             {{--            {{dd($item)}}--}}
             <tr>
-                <td>{{$key + 1}}</td>
+                <td>{{$count++}}</td>
                 <td>{{ $item->seat_no }}</td>
                 <td>{{ $item->customer->name }}</td>
                 <td>{{ formatCNIC($item->customer->cnic) }}</td>
