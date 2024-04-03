@@ -1445,6 +1445,7 @@
             <input type="hidden" name="departure_city_id" :value="this.addForm.departureCity">
             <input type="hidden" name="date" :value="this.addForm.date">
             <input type="hidden" name="schedule_id" :value="this.addForm.schedule">
+            <input type="hidden" name="departure_time" :value="this.addForm.departure_time">
         </form>
         <!--Print Terminal Invoice-->
         <form :action="$store.state.api_url + 'api/web/v1/print/pdf/terminal/invoice'" method="POST" ref="refTerminalInvoice"
@@ -1455,6 +1456,7 @@
             <input type="hidden" name="date" :value="this.addForm.date">
             <input type="hidden" name="schedule_id" :value="this.addForm.schedule">
             <input type="hidden" name="terminal_id" :value="this.addForm.terminalId">
+            <input type="hidden" name="departure_time" :value="this.addForm.departure_time">
         </form>
         <!--Print Bus Invoice -->
         <form :action="$store.state.api_url + 'api/web/v1/print/pdf/bus/invoice'" method="POST" ref="refBusInvoice"
@@ -1464,6 +1466,7 @@
             <input type="hidden" name="departure_city_id" :value="this.addForm.departureCity">
             <input type="hidden" name="date" :value="this.addForm.date">
             <input type="hidden" name="schedule_id" :value="this.addForm.schedule">
+            <input type="hidden" name="departure_time" :value="this.addForm.departure_time">
         </form>
         <!--        print Customer Ticket Print-->
         <form :action="$store.state.api_url + 'api/web/v1/print/pdf/customer/ticket'" method="POST" ref="refTicket"
