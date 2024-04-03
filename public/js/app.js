@@ -29403,6 +29403,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       label: "",
       haveLabel: false,
       hideCheckBox: false,
+      runUpdateFun: true,
       pointsCardId: "",
       ticketsId: "",
       appliedSurcharge: "",
@@ -31461,9 +31462,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context24.prev = _context24.next) {
               case 0:
                 _this25.validationErrors = [];
+                _this25.runUpdateFun = true;
 
                 if (!(_this25.addForm.oldBookings == 1 && !_this25.schedule.bus_class.seat_map[row][col].type)) {
-                  _context24.next = 3;
+                  _context24.next = 4;
                   break;
                 }
 
@@ -31474,9 +31476,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 3:
+              case 4:
                 if (!(_this25.schedule.bus_class.seat_map[row][col].type && _this25.selectedSeats.length == 0)) {
-                  _context24.next = 10;
+                  _context24.next = 11;
                   break;
                 }
 
@@ -31509,12 +31511,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 _this25.addForm.totalAmount = _this25.addForm.totalFare;
                 _this25.addForm.selectedBookedSeats = _this25.selectedBookedSeats;
-                _context24.next = 22;
+                _context24.next = 24;
                 break;
 
-              case 10:
+              case 11:
                 if (!(!_this25.schedule.bus_class.seat_map[row][col].type && _this25.selectedBookedSeats.length == 0)) {
-                  _context24.next = 19;
+                  _context24.next = 20;
                   break;
                 }
 
@@ -31546,10 +31548,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this25.addForm.selectedSeats = _this25.selectedSeats;
                 _this25.addForm.selectedSeatsFare = _this25.selectedSeatsFare;
                 _this25.addForm.selectedSeatsClass = _this25.selectedSeatsClass;
-                _context24.next = 22;
+                _context24.next = 24;
                 break;
 
-              case 19:
+              case 20:
+                _this25.runUpdateFun = false;
+
                 _this25.fetchScheduleData();
 
                 _this25.resetArrays();
@@ -31561,9 +31565,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 22:
+              case 24:
                 if (!(_this25.schedule.bus_class.seat_map[row][col].over_issue && _this25.selectedOverIssueSeats.length == 0)) {
-                  _context24.next = 28;
+                  _context24.next = 30;
                   break;
                 }
 
@@ -31588,12 +31592,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _this25.addForm.selectedBookedOverIssueSeats = _this25.selectedBookedOverIssueSeats;
-                _context24.next = 37;
+                _context24.next = 40;
                 break;
 
-              case 28:
+              case 30:
                 if (!(!_this25.schedule.bus_class.seat_map[row][col].over_issue && _this25.selectedBookedOverIssueSeats.length == 0)) {
-                  _context24.next = 34;
+                  _context24.next = 36;
                   break;
                 }
 
@@ -31610,10 +31614,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _this25.addForm.selectedOverIssueSeats = _this25.selectedOverIssueSeats;
-                _context24.next = 37;
+                _context24.next = 40;
                 break;
 
-              case 34:
+              case 36:
+                _this25.runUpdateFun = false;
+
                 _this25.fetchScheduleData();
 
                 _this25.resetArrays();
@@ -31625,7 +31631,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 37:
+              case 40:
               case "end":
                 return _context24.stop();
             }
@@ -31643,35 +31649,37 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context25.prev = _context25.next) {
               case 0:
-                if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
-                  index = _this26.advanceSeat.indexOf(data.seatNo);
+                if (_this26.runUpdateFun == true) {
+                  if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
+                    index = _this26.advanceSeat.indexOf(data.seatNo);
 
-                  if (index != -1) {
-                    _this26.addForm.selectedSeats.splice(index, 1);
+                    if (index != -1) {
+                      _this26.addForm.selectedSeats.splice(index, 1);
 
-                    _this26.advanceSeat.splice(index, 1);
+                      _this26.advanceSeat.splice(index, 1);
 
-                    _this26.addForm.alreadyBookedId.splice(index, 1);
+                      _this26.addForm.alreadyBookedId.splice(index, 1);
 
-                    _this26.addForm.customerName = "";
-                    _this26.addForm.customerCNIC = "";
-                    _this26.addForm.contact = "";
+                      _this26.addForm.customerName = "";
+                      _this26.addForm.customerCNIC = "";
+                      _this26.addForm.contact = "";
 
-                    if (_this26.advanceSeat.length == 0) {
-                      _this26.addForm.flag = 0;
+                      if (_this26.advanceSeat.length == 0) {
+                        _this26.addForm.flag = 0;
+                      }
+                    } else {
+                      _this26.addForm.alreadyBookedId.push(data.id);
+
+                      _this26.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
+                      _this26.addForm.customerName = data.customer_name;
+                      _this26.addForm.contact = data.customer_phone; // this.addForm.remarks = data.remarks;
+
+                      _this26.addForm.selectedSeats.push(data.seatNo);
+
+                      _this26.advanceSeat.push(data.seatNo);
+
+                      _this26.addForm.flag = 1;
                     }
-                  } else {
-                    _this26.addForm.alreadyBookedId.push(data.id);
-
-                    _this26.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
-                    _this26.addForm.customerName = data.customer_name;
-                    _this26.addForm.contact = data.customer_phone; // this.addForm.remarks = data.remarks;
-
-                    _this26.addForm.selectedSeats.push(data.seatNo);
-
-                    _this26.advanceSeat.push(data.seatNo);
-
-                    _this26.addForm.flag = 1;
                   }
                 } // this validation only for if types is different selected liked booked or advance booking mixed
 

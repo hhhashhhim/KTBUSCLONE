@@ -1644,6 +1644,7 @@ export default {
             label: "",
             haveLabel: false,
             hideCheckBox: false,
+            runUpdateFun: true,
             pointsCardId: "",
             ticketsId: "",
             appliedSurcharge: "",
@@ -3006,7 +3007,7 @@ export default {
 
         async selectSeat(row, col, seatNo, fare, colClass) {
             this.validationErrors = [];
-            
+            this.runUpdateFun = true;
             if (this.addForm.oldBookings == 1 && !this.schedule.bus_class.seat_map[row][col].type) {
                 return swal({
                     title: "Ops",
@@ -3065,6 +3066,7 @@ export default {
                 this.addForm.selectedSeatsClass = this.selectedSeatsClass;
             } else {
              
+                this.runUpdateFun = false;
                 this.fetchScheduleData();
                 this.resetArrays();
                 return swal({
@@ -3105,6 +3107,7 @@ export default {
                 }
                 this.addForm.selectedOverIssueSeats = this.selectedOverIssueSeats;
             } else {
+                this.runUpdateFun = false;
                 this.fetchScheduleData();
                 this.resetArrays();
                 return swal({
@@ -3120,29 +3123,32 @@ export default {
         // update Form After  advanced Booked seat
         async updateBookedSeat(data) {
            
-            if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
-                let index = this.advanceSeat.indexOf(data.seatNo);
-                if (index != -1) {
-                    this.addForm.selectedSeats.splice(index, 1);
-                    this.advanceSeat.splice(index, 1);
-                    this.addForm.alreadyBookedId.splice(index, 1);
-                    this.addForm.customerName = "";
-                    this.addForm.customerCNIC = "";
-                    this.addForm.contact = "";
-                    if(this.advanceSeat.length == 0)
-                    {
-                        this.addForm.flag = 0;
+            if(this.runUpdateFun == true)
+            {
+                if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
+                    let index = this.advanceSeat.indexOf(data.seatNo);
+                    if (index != -1) {
+                        this.addForm.selectedSeats.splice(index, 1);
+                        this.advanceSeat.splice(index, 1);
+                        this.addForm.alreadyBookedId.splice(index, 1);
+                        this.addForm.customerName = "";
+                        this.addForm.customerCNIC = "";
+                        this.addForm.contact = "";
+                        if(this.advanceSeat.length == 0)
+                        {
+                            this.addForm.flag = 0;
+                        }
+                    } else {
+                        this.addForm.alreadyBookedId.push(data.id);
+                        this.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
+                        this.addForm.customerName = data.customer_name;
+                        this.addForm.contact = data.customer_phone;
+                        // this.addForm.remarks = data.remarks;
+                        this.addForm.selectedSeats.push(data.seatNo);
+                        this.advanceSeat.push(data.seatNo)
+                        this.addForm.flag = 1;
+                       
                     }
-                } else {
-                    this.addForm.alreadyBookedId.push(data.id);
-                    this.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
-                    this.addForm.customerName = data.customer_name;
-                    this.addForm.contact = data.customer_phone;
-                    // this.addForm.remarks = data.remarks;
-                    this.addForm.selectedSeats.push(data.seatNo);
-                    this.advanceSeat.push(data.seatNo)
-                    this.addForm.flag = 1;
-                   
                 }
             }
             
