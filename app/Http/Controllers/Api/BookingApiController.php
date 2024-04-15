@@ -701,7 +701,7 @@ class BookingApiController extends Controller
                     {
                         $ticketDepIndex = array_search($tkt->departure_city_id,$allFaresOfRoute);
                         $ticketDesIndex = array_search($tkt->destination_city_id,$allFaresOfRoute);
-                        if(($ticketDepIndex > $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
+                        if(($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
                         {
                             return response()->json(["errors" => ["Error" => ["One seat of your combination already booked"]]], 422);
                         }

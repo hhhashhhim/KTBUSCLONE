@@ -15,6 +15,10 @@ class ScheduleDetail extends Model
 {
     use HasFactory, SoftDeletes;
     protected $guarded = [];
+    /* Fillable
+    *  Id
+    * schedule_date ( Date At which bus will leave from first terminal ) 
+    */
 
     public function company(){
         return $this->hasOne( Company::class,'id','company_id' );

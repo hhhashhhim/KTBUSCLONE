@@ -226,7 +226,15 @@ class ScheduleController extends Controller
                         "departure_date" => date("Y-m-d",strtotime($updatedTime)),
                         "departure_time" => date("H:i:s",strtotime($updatedTime)),
                     ]);  
+
                 }
+                DB::table('tickets')
+                ->where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$request->schedule_id])
+                ->whereBetween("schedule_date",[$request->start_date,$request->end_date])
+                ->update([
+                    'schedule_time' => DB::raw("DATE_ADD(schedule_time, INTERVAL $request->time MINUTE)"),
+                    'schedule_time_exact' => DB::raw("DATE_ADD(schedule_time_exact, INTERVAL $request->time MINUTE)")
+                ]);
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
                     "message" => Auth::user()->name." | updated schedule time from $request->start_date to $request->end_date time ($request->time) | $request->schedule_id",
