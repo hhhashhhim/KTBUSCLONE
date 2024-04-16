@@ -70,7 +70,7 @@
                         </span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="dropdown">
+                        <li class="dropdown" v-if="checkForSubmenu('report-header')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'report-header'}">
                                 <i class="fas fa-city"></i> Report Headers
                             </router-link>
@@ -105,7 +105,7 @@
                                 <i class="fas fa-clock"></i> Closed Trip Report
                             </router-link>
                         </li>
-                        <li class="dropdown">
+                        <li class="dropdown" v-if="checkForSubmenu('expenses')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'office-expenses-page' }">
                                 <i class="fas fa-bookmark"></i> Office Expenses
                             </router-link>

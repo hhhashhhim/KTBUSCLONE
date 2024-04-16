@@ -424,6 +424,10 @@ export default {
                     allow: true,
                     childs: [
                         {
+                            name: "report-header",
+                            allow: true,
+                        },
+                        {
                             name: "confirm-cancel",
                             allow: true,
                         },
