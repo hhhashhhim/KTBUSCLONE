@@ -442,7 +442,9 @@ export default {
                             name: "terminal-sale",
                             allow: true,
                             buttons: [
-                                {name: "terminal-filter", allow: true},
+                                {name: "terminal-sale-terminal-filter", allow: true},
+                                {name: "terminal-sale-user-filter", allow: true},
+                                {name: "terminal-sale-route-filter", allow: true},
                             ],
                         },
                         {

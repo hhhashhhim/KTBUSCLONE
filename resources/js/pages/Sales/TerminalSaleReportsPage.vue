@@ -14,7 +14,7 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-md-2" v-if="checkForSubmenuButtons('terminal-filter')">
+                                                <div class="col-md-2" v-if="checkForSubmenuButtons('terminal-sale-terminal-filter')">
                                                     <label for="terminalFilter">Terminals</label>
                                                     <select id="terminalFilter" class="form-control"
                                                             v-model="filterSales.terminal"
@@ -26,7 +26,7 @@
                                                         </option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="col-md-2" v-if="checkForSubmenuButtons('terminal-sale-user-filter')">
                                                     <label for="usernameFilter">Users</label>
                                                     <select id="usernameFilter" class="form-control"
                                                             v-model="filterSales.user"
@@ -38,7 +38,7 @@
                                                         </option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="col-md-2" v-if="checkForSubmenuButtons('terminal-sale-route-filter')">
                                                     <label for="routeIds">Routes</label>
                                                     <select id="routeIds" class="form-control" multiple
                                                             v-model="filterSales.route"
