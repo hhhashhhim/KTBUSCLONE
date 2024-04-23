@@ -391,11 +391,12 @@ class BookingApiController extends Controller
                 $seatChoices =  $schedule->route->online_seat_choices ? explode(",",$schedule->route->online_seat_choices) : null;
                 // Looping Through the seat of the bus
                 $seatMap = $scheduleDetail->bus_class->seat_map;
+                $count = 0;
                 foreach ($seatMap as $i => &$iValue) {
                     foreach ($iValue as $j => &$column) {
                         // adding fare to each seat
                         if ($column['reserved']) {
-
+                            $count++;
                             $data = $fareForAllClasses->where('fare_class', $column['class'])->first();
                             $seatMap[$i][$j]['fare'] = (int)$data->fare;
                             if ($scheduleDiscount) {
@@ -547,6 +548,7 @@ class BookingApiController extends Controller
                 }
                 $schedule->bus_class->seat_map = $seatMap;
                 $data = $schedule->bus_class;
+                $data->total_seats = $count;
 
 
 

@@ -142,6 +142,10 @@
         "allow": true,
         "childs": [
             {
+                "name": "report-header",
+                "allow": true
+            },
+            {
                 "name": "confirm-cancel",
                 "allow": true
             },
@@ -151,6 +155,24 @@
                 "buttons": [
                     {
                         "name": "terminal-filter",
+                        "allow": true
+                    }
+                ]
+            },
+            {
+                "name": "terminal-sale",
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "terminal-sale-terminal-filter",
+                        "allow": true
+                    },
+                    {
+                        "name": "terminal-sale-user-filter",
+                        "allow": true
+                    },
+                    {
+                        "name": "terminal-sale-route-filter",
                         "allow": true
                     }
                 ]
@@ -352,6 +374,10 @@
                     },
                     {
                         "name": "seat-details",
+                        "allow": true
+                    },
+                    {
+                        "name": "bus-class",
                         "allow": true
                     },
                     {
