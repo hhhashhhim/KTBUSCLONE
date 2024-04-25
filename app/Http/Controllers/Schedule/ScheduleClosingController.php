@@ -83,7 +83,9 @@ class ScheduleClosingController extends Controller
                 ]);
                 TicketClosingMerge::whereIn("id",$request->mergeIds)->delete();
                 $closingIds = TicketClosing::where("ticket_merge_id",$merge->id)->pluck("id");
-                Ticket::whereIn("ticket_closing_id",$closingIds)->update([
+                Ticket::whereIn("ticket_closing_id",$closingIds)
+                ->withTrashed()
+                ->update([
                     "ticket_merge_id" => $merge->id
                 ]);
                 ActivityLog::create([
@@ -153,7 +155,11 @@ class ScheduleClosingController extends Controller
             ->with("closing:id,ticket_merge_id,schedule_id", "closing.schedule:id,name")
             ->with("tickets.elt:id,ticket_id,elt_price","tickets.schedule:id,route_id")
             ->with(["tickets"=>function($q){
-                $q->where("type","booked");
+                $q->withTrashed();
+                $q->where(function ($query) {
+                    $query->where("type", "booked")
+                          ->orWhere("type", "over-issue");
+                });
                 $q->select("id","ticket_merge_id","seat_fare","discount","schedule_id","terminal_id","ticket_closing_id");
             }])
             ->where(function($q) use ($request){
@@ -267,7 +273,11 @@ class ScheduleClosingController extends Controller
             ->with("closing:id,ticket_merge_id,schedule_id", "closing.schedule:id,name")
             ->with("tickets.elt:id,ticket_id,elt_price","tickets.schedule:id,route_id")
             ->with(["tickets"=>function($q){
-                $q->where("type","booked");
+                $q->withTrashed();
+                $q->where(function ($query) {
+                    $query->where("type", "booked")
+                          ->orWhere("type", "over-issue");
+                });
                 $q->select("id","ticket_merge_id","seat_fare","discount","schedule_id","terminal_id","ticket_closing_id");
             }])
             ->where(function($q) use ($request){
@@ -490,7 +500,9 @@ class ScheduleClosingController extends Controller
                 ]);
             }
 
-            Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, "schedule_date" => $request->date])->update([
+            Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, "schedule_date" => $request->date])
+            ->withTrashed()
+            ->update([
                 "bus_id" => $request->bus,
                 "ticket_closing_id" => $closingRecord->id,
             ]);

@@ -165,14 +165,24 @@ class ExpenseController extends Controller
         $closing_pair = TicketClosing::with("schedule")->where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->get();
         $data = (object)[];
         
-        $data->schedule_start = Ticket::where("type","booked")->with("elt")->with(["commission"=>function($q) use ($closing_pair){
+        $data->schedule_start = Ticket::withTrashed()
+            ->where(function ($query) {
+                $query->where("type", "booked")
+                      ->orWhere("type", "over-issue");
+                })
+            ->with("elt")->with(["commission"=>function($q) use ($closing_pair){
             $q->where("route_id",$closing_pair[0]->schedule->route_id);
         }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[0]->id)->with('terminal:id,name')->get()->groupBy(['terminal_id']);
 
-        $data->schedule_return = Ticket::where("type","booked")->with("elt")->with(["commission"=>function($q) use ($closing_pair){
+        $data->schedule_return = Ticket:: withTrashed()
+            ->where(function ($query) {
+                $query->where("type", "booked")
+                      ->orWhere("type", "over-issue");
+                })
+            ->with("elt")->with(["commission"=>function($q) use ($closing_pair){
             $q->where("route_id",$closing_pair[1]->schedule->route_id);
         }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[1]->id)->with('terminal:id,name')->get()->groupBy(['terminal_id']);
-
+    
         $data->expense = TicketMergeExpense::where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->with("expense_category:id,name")->get();
 
         // get bus number
