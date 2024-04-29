@@ -217,6 +217,7 @@
                             $returnTotalAmount += ($item->sum('seat_fare') - $item->sum('discount')) - $returnCommission - $returnAdjustCommission - $returnFixCommission ;
                         @endphp
                         <td>{{ $returnElt }}</td>
+                        @php $returnTotalElt += $returnElt @endphp
                     </tr>
                 @endforeach
             </table>
@@ -225,7 +226,7 @@
                     <td style="width: 43%">Total</td>
                     <td style="width: 38%">{{$returnTotalPass}}</td>
                     <td style="width: 17.5%">{{$returnTotalAmount}}</td>
-                    <td style=""> {{$returnElt}}</td>
+                    <td style=""> {{$returnTotalElt}}</td>
                 </tr>
 
             </table>
