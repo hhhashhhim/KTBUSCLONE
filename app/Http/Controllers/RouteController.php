@@ -232,7 +232,10 @@ class RouteController extends Controller
                                 'company_id' => Auth::user()->company_id,
                                 'added_by' => auth()->user()->id
                             ]);
-                            $TerminalVisibility->delete();
+                            if(isset($TerminalVisibility))
+                            {
+                                $TerminalVisibility->delete();
+                            }
                         }
                     }
                 }
