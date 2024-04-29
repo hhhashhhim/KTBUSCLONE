@@ -560,6 +560,7 @@ class ScheduleClosingController extends Controller
                     'added_by' => Auth::user()->id,
                 ]);
             }
+            
             Ticket::where("ticket_closing_id",$closing->id)->withTrashed()->update(["bus_id"=>$request->bus]);
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
