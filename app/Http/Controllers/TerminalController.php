@@ -338,8 +338,12 @@ class TerminalController extends Controller
     public function filterData(Request $request)
     {
         $tickets = Ticket::with('updated_name:id,name', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number","customer:id,name,cnic,contact")
+            ->withTrashed()
             ->where('company_id', Auth::user()->company_id)
-            ->where('type', 'booked')
+            ->where(function ($query) {
+                $query->where("type", "booked")
+                      ->orWhere("type", "over-issue");
+                })
             ->where(function($query) use ($request){
                 if($request->terminal)
                 {
