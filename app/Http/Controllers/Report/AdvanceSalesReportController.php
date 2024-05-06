@@ -27,7 +27,7 @@ class AdvanceSalesReportController extends Controller
 
     public function getRoutes()
     {
-        return Route::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
+        return Route::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name',"via"]);
     }
 
     public function filterData(Request $request)

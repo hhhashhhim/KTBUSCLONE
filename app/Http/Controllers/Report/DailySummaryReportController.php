@@ -20,7 +20,7 @@ class DailySummaryReportController extends Controller
 {
     public function getRoutes()
     {
-        return Route::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
+        return Route::where('company_id', Auth::user()->company_id)->get(['id', 'name','via']);
     }
 
     public function getBuses()

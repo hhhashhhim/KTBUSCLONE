@@ -53,7 +53,7 @@ class TerminalController extends Controller
 
     public function getRoutes(Request $request)
     {
-        return Route::where(['company_id'=>Auth::user()->company_id,"hide"=>0])->get(["id", "name"]);
+        return Route::where(['company_id'=>Auth::user()->company_id,"hide"=>0])->get(["id", "name","via"]);
     }
 
     public function store(Request $request)

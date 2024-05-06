@@ -390,15 +390,6 @@ class BookingController extends Controller
                 $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$scheduleDetail->schedule_id,"schedule_date"=>$scheduleDetail->schedule_date])->first();
                 $schedule = Schedule::where('id', $ticket['schedule_id'])->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                 
-                $invoice = Invoice::create([
-                    "schedule_id" => $schedule->id,
-                    "route_id" => $schedule->route_id,
-                    "terminal_id" => $request->terminalId ?? Auth::user()->terminal_id,
-                    "schedule_date" => $scheduleDetail->schedule_date,
-                    "schedule_time" => $scheduleDetail->departure_time,
-                    "company_id" => Auth::user()->company_id,
-                    "added_by" => Auth::user()->id,
-                ]);
                 
                 $departure_city_id = $schedule->route->fares->first()->departure_city_id;
                 $destination_city_id = $schedule->route->fares->last()->destination_city_id;
@@ -435,7 +426,7 @@ class BookingController extends Controller
                     'destination_city_id' => $item['dataDestination'],
                     'seat_no' => $item['selected_seatNo'],
                     'terminal_id' => $ticket['terminal_id'],
-                    'invoice_id' => $invoice->id,
+                    'invoice_id' => $ticket['invoice_id'],
                     'ticket_closing_id' => $existingTicket ? $existingTicket->ticket_closing_id : null,
                     'ticket_merge_id' => $existingTicket ? $existingTicket->ticket_merge_id : null,
                     'bus_id' => $existingTicket ? $existingTicket->bus_id : null,
