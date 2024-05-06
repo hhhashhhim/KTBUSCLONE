@@ -44,7 +44,7 @@
                                                                         v-for="(route, i) in routes"
                                                                         :value="route.id"
                                                                         :key="i"
-                                                                >{{ route.name }}
+                                                                >{{ route.name }}  ({{ route.via??'n/a' }})
                                                                 </option>
                                                             </select>
                                                         </div>

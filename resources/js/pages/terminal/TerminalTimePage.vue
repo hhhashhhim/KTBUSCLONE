@@ -33,7 +33,7 @@
                                                                 <option value="" selected>Select Route</option>
                                                                 <option v-for="(route, i) in routes"
                                                                         :value="route.id" :key="i">
-                                                                    {{ route.name }}
+                                                                    {{ route.name }}  ({{ route.via??'n/a' }})
                                                                 </option>
                                                             </select>
                                                         </td>

@@ -3840,10 +3840,11 @@ export default {
                 dataDestination: data.destination_city_id,
                 dataSeat_no: data.seat_no,
                 dataSeatFare: data.seat_fare,
+                dataSeatDiscount: data.discount,
                 dataAll: data,
             }
             this.mainAllRescheduleData[0] = this.rescheduleData;
-            this.mainAllRescheduleData.totalFare = this.rescheduleData.dataSeatFare;
+            this.mainAllRescheduleData.totalFare = parseInt(this.rescheduleData.dataSeatFare) - parseInt(this.rescheduleData.dataSeatDiscount);
             this.mainAllRescheduleData.oldSeats = this.rescheduleData.dataSeat_no;
             if (parseInt(this.rescheduleData.dataDepartureCity) == 0) {
                 this.rescheduleData.rescheduleDestinationCity = 0;
