@@ -36,23 +36,25 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr v-for="(terminal, i) in terminals" :key="i">
-                                                <td>{{ i + 1 }}</td>
-                                                <td>{{ terminal.name }}</td>
-                                                <td>{{ terminal.terminal_count }}</td>
-                                                <td>{{ terminal.added_by.name }}</td>
-                                                <td v-if="checkForSubmenuButtons('view-terminal') || checkForSubmenuButtons('edit-terminal') || checkForSubmenuButtons('delete-terminal')|| checkForSubmenuButtons('commission')|| checkForSubmenuButtons('discount')">
-                                                    <button title="View Terminals"
-                                                            data-target="#detail-modal"
-                                                            data-toggle="modal"
-                                                            @click="terminalDetail(terminal.id); datatableReset()"
-                                                            class="btn btn-info mx-2"
-                                                            v-if="checkForSubmenuButtons('view-terminal')"
-                                                    >
-                                                        <i class="far fa-eye"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                            <template v-for="(terminal, i) in terminals" :key="i">
+                                                <tr v-if="terminal.terminal_count > 0">
+                                                    <td>{{ i + 1 }}</td>
+                                                    <td>{{ terminal.name }}</td>
+                                                    <td>{{ terminal.terminal_count }}</td>
+                                                    <td>{{ terminal.added_by.name }}</td>
+                                                    <td v-if="checkForSubmenuButtons('view-terminal') || checkForSubmenuButtons('edit-terminal') || checkForSubmenuButtons('delete-terminal')|| checkForSubmenuButtons('commission')|| checkForSubmenuButtons('discount')">
+                                                        <button title="View Terminals"
+                                                                data-target="#detail-modal"
+                                                                data-toggle="modal"
+                                                                @click="terminalDetail(terminal.id); datatableReset()"
+                                                                class="btn btn-info mx-2"
+                                                                v-if="checkForSubmenuButtons('view-terminal')"
+                                                        >
+                                                            <i class="far fa-eye"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </template>
                                             </tbody>
                                         </table>
                                     </div>
