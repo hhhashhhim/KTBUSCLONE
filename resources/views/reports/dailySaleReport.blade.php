@@ -264,43 +264,40 @@
                 <tr>
                     <td style="width: 46%">{{$singleData->city_one}}</td>
                     <td>{{$startTotalPass}}</td>
-                    <td style="width: 17.5%">{{$startTotalAmount}}</td>
+                    <td style="width: 17.5%">+ {{$startTotalAmount}}</td>
                 </tr>
             </table>
             <table border="2" style="text-align: center;">
                 <tr>
                     <td style="width: 46%">{{$singleData->city_two}}</td>
                     <td>{{$returnTotalPass}}</td>
-                    <td style="width: 17.5%">{{$returnTotalAmount}}</td>
+                    <td style="width: 17.5%">+ {{$returnTotalAmount}}</td>
                 </tr>
             </table>
             <table border="2" style="text-align: center;">
                 <tr>
-                    <td style="width: 46%">Gross Total</td>
-                    <td>{{$startTotalPass + $returnTotalPass}}</td>
-                    <td style="width: 17.5%">{{$startTotalAmount + $returnTotalAmount}}</td>
+                    <th style="width: 46%">Gross Total</th>
+                    <th>{{$startTotalPass + $returnTotalPass}}</th>
+                    <th style="width: 17.5%">= {{$startTotalAmount + $returnTotalAmount}}</th>
                 </tr>
             </table>
-            @php $refundAmount = 0; @endphp
-            @foreach($refundTerminal as $refund)
+          
             <table border="2" style="text-align: center;">
                 <tr>
-                    <td style="width: 50%">{{ $refund['terminal'] }} refund</td>
-                    <td style="width: 50%">{{$refund['amount']}}</td>
+                    <td style="width: 50%">All Terminal Refund</td>
+                    <td style="width: 50%">+ {{array_sum(array_column($refundTerminal, 'amount'))}}</td>
                 </tr>
             </table>
-            @php $refundAmount += $refund['amount'] @endphp
-            @endforeach
             <table border="2" style="text-align: center;">
                 <tr>
                     <td style="width: 50%">Expenses</td>
-                    <td style="width: 50%">{{$data->expense->sum('amount')}}</td>
+                    <td style="width: 50%">- {{$data->expense->sum('amount')}}</td>
                 </tr>
             </table>
             <table border="2" style="text-align: center;">
                 <tr>
-                    <td style="width: 50%">Net Profit</td>
-                    <td style="width: 50%">{{$startTotalAmount + $refundAmount + $returnTotalAmount - $data->expense->sum('amount')}}</td>
+                    <th style="width: 50%">Net Profit</th>
+                    <th style="width: 50%">= {{$startTotalAmount + array_sum(array_column($refundTerminal, 'amount')) + $returnTotalAmount - $data->expense->sum('amount')}}</th>
                 </tr>
             </table>
         </div>

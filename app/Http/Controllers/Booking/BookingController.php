@@ -1407,7 +1407,6 @@ class BookingController extends Controller
         $driverInfo = getMembers($passengerData->first(), Auth::user()->company_id, 1) ?? [];
         $hostInfo = getMembers($passengerData->first(), Auth::user()->company_id, 2) ?? [];
         $routeName = routeName($request->schedule_id);
-        $routeId = Schedule::where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first()->route_id;
         $bus = (object)[];
         $bus->bus_class = BusClass::find($scheduleDetail->bus_class_id)->name??'N/A';
         $bus->bus_no = $passengerData->count() > 0 ? Bus::find($passengerData[0]->bus_id)->bus_number??'N/A' : "N/A";

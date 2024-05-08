@@ -246,14 +246,18 @@ class RouteController extends Controller
     
                 foreach($schedules as $schedule)
                 {
+                    // getting schedule detail from today or upcoming schedule to get schedule start date
                     $start_date = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$schedule->id])->where("schedule_date", '>=' , date("Y-m-d"))->orderBy("id","ASC")->first();
+                    // getting schedule detail from today or upcoming schedule to get schedule end date
                     $end_date = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$schedule->id])->where("schedule_date", '>=' , date("Y-m-d"))->orderBy("id",'DESC')->first();
                     if($start_date && $end_date)
                     {
+                        // getting route detail like fsd -> mltn -> kch
                         $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
+                        // how many days schedule exist
                         $days = $this->getDays($start_date->schedule_date, $end_date->schedule_date);
       
-        
+                        // to run loop equal to schedule existing days
                         for ($i = 0; $i <= $days; $i++) {
                             $date_wise_departure = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$schedule->id,"schedule_date"=>date("Y-m-d",strtotime(date("$start_date->schedule_date"))+($i * 86400))])->orderBy("id","ASC")->first();
                             ScheduleDetail::where("schedule_id",$schedule->id)->where("schedule_date", date("Y-m-d",strtotime(date("$start_date->schedule_date"))+($i * 86400)))->delete();
@@ -266,6 +270,7 @@ class RouteController extends Controller
                                 if ($lastDepId == $detail->departure_city_id) {
                                     $departureTime = date("Y-m-d H:i", $totalTime);
                                 } else {
+                                    // getting time difference between two cities in a route
                                     $fareTableTime = FareTable::where(['from_city_id' => $lastDepId, 'to_city_id' => $detail->departure_city_id])->first()->time_difference??"00:00";
                                     $timeDiff = explode(':', $fareTableTime);
                                     $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));

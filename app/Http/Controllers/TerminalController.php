@@ -25,7 +25,7 @@ class TerminalController extends Controller
 {
     public function index()
     {
-        return City::withCount(['terminal'=>function($q){$q->where("hide",0);}])->with('addedBy')->where('company_id', Auth::user()->company_id)->get();
+        return City::has('terminal', '>', 0)->withCount(['terminal'=>function($q){$q->where("hide",0);}])->with('addedBy')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function companies()
@@ -337,7 +337,7 @@ class TerminalController extends Controller
 
     public function filterData(Request $request)
     {
-        $tickets = Ticket::with('updated_name:id,name', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number","customer:id,name,cnic,contact")
+        $tickets = Ticket::with('updated_name:id,name', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number","customer:id,name,cnic,contact","route:id,name,via")
             ->withTrashed()
             ->where('company_id', Auth::user()->company_id)
             ->where(function ($query) {
@@ -361,7 +361,7 @@ class TerminalController extends Controller
                 return $query->whereIn('route_id', $request->route);
             })
             ->orderBy('date', 'desc')
-            ->get(["id","terminal_id","route_id","bus_class_id","schedule_date","schedule_time","updated_by","bus_id","invoice_id","seat_fare","discount","seat_no","customer_id"]);
+            ->get(["id","terminal_id","route_id","bus_class_id","schedule_date","schedule_time","updated_by","bus_id","invoice_id","seat_fare","discount","seat_no","customer_id","route_id"]);
 
         $tickets->map(function ($single) {
             $single->load(['commission'=>function($q){

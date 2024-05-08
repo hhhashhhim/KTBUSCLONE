@@ -8,6 +8,7 @@ use App\Models\Bus\BusClass;
 use App\Models\Bus\Bus;
 use App\Models\Booking\BookingCancel;
 use App\Models\Schedule\Schedule;
+use App\Models\Route\Route;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\TerminalCommission;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,6 +24,11 @@ class Ticket extends Model
     public function addedBy()
     {
         return $this->hasOne(User::class, 'id', 'added_by');
+    }
+    
+    public function route()
+    {
+        return $this->hasOne(Route::class, 'id', 'route_id');
     }
 
     public function departure_city()

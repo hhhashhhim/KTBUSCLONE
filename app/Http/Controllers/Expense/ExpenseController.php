@@ -223,8 +223,8 @@ class ExpenseController extends Controller
 
             $refundTerminal[] = $singleTerminal;
         });
-        // //////////
         
+
         return view('reports.dailySaleReport', [
             "singleData" => $singleData,
             "data" => $data,
