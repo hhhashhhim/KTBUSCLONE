@@ -656,9 +656,7 @@
                         <select
                             class="form-control"
                             id="route"
-                            v-model="dataEdit.schedules.route_id"
-                            disabled
-                        >
+                            v-model="dataEdit.schedules.route_id">
                             <option value="0" selected>Select Route</option>
                             <option
                                 v-for="(route, i) in editRoutes"

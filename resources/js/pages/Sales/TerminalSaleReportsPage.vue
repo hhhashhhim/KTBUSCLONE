@@ -92,6 +92,7 @@
                                                                 <th>Bus Time</th>
                                                                 <th>Bus No</th>
                                                                 <th>Bus Class</th>
+                                                                <th>Route</th>
                                                                 <th>Name</th>
                                                                 <th>Cnic</th>
                                                                 <th>Contact</th>
@@ -109,6 +110,7 @@
                                                                 <td>{{ data.schedule_date }}<br>{{ data.schedule_time }}</td>
                                                                 <td>{{ data.bus ? data.bus.bus_number : 'N/A' }}</td>
                                                                 <td>{{ data.bus_class.name }}</td>
+                                                                <td>{{ data.route.name }}  ({{ data.route.via??'n/a' }})</td>
                                                                 <td>{{ data.customer.name }}</td>
                                                                 <td>{{ data.customer.cnic }}</td>
                                                                 <td>{{ data.customer.contact }}</td>
