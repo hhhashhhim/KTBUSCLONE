@@ -6,8 +6,9 @@
                     <div class="card card-primary">
                         <div class="card-header d-flex justify-content-between">
                             <h4>Leaves</h4>
-                            <div class="card-header-action">
+                            <div class="card-header-action" v-if="checkForSubmenuButtons('apply-leave')">
                                 <a
+                                    
                                     href="#"
                                     v-if="$store.state.user.role.name == 'admin'"
                                     data-toggle="modal"
@@ -57,7 +58,7 @@
                                                         <th>Status</th>
                                                         <th>Applied By</th>
                                                         <th v-if="$store.state.user.role.name == 'admin'">Approval</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-leave')">Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -99,7 +100,7 @@
                                                             </div>
                                                         </td>
                                                         <td class="text-center" v-if="leave.status == 'P'  ||  $store.state.user.role.name != 'admin'">
-                                                            <button title="Edit Leave" :data-target="'#' + editFormID" data-toggle="modal"
+                                                            <button v-if="checkForSubmenuButtons('edit-leave')" title="Edit Leave" :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="editLeave(leave)"
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
@@ -227,6 +228,7 @@ export default {
             editFormID: "edit_leaves_form",
             deleteFormID: "delete_leaves_form",
             validationErrors: [],
+            permissions: [],
             success: false,
             error: false,
             delId: "",
@@ -235,6 +237,7 @@ export default {
     },
     async created() {
         $('.modal').remove();
+        this.permissions = this.$store.state.permissions;
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {
             window.addEventListener('keydown', this.enterKey);

@@ -7,7 +7,7 @@
                         <div class="card-header">
                             <h4>Expense Categories</h4>
                             <div class="card-header-action">
-                                <a href="#" data-toggle="modal" :data-target="'#'+formID" @click="clearForm()"
+                                <a v-if="checkForSubmenuButtons('add-category')" href="#" data-toggle="modal" :data-target="'#'+formID" @click="clearForm()"
                                    class="btn btn-primary">
                                     Add New Category
                                 </a>
@@ -27,7 +27,7 @@
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
                                                         <th>Added By</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-category')">Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -36,7 +36,7 @@
                                                         <td>{{ category.name }}</td>
                                                         <td>{{ category.added_by.name }}</td>
                                                         <td>
-                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                            <button v-if="checkForSubmenuButtons('edit-category')" :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(category)"
                                                                     class=" text-light btn btn-primary mx-1"
                                                                     title="Edit Category">
@@ -129,6 +129,7 @@ export default {
             loading: false,
             formID: 'category_form',
             editFormID: 'edit_category_form',
+            permissions: [],
             // deleteFormID:'delete_city_form',
             data: {
                 name: "",
@@ -144,6 +145,7 @@ export default {
     },
     async created() {
         $('.modal').remove();
+        this.permissions = this.$store.state.permissions;
         await this.fetchData();
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {

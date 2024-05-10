@@ -26,6 +26,16 @@ export default {
                     localStorage.removeItem("token");
                     window.location.href = this.$store.state.main_url;
                 }
+                if(error.response.status == 403)
+                {
+                    window.history.back();
+                    return swal({
+                        title: "OOPS!!!!!",
+                        text: "ACCESS DENIED",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
                 return error.response
             }
         },

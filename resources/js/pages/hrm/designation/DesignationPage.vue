@@ -8,6 +8,7 @@
                             <h4>Designations</h4>
                             <div class="card-header-action">
                                 <a
+                                    v-if="checkForSubmenuButtons('add-designation')"
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
@@ -53,7 +54,7 @@
                                                         <th>Department Name</th>
                                                         <th>No. Of Designations</th>
                                                         <th>Added By</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('view-designation')">Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -66,6 +67,7 @@
                                                         <td>{{ designation.added_by.name }}</td>
                                                         <td>
                                                             <button
+                                                                v-if="checkForSubmenuButtons('view-designation')"
                                                                 data-target="#detail-modal"
                                                                 data-toggle="modal"
                                                                 @click="designationDetail(designation.id)"
@@ -279,6 +281,7 @@ export default {
             deleteFormID: "delete_designation_form",
             validationErrors: [],
             terminals: [],
+            permissions: [],
             success: false,
             error: false,
             delId: "",
@@ -287,6 +290,7 @@ export default {
     },
     async created() {
         $('.modal').remove();
+        this.permissions = this.$store.state.permissions;
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {
             window.addEventListener('keydown', this.enterKey);

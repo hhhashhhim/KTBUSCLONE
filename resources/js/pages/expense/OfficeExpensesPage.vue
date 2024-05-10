@@ -8,7 +8,7 @@
                             <h4>Office Expenses</h4>
                             <div class="card-header-action">
                                 <a href="#" data-toggle="modal" :data-target="'#'+formID" @click="clearForm()"
-                                   class="btn btn-primary" v-if="checkForSubmenuButtons('add-counter-expenses')">
+                                   class="btn btn-primary">
                                     Add Office Expenses
                                 </a>
                             </div>

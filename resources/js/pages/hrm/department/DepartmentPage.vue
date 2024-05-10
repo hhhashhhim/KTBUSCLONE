@@ -8,6 +8,7 @@
                             <h4>Departments</h4>
                             <div class="card-header-action">
                                 <a
+                                    v-if="checkForSubmenuButtons('add-department')"
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + formID"
@@ -52,7 +53,7 @@
                                                         <th>Terminal Name</th>
                                                         <th>City Name</th>
                                                         <th>Added By</th>
-                                                        <th>Action</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-department')">Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -63,7 +64,7 @@
                                                         <td>{{ department.terminal.city.name }}</td>
                                                         <td>{{ department.added_by.name }}</td>
                                                         <td>
-                                                            <button :data-target="'#' + editFormID" data-toggle="modal"
+                                                            <button v-if="checkForSubmenuButtons('edit-department')" :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="editDepartment(department)"
                                                                     class="btn btn-primary mx-1"
                                                                     title="Edit Department">
@@ -185,6 +186,7 @@ export default {
             departments: [],
             loading: false,
             formID: "department_form",
+            permissions: [],
             editFormID: "edit_department_form",
             deleteFormID: "delete_department_form",
             validationErrors: [],
@@ -197,6 +199,7 @@ export default {
     },
     async created() {
         $('.modal').remove();
+        this.permissions = this.$store.state.permissions;
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {
             window.addEventListener('keydown', this.enterKey);
