@@ -15,11 +15,19 @@ class FareClassController extends Controller
 {
     protected function index()
     {
+        if(!checkForSubmenu("fare-class"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return FareClass::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
     }
 
     public function storeFareClass(Request $request)
     {
+        if(!checkPermissionButtons("add-class"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -59,6 +67,10 @@ class FareClassController extends Controller
 
     public function updateFareClass(Request $request)
     {
+        if(!checkPermissionButtons("edit-class"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -92,8 +104,8 @@ class FareClassController extends Controller
             }
     }
 
-    public function deleteFareClass(Request $request)
-    {
-        return FareClass::find($request->id)->delete();
-    }
+    // public function deleteFareClass(Request $request)
+    // {
+    //     return FareClass::find($request->id)->delete();
+    // }
 }

@@ -28,6 +28,10 @@ class ScheduleController extends Controller
 {
     public function index(Request $request)
     {
+        if(!checkForSubmenu("schedules"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $schedules = Schedule::
             with('fare_class', 'route', 'bus_class', 'addedBy')
             ->with(["schedule_time"=>function($q) use ($request){
@@ -56,6 +60,10 @@ class ScheduleController extends Controller
 
     public function storeSchedule(Request $request)
     {
+        if(!checkPermissionButtons("add-schedule"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 // $cityIds = array_column($request->cities, 'id');
@@ -191,6 +199,10 @@ class ScheduleController extends Controller
 
     public function editSchedule(Request $request)
     {
+        if(!checkPermissionButtons("edit-schedule"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $schedule = Schedule::find($request->id);
         $visibilities = ScheduleTerminalVisibility::where("schedule_id",$schedule->id)->pluck("terminal_id");
         $discountTerminals = ScheduleTerminalDiscount::where("schedule_id",$schedule->id)->pluck("terminal_id");
@@ -203,6 +215,10 @@ class ScheduleController extends Controller
 
     public function updateScheduleTime(Request $request)
     {
+        if(!checkPermissionButtons("update-time"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -251,6 +267,10 @@ class ScheduleController extends Controller
     }
     public function updateSchedule(Request $request)
     {
+        if(!checkPermissionButtons("edit-schedule"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $req = $request->schedules;
@@ -364,6 +384,10 @@ class ScheduleController extends Controller
 
     public function hideSchedule(Request $request)
     {
+        if(!checkPermissionButtons("delete-schedule"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $schedule = Schedule::find($request->id);
         ActivityLog::create([
             "activity_by" => Auth::user()->id,
@@ -378,16 +402,28 @@ class ScheduleController extends Controller
 
     public function getRoutes()
     {
+        if(!checkForSubmenu("schedules"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Route::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get();
     }
     
     public function getTerminals()
     {
+        if(!checkForSubmenu("schedules"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Terminal::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(["id","name"]);
     }
 
     public function getCity(Request $request)
     {
+        if(!checkForSubmenu("schedules"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $routeFares = RouteFare::where('route_id', $request->id)->select('departure_city_id', 'destination_city_id')->get();
         $data = [];
         foreach ($routeFares as $i => $routeFare) {
@@ -405,11 +441,19 @@ class ScheduleController extends Controller
 
     public function getRouteFareClass(Request $request)
     {
+        if(!checkForSubmenu("schedules"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return RouteFare::with('fare_class')->where('company_id', Auth::user()->company_id)->where('route_id', $request->id)->select('fare_class_id')->distinct()->get();
     }
 
     public function getEntire(Request $request)
     {
+        if(!checkForSubmenu("schedules"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return [
             //            'fareClass' => FareClass::where('company_id', Auth::user()->company_id)->where('id', $request->fareClass)->first()->name,
             'route' => Route::where('company_id', Auth::user()->company_id)->where('id', $request->route)->pluck('name')->first(),
@@ -422,6 +466,10 @@ class ScheduleController extends Controller
 
     public function genericCommon()
     {
+        if(!checkForSubmenu("schedules"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return [
             'route' => Route::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(),
             'discount' => Discount::where('company_id', Auth::user()->company_id)->get(),
@@ -431,6 +479,10 @@ class ScheduleController extends Controller
 
     public function extend(Request $request)
     {
+        if(!checkPermissionButtons("extend-schedule"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $schedule = Schedule::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
@@ -499,27 +551,47 @@ class ScheduleController extends Controller
 
     public function allBuses(Request $request)
     {
+        if(!checkForSubmenu("schedules"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $busClassId = ScheduleDetail::where(['company_id' => Auth::user()->company_id, 'schedule_id' => $request['id']])->first(['bus_class_id'])->bus_class_id;
         return Bus::where('company_id', Auth::user()->company_id)->where('fare_class_id', $busClassId)->get(['id', 'bus_number']);
     }
 
     public function fareClasses()
     {
+        if(!checkForSubmenu("schedules"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return FareClass::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
     }
 
     public function busClasses()
     {
+        if(!checkForSubmenu("schedules"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return BusClass::with('addedBy')->orderBy('id')->where(['company_id'=> Auth::user()->company_id,"hide" => 0])->get();
     }
 
     public function surchargeSelective()
     {
+        if(!checkForSubmenu("schedules"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Surcharge::where('company_id', Auth::user()->company_id)->where('is_active', 1)->get();
     }
 
     public function discountSelective()
     {
+        if(!checkForSubmenu("schedules"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Discount::where('company_id', Auth::user()->company_id)->where('is_active', 1)->get();
     }
 }

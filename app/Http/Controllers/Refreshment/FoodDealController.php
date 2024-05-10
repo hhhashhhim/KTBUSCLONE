@@ -15,24 +15,17 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class FoodDealController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index(Request $request)
     {
+        if(!checkPermissionButtons("deal"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Hotel::
             with('user:id,name,email','deals:id,name,price,description,hotel_id',
             'deals.dealDetails:id,food_id,food_deal_id,quantity','deals.dealDetails.food:id,name,unit')
@@ -41,6 +34,10 @@ class FoodDealController extends Controller
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("deal-add-deal"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $request->validate([
@@ -91,6 +88,10 @@ class FoodDealController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("deal-edit-deal"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $request->validate([

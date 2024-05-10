@@ -15,23 +15,21 @@ use Illuminate\Support\Facades\Log;
 class FleetMaintenancePartController extends Controller
 {
 
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index()
     {
+        if(!checkForSubmenu("part"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return MaintenancePart::with('addedBy', 'company')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-part"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -68,6 +66,10 @@ class FleetMaintenancePartController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("edit-part"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [

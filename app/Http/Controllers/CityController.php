@@ -16,11 +16,19 @@ class CityController extends Controller
 {
     public function index(Request $request)
     {
+        if(!checkForSubmenu("cities"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return City::with('addedBy')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->orderBy('id')->get();
     }
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-city"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -57,6 +65,10 @@ class CityController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("edit-city"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -88,6 +100,10 @@ class CityController extends Controller
 
     public function hideCity(Request $request)
     {
+        if(!checkPermissionButtons("delete-city"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $city = City::find($request->id);
         ActivityLog::create([
             "activity_by" => Auth::user()->id,

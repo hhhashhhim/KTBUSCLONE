@@ -16,11 +16,11 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
     Route::post('/cities', [BookingController::class, 'cities']);
     Route::post('/store', [BookingController::class, 'store']);
     Route::post('/terminals', [BookingController::class, 'getTerminals']);
-    Route::post('/delete', [BookingController::class, 'deleteBooking']);
+    // Route::post('/delete', [BookingController::class, 'deleteBooking']);
     Route::post('/getCNIC', [BookingController::class, 'getCnic']);
     Route::post('/getPoints', [BookingController::class, 'getPoints']);
     Route::post('/usagePoints', [BookingController::class, 'usagePoints']);
-    Route::post('/details', [BookingController::class, 'detailTicket']);
+    // Route::post('/details', [BookingController::class, 'detailTicket']);
     Route::post('/reschedule', [BookingController::class, 'singleReschedule']);
     Route::post('/seat-classes', [BookingController::class, 'seatClasses']);
     Route::post('/fetchSchedule', [BookingController::class, 'fetchSpecificSchedule']);
@@ -31,7 +31,7 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
     Route::post('/canceling', [BookingController::class, 'cancelingBooking']);
     Route::post('/canceling/all', [BookingController::class, 'cancelingAllBooking']);
     Route::post('/elt', [BookingController::class, 'bookingElt']);
-    Route::post('/getPassenger', [BookingController::class, 'getPassengersList']);
+    // Route::post('/getPassenger', [BookingController::class, 'getPassengersList']);
     Route::post('/getClosingData', [BookingController::class, 'getClosingData']);
     Route::post('/getBusClasses', [BookingController::class, 'getBusClasses']);
     Route::post('/busclass/update', [BookingController::class, 'updateBusClass']);

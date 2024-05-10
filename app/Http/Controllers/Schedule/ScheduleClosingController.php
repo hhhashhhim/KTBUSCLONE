@@ -30,6 +30,10 @@ class ScheduleClosingController extends Controller
 {
     public function closing()
     {
+        if(!checkForSubmenu("closing"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
         $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id,"hide"=>0])->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
         $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id,"hide"=>0])->get(["id", "user_id", "name", "cnic"]);
@@ -51,6 +55,10 @@ class ScheduleClosingController extends Controller
     
     public function unclosing()
     {
+        if(!checkForSubmenu("closing"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $closings = TicketClosing::where('company_id', Auth::user()->company_id)
         ->with("bus:id,bus_number", "schedule:id,name,route_id", "schedule.route:id,name")
         ->get()
@@ -66,6 +74,10 @@ class ScheduleClosingController extends Controller
     
     public function mergeClosing(Request $request)
     {
+        if(!checkForSubmenu("closing"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
             DB::beginTransaction();
                 $mergeOne = TicketClosingMerge::where("id",$request->mergeIds[0])->first();
@@ -104,6 +116,10 @@ class ScheduleClosingController extends Controller
     
     public function releaseClosing(Request $request)
     {
+        if(!checkPermissionButtons("edit-close-booking"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
             DB::beginTransaction();
                 $mergeId = TicketClosing::find($request->closingId)->ticket_merge_id;
@@ -149,6 +165,10 @@ class ScheduleClosingController extends Controller
 
     public function merges(Request $request)
     {
+        if(!checkForSubmenu("merges"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $merges = TicketClosingMerge::where(['company_id' => Auth::user()->company_id, 'schedule_complete' => 1])
             ->withSum("expenses",'amount')
             ->with("bus:id,bus_number")
@@ -267,6 +287,10 @@ class ScheduleClosingController extends Controller
     
     public function mergesPdf(Request $request)
     {
+        if(!checkForSubmenu("merges"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $merges = TicketClosingMerge::where(['company_id' => Auth::user()->company_id, 'schedule_complete' => 1])
             ->withSum("expenses",'amount')
             ->with("bus:id,bus_number")
@@ -393,6 +417,10 @@ class ScheduleClosingController extends Controller
     
     public function updateClosingDate(Request $request)
     {
+        if(!checkForSubmenu("merges"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         TicketClosingMerge::where("id",$request->mergeId)->update([
             "closing_date" => $request->closingDate,
         ]);
@@ -419,6 +447,10 @@ class ScheduleClosingController extends Controller
 
     public function store(Request $request)
     {
+        if(!checkForSubmenu("assign-bus"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
             DB::beginTransaction();
             // this is for get route id that will be followed by schedule
@@ -523,6 +555,10 @@ class ScheduleClosingController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkForSubmenu("edit-close-booking"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
             DB::beginTransaction();
             // delete old members

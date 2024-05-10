@@ -13,19 +13,12 @@ use Illuminate\Support\Facades\Log;
 
 class LeaveController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index()
     {
+        if(!checkForSubmenu("leaves"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $role = Role::where('company_id', Auth::user()->company_id)->where('id', Auth::user()->role_id)->get(['name']);
         if($role == 'admin') {
             return Leave::with('addedBy', 'company', 'decision')->where('company_id', Auth::user()->company_id)->get();
@@ -37,6 +30,10 @@ class LeaveController extends Controller
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("apply-leave"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -79,6 +76,10 @@ class LeaveController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("edit-leave"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -118,10 +119,10 @@ class LeaveController extends Controller
 
     }
 
-    public function delete(Request $request)
-    {
-        return Leave::find($request->id)->delete();
-    }
+    // public function delete(Request $request)
+    // {
+    //     return Leave::find($request->id)->delete();
+    // }
 
     public function dateDifferenceInDays($from, $to)
     {
@@ -132,6 +133,10 @@ class LeaveController extends Controller
 
     public function approval(Request $request)
     {
+        if(!checkForSubmenu("leaves"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
          Leave::where('id', $request->id)->update([
             'status'=>$request->status,
             'decider_id'=>Auth::user()->id,

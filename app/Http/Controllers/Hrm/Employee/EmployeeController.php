@@ -20,12 +20,20 @@ class EmployeeController extends Controller
 {
     public function index()
     {
+        if(!checkForSubmenu("employees"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Employee::with('addedBy', 'company', 'department', 'designation', 'user', 'terminal.city')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get();
 
     }
 
     public function getCities()
     {
+        if(!checkForSubmenu("employees"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $cities = City::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
         foreach ($cities as $single) {
             $single->name = ucfirst($single->name);
@@ -35,6 +43,10 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-employee"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 if ($request->createAccount == 1) {
@@ -121,6 +133,10 @@ class EmployeeController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("edit-employee"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -202,6 +218,10 @@ class EmployeeController extends Controller
 
     public function hideEmployee(Request $request)
     {
+        if(!checkPermissionButtons("delete-employee"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $employee = Employee::find($request->id);
         ActivityLog::create([
             "activity_by" => Auth::user()->id,
@@ -216,6 +236,10 @@ class EmployeeController extends Controller
 
     public function userStore(Request $request)
     {
+        if(!checkPermissionButtons("add-employee"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $user = User::create([

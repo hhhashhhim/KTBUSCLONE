@@ -8,5 +8,5 @@ Route::group(['prefix' => 'web/v1/discount','middleware' => ['auth:sanctum']], f
     Route::post('/', [DiscountController::class, 'index']);
     Route::post('/store', [DiscountController::class, 'storeDiscount']);
     Route::post('/update', [DiscountController::class, 'updateDiscount']);
-    Route::post('/delete', [DiscountController::class, 'deleteDiscount']);
+    // Route::post('/delete', [DiscountController::class, 'deleteDiscount']);
 });

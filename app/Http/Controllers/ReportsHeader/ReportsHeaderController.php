@@ -16,11 +16,19 @@ class ReportsHeaderController extends Controller
 {
     public function index()
     {
+        if(!checkForSubmenu("report-header"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return ReportsHeader::with('addedBy')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function store(Request $request)
     {
+        if(!checkForSubmenu("report-header"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -55,6 +63,10 @@ class ReportsHeaderController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkForSubmenu("report-header"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -89,7 +101,10 @@ class ReportsHeaderController extends Controller
 
     public function linkGet(Request $request)
     {
-        
+        if(!checkForSubmenu("report-header"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $links = ReportHeaderLink::where(['company_id'=> Auth::user()->company_id,'ticket_merge_id'=>$request->ticket_merge_id])->get();
         $headers = ReportsHeader::with('addedBy')->where('company_id', Auth::user()->company_id)->get();
         if($links->count() > 0)
@@ -110,6 +125,10 @@ class ReportsHeaderController extends Controller
 
     public function headerLink(Request $request)
     {
+        if(!checkForSubmenu("report-header"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 ReportHeaderLink::where("ticket_merge_id", $request->ticket_merge_id)->delete();

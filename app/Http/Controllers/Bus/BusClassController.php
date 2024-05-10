@@ -27,11 +27,19 @@ class BusClassController extends Controller
 
     protected function index()
     {
+        if(!checkForSubmenu("bus-class"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return BusClass::with('addedBy')->orderBy('id')->where(['company_id'=> Auth::user()->company_id,"hide" => 0])->get();
     }
 
     public function storeBusClass(Request $request)
     {
+        if(!checkPermissionButtons("add-bus-class"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -77,6 +85,10 @@ class BusClassController extends Controller
 
     public function updateBusClass(Request $request)
     {
+        if(!checkPermissionButtons("edit-bus-Class"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $busClass = BusClass::where('id', $request->id)->update([
@@ -105,6 +117,10 @@ class BusClassController extends Controller
 
     public function hideBusClass(Request $request)
     {
+        if(!checkPermissionButtons("delete-bus-class"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $busClass = BusClass::find($request->id);
         ActivityLog::create([
             "activity_by" => Auth::user()->id,
@@ -119,6 +135,10 @@ class BusClassController extends Controller
 
     public function duplicateBusClass(Request $request)
     {
+        if(!checkPermissionButtons("duplicate-bus-Class"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $busClass = BusClass::where('company_id', Auth::user()->company_id)->where('id', $request->id)->first();
@@ -142,12 +162,20 @@ class BusClassController extends Controller
             }
     }
     public function fareClasses(){
+        if(!checkForSubmenu("bus-class"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return FareClass::with('addedBy')
         ->where('company_id', Auth::user()->company_id)->orderBy('id')
         ->get();
     }
     public function saveFareClass(Request $request)
     {
+        if(!checkPermissionButtons("add-class"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [

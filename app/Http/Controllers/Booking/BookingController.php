@@ -51,6 +51,10 @@ class BookingController extends Controller
 {
     public function index(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $bookings = Ticket::select('schedule_id', 'date', 'schedule_details_id', 'bus_class_id')->with('schedule:id,name', 'scheduleDetail', 'seatClass')->whereDate('date', isset($request->date) ? $request->date : date("Y-m-d"))
             ->where('company_id', Auth::user()->company_id)->get()->groupBy(['date', 'schedule_id']);
         $allBooking = [];
@@ -67,6 +71,10 @@ class BookingController extends Controller
 
     public function cities()
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         if (Auth::user()->departure_city_ids == "all") {
             $ids = City::where("company_id", Auth::user()->company_id)->pluck('id');
         } else {
@@ -77,6 +85,10 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         /*
         * Validation Types on Ticket Must be
         * 1) Target => Same ticket for same departure and designation must not be same
@@ -367,6 +379,10 @@ class BookingController extends Controller
 
     public function singleReschedule(Request $request)
     {
+        if(!checkPermissionButtons("reschedule-seats"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
             DB::beginTransaction();
             foreach ($request->data as $key => $item) {
@@ -502,13 +518,17 @@ class BookingController extends Controller
         }
     }
 
-    public function deleteBooking(Request $request)
-    {
-        return Ticket::find($request->id)->delete();
-    }
+    // public function deleteBooking(Request $request)
+    // {
+    //     return Ticket::find($request->id)->delete();
+    // }
 
     public function fetchSpecificSchedule(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         if (!$request->date) {
             return "Date is Required";
         }
@@ -553,6 +573,10 @@ class BookingController extends Controller
     public
     function fetchSpecificDestination(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $depart_city = RouteFare::where('departure_city_id', $request->id)->where('company_id', Auth::user()->company_id)->pluck('destination_city_id')->toArray();
         if (Auth::user()->destination_city_ids == "all") {
             $finalArray = $depart_city;
@@ -565,6 +589,10 @@ class BookingController extends Controller
 
     public function fetchSpecificOverIssueSeat(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $ticket = Ticket::where(["company_id" => Auth::user()->company_id, "date" => $request->date, "seat_no" => $request->seat_no, "schedule_id" => $request->schedule_id, "destination_city_id" => $request->destination_id, "departure_city_id" => $request->departure_id])->select('booking_no', 'customer_id', 'gender', 'is_partial', 'type', 'remarks')->first();
         $customer = Customer::where(["company_id" => Auth::user()->company_id, "id" => $ticket->customer_id])->first();
         $ticket = json_decode(json_encode($ticket), true);
@@ -579,6 +607,10 @@ class BookingController extends Controller
 
     public function overIssueAddNew(Request $request)
     {
+        if(!checkPermissionButtons("overissue-seat"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
             DB::beginTransaction();
             $ticket = Ticket::where([
@@ -620,7 +652,10 @@ class BookingController extends Controller
     public
     function getCnic(Request $request)
     {
-        
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         if ($request->status == 'addFormCNIC') {
             $cnic = plainContactAndCnic($request['cnicNumber']);
             return Customer::where('company_id', Auth::user()->company_id)->where('cnic', $cnic)->first();
@@ -662,24 +697,36 @@ class BookingController extends Controller
     public
     function getTerminals()
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return [
             'terminals' => Terminal::with('city')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(),
             'authTerminalId' => Auth::user()->terminal_id ?? 0,
         ];
     }
 
-    public
-    function detailTicket(Request $request)
-    {
-        return Ticket::with('addedBy', 'customer')->where('company_id', Auth::user()->company_id)
-            ->whereDate('date', $request->date)
-            ->where('schedule_id', $request->schedule_id)
-            ->get();
-    }
+    // public
+    // function detailTicket(Request $request)
+    // {
+    //     if(!checkPermissionButtons("seat-details"))
+    //     {
+    //         return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+    //     }
+    //     return Ticket::with('addedBy', 'customer')->where('company_id', Auth::user()->company_id)
+    //         ->whereDate('date', $request->date)
+    //         ->where('schedule_id', $request->schedule_id)
+    //         ->get();
+    // }
 
     public
     function advanceData(Request $request)
     {
+        if(!checkPermissionButtons("seat-details"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->scheduleId,
@@ -713,12 +760,20 @@ class BookingController extends Controller
     public
     function getFareClass()
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return FareClass::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
     }
 
     public
     function dropCheck(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->id,
@@ -759,6 +814,10 @@ class BookingController extends Controller
     public
     function fetchELTDetails(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $uniqueDate = ScheduleDetail::where("departure_id", $request->departureCity)
             ->where("destination_id", $request->destinationCity)
             ->where('schedule_id', $request->id)
@@ -777,6 +836,10 @@ class BookingController extends Controller
     public
     function terminalSeats(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $seats = Terminal::where('id', $request->terminal_id)->value('available_seats');
         if (!is_null($seats) && Auth::user()->check_allowed_seats == 1) {
             if (strpos($seats, '-') !== false) {
@@ -805,6 +868,10 @@ class BookingController extends Controller
     public
     function selected(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         if (!$request->departureCity || !$request->destinationCity || !$request->date) {
             echo "Error";
             return [];
@@ -992,6 +1059,10 @@ class BookingController extends Controller
 
     public function dropSchedule(Request $request)
     {
+        if(!checkPermissionButtons("drop-schedule"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $scheduleDetail = ScheduleDetail::where([
@@ -1078,6 +1149,10 @@ class BookingController extends Controller
     }
     public function revertDropSchedule(Request $request)
     {
+        if(!checkPermissionButtons("drop-schedule"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $scheduleDetail = ScheduleDetail::where([
@@ -1110,6 +1185,10 @@ class BookingController extends Controller
     public
     function getClosingData(Request $request)
     {
+        if(!checkPermissionButtons("assign-bus"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->scheduleId,
@@ -1164,6 +1243,10 @@ class BookingController extends Controller
     public
     function getBusClasses(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $bus_classes =  BusClass::with('addedBy')->orderBy('id')->where(['company_id'=> Auth::user()->company_id,"hide" => 0])->get();
     
         $data = [
@@ -1174,6 +1257,10 @@ class BookingController extends Controller
     
     function updateBusClass(Request $request)
     {
+        if(!checkPermissionButtons("bus-class"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
                     'company_id' => Auth::user()->company_id,
@@ -1197,6 +1284,10 @@ class BookingController extends Controller
     public
     function bookingElt(Request $request)
     {
+        if(!checkPermissionButtons("add-elt"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 if (is_null(Auth::user()->terminal_id)) {
@@ -1271,6 +1362,10 @@ class BookingController extends Controller
     public
     function cancelingBooking(Request $request)
     {
+        if(!checkPermissionButtons("cancel-ticket"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $ticket = Ticket::where([
@@ -1341,6 +1436,10 @@ class BookingController extends Controller
     public
     function cancelingAllBooking(Request $request)
     {
+        if(!checkPermissionButtons("cancel-ticket"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $tickets = Ticket::whereIn("id",$request->cancelAllSeat)->where(['company_id' => Auth::user()->company_id])->get();
@@ -1383,6 +1482,10 @@ class BookingController extends Controller
     public
     function terminalInvoice(Request $request)
     {
+        if(!checkPermissionButtons("terminal-invoice"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $scheduleDetail = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
@@ -1445,6 +1548,10 @@ class BookingController extends Controller
     public
     function busInvoice(Request $request)
     {
+        if(!checkPermissionButtons("bus-invoice"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
@@ -1541,6 +1648,10 @@ class BookingController extends Controller
     public
     function ticketPdf(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         if ((int)$request->duplicate == 0) {
             $ids = explode("-", $request->ticket_ids);
         } else {
@@ -1575,6 +1686,10 @@ class BookingController extends Controller
     public
     function eltPdf(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $ticketsElt = TicketELT::with('schedule', 'customer', 'ticket.seatClass:id,name', 'destination', 'departure')->where(['company_id' => Auth::user()->company_id, 'id' => $request->elt_ids])->first();
         $format = TicketsTemplate::where(['company_id' => Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id])->first();
         $finalData = [
@@ -1584,22 +1699,30 @@ class BookingController extends Controller
         return view('pdf/eltPdf', ['data' => $finalData]);
     }
 
-    public
-    function getPassengersList(Request $request)
-    {
-        $customers_id = Ticket::where([
-            'company_id' => Auth::user()->company_id,
-            'schedule_id' => $request->schedule_id,
-            'departure_city_id' => $request->departure_city_id,
-            'destination_city_id' => $request->destination_city_id,
-            'date' => $request->date,
-        ])->pluck('customer_id')->toArray();
-        return implode('-', array_unique($customers_id));
-    }
+    // public
+    // function getPassengersList(Request $request)
+    // {
+    //     if(!checkPermissionButtons("pax-list"))
+    //     {
+    //         return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+    //     }
+    //     $customers_id = Ticket::where([
+    //         'company_id' => Auth::user()->company_id,
+    //         'schedule_id' => $request->schedule_id,
+    //         'departure_city_id' => $request->departure_city_id,
+    //         'destination_city_id' => $request->destination_city_id,
+    //         'date' => $request->date,
+    //     ])->pluck('customer_id')->toArray();
+    //     return implode('-', array_unique($customers_id));
+    // }
 
     public
     function passengerListPdf(Request $request)
     {
+        if(!checkForSubmenu("pax-list"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
@@ -1657,6 +1780,10 @@ class BookingController extends Controller
     public
     function fetchScheduleSurchargeDiscount(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Schedule::with(['surcharge' => function ($q) {
             $q->where('is_active', 1);
         }])->with(['discount' => function ($q) {
@@ -1667,6 +1794,10 @@ class BookingController extends Controller
     public
     function fetchTerminalDiscount(Request $request)
     {
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $schedule = Schedule::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
         return $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->dropTerminal ?? 0, "route_id" => $schedule->route_id])->first();
     }
@@ -1674,7 +1805,10 @@ class BookingController extends Controller
     public
     function fetchOverIssueSeat(Request $request)
     {
-
+        if(!checkForSubmenu("bookings"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $uniqueDate = ScheduleDetail::where("departure_id", $request->departureCity)
             ->where("destination_id", $request->destinationCity)
             ->where('schedule_id', $request->id)
@@ -1693,6 +1827,10 @@ class BookingController extends Controller
     public
     function revertOverIssueSeat(Request $request)
     {
+        if(!checkPermissionButtons("overissue-seat"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $ticket = Ticket::where([
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $request->schedule_date,
@@ -1712,6 +1850,10 @@ class BookingController extends Controller
     public
     function getFetchOldELT(Request $request)
     {
+        if(!checkPermissionButtons("add-elt"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $foundELT = TicketELT::where([
             'date' => $request->date,
             'customer_id' => $request->customer_id,

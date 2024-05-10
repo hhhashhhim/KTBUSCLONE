@@ -14,23 +14,16 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 class HotelController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index()
     {
+        if(!checkForSubmenu("hotels"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $checkHotelLogin = Hotel::where("user_id",Auth::user()->id)->where("company_id",Auth::user()->company_id)->first();
         if($checkHotelLogin)
         {
@@ -44,6 +37,10 @@ class HotelController extends Controller
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-hotel"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $request->validate([
@@ -95,6 +92,10 @@ class HotelController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("edit-hotel"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $request->validate([

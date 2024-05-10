@@ -13,24 +13,21 @@ use Illuminate\Support\Facades\Log;
 
 class DiscountController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index()
     {
+        if(!checkForSubmenu("discounts"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Discount::with('addedBy')->orderBy('id')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function storeDiscount(Request $request)
     {
+        if(!checkPermissionButtons("add-discount"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -68,6 +65,10 @@ class DiscountController extends Controller
 
     public function updateDiscount(Request $request)
     {
+        if(!checkPermissionButtons("edit-discount"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -102,8 +103,8 @@ class DiscountController extends Controller
             }
     }
 
-    public function deleteDiscount(Request $request)
-    {
-        return Discount::find($request->id)->delete();
-    }
+    // public function deleteDiscount(Request $request)
+    // {
+    //     return Discount::find($request->id)->delete();
+    // }
 }

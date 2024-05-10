@@ -17,16 +17,28 @@ class CardAssignController extends Controller
 {
     public function index()
     {
+        if(!checkForSubmenu("loyaltyCardAssign"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return CardAssign::with('addedBy:id,name', 'updatedBy:id,name', 'customer', 'cardCategory:id,name')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function cardCategories()
     {
+        if(!checkForSubmenu("loyaltyCardAssign"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return CardCategory::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
     }
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-assign-card"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $data = CardAssign::where(['cnic' => plainContactAndCnic($request->customerCNIC), 'company_id' => Auth::user()->company_id])->first();
@@ -74,6 +86,10 @@ class CardAssignController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("edit-assign-card"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $assignCard =  CardAssign::where(['id' => $request->id, 'company_id' => Auth::user()->company_id])->first();
@@ -101,6 +117,10 @@ class CardAssignController extends Controller
 
     public function getCnic(Request $request)
     {
+        if(!checkForSubmenu("loyaltyCardAssign"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         if ($request->status == 'addFormCNIC') {
             return Customer::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request['cnicNumber']))->first();
         }

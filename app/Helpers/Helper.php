@@ -25,6 +25,31 @@ use Rawilk\Printing\Facades\Printing;
 use Rawilk\Printing\Receipts\ReceiptPrinter;
 
 
+if (!function_exists('checkForSubmenu')) {
+    function checkForSubmenu($moduleName) {
+        $permissions = Role::find(Auth::user()->role_id)->permissions;
+        $valid = false;
+    
+        // Loop through each permission item
+        foreach ($permissions as $permission) {
+            // Check if 'childs' key exists and is an array
+            if (isset($permission['childs']) && is_array($permission['childs'])) {
+                // Loop through each submenu item
+                foreach ($permission['childs'] as $subMenuItem) {
+                    // Check if 'name' matches the moduleName
+                    if ($subMenuItem['name'] == $moduleName) {
+                        // Set valid to the 'allow' value of the matching submenu item
+                        $valid = $subMenuItem['allow'];
+                        // Exit the loop since we found the match
+                        break 2; // Exit both foreach loops
+                    }
+                }
+            }
+        }
+    
+        return $valid;
+    }
+}
 if (!function_exists('checkPermissionButtons')) {
     function checkPermissionButtons($name)
     {

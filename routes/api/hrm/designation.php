@@ -10,6 +10,6 @@ Route::group(['prefix' => 'web/v1/hrm/designation','middleware' => ['auth:sanctu
     Route::post('/getTerminal', [DesignationController::class, 'getTerminal']);
     Route::post('/edit', [DesignationController::class, 'edit']);
     Route::post('/update', [DesignationController::class, 'update']);
-    Route::post('/delete', [DesignationController::class, 'delete']);
+    // Route::post('/delete', [DesignationController::class, 'delete']);
     Route::post('/selective', [DesignationController::class, 'selective']);
 });

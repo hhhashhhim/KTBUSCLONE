@@ -18,6 +18,10 @@ class ScheduleDropReportController extends Controller
 {
     public function dropReport()
     {
+        if(!checkForSubmenu("schedule-drop"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return DropSchedule::where('company_id', Auth::user()->company_id)->with("schedule:id,name,route_id","schedule.route:id,name,via","added_by:id,name")->get();
     }
 

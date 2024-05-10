@@ -14,30 +14,27 @@ use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class FoodController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index(Request $request)
     {
+        if(!checkPermissionButtons("food"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Hotel::with('user:id,name,email','foods:id,name,price,unit,description,hotel_id')
                 ->where(["id"=>$request->hotelId,"company_id"=>Auth::user()->company_id])->first();
     }
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("food-add-food"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $request->validate([
@@ -72,6 +69,10 @@ class FoodController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("food-edit-food"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $request->validate([

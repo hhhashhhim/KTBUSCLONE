@@ -15,11 +15,19 @@ class CounterExpensesController extends Controller
 {
     public function index()
     {
+        if(!checkForSubmenu("counter-expenses"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return CounterExpense::where(['company_id' => Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id])->get();
     }
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-counter-expenses"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -57,6 +65,10 @@ class CounterExpensesController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("edit-counter-expenses"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [

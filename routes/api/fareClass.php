@@ -8,5 +8,5 @@ Route::group(['prefix' => 'web/v1/fare-class','middleware' => ['auth:sanctum']],
     Route::post('/', [FareClassController::class, 'index']);
     Route::post('/store', [FareClassController::class, 'storeFareClass']);
     Route::post('/update', [FareClassController::class, 'updateFareClass']);
-    Route::post('/delete', [FareClassController::class, 'deleteFareClass']);
+    // Route::post('/delete', [FareClassController::class, 'deleteFareClass']);
 });

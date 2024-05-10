@@ -14,29 +14,30 @@ use Illuminate\Support\Facades\Log;
 
 class DesignationController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index()
     {
+        if(!checkForSubmenu("designations"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Department::withCount('designation')->with('addedBy', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function edit(Request $request)
     {
+        if(!checkPermissionButtons("view-designation"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Designation::with('addedBy')->where('department_id', $request->id)->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-designation"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -73,6 +74,10 @@ class DesignationController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("view-designation"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -103,18 +108,26 @@ class DesignationController extends Controller
             }
     }
 
-    public function delete(Request $request)
-    {
-        return Designation::find($request->id)->delete();
-    }
+    // public function delete(Request $request)
+    // {
+    //     return Designation::find($request->id)->delete();
+    // }
 
     public function selective(Request $request)
     {
+        if(!checkForSubmenu("designations"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Designation::where('department_id', $request->id)->get(['id', 'name', 'terminal_id', 'department_id']);
     }
 
     public function getTerminal(Request $request)
     {
+        if(!checkForSubmenu("designations"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
       return  Department::where([
             'company_id' => Auth::user()->company_id,
             'terminal_id' => $request->id,

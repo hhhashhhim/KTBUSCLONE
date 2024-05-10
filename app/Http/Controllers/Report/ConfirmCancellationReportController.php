@@ -14,11 +14,19 @@ class ConfirmCancellationReportController extends Controller
 {
     public function getTerminals()
     {
+        if(!checkForSubmenu("confirm-cancel"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Terminal::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
     }
 
     public function filterData(Request $request)
     {
+        if(!checkForSubmenu("confirm-cancel"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $tickets = Ticket::with('cancel_ticket', 'schedule:id,time')
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'canceled')
@@ -70,6 +78,10 @@ class ConfirmCancellationReportController extends Controller
     public
     function getPrintPdf(Request $request)
     {
+        if(!checkForSubmenu("confirm-cancel"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $tickets = Ticket::with('cancel_ticket', 'schedule:id,time')
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'canceled')

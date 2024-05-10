@@ -17,21 +17,37 @@ class AdvanceSalesReportController extends Controller
 {
     public function getUserNames()
     {
+        if(!checkForSubmenu("advance-sale-report"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return User::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
     }
 
     public function getTerminals()
     {
+        if(!checkForSubmenu("advance-sale-report"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Terminal::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
     }
 
     public function getRoutes()
     {
+        if(!checkForSubmenu("advance-sale-report"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Route::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name',"via"]);
     }
 
     public function filterData(Request $request)
     {
+        if(!checkForSubmenu("advance-sale-report"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
             ->withTrashed()
             ->where('company_id', Auth::user()->company_id)
@@ -163,6 +179,10 @@ class AdvanceSalesReportController extends Controller
 
     public function advanceSalePdf(Request $request)
     {
+        if(!checkForSubmenu("advance-sale-report"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $route = explode(",",$request->route);
         $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
             ->withTrashed()

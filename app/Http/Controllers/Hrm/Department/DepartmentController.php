@@ -14,24 +14,21 @@ use Illuminate\Support\Facades\Log;
 
 class DepartmentController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index()
     {
+        if(!checkForSubmenu("departments"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Department::with('addedBy', 'company', 'terminal:id,name,city_id', 'terminal.city:id,name')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-department"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -68,6 +65,10 @@ class DepartmentController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("edit-department"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -103,16 +104,28 @@ class DepartmentController extends Controller
 
     public function delete(Request $request)
     {
+        if(!checkForSubmenu("departments"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Department::find($request->id)->delete();
     }
 
     public function selective(Request $request)
     {
+        if(!checkForSubmenu("departments"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Department::where('terminal_id', $request->id)->get(['id', 'name', 'terminal_id']);
     }
 
     public function allTerminals()
     {
+        if(!checkForSubmenu("departments"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Terminal::with('city')->where('company_id', Auth::user()->company_id)->get(['id', 'name', 'city_id']);
     }
 }

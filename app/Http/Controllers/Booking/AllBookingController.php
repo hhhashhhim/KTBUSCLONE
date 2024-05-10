@@ -14,21 +14,37 @@ class AllBookingController extends Controller
 {
     public function routes()
     {
+        if(!checkForSubmenu("all-booking"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Route::where(['company_id'=>Auth::user()->company_id,"hide"=>0])->get();
     }
 
     public function terminals()
     {
+        if(!checkForSubmenu("all-booking"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Terminal::where(['company_id'=>Auth::user()->company_id,"hide"=>0])->get();
     }
 
     public function buses()
     {
+        if(!checkForSubmenu("all-booking"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Bus::where('company_id', Auth::user()->company_id)->get();
     }
 
     public function filter(Request $request)
     {
+        if(!checkForSubmenu("all-booking"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $data = Ticket::where(["tickets.company_id" => Auth::user()->company_id])
 
             // Within Customer Table

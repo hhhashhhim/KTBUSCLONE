@@ -18,24 +18,18 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class FoodOrderController extends Controller
 {
 
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index(Request $request)
     {
+        if(!checkForSubmenu("order"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Hotel::
             with('user:id,name,email','deals:id,name,price,description,hotel_id',
             'deals.dealDetails:id,food_id,food_deal_id,quantity','deals.dealDetails.food:id,name,unit')
@@ -45,6 +39,10 @@ class FoodOrderController extends Controller
     
     public function orderFoodIndex(Request $request)
     {
+        if(!checkForSubmenu("order"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $checkHotelLogin = Hotel::where("user_id",Auth::user()->id)->where("company_id",Auth::user()->company_id)->first();
         if($checkHotelLogin)
         {
@@ -100,6 +98,10 @@ class FoodOrderController extends Controller
 
     public function hotelItems(Request $request)
     {
+        if(!checkForSubmenu("order"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $food = HotelFood::where(['company_id'=>Auth::user()->company_id,"hotel_id"=>$request->id])->get(["id","name","price"]);
         $food->map(function($q){
             $q->cid = $q->id.'-1'; // 1 to identify food
@@ -115,6 +117,10 @@ class FoodOrderController extends Controller
     
     public function hotelAllItems(Request $request)
     {
+        if(!checkForSubmenu("order"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $foods = HotelFood::where(['company_id'=>Auth::user()->company_id,"hotel_id"=>$request->id])->get();
         $deals = HotelFoodDeal::where(['company_id'=>Auth::user()->company_id,"hotel_id"=>$request->id])
         ->with("dealDetails:id,food_id,food_deal_id,quantity","dealDetails.food:id,name,unit")
@@ -129,6 +135,10 @@ class FoodOrderController extends Controller
 
     public function orderBook(Request $request)
     {
+        if(!checkForSubmenu("add-order"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $request->validate([
@@ -182,6 +192,10 @@ class FoodOrderController extends Controller
 
     public function orderReceive(Request $request)
     {
+        if(!checkForSubmenu("received-order"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         HotelFoodOrder::where("id",$request->id)->update([
             "status" => "received"
         ]);
@@ -195,6 +209,10 @@ class FoodOrderController extends Controller
     
     public function orderReady(Request $request)
     {
+        if(!checkForSubmenu("ready-order"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         HotelFoodOrder::where("id",$request->id)->update([
             "status" => "ready"
         ]);
@@ -208,6 +226,10 @@ class FoodOrderController extends Controller
     }
     public function orderDelivered(Request $request)
     {
+        if(!checkForSubmenu("delivered-order"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         HotelFoodOrder::where("id",$request->id)->update([
             "status" => "delivered"
         ]);

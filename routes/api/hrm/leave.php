@@ -8,6 +8,6 @@ Route::group(['prefix' => 'web/v1/hrm/leave','middleware' => ['auth:sanctum']], 
     Route::post('/', [LeaveController::class, 'index']);
     Route::post('/store', [LeaveController::class, 'store']);
     Route::post('/update', [LeaveController::class, 'update']);
-    Route::post('/delete', [LeaveController::class, 'delete']);
+    // Route::post('/delete', [LeaveController::class, 'delete']);
     Route::post('/approval', [LeaveController::class, 'approval']);
 });

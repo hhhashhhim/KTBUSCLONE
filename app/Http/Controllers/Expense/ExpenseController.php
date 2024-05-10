@@ -22,6 +22,10 @@ class ExpenseController extends Controller
 
     public function index(Request $request)
     {
+        if(!checkPermissionButtons("add-expense"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $expenses = TicketMergeExpense::where(["ticket_merge_id" => $request->ticket_merge_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
         
         // for sale show at front
@@ -116,6 +120,10 @@ class ExpenseController extends Controller
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-expense"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $request->validate([
@@ -161,7 +169,10 @@ class ExpenseController extends Controller
 
     public function dailySummery(Request $request)
     {
-        
+        if(!checkPermissionButtons("add-expense"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $closing_pair = TicketClosing::with("schedule")->where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->get();
         $data = (object)[];
         
@@ -234,11 +245,19 @@ class ExpenseController extends Controller
 
     public function officeExpenses(Request $request)
     {
+        if(!checkForSubmenu("expenses"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return OfficeExpense::where(['company_id' => Auth::user()->company_id])->latest("closing_date")->get();
     }
 
     public function officeExpenStore(Request $request)
     {
+        if(!checkForSubmenu("expenses"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
             DB::beginTransaction();
             $rules = [
@@ -278,6 +297,10 @@ class ExpenseController extends Controller
     
     public function officeExpenUpdate(Request $request)
     {
+        if(!checkForSubmenu("expenses"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
             DB::beginTransaction();
             $rules = [

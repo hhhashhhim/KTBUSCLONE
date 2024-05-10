@@ -23,11 +23,19 @@ class ExpenseCategoryController extends Controller
 {
     public function index()
     {
+        if(!checkForSubmenu("categories"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return ExpenseCategory::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
     }
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-category"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -71,6 +79,10 @@ class ExpenseCategoryController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("edit-category"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -105,9 +117,4 @@ class ExpenseCategoryController extends Controller
                 return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
     }
-
-    // public function delete(Request $request)
-    // {
-    //     return City::find($request->id)->delete();
-    // }
 }
