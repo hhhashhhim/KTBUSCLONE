@@ -394,7 +394,7 @@ class TerminalController extends Controller
 
     public function filterData(Request $request)
     {
-        if(!checkPermissionButtons("terminal-sale"))
+        if(!checkForSubmenu("terminal-sale"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
