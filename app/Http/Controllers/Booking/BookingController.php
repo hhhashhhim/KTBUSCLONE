@@ -1719,7 +1719,7 @@ class BookingController extends Controller
     public
     function passengerListPdf(Request $request)
     {
-        if(!checkForSubmenu("pax-list"))
+        if(!checkPermissionButtons("pax-list"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
