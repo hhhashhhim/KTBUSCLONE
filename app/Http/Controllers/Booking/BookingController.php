@@ -1362,7 +1362,7 @@ class BookingController extends Controller
     public
     function cancelingBooking(Request $request)
     {
-        if(!checkPermissionButtons("cancel-ticket"))
+        if(!checkPermissionButtons("cancel-ticket") && !checkPermissionButtons("reserved-cancel"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
