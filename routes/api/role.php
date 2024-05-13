@@ -9,6 +9,6 @@ Route::group(['prefix' => 'web/v1/role','middleware' => ['auth:sanctum']], funct
     Route::post('/', [RoleController::class, 'index']);
     Route::post('store', [RoleController::class, 'store']);
     Route::post('update', [RoleController::class, 'update']);
-    Route::post('delete', [RoleController::class, 'delete']);
+    // Route::post('delete', [RoleController::class, 'delete']);
     Route::post('/get', [RoleController::class, 'role']);
 });

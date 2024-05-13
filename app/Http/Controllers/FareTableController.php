@@ -49,6 +49,10 @@ class FareTableController extends Controller
 
     public function record(Request $request)
     {
+        if(!checkForSubmenu("fare-table"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         // whereHas query only for if city deleted then deleted city data should not be visible
         $fareTable = FareTable::
             whereHas("city_from", function($q){
@@ -79,6 +83,10 @@ class FareTableController extends Controller
 
     public function getCitiesClasses()
     {
+        if(!checkForSubmenu("fare-table"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $cities = City::where(['company_id' => Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
         $classes = FareClass::where(['company_id' => Auth::user()->company_id])->get(['id', 'name']);
         return [
@@ -89,6 +97,10 @@ class FareTableController extends Controller
 
     public function getFarePrices($fare_class)
     {
+        if(!checkForSubmenu("fare-table"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $cities = City::with(['city_to' => function ($q) {
             $q->orderBy('name')->where('cities.company_id', Auth::user()->company_id);
         }])
@@ -120,18 +132,29 @@ class FareTableController extends Controller
 
     public function getFareClass()
     {
+        if(!checkForSubmenu("fare-table"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return FareClass::where('company_id', Auth::user()->company_id)->orderBy('id')->select('id', 'name')->get(['name', 'id']);
     }
 
     public function check(Request $request)
     {
+        if(!checkForSubmenu("fare-table"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $checkFare = FareTable::where('fare_class', $request->fare_class)->where('from_city_id', $request->from)->where('to_city_id', $request->to)->where('company_id', Auth::user()->company_id)->select('id', 'fare', 'distance_in_km', 'time_difference', 'fare_class')->first();
         return response($checkFare, 200);
     }
 
     public function fareUpdate(Request $request)
     {
-        
+        if(!checkForSubmenu("fare-table"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 FareTable::where(['from_city_id' => $request->fromCity, 'to_city_id' => $request->toCity, 'fare_class' => $request->fareClass, 'company_id' => Auth::user()->company_id])->update([
@@ -164,7 +187,10 @@ class FareTableController extends Controller
     
     public function fareUpdateMultiple(Request $request)
     {
-        
+        if(!checkForSubmenu("fare-table"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
             DB::beginTransaction();
 
@@ -227,6 +253,10 @@ class FareTableController extends Controller
 
     public function farePrint(Request $request)
     {
+        if(!checkForSubmenu("fare-table"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $routeFareCities = RouteFare::where('route_id', $request->route_id)->where('company_id', Auth::user()->company_id)->with('city_to:id,name', 'city_from:id,name', 'fare_details:id,fare,fare_class', 'fare_details.class:id,name')->get()->groupBy(['departure_city_id', 'destination_city_id']);
         $data = [];
         foreach ($routeFareCities as $cities) {

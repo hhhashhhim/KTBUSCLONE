@@ -11,20 +11,20 @@ use Illuminate\Support\Facades\Auth;
 
 class RoleController extends Controller
 {
-    public $company_id;
-
-    public function __construct(){
-        $this->middleware(function ($request, $next){
-            Auth::user()->company_id = Auth::user()->company_id;
-            return $next( $request );
-        });
-    }
     public function index()
     {
+        if(!checkForSubmenu("roles"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Role::with('company:id,name')->where('company_id',Auth::user()->company_id)->latest('id')->get();
     }
     public function role(Request $request)
     {
+        if(!checkForSubmenu("roles"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $role = Role::with('company:id,name')->find($request->id);
         $company = Company::find($role->company_id);
         if ($company) {
@@ -73,6 +73,10 @@ class RoleController extends Controller
     }
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-role"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $this->validate($request, [
             'name' => 'required',
         ]);
@@ -91,6 +95,10 @@ class RoleController extends Controller
     }
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("edit-role"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         Role::find($request->id)->update([
             'name' => $request->name,
             'company_id' => auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id,
@@ -106,10 +114,10 @@ class RoleController extends Controller
             'message' => 'updated successfully',
         ], 201);
     }
-    public function delete(Request $request)
-    {
-        return Role::find($request->id)->delete();
-    }
+    // public function delete(Request $request)
+    // {
+    //     return Role::find($request->id)->delete();
+    // }
     public function permissions()
     {
         return $permissions = [

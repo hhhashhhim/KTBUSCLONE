@@ -16,7 +16,10 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        
+        if(!checkForSubmenu("users"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $users = User::
             with('role:id,name', 'company:id,name', 'terminal:id,name,city_id', 'terminal.city:id,name')
             ->where(function($q) use ($request){
@@ -47,6 +50,10 @@ class UserController extends Controller
 
     public function getCities()
     {
+        if(!checkForSubmenu("users"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $cities = City::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
         foreach ($cities as $single) {
             $single->name = ucfirst($single->name);
@@ -56,6 +63,10 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-users"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
 
@@ -106,6 +117,10 @@ class UserController extends Controller
 
     public function edit(Request $request)
     {
+        if(!checkPermissionButtons("add-users"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $user = User::with('userpass')->find($request->id);
         $user->departure_city_ids = json_decode($user->departure_city_ids);
         $user->destination_city_ids = json_decode($user->destination_city_ids);
@@ -114,6 +129,10 @@ class UserController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("add-users"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
 
@@ -167,6 +186,10 @@ class UserController extends Controller
 
     public function updateTerminal(Request $request)
     {
+        if(!checkPermissionButtons("assign-terminal-admin"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $user = User::where(['id' => Auth::user()->id, 'company_id' => Auth::user()->company_id])->first();
         $user->terminal_id = $request->terminal_id;
         $user->save();
@@ -175,6 +198,10 @@ class UserController extends Controller
 
     public function hideUser(Request $request)
     {
+        if(!checkPermissionButtons("delete-user"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $user = User::find($request->id);
         ActivityLog::create([
             "activity_by" => Auth::user()->id,

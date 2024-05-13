@@ -17,7 +17,7 @@ class AdvanceSalesReportController extends Controller
 {
     public function getUserNames()
     {
-        if(!checkForSubmenu("advance-sale-report"))
+        if(!checkForSubmenu("sales"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
@@ -26,7 +26,7 @@ class AdvanceSalesReportController extends Controller
 
     public function getTerminals()
     {
-        if(!checkForSubmenu("advance-sale-report"))
+        if(!checkForSubmenu("sales"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
@@ -35,7 +35,7 @@ class AdvanceSalesReportController extends Controller
 
     public function getRoutes()
     {
-        if(!checkForSubmenu("advance-sale-report"))
+        if(!checkForSubmenu("sales"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
@@ -44,7 +44,7 @@ class AdvanceSalesReportController extends Controller
 
     public function filterData(Request $request)
     {
-        if(!checkForSubmenu("advance-sale-report"))
+        if(!checkForSubmenu("sales"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
@@ -179,7 +179,7 @@ class AdvanceSalesReportController extends Controller
 
     public function advanceSalePdf(Request $request)
     {
-        if(!checkForSubmenu("advance-sale-report"))
+        if(!checkForSubmenu("sales"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }

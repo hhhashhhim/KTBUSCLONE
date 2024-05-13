@@ -15,11 +15,19 @@ class TicketsTemplateController extends Controller
 {
     public function index()
     {
+        if(!checkForSubmenu("tickets"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return TicketsTemplate::with('terminal.city')->where(['company_id' => Auth::user()->company_id])->get();
     }
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-template"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 if (Auth::user()->terminal_id == null) {
@@ -67,12 +75,20 @@ class TicketsTemplateController extends Controller
 
     public function allTerminals()
     {
+        if(!checkForSubmenu("tickets"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Terminal::with('city')->where('company_id', Auth::user()->company_id)->get();
     }
 
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("edit-template"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -118,6 +134,10 @@ class TicketsTemplateController extends Controller
 
     public function activityLog(Request $request)
     {
+        if(!checkForSubmenu("ActivityLog"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return ActivityLog::with("activity")
             ->where("created_at" , '>', now()->subDays(3))
             ->where("company_id",Auth::user()->company_id) 

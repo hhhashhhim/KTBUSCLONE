@@ -14,24 +14,21 @@ use Illuminate\Support\Facades\Log;
 
 class SurchargeController extends Controller
 {
-
-//    public $company_id;
-//
-//    public function __construct()
-//    {
-//        $this->middleware(function ($request, $next) {
-//            Auth::user()->company_id = Auth::user()->company_id;
-//            return $next($request);
-//        });
-//    }
-
     public function index()
     {
+        if(!checkForSubmenu("surcharge"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Surcharge::with('addedBy')->orderBy('id')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function storeSurcharge(Request $request)
     {
+        if(!checkPermissionButtons("add-surcharge"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -69,6 +66,10 @@ class SurchargeController extends Controller
 
     public function updateSurcharge(Request $request)
     {
+        if(!checkPermissionButtons("edit-surcharge"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -102,8 +103,8 @@ class SurchargeController extends Controller
             }
     }
 
-    public function deleteSurcharge(Request $request)
-    {
-        return Surcharge::find($request->id)->delete();
-    }
+    // public function deleteSurcharge(Request $request)
+    // {
+    //     return Surcharge::find($request->id)->delete();
+    // }
 }

@@ -25,21 +25,37 @@ class TerminalController extends Controller
 {
     public function index()
     {
+        if(!checkForSubmenu("terminals"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return City::has('terminal', '>', 0)->withCount(['terminal'=>function($q){$q->where("hide",0);}])->with('addedBy')->where('company_id', Auth::user()->company_id)->get();
     }
 
     public function companies()
     {
+        if(!checkForSubmenu("terminals"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Company::orderBy('id', 'desc')->get();
     }
 
     public function cities()
     {
+        if(!checkForSubmenu("terminals"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return City::with('addedBy')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->orderBy('id')->get();
     }
 
     public function allTerminals()
     {
+        if(!checkForSubmenu("terminals"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return [
             'terminals' => Terminal::with('city')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name', 'city_id']),
             'authTerminalId' => Auth::user()->terminal_id,
@@ -48,16 +64,28 @@ class TerminalController extends Controller
 
     public function getTerminal(Request $request)
     {
+        if(!checkForSubmenu("terminals"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Terminal::with('addedBy')->where('city_id', $request->id)->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get();
     }
 
     public function getRoutes(Request $request)
     {
+        if(!checkForSubmenu("terminals"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return Route::where(['company_id'=>Auth::user()->company_id,"hide"=>0])->get(["id", "name","via"]);
     }
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-terminal"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -117,6 +145,10 @@ class TerminalController extends Controller
 
     public function hideTerminal(Request $request)
     {
+        if(!checkPermissionButtons("delete-terminal"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $terminal = Terminal::find($request->id);
         ActivityLog::create([
             "activity_by" => Auth::user()->id,
@@ -131,6 +163,10 @@ class TerminalController extends Controller
 
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("edit-terminal"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $this->validate($request, [
@@ -182,7 +218,10 @@ class TerminalController extends Controller
 
     public function terminalCommissions(Request $request)
     {
-
+        if(!checkPermissionButtons("commission"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $terminalCommission = TerminalCommission::where(["terminal_id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
         $terminal = Terminal::where(["id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->first();
         return [
@@ -193,6 +232,10 @@ class TerminalController extends Controller
 
     public function commissionStore(Request $request)
     {
+        if(!checkPermissionButtons("commission"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $request->validate([
@@ -235,7 +278,10 @@ class TerminalController extends Controller
 
     public function terminalDiscounts(Request $request)
     {
-
+        if(!checkPermissionButtons("discount"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
         $terminal = Terminal::where(["id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->first();
         return [
@@ -246,6 +292,10 @@ class TerminalController extends Controller
 
     public function discountStore(Request $request)
     {
+        if(!checkPermissionButtons("discount"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $request->validate([
@@ -287,7 +337,10 @@ class TerminalController extends Controller
 
     public function terminalTimes(Request $request)
     {
-
+        if(!checkPermissionButtons("edit-terminal"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $terminalTimes = TerminalTimeDifference::where(["terminal_id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
         $terminal = Terminal::where(["id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->first();
         return [
@@ -298,6 +351,10 @@ class TerminalController extends Controller
 
     public function timeStore(Request $request)
     {
+        if(!checkPermissionButtons("edit-terminal"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $request->validate([
@@ -337,6 +394,10 @@ class TerminalController extends Controller
 
     public function filterData(Request $request)
     {
+        if(!checkPermissionButtons("terminal-sale"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $tickets = Ticket::with('updated_name:id,name', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number","customer:id,name,cnic,contact","route:id,name,via")
             ->withTrashed()
             ->where('company_id', Auth::user()->company_id)

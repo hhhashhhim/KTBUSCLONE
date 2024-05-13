@@ -16,11 +16,19 @@ class TerminalTimeDifferenceController extends Controller
 {
     public function index()
     {
+        if(!checkPermissionButtons("edit-terminal"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return City::where('company_id', Auth::user()->company_id)->withCount('terminal')->having('terminal_count', '>=', 2)->get(['id', 'name']);
     }
 
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("edit-terminal"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 if ($request->created == 0) {
@@ -84,6 +92,10 @@ class TerminalTimeDifferenceController extends Controller
 
     public function check(Request $request)
     {
+        if(!checkPermissionButtons("edit-terminal"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $data = TerminalTimeDifference::where(['company_id' => Auth::user()->company_id, 'city_id' => $request->city, 'terminal_from_id' => $request->from, 'terminal_to_id' => $request->to])->first();
         if ($data) {
             return $data;
@@ -93,6 +105,10 @@ class TerminalTimeDifferenceController extends Controller
 
     public function getTerminals(Request $request)
     {
+        if(!checkPermissionButtons("edit-terminal"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $terminals = Terminal::where(['company_id' => Auth::user()->company_id, 'city_id' => $request->city])->get(['city_id', 'id', 'name']);
         return $terminals->map(function ($single) use ($request) {
             $single->allTerminals = Terminal::where(['company_id' => Auth::user()->company_id, 'city_id' => $request->city])->get(['city_id', 'id', 'name']);

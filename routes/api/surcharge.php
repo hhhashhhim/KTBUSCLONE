@@ -8,5 +8,5 @@ Route::group(['prefix' => 'web/v1/surcharge','middleware' => ['auth:sanctum']], 
     Route::post('/', [SurchargeController::class, 'index']);
     Route::post('/store', [SurchargeController::class, 'storeSurcharge']);
     Route::post('/update', [SurchargeController::class, 'updateSurcharge']);
-    Route::post('/delete', [SurchargeController::class, 'deleteSurcharge']);
+    // Route::post('/delete', [SurchargeController::class, 'deleteSurcharge']);
 });

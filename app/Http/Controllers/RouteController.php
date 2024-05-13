@@ -18,8 +18,12 @@ use Illuminate\Support\Facades\Log;
 
 class RouteController extends Controller
 {
-    public function index(){
-
+    public function index()
+    {
+        if(!checkForSubmenu("routes"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $cities = City::with('city_to:id,name')->get();
         $subRoutes = $cities->map(function ($city_from, $i){
             $city_from['city_to_final'] = $city_from->city_to;
@@ -38,6 +42,10 @@ class RouteController extends Controller
     }
     public function store(Request $request)
     {
+        if(!checkPermissionButtons("add-routes"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
             DB::beginTransaction();
             $request->validate([
@@ -169,6 +177,10 @@ class RouteController extends Controller
 
     public function edit(Request $request)
     {
+        if(!checkPermissionButtons("edit-routes"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $route = Route::find($request->id);
 
         $lastFare = $route->fares->last();
@@ -182,6 +194,10 @@ class RouteController extends Controller
     }
     public function update(Request $request)
     {
+        if(!checkPermissionButtons("edit-routes"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 $request->validate([
@@ -311,6 +327,10 @@ class RouteController extends Controller
     }
     public function hideRoute(Request $request)
     {
+        if(!checkPermissionButtons("delete-routes"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $route = Route::find($request->id);
         ActivityLog::create([
             "activity_by" => Auth::user()->id,
@@ -324,12 +344,20 @@ class RouteController extends Controller
     }
     public function routeVisibilities(Request $request)
     {
+        if(!checkPermissionButtons("details-routes"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return [
             'visibilities' => TerminalVisibility::where(["route_id"=>$request->id,"company_id"=>Auth::user()->company_id])->with("departure:id,name","destination:id,name")->get(),
         ];
     }
     public function visibilityUpdate(Request $request)
     {
+        if(!checkPermissionButtons("details-routes"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         try {
                 DB::beginTransaction();
                 ActivityLog::create([
@@ -354,12 +382,20 @@ class RouteController extends Controller
     }
     public function list()
     {
+        if(!checkForSubmenu("routes"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return [
             'cities' => City::orderBy('id')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->select('name', 'id')->get(),
             'routes' => Route::with('addedBy')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get()
         ];
     }
     public function details(Request $request){
+        if(!checkPermissionButtons("details-routes"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         $routeFareCities = RouteFare::where('route_id', $request->id)->where('company_id', Auth::user()->company_id)->with('city_to:id,name', 'city_from:id,name', 'fare_details:id,fare,fare_class,time_difference', 'fare_details.class:id,name')->get()->groupBy(['departure_city_id', 'destination_city_id']);
         $data = [];
         foreach ($routeFareCities as $cities) {
