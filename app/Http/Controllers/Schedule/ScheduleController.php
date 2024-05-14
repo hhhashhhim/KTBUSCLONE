@@ -234,16 +234,26 @@ class ScheduleController extends Controller
                 ];
                 $this->validate($request, $rules, $customMessages);
 
-                $detail = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$request->schedule_id])->whereBetween("schedule_date",[$request->start_date,$request->end_date])->get();
-                foreach($detail as $single)
+                $detailGroup = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$request->schedule_id])->whereBetween("schedule_date",[$request->start_date,$request->end_date])->get()->groupBy("schedule_date");
+                
+                foreach($detailGroup as $detail)
                 {
-                    $updatedTime = date("Y-m-d H:i:s",strtotime(($single->departure_date.' '.$single->departure_time)) + ($request->time*60));
-                    $single->update([
-                        "departure_date" => date("Y-m-d",strtotime($updatedTime)),
-                        "departure_time" => date("H:i:s",strtotime($updatedTime)),
-                    ]);  
-
+                    foreach($detail as $key => $single)
+                    {
+                        $updatedTime = date("Y-m-d H:i:s",strtotime(($single->departure_date.' '.$single->departure_time)) + ($request->time*60));
+                        if($key==0)
+                        {
+                            $schedule_date = date("Y-m-d",strtotime($updatedTime));
+                        }
+                        $single->update([
+                            "departure_date" => date("Y-m-d",strtotime($updatedTime)),
+                            "departure_time" => date("H:i:s",strtotime($updatedTime)),
+                            "schedule_date" => $schedule_date,
+                        ]);
+                        
+                    }
                 }
+
                 DB::table('tickets')
                 ->where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$request->schedule_id])
                 ->whereBetween("schedule_date",[$request->start_date,$request->end_date])
