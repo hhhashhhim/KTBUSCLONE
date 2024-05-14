@@ -447,7 +447,7 @@ class ScheduleClosingController extends Controller
 
     public function store(Request $request)
     {
-        if(!checkForSubmenu("assign-bus"))
+        if(!checkPermissionButtons("assign-bus"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
