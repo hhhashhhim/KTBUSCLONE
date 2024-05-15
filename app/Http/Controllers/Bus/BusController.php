@@ -31,7 +31,7 @@ class BusController extends Controller
 
     public function storeBus(Request $request)
     {
-        $detailGroup = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>349])->where("schedule_date",'>', "2024-05-10")->get()->groupBy("schedule_date");
+        $detailGroup = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>349])->where("schedule_date",'>', "2024-05-12")->get()->groupBy("schedule_date");
                 
         foreach($detailGroup as $detail)
         {
