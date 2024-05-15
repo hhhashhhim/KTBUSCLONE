@@ -555,7 +555,7 @@ class ScheduleClosingController extends Controller
 
     public function update(Request $request)
     {
-        if(!checkForSubmenu("edit-close-booking"))
+        if(!checkPermissionButtons("edit-close-booking"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
