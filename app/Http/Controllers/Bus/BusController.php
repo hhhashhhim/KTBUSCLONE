@@ -9,6 +9,7 @@ use App\Models\Bus\BusSeatMap;
 use App\Models\ActivityLog;
 use App\Models\FareClass;
 use App\Models\Schedule\ScheduleDetail;
+use App\Models\Ticket;
 use App\Models\Schedule\TicketClosing;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -30,7 +31,36 @@ class BusController extends Controller
 
     public function storeBus(Request $request)
     {
-        
+        $detailGroup = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>349])->where("schedule_date",'>', "2024-05-10")->get()->groupBy("schedule_date");
+                
+        foreach($detailGroup as $detail)
+        {
+            foreach($detail as $key => $single)
+            {
+                $updatedTime = date("Y-m-d H:i:s",strtotime(($single->departure_date.' '.$single->departure_time)));
+                if($key==0)
+                {
+                    $schedule_date = date("Y-m-d",strtotime($updatedTime));
+                }
+                $single->update([
+                    "departure_date" => date("Y-m-d",strtotime($updatedTime)),
+                    "departure_time" => date("H:i:s",strtotime($updatedTime)),
+                    "schedule_date" => $schedule_date,
+                ]);
+                Ticket::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>349])->where([
+                    "date"=>$single->departure_date,
+                    "departure_city_id"=>$single->departure_id,
+                    "destination_city_id"=>$single->destination_id,
+                    "schedule_time"=>$single->departure_time,
+                ])->update([
+                    "schedule_date"=>$schedule_date
+                ]);
+                
+            }
+        }
+
+
+        return 'h';
         // $data = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_date"=>"2024-02-25","schedule_id"=>330])->get();
         
         // foreach($data as $single)

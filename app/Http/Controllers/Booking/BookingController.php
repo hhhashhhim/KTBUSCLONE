@@ -533,7 +533,6 @@ class BookingController extends Controller
             return "Date is Required";
         }
         $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
-        $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
         $advanceBookingDays = Terminal::where("id",Auth::user()->terminal_id)->first()->advance_booking;
 
         $allSchedules = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
