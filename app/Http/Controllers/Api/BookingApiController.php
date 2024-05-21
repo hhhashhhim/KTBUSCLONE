@@ -133,6 +133,7 @@ class BookingApiController extends Controller
 
     public function availableSchedules(Request $request)
     {
+        
         try {
                 $validator = Validator::make($request->all(), [
                     'departure_city_id' => 'required',
@@ -274,6 +275,11 @@ class BookingApiController extends Controller
                     $single->total_fare = $original_fare;
                     $single->final_fare = $discounted_fare;
 
+                    $fareTableTime = FareTable::where(['from_city_id' => $single->departure_id, 'to_city_id' => $single->destination_id])->first()->time_difference??"00:00";
+                    $timeDiff = explode(':', $fareTableTime);
+                    $totalTime = (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
+
+                    $single->arrival_date_time = date("Y-m-d H:i:s", strtotime($single->departure_date . ' ' . $single->departure_time) + $totalTime);
                     $single->departure_date_time = date("Y-m-d H:i:s", strtotime($single->departure_date . ' ' . $single->departure_time));
 
                 });

@@ -35,22 +35,26 @@ class TicketsTemplateController extends Controller
                 }
                 $rules = [
                     'terminal' => 'required',
-        //            'uanNumber' => 'required',
+                    'name' => 'required',
+                    'address' => 'required',
+                    'uanNumber' => 'required',
                     'termsCondition' => 'required',
                 ];
 
                 $customMessages = [
                     'terminal.required' => 'Please Select Any Terminal',
-        //            'uanNumber.required' => 'UAN Number is required',
+                    'name.required' => 'Name is required',
+                    'address.required' => 'Address is required',
+                    'uanNumber.required' => 'UAN Number is required',
                     'termsCondition.required' => 'Terms & Condition is required',
                 ];
                 $this->validate($request, $rules, $customMessages);
-        //        $terminal = Terminal::where('company_id', Auth::user()->company_id)->where('id',Auth::user()->terminal_id)->first();
                 TicketsTemplate::where('company_id', Auth::user()->company_id)->where('terminal_id', $request->terminal)->where('status', 1)->update(array('status' => 0));
                 $template = TicketsTemplate::create([
                     'company_id' => Auth::user()->company_id,
+                    'name' => $request->name,
                     'terminal_id' => $request->terminal ?? Auth::user()->terminal_id,
-                    'uan' => '03111777333',
+                    'uan' => $request->uanNumber,
                     'phone' => $request->phoneNumber,
                     'address' => $request->address,
                     'terms_condition' => $request->termsCondition,
@@ -93,7 +97,8 @@ class TicketsTemplateController extends Controller
                 DB::beginTransaction();
                 $rules = [
                     'terminal_id' => 'required',
-        //            'uan' => 'required',
+                    'name' => 'required',
+                    'uan' => 'required',
                     'phone' => 'required',
                     'address' => 'required',
                     'terms_condition' => 'required',
@@ -101,16 +106,18 @@ class TicketsTemplateController extends Controller
 
                 $customMessages = [
                     'terminal_id.required' => 'Please Select Any Terminal',
-        //            'uan.required' => 'UAN Number is required',
+                    'name.required' => 'Name is required',
+                    'uan.required' => 'UAN Number is required',
                     'phone.required' => 'Phone Number is required',
                     'address.required' => 'Terminal Address is required',
                     'terms_condition.required' => 'Terms & Condition is required',
                 ];
                 $this->validate($request, $rules, $customMessages);
-                TicketsTemplate::where('company_id', Auth::user()->company_id)->where('status', 1)->update(array('status' => 0));
+                TicketsTemplate::where(['terminal_id' => $request->terminal_id, 'company_id'=> Auth::user()->company_id])->where('status', 1)->update(array('status' => 0));
                 $template = TicketsTemplate::where('id', $request->id)->update([
                     'terminal_id' => $request->terminal_id,
-        //            'uan' => plainContactAndCnic($request->uan),
+                    'name' => $request->name,
+                    'uan' => plainContactAndCnic($request->uan),
                     'phone' => plainContactAndCnic($request->phone),
                     'address' => $request->address,
                     'terms_condition' => $request->terms_condition,

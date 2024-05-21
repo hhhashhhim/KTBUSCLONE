@@ -85,11 +85,11 @@
 <body>
 <div style="page-break-before:always">&nbsp;</div>
 <div id="info">
-    <div class="companyname"><span>Kainat Travels</span></div>
+    <div class="companyname"><span>{{isset($data['format']->name) ? $data['format']->name : "Kainat Travels"}}</span></div>
     <div class="companyAddress">
         <span>{{ isset($data['format']->address) ? $data['format']->address : auth()->user()->terminal->address }}</span>
-        <div><span><b>UAN(24/7) : </b>03-111-777-333</span></div>
-        <div><span><b>Phone : </b> {{ isset($data['format']->contact) ?  formatContact($data['format']->contact) : formatContact(auth()->user()->terminal->contact) }}</span>
+        <div><span><b>UAN(24/7) : </b>{{isset($data['format']->uan) ? $data['format']->uan : "03-111-777-333"}}</span></div>
+        <div><span><b>Phone : </b> {{ isset($data['format']->phone) ?  formatContact($data['format']->phone) : formatContact(auth()->user()->terminal->contact) }}</span>
         </div>
     </div>
     @if($data['duplicate'] == 1)

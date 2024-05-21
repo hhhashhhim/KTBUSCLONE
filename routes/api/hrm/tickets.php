@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'web/v1/settings','middleware' => ['auth:sanctum']], function () {
     Route::post('/activity/logs', [TicketsTemplateController::class, 'activityLog']);
     
-    Route::group(['prefix' => 'v1/tickets','middleware' => ['auth:sanctum']], function () {
+    Route::group(['prefix' => '/tickets','middleware' => ['auth:sanctum']], function () {
         Route::post('/', [TicketsTemplateController::class, 'index']);
         Route::post('/store', [TicketsTemplateController::class, 'store']);
         Route::post('/update', [TicketsTemplateController::class, 'update']);

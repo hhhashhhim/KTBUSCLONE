@@ -170,6 +170,10 @@ class EmployeeController extends Controller
                         'user_password' => $request->password,
                     ]);
                 }
+                
+                $convertToNull = function($value) {
+                    return ($value === 'null' ? null : $value);
+                };
 
                 Employee::find($request->id)->update([
                     'name' => $request->EmployeeName,
@@ -178,11 +182,11 @@ class EmployeeController extends Controller
                     'contact' => plainContactAndCnic($request->EmployeeContact),
                     'address' => $request->EmployeeAddress,
                     'reference' => $request->RefHiring,
-                    'hiring_date' => $request->HiringDate,
+                    'hiring_date' => $convertToNull($request->HiringDate),
                     'dob' => $request->EmployeeDob,
-                    'salary' => $request->EmployeeSalary,
+                    'salary' => $convertToNull($request->EmployeeSalary),
                     'salary_type' => $request->RadioSalaryTypeAdd,
-                    'working_days' => $request->workingDays,
+                    'working_days' => $convertToNull($request->workingDays),
                     'paid_leaves' => $request->paidLeaves,
                     'blood_group' => $request->bloodGroup,
                     'emergency_contact' => $request->EmergencyContact,

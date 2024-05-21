@@ -1672,7 +1672,7 @@ class BookingController extends Controller
 
             $item->acutal_time = date("Y-m-d H:i:00", strtotime($item->date . " " . $item->schedule_time) + $sub);
         });
-        $format = Terminal::find($tickets[0]->terminal_id);
+        $format = TicketsTemplate::with("terminal")->where(['terminal_id' => Auth::user()->terminal_id, 'company_id'=> Auth::user()->company_id])->where('status', 1)->first();
         $finalData = [
             'tickets' => $tickets,
             'format' => $format,
