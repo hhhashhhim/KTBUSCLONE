@@ -28,7 +28,9 @@ export default {
                 }
                 if(error.response.status == 403)
                 {
-                    window.history.back();
+                    setTimeout(() => {
+                        window.location.href = this.$store.state.main_url + 'admin/dashboard';
+                    }, 500); 
                     return swal({
                         title: "OOPS!!!!!",
                         text: "ACCESS DENIED",

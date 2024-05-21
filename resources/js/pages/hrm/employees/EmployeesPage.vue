@@ -66,17 +66,17 @@
                                                     <tr v-for="(employee, i) in employees" :key="i">
                                                         <td>{{ i + 1 }}</td>
                                                         <td v-if="employee.profile_Img != null"><a
-                                                            :href="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
+                                                            :href="$store.state.api_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
                                                             target="_blank">
                                                             <img
-                                                                :src="$store.state.app_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
+                                                                :src="$store.state.api_url +'uploads/hrm/employee/profile/'+ employee.profile_Img"
                                                                 style="width:90px;height:100px;" alt="">
                                                         </a>
                                                         </td>
                                                         <td v-else><a
-                                                            :href="$store.state.app_url +'uploads/no-user.png'"
+                                                            :href="$store.state.api_url +'uploads/no-user.png'"
                                                             target="_blank">
-                                                            <img :src="$store.state.app_url +'uploads/no-user.png'"
+                                                            <img :src="$store.state.api_url +'uploads/no-user.png'"
                                                                  style="width:90px;height:100px;" alt="">
                                                         </a>
                                                         </td>
@@ -1452,7 +1452,6 @@ export default {
                     timer: 2000
                 });
             if (this.editEmp.EmployeeTerminal == '0' && this.editEmp.EmployeeType == '0')
-                this.editEmp.EmployeeType !== '0' ?? this.editEmp.EmployeeTerminal == '0';
             return swal({
                 title: "Required!",
                 text: "Employee's Terminal is Required",
@@ -1460,7 +1459,6 @@ export default {
                 timer: 2000
             });
             if (this.editEmp.EmployeeDepartment == "0" && this.editEmp.EmployeeType == '0')
-                this.editEmp.EmployeeType !== '0' ?? this.editEmp.EmployeeDepartment == '0';
             return swal({
                 title: "Required!",
                 text: "Please Select Employee's Department",
@@ -1468,7 +1466,6 @@ export default {
                 timer: 2000
             });
             if (this.editEmp.EmployeeDesignation == '0' && this.editEmp.EmployeeType == '0')
-                this.editEmp.EmployeeType !== '0' ?? this.editEmp.EmployeeDesignation == '0';
             return swal({
                 title: "Required!",
                 text: "Employee's Designation is Required",
@@ -1482,7 +1479,7 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-
+            
             formData.append('userId', this.editEmp.userId);
             formData.append('id', this.editEmp.id);
             formData.append('email', this.editEmp.email);
@@ -1508,7 +1505,7 @@ export default {
             formData.append('status', this.editEmp.status);
 
             this.loading = true;
-
+            
             const resEmployeeUpdate = await this.callApi("post", 'hrm/employee/update', formData, config);
             if (resEmployeeUpdate.status == 200) {
                 $(".modal").click();

@@ -25,6 +25,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th>Sr No.</th>
+                                                            <th>Name</th>
                                                             <th>Terminal</th>
                                                             <th>Address</th>
                                                             <th>UAN #</th>
@@ -37,6 +38,7 @@
                                                     <tbody>
                                                         <tr v-for="(template, i) in templates" :key="i">
                                                             <td>{{ i + 1 }}</td>
+                                                            <td>{{ template.name }}</td>
                                                             <td v-if="template.terminal_id != null">
                                                                 {{ template.terminal.city.name }} -
                                                                 {{ template.terminal.name }}
@@ -88,17 +90,21 @@
                             </option>
                         </select>
                     </div>
-                    <!--                    <div class="form-group col-md-4">-->
-                    <!--                        <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>-->
-                    <!--                        <vue-mask id="uanNumber"-->
-                    <!--                                  class="form-control"-->
-                    <!--                                  v-model="addForm.uanNumber"-->
-                    <!--                                  mask="00-000-000-000"-->
-                    <!--                                  :raw="false"-->
-                    <!--                                  :options="optionsUan"-->
-                    <!--                        >-->
-                    <!--                        </vue-mask>-->
-                    <!--                    </div>-->
+                    <div class="form-group col-md-6">
+                        <label for="terminals">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="Enter Name" v-model="addForm.name">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>
+                        <vue-mask id="uanNumber"
+                                    class="form-control"
+                                    v-model="addForm.uanNumber"
+                                    mask="00-000-000-000"
+                                    :raw="false"
+                                    :options="optionsUan"
+                        >
+                        </vue-mask>
+                    </div>
                     <div class="form-group col-md-6">
                         <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>
 
@@ -129,7 +135,7 @@
             </Add>
             <Edit heading="Edit Template" :errors="this.validationErrors" :success="success" :editForm="editFormID">
                 <div class="row mt-3">
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-6">
                         <label for="terminals">Terminals <span class="text-danger">*</span></label>
                         <select class="form-control" id="terminals" v-model="dataEdit.terminal_id">
                             <option value="0" selected>Select Terminal</option>
@@ -139,13 +145,28 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
+                        <label for="terminals">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="Enter Name" v-model="dataEdit.name">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>
+                        <vue-mask id=""
+                                    class="form-control"
+                                    v-model="dataEdit.uan"
+                                    mask="00-000-000-000"
+                                    :raw="false"
+                                    :options="optionsUan"
+                        >
+                        </vue-mask>
+                    </div>
+                    <div class="form-group col-md-4">
                         <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>
 
                         <vue-mask id="phoneNumber" class="form-control" v-model="dataEdit.phone" mask="0000-0000000"
                             :raw="false" :options="optionsPhone">
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="status">Status</label>
                         <select class="form-control" id="status" v-model="dataEdit.status">
                             <option value="1">Active</option>
@@ -294,14 +315,38 @@ export default {
                     timer: 2000,
                 });
             }
-            // if (this.addForm.uanNumber == '' || typeof this.addForm.uanNumber == 'undefined') {
-            //     return swal({
-            //         title: "Required !!!",
-            //         text: "UAN Number is Required",
-            //         icon: "error",
-            //         timer: 2000,
-            //     });
-            // }
+            if (this.addForm.name == '' || typeof this.addForm.name == 'undefined') {
+                return swal({
+                    title: "Required !!!",
+                    text: "Name is Required",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.addForm.uanNumber == '' || typeof this.addForm.uanNumber == 'undefined') {
+                return swal({
+                    title: "Required !!!",
+                    text: "UAN Number is Required",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.addForm.phoneNumber == '' || typeof this.addForm.phoneNumber == 'undefined') {
+                return swal({
+                    title: "Required !!!",
+                    text: "Phone Number is Required",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.addForm.address == '' || typeof this.addForm.address == 'undefined') {
+                return swal({
+                    title: "Required !!!",
+                    text: "Address is Required",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
             if (this.addForm.termsCondition == '' || typeof this.addForm.termsCondition == 'undefined') {
                 return swal({
                     title: "Required !!!",
@@ -349,7 +394,6 @@ export default {
         },
 
         async edit(template) {
-            console.log(template)
             this.dataEdit = template;
         },
 
@@ -362,14 +406,22 @@ export default {
                     timer: 2000,
                 });
             }
-            // if (this.dataEdit.uan == '' || typeof this.dataEdit.uan == 'undefined') {
-            //     return swal({
-            //         title: "Required !!!",
-            //         text: "UAN Number is Required",
-            //         icon: "error",
-            //         timer: 2000,
-            //     });
-            // }
+            if (this.dataEdit.name == '' || typeof this.dataEdit.name == 'undefined') {
+                return swal({
+                    title: "Required !!!",
+                    text: "Name is Required",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.dataEdit.uan == '' || typeof this.dataEdit.uan == 'undefined') {
+                return swal({
+                    title: "Required !!!",
+                    text: "UAN Number is Required",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
             if (this.dataEdit.phone == '' || typeof this.dataEdit.phone == 'undefined') {
                 return swal({
                     title: "Required !!!",

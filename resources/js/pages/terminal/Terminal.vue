@@ -783,13 +783,6 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (this.dataEdit.online_terminal_name == " " || this.dataEdit.online_terminal_name == "")
-                return swal({
-                    title: "Required",
-                    text: "Online terminal name is required",
-                    icon: "error",
-                    timer: 2000
-                });
             if (this.dataEdit.contact === "")
                 return swal({
                     title: "Required",
