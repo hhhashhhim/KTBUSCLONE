@@ -145,7 +145,7 @@
                                                 <div class="form-group mb-0">
                                                     <label>Contact <span class="text-danger ml-1">*</span></label>
                                                     <vue-mask
-                                                        v-on:blur="getCustomer('addFormContact')"
+                                                        
                                                         class="form-control"
                                                         v-model="addForm.contact"
                                                         mask="0000-0000000"
