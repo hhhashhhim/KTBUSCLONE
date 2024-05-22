@@ -345,7 +345,7 @@
                                     <!--                                        Seat Map-->
                                     <div class="col-md-4 overflow-auto" id="seatMapDiv">
                                         <div v-if="showBookingDiv"
-                                             class="d-flex seat-img p-0 m-0"
+                                             class="d-flex seat-img p-0 m-0 justify-content-center"
                                              v-for="(record, rowIndex) in schedule.bus_class.seat_map" :key="rowIndex">
                                             <div v-for="(col, colIndex) in record" :key="colIndex">
                                                 <div v-if="col.reserved">
