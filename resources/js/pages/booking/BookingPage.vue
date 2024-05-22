@@ -1208,7 +1208,7 @@
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3"> Bus Class :</p>
-                                                        <p class="mb-0">{{ innerItem.seat_class.name }}</p>
+                                                        <p class="mb-0">{{ innerItem.bus_class.name }}</p>
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Schedule : </p>
