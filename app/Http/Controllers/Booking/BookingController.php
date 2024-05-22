@@ -282,7 +282,7 @@ class BookingController extends Controller
                         'departure_city_id'   => $request->departureCity,
                         'destination_city_id' => $request->destinationCity,
                         'seat_no'             => $seat,
-                        'bus_class_id'        => $request->selectedSeatsClass[$i],
+                        'bus_class_id'        => $detail->bus_class_id,
                         'seat_fare'           => $request->selectedSeatsFare[$i],
                         'is_partial'          => $isPartial,
                         'booking_no'          => $bookingNo,
@@ -446,7 +446,7 @@ class BookingController extends Controller
                     'ticket_closing_id' => $existingTicket ? $existingTicket->ticket_closing_id : null,
                     'ticket_merge_id' => $existingTicket ? $existingTicket->ticket_merge_id : null,
                     'bus_id' => $existingTicket ? $existingTicket->bus_id : null,
-                    'bus_class_id' => $ticket['bus_class_id'],
+                    'bus_class_id' => $scheduleDetail->bus_class_id,
                     'seat_fare' => $item['selected_seatFare'],
                     'is_partial' => $isPartial,
                     'booking_no' => $bookingNo,
@@ -734,7 +734,7 @@ class BookingController extends Controller
             'destination_id' => $request->destinationCity,
             'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
         ])->first(['schedule_date']);
-        $tickets = Ticket::with('scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'seatClass')->where('company_id', Auth::user()->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('schedule_date', $uniqueDate->schedule_date)->get()->groupBy('seat_no');
+        $tickets = Ticket::with('scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'busClass')->where('company_id', Auth::user()->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('schedule_date', $uniqueDate->schedule_date)->get()->groupBy('seat_no');
         $checkCustomers = [];
         foreach ($tickets as $key => $single) {
             foreach ($single as $key => $item) {

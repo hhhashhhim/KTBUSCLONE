@@ -788,7 +788,7 @@ class BookingApiController extends Controller
                             'departure_city_id' => $request->departure_city_id,
                             'destination_city_id' => $request->destination_city_id,
                             'seat_no' => $seat,
-                            'bus_class_id' => $request->selected_seats_class[$i],
+                            'bus_class_id' => $detail->bus_class_id,
                             'seat_fare' => $request->selected_seats_fare[$i],
                             'is_partial' => $isPartial,
                             'booking_no' => $bookingNo,

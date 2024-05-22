@@ -100,7 +100,7 @@
         <br>
         <div id="barcode-area">
             <img style="width: 130px !important;"
-                 src="{{ asset('/Customers/Qrs/'.codeImage('Customer Name : '.ucfirst($data['tickets'][$key]->customer->name) . ' | ' . 'Customer CNIC : '. formatCNIC($data['tickets'][$key]->customer->cnic).' | ' . 'Customer Phone : '. formatContact($data['tickets'][$key]->customer->contact) .' | '.'Seat No : ' . $data['tickets'][$key]['seat_no'] .' | '.'Bus Class : ' .ucfirst($data['tickets'][$key]->seatClass->name) . ' | '. 'From : ' . ucfirst($data['tickets'][$key]->departure_city->name) . ' | ' . 'To : ' . ucfirst($data['tickets'][$key]->destination_city->name) . ' | ' . 'Departure Date : ' . date('d/m/Y', strtotime($data['tickets'][$key]['date'])) . ' | '. 'Departure Time : ' . date('H:i A', strtotime($data['tickets'][$key]->schedule->time)) . ' | ' . ' Booking Date Time : '.  date('d/m/Y H:i A', strtotime($data['tickets'][$key]['created_at'])) . ' | ' . 'Fare :'. $data['tickets'][$key]['seat_fare'])) }}"
+                 src="{{ asset('/Customers/Qrs/'.codeImage('Customer Name : '.ucfirst($data['tickets'][$key]->customer->name) . ' | ' . 'Customer CNIC : '. formatCNIC($data['tickets'][$key]->customer->cnic).' | ' . 'Customer Phone : '. formatContact($data['tickets'][$key]->customer->contact) .' | '.'Seat No : ' . $data['tickets'][$key]['seat_no'] .' | '.'Bus Class : ' .ucfirst($data['tickets'][$key]->busClass->name) . ' | '. 'From : ' . ucfirst($data['tickets'][$key]->departure_city->name) . ' | ' . 'To : ' . ucfirst($data['tickets'][$key]->destination_city->name) . ' | ' . 'Departure Date : ' . date('d/m/Y', strtotime($data['tickets'][$key]['date'])) . ' | '. 'Departure Time : ' . date('H:i A', strtotime($data['tickets'][$key]->schedule->time)) . ' | ' . ' Booking Date Time : '.  date('d/m/Y H:i A', strtotime($data['tickets'][$key]['created_at'])) . ' | ' . 'Fare :'. $data['tickets'][$key]['seat_fare'])) }}"
                  class="rounded"/>
 
             <div class="clear-both">
@@ -113,7 +113,7 @@
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Bus Class:</p>
-                <p class="my-5 float-right">{{ ucfirst($data['tickets'][$key]->seatClass->name) }}</p>
+                <p class="my-5 float-right">{{ ucfirst($data['tickets'][$key]->busClass->name) }}</p>
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">From :</p>
@@ -172,7 +172,7 @@
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Bus Class:</p>
-                <p class="my-5 float-right">{{ ucfirst($data['tickets'][$key]->seatClass->name) }}</p>
+                <p class="my-5 float-right">{{ ucfirst($data['tickets'][$key]->busClass->name) }}</p>
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">From :</p>
