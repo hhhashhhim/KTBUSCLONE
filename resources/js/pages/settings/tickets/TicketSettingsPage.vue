@@ -111,6 +111,8 @@
                         <vue-mask id="phoneNumber" class="form-control" v-model="addForm.phoneNumber" mask="0000-0000000"
                             :raw="false" :options="optionsPhone">
                         </vue-mask>
+                        <input type="checkbox" v-model="addForm.show_phone">
+                        <lable class="mx-1">Show phone on ticket</lable>
                     </div>
                     <div class="form-group col-md-12">
                         <label for="address">Address<span class="text-danger ml-1">*</span></label>
@@ -165,6 +167,8 @@
                         <vue-mask id="phoneNumber" class="form-control" v-model="dataEdit.phone" mask="0000-0000000"
                             :raw="false" :options="optionsPhone">
                         </vue-mask>
+                        <input type="checkbox" v-model="dataEdit.show_phone">
+                        <lable class="mx-1">Show phone on ticket</lable>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="status">Status</label>
@@ -227,6 +231,7 @@ export default {
             terminals: [],
             addForm: {
                 terminal: 0,
+                show_phone: true,
             },
             dataEdit: {},
             loading: false,
@@ -250,7 +255,17 @@ export default {
         this.fetchTemplates();
         this.permissions = this.$store.state.permissions;
     },
-
+    watch: {
+        'addForm.show_phone'(newValue) {
+            if (newValue) {
+                this.addForm.phoneNumber = "";
+            }
+            else
+            {
+                this.addForm.phoneNumber = '0000-0000000';
+            }
+        },
+    },
     methods: {
         clearForm: function () {
             this.addForm.terminal = 0;
@@ -395,6 +410,7 @@ export default {
 
         async edit(template) {
             this.dataEdit = template;
+            this.dataEdit.show_phone = template.show_phone == 1 ? true : false;
         },
 
         async updateTemplate() {
