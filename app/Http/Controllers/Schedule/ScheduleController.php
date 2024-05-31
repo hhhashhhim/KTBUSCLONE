@@ -33,9 +33,9 @@ class ScheduleController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $schedules = Schedule::
-            with('fare_class', 'route', 'bus_class', 'addedBy')
+            with('fare_class', 'route', 'addedBy')
             ->with(["schedule_time"=>function($q) use ($request){
-                $q->where("schedule_date",'=',$request->departure_date??date("Y-m-d"))->select("schedule_id","schedule_date","departure_time");
+                $q->with("bus_class:id,name")->where("schedule_date",'=',$request->departure_date??date("Y-m-d"))->select("schedule_id","schedule_date","departure_time","bus_class_id");
             }])
             ->where(function($q) use ($request){
                 if($request->bus_class)

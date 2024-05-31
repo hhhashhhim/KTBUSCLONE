@@ -405,6 +405,7 @@ class BookingApiController extends Controller
                             $count++;
                             $data = $fareForAllClasses->where('fare_class', $column['class'])->first();
                             $seatMap[$i][$j]['fare'] = (int)$data->fare;
+                            $seatMap[$i][$j]['original_fare'] = (int)$data->fare;
                             if ($scheduleDiscount) {
                                 if ($scheduleDiscount->type == "percentage") {
                                     $number = $scheduleDiscount->percentage / 100;
