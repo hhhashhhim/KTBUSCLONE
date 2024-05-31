@@ -101,7 +101,7 @@
                                                         <td>{{ schedule.schedule_time ? tConvert(schedule.schedule_time.departure_time) : schedule.time + ' | Exp' }}</td>
                                                         <td> {{ schedule.route ? schedule.route.name : "N/A" }}</td>
                                                         <td> {{
-                                                                schedule.bus_class ? schedule.bus_class.name : "N/A"
+                                                                schedule.schedule_time ? schedule.schedule_time.bus_class.name : "N/A"
                                                             }}
                                                         </td>
                                                         <td> {{
