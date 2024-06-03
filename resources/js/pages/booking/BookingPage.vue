@@ -1187,11 +1187,15 @@
                                     <div class="card" v-for="(singleItems,  i) in selectedSeatDataBackEnd">
                                         <div class="card-body p-3" v-for="(innerItem,key , j) in singleItems">
                                             <div class="row ml-2 border-bottom" v-if="key == 0">
-                                                <div class="col-md-6 d-flex justify-content-start">
+                                                <div class="col-md-4 d-flex justify-content-start">
                                                     <h4 class="mb-0 font-weight-bold mr-3">Seat :</h4>
                                                     <h4 class="mb-0 text-muted">{{ innerItem.seat_no }}</h4>
                                                 </div>
-                                                <div class="col-md-6 d-flex justify-content-end">
+                                                <div class="col-md-4 d-flex justify-content-start">
+                                                    <h6 class="mb-0 font-weight-bold mr-3">Booked By :</h6>
+                                                    <h6 class="mb-0 text-muted">{{ innerItem.added_name.name }}</h6>
+                                                </div>
+                                                <div class="col-md-4 d-flex justify-content-end">
                                                     <h4 class="mb-0 font-weight-bold mr-3">Type:</h4>
                                                     <h4 class="mb-0 text-muted text-capitalize"><span
                                                         v-if="innerItem.is_partial == 1">Partial - </span>{{

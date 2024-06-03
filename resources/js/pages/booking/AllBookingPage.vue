@@ -149,7 +149,7 @@
                                                             <th>CNIC</th>
                                                             <th>Contact</th>
                                                             <th>Fare</th>
-                                                            <th>Booking Date</th>
+                                                            <th>Booking Time</th>
                                                             <th>Canceled By</th>
                                                             <th>Canceled Date</th>
                                                             <th>Status</th>
@@ -181,10 +181,10 @@
                                                             <td>{{ record.contact }}</td>
                                                             <td>{{ parseFloat(record.seat_fare) - parseFloat(record.discount ?? 0) }}
                                                             </td>
-                                                            <td>{{ record.created_at }}</td>
+                                                            <td>{{ formatDate(record.created_at) }}</td>
                                                             <td>{{ record.type == "canceled" ? record.cancel_ticket.added_by_name ? record.cancel_ticket.added_by_name.name : 'Auto' : 'N/A' }}
                                                             </td>
-                                                            <td>{{ record.type == "canceled" ? record.cancel_ticket.created_at : 'N/A' }}
+                                                            <td>{{ record.type == "canceled" ? formatDate(record.cancel_ticket.created_at) : 'N/A' }}
                                                             </td>
                                                             <td>{{ record.type }}</td>
                                                         </tr>
@@ -318,6 +318,18 @@ export default {
                 this.tableLoading = false;
             }
         },
+        formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const hours = date.getHours() % 12 || 12; // Get hours in 12-hour format
+            const minutes = ('0' + date.getMinutes()).slice(-2); // Ensure minutes are always two digits
+            const ampm = date.getHours() < 12 ? 'AM' : 'PM'; // Get AM/PM
+
+            // Format date as DD-MM-YYYY
+            const formattedDate = ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear();
+
+            // Combine time and date
+            return `${hours}:${minutes} ${ampm} | ${formattedDate}`;
+        }
     },
     computed: {
         ...mapGetters(['getDeletingObj'])

@@ -75,7 +75,10 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table class="table table-striped table-hover" id="schedule_table"
+                                                <div v-if="tableLoading">
+                                                    <img class="loading-spinner" :src="$store.state.main_url + 'assets/img/loading-spinner.gif'">
+                                                </div>
+                                                <table v-else class="table table-striped table-hover" id="schedule_table"
                                                 >
                                                     <thead>
                                                     <tr>
@@ -98,7 +101,7 @@
                                                         <td>{{ schedule.name }}</td>
                                                         <td>{{ schedule.start_date }}</td>
                                                         <td>{{ schedule.end_date }}</td>
-                                                        <td>{{ schedule.schedule_time ? tConvert(schedule.schedule_time.departure_time) : schedule.time + ' | Exp' }}</td>
+                                                        <td>{{ schedule.schedule_type ? tConvert(schedule.schedule_time.departure_time) : schedule.time + ' | Exp' }}</td>
                                                         <td> {{ schedule.route ? schedule.route.name : "N/A" }}</td>
                                                         <td> {{
                                                                 schedule.schedule_time ? schedule.schedule_time.bus_class.name : "N/A"
@@ -758,6 +761,7 @@ export default {
             value: [],
             editDiscounts: [],
             editSurcharges: [],
+            tableLoading: true,
             editRoutes: [],
             success: false,
             error: false,
@@ -958,9 +962,10 @@ export default {
                 }
         },
         async fetchSchedule() {
-
+            this.tableLoading = true;
             const res = await this.callApi("post", "schedule",this.filterData);
             if (res.status == 200) {
+                this.tableLoading = false;
                 this.schedules = res.data;
             } else {
                 console.log(res);
@@ -1435,8 +1440,10 @@ export default {
     },
 };
 </script>
-<!--<style scoped>-->
-<!--#tableSchedulePreview, th, td{-->
-<!--    border: 3px solid;-->
-<!--}-->
-<!--</style>-->
+<style scoped>
+.loading-spinner {
+    display: block;
+    margin: 0 auto;
+    padding: 2em;
+  }
+</style>
