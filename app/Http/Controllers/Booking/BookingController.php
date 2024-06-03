@@ -734,7 +734,7 @@ class BookingController extends Controller
             'destination_id' => $request->destinationCity,
             'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
         ])->first(['schedule_date']);
-        $tickets = Ticket::with('scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'busClass')->where('company_id', Auth::user()->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('schedule_date', $uniqueDate->schedule_date)->get()->groupBy('seat_no');
+        $tickets = Ticket::with('scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'busClass','added_name')->where('company_id', Auth::user()->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('schedule_date', $uniqueDate->schedule_date)->get()->groupBy('seat_no');
         $checkCustomers = [];
         foreach ($tickets as $key => $single) {
             foreach ($single as $key => $item) {

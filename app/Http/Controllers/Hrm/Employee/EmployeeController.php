@@ -137,6 +137,7 @@ class EmployeeController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+        
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -197,7 +198,7 @@ class EmployeeController extends Controller
                     "terminal_id" => $request->EmployeeTerminal,
                 ]);
                 if ($request->profile) {
-                    Employee::where("user_id", $request->userId)->update([
+                    Employee::where("id", $request->id)->update([
                         'profile_Img' => $this->image($request->profile),
                     ]);
                 }

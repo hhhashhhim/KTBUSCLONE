@@ -32,10 +32,50 @@ class ScheduleController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+
+        $schedules = Schedule::with(['schedule_time' => function ($q) use ($request) {
+            $q->with("bus_class")->where('schedule_date', '=', $request->departure_date ?? date('Y-m-d'));
+            
+        }])
+        ->where(function($q) use ($request){
+            if($request->route)
+            {
+                $q->where("route_id",$request->route);
+            }
+        })
+        ->with("route","addedBy")
+        ->where(['company_id'=> Auth::user()->company_id,"hide"=>0])
+        ->get();
+        
+        $schedules->each(function($schedule,$key) use ($request,$schedules) {
+            if ($schedule->schedule_time === null ) {
+                $times = $schedule->schedule_time()->with("bus_class")->orderBy('id','desc')->first();
+                $schedule->setRelation('schedule_time', $times);
+                $schedule->schedule_type = 0;
+            }
+            else
+            {
+                $schedule->schedule_type = 1;
+            }
+
+            if($request->bus_class && ($request->bus_class != $schedule->schedule_time->bus_class_id))
+            {
+                unset($schedules[$key]);
+            }
+        });
+
+        return $schedules;
+
+
+
+
+
+
+
+        
         $schedules = Schedule::
-            with('fare_class', 'route', 'addedBy')
-            ->with(["schedule_time"=>function($q) use ($request){
-                $q->with("bus_class:id,name")->where("schedule_date",'=',$request->departure_date??date("Y-m-d"))->select("schedule_id","schedule_date","departure_time","bus_class_id");
+            with(["schedule_time"=>function($q) use ($request){
+                $q->where("schedule_date",'=',$request->departure_date??date("Y-m-d"));
             }])
             ->where(function($q) use ($request){
                 if($request->bus_class)
@@ -45,10 +85,6 @@ class ScheduleController extends Controller
                 if($request->route)
                 {
                     $q->where("route_id",$request->route);
-                }
-                if ($request->departure_date) {
-                    $q->whereDate("start_date", "<=", $request->departure_date)
-                      ->whereDate("end_date", ">=", $request->departure_date);
                 }
             })
             ->where(['company_id'=> Auth::user()->company_id,"hide"=>0])

@@ -108,7 +108,7 @@
             <th>Name</th>
             <th>Total Seat</th>
             <th>Destination</th>
-            <th style="width:30% !important; word-wrap: break-word;">Seat #</th>
+            <th style="min-width: 150px !important;">Seat #</th>
             <th>Sale</th>
             <th>Discount</th>
             <th>Commission</th>
@@ -136,7 +136,7 @@
                         $totalSeat += $destination->count()
                     @endphp
                     <td>{{ $destination[0]->destination_city->name }}</td>
-                    <td>{{ $destination->pluck('seat_no')->implode(",") }}</td>
+                    <td>{{ $destination->pluck('seat_no')->implode(", ") }}</td>
                     <td>{{ $destination->sum("seat_fare") }}</td>
                     @php
                         $totalSale += $destination->sum("seat_fare")

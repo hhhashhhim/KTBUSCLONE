@@ -26,6 +26,11 @@ class Ticket extends Model
         return $this->hasOne(User::class, 'id', 'added_by');
     }
     
+    public function added_name()
+    {
+        return $this->hasOne(User::class, 'id', 'added_by');
+    }
+    
     public function route()
     {
         return $this->hasOne(Route::class, 'id', 'route_id');
