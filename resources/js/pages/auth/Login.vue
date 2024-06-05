@@ -8,6 +8,8 @@
                             <div class="card-header text-center">
                                 <img :src="$store.state.main_url + 'assets/img/kt-logo.png'"
                                      style="width:350px !important;" alt="">
+                                     <!-- <img :src="$store.state.main_url + 'assets/img/sarlogo.png'"
+                                     style="width:130px !important; margin: auto;" alt=""> -->
                             </div>
                             <div class="card-body">
                                 <div

@@ -4188,7 +4188,7 @@ export default {
                     timer: 2000
                 });
             }
-            if (this.checkForSubmenuButtons('check-assigned-bus')) {
+            if (this.checkForSubmenuButtons('check-assign-bus')) {
                 // check Buss Assigned or not
                 const resCheckedBus = await this.callApi("post", "booking/check/bus/assigned", {
                     scheduleId: this.addForm.schedule,

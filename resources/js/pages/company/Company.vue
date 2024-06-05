@@ -572,7 +572,8 @@ export default {
                                 {name: "reschedule-seats", allow: true},
                                 {name: "overissue-seat", allow: true},
                                 {name: "cancel-ticket", allow: true},
-                                {name: "check-assigned-bus", allow: true},
+                                {name: "reserved-cancel", allow: true},
+                                {name: "check-assign-bus", allow: true},
                             ]
                         },
                         {
