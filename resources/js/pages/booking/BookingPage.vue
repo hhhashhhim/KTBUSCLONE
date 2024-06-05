@@ -658,7 +658,7 @@
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3"> Bus Class :</p>
-                                                        <p class="mb-0">{{ singleSeat.seat_class.name }}</p>
+                                                        <p class="mb-0">{{ singleSeat.bus_class.name }}</p>
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Schedule : </p>
