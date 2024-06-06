@@ -698,22 +698,29 @@ if (!function_exists('codeImage')) {
 if (!function_exists('customRound')) {
     function customRound($value)
     {
-        $result = $value % 100;
-        if($result < 25)
-        {
-            $round = 0;
-        }
-        elseif($result >= 25 && $result < 75)
-        {
-            $round = 50;
-        }
-        elseif($result >= 75 )
-        {
-            $round = 100;
-        }
-        $result = $value - $result + $round;
         
-        return $result;
+        // multiple of 10
+        $result = $value % 10;
+        $new = 10 - $result;
+        
+        return $value + $new;
+        // round 50 multiple
+        // $result = $value % 100;
+        // if($result < 25)
+        // {
+        //     $round = 0;
+        // }
+        // elseif($result >= 25 && $result < 75)
+        // {
+        //     $round = 50;
+        // }
+        // elseif($result >= 75 )
+        // {
+        //     $round = 100;
+        // }
+        // $result = $value - $result + $round;
+        
+        // return $result;
     }
 }
 

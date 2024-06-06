@@ -49,7 +49,7 @@
         <tr>
             <td>Terminal : {{$filterData->terminal}}</td>
             <td>User : {{$filterData->user}}</td>
-            <td>Route : {{implode(",",$filterData->route)}}</td>
+            <td>Route : {{count($filterData->route) > 0 ? implode(",",$filterData->route) : "All"}}</td>
             <td>{{$filterData->from}} -- {{$filterData->to}}</td>
         </tr>
     </table>
@@ -88,113 +88,7 @@
         </tr>
     </table>
     
-    <div id="info">
-        <div class="companyName"><span>Ticket Refund</span></div>
-    </div>
-    <br>
-
-    <table border="2">
-        <tr>
-            <th>TICKET ID</th>
-            <th>TERMINAL</th>
-            <th>BUS NO</th>
-            <th>SEAT NO</th>
-            <th>REFUND AMOUNT</th>
-            <th>CANCELATION CHARGES</th>
-            <th>BUS TIMING</th>
-            <th>REFUND BY</th>
-            <th>CANCELATION DATE</th>
-        </tr>
-        @foreach($refund as $ref)
-        <tr>
-            <td>{{ $ref['id'] }}</td>
-            <td>{{ $ref['terminal_name'] }}</td>
-            <td>{{ $ref['bus_NO'] }}</td>
-            <td>{{ $ref['seat_no'] }}</td>
-            <td>{{ $ref['amount_refund'] }}</td>
-            <td>{{ $ref['cancelation_charges'] }}</td>
-            <td>{{ $ref['bus_time'] }}</td>
-            <td>{{ $ref['refund_by'] }}</td>
-            <td>{{ $ref['cancel_date'] }}</td>
-        </tr>
-        @endforeach
-        <!-- Total Row -->
-        <tr>
-            <th colspan="4"></th>
-            <th>{{$refund->sum("amount_refund")}}</th>
-            <th>{{$refund->sum("cancelation_charges")}}</th>
-            <th></th>
-            <th></th>
-            <th></th>
-        </tr>
-    </table>
-
-    <div id="info">
-        <div class="companyName"><span>Counter Expense</span></div>
-    </div>
-    <br>
-
-    <table border="2">
-        <tr>
-            <th>Terminal Name</th>
-            <th>Amount</th>
-            <th>Narration</th>
-            <th> Added By</th>
-        </tr>
-        @foreach($counterExpenses as $expense)
-        <tr>
-            <td>{{ $expense['terminal']['name'] }}</td>
-            <td>{{ $expense['amount'] }}</td>
-            <td>{{ $expense['narration'] }}</td>
-            <td>{{ $expense['added_by_data']['name']??'N/A' }}</td>
-        </tr>
-        @endforeach
-        <!-- Total Row -->
-        <tr>
-            <th></th>
-            <th>{{$counterExpenses->sum("amount")}}</th>
-            <th></th>
-            <th></th>
-        </tr>
-    </table>
     
-    <div id="info">
-        <div class="companyName"><span>Cash Detail</span></div>
-    </div>
-    <br>
-
-    <table border="2">
-        <tr>
-            <th style="width: 75% !important;">CASH ON COUNTER</th>
-            <td style="width: 25% !important;">
-            {{ array_sum(array_column($record, 'sales'))}}
-            </td>
-        </tr>
-        <tr>
-            <th style="width: 75% !important;">TOTAL ELT</th>
-            <td style="width: 25% !important;">
-            {{ array_sum(array_column($record, 'elt'))}}
-            </td>
-        </tr>
-        <tr>
-            <th style="width: 75% !important;">TOTAL REFUND</th>
-            <td style="width: 25% !important;">
-            {{$refund->sum("amount_refund")}}
-            </td>
-        </tr>
-        <tr>
-            <th style="width: 75% !important;">TOTAL CANCELLATION CHARGES</th>
-            <td style="width: 25% !important;">
-            {{$refund->sum("cancelation_charges")}}
-            </td>
-        </tr>
-        <tr>
-            <th style="width: 75% !important;">Total Counter Expenses</th>
-            <td style="width: 25% !important;">
-            {{$counterExpenses->sum("amount")}}
-            </td>
-        </tr>
-    </table>
 
 
 </div>
