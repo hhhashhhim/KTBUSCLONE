@@ -701,7 +701,7 @@ if (!function_exists('customRound')) {
         
         // multiple of 10
         $result = $value % 10;
-        $new = 10 - $result;
+        $new = 10 - ($result==0 ? 10 : $result);
         
         return $value + $new;
         // round 50 multiple
