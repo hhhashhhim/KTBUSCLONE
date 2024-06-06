@@ -73,57 +73,65 @@
                                                     {{ loadingTable ? 'Loading...' : 'Print Record' }}
                                                 </button>
                                             </div> -->
-                                            <form :action="$store.state.api_url + 'api/web/v1/advance/sales/pdf'" method="POST" ref="salePrint"
-                                                target="_blank">
-                                                <input type="hidden" name="token" :value="this.$store.state.token">
-                                                <input type="hidden" name="terminal" :value="filterSales.terminal">
-                                                <input type="hidden" name="user" :value="filterSales.user">
-                                                <input type="hidden" name="route" :value="filterSales.route">
-                                                <input type="hidden" name="fromDateTime" :value="filterSales.fromDateTime">
-                                                <input type="hidden" name="toDateTime" :value="filterSales.toDateTime">
-                                            </form>
                                             <div class="row mt-2">
                                                 <div class="col-md-12">
                                                     <div class="table-responsive">
-                                                        <table class="table table-striped table-hover text-center"
-                                                               id="saleReportTable">
-                                                            <thead>
-                                                            <tr>
-                                                                <th>Date</th>
-                                                                <th>Bus No</th>
-                                                                <th>Bus Class</th>
-                                                                <th>No of Seat</th>
-                                                                <th>Terminal Name</th>
-                                                                <th>User Name</th>
-                                                                <th>Sale Amount</th>
-                                                                <th>ELT Amount</th>
-                                                            </tr>
-                                                            </thead>
+                                                        <div v-if="tableLoading">
+                                                            <img class="loading-spinner" :src="$store.state.main_url + 'assets/img/loading-spinner.gif'">
+                                                        </div>
+                                                        <div v-else>
+                                                            <div class="d-flex justify-content-end mb-2">
+                                                                <form :action="$store.state.api_url + 'api/web/v1/advance/sales/pdf'" method="POST" ref="salePrint"
+                                                                    target="_blank">
+                                                                    <input type="hidden" name="token" :value="this.$store.state.token">
+                                                                    <input type="hidden" name="terminal" :value="filterSales.terminal">
+                                                                    <input type="hidden" name="user" :value="filterSales.user">
+                                                                    <input type="hidden" name="route" :value="filterSales.route">
+                                                                    <input type="hidden" name="fromDateTime" :value="filterSales.fromDateTime">
+                                                                    <input type="hidden" name="toDateTime" :value="filterSales.toDateTime">
+                                                                    <input type="submit" value="Print" class="btn btn-dark">
+                                                                </form>
+                                                            </div>
+                                                            <table class="table table-striped table-hover text-center"
+                                                                id="saleReportTable">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th>Date</th>
+                                                                    <th>Bus No</th>
+                                                                    <th>Bus Class</th>
+                                                                    <th>No of Seat</th>
+                                                                    <th>Terminal Name</th>
+                                                                    <th>User Name</th>
+                                                                    <th>Sale Amount</th>
+                                                                    <th>ELT Amount</th>
+                                                                </tr>
+                                                                </thead>
 
-                                                            <tbody>
-                                                            <tr v-for="(data,i) in filters.record" :key="i">
-                                                                <td>{{ data.date }}<br>{{ data.time }}</td>
-                                                                <td>{{ data.bus_number }}</td>
-                                                                <td>{{ data.bus_class }}</td>
-                                                                <td>{{ data.seats }}</td>
-                                                                <td>{{ data.terminal }}</td>
-                                                                <td>{{ data.user }}</td>
-                                                                <td>{{ data.sales }}</td>
-                                                                <td>{{ data.elt }}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th colspan="3"></th>
-                                                                <th>{{ totalSeats() ?? 0 }}</th>
-                                                                <th colspan="2"></th>
-                                                                <th>{{ totalSeatFare() ?? 0 }}</th>
-                                                                <th>{{ totalEltFare() ?? 0 }}</th>
-                                                            </tr>
-                                                            </tbody>
-                                                        </table>
+                                                                <tbody>
+                                                                <tr v-for="(data,i) in filters.record" :key="i">
+                                                                    <td>{{ data.date }}<br>{{ data.time }}</td>
+                                                                    <td>{{ data.bus_number }}</td>
+                                                                    <td>{{ data.bus_class }}</td>
+                                                                    <td>{{ data.seats }}</td>
+                                                                    <td>{{ data.terminal }}</td>
+                                                                    <td>{{ data.user }}</td>
+                                                                    <td>{{ data.sales }}</td>
+                                                                    <td>{{ data.elt }}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th colspan="3"></th>
+                                                                    <th>{{ totalSeats() ?? 0 }}</th>
+                                                                    <th colspan="2"></th>
+                                                                    <th>{{ totalSeatFare() ?? 0 }}</th>
+                                                                    <th>{{ totalEltFare() ?? 0 }}</th>
+                                                                </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <!--                                                Refund Ticket -->
-                                                <div class="col-md-12 text-center">
+                                                <!-- <div class="col-md-12 text-center">
                                                     <div class="my-1">
                                                         <h3 class="text-mute">TICKET REFUND</h3>
                                                     </div>
@@ -159,7 +167,6 @@
                                                             </tr>
                                                             <tr>
                                                                 <th colspan="5"></th>
-                                                                <!-- <th>{{ refundTotalSeats() ?? 0 }}</th> -->
                                                                 <th>{{ refundTotal() ?? 0 }}</th>
                                                                 <th>{{ refundTotalCharges() ?? 0 }}</th>
                                                                 <th colspan="3"></th>
@@ -167,10 +174,10 @@
                                                             </tbody>
                                                         </table>
                                                     </div>
-                                                </div>
+                                                </div> -->
 
                                                 <!--                                                Refund -->
-                                                <div class="col-md-12 text-center">
+                                                <!-- <div class="col-md-12 text-center">
                                                     <div class="my-1">
                                                         <h3 class="text-mute">Counter Expenses</h3>
                                                     </div>
@@ -202,10 +209,10 @@
                                                             </tbody>
                                                         </table>
                                                     </div>
-                                                </div>
+                                                </div> -->
 
 
-                                                <div class="col-md-12 text-center">
+                                                <!-- <div class="col-md-12 text-center">
                                                     <div class="my-1">
                                                         <h3 class="text-mute">Cash Details</h3>
                                                     </div>
@@ -248,7 +255,7 @@
                                                             </tbody>
                                                         </table>
                                                     </div>
-                                                </div>
+                                                </div> -->
                                             </div>
                                         </div>
                                     </div>
@@ -270,6 +277,7 @@ export default {
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             terminals: [],
             loadingTable: false,
+            tableLoading: true,
             users: [],
             permissions: [],
             routes: [],
@@ -318,6 +326,7 @@ export default {
             const resUserNames = await this.callApi("post", 'advance/sales/getUserNames');
             const resRoutes = await this.callApi("post", 'advance/sales/getRoutes');
             if (resTerminals.status == 200 && resUserNames.status == 200 && resRoutes.status == 200) {
+                this.tableLoading = false;
                 this.terminals = resTerminals.data;
                 this.users = resUserNames.data;
                 this.routes = resRoutes.data;
@@ -325,6 +334,7 @@ export default {
 
         },
         async salesFilter() {
+            this.tableLoading = true;
             if (!this.filterSales.fromDateTime)
                 return swal({
                     title: "Required",
@@ -339,9 +349,9 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            this.loadingTable = true;
             const resFetchData = await this.callApi("post", 'advance/sales/fetchFilterData', this.filterSales);
             if (resFetchData.status == 200) {
+                this.tableLoading = false;
                 this.filters.record = resFetchData.data.record;
                 this.filters.refund = resFetchData.data.refund;
                 this.filters.counterExpenses = resFetchData.data.counterExpenses;
@@ -442,4 +452,9 @@ table, th, td {
     border: 1px solid #b9b9b9;
     border-collapse: collapse;
 }
+.loading-spinner {
+    display: block;
+    margin: 0 auto;
+    padding: 2em;
+  }
 </style>

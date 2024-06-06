@@ -27275,6 +27275,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
       terminals: [],
       loadingTable: false,
+      tableLoading: true,
       users: [],
       permissions: [],
       routes: [],
@@ -27363,6 +27364,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resRoutes = _context2.sent;
 
                 if (resTerminals.status == 200 && resUserNames.status == 200 && resRoutes.status == 200) {
+                  _this2.tableLoading = false;
                   _this2.terminals = resTerminals.data;
                   _this2.users = resUserNames.data;
                   _this2.routes = resRoutes.data;
@@ -27385,8 +27387,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
+                _this3.tableLoading = true;
+
                 if (_this3.filterSales.fromDateTime) {
-                  _context3.next = 2;
+                  _context3.next = 3;
                   break;
                 }
 
@@ -27397,9 +27401,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 2:
+              case 3:
                 if (_this3.filterSales.toDateTime) {
-                  _context3.next = 4;
+                  _context3.next = 5;
                   break;
                 }
 
@@ -27410,8 +27414,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 4:
-                _this3.loadingTable = true;
+              case 5:
                 _context3.next = 7;
                 return _this3.callApi("post", 'advance/sales/fetchFilterData', _this3.filterSales);
 
@@ -27419,6 +27422,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resFetchData = _context3.sent;
 
                 if (resFetchData.status == 200) {
+                  _this3.tableLoading = false;
                   _this3.filters.record = resFetchData.data.record;
                   _this3.filters.refund = resFetchData.data.refund;
                   _this3.filters.counterExpenses = resFetchData.data.counterExpenses;
@@ -57881,94 +57885,61 @@ var _hoisted_29 = {
   "class": "col-md-2"
 };
 var _hoisted_30 = ["disabled"];
-var _hoisted_31 = ["action"];
-var _hoisted_32 = ["value"];
-var _hoisted_33 = ["value"];
-var _hoisted_34 = ["value"];
-var _hoisted_35 = ["value"];
-var _hoisted_36 = ["value"];
-var _hoisted_37 = ["value"];
-var _hoisted_38 = {
+var _hoisted_31 = {
   "class": "row mt-2"
 };
-var _hoisted_39 = {
+var _hoisted_32 = {
   "class": "col-md-12"
 };
-var _hoisted_40 = {
+var _hoisted_33 = {
   "class": "table-responsive"
 };
-var _hoisted_41 = {
-  "class": "table table-striped table-hover text-center",
-  id: "saleReportTable"
+var _hoisted_34 = {
+  key: 0
 };
-
-var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Class"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "No of Seat"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "User Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sale Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "ELT Amount")])], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_43 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("br", null, null, -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    colspan: "3"
-  }, null, -1
-  /* HOISTED */
-  );
-});
+var _hoisted_35 = ["src"];
+var _hoisted_36 = {
+  key: 1
+};
+var _hoisted_37 = {
+  "class": "d-flex justify-content-end mb-2"
+};
+var _hoisted_38 = ["action"];
+var _hoisted_39 = ["value"];
+var _hoisted_40 = ["value"];
+var _hoisted_41 = ["value"];
+var _hoisted_42 = ["value"];
+var _hoisted_43 = ["value"];
+var _hoisted_44 = ["value"];
 
 var _hoisted_45 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    colspan: "2"
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "submit",
+    value: "Print",
+    "class": "btn btn-dark"
   }, null, -1
   /* HOISTED */
   );
 });
 
 var _hoisted_46 = {
-  "class": "col-md-12 text-center"
+  "class": "table table-striped table-hover text-center",
+  id: "saleReportTable"
 };
 
 var _hoisted_47 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "my-1"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", {
-    "class": "text-mute"
-  }, "TICKET REFUND")], -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Class"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "No of Seat"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "User Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sale Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "ELT Amount")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_48 = {
-  "class": "table-responsive"
-};
-var _hoisted_49 = {
-  "class": "table table-striped table-hover",
-  style: {
-    "border": "3px solid #b9b9b9"
-  }
-};
-
-var _hoisted_50 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "SR NO"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "TICKET ID"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "TERMINAL"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "BUS NO"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "SEAT NO"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "REFUND AMOUNT"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "CANCELATION CHARGES"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "BUS TIMING"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "REFUND BY"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "CANCELATION DATE")])], -1
+var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("br", null, null, -1
   /* HOISTED */
   );
 });
 
-var _hoisted_51 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    colspan: "5"
-  }, null, -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_52 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_49 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     colspan: "3"
   }, null, -1
@@ -57976,37 +57947,7 @@ var _hoisted_52 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_53 = {
-  "class": "col-md-12 text-center"
-};
-
-var _hoisted_54 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "my-1"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", {
-    "class": "text-mute"
-  }, "Counter Expenses")], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_55 = {
-  "class": "table-responsive"
-};
-var _hoisted_56 = {
-  "class": "table table-striped table-hover",
-  style: {
-    "border": "3px solid #b9b9b9"
-  }
-};
-
-var _hoisted_57 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Narration"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, " Added By")])], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_58 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_50 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     colspan: "2"
   }, null, -1
@@ -58014,119 +57955,8 @@ var _hoisted_58 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_59 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    colspan: "2"
-  }, null, -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_60 = {
-  "class": "col-md-12 text-center"
-};
-
-var _hoisted_61 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "my-1"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", {
-    "class": "text-mute"
-  }, "Cash Details")], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_62 = {
-  "class": "table-responsive w-100"
-};
-var _hoisted_63 = {
-  "class": "table table-striped table-hover",
-  style: {
-    "border": "3px solid #b9b9b9"
-  }
-};
-
-var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    style: {
-      "width": "75% !important"
-    }
-  }, "CASH ON COUNTER", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_65 = {
-  style: {
-    "width": "25% !important"
-  }
-};
-
-var _hoisted_66 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    style: {
-      "width": "75% !important"
-    }
-  }, "TOTAL ELT", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_67 = {
-  style: {
-    "width": "25% !important"
-  }
-};
-
-var _hoisted_68 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    style: {
-      "width": "75% !important"
-    }
-  }, "TOTAL REFUND", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_69 = {
-  style: {
-    "width": "25% !important"
-  }
-};
-
-var _hoisted_70 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    style: {
-      "width": "75% !important"
-    }
-  }, "TOTAL CANCELLATION CHARGES ", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_71 = {
-  style: {
-    "width": "25% !important"
-  }
-};
-
-var _hoisted_72 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    style: {
-      "width": "75% !important"
-    }
-  }, "Total Counter Expenses ", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_73 = {
-  style: {
-    "width": "25% !important"
-  }
-};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _$options$totalSeats, _$options$totalSeatFa, _$options$totalEltFar, _$options$refundTotal, _$options$refundTotal2, _$options$totalCounte, _$options$totalSeatFa2, _$options$totalEltFar2, _$options$refundTotal3, _$options$refundTotal4, _$options$totalCounte2;
+  var _$options$totalSeats, _$options$totalSeatFa, _$options$totalEltFar;
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [_ctx.checkForSubmenuButtons('terminal-filter') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     id: "terminalFilter",
@@ -58209,7 +58039,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     disabled: $data.loadingTable
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loadingTable ? 'Loading...' : 'Fetch Record'), 9
   /* TEXT, PROPS */
-  , _hoisted_30)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"d-flex justify-content-end\" v-if=\"filters.record != null\">\r\n                                                <button class=\"btn btn-dark mt-4\" type=\"button\" @click=\"salesPrint()\"\r\n                                                        :disabled=\"loadingTable\">\r\n                                                    {{ loadingTable ? 'Loading...' : 'Print Record' }}\r\n                                                </button>\r\n                                            </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+  , _hoisted_30)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"d-flex justify-content-end\" v-if=\"filters.record != null\">\r\n                                                <button class=\"btn btn-dark mt-4\" type=\"button\" @click=\"salesPrint()\"\r\n                                                        :disabled=\"loadingTable\">\r\n                                                    {{ loadingTable ? 'Loading...' : 'Print Record' }}\r\n                                                </button>\r\n                                            </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [$data.tableLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_34, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "loading-spinner",
+    src: _ctx.$store.state.main_url + 'assets/img/loading-spinner.gif'
+  }, null, 8
+  /* PROPS */
+  , _hoisted_35)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     action: _ctx.$store.state.api_url + 'api/web/v1/advance/sales/pdf',
     method: "POST",
     ref: "salePrint",
@@ -58220,44 +58055,44 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: this.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_32), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_39), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "terminal",
     value: $data.filterSales.terminal
   }, null, 8
   /* PROPS */
-  , _hoisted_33), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_40), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "user",
     value: $data.filterSales.user
   }, null, 8
   /* PROPS */
-  , _hoisted_34), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_41), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "route",
     value: $data.filterSales.route
   }, null, 8
   /* PROPS */
-  , _hoisted_35), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_42), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "fromDateTime",
     value: $data.filterSales.fromDateTime
   }, null, 8
   /* PROPS */
-  , _hoisted_36), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_43), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "toDateTime",
     value: $data.filterSales.toDateTime
   }, null, 8
   /* PROPS */
-  , _hoisted_37)], 8
+  , _hoisted_44), _hoisted_45], 8
   /* PROPS */
-  , _hoisted_31), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_41, [_hoisted_42, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters.record, function (data, i) {
+  , _hoisted_38)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_46, [_hoisted_47, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters.record, function (data, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.date), 1
     /* TEXT */
-    ), _hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.time), 1
+    ), _hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.time), 1
     /* TEXT */
     )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.bus_number), 1
     /* TEXT */
@@ -58276,71 +58111,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     )]);
   }), 128
   /* KEYED_FRAGMENT */
-  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_44, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalSeats = $options.totalSeats()) !== null && _$options$totalSeats !== void 0 ? _$options$totalSeats : 0), 1
+  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalSeats = $options.totalSeats()) !== null && _$options$totalSeats !== void 0 ? _$options$totalSeats : 0), 1
   /* TEXT */
-  ), _hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalSeatFa = $options.totalSeatFare()) !== null && _$options$totalSeatFa !== void 0 ? _$options$totalSeatFa : 0), 1
+  ), _hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalSeatFa = $options.totalSeatFare()) !== null && _$options$totalSeatFa !== void 0 ? _$options$totalSeatFa : 0), 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalEltFar = $options.totalEltFare()) !== null && _$options$totalEltFar !== void 0 ? _$options$totalEltFar : 0), 1
   /* TEXT */
-  )])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                Refund Ticket "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [_hoisted_47, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_49, [_hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters.refund, function (dataRefund, i) {
-    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
-      key: i
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i + 1), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(dataRefund.id), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(dataRefund.terminal_name), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(dataRefund.bus_NO), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(dataRefund.seat_no), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(dataRefund.amount_refund), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(dataRefund.cancelation_charges), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(dataRefund.bus_time), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(dataRefund.refund_by), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(dataRefund.cancel_date), 1
-    /* TEXT */
-    )]);
-  }), 128
-  /* KEYED_FRAGMENT */
-  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_51, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th>{{ refundTotalSeats() ?? 0 }}</th> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$refundTotal = $options.refundTotal()) !== null && _$options$refundTotal !== void 0 ? _$options$refundTotal : 0), 1
-  /* TEXT */
-  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$refundTotal2 = $options.refundTotalCharges()) !== null && _$options$refundTotal2 !== void 0 ? _$options$refundTotal2 : 0), 1
-  /* TEXT */
-  ), _hoisted_52])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                Refund "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [_hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_56, [_hoisted_57, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters.counterExpenses, function (single, i) {
-    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
-      key: i
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i + 1), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.terminal.name), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.amount), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.narration), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.added_by.name), 1
-    /* TEXT */
-    )]);
-  }), 128
-  /* KEYED_FRAGMENT */
-  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_58, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalCounte = $options.totalCounterAmount()) !== null && _$options$totalCounte !== void 0 ? _$options$totalCounte : 0), 1
-  /* TEXT */
-  ), _hoisted_59])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [_hoisted_61, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_62, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_64, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_65, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalSeatFa2 = $options.totalSeatFare()) !== null && _$options$totalSeatFa2 !== void 0 ? _$options$totalSeatFa2 : 0), 1
-  /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_67, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalEltFar2 = $options.totalEltFare()) !== null && _$options$totalEltFar2 !== void 0 ? _$options$totalEltFar2 : 0), 1
-  /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_68, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_69, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$refundTotal3 = $options.refundTotal()) !== null && _$options$refundTotal3 !== void 0 ? _$options$refundTotal3 : 0), 1
-  /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_71, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$refundTotal4 = $options.refundTotalCharges()) !== null && _$options$refundTotal4 !== void 0 ? _$options$refundTotal4 : 0), 1
-  /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_72, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_73, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$options$totalCounte2 = $options.totalCounterAmount()) !== null && _$options$totalCounte2 !== void 0 ? _$options$totalCounte2 : 0), 1
-  /* TEXT */
-  )])])])])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])])])]);
+  )])])])]))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                Refund Ticket "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"col-md-12 text-center\">\r\n                                                    <div class=\"my-1\">\r\n                                                        <h3 class=\"text-mute\">TICKET REFUND</h3>\r\n                                                    </div>\r\n                                                    <div class=\"table-responsive\">\r\n                                                        <table class=\"table table-striped table-hover\"\r\n                                                               style=\"  border: 3px solid #b9b9b9\">\r\n                                                            <thead>\r\n                                                            <tr>\r\n                                                                <th>SR NO</th>\r\n                                                                <th>TICKET ID</th>\r\n                                                                <th>TERMINAL</th>\r\n                                                                <th>BUS NO</th>\r\n                                                                <th>SEAT NO</th>\r\n                                                                <th>REFUND AMOUNT</th>\r\n                                                                <th>CANCELATION CHARGES</th>\r\n                                                                <th>BUS TIMING</th>\r\n                                                                <th>REFUND BY</th>\r\n                                                                <th>CANCELATION DATE</th>\r\n                                                            </tr>\r\n                                                            </thead>\r\n                                                            <tbody>\r\n                                                            <tr v-for=\"(dataRefund,i) in filters.refund\" :key=\"i\">\r\n                                                                <td>{{ i + 1 }}</td>\r\n                                                                <td>{{ dataRefund.id }}</td>\r\n                                                                <td>{{ dataRefund.terminal_name }}</td>\r\n                                                                <td>{{ dataRefund.bus_NO }}</td>\r\n                                                                <td>{{ dataRefund.seat_no }}</td>\r\n                                                                <td>{{ dataRefund.amount_refund }}</td>\r\n                                                                <td>{{ dataRefund.cancelation_charges }}</td>\r\n                                                                <td>{{ dataRefund.bus_time }}</td>\r\n                                                                <td>{{ dataRefund.refund_by }}</td>\r\n                                                                <td>{{ dataRefund.cancel_date }}</td>\r\n                                                            </tr>\r\n                                                            <tr>\r\n                                                                <th colspan=\"5\"></th>\r\n                                                                <th>{{ refundTotal() ?? 0 }}</th>\r\n                                                                <th>{{ refundTotalCharges() ?? 0 }}</th>\r\n                                                                <th colspan=\"3\"></th>\r\n                                                            </tr>\r\n                                                            </tbody>\r\n                                                        </table>\r\n                                                    </div>\r\n                                                </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("                                                Refund "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"col-md-12 text-center\">\r\n                                                    <div class=\"my-1\">\r\n                                                        <h3 class=\"text-mute\">Counter Expenses</h3>\r\n                                                    </div>\r\n                                                    <div class=\"table-responsive\">\r\n                                                        <table class=\"table table-striped table-hover\"\r\n                                                               style=\"  border: 3px solid #b9b9b9\">\r\n                                                            <thead>\r\n                                                            <tr>\r\n                                                                <th>Sr No.</th>\r\n                                                                <th>Terminal Name</th>\r\n                                                                <th>Amount</th>\r\n                                                                <th>Narration</th>\r\n                                                                <th> Added By</th>\r\n                                                            </tr>\r\n                                                            </thead>\r\n                                                            <tbody>\r\n                                                            <tr v-for=\"(single,i) in filters.counterExpenses\" :key=\"i\">\r\n                                                                <td>{{ i + 1 }}</td>\r\n                                                                <td>{{ single.terminal.name }}</td>\r\n                                                                <td>{{ single.amount }}</td>\r\n                                                                <td>{{ single.narration }}</td>\r\n                                                                <td>{{ single.added_by.name }}</td>\r\n                                                            </tr>\r\n                                                            <tr>\r\n                                                                <th colspan=\"2\"></th>\r\n                                                                <th>{{ totalCounterAmount() ?? 0 }}</th>\r\n                                                                <th colspan=\"2\"></th>\r\n                                                            </tr>\r\n                                                            </tbody>\r\n                                                        </table>\r\n                                                    </div>\r\n                                                </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"col-md-12 text-center\">\r\n                                                    <div class=\"my-1\">\r\n                                                        <h3 class=\"text-mute\">Cash Details</h3>\r\n                                                    </div>\r\n                                                    <div class=\"table-responsive w-100\">\r\n                                                        <table class=\"table table-striped table-hover\"\r\n                                                               style=\"  border: 3px solid #b9b9b9\">\r\n                                                            <tbody>\r\n                                                            <tr>\r\n                                                                <th style=\"width: 75% !important;\">CASH ON COUNTER</th>\r\n                                                                <td style=\"width: 25% !important;\">\r\n                                                                    {{ totalSeatFare() ?? 0 }}\r\n                                                                </td>\r\n                                                            </tr>\r\n                                                            <tr>\r\n                                                                <th style=\"width: 75% !important;\">TOTAL ELT</th>\r\n                                                                <td style=\"width: 25% !important;\">\r\n                                                                    {{ totalEltFare() ?? 0 }}\r\n                                                                </td>\r\n                                                            </tr>\r\n                                                            <tr>\r\n                                                                <th style=\"width: 75% !important;\">TOTAL REFUND</th>\r\n                                                                <td style=\"width: 25% !important;\">{{\r\n                                                                        refundTotal() ?? 0\r\n                                                                    }}\r\n                                                                </td>\r\n                                                            </tr>\r\n                                                            <tr>\r\n                                                                <th style=\"width: 75% !important;\">TOTAL CANCELLATION\r\n                                                                    CHARGES\r\n                                                                </th>\r\n                                                                <td style=\"width: 25% !important;\">\r\n                                                                    {{ refundTotalCharges() ?? 0 }}\r\n                                                                </td>\r\n                                                            </tr>\r\n                                                            <tr>\r\n                                                                <th style=\"width: 75% !important;\">Total Counter Expenses\r\n                                                                </th>\r\n                                                                <td style=\"width: 25% !important;\">{{ totalCounterAmount() ?? 0 }}                                                                </td>\r\n                                                            </tr>\r\n                                                            </tbody>\r\n                                                        </table>\r\n                                                    </div>\r\n                                                </div> ")])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])])])]);
 }
 
 /***/ }),
@@ -95929,7 +95706,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-56dc4dd1], th[data-v-56dc4dd1], td[data-v-56dc4dd1] {\r\n    border: 1px solid #b9b9b9;\r\n    border-collapse: collapse;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-56dc4dd1], th[data-v-56dc4dd1], td[data-v-56dc4dd1] {\r\n    border: 1px solid #b9b9b9;\r\n    border-collapse: collapse;\n}\n.loading-spinner[data-v-56dc4dd1] {\r\n    display: block;\r\n    margin: 0 auto;\r\n    padding: 2em;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
