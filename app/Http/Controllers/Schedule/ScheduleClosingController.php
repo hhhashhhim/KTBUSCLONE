@@ -61,11 +61,64 @@ class ScheduleClosingController extends Controller
         }
         $closings = TicketClosing::where('company_id', Auth::user()->company_id)
         ->with("bus:id,bus_number", "schedule:id,name,route_id", "schedule.route:id,name")
+        ->where("hide",0)
         ->get()
         ->groupBy('ticket_merge_id')
         ->filter(function ($group){
             return $group->count() == 1;
         });
+        $data = [
+            "closings" => $closings,
+        ];
+        return $data;
+    }
+    
+    public function hideUnclosing(Request $request)
+    {
+        if(!checkForSubmenu("closing"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        $unclosing = TicketClosing::find($request->id);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | unclosing deleted ($unclosing->id)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
+        return $unclosing->update([
+            "hide" => 1
+        ]);
+    }
+    
+    public function revertUnclosing(Request $request)
+    {
+        if(!checkForSubmenu("closing"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        $unclosing = TicketClosing::find($request->id);
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name." | unclosing revert ($unclosing->id)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
+        return $unclosing->update([
+            "hide" => 0
+        ]);
+    }
+    
+    public function spareUnclosing(Request $request)
+    {
+        if(!checkForSubmenu("closing"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        $closings = TicketClosing::where('company_id', Auth::user()->company_id)
+        ->with("bus:id,bus_number", "schedule:id,name,route_id", "schedule.route:id,name")
+        ->where("hide",1)
+        ->get();
         $data = [
             "closings" => $closings,
         ];

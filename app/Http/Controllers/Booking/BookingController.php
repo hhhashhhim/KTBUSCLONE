@@ -1659,7 +1659,7 @@ class BookingController extends Controller
             $ids = [$request->ticket_id];
         }
         // return $ids;
-        $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
+       $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->withTrashed()->whereIn('id', $ids)->get();
         $tickets->map(function ($item) {
           
 

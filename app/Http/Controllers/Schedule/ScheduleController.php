@@ -530,59 +530,59 @@ class ScheduleController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         try {
-                DB::beginTransaction();
-                $schedule = Schedule::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
-                $lastEndDate = date("Y-m-d", strtotime($schedule->end_date) + 86400);
-                
-                $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
-                $scheduleDetail = ScheduleDetail::where(["schedule_id"=>$schedule->id,"schedule_date"=>$schedule->end_date])->first();
-                // $days = $this->getDays($lastEndDate, $schedule->end_date);
-                $end_date = $schedule->end_date;
-                for ($i = 0; $i < $request->extended_days; $i++) {
-                    $lastDepId = $routeDetails[0]->departure_city_id;
-                    $totalTime = strtotime(date("$lastEndDate $schedule->time")) + ($i * 86400);
-                    $scheduleStartDate = date("Y-m-d", $totalTime);
-                    foreach ($routeDetails as $key => $detail) {
+            DB::beginTransaction();
+            $schedule = Schedule::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
+            
+            $scheduleDetail = ScheduleDetail::where(["schedule_id"=>$schedule->id])->orderBy("id",'desc')->first();
+            $lastDayDepartureTime = ScheduleDetail::where(["schedule_id"=>$schedule->id,"schedule_date"=>$scheduleDetail->schedule_date])->first()->departure_time;
 
-                        if ($lastDepId == $detail->departure_city_id) {
-                            $departureTime = date("Y-m-d H:i", $totalTime);
-                        } else {
-                            $lastDepId.' '.$detail->departure_city_id;
-                            $fareTableTime = FareTable::where(['from_city_id' => $lastDepId, 'to_city_id' => $detail->departure_city_id])->first()->time_difference??"00:00";
-                            $timeDiff = explode(':', $fareTableTime);
-                            $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
-                            $departureTime = date("Y-m-d H:i", $totalTime);
-                            $lastDepId = $detail->departure_city_id;
-                        }
+            $lastEndDate = date("Y-m-d", strtotime($scheduleDetail->schedule_date) + 86400);
 
-                        ScheduleDetail::create([
-                            'company_id' => Auth::user()->company_id,
-                            'added_by' => Auth::user()->id,
-                            'schedule_id' => $schedule->id,
-                            'bus_class_id' => $scheduleDetail->bus_class_id,
-                            'departure_id' => $detail->departure_city_id,
-                            'destination_id' => $detail->destination_city_id,
-                            'departure_time' => date('H:i', strtotime($departureTime)),
-                            'departure_date' => date('Y-m-d', strtotime($departureTime)),
-                            'schedule_date' => $scheduleStartDate, // schedule departure date
-                        ]);
-                        $end_date = $scheduleStartDate;
-                        
+            
+
+            $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
+            
+            for ($i = 0; $i < $request->extended_days; $i++) {
+                $lastDepId = $routeDetails[0]->departure_city_id;
+                $totalTime = strtotime(date("$lastEndDate $lastDayDepartureTime")) + ($i * 86400);
+                $scheduleStartDate = date("Y-m-d", $totalTime);
+                foreach ($routeDetails as $key => $detail) {
+
+                    if ($lastDepId == $detail->departure_city_id) {
+                        $departureTime = date("Y-m-d H:i", $totalTime);
+                    } else {
+                        $lastDepId.' '.$detail->departure_city_id;
+                        $fareTableTime = FareTable::where(['from_city_id' => $lastDepId, 'to_city_id' => $detail->departure_city_id])->first()->time_difference??"00:00";
+                        $timeDiff = explode(':', $fareTableTime);
+                        $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
+                        $departureTime = date("Y-m-d H:i", $totalTime);
+                        $lastDepId = $detail->departure_city_id;
                     }
-                };
-               
-                $schedule->update([
-                    "end_date" => $end_date,
-                ]);
 
-                ActivityLog::create([
-                    "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | extend schedule $request->extended_days days ($schedule->name $schedule->id)",
-                    "requested_host" => $request->ip(),
-                    "company_id" => Auth::user()->company_id
-                ]);
-                DB::commit();
-                return $schedule;
+                    ScheduleDetail::create([
+                        'company_id' => Auth::user()->company_id,
+                        'added_by' => Auth::user()->id,
+                        'schedule_id' => $schedule->id,
+                        'bus_class_id' => $scheduleDetail->bus_class_id,
+                        'departure_id' => $detail->departure_city_id,
+                        'destination_id' => $detail->destination_city_id,
+                        'departure_time' => date('H:i', strtotime($departureTime)),
+                        'departure_date' => date('Y-m-d', strtotime($departureTime)),
+                        'schedule_date' => $scheduleStartDate, // schedule departure date
+                    ]);
+                    
+                }
+            };
+           
+            
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name." | extend schedule $request->extended_days days ($schedule->name $schedule->id)",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
+            DB::commit();
+            return $schedule;
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Database transaction error: ' . $e->getMessage());
