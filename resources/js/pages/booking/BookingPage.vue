@@ -708,6 +708,10 @@
                                             <!--Buttons-->
                                             <div class="row mt-3">
                                                 <div class="col-md-12 text-right">
+                                                    <button type="button" class="btn btn-secondary text-dark"
+                                                            v-if="checkForSubmenuButtons('duplicate-ticket')"
+                                                            @click="duplicateTicket(singleSeat)">Duplicate Ticket
+                                                    </button>
                                                     <button @click="revertOverIssueFunction(singleSeat)"
                                                             type="button" class="btn btn-info ml-2"
                                                             :disabled="loadingRevertButton">{{
@@ -4004,7 +4008,7 @@ export default {
 
             this.ticketsId = data.id
             setTimeout(() => {
-                if (data.type == "booked") {
+                if (data.type == "booked" || data.type == "over-issue") {
                     this.$refs.refDuplicateTicket.submit();
                     this.closeModal();
                 } else {

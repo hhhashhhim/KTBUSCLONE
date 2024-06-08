@@ -17,8 +17,7 @@
                                 class="modal-title text-center text-danger"
                                 style="width: 97%"
                             >
-                                <i class="fas fa-exclamation-circle fa-2x"></i> Delete
-                                Confirmation
+                                <i class="fas fa-exclamation-circle fa-2x"></i> Confirmation
                             </h4>
                             <button
                                 type="button"

@@ -33,9 +33,8 @@
                                                         <th>Route Name</th>
                                                         <th>Schedule Date</th>
                                                         <th>Schedule Time</th>
-                                                        <th v-if="checkForSubmenuButtons('edit-close-booking')">Action
-                                                        </th>
-                                                        <!-- <th>Expense</th> -->
+                                                        <th>٘Merge</th>
+                                                        <th v-if="checkForSubmenuButtons('edit-close-booking')">Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -61,13 +60,22 @@
                                                                 :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
                                                                 {{ close.schedule_time }}
                                                             </td>
-                                                            <td
-                                                                :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'">
-                                                                 <input type="checkbox" 
+                                                            <td class="h5"
+                                                                :class="data.length == 2 ? j == 1 ? 'border-bottom border-success' : 'border-top border-success' : 'border-bottom border-top border-danger'">
+                                                                <input type="checkbox" 
                                                                         id="femaleCheckBox"
                                                                         :checked="addData.mergeIds.includes(close.ticket_merge_id)"
                                                                         @click="changeClosingId(close)"
                                                                         name="">
+                                                            </td>
+                                                            <td
+                                                                :class="data.length == 2 ? j == 1 ? 'border-bottom border-right border-success' : 'border-right border-top border-success' : 'border-bottom border-right border-top border-danger'">
+                                                                <button title="Delete Unclosing"
+                                                                        :data-target="'#' + hideFormID" @click="delId = close.id" data-toggle="modal"
+                                                                        class="btn btn-danger btn-sm mx-2"
+                                                                >
+                                                                <i class="far fas fa-trash"></i>
+                                                                </button>
                                                             </td>
                                                         </tr>
                                                     </template>
@@ -87,6 +95,17 @@
                     </div>
                 </div>
             </div>
+            <Hide :hideForm="hideFormID" confirmationMessage="Are You Sure You want To Delete This Closing ???">
+                <template v-slot:button>
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-block"
+                       :disabled="loading" @click="hideUnclosing"
+                    >
+                    {{ loading ? 'Loading...' : 'Yes, I want to Delete' }}
+                    </button>
+                </template>
+            </Hide>
         </div>
     </section>
 </template>
@@ -94,10 +113,11 @@
 <script>
 
 import {mapGetters} from "vuex";
-
+import Hide from "../../components/Hide.vue";
 export default {
     name: "unclosing",
     components: {
+        Hide
     },
     data() {
         return {
@@ -106,6 +126,8 @@ export default {
             permissions: [],
             validationErrors: "",
             formID: "schedule_closing_form",
+            hideFormID: "hide_schedule_form",
+            delId: "",
             seatNo: 0,
             addData: {
                 mergeIds: [],
@@ -164,6 +186,35 @@ export default {
                 this.closings = res.data.closings;
             } else {
                 console.log(res);
+            }
+        },
+
+        async hideUnclosing() {
+            
+            this.loading = true;
+            const resHide = await this.callApi("post", 'booking/close/schedule/unclosing/hide', {id:this.delId});
+            if (resHide.status == 200) {
+                $(".modal").click();
+                swal({
+                    title: "Success",
+                    text: "Unclosing Deleted Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.loading = false;
+                this.fetchData();
+            } else {
+                if (resHide.status == 422) {
+                    this.loading = false;
+                    for (const key in resHide.data.errors) {
+                        resHide.data.errors[key].forEach((element) => {
+                            this.errorsArray(element, key);
+                        });
+                    }
+                }
+                setTimeout(() => {
+                    this.loading = false
+                }, 3000);
             }
         },
 

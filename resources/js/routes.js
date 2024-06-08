@@ -20,6 +20,7 @@ import BusClassPage from "./pages/buses/BusClassPage.vue";
 import BookingPage from "./pages/booking/BookingPage.vue";
 import ScheduleClosingPage from "./pages/schedule/ScheduleClosingPage.vue";
 import ScheduleUnclosingPage from "./pages/schedule/ScheduleUnclosingPage.vue";
+import ScheduleUnclosingSparePage from "./pages/schedule/ScheduleUnclosingSparePage.vue";
 import ScheduleMergePage from "./pages/schedule/ScheduleMergePage.vue";
 import AllBookingPage from "./pages/booking/AllBookingPage.vue";
 import EmployeesPage from "./pages/hrm/employees/EmployeesPage.vue";
@@ -57,8 +58,8 @@ import ConfirmCancellationPage from "./pages/Cancel/ConfirmCancelationPage.vue";
 import CounterExpensesPage from "./pages/expense/CounterExpensesPage.vue";
 import OfficeExpensesPage from "./pages/expense/OfficeExpensesPage.vue";
 
-// const url = '/kt-dev/'
-const url = '/'
+const url = '/kt-dev/'
+// const url = '/'
 
 
 const routes = [
@@ -166,6 +167,11 @@ const routes = [
         path: url + "booking/schedule/unclosing",
         component: ScheduleUnclosingPage,
         name: "booking-schedule-unclosing"
+    },
+    {
+        path: url + "booking/schedule/unclosing/spare",
+        component: ScheduleUnclosingSparePage,
+        name: "booking-schedule-unclosing-spare"
     },
     {
         path: url + "booking/schedule/merges",
