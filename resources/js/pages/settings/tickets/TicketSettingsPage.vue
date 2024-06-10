@@ -80,7 +80,7 @@
             <!-- Add Modal -->
             <Add :heading="'Add Template'" :errors="this.validationErrors" :success="success" :formID="formID">
                 <div class="row mt-3">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="terminals">Terminals <span class="text-danger">*&nbsp;&nbsp; (Just For Company
                                 Admin)</span></label>
                         <select class="form-control" id="terminals" v-model="addForm.terminal">
@@ -90,9 +90,17 @@
                             </option>
                         </select>
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="terminals">Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" placeholder="Enter Name" v-model="addForm.name">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="">Footer Text<span class="text-danger">*</span></label>
+                        <select class="form-control" id="" v-model="addForm.footerText">
+                            <option value="0" selected>Select</option>
+                            <option>Rights Reserved by Kainat Travels</option>
+                            <option>Software Developed By SAR ZONE 0341-1111727</option>
+                        </select>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>
@@ -137,7 +145,7 @@
             </Add>
             <Edit heading="Edit Template" :errors="this.validationErrors" :success="success" :editForm="editFormID">
                 <div class="row mt-3">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="terminals">Terminals <span class="text-danger">*</span></label>
                         <select class="form-control" id="terminals" v-model="dataEdit.terminal_id">
                             <option value="0" selected>Select Terminal</option>
@@ -146,9 +154,17 @@
                             </option>
                         </select>
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="terminals">Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" placeholder="Enter Name" v-model="dataEdit.name">
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="">Footer Text<span class="text-danger">*</span></label>
+                        <select class="form-control" id="" v-model="dataEdit.footer_text">
+                            <option value="0" selected>Select</option>
+                            <option>Rights Reserved by Kainat Travels</option>
+                            <option>Software Developed By SAR ZONE 0341-1111727</option>
+                        </select>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>
@@ -231,6 +247,7 @@ export default {
             terminals: [],
             addForm: {
                 terminal: 0,
+                footerText: 0,
                 show_phone: true,
             },
             dataEdit: {},
@@ -370,6 +387,14 @@ export default {
                     timer: 2000,
                 });
             }
+            if (this.addForm.footerText == '0') {
+                return swal({
+                    title: "Required !!!",
+                    text: "Please Select any Footer Text",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
             this.loading = true;
             const resAddTemplate = await this.callApi("post", 'settings/tickets/store', this.addForm);
             if (resAddTemplate.status == 201) {
@@ -458,6 +483,14 @@ export default {
                 return swal({
                     title: "Required !!!",
                     text: "Terms &Condition is Required",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.dataEdit.footer_text == '0' || this.dataEdit.footer_text == null) {
+                return swal({
+                    title: "Required !!!",
+                    text: "Please Select any Footer Text",
                     icon: "error",
                     timer: 2000,
                 });

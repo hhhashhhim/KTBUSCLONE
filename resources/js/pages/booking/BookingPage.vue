@@ -338,7 +338,7 @@
                                                 </button>
                                             </div>
                                             <div class="text-center" v-if="!hideDivButtonsDrop">
-                                                <h4>This schedule is dropped</h4>
+                                                <h4>{{ labelDrop }}</h4>
                                             </div>
                                         </div>
                                     </div>
@@ -2953,10 +2953,11 @@ export default {
                 date: this.addForm.date,
                 departureCity: this.addForm.departureCity,
                 destinationCity: this.addForm.destinationCity,
+                departure_time: this.addForm.departure_time,
             });
             if (resDropCheck.status == 200) {
                 if (resDropCheck.data.checkDrop) {
-                    this.labelDrop = 'This Schedule is Dropped';
+                    this.labelDrop = "This schedule is dropped by " + resDropCheck.data.checkDrop.drop_by.name??'N/A';
                     this.hideDivButtonsDrop = false;
                 } else {
                     this.hideDivButtonsDrop = true;
