@@ -1235,7 +1235,7 @@
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Customer Phone : </p>
                                                         <p class="mb-0">
-                                                            {{ phoneFormat(innerItem.customer.contact) }}</p>
+                                                            {{ auth_terminal.other_terminal_passenger_detail == 1 ? phoneFormat(innerItem.customer.contact) : "---" }}</p>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
@@ -1543,6 +1543,7 @@ export default {
             drivers: [],
             hosts: [],
             assignBus: 0,
+            auth_terminal: [],
             shiftingFormId: "shifting-modal",
             partialSeatFormId: "partialSeat-modal",
             detailsFormId: "details-modal",
@@ -2706,6 +2707,7 @@ export default {
                     this.totalSeats = 0;
                     this.BusNo = resSelected.data.bus_no;
                     this.totalSeatsBooked = 0;
+                    this.auth_terminal = resSelected.data.auth_terminal;
                     this.totalSeatsIssued = 0;
                     this.totalSeatsAvailable = 0;
                     for (let i = 0; i < resSelected.data.bus_class.seat_map.length; i++) {

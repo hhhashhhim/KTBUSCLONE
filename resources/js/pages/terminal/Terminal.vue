@@ -352,6 +352,13 @@
                         <label for="online_terminal_name">Online Terminal Name</label>
                         <input type="text" class="form-control" v-model="dataEdit.online_terminal_name">
                     </div>
+                    <div class="form-group col-md-4">
+                        <label for="phoneNumber">Show other terminal passenger detail</label>
+                        <div class="d-block">
+                            <input type="checkbox" v-model="dataEdit.other_terminal_passenger_detail">
+                            <lable class="mx-1">Show detail</lable>
+                        </div>
+                    </div>
                     <!-- <div class="form-group col-md-2 d-flex align-items-center">
                         <label class="mt-4" for="active">Online Availability </label>
                         <label class="colorinput mx-3 mt-3">
@@ -749,6 +756,7 @@ export default {
         },
         async editTerminal(single) {
             this.dataEdit = single;
+            this.dataEdit.other_terminal_passenger_detail = single.other_terminal_passenger_detail == 1 ? true : false;
         },
         async terminalDetail(id) {
             const getTerminalRes = await this.callApi("post", "terminals/getTerminal", {id: id});
