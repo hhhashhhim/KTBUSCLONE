@@ -1054,6 +1054,7 @@ class BookingController extends Controller
         $schedule->bus_class->seat_map = $seatMap;
         $schedule->bus_no = $tickets->count() > 0 && $tickets[0]->bus_id ? Bus::find($tickets[0]->bus_id)->bus_number : "N/A";
         unset($schedule->route);
+        $schedule->auth_terminal = Auth::user()->terminal;
         return $schedule;
     }
 
