@@ -17,7 +17,6 @@ Route::group(['prefix' => 'web/v1/schedule','middleware' => ['auth:sanctum']], f
     Route::post('/getEntire', [ScheduleController::class, 'getEntire']);
     Route::post('/getRouteFare', [ScheduleController::class, 'getRouteFareClass']);
     Route::post('/genericCommon', [ScheduleController::class, 'genericCommon']);
-    Route::post('/dropCheck', [ScheduleController::class, 'dropCheck']);
     Route::post('/extend', [ScheduleController::class, 'extend']);
     Route::post('/allBuses', [ScheduleController::class, 'allBuses']);
     Route::post('/fare-class', [ScheduleController::class, 'fareClasses']);

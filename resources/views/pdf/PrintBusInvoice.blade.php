@@ -79,10 +79,10 @@
 <body>
 <div style="width: 100% !important; height: auto !important;">
     <div id="info">
-        <div class="companyName"><span>Kainat Travels</span></div>
+        <div class="companyName"><span>{{isset($format->name) ? $format->name : "Kainat Travels"}}</span></div>
         <div class="companyAddress">
             <span style="padding-bottom: 10px !important;text-transform: capitalize">{{ $infoData->current_terminal }} Terminal</span>
-            <div><span><b>UAN(24/7) : </b>03-111-777-333
+            <div><span><b>UAN(24/7) : </b>{{isset($format->uan) ? $format->uan : "03-111-777-333"}}
         </span></div>
         </div>
     </div>

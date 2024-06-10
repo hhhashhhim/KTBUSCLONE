@@ -22,4 +22,9 @@ class DropSchedule extends Model
     {
         return $this->hasOne( User::class, 'id', 'added_by' );
     }
+    
+    public function drop_by()
+    {
+        return $this->hasOne( User::class, 'id', 'added_by' );
+    }
 }

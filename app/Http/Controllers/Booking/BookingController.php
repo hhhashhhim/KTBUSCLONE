@@ -779,8 +779,9 @@ class BookingController extends Controller
             'departure_date' => $request->date,
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
+            'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
         ])->first()->schedule_date;
-        $found = DropSchedule::where([
+        $found = DropSchedule::with("drop_by")->where([
             'company_id' => Auth::user()->company_id,
             'schedule_date' => $uniqueDate,
             'schedule_id' => $request->id,
@@ -1543,7 +1544,8 @@ class BookingController extends Controller
         ;
         $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'bus' => $bus, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount, 'commission' => $commission, 'refund' => round($refundData)];
         $terminal = Terminal::find(Auth::user()->terminal_id);
-        return view('pdf/TerminalPaxDetails', ['data' => $passengerData, 'terminal' => $terminal]);
+        $format = TicketsTemplate::with("terminal")->where(['terminal_id' => Auth::user()->terminal_id, 'company_id'=> Auth::user()->company_id])->where('status', 1)->first();
+        return view('pdf/TerminalPaxDetails', ['data' => $passengerData, 'terminal' => $terminal,"format"=>$format]);
     }
 
     public
@@ -1643,7 +1645,8 @@ class BookingController extends Controller
             ->first(["id", "bus_id"]);
 
         $infoData->bus_data = $busData;
-        return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData,"refundTerminal" => $refundTerminal]);
+        $format = TicketsTemplate::with("terminal")->where(['terminal_id' => Auth::user()->terminal_id, 'company_id'=> Auth::user()->company_id])->where('status', 1)->first();
+        return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData,"refundTerminal" => $refundTerminal,"format"=>$format]);
     }
 
     public
@@ -1760,7 +1763,7 @@ class BookingController extends Controller
             'schedule_date' => $uniqueDate,
             'type' => 'booked',
         ])->groupBy('destination_city_id')->selectRaw('destination_city_id,count(*) as destinationPassengerCount')->get();
-        $format = TicketsTemplate::where('company_id', Auth::user()->company_id)->orWhere('terminal_id', Auth::user()->terminal_id)->where('status', 1)->first();
+        $format = TicketsTemplate::with("terminal")->where(['terminal_id' => Auth::user()->terminal_id, 'company_id'=> Auth::user()->company_id])->where('status', 1)->first();
         $countPassenger = count($passengerData);
         $actualDeparture = date('m/d/Y h:i A', strtotime($uniqueDate . ' ' . $scheduleTime));
         $driverInfo = getMembers($passengerData->first(), Auth::user()->company_id, 1) ?? [];

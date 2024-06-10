@@ -87,14 +87,14 @@
 </head>
 <body>
 <div id="info">
-    <div class="companyName"><span>Kainat Travels</span></div>
+    <div class="companyName"><span>{{isset($format->name) ? $format->name : "Kainat Travels"}}</span></div>
     <br>
     <div class="companyAddress">
         <div><span><b>{{ isset($format->address) ? $format->address : auth()->user()->terminal->address }}</b></span></div>
     </div>
     <br>
     <div class="companyAddress">
-        <div><span><b>UAN(24/7) : </b>03-111-777-333</span></div>
+        <div><span><b>UAN(24/7) : </b>{{isset($format->uan) ? $format->uan : "03-111-777-333"}}</span></div>
     </div>
 </div>
 <br>

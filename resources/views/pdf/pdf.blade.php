@@ -92,8 +92,8 @@
         @if(isset($data['format']->phone) && $data['format']->show_phone == 0)
         @else
         <div><span><b>Phone : </b> {{ isset($data['format']->phone) ?  formatContact($data['format']->phone) : formatContact(auth()->user()->terminal->contact) }}</span>
-        @endif
         </div>
+        @endif
     </div>
     @if($data['duplicate'] == 1)
         <div style="text-align: center; border:2px dashed black;"><h3>Duplicate Ticket</h3></div>
@@ -160,7 +160,7 @@
             <p>{{ isset($data['format']->terms_condition) ? $data['format']->terms_condition : "Refreshment,WIFI upto 350MB, And MOD is Complimentary Refreshment,WIFI Bus will not drop passengers without Company TerminalBus will not drop" }}</p>
 
             <br>
-            <p> &#169; Rights Reserved by Kainat Travels</p>
+            <p> &#169; {{isset($data['format']->footer_text) ? $data['format']->footer_text : "Rights Reserved by Kainat Travels"}}</p>
         </div>
 
         <div style="page-break-before:always">&nbsp;</div>

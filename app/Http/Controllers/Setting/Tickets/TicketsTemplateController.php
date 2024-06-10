@@ -39,6 +39,7 @@ class TicketsTemplateController extends Controller
                     'address' => 'required',
                     'uanNumber' => 'required',
                     'termsCondition' => 'required',
+                    'footerText' => 'required',
                 ];
 
                 $customMessages = [
@@ -47,6 +48,7 @@ class TicketsTemplateController extends Controller
                     'address.required' => 'Address is required',
                     'uanNumber.required' => 'UAN Number is required',
                     'termsCondition.required' => 'Terms & Condition is required',
+                    'footerText.required' => 'Footer Text is required',
                 ];
                 $this->validate($request, $rules, $customMessages);
                 TicketsTemplate::where('company_id', Auth::user()->company_id)->where('terminal_id', $request->terminal)->where('status', 1)->update(array('status' => 0));
@@ -57,6 +59,7 @@ class TicketsTemplateController extends Controller
                     'uan' => $request->uanNumber,
                     'phone' => $request->phoneNumber,
                     'show_phone' => $request->show_phone,
+                    'footer_text' => $request->footerText,
                     'address' => $request->address,
                     'terms_condition' => $request->termsCondition,
                     'status' => 1,
@@ -103,6 +106,7 @@ class TicketsTemplateController extends Controller
                     'phone' => 'required',
                     'address' => 'required',
                     'terms_condition' => 'required',
+                    'footer_text' => 'required',
                 ];
 
                 $customMessages = [
@@ -112,6 +116,7 @@ class TicketsTemplateController extends Controller
                     'phone.required' => 'Phone Number is required',
                     'address.required' => 'Terminal Address is required',
                     'terms_condition.required' => 'Terms & Condition is required',
+                    'footer_text.required' => 'Footer Text is required',
                 ];
                 $this->validate($request, $rules, $customMessages);
                 TicketsTemplate::where(['terminal_id' => $request->terminal_id, 'company_id'=> Auth::user()->company_id])->where('status', 1)->update(array('status' => 0));
@@ -121,6 +126,7 @@ class TicketsTemplateController extends Controller
                     'uan' => plainContactAndCnic($request->uan),
                     'phone' => plainContactAndCnic($request->phone),
                     'show_phone' => $request->show_phone,
+                    'footer_text' => $request->footer_text,
                     'address' => $request->address,
                     'terms_condition' => $request->terms_condition,
                     'status' => $request->status,
