@@ -29452,7 +29452,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         totalAmount: 0,
         discount: 0,
         terminalId: 0,
-        alreadyBookedId: []
+        alreadyBookedId: [],
+        reservedFare: []
       },
       advanceCash: {
         sale: 0,
@@ -31006,6 +31007,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this21.addForm.contact = "";
                 _this21.addForm.flag = 0;
                 _this21.addForm.alreadyBookedId = [];
+                _this21.addForm.reservedFare = [];
                 _this21.addForm.remarks = "";
                 _this21.addForm.totalFare = 0;
                 _this21.selectedSeats = [];
@@ -31023,11 +31025,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this21.showBookingDiv = false;
 
                 if (!(_this21.addForm.schedule != 0 && _this21.addForm.date && _this21.addForm.departureCity != 0 && _this21.addForm.destinationCity != 0)) {
-                  _context20.next = 67;
+                  _context20.next = 69;
                   break;
                 }
 
-                _context20.next = 27;
+                _context20.next = 28;
                 return _this21.callApi("post", "booking/schedule/selected", {
                   id: _this21.addForm.schedule,
                   date: _this21.addForm.date,
@@ -31037,7 +31039,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   departure_time: _this21.addForm.departure_time
                 });
 
-              case 27:
+              case 28:
                 resSelected = _context20.sent;
 
                 if (resSelected.status == 200) {
@@ -31075,6 +31077,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this21.addForm.contact = "";
                 _this21.addForm.flag = 0;
                 _this21.addForm.alreadyBookedId = [];
+                _this21.addForm.reservedFare = [];
                 _this21.addForm.remarks = "";
                 _this21.addForm.totalFare = 0;
                 _this21.selectedSeats = [];
@@ -31086,14 +31089,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this21.addForm.selectedSeatsClass = [];
                 _this21.addForm.totalAmount = 0;
                 _this21.addForm.discount = '';
-                _context20.next = 47;
+                _context20.next = 49;
                 return _this21.callApi("post", "booking/terminal/seats", {
                   terminal_id: _this21.$store.state.user.terminal_id
                 });
 
-              case 47:
+              case 49:
                 terminalSeats = _context20.sent;
-                _context20.next = 50;
+                _context20.next = 52;
                 return _this21.callApi("post", "booking/schedule/terminal/discount/fetch", {
                   id: _this21.addForm.schedule,
                   date: _this21.addForm.date,
@@ -31102,16 +31105,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   dropTerminal: _this21.addForm.terminalId
                 });
 
-              case 50:
+              case 52:
                 restDiscount = _context20.sent;
-                _context20.next = 53;
+                _context20.next = 55;
                 return _this21.callApi("post", "booking/discount/surcharge/fetch", {
                   schedule_id: _this21.addForm.schedule
                 });
 
-              case 53:
+              case 55:
                 resFetchDiscountSurcharge = _context20.sent;
-                _context20.next = 56;
+                _context20.next = 58;
                 return _this21.callApi("post", "booking/booked/seats/elt/detail", {
                   id: _this21.addForm.schedule,
                   date: _this21.addForm.date,
@@ -31119,9 +31122,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   destinationCity: _this21.addForm.destinationCity
                 });
 
-              case 56:
+              case 58:
                 responseEltDetails = _context20.sent;
-                _context20.next = 59;
+                _context20.next = 61;
                 return _this21.callApi("post", "booking/fetch/over/issue/seat", {
                   id: _this21.addForm.schedule,
                   date: _this21.addForm.date,
@@ -31129,7 +31132,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   destinationCity: _this21.addForm.destinationCity
                 });
 
-              case 59:
+              case 61:
                 resFetchOverIssueSeat = _context20.sent;
 
                 if (resFetchOverIssueSeat.status == 200) {
@@ -31190,7 +31193,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 67:
+              case 69:
               case "end":
                 return _context20.stop();
             }
@@ -31682,6 +31685,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                       _this26.addForm.alreadyBookedId.splice(index, 1);
 
+                      _this26.addForm.reservedFare.splice(index, 1);
+
                       _this26.addForm.customerName = "";
                       _this26.addForm.customerCNIC = "";
                       _this26.addForm.contact = "";
@@ -31691,6 +31696,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                       }
                     } else {
                       _this26.addForm.alreadyBookedId.push(data.id);
+
+                      _this26.addForm.reservedFare.push(data.fare);
 
                       _this26.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
                       _this26.addForm.customerName = data.customer_name;
@@ -31989,7 +31996,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resTicket = _context26.sent;
 
                 if (!(resTicket.status == 200)) {
-                  _context26.next = 56;
+                  _context26.next = 57;
                   break;
                 }
 
@@ -32027,6 +32034,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this27.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
                 _this27.selectedSeats.length = 0;
                 _this27.addForm.alreadyBookedId = [];
+                _this27.addForm.reservedFare = [];
 
                 _this27.fetchScheduleData();
 
@@ -32040,17 +32048,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     _this27.$refs.refTicket.submit();
                   }
                 }, 700);
-                _context26.next = 53;
+                _context26.next = 54;
                 return _this27.callApi("post", "booking/whatsapp/message", {
                   ticket_ids: resTicket.data.ids
                 });
 
-              case 53:
+              case 54:
                 resBookingDetail = _context26.sent;
-                _context26.next = 58;
+                _context26.next = 59;
                 break;
 
-              case 56:
+              case 57:
                 if (resTicket.status == 422) {
                   (function () {
                     var errorContent = "";
@@ -32074,7 +32082,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this27.bookingLoading = false;
                 }, 1000);
 
-              case 58:
+              case 59:
               case "end":
                 return _context26.stop();
             }
@@ -32102,12 +32110,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this28.addForm.selectedBookedSeats = [];
                 _this28.addForm.selectedOverIssueSeats = [];
                 _this28.addForm.alreadyBookedId = [];
+                _this28.addForm.reservedFare = [];
                 _this28.advanceSeat = [];
                 _this28.addForm.selectedBookedOverIssueSeats = [];
                 _this28.bookedSeats = [];
                 _this28.bookedOverIssueSeats = [];
 
-              case 16:
+              case 17:
               case "end":
                 return _context27.stop();
             }

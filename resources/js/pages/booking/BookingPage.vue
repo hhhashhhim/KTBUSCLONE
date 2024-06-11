@@ -1687,6 +1687,7 @@ export default {
                 discount: 0,
                 terminalId: 0,
                 alreadyBookedId: [],
+                reservedFare: [],
             },
             advanceCash: {
                 sale: 0,
@@ -2676,6 +2677,7 @@ export default {
             this.addForm.contact = "";
             this.addForm.flag = 0;
             this.addForm.alreadyBookedId = [];
+            this.addForm.reservedFare = [];
             this.addForm.remarks = "";
             this.addForm.totalFare = 0;
             this.selectedSeats = [];
@@ -2730,6 +2732,7 @@ export default {
                 this.addForm.contact = "";
                 this.addForm.flag = 0;
                 this.addForm.alreadyBookedId = [];
+                this.addForm.reservedFare = [];
                 this.addForm.remarks = "";
                 this.addForm.totalFare = 0;
                 this.selectedSeats = [];
@@ -3145,6 +3148,7 @@ export default {
                         this.addForm.selectedSeats.splice(index, 1);
                         this.advanceSeat.splice(index, 1);
                         this.addForm.alreadyBookedId.splice(index, 1);
+                        this.addForm.reservedFare.splice(index, 1);
                         this.addForm.customerName = "";
                         this.addForm.customerCNIC = "";
                         this.addForm.contact = "";
@@ -3154,6 +3158,7 @@ export default {
                         }
                     } else {
                         this.addForm.alreadyBookedId.push(data.id);
+                        this.addForm.reservedFare.push(data.fare);
                         this.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
                         this.addForm.customerName = data.customer_name;
                         this.addForm.contact = data.customer_phone;
@@ -3165,7 +3170,6 @@ export default {
                     }
                 }
             }
-            
             // this validation only for if types is different selected liked booked or advance booking mixed
             const uniqueArray = [...new Set(this.checkSameType)];
             if(uniqueArray.length > 1)
@@ -3449,6 +3453,7 @@ export default {
                 this.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
                 this.selectedSeats.length = 0; 
                 this.addForm.alreadyBookedId = [];           
+                this.addForm.reservedFare = [];           
                 this.fetchScheduleData();
                 this.resetArrays();
 
@@ -3505,6 +3510,7 @@ export default {
             this.addForm.selectedBookedSeats = [];
             this.addForm.selectedOverIssueSeats = [];
             this.addForm.alreadyBookedId = [];
+            this.addForm.reservedFare = [];
             this.advanceSeat = [];
             this.addForm.selectedBookedOverIssueSeats = [];
             this.bookedSeats = [];
