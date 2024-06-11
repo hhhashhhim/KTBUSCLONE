@@ -72,6 +72,9 @@ class AdvanceSalesReportController extends Controller
             ->when($request->route, function ($query) use ($request) {
                 return $query->whereIn('route_id', $request->route);
             })
+            ->when($request->counterSale, function ($query) use ($request) {
+                return $query->whereBetween('created_at', [date("Y-m-d H:i:s",strtotime($request->fromDateTime)),date("Y-m-d H:i:s",strtotime($request->toDateTime))]);
+            })
             ->orderBy('date', 'desc')
             ->get();
 
@@ -81,11 +84,11 @@ class AdvanceSalesReportController extends Controller
         });
 
         // date filter
-        if($request->fromDateTime)
+        if($request->fromDateTime && $request->counterSale == false)
         {
             $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s",strtotime($request->fromDateTime)));
         }
-        if($request->toDateTime)
+        if($request->toDateTime && $request->counterSale == false)
         {
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
@@ -208,6 +211,9 @@ class AdvanceSalesReportController extends Controller
             ->when($request->route, function ($query) use ($route_ids) {
                 return $query->whereIn('route_id', $route_ids);
             })
+            ->when(($request->counterSale == "true"), function ($query) use ($request) {
+                return $query->whereBetween('created_at', [date("Y-m-d H:i:s",strtotime($request->fromDateTime)),date("Y-m-d H:i:s",strtotime($request->toDateTime))]);
+            })
             ->orderBy('date', 'desc')
             ->get();
         
@@ -217,11 +223,11 @@ class AdvanceSalesReportController extends Controller
         });
 
         // date filter
-        if($request->fromDateTime)
+        if($request->fromDateTime && ((bool)$request->counterSale) == "false")
         {
             $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s",strtotime($request->fromDateTime)));
         }
-        if($request->toDateTime)
+        if($request->toDateTime && ((bool)$request->counterSale) == "false")
         {
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
