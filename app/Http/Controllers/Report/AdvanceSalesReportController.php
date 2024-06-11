@@ -223,11 +223,11 @@ class AdvanceSalesReportController extends Controller
         });
 
         // date filter
-        if($request->fromDateTime && ((bool)$request->counterSale) == "false")
+        if($request->fromDateTime && $request->counterSale == "false")
         {
             $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s",strtotime($request->fromDateTime)));
         }
-        if($request->toDateTime && ((bool)$request->counterSale) == "false")
+        if($request->toDateTime && $request->counterSale == "false")
         {
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
