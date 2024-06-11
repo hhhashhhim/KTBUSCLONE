@@ -252,7 +252,7 @@ if (!function_exists('updateAdvancedSeat')) {
                 'type' => 'booked',
                 'schedule_time' => $request->departure_time,
                 'invoice_id' => $invoice->id,
-                'seat_fare' => round($request->totalFare / count($request->alreadyBookedId)),
+                'seat_fare' => $request->reservedFare[$key],
                 'discount' => $request->discount ? round($request->discount / count($request->alreadyBookedId)) : 0,
                 'remarks' => $request->remarks,
                 'customer_id' => $customerData->id,
