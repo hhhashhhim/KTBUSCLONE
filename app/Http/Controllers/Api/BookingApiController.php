@@ -18,6 +18,7 @@ use App\Http\Resources\CreatedResource;
 use App\Models\Discount\Discount;
 use App\Models\Surcharge\Surcharge;
 use App\Models\FareTable;
+use App\Models\User;
 use App\Models\FareClass;
 use App\Models\ActivityLog;
 use App\Models\TerminalDiscount;
@@ -599,6 +600,19 @@ class BookingApiController extends Controller
                             'updated_by' => Auth::user()->id,
                             'booked_time' => date("Y-m-d H:i:s"),
                         ]);
+
+                        // this is only for change ticket from online web to one link if payment proccess complete with bank alflah in our website.
+                        if(isset($request->secure_flag) && $request->secure_flag == "alflahportalpaymentprocess123")
+                        {
+                            $onelink = User::with("terminal")->find(88);
+                            Ticket::where("invoice_id",$request->invoice_id)->update([
+                                "added_by" => $onelink->id,
+                                "updated_by" => $onelink->id,
+                                "terminal_id" => $onelink->terminal_id,
+                                "terminal_name" => $onelink->terminal->name,
+                            ]);
+                        }
+                        //////////////////////////////////////////////
                         ActivityLog::create([
                             "activity_by" => Auth::user()->id,
                             "message" => Auth::user()->name." | update ticket (advance to confirm) | time : ".$checkAlreadyBooked[0]->schedule_date." ".$checkAlreadyBooked[0]->schedule_time." | invoice id :".$request->invoice_id,
