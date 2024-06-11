@@ -50,11 +50,11 @@ class DailySummaryReportController extends Controller
             ->where('schedule_complete', 1)
             ->where('company_id', Auth::user()->company_id)
             ->where(function ($q) use ($request) {
-                if ($request->route != 0) {
-                    $schedules = Schedule::where('route_id', $request->route)->where('company_id', Auth::user()->company_id)->pluck('id');
-                    $closing_ids = TicketClosing::whereIn('schedule_id', $schedules)->where('schedule_return', 1)->where('company_id', Auth::user()->company_id)->pluck('ticket_merge_id');
-                    $q->whereIn('id', $closing_ids);
-                }
+                // if ($request->route != 0) {
+                //     $schedules = Schedule::where('route_id', $request->route)->where('company_id', Auth::user()->company_id)->pluck('id');
+                //     $closing_ids = TicketClosing::whereIn('schedule_id', $schedules)->where('schedule_return', 1)->where('company_id', Auth::user()->company_id)->pluck('ticket_merge_id');
+                //     $q->whereIn('id', $closing_ids);
+                // }
                 if ($request->busNO != 0) {
                     $q->where('bus_id', $request->busNO);
                 }
