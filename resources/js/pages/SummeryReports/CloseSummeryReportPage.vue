@@ -20,7 +20,7 @@
                                                 <input type="hidden" name="token" :value="$store.state.token">
                                                 <input type="hidden" name="language" id="languageReport">
                                                 <div class="row">
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-4">
                                                         <div class="form-group">
                                                             <label for="busNo">Bus No</label>
                                                             <select class="form-control" id="busNo" name="busNO">
@@ -49,7 +49,7 @@
                                                             </select>
                                                         </div>
                                                     </div> -->
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-4">
                                                         <div class="form-group">
                                                             <label for="fromDate">From Date</label>
                                                             <input type="date" id="fromDate" class="form-control"
@@ -57,7 +57,7 @@
                                                                    :max="maxDateFilterReport()">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-4">
                                                         <div class="form-group">
                                                             <label for="toDate">To Date</label>
                                                             <input type="date" id="toDate" class="form-control"

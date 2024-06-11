@@ -59293,7 +59293,7 @@ var _hoisted_15 = {
   "class": "row"
 };
 var _hoisted_16 = {
-  "class": "col-md-3"
+  "class": "col-md-4"
 };
 var _hoisted_17 = {
   "class": "form-group"
@@ -59320,7 +59320,7 @@ var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 
 var _hoisted_21 = ["value"];
 var _hoisted_22 = {
-  "class": "col-md-3"
+  "class": "col-md-4"
 };
 var _hoisted_23 = {
   "class": "form-group"
@@ -59334,7 +59334,7 @@ var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 
 var _hoisted_25 = ["max"];
 var _hoisted_26 = {
-  "class": "col-md-3"
+  "class": "col-md-4"
 };
 var _hoisted_27 = {
   "class": "form-group"
