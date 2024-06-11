@@ -59327,57 +59327,30 @@ var _hoisted_23 = {
 };
 
 var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-  "for": "scheduleRoute"
-}, "Route", -1
-/* HOISTED */
-);
-
-var _hoisted_25 = {
-  "class": "form-control",
-  id: "scheduleRoute",
-  name: "route"
-};
-
-var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-  value: "0",
-  selected: ""
-}, "Select Route", -1
-/* HOISTED */
-);
-
-var _hoisted_27 = ["value"];
-var _hoisted_28 = {
-  "class": "col-md-3"
-};
-var _hoisted_29 = {
-  "class": "form-group"
-};
-
-var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "fromDate"
 }, "From Date", -1
 /* HOISTED */
 );
 
-var _hoisted_31 = ["max"];
-var _hoisted_32 = {
+var _hoisted_25 = ["max"];
+var _hoisted_26 = {
   "class": "col-md-3"
 };
-var _hoisted_33 = {
+var _hoisted_27 = {
   "class": "form-group"
 };
 
-var _hoisted_34 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "toDate"
 }, "To Date", -1
 /* HOISTED */
 );
 
-var _hoisted_35 = ["max"];
-var _hoisted_36 = {
+var _hoisted_29 = ["max"];
+var _hoisted_30 = {
   "class": "row"
 };
-var _hoisted_37 = {
+var _hoisted_31 = {
   "class": "card-footer"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -59401,19 +59374,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_21);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [_hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", _hoisted_25, [_hoisted_26, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.routes, function (route, i) {
-    var _route$via;
-
-    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
-      "class": "text-uppercase",
-      value: route.id,
-      key: i
-    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(route.name) + " (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_route$via = route.via) !== null && _route$via !== void 0 ? _route$via : 'n/a') + ") ", 9
-    /* TEXT, PROPS */
-    , _hoisted_27);
-  }), 128
-  /* KEYED_FRAGMENT */
-  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [_hoisted_30, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"col-md-3\">\r\n                                                        <div class=\"form-group\">\r\n                                                            <label for=\"scheduleRoute\">Route</label>\r\n                                                            <select class=\"form-control\" id=\"scheduleRoute\"\r\n                                                                    name=\"route\">\r\n                                                                <option value=\"0\" selected>Select Route</option>\r\n                                                                <option class=\"text-uppercase\"\r\n                                                                        v-for=\"(route, i) in routes\"\r\n                                                                        :value=\"route.id\"\r\n                                                                        :key=\"i\"\r\n                                                                >{{ route.name }}  ({{ route.via??'n/a' }})\r\n                                                                </option>\r\n                                                            </select>\r\n                                                        </div>\r\n                                                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [_hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "date",
     id: "fromDate",
     "class": "form-control",
@@ -59421,7 +59382,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     max: $options.maxDateFilterReport()
   }, null, 8
   /* PROPS */
-  , _hoisted_31)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [_hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_25)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [_hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "date",
     id: "toDate",
     "class": "form-control",
@@ -59429,9 +59390,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     max: $options.maxDateFilterReport()
   }, null, 8
   /* PROPS */
-  , _hoisted_35)])])])], 8
+  , _hoisted_29)])])])], 8
   /* PROPS */
-  , _hoisted_12), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  , _hoisted_12), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "btn btn-primary mr-2",
     onClick: _cache[0] || (_cache[0] = function ($event) {
       return $options.getSummeryReport('english');

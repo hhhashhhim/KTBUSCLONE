@@ -34,7 +34,7 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <!-- <div class="col-md-3">
                                                         <div class="form-group">
                                                             <label for="scheduleRoute">Route</label>
                                                             <select class="form-control" id="scheduleRoute"
@@ -48,7 +48,7 @@
                                                                 </option>
                                                             </select>
                                                         </div>
-                                                    </div>
+                                                    </div> -->
                                                     <div class="col-md-3">
                                                         <div class="form-group">
                                                             <label for="fromDate">From Date</label>
