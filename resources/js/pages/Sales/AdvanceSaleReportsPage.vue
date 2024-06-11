@@ -75,6 +75,12 @@
                                             </div> -->
                                             <div class="row mt-2">
                                                 <div class="col-md-12">
+                                                    <input type="checkbox" v-model="filterSales.counterSale">
+                                                    <lable class="mx-1">Check for count sale</lable>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-md-12">
                                                     <div class="table-responsive">
                                                         <div v-if="tableLoading">
                                                             <img class="loading-spinner" :src="$store.state.main_url + 'assets/img/loading-spinner.gif'">
@@ -89,6 +95,7 @@
                                                                     <input type="hidden" name="route" :value="filterSales.route">
                                                                     <input type="hidden" name="fromDateTime" :value="filterSales.fromDateTime">
                                                                     <input type="hidden" name="toDateTime" :value="filterSales.toDateTime">
+                                                                    <input type="hidden" name="counterSale" :value="filterSales.counterSale">
                                                                     <input type="submit" value="Print" class="btn btn-dark">
                                                                 </form>
                                                             </div>
@@ -289,6 +296,7 @@ export default {
                 route: [],
                 fromDateTime: '',
                 toDateTime: '',
+                counterSale: false,
             },
         }
     },
