@@ -1235,7 +1235,8 @@
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Customer Phone : </p>
                                                         <p class="mb-0">
-                                                            {{ auth_terminal.other_terminal_passenger_detail == 1 ? phoneFormat(innerItem.customer.contact) : "---" }}</p>
+                                                            {{ auth_terminal.other_terminal_passenger_detail == 1 ? phoneFormat(innerItem.customer.contact) : "---" }}
+                                                        </p>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
@@ -3156,6 +3157,7 @@ export default {
                         {
                             this.addForm.flag = 0;
                         }
+                        this.getPoints('addFormCNIC')
                     } else {
                         this.addForm.alreadyBookedId.push(data.id);
                         this.addForm.reservedFare.push(data.fare);
@@ -3166,7 +3168,7 @@ export default {
                         this.addForm.selectedSeats.push(data.seatNo);
                         this.advanceSeat.push(data.seatNo)
                         this.addForm.flag = 1;
-                       
+                        this.getPoints('addFormCNIC')
                     }
                 }
             }
@@ -4350,6 +4352,7 @@ export default {
 .seat-img span {
     height: 45px;
     width: 45px;
+    line-height: 1.01;
     display: inline-block;
     cursor: pointer !important;
     margin: 2px;

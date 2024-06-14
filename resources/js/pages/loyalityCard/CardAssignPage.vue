@@ -80,10 +80,6 @@
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <!--                                                            <button-->
-                                                            <!--                                                                class="btn btn-danger d-none">-->
-                                                            <!--                                                                <i class="far fa-trash-alt"></i>-->
-                                                            <!--                                                            </button>-->
                                                         </td>
                                                     </tr>
                                                     </tbody>

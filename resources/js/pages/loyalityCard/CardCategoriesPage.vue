@@ -78,10 +78,7 @@
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
-                                                            <!--                                                            <button-->
-                                                            <!--                                                                class="btn btn-danger d-none">-->
-                                                            <!--                                                                <i class="far fa-trash-alt"></i>-->
-                                                            <!--                                                            </button>-->
+                                                            
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -173,7 +170,7 @@
                             class="text-danger ml-1">*</span></label>
                         <div class="input-group">
                             <input type="text" class="form-control" maxlength="3" v-model="DistancePoints"
-                                    placeholder="Enter km after that distance will increase 1 point"
+                                    placeholder="Enter km for 1 point"
                                     @keypress="isNumber($event)">
                         </div>
                     </div>
@@ -182,7 +179,7 @@
                             <span
                                 class="text-muted">max: 10K</span> </label>
                         <input type="text" class="form-control" maxlength="5" v-model="FlatPoints"
-                                placeholder="Enter amount after that amount will increase 1 point"
+                                placeholder="Enter amount for 1 point"
                                 @keypress="isNumber($event)">
                     </div>
                 </div>
@@ -207,8 +204,10 @@
                         <label for="CardName">Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.name"/>
                     </div>
-                    <!--                    Discount-->
-                    <div class="form-group col-md-3 mt-4 pt-2">
+                </div>
+                <h5>Discount Usage</h5>
+                <div class="row">
+                    <div class="form-group col-md-4 mt-4 pt-2">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" id="Editpercentage" name="percentageAmount" class="custom-control-input"
                                    :checked="dataEdit.discount_type == 'percentage'" value="percentage"
@@ -223,9 +222,7 @@
                             <label class="custom-control-label" for="Editflat">Flat Amount</label>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-8" v-if="showDivPercentageEdit">
                         <label for="SurchargePercentage">Discount In Percentage <span class="text-danger ml-1">*</span></label>
                         <div class="input-group">
                             <input type="text" class="form-control" maxlength="3" v-model="dataEdit.percentage_discount"
@@ -236,7 +233,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-8" v-if="showDivFlatEdit">
                         <label for="SurchargePercentage">Discount In Flat Amount <span class="text-danger ml-1">*</span>
                             <span
                                 class="text-muted">max: 10K</span> </label>
@@ -246,7 +243,7 @@
                     </div>
 
                     <div class="col-md-12">
-                        <h5>Addition of Points Via Type</h5>
+                        <h5>Point Addition</h5>
                         <!--points-->
                         <div class="row">
                             <div class="form-group col-md-4 mt-4 pt-2">
@@ -255,7 +252,7 @@
                                            class="custom-control-input"
                                            :checked="dataEdit.point_type == 'distancePoints'" value="distancePoints"
                                            v-model="dataEdit.point_type"
-                                           @click="ChangeRadioValue('distancePoints')">
+                                           @click="ChangeRadioValue('distancePointsEdit')">
                                     <label class="custom-control-label" for="EditdistancePoints">Distance</label>
                                 </div>
                                 <div class="custom-control custom-radio custom-control-inline">
@@ -263,26 +260,26 @@
                                            class="custom-control-input"
                                            value="flatPoints"
                                            :checked="dataEdit.point_type == 'flatPoints'"
-                                           v-model="dataEdit.point_type" @click="ChangeRadioValue('flatPoints')">
+                                           v-model="dataEdit.point_type" @click="ChangeRadioValue('flatPointsEdit')">
                                     <label class="custom-control-label" for="EditflatPoints">Flat</label>
                                 </div>
                             </div>
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-8" v-if="showDivDistancePointsEdit">
                                 <label for="SurchargePercentage">Distance <span
                                     class="text-danger ml-1">*</span></label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" maxlength="3"
                                            v-model="dataEdit.point_distance"
-                                           placeholder="How Many Points Set after 1 KiloMeter?"
+                                           placeholder="Enter km for 1 point"
                                            @keypress="isNumber($event)">
                                 </div>
                             </div>
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-8" v-if="showDivFlatPointsEdit">
                                 <label for="SurchargePercentage">Flat<span class="text-danger mx-1">*</span>
                                     <span
                                         class="text-muted">max: 10K</span> </label>
                                 <input type="text" class="form-control" maxlength="5" v-model="dataEdit.point_flat"
-                                       placeholder="How many Points Set of Amount?"
+                                       placeholder="Enter amount for per point"
                                        @keypress="isNumber($event)">
                             </div>
                         </div>
@@ -326,6 +323,10 @@ export default {
             showDivFlat: false,
             showDivFlatPoints: true,
             showDivDistancePoints: false,
+            showDivPercentageEdit: true,
+            showDivFlatEdit: false,
+            showDivDistancePointsEdit: true,
+            showDivFlatPointsEdit: false,
             formID: "card_category",
             editFormID: "edit_card_category",
             deleteFormID: "delete_card_category",
@@ -373,33 +374,18 @@ export default {
 
         },
         ChangeRadioValue(value) {
+
+            // add form point addition row
             if (value == "percentage") {
                 this.showDivPercentage = true;
                 this.showDivFlat = false;
-            }
-            if (value == "Editpercentage") {
-                if (this.dataEdit.discount_type == 'percentage') {
-                    this.showDivPercentageEdit = true;
-                    this.showDivFlatEdit = false
-                } else {
-                    this.showDivPercentageEdit = false;
-                    this.showDivFlatEdit = true;
-                }
-            }
-            if (value == "Editflat") {
-                if (this.dataEdit.discount_type == 'flat') {
-                    this.showDivPercentageEdit = false;
-                    this.showDivFlatEdit = true;
-                } else {
-                    this.showDivPercentageEdit = true;
-                    this.showDivFlatEdit = true;
-                }
-
             }
             if (value == "flat") {
                 this.showDivPercentage = false;
                 this.showDivFlat = true;
             }
+
+            // add form point usage row
             if (value == "distancePoints") {
                 this.showDivDistancePoints = true;
                 this.showDivFlatPoints = false;
@@ -408,6 +394,28 @@ export default {
                 this.showDivDistancePoints = false;
                 this.showDivFlatPoints = true;
             }
+
+            // edit form point addintion row
+            if (value == "Editpercentage") {
+                this.showDivPercentageEdit = true;
+                this.showDivFlatEdit = false  
+            }
+            if (value == "Editflat") {
+                this.showDivPercentageEdit = false;
+                this.showDivFlatEdit = true;
+            }
+
+            // add form point usage row
+            if (value == "distancePointsEdit") {
+                this.showDivDistancePointsEdit = true;
+                this.showDivFlatPointsEdit = false;
+            }
+            if (value == "flatPointsEdit") {
+                this.showDivDistancePointsEdit = false;
+                this.showDivFlatPointsEdit = true;
+            }
+            
+            
         },
         async fetchCardCategories() {
             const res = await this.callApi("post", 'loyaltyCard');
@@ -624,7 +632,27 @@ export default {
 
         edit(cardList) {
             this.dataEdit = cardList;
-            console.log(this.dataEdit);
+            if(cardList.discount_type == "flat")
+            {
+                this.showDivPercentageEdit = false;
+                this.showDivFlatEdit = true;
+            }
+            else
+            {
+                this.showDivPercentageEdit = true;
+                this.showDivFlatEdit = false;
+            }
+            
+            if(cardList.point_type == "flatPoints")
+            {
+                this.showDivDistancePointsEdit = false;
+                this.showDivFlatPointsEdit = true;
+            }
+            else
+            {
+                this.showDivDistancePointsEdit = true;
+                this.showDivFlatPointsEdit = false;
+            }
 
 
         },
