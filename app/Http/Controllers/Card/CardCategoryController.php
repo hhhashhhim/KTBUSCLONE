@@ -79,11 +79,11 @@ class CardCategoryController extends Controller
                 $category = CardCategory::where(['id' => $request->id, 'company_id' => Auth::user()->company_id])->update([
                     'name' => $request->name,
                     'discount_type' => $request->discount_type,
-                    'flat_discount' => $request->flat_discount ?? 0,
-                    'percentage_discount' => $request->percentage_discount ?? 0,
+                    'flat_discount' => $request->discount_type == "flat" ? $request->flat_discount : 0,
+                    'percentage_discount' => $request->discount_type == "flat" ? 0 : $request->percentage_discount,
                     'point_type' => $request->point_type,
-                    'point_flat' => $request->point_flat ?? 0,
-                    'point_distance' => $request->point_distance ?? 0,
+                    'point_flat' => $request->point_type == "flatPoints" ? $request->point_flat : 0,
+                    'point_distance' => $request->point_type == "flatPoints" ? 0 : $request->point_distance,
                     'updated_by' => Auth::user()->id,
                 ]);
                 ActivityLog::create([

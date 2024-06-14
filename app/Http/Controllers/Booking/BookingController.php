@@ -133,10 +133,51 @@ class BookingController extends Controller
                 "company_id"    => Auth::user()->company_id,
                 "added_by"      => Auth::user()->id,
             ]);
+
+            $finalAmountDiscount = 0;
+            if((isset($request->flag) && $request->flag == 1) || $request->type == 'booked')
+            {
+                if ($request->usagePoints == true) {
+//                  Get Customer's Loyalty Card
+                    $cardAssign = CardAssign::where(['id' => $request->pointsCardId, 'company_id' => Auth::user()->company_id])->first();
+                    $card = CardCategory::where(['id' => $cardAssign->card_category_id, 'company_id' => Auth::user()->company_id])->first();
+                    
+                    if ($card->discount_type == 'percentage') {
+                        $amountInPercent = (int)$card->percentage_discount * $request->pointsUseInput;
+                        $finalAmountDiscount = (int)(($request->totalFare * $amountInPercent) / 100);
+                        $cardAssign->update([
+                            'starting_points' => $cardAssign->starting_points - $request->pointsUseInput,
+                        ]);
+                    }
+                    if ($card->discount_type == 'flat') {
+                        $finalAmountDiscount = (int)$card->flat_discount * $request->pointsUseInput;
+                        $cardAssign->update([
+                            'starting_points' => $cardAssign->starting_points - $request->pointsUseInput,
+                        ]);
+                    }
+                }
+                // loyalty card point addition
+                if (!is_null($request->customerCNIC)) {
+                    $checkCard = CardAssign::where(['cnic' => plainContactAndCnic($request->customerCNIC), 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
+                    if ($checkCard) {
+                        if ($checkCard->cardCategory->point_type == "flatPoints") {
+                            $addPoint = $request->totalAmount / $checkCard->cardCategory->point_flat;
+                        } else {
+                            $distance = FareTable::where(['from_city_id' => $request->departureCity, 'to_city_id' => $request->destinationCity, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
+                            if ($distance) {
+                                $addPoint = $distance / $checkCard->cardCategory->point_distance;
+                            } else {
+                                return response()->json(["errors" => ["Error" => ["Please Fill The Distance In Kilometer Field In fare Table"]]], 422);
+                            }
+                        }
+                        $checkCard->increment("starting_points", $addPoint);
+                    }
+                }
+            }
             //Reservation To Booking
             if (isset($request->flag) && $request->flag == 1) {
                 //If Reserved seat is converted into Issued/Booked
-                $allTicket = updateAdvancedSeat($request, $invoice);
+                $allTicket = updateAdvancedSeat($request, $invoice,$finalAmountDiscount);
                 
                 ActivityLog::create([
                     "activity_by"    => Auth::user()->id,
@@ -197,44 +238,6 @@ class BookingController extends Controller
                         || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
                     {
                         return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
-                    }
-                }
-                
-                if ($request->usagePoints == true) {
-//                  Get Customer's Loyalty Card
-                    $cardAssign = CardAssign::where(['id' => $request->pointsCardId, 'company_id' => Auth::user()->company_id])->first();
-                    $card = CardCategory::where(['id' => $cardAssign->card_category_id, 'company_id' => Auth::user()->company_id])->first();
-                    $finalAmountDiscount = 0;
-                    if ($card->discount_type == 'percentage') {
-                        $amountInPercent = (int)$card->percentage_discount * $request->pointsUseInput;
-                        $finalAmountDiscount = (int)(($request->totalFare * $amountInPercent) / 100);
-                        $cardAssign->update([
-                            'starting_points' => $cardAssign->starting_points - $request->pointsUseInput,
-                        ]);
-                    }
-                    if ($card->discount_type == 'flat') {
-                        $amountInFlat = (int)$card->flat_discount * $request->pointsUseInput;
-                        $finalAmountDiscount = (int)($request->totalFare - $amountInFlat);
-                        $cardAssign->update([
-                            'starting_points' => $cardAssign->starting_points - $request->pointsUseInput,
-                        ]);
-                    }
-                }
-                // loyalty card point addition
-                if (!is_null($request->customerCNIC)) {
-                    $checkCard = CardAssign::where(['cnic' => plainContactAndCnic($request->customerCNIC), 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
-                    if ($checkCard) {
-                        if ($checkCard->cardCategory->point_type == "flatPoints") {
-                            $addPoint = $request->totalAmount / $checkCard->cardCategory->point_flat;
-                        } else {
-                            $distance = FareTable::where(['from_city_id' => $request->departureCity, 'to_city_id' => $request->destinationCity, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
-                            if ($distance) {
-                                $addPoint = $distance / $checkCard->cardCategory->point_distance;
-                            } else {
-                                return response()->json(["errors" => ["Error" => ["Please Fill The Distance In Kilometer Field In fare Table"]]], 422);
-                            }
-                        }
-                        $checkCard->increment("starting_points", $addPoint);
                     }
                 }
                 
@@ -355,6 +358,7 @@ class BookingController extends Controller
                     "company_id"     => Auth::user()->company_id
                 ]);
             }
+
             
             DB::commit();
             return [

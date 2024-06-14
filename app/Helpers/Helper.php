@@ -223,7 +223,7 @@ if (!function_exists('updateFare')) {
 
 //Updated Already advanced Booked Seat
 if (!function_exists('updateAdvancedSeat')) {
-    function updateAdvancedSeat($request, $invoice)
+    function updateAdvancedSeat($request, $invoice,$finalAmountDiscount)
     {
         // $customerData =  Customer::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request->customerCNIC))->orWhere("contact",plainContactAndCnic($request->contact))->first();
         $customerData =  Customer::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request->customerCNIC))->first();
@@ -253,7 +253,7 @@ if (!function_exists('updateAdvancedSeat')) {
                 'schedule_time' => $request->departure_time,
                 'invoice_id' => $invoice->id,
                 'seat_fare' => $request->reservedFare[$key],
-                'discount' => $request->discount ? round($request->discount / count($request->alreadyBookedId)) : 0,
+                'discount' => $request->discount ? round($request->discount / count($request->alreadyBookedId)) : ($finalAmountDiscount ? ($finalAmountDiscount / count($request->alreadyBookedId)) : 0),
                 'remarks' => $request->remarks,
                 'customer_id' => $customerData->id,
                 'updated_by' => Auth::user()->id,
