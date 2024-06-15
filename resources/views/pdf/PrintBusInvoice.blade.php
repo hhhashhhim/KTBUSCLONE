@@ -203,7 +203,7 @@
         @foreach($refundTerminal as $refund)
             @if($refund['amount'] != 0)
             <tr>
-                <th colspan="8">{{ $refund['terminal'] }} refund</th>
+                <th colspan="8">{{ $refund['terminal'] }} cancellation charges of seats {{" (" . $refund['seats'] . ")"}}</th>
                 <th colspan="3">{{ $refund['amount'] }}</th>
                 @php $refundAmount += $refund['amount'] @endphp
             </tr>

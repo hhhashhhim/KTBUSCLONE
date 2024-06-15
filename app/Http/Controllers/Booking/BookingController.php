@@ -1383,14 +1383,6 @@ class BookingController extends Controller
                     'seat_no' => $request->seat_no,
 
                 ])->first();
-                $ticketPoints = Ticket::where([
-                    'company_id' => Auth::user()->company_id,
-                    'date' => $request->date,
-                    'schedule_id' => $request->schedule_id,
-                    'customer_id' => $request->customer_id,
-                    'departure_city_id' => $request->departure_id,
-                    'destination_city_id' => $request->destination_id,
-                ])->withTrashed()->get();
 
                 //Deduct points reverse in case of cancellation
                 $customer = Customer::where('id', $ticket->customer_id)->first();
@@ -1402,7 +1394,10 @@ class BookingController extends Controller
                         $distance = FareTable::where(['from_city_id' => $ticket->departure_city_id, 'to_city_id' => $ticket->destination_city_id, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
                         $subPoint = $distance / $checkCard->cardCategory->point_distance;
                     }
-                    $checkCard->decrement("starting_points", $subPoint / $ticketPoints->count());
+                    if($ticket->type == "booked")
+                    {
+                        $checkCard->decrement("starting_points", $subPoint);
+                    }
 
                     $checkCard->increment("starting_points", $ticket->points_usage);
                 }
@@ -1455,6 +1450,26 @@ class BookingController extends Controller
                     if ($delElt) {
                         $delElt->delete();
                     }
+
+
+                    //Deduct points reverse in case of cancellation
+                    $customer = Customer::where('id', $ticket->customer_id)->first();
+                    $checkCard = CardAssign::where(['cnic' => $customer->cnic, 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
+                    if ($checkCard) {
+                        if ($checkCard->cardCategory->point_type == "flatPoints") {
+                            $subPoint = $ticket->seat_fare / $checkCard->cardCategory->point_flat;
+                        } else {
+                            $distance = FareTable::where(['from_city_id' => $ticket->departure_city_id, 'to_city_id' => $ticket->destination_city_id, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
+                            $subPoint = $distance / $checkCard->cardCategory->point_distance;
+                        }
+                        if($ticket->type == "booked")
+                        {
+                            $checkCard->decrement("starting_points", $subPoint);
+                        }
+
+                        $checkCard->increment("starting_points", $ticket->points_usage);
+                    }
+
                     $type = $ticket->type;
                     $ticket->update([
                         'type' => 'canceled',
@@ -1614,22 +1629,25 @@ class BookingController extends Controller
                 'type' => "canceled",
             ])
             ->with("cancel_ticket:id,ticket_id,percentage","terminal:id,name")
-            ->get(["id","seat_fare","discount","terminal_id"])->groupBy("terminal_id");
+            ->get(["id","seat_fare","discount","terminal_id","seat_no"])->groupBy("terminal_id");
 
         $refundTerminal = [];
         $cancelTicket->map(function($single) use (&$refundTerminal){
             
             $refundAmount = 0;
-            $single->map(function($ticket) use (&$refundAmount){
+            $refundSeats = [];
+            $single->map(function($ticket) use (&$refundAmount,&$refundSeats){
             
                 if($ticket->cancel_ticket)
                 {
                     $refundAmount += (($ticket->seat_fare - $ticket->discount) / 100) * $ticket->cancel_ticket->percentage;
+                    $refundSeats[] = $ticket->seat_no;
                 }
             });
             $singleTerminal = [];
             $singleTerminal["terminal"] = $single[0]->terminal->name;
             $singleTerminal["amount"] = $refundAmount;
+            $singleTerminal["seats"] = implode(",",$refundSeats);
 
             $refundTerminal[] = $singleTerminal;
         });
@@ -1650,6 +1668,8 @@ class BookingController extends Controller
             ->first(["id", "bus_id"]);
 
         $infoData->bus_data = $busData;
+
+       
         $format = TicketsTemplate::with("terminal")->where(['terminal_id' => Auth::user()->terminal_id, 'company_id'=> Auth::user()->company_id])->where('status', 1)->first();
         return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData,"refundTerminal" => $refundTerminal,"format"=>$format]);
     }

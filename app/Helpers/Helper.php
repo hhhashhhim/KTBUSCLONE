@@ -258,6 +258,8 @@ if (!function_exists('updateAdvancedSeat')) {
                 'customer_id' => $customerData->id,
                 'updated_by' => Auth::user()->id,
                 'booked_time' => date("Y-m-d H:i:s"),
+                'discount_type'       => $request->usagePoints ? 'card' : null,
+                'points_usage' => $request->pointsUseInput / count($request->alreadyBookedId),
             ]);
 
             // online terminal request will be differrent so it is in if condition
