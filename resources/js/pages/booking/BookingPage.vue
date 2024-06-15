@@ -2694,6 +2694,7 @@ export default {
             this.validationErrors = [];
             this.loading = true;
             this.showBookingDiv = false;
+            this.checkedUsagePoints = false;
             if (this.addForm.schedule != 0 && this.addForm.date && this.addForm.departureCity != 0 && this.addForm.destinationCity != 0) {
                 const resSelected = await this.callApi("post", "booking/schedule/selected", {
                     id: this.addForm.schedule,

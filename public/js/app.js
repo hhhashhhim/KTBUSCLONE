@@ -31024,13 +31024,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this21.validationErrors = [];
                 _this21.loading = true;
                 _this21.showBookingDiv = false;
+                _this21.checkedUsagePoints = false;
 
                 if (!(_this21.addForm.schedule != 0 && _this21.addForm.date && _this21.addForm.departureCity != 0 && _this21.addForm.destinationCity != 0)) {
-                  _context20.next = 69;
+                  _context20.next = 70;
                   break;
                 }
 
-                _context20.next = 28;
+                _context20.next = 29;
                 return _this21.callApi("post", "booking/schedule/selected", {
                   id: _this21.addForm.schedule,
                   date: _this21.addForm.date,
@@ -31040,7 +31041,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   departure_time: _this21.addForm.departure_time
                 });
 
-              case 28:
+              case 29:
                 resSelected = _context20.sent;
 
                 if (resSelected.status == 200) {
@@ -31090,14 +31091,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this21.addForm.selectedSeatsClass = [];
                 _this21.addForm.totalAmount = 0;
                 _this21.addForm.discount = '';
-                _context20.next = 49;
+                _context20.next = 50;
                 return _this21.callApi("post", "booking/terminal/seats", {
                   terminal_id: _this21.$store.state.user.terminal_id
                 });
 
-              case 49:
+              case 50:
                 terminalSeats = _context20.sent;
-                _context20.next = 52;
+                _context20.next = 53;
                 return _this21.callApi("post", "booking/schedule/terminal/discount/fetch", {
                   id: _this21.addForm.schedule,
                   date: _this21.addForm.date,
@@ -31106,16 +31107,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   dropTerminal: _this21.addForm.terminalId
                 });
 
-              case 52:
+              case 53:
                 restDiscount = _context20.sent;
-                _context20.next = 55;
+                _context20.next = 56;
                 return _this21.callApi("post", "booking/discount/surcharge/fetch", {
                   schedule_id: _this21.addForm.schedule
                 });
 
-              case 55:
+              case 56:
                 resFetchDiscountSurcharge = _context20.sent;
-                _context20.next = 58;
+                _context20.next = 59;
                 return _this21.callApi("post", "booking/booked/seats/elt/detail", {
                   id: _this21.addForm.schedule,
                   date: _this21.addForm.date,
@@ -31123,9 +31124,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   destinationCity: _this21.addForm.destinationCity
                 });
 
-              case 58:
+              case 59:
                 responseEltDetails = _context20.sent;
-                _context20.next = 61;
+                _context20.next = 62;
                 return _this21.callApi("post", "booking/fetch/over/issue/seat", {
                   id: _this21.addForm.schedule,
                   date: _this21.addForm.date,
@@ -31133,7 +31134,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   destinationCity: _this21.addForm.destinationCity
                 });
 
-              case 61:
+              case 62:
                 resFetchOverIssueSeat = _context20.sent;
 
                 if (resFetchOverIssueSeat.status == 200) {
@@ -31194,7 +31195,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 69:
+              case 70:
               case "end":
                 return _context20.stop();
             }
