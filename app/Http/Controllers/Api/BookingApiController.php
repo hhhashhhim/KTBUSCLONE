@@ -594,7 +594,7 @@ class BookingApiController extends Controller
             return new ValidationResource($validator->errors());
         }
 
-        return $request;
+        
         if($request->secure_flag == 1)
         {
             $onelink = User::with("terminal")->find(88);
