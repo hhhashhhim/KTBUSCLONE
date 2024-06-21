@@ -575,6 +575,50 @@ class BookingApiController extends Controller
         }
     }
 
+    public function updateSeatTerminalData(Request $request)
+    {
+        if(Auth::user()->id != 36)
+        {
+            return response()->json(["Error"=>"You have not authorized for this url"],403);    
+        }
+        
+        // this is only for change ticket from online web to one link if payment proccess complete with bank alflah in our website.
+        $validator = Validator::make($request->all(), [
+            'invoice_id' => 'required',
+            'secure_flag' => 'required',
+        ]);
+
+        // if validation fails
+        if ($validator->fails())
+        {
+            return new ValidationResource($validator->errors());
+        }
+
+        return $request;
+        if($request->secure_flag == 1)
+        {
+            $onelink = User::with("terminal")->find(88);
+            Ticket::where("invoice_id",$request->invoice_id)->update([
+                "added_by" => $onelink->id,
+                "updated_by" => $onelink->id,
+                "terminal_id" => $onelink->terminal_id,
+                "terminal_name" => $onelink->terminal->name,
+            ]);
+            return response()->json(["Success"=>"Terminal data updated"]);
+        }
+        if($request->secure_flag == 2)
+        {
+            $onlineweb = User::with("terminal")->find(36);
+            Ticket::where("invoice_id",$request->invoice_id)->update([
+                "added_by" => $onlineweb->id,
+                "updated_by" => $onlineweb->id,
+                "terminal_id" => $onlineweb->terminal_id,
+                "terminal_name" => $onlineweb->terminal->name,
+            ]);
+            return response()->json(["Success"=>"Terminal data updated"]);
+        }
+
+    }
     public function bookSeat(Request $request)
     {
         try {
@@ -600,18 +644,6 @@ class BookingApiController extends Controller
                             'updated_by' => Auth::user()->id,
                             'booked_time' => date("Y-m-d H:i:s"),
                         ]);
-
-                        // this is only for change ticket from online web to one link if payment proccess complete with bank alflah in our website.
-                        if(isset($request->secure_flag) && $request->secure_flag == "alflahportalpaymentprocess123")
-                        {
-                            $onelink = User::with("terminal")->find(88);
-                            Ticket::where("invoice_id",$request->invoice_id)->update([
-                                "added_by" => $onelink->id,
-                                "updated_by" => $onelink->id,
-                                "terminal_id" => $onelink->terminal_id,
-                                "terminal_name" => $onelink->terminal->name,
-                            ]);
-                        }
                         //////////////////////////////////////////////
                         ActivityLog::create([
                             "activity_by" => Auth::user()->id,

@@ -32,6 +32,7 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
       Route::post('/schedules/available',[BookingApiController::class,'availableSchedules']);
       Route::post('/schedule/preview',[BookingApiController::class,'previewSchedule']);
       Route::post('/new',[BookingApiController::class,'bookSeat']);
+      Route::post('/update/terminal/data',[BookingApiController::class,'updateSeatTerminalData']);
    });
    
    Route::group(['prefix'=>'v1/tickets'],function(){
