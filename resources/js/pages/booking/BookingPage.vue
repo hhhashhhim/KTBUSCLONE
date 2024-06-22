@@ -1689,6 +1689,7 @@ export default {
                 terminalId: 0,
                 alreadyBookedId: [],
                 reservedFare: [],
+                advanceSeatClass: [],
             },
             advanceCash: {
                 sale: 0,
@@ -2679,6 +2680,7 @@ export default {
             this.addForm.flag = 0;
             this.addForm.alreadyBookedId = [];
             this.addForm.reservedFare = [];
+            this.addForm.advanceSeatClass = [];
             this.addForm.remarks = "";
             this.addForm.totalFare = 0;
             this.selectedSeats = [];
@@ -2735,6 +2737,7 @@ export default {
                 this.addForm.flag = 0;
                 this.addForm.alreadyBookedId = [];
                 this.addForm.reservedFare = [];
+                this.addForm.advanceSeatClass = [];
                 this.addForm.remarks = "";
                 this.addForm.totalFare = 0;
                 this.selectedSeats = [];
@@ -3141,7 +3144,6 @@ export default {
 
         // update Form After  advanced Booked seat
         async updateBookedSeat(data) {
-           
             if(this.runUpdateFun == true)
             {
                 if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
@@ -3151,6 +3153,7 @@ export default {
                         this.advanceSeat.splice(index, 1);
                         this.addForm.alreadyBookedId.splice(index, 1);
                         this.addForm.reservedFare.splice(index, 1);
+                        this.addForm.advanceSeatClass.splice(index, 1);
                         this.addForm.customerName = "";
                         this.addForm.customerCNIC = "";
                         this.addForm.contact = "";
@@ -3162,6 +3165,7 @@ export default {
                     } else {
                         this.addForm.alreadyBookedId.push(data.id);
                         this.addForm.reservedFare.push(data.fare);
+                        this.addForm.advanceSeatClass.push(data.class);
                         this.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
                         this.addForm.customerName = data.customer_name;
                         this.addForm.contact = data.customer_phone;
@@ -3457,6 +3461,7 @@ export default {
                 this.selectedSeats.length = 0; 
                 this.addForm.alreadyBookedId = [];           
                 this.addForm.reservedFare = [];           
+                this.addForm.advanceSeatClass = [];           
                 this.fetchScheduleData();
                 this.resetArrays();
 
@@ -3514,6 +3519,7 @@ export default {
             this.addForm.selectedOverIssueSeats = [];
             this.addForm.alreadyBookedId = [];
             this.addForm.reservedFare = [];
+            this.addForm.advanceSeatClass = [];
             this.advanceSeat = [];
             this.addForm.selectedBookedOverIssueSeats = [];
             this.bookedSeats = [];

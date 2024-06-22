@@ -83,7 +83,7 @@
                     <div class="form-group col-md-4">
                         <label for="terminals">Terminals <span class="text-danger">*&nbsp;&nbsp; (Just For Company
                                 Admin)</span></label>
-                        <select class="form-control" id="terminals" v-model="addForm.terminal">
+                        <select class="form-control" id="terminals" v-model="addForm.terminals" multiple>
                             <option value="0" selected>Select Terminal</option>
                             <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{ terminal.name }} -
                                 ({{ terminal.city.name }})
@@ -246,7 +246,7 @@ export default {
             templates: [],
             terminals: [],
             addForm: {
-                terminal: 0,
+                terminals: [],
                 footerText: 0,
                 show_phone: true,
             },
@@ -271,6 +271,24 @@ export default {
 
         this.fetchTemplates();
         this.permissions = this.$store.state.permissions;
+    },
+    mounted() {
+        setTimeout(() => {
+            const terminals = $('#terminals');
+
+            // Initialize Select2
+            terminals.select2({
+                closeOnSelect: false
+            });
+
+            // Handle Select2 change event
+            const self = this;
+
+            terminals.on('change', function() {
+                const selectedValues = $(this).val();
+                self.addForm.terminals = selectedValues;
+            });
+        }, 1000);
     },
     watch: {
         'addForm.show_phone'(newValue) {
@@ -339,7 +357,7 @@ export default {
         },
 
         async addTemplate() {
-            if (this.addForm.terminal == '0') {
+            if (this.addForm.terminals.length == 0) {
                 return swal({
                     title: "Required !!!",
                     text: "Please Select any Terminal",
