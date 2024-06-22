@@ -8,10 +8,12 @@ use App\Models\FareTable;
 use App\Models\Hrm\Employee\Employee;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
+use App\Models\Discount\Discount;
 use App\Models\Schedule\Schedule;
 use App\Models\Booking\TicketIsPartial;
 use App\Models\Terminal\TerminalTimeDifference;
 use App\Models\Schedule\ScheduleDetail;
+use App\Models\TerminalDiscount;
 use App\Models\Schedule\TicketClosing;
 use App\Http\Resources\CreatedResource;
 use App\Models\Schedule\TicketClosingMember;
@@ -183,6 +185,53 @@ if (!function_exists('priceDiff')) {
     }
 }
 
+if (!function_exists('checkDiscountAmount')) {
+    function checkDiscountAmount($detail,$terminalId,$fare_class)
+    {
+
+        $scheduleDiscount = Discount::where('id', $detail->schedule->discount_id)
+        ->where('is_active', 1)
+        ->whereHas("discount_terminals", function ($q) use ($terminalId) {
+            $q->where("terminal_id", $terminalId ?? Auth::user()->terminal_id);
+        })
+        ->first();
+
+        $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $detail->schedule->route_id])
+        ->where('start_date', '<=', date("Y-m-d"))
+        ->where('end_date', '>=', date("Y-m-d"))->first();
+
+        $fare = FareTable::where('from_city_id', $detail->departure_id)
+            ->where('to_city_id', $detail->destination_id)
+            ->where('fare_class', $fare_class)
+            ->where('company_id', Auth::user()->company_id)
+            ->first()->fare;
+
+        $discounted_fare = 0;
+        if ($scheduleDiscount) {
+            if ($scheduleDiscount->type == "percentage") {
+                $number = $scheduleDiscount->percentage / 100;
+                $percentage = (int)$fare * $number;
+                $discounted_fare = round((int)$fare - $percentage);
+            } else {
+                $discounted_fare = (int)$fare - (int)$scheduleDiscount->flat;
+            }
+        }
+        if ($terminalDiscount) {
+            $tdiscount = ((int)$fare / 100) * (int)$terminalDiscount->discount;
+            $discounted_fare = $discounted_fare - $tdiscount;
+        }
+        if($discounted_fare == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            $discount = $fare - $discounted_fare;
+            return $discount - ($discount % 10);
+        }
+    }
+}
+
 if (!function_exists('updateFare')) {
     function updateFare($request, $company_id)
     {
@@ -246,14 +295,24 @@ if (!function_exists('updateAdvancedSeat')) {
                 'contact' => plainContactAndCnic($request->contact),
             ]);
         }
+
+        $detail = ScheduleDetail::where("departure_id", $request->departureCity)
+            ->where("destination_id", $request->destinationCity)
+            ->where('schedule_id', $request->schedule)
+            ->where('departure_date', $request->date)
+            ->where('company_id', Auth::user()->company_id)
+            ->where('departure_time', date("H:i:s",strtotime($request->departure_time)))
+            ->first();
+
         foreach ($request->alreadyBookedId as $key => $single) {
             $customer_id = Ticket::where('company_id', Auth::user()->company_id)->where('id', $single)->first();
+            $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->advanceSeatClass[$key]);
             $customer_id->update([
                 'type' => 'booked',
                 'schedule_time' => $request->departure_time,
                 'invoice_id' => $invoice->id,
-                'seat_fare' => $request->reservedFare[$key],
-                'discount' => $request->discount ? round($request->discount / count($request->alreadyBookedId)) : ($finalAmountDiscount ? ($finalAmountDiscount / count($request->alreadyBookedId)) : 0),
+                'seat_fare' => $request->reservedFare[$key] + $checkDiscount,
+                'discount' => $checkDiscount + ($request->discount ? round($request->discount / count($request->alreadyBookedId)) : ($finalAmountDiscount ? ($finalAmountDiscount / count($request->alreadyBookedId)) : 0)),
                 'remarks' => $request->remarks,
                 'customer_id' => $customerData->id,
                 'updated_by' => Auth::user()->id,
@@ -703,9 +762,16 @@ if (!function_exists('customRound')) {
         
         // multiple of 10
         $result = $value % 10;
-        $new = 10 - ($result==0 ? 10 : $result);
+        // $new = 10 - ($result==0 ? 10 : $result);
+        if($result == 0)
+        {
+            return $value;
+        }
+        else
+        {
+            return $value - $result + 10;
+        }
         
-        return $value + $new;
         // round 50 multiple
         // $result = $value % 100;
         // if($result < 25)

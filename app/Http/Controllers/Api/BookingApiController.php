@@ -593,8 +593,6 @@ class BookingApiController extends Controller
         {
             return new ValidationResource($validator->errors());
         }
-
-        
         if($request->secure_flag == 1)
         {
             $onelink = User::with("terminal")->find(88);
@@ -830,13 +828,14 @@ class BookingApiController extends Controller
                     ]);
                     $allTicket = [];
                     foreach ($request->selected_seats as $i => $seat) {
+                        $checkDiscount =  checkDiscountAmount($detail,$terminalId,$request->selected_seats_class[$i]);
                         $ticket = Ticket::create([
                             'company_id' => $companyId,
                             'departure_city_id' => $request->departure_city_id,
                             'destination_city_id' => $request->destination_city_id,
                             'seat_no' => $seat,
                             'bus_class_id' => $detail->bus_class_id,
-                            'seat_fare' => $request->selected_seats_fare[$i],
+                            'seat_fare' => $request->selected_seats_fare[$i] + $checkDiscount,
                             'is_partial' => $isPartial,
                             'booking_no' => $bookingNo,
                             'invoice_id' => $invoice->id,
@@ -861,7 +860,7 @@ class BookingApiController extends Controller
                             'booked_time' => date("Y-m-d H:i:s"),
                             'added_by' => Auth::user()->id,
                             'updated_by' => Auth::user()->id,
-                            'discount' => 0,
+                            'discount' => $checkDiscount,
                             'points_usage' => 0,
                         ]);
                         if ($isPartial == 1) {

@@ -51,20 +51,23 @@ class TicketsTemplateController extends Controller
                     'footerText.required' => 'Footer Text is required',
                 ];
                 $this->validate($request, $rules, $customMessages);
-                TicketsTemplate::where('company_id', Auth::user()->company_id)->where('terminal_id', $request->terminal)->where('status', 1)->update(array('status' => 0));
-                $template = TicketsTemplate::create([
-                    'company_id' => Auth::user()->company_id,
-                    'name' => $request->name,
-                    'terminal_id' => $request->terminal ?? Auth::user()->terminal_id,
-                    'uan' => $request->uanNumber,
-                    'phone' => $request->phoneNumber,
-                    'show_phone' => $request->show_phone,
-                    'footer_text' => $request->footerText,
-                    'address' => $request->address,
-                    'terms_condition' => $request->termsCondition,
-                    'status' => 1,
-                    'added_by' => Auth::user()->id,
-                ]);
+                foreach($request->terminals as $terminal)
+                {
+                    TicketsTemplate::where('company_id', Auth::user()->company_id)->where('terminal_id', $terminal)->where('status', 1)->update(array('status' => 0));
+                    $template = TicketsTemplate::create([
+                        'company_id' => Auth::user()->company_id,
+                        'name' => $request->name,
+                        'terminal_id' => $terminal,
+                        'uan' => $request->uanNumber,
+                        'phone' => $request->phoneNumber,
+                        'show_phone' => $request->show_phone,
+                        'footer_text' => $request->footerText,
+                        'address' => $request->address,
+                        'terms_condition' => $request->termsCondition,
+                        'status' => 1,
+                        'added_by' => Auth::user()->id,
+                    ]);
+                }
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
                     "message" => Auth::user()->name." | added ticket template",
