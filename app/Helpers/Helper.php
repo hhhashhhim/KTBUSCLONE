@@ -217,7 +217,7 @@ if (!function_exists('checkDiscountAmount')) {
             }
         }
         if ($terminalDiscount) {
-            $tdiscount = ((int)$fare / 100) * (int)$terminalDiscount->discount;
+            $tdiscount = ((int)$fare / 100) * (float)$terminalDiscount->discount;
             $discounted_fare = $discounted_fare - $tdiscount;
         }
         if($discounted_fare == 0)

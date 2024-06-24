@@ -280,15 +280,14 @@ class BookingController extends Controller
                 
                 $allTicket = [];
                 foreach ($request->selectedSeats as $i => $seat) {
-                    // $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->selectedSeatsClass[$i]);
-                    $checkDiscount =  0;
+                    $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->selectedSeatsClass[$i]);
                     $ticket = Ticket::create([
                         'company_id'          => Auth::user()->company_id,
                         'departure_city_id'   => $request->departureCity,
                         'destination_city_id' => $request->destinationCity,
                         'seat_no'             => $seat,
                         'bus_class_id'        => $detail->bus_class_id,
-                        'seat_fare'           => $request->selectedSeatsFare[$i] + $checkDiscount,
+                        'seat_fare'           => $request->selectedSeatsFare[$i],
                         'is_partial'          => $isPartial,
                         'booking_no'          => $bookingNo,
                         'invoice_id'          => $invoice->id,
@@ -313,7 +312,7 @@ class BookingController extends Controller
                         'booked_time'         => date("Y-m-d H:i:s"),
                         'added_by'            => Auth::user()->id,
                         'updated_by'          => Auth::user()->id,
-                        'discount'            => $checkDiscount + ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
+                        'discount'            => ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
                         'points_usage'        => $request->pointsUseInput / count($request->selectedSeats),
                     ]);
                     if ($isPartial == 1) {
@@ -355,7 +354,7 @@ class BookingController extends Controller
                 }
                 ActivityLog::create([
                     "activity_by"    => Auth::user()->id,
-                    "message"        => Auth::user()->name." | stored ticket ($request->type) | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->selectedSeats)." --- ".json_encode($request->selectedSeatsFare),
+                    "message"        => Auth::user()->name." ($checkDiscount)| stored ticket ($request->type) | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->selectedSeats)." --- ".json_encode($request->selectedSeatsFare),
                     "requested_host" => $request->ip(),
                     "company_id"     => Auth::user()->company_id
                 ]);
