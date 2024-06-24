@@ -306,8 +306,7 @@ if (!function_exists('updateAdvancedSeat')) {
 
         foreach ($request->alreadyBookedId as $key => $single) {
             $customer_id = Ticket::where('company_id', Auth::user()->company_id)->where('id', $single)->first();
-            // $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->advanceSeatClass[$key]);
-            $checkDiscount =  0;
+            $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->advanceSeatClass[$key]);
             $customer_id->update([
                 'type' => 'booked',
                 'schedule_time' => $request->departure_time,

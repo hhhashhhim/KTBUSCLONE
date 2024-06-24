@@ -280,8 +280,7 @@ class BookingController extends Controller
                 
                 $allTicket = [];
                 foreach ($request->selectedSeats as $i => $seat) {
-                    // $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->selectedSeatsClass[$i]);
-                    $checkDiscount =  0;
+                    $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->selectedSeatsClass[$i]);
                     $ticket = Ticket::create([
                         'company_id'          => Auth::user()->company_id,
                         'departure_city_id'   => $request->departureCity,
