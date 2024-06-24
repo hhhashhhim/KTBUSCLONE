@@ -206,7 +206,7 @@ if (!function_exists('checkDiscountAmount')) {
             ->where('company_id', Auth::user()->company_id)
             ->first()->fare;
 
-        $discounted_fare = 0;
+        $discounted_fare = $fare;
         if ($scheduleDiscount) {
             if ($scheduleDiscount->type == "percentage") {
                 $number = $scheduleDiscount->percentage / 100;
@@ -220,15 +220,9 @@ if (!function_exists('checkDiscountAmount')) {
             $tdiscount = ((int)$fare / 100) * (float)$terminalDiscount->discount;
             $discounted_fare = $discounted_fare - $tdiscount;
         }
-        if($discounted_fare == 0)
-        {
-            return 0;
-        }
-        else
-        {
-            $discount = $fare - $discounted_fare;
-            return $discount - ($discount % 10);
-        }
+        
+        $discount = $fare - $discounted_fare;
+        return $discount - ($discount % 10);
     }
 }
 
@@ -306,8 +300,7 @@ if (!function_exists('updateAdvancedSeat')) {
 
         foreach ($request->alreadyBookedId as $key => $single) {
             $customer_id = Ticket::where('company_id', Auth::user()->company_id)->where('id', $single)->first();
-            // $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->advanceSeatClass[$key]);
-            $checkDiscount =  0;
+            $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->advanceSeatClass[$key]);
             $customer_id->update([
                 'type' => 'booked',
                 'schedule_time' => $request->departure_time,

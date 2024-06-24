@@ -829,8 +829,7 @@ class BookingApiController extends Controller
                     ]);
                     $allTicket = [];
                     foreach ($request->selected_seats as $i => $seat) {
-                        // $checkDiscount =  checkDiscountAmount($detail,$terminalId,$request->selected_seats_class[$i]);
-                        $checkDiscount =  0;
+                        $checkDiscount =  checkDiscountAmount($detail,$terminalId,$request->selected_seats_class[$i]);
                         $ticket = Ticket::create([
                             'company_id' => $companyId,
                             'departure_city_id' => $request->departure_city_id,

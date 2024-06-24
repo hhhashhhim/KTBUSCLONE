@@ -287,7 +287,7 @@ class BookingController extends Controller
                         'destination_city_id' => $request->destinationCity,
                         'seat_no'             => $seat,
                         'bus_class_id'        => $detail->bus_class_id,
-                        'seat_fare'           => $request->selectedSeatsFare[$i],
+                        'seat_fare'           => $request->selectedSeatsFare[$i] + $checkDiscount,
                         'is_partial'          => $isPartial,
                         'booking_no'          => $bookingNo,
                         'invoice_id'          => $invoice->id,
@@ -312,7 +312,7 @@ class BookingController extends Controller
                         'booked_time'         => date("Y-m-d H:i:s"),
                         'added_by'            => Auth::user()->id,
                         'updated_by'          => Auth::user()->id,
-                        'discount'            => ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
+                        'discount'            => $checkDiscount + ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
                         'points_usage'        => $request->pointsUseInput / count($request->selectedSeats),
                     ]);
                     if ($isPartial == 1) {
