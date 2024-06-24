@@ -944,7 +944,7 @@ class BookingController extends Controller
                         }
                     }
                     if ($terminalDiscount) {
-                        $tdiscount = ((int)$data->fare / 100) * (int)$terminalDiscount->discount;
+                        $tdiscount = ((int)$data->fare / 100) * (float)$terminalDiscount->discount;
                         $seatMap[$i][$j]['fare'] = $seatMap[$i][$j]['fare'] - $tdiscount;
                     }
                     if ($scheduleSurcharge) {
@@ -1040,7 +1040,7 @@ class BookingController extends Controller
                             }
                         }
                         if ($terminalDiscount) {
-                            $tdiscount = ((int)$fare / 100) * (int)$terminalDiscount->discount;
+                            $tdiscount = ((int)$fare / 100) * (float)$terminalDiscount->discount;
                             $seatMap[$i][$j]['fare'] = $seatMap[$i][$j]['fare'] - $tdiscount;
                         }
                         if ($scheduleSurcharge) {

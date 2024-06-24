@@ -249,7 +249,7 @@ class BookingApiController extends Controller
                             }
                         }
                         if ($terminalDiscount) {
-                            $tdiscount = ((int) $fare / 100) * (int)$terminalDiscount->discount;
+                            $tdiscount = ((int) $fare / 100) * (float)$terminalDiscount->discount;
                             $editFare = $editFare - $tdiscount;
                         }
                         if ($scheduleSurcharge) {
@@ -417,7 +417,7 @@ class BookingApiController extends Controller
                                 }
                             }
                             if ($terminalDiscount) {
-                                $tdiscount = ((int)$data->fare / 100) * (int)$terminalDiscount->discount;
+                                $tdiscount = ((int)$data->fare / 100) * (float)$terminalDiscount->discount;
                                 $seatMap[$i][$j]['fare'] = $seatMap[$i][$j]['fare'] - $tdiscount;
                             }
                             if ($scheduleSurcharge) {
@@ -537,7 +537,7 @@ class BookingApiController extends Controller
                                     }
                                 }
                                 if ($terminalDiscount) {
-                                    $tdiscount = ((int)$fare / 100) * (int)$terminalDiscount->discount;
+                                    $tdiscount = ((int)$fare / 100) * (float)$terminalDiscount->discount;
                                     $seatMap[$i][$j]['fare'] = $seatMap[$i][$j]['fare'] - $tdiscount;
                                 }
                                 if ($scheduleSurcharge) {
@@ -551,7 +551,8 @@ class BookingApiController extends Controller
                                 }
                             }
                         }
-                        $seatMap[$i][$j]['fare'] = customRound($seatMap[$i][$j]['fare']??0);
+                        
+                        $seatMap[$i][$j]['fare'] = (int)customRound($seatMap[$i][$j]['fare']??0);
                     }
                 }
                 $schedule->bus_class->seat_map = $seatMap;
