@@ -28,7 +28,7 @@ class AddFieldsToDiscountsTable extends Migration
     {
         Schema::table('discounts', function (Blueprint $table) {
             $table->dropColumn('type');
-            $table->renameColumn('percentage','amount');
+            $table->renameColumn('amount','percentage');
         });
     }
 }

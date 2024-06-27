@@ -27,8 +27,8 @@ class AddColumnsToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('destination_city_id');
-            $table->dropColumn('departure_city_id');
+            $table->dropColumn('destination_city_ids');
+            $table->dropColumn('departure_city_ids');
         });
     }
 }

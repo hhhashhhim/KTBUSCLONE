@@ -28,7 +28,7 @@ class AddFieldsToSurchargesTable extends Migration
     {
         Schema::table('surcharges', function (Blueprint $table) {
             $table->dropColumn('type');
-            $table->renameColumn('percentage','amount');
+            $table->renameColumn('amount','percentage');
         });
     }
 }

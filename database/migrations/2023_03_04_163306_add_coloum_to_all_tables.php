@@ -13,9 +13,6 @@ class AddColoumToAllTables extends Migration
      */
     public function up()
     {
-        Schema::table('accounts', function (Blueprint $table) {
-            $table->integer('updated_by')->nullable()->after('created_at');
-        });
         Schema::table('bus_classes', function (Blueprint $table) {
             $table->integer('updated_by')->nullable()->after('created_at');
         });
@@ -134,9 +131,6 @@ class AddColoumToAllTables extends Migration
      */
     public function down()
     {
-        Schema::table('accounts', function (Blueprint $table) {
-            $table->dropColumn('updated_by');
-        });
         Schema::table('bus_classes', function (Blueprint $table) {
             $table->dropColumn('updated_by');
         });
