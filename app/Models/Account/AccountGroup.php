@@ -7,18 +7,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AccountCategory extends Model
+class AccountGroup extends Model
 {
     use HasFactory, softDeletes;
     protected $guarded = [];
 
-    public function firstLevel()
-    {
-        return $this->hasOne(Account::class, 'id', 'first_level_id');
+    public function account(){
+        return $this->belongsTo( Account::class, 'account_id', 'id');
     }
-    
-    public function secondLevel()
-    {
-        return $this->hasOne(Account::class, 'id', 'second_level_id');
+
+    public function group(){
+        return $this->belongsTo( AccountGroup::class, 'parent_id', 'id');
     }
 }

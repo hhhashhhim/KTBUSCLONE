@@ -32,64 +32,30 @@ class ScheduleController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-
-        $schedules = Schedule::with(['schedule_time' => function ($q) use ($request) {
-            $q->with("bus_class")->where('schedule_date', '=', $request->departure_date ?? date('Y-m-d'));
-            
-        }])
-        ->where(function($q) use ($request){
+        
+        $schedules = ScheduleDetail::
+        with('schedule.route','bus_class')
+        ->whereHas('schedule', function($q)use($request){
+            $q->where("hide",0);
             if($request->route)
             {
-                $q->where("route_id",$request->route);
+                return $q->where("route_id",$request->route);
             }
         })
-        ->with("route","addedBy")
-        ->where(['company_id'=> Auth::user()->company_id,"hide"=>0])
-        ->get();
-        
-        $schedules->each(function($schedule,$key) use ($request,$schedules) {
-            if ($schedule->schedule_time === null ) {
-                $times = $schedule->schedule_time()->with("bus_class")->orderBy('id','desc')->first();
-                $schedule->setRelation('schedule_time', $times);
-                $schedule->schedule_type = 0;
-            }
-            else
+        ->where(function($q)use($request){
+            if($request->departure_date)
             {
-                $schedule->schedule_type = 1;
+                return $q->where("schedule_date",$request->departure_date);
             }
-
-            if($request->bus_class && ($request->bus_class != $schedule->schedule_time->bus_class_id))
+            if($request->bus_class)
             {
-                unset($schedules[$key]);
+                return $q->where("bus_class_id",$request->bus_class);
             }
-        });
-
-        return $schedules;
-
-
-
-
-
-
-
-        
-        $schedules = Schedule::
-            with(["schedule_time"=>function($q) use ($request){
-                $q->where("schedule_date",'=',$request->departure_date??date("Y-m-d"));
-            }])
-            ->where(function($q) use ($request){
-                if($request->bus_class)
-                {
-                    $q->where("bus_class_id",$request->bus_class);
-                }
-                if($request->route)
-                {
-                    $q->where("route_id",$request->route);
-                }
-            })
-            ->where(['company_id'=> Auth::user()->company_id,"hide"=>0])
-            ->orderBy('time')
-            ->get();
+        })
+        ->where(['company_id' => Auth::user()->company_id])
+        ->orderby("schedule_date","DESC")
+        ->orderby("created_at","ASC")
+        ->get()->unique("schedule_id");
 
         return $schedules;
     }
@@ -542,6 +508,7 @@ class ScheduleController extends Controller
 
             $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
             
+            $end_date = $schedule->end_date;
             for ($i = 0; $i < $request->extended_days; $i++) {
                 $lastDepId = $routeDetails[0]->departure_city_id;
                 $totalTime = strtotime(date("$lastEndDate $lastDayDepartureTime")) + ($i * 86400);
@@ -570,11 +537,13 @@ class ScheduleController extends Controller
                         'departure_date' => date('Y-m-d', strtotime($departureTime)),
                         'schedule_date' => $scheduleStartDate, // schedule departure date
                     ]);
-                    
+                    $end_date = $scheduleStartDate;
                 }
             };
            
-            
+            $schedule->update([
+                "end_date" => $end_date
+            ]);
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
                 "message" => Auth::user()->name." | extend schedule $request->extended_days days ($schedule->name $schedule->id)",

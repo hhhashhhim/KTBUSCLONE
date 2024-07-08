@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Models\Schedule\Schedule;
+use Illuminate\Support\Facades\DB;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,4 +16,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('/test', function () {
+
+    DB::enableQueryLog();
+    $schedules = Schedule::with(['scheduleDetail' => function($q) {
+        $q->orderBy("schedule_date", "DESC")->limit(10);
+    }])
+    ->get();
+    return DB::getQueryLog();
 });

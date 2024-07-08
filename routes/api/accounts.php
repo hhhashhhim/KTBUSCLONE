@@ -5,8 +5,8 @@ use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'web/v1/accounts','middleware' => ['auth:sanctum']], function () {
-    Route::post('/coa/categories', [AccountController::class, 'accountCategories']);
-    Route::post('/coa/getSecondLevel', [AccountController::class, 'getSecondLevel']);
-    Route::post('/coa/category/store', [AccountController::class, 'categoryStore']);
+    Route::post('/coa/groups', [AccountController::class, 'accountGroups']);
+    Route::post('/coa/second/groups', [AccountController::class, 'getThirdLevel']);
+    Route::post('/coa/group/store', [AccountController::class, 'groupStore']);
     Route::post('/coa/category/update', [AccountController::class, 'categoryUpdate']);
 });
