@@ -354,7 +354,7 @@
                             <a href="#" class="has-dropdown">Chart Of Account</a>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <router-link class="nav-link text-capitalize" :to="{ name: 'accounts-categories' }">
+                                    <router-link class="nav-link text-capitalize" :to="{ name: 'account-groups' }">
                                         <i class="fas fa-street-view"></i> Tier 3
                                     </router-link>
                                 </li>

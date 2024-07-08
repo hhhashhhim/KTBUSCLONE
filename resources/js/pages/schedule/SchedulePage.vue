@@ -98,41 +98,41 @@
                                                     <tbody>
                                                     <tr v-for="(schedule, i) in schedules" :key="i">
                                                         <td>{{ i + 1 }}</td>
-                                                        <td>{{ schedule.name }}</td>
-                                                        <td>{{ schedule.start_date }}</td>
-                                                        <td>{{ schedule.end_date }}</td>
-                                                        <td>{{ schedule.schedule_type ? tConvert(schedule.schedule_time.departure_time) : schedule.time + ' | Exp' }}</td>
-                                                        <td> {{ schedule.route ? schedule.route.name : "N/A" }}</td>
+                                                        <td>{{ schedule.schedule.name }}</td>
+                                                        <td>{{ schedule.schedule.start_date }}</td>
+                                                        <td>{{ schedule.schedule.end_date }}</td>
+                                                        <td>{{tConvert(schedule.departure_time)}}</td>
+                                                        <td> {{ schedule.schedule.route ? schedule.schedule.route.name : "N/A" }}</td>
                                                         <td> {{
-                                                                schedule.schedule_time ? schedule.schedule_time.bus_class.name : "N/A"
+                                                                schedule.bus_class.name
                                                             }}
                                                         </td>
                                                         <td> {{
-                                                                schedule.added_by ? schedule.added_by.name : "N/A"
+                                                                "N/A"
                                                             }}
                                                         </td>
                                                         <td>
                                                             <button class="btn btn-info btn-sm mr-1"
                                                                     v-if="checkForSubmenuButtons('extend-schedule')"
-                                                                    @click="addDays(schedule), this.extendDate.extended_days == ''"
+                                                                    @click="addDays(schedule.schedule), this.extendDate.extended_days == ''"
                                                                     data-target="#addDaysModal" data-toggle="modal"
                                                                     title="Extend Schedule Range"><i
                                                                 class="fas fa-plus"></i></button>
                                                             <button title="Edit Schedule"
                                                                     v-if="checkForSubmenuButtons('edit-schedule')"
-                                                                    @click=" edit(schedule); genericData(); "
+                                                                    @click=" edit(schedule.schedule); genericData(); "
                                                                     class="btn btn-primary mr-1 btn-sm"><i
                                                                 class="far fa-edit"></i>
                                                             </button>
                                                             <button class="btn btn-success btn-sm mr-1"
                                                                     v-if="checkForSubmenuButtons('update-time')"
-                                                                    @click="editTime(schedule)"
+                                                                    @click="editTime(schedule.schedule)"
                                                                     data-target="#editTimeModal" data-toggle="modal"
                                                                     title="Edit Time"><i
                                                                 class="fas fa-clock"></i></button>
                                                             <button title="Delete Terminal"
                                                                     v-if="checkForSubmenuButtons('delete-schedule')"
-                                                                    :data-target="'#' + hideFormID" @click="delId = schedule.id" data-toggle="modal"
+                                                                    :data-target="'#' + hideFormID" @click="delId = schedule.schedule.id" data-toggle="modal"
                                                                     class="btn btn-danger btn-sm mr-1"
                                                             >
                                                                 <i class="far fas fa-trash"></i>
