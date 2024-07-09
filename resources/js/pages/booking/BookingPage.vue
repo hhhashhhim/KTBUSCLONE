@@ -202,7 +202,7 @@
                                                         </div>
                                                     </div>
                                                     <div
-                                                        :class="!checkForSubmenuButtons('terminal-id') ? 'col-md-6' : 'col-md-6'"
+                                                        :class="checkForSubmenuButtons('advance-booking') ? 'col-md-6' : 'col-md-6'"
                                                         class="align-self-center">
                                                         <div class="custom-control custom-checkbox">
                                                             <input type="checkbox" class="custom-control-input"
