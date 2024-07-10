@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Setting\Tickets;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting\Tickets\TicketsTemplate;
+use App\Models\Setting\Tickets\TicketTemplateTerminal;
 use App\Models\Terminal;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
@@ -19,7 +20,15 @@ class TicketsTemplateController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return TicketsTemplate::with('terminal.city')->where(['company_id' => Auth::user()->company_id])->get();
+        return $ticketsTemplates = TicketsTemplate::
+            where('company_id', Auth::user()->company_id)
+            ->get()
+            ->map(function($template) {
+                // Append terminal IDs as an array
+                $template->terminal_ids = $template->template_terminals->pluck('terminal_id')->toArray();
+                unset($template->template_terminals);
+                return $template;
+            });
     }
 
     public function store(Request $request)
@@ -51,20 +60,27 @@ class TicketsTemplateController extends Controller
                     'footerText.required' => 'Footer Text is required',
                 ];
                 $this->validate($request, $rules, $customMessages);
+
+                $template = TicketsTemplate::create([
+                    'company_id' => Auth::user()->company_id,
+                    'name' => $request->name,
+                    'uan' => $request->uanNumber,
+                    'phone' => $request->phoneNumber,
+                    'show_phone' => $request->show_phone,
+                    'show_coupen' => $request->show_coupen,
+                    'footer_text' => $request->footerText,
+                    'address' => $request->address,
+                    'terms_condition' => $request->termsCondition,
+                    'status' => 1,
+                    'added_by' => Auth::user()->id,
+                ]);
+
                 foreach($request->terminals as $terminal)
                 {
-                    TicketsTemplate::where('company_id', Auth::user()->company_id)->where('terminal_id', $terminal)->where('status', 1)->update(array('status' => 0));
-                    $template = TicketsTemplate::create([
-                        'company_id' => Auth::user()->company_id,
-                        'name' => $request->name,
+                    TicketTemplateTerminal::create([
+                        'ticket_template_id' => $template->id,
                         'terminal_id' => $terminal,
-                        'uan' => $request->uanNumber,
-                        'phone' => $request->phoneNumber,
-                        'show_phone' => $request->show_phone,
-                        'footer_text' => $request->footerText,
-                        'address' => $request->address,
-                        'terms_condition' => $request->termsCondition,
-                        'status' => 1,
+                        'company_id' => Auth::user()->company_id,
                         'added_by' => Auth::user()->id,
                     ]);
                 }
@@ -103,7 +119,7 @@ class TicketsTemplateController extends Controller
         try {
                 DB::beginTransaction();
                 $rules = [
-                    'terminal_id' => 'required',
+                    'terminal_ids' => 'required',
                     'name' => 'required',
                     'uan' => 'required',
                     'phone' => 'required',
@@ -113,7 +129,7 @@ class TicketsTemplateController extends Controller
                 ];
 
                 $customMessages = [
-                    'terminal_id.required' => 'Please Select Any Terminal',
+                    'terminal_ids.required' => 'Please Select Any Terminal',
                     'name.required' => 'Name is required',
                     'uan.required' => 'UAN Number is required',
                     'phone.required' => 'Phone Number is required',
@@ -122,19 +138,32 @@ class TicketsTemplateController extends Controller
                     'footer_text.required' => 'Footer Text is required',
                 ];
                 $this->validate($request, $rules, $customMessages);
-                TicketsTemplate::where(['terminal_id' => $request->terminal_id, 'company_id'=> Auth::user()->company_id])->where('status', 1)->update(array('status' => 0));
+                
                 $template = TicketsTemplate::where('id', $request->id)->update([
-                    'terminal_id' => $request->terminal_id,
                     'name' => $request->name,
                     'uan' => plainContactAndCnic($request->uan),
                     'phone' => plainContactAndCnic($request->phone),
                     'show_phone' => $request->show_phone,
+                    'show_coupen' => $request->show_coupen,
                     'footer_text' => $request->footer_text,
                     'address' => $request->address,
                     'terms_condition' => $request->terms_condition,
                     'status' => $request->status,
                     'updated_by' => Auth::user()->id,
+                    'company_id' => Auth::user()->company_id,
                 ]);
+
+                TicketTemplateTerminal::where(['ticket_template_id' => $request->id, 'company_id'=> Auth::user()->company_id])->delete();
+                TicketTemplateTerminal::whereIn('terminal_id', $request->terminal_ids)->delete();
+                foreach($request->terminal_ids as $terminal)
+                {
+                    TicketTemplateTerminal::create([
+                        'ticket_template_id' => $request->id,
+                        'terminal_id' => $terminal,
+                        'company_id' => Auth::user()->company_id,
+                        'added_by' => Auth::user()->id,
+                    ]);
+                }
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
                     "message" => Auth::user()->name." | updated ticket template",

@@ -101,7 +101,7 @@ class BookingController extends Controller
         */
 
         try {
-            $lock = Cache::lock("tickets")->block(5, function () use ($request) {
+            $lock = Cache::lock("tickets")->block(7, function () use ($request) {
             DB::beginTransaction();
             if ($request->terminalId == 0 && is_null(Auth::user()->terminal_id)) {
                 //Check if terminal is assigned to user
@@ -174,6 +174,55 @@ class BookingController extends Controller
                     }
                 }
             }
+            /*
+            *   Validation
+            *   Only Purpose to Seat Avoid Duplication 
+            *   $lastDestination means last destination Route will have, Route are saved as 
+            *   Route 1) RWP to Moro
+            *   Route 2) Moro to Karachi 
+            *   $lastDestination will have Karachi
+            *   $allFaresOfRout will have RWP and Moro
+            *   
+            */
+            $lastDestination = $schedule->route->fares->last();
+            $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
+            //RWP MORO KARACHI are now single Array
+            array_push($allFaresOfRoute, $lastDestination->destination_city_id);
+            //Example MORO departure will have 1 index  
+            $scheduleDepIndex = array_search( $request->departureCity, $allFaresOfRoute );
+            //Example Karachi destination will have 2 index  
+            $scheduleDesIndex = array_search( $request->destinationCity, $allFaresOfRoute );
+
+            //Seat 35
+            $checkAlreadyBooked = Ticket::whereIn( "seat_no", $request->selectedSeats )
+            ->where([
+                'company_id'    => Auth::user()->company_id, 
+                'schedule_date' => date('Y-m-d', strtotime($detail->schedule_date) ), 
+                'schedule_id'   => $request->schedule
+            ])
+            ->get();
+
+            foreach($checkAlreadyBooked as $tkt)
+            {
+                //Check if Ticket is Booked for RWP to MORO Target is to book MORO to Karachi
+                // $ticketDepIndex will have 0 as Karachi is at index 0
+                $ticketDepIndex = array_search( $tkt->departure_city_id, $allFaresOfRoute );
+                // $ticketDesIndex will have 1 as MORO is at index 1 
+                $ticketDesIndex = array_search( $tkt->destination_city_id, $allFaresOfRoute );
+
+                /*
+                *   $ticketDepIndex for RWP will have 0 and $scheduleDepIndex will have 1 for MORO $scheduleDesIndex will have 2 For Karachi
+                *   Condition 1) ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex)
+                *   Output 0 >= 1 && 0 < 2 Result False
+                *   Condition 2 )($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
+                *   Output 1 > 1 > 1 && 1 <= 2 Result False
+                */
+                if( ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
+                    || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
+                {
+                    return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
+                }
+            }
             //Reservation To Booking
             if (isset($request->flag) && $request->flag == 1) {
                 //If Reserved seat is converted into Issued/Booked
@@ -190,55 +239,6 @@ class BookingController extends Controller
                 if (count($request->selectedSeats) == 0) {
                     //Check If Seat is already Booked
                     return response()->json(["errors" => ["Error" => ["Please refresh your seat map you entered some wrong/duplicate entry"]]], 422);
-                }
-                /*
-                *   Validation
-                *   Only Purpose to Seat Avoid Duplication 
-                *   $lastDestination means last destination Route will have, Route are saved as 
-                *   Route 1) RWP to Moro
-                *   Route 2) Moro to Karachi 
-                *   $lastDestination will have Karachi
-                *   $allFaresOfRout will have RWP and Moro
-                *   
-                */
-                $lastDestination = $schedule->route->fares->last();
-                $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
-                //RWP MORO KARACHI are now single Array
-                array_push($allFaresOfRoute, $lastDestination->destination_city_id);
-                //Example MORO departure will have 1 index  
-                $scheduleDepIndex = array_search( $request->departureCity, $allFaresOfRoute );
-                //Example Karachi destination will have 2 index  
-                $scheduleDesIndex = array_search( $request->destinationCity, $allFaresOfRoute );
-
-                //Seat 35
-                $checkAlreadyBooked = Ticket::whereIn( "seat_no", $request->selectedSeats )
-                ->where([
-                    'company_id'    => Auth::user()->company_id, 
-                    'schedule_date' => date('Y-m-d', strtotime($detail->schedule_date) ), 
-                    'schedule_id'   => $request->schedule
-                ])
-                ->get();
-
-                foreach($checkAlreadyBooked as $tkt)
-                {
-                    //Check if Ticket is Booked for RWP to MORO Target is to book MORO to Karachi
-                    // $ticketDepIndex will have 0 as Karachi is at index 0
-                    $ticketDepIndex = array_search( $tkt->departure_city_id, $allFaresOfRoute );
-                    // $ticketDesIndex will have 1 as MORO is at index 1 
-                    $ticketDesIndex = array_search( $tkt->destination_city_id, $allFaresOfRoute );
-
-                    /*
-                    *   $ticketDepIndex for RWP will have 0 and $scheduleDepIndex will have 1 for MORO $scheduleDesIndex will have 2 For Karachi
-                    *   Condition 1) ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex)
-                    *   Output 0 >= 1 && 0 < 2 Result False
-                    *   Condition 2 )($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
-                    *   Output 1 > 1 > 1 && 1 <= 2 Result False
-                    */
-                    if( ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
-                        || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
-                    {
-                        return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
-                    }
                 }
                 
                 $departure_city_id   = $schedule->route->fares->first()->departure_city_id;
@@ -280,15 +280,14 @@ class BookingController extends Controller
                 
                 $allTicket = [];
                 foreach ($request->selectedSeats as $i => $seat) {
-                    // $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->selectedSeatsClass[$i]);
-                    $checkDiscount =  0;
+                    $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->selectedSeatsClass[$i]);
                     $ticket = Ticket::create([
                         'company_id'          => Auth::user()->company_id,
                         'departure_city_id'   => $request->departureCity,
                         'destination_city_id' => $request->destinationCity,
                         'seat_no'             => $seat,
                         'bus_class_id'        => $detail->bus_class_id,
-                        'seat_fare'           => $request->selectedSeatsFare[$i] + $checkDiscount,
+                        'seat_fare'           => $request->selectedSeatsFare[$i],
                         'is_partial'          => $isPartial,
                         'booking_no'          => $bookingNo,
                         'invoice_id'          => $invoice->id,
@@ -313,7 +312,8 @@ class BookingController extends Controller
                         'booked_time'         => date("Y-m-d H:i:s"),
                         'added_by'            => Auth::user()->id,
                         'updated_by'          => Auth::user()->id,
-                        'discount'            => $checkDiscount + ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
+                        'discount'            => ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
+                        'display_discount'    => $checkDiscount,
                         'points_usage'        => $request->pointsUseInput / count($request->selectedSeats),
                     ]);
                     if ($isPartial == 1) {
@@ -1566,7 +1566,12 @@ class BookingController extends Controller
         ;
         $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'bus' => $bus, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount, 'commission' => $commission, 'refund' => round($refundData)];
         $terminal = Terminal::find(Auth::user()->terminal_id);
-        $format = TicketsTemplate::with("terminal")->where(['terminal_id' => Auth::user()->terminal_id, 'company_id'=> Auth::user()->company_id])->where('status', 1)->first();
+        $format = TicketsTemplate::with("terminal")
+        ->join("ticket_template_terminals","ticket_template_terminals.ticket_template_id","tickets_templates.id")
+        ->whereNull('tickets_templates.deleted_at')
+        ->whereNull('ticket_template_terminals.deleted_at')
+        ->where(['tickets_templates.company_id'=> Auth::user()->company_id,"ticket_template_terminals.terminal_id"=>Auth::user()->terminal_id])->where('tickets_templates.status', 1)
+        ->first();
         return view('pdf/TerminalPaxDetails', ['data' => $passengerData, 'terminal' => $terminal,"format"=>$format]);
     }
 
@@ -1672,7 +1677,12 @@ class BookingController extends Controller
         $infoData->bus_data = $busData;
 
        
-        $format = TicketsTemplate::with("terminal")->where(['terminal_id' => Auth::user()->terminal_id, 'company_id'=> Auth::user()->company_id])->where('status', 1)->first();
+        $format = TicketsTemplate::with("terminal")
+        ->join("ticket_template_terminals","ticket_template_terminals.ticket_template_id","tickets_templates.id")
+        ->whereNull('tickets_templates.deleted_at')
+        ->whereNull('ticket_template_terminals.deleted_at')
+        ->where(['tickets_templates.company_id'=> Auth::user()->company_id,"ticket_template_terminals.terminal_id"=>Auth::user()->terminal_id])->where('tickets_templates.status', 1)
+        ->first();;
         return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData,"refundTerminal" => $refundTerminal,"format"=>$format]);
     }
 
@@ -1704,7 +1714,12 @@ class BookingController extends Controller
 
             $item->acutal_time = date("Y-m-d H:i:00", strtotime($item->date . " " . $item->schedule_time) + $sub);
         });
-        $format = TicketsTemplate::with("terminal")->where(['terminal_id' => Auth::user()->terminal_id, 'company_id'=> Auth::user()->company_id])->where('status', 1)->first();
+        $format = TicketsTemplate::with("terminal")
+                ->join("ticket_template_terminals","ticket_template_terminals.ticket_template_id","tickets_templates.id")
+                ->whereNull('tickets_templates.deleted_at')
+                ->whereNull('ticket_template_terminals.deleted_at')
+                ->where(['tickets_templates.company_id'=> Auth::user()->company_id,"ticket_template_terminals.terminal_id"=>Auth::user()->terminal_id])->where('tickets_templates.status', 1)
+                ->first();
         $finalData = [
             'tickets' => $tickets,
             'format' => $format,
@@ -1790,7 +1805,12 @@ class BookingController extends Controller
             'schedule_date' => $uniqueDate,
             'type' => 'booked',
         ])->groupBy('destination_city_id')->selectRaw('destination_city_id,count(*) as destinationPassengerCount')->get();
-        $format = TicketsTemplate::with("terminal")->where(['terminal_id' => Auth::user()->terminal_id, 'company_id'=> Auth::user()->company_id])->where('status', 1)->first();
+        $format = TicketsTemplate::with("terminal")
+        ->join("ticket_template_terminals","ticket_template_terminals.ticket_template_id","tickets_templates.id")
+        ->whereNull('tickets_templates.deleted_at')
+        ->whereNull('ticket_template_terminals.deleted_at')
+        ->where(['tickets_templates.company_id'=> Auth::user()->company_id,"ticket_template_terminals.terminal_id"=>Auth::user()->terminal_id])->where('tickets_templates.status', 1)
+        ->first();
         $countPassenger = count($passengerData);
         $actualDeparture = date('m/d/Y h:i A', strtotime($uniqueDate . ' ' . $scheduleTime));
         $driverInfo = getMembers($passengerData->first(), Auth::user()->company_id, 1) ?? [];

@@ -29,5 +29,8 @@ class TicketsTemplate extends Model
     public function terminal(){
         return $this->hasOne( Terminal::class,'id','terminal_id' );
     }
+    public function template_terminals(){
+        return $this->hasMany( TicketTemplateTerminal::class,'ticket_template_id','id' );
+    }
 
 }

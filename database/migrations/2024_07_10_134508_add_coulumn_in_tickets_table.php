@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddColumnToTicketsTemplates extends Migration
+class AddCoulumnInTicketsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddColumnToTicketsTemplates extends Migration
      */
     public function up()
     {
-        Schema::table('tickets_templates', function (Blueprint $table) {
-            $table->string('name')->after('company_id');
+        Schema::table('tickets', function (Blueprint $table) {
+            $table->integer('display_discount')->after('discount')->default(0);
         });
     }
 
@@ -25,8 +25,8 @@ class AddColumnToTicketsTemplates extends Migration
      */
     public function down()
     {
-        Schema::table('tickets_templates', function (Blueprint $table) {
-            $table->dropColumn('name');
+        Schema::table('tickets', function (Blueprint $table) {
+            $table->dropColumn('display_discount');
         });
     }
 }

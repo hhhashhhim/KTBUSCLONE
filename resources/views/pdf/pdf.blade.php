@@ -140,11 +140,11 @@
 
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Fare :</p>
-                <p class="my-5 float-right">{{ $data['tickets'][$key]['seat_fare'] }}</p>
+                <p class="my-5 float-right">{{ $data['tickets'][$key]['seat_fare'] + $data['tickets'][$key]['display_discount'] }}</p>
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Discount :</p>
-                <p class="my-5 float-right">{{ $data['tickets'][$key]['discount'] ?? 0 }}</p>
+                <p class="my-5 float-right">{{ ($data['tickets'][$key]['discount'] ?? 0) + $data['tickets'][$key]['display_discount'] }}</p>
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Total Fare :</p>
@@ -164,6 +164,8 @@
         </div>
 
         <div style="page-break-before:always">&nbsp;</div>
+
+        @if(isset($data['format']) && $data['format']->show_coupen)
         <div class="custinfo" id="custinfo">
             <div class="clear-both">
                 <p class="font-weight-bold float-left">Seat No :</p>
@@ -204,6 +206,7 @@
                 <p class="my-5 float-right">{{ formatContact($data['tickets'][$key]->customer->contact)}}</p>
             </div>
         </div>
+        @endif
     </div>
 </div>
 </body>
