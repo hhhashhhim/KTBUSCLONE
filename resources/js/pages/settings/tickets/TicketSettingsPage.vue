@@ -26,7 +26,6 @@
                                                         <tr>
                                                             <th>Sr No.</th>
                                                             <th>Name</th>
-                                                            <th>Terminal</th>
                                                             <th>Address</th>
                                                             <th>UAN #</th>
                                                             <th>Phone #</th>
@@ -39,11 +38,6 @@
                                                         <tr v-for="(template, i) in templates" :key="i">
                                                             <td>{{ i + 1 }}</td>
                                                             <td>{{ template.name }}</td>
-                                                            <td v-if="template.terminal_id != null">
-                                                                {{ template.terminal.city.name }} -
-                                                                {{ template.terminal.name }}
-                                                            </td>
-                                                            <td v-else>N/A</td>
                                                             <td class="text-break">{{ template.address }}</td>
                                                             <td>{{ template.uan }}</td>
                                                             <td>{{ template.phone }}</td>
@@ -102,7 +96,7 @@
                             <option>Software Developed By SAR ZONE 0341-1111727</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>
                         <vue-mask id="uanNumber"
                                     class="form-control"
@@ -113,7 +107,7 @@
                         >
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>
 
                         <vue-mask id="phoneNumber" class="form-control" v-model="addForm.phoneNumber" mask="0000-0000000"
@@ -121,6 +115,13 @@
                         </vue-mask>
                         <input type="checkbox" v-model="addForm.show_phone">
                         <lable class="mx-1">Show phone on ticket</lable>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="phoneNumber">Show Coupen<span class="text-danger ml-1"></span></label>
+                        <div>
+                            <input type="checkbox" v-model="addForm.show_coupen">
+                            <lable class="mx-1">Yes</lable>
+                        </div>
                     </div>
                     <div class="form-group col-md-12">
                         <label for="address">Address<span class="text-danger ml-1">*</span></label>
@@ -147,7 +148,7 @@
                 <div class="row mt-3">
                     <div class="form-group col-md-4">
                         <label for="terminals">Terminals <span class="text-danger">*</span></label>
-                        <select class="form-control" id="terminals" v-model="dataEdit.terminal_id">
+                        <select class="form-control" id="editTerminals" v-model="dataEdit.terminal_ids" multiple>
                             <option value="0" selected>Select Terminal</option>
                             <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{ terminal.city.name
                             }} - {{ terminal.name }}
@@ -166,7 +167,7 @@
                             <option>Software Developed By SAR ZONE 0341-1111727</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>
                         <vue-mask id=""
                                     class="form-control"
@@ -177,7 +178,7 @@
                         >
                         </vue-mask>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>
 
                         <vue-mask id="phoneNumber" class="form-control" v-model="dataEdit.phone" mask="0000-0000000"
@@ -186,12 +187,19 @@
                         <input type="checkbox" v-model="dataEdit.show_phone">
                         <lable class="mx-1">Show phone on ticket</lable>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="status">Status</label>
                         <select class="form-control" id="status" v-model="dataEdit.status">
                             <option value="1">Active</option>
                             <option value="0">In Active</option>
                         </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="phoneNumber">Show Coupen<span class="text-danger ml-1"></span></label>
+                        <div>
+                            <input type="checkbox" v-model="dataEdit.show_coupen">
+                            <lable class="mx-1">Yes</lable>
+                        </div>
                     </div>
                     <div class="form-group col-md-12">
                         <label for="address">Address<span class="text-danger ml-1">*</span></label>
@@ -249,6 +257,7 @@ export default {
                 terminals: [],
                 footerText: 0,
                 show_phone: true,
+                show_coupen: true,
             },
             dataEdit: {},
             loading: false,
@@ -454,6 +463,23 @@ export default {
         async edit(template) {
             this.dataEdit = template;
             this.dataEdit.show_phone = template.show_phone == 1 ? true : false;
+            this.dataEdit.show_coupen = template.show_coupen == 1 ? true : false;
+            setTimeout(() => {
+                const terminals = $('#editTerminals');
+
+                // Initialize Select2
+                terminals.select2({
+                    closeOnSelect: false
+                });
+
+                // Handle Select2 change event
+                const self = this;
+
+                terminals.on('change', function() {
+                    const selectedValues = $(this).val();
+                    self.dataEdit.terminal_ids = selectedValues;
+                });
+            }, 300);
         },
 
         async updateTemplate() {
