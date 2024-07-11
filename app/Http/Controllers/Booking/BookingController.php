@@ -193,14 +193,28 @@ class BookingController extends Controller
             //Example Karachi destination will have 2 index  
             $scheduleDesIndex = array_search( $request->destinationCity, $allFaresOfRoute );
 
-            //Seat 35
-            $checkAlreadyBooked = Ticket::whereIn( "seat_no", $request->selectedSeats )
-            ->where([
-                'company_id'    => Auth::user()->company_id, 
-                'schedule_date' => date('Y-m-d', strtotime($detail->schedule_date) ), 
-                'schedule_id'   => $request->schedule
-            ])
-            ->get();
+            // if seat are going to update then case will be different from newly created
+            if (isset($request->flag) && $request->flag == 1) {
+                //Seat 35
+                $checkAlreadyBooked = Ticket::whereIn( "seat_no", $request->selectedSeats )
+                ->where([
+                    'company_id'    => Auth::user()->company_id, 
+                    'schedule_date' => date('Y-m-d', strtotime($detail->schedule_date) ), 
+                    'schedule_id'   => $request->schedule,
+                    "type"          => "booked"
+                ])
+                ->get();
+            }
+            else {
+                //Seat 35
+                $checkAlreadyBooked = Ticket::whereIn( "seat_no", $request->selectedSeats )
+                ->where([
+                    'company_id'    => Auth::user()->company_id, 
+                    'schedule_date' => date('Y-m-d', strtotime($detail->schedule_date) ), 
+                    'schedule_id'   => $request->schedule
+                ])
+                ->get();
+            }
 
             foreach($checkAlreadyBooked as $tkt)
             {
