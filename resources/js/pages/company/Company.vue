@@ -229,6 +229,11 @@
                                    v-model="dataEdit.password"/>
                         </div>
                         <div class="form-group col-md-12">
+                            <label for="auth">Whatsapp Auth Key</label>
+                            <input type="text" class="form-control" placeholder="" id="auth"
+                                   v-model="dataEdit.whatsapp_auth_key"/>
+                        </div>
+                        <div class="form-group col-md-12">
                             <label for="location">Location</label>
                             <textarea class="form-control" placeholder="Enter Location" id="location"
                                       v-model="dataEdit.location" cols="30" rows="10"></textarea>
