@@ -45,7 +45,6 @@ class TicketsTemplateController extends Controller
                 $rules = [
                     'terminal' => 'required',
                     'name' => 'required',
-                    'address' => 'required',
                     'uanNumber' => 'required',
                     'termsCondition' => 'required',
                     'footerText' => 'required',
@@ -54,7 +53,6 @@ class TicketsTemplateController extends Controller
                 $customMessages = [
                     'terminal.required' => 'Please Select Any Terminal',
                     'name.required' => 'Name is required',
-                    'address.required' => 'Address is required',
                     'uanNumber.required' => 'UAN Number is required',
                     'termsCondition.required' => 'Terms & Condition is required',
                     'footerText.required' => 'Footer Text is required',
@@ -123,7 +121,6 @@ class TicketsTemplateController extends Controller
                     'name' => 'required',
                     'uan' => 'required',
                     'phone' => 'required',
-                    'address' => 'required',
                     'terms_condition' => 'required',
                     'footer_text' => 'required',
                 ];
@@ -133,7 +130,6 @@ class TicketsTemplateController extends Controller
                     'name.required' => 'Name is required',
                     'uan.required' => 'UAN Number is required',
                     'phone.required' => 'Phone Number is required',
-                    'address.required' => 'Terminal Address is required',
                     'terms_condition.required' => 'Terms & Condition is required',
                     'footer_text.required' => 'Footer Text is required',
                 ];

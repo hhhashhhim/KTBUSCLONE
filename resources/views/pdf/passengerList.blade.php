@@ -90,7 +90,7 @@
     <div class="companyName"><span>{{isset($format->name) ? $format->name : "Kainat Travels"}}</span></div>
     <br>
     <div class="companyAddress">
-        <div><span><b>{{ isset($format->address) ? $format->address : auth()->user()->terminal->address }}</b></span></div>
+        <div><span><b>{{ auth()->user()->terminal->address }}</b></span></div>
     </div>
     <br>
     <div class="companyAddress">

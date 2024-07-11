@@ -76,7 +76,7 @@
     <div class="companyName"><span>{{isset($format->name) ? $format->name : "Kainat Travels"}}</span></div>
     <div class="companyAddress">
         <div style=" padding-bottom: 5px;"><span
-                style="font-weight:600">   {{ isset($format->address) ? $format->address : auth()->user()->terminal->address }}</span>
+                style="font-weight:600">   {{ auth()->user()->terminal->address }}</span>
         </div>
         <div style=" padding-bottom: 5px;"><span
                 style="font-weight:600">{{ isset($terminal->name) ? $terminal->name : "Main Terminal"}}</span>

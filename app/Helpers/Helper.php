@@ -375,9 +375,9 @@ if (!function_exists('updateAdvancedSeat')) {
     }
 }
 
-//Updated Already advanced Booked Seat
+
 if (!function_exists('ticketConfirmedMessage')) {
-    function ticketConfirmedMessage($tickets)
+    function ticketConfirmedMessage($tickets,$type)
     {
         
         $seats = implode(",",Ticket::whereIn("id",$tickets)->pluck("seat_no")->toArray());
@@ -402,34 +402,54 @@ if (!function_exists('ticketConfirmedMessage')) {
         }
         else
         {
-            $html .= "*".$detail->terminal->name.":* ".date("h:i A", strtotime($detail->schedule_time))."\n";
+            $html .= "*".$detail->terminal->name.":* ".date("h:i A", strtotime($detail->schedule_time));
         }
+
+        
+        
+
+
+        
          
-        $url = "http://cloud.selfieartworld.com:3000/api/sendText";
+        $url = "https://whatsapp.sarzone.com/api/send-messages";
         $mobile = "92".substr($detail->customer->contact, -10);
-        $message = "Dear *".$detail->customer->name."*,
-
-We are pleased to confirm your ticket booking from *".$detail->departure_city->name."* to *".$detail->destination_city->name."* on *".$detail->date."*. You've booked seat numbers *$seats*.
-Your departure times from different terminal are as follows:
-
+        $session = 'Hamza_4-Device1';
+        $messageConfirmed = "Dear ".$detail->customer->name.",
+Seat# $seats, ".$detail->departure_city->name." to ".$detail->destination_city->name."
+Date ".$detail->date."
+has been Confirmed
+Departure at:
 $html
 
-Please ensure you arrive at the bus terminal at least 30 minutes before departure.                           
-        
-For any assistance, feel free to reach out to us at 03-111-777-333.                           
+For any inquiries/Complains Dial UAN 03111777333
 
-*Kainat Travels*";
+Terms & conditions applied
+1:Arrive terminal 30 before departure Bus will not delayed for passenger.
+2: Per person allowed luggage is upto 30kg only,Commercial or additional luggage will booked additionally.
+3: Wifi upto 350mb,Refreshment/Food & Multimedia services are Complementary & non claimable.
+4:For passenger safety Bus will not pick/drop passengers from Roadside or outside Company Terminal
+5: Keep your personal belongings Safe Company is not responsible for any loss or damage.";
 
+        $messageReserved = "Dear ".$detail->customer->name.",
+Seat# $seats,
+".$detail->departure_city->name." to ".$detail->destination_city->name."
+$html
+Date ".$detail->date." Is Reserved
+Buy your Ticket within 02hrs of reservation else your seat consider on change 
+For any inquiries/complains dial UAN 03111777333
+
+Terms & conditions applied.";
 
         $headers = array(
             'accept: application/json',
-            'X-Api-Key: 03261594870As',
+            'X-Api-Key: (fC3dUv&PtG$%TeMgdE1TegI#1(tP&CgmDSb)No+jkV#c7l*qh',
             'Content-Type: application/json'
         );
         $data = array(
-            'chatId' => $mobile.'@c.us',
-            'text' => $message,
-            'session' => 'kainattravels'
+            "session" => $session,
+            "message_type" =>  'text',
+            "receiver_number" => $mobile, 
+            "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed
         );
 
         $ch = curl_init($url);

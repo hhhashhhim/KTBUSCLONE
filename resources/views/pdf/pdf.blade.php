@@ -87,7 +87,7 @@
 <div id="info">
     <div class="companyname"><span>{{isset($data['format']->name) ? $data['format']->name : "Kainat Travels"}}</span></div>
     <div class="companyAddress">
-        <span>{{ isset($data['format']->address) ? $data['format']->address : auth()->user()->terminal->address }}</span>
+        <span>{{ auth()->user()->terminal->address }}</span>
         <div><span><b>UAN(24/7) : </b>{{isset($data['format']->uan) ? $data['format']->uan : "03-111-777-333"}}</span></div>
         @if(isset($data['format']->phone) && $data['format']->show_phone == 0)
         @else
@@ -103,8 +103,11 @@
         <br>
         <div id="barcode-area">
             <div class="clear-both">
-                <p class="font-weight-bold float-left">Customer Name :</p>
-                <p class="float-right">{{ ucfirst($data['tickets'][$key]->customer->name)}}</p>
+                <p class="my-5 font-weight-bold float-left">{{ "TKT".$data['tickets'][$key]['id']."INV".$data['tickets'][$key]['invoice_id'] }}</p>
+            </div>
+            <div class="clear-both">
+                <p class="my-5 font-weight-bold float-left">Customer Name :</p>
+                <p class="my-5 float-right">{{ ucfirst($data['tickets'][$key]->customer->name)}}</p>
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Seat No :</p>
@@ -130,7 +133,7 @@
 
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Departure Time :</p>
-                <p class="my-5 float-right">{{ date('H:i A', strtotime($data['tickets'][$key]['acutal_time'])) }}</p>
+                <p class="my-5 float-right">{{ date('h:i A', strtotime($data['tickets'][$key]['acutal_time'])) }}</p>
             </div>
 
             <div class="clear-both">
@@ -190,7 +193,7 @@
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Departure Time :</p>
-                <p class="my-5 float-right">{{ date('H:i A', strtotime($data['tickets'][$key]['acutal_time'])) }}</p>
+                <p class="my-5 float-right">{{ date('h:i A', strtotime($data['tickets'][$key]['acutal_time'])) }}</p>
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Customer Name :</p>

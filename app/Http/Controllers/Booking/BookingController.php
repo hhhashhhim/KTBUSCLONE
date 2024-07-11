@@ -393,7 +393,7 @@ class BookingController extends Controller
 
     public function whatsappMessage(Request $request)
     {
-        ticketConfirmedMessage(explode('-', $request->ticket_ids));
+        ticketConfirmedMessage(explode('-', $request->ticket_ids),$request->type);
     }
 
 
