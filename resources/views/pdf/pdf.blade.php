@@ -165,7 +165,8 @@
 
         <div style="page-break-before:always">&nbsp;</div>
 
-        @if(isset($data['format']) && $data['format']->show_coupen)
+        @if((isset($data['format']) && $data['format']->show_coupen == 0))
+        @else
         <div class="custinfo" id="custinfo">
             <div class="clear-both">
                 <p class="font-weight-bold float-left">Seat No :</p>
