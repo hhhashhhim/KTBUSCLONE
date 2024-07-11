@@ -418,7 +418,7 @@ if (!function_exists('ticketConfirmedMessage')) {
             4 => 'Hamza_4-Device4',
             5 => 'Hamza_4-Device-5'
         ];
-        $randomNumber = rand(4, 5);
+        $randomNumber = rand(1, 5);
         $session = $names[$randomNumber];
 
 
