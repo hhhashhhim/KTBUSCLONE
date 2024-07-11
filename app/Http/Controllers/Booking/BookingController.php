@@ -8,6 +8,7 @@ use App\Models\Booking\RescheduleExtraAmount;
 use App\Models\Booking\TicketAdvancedBooked;
 use App\Models\Booking\TicketELT;
 use App\Models\Booking\TicketIsPartial;
+use Illuminate\Support\Facades\Http;
 use App\Models\Booking\TicketReschedule;
 use App\Models\Booking\TicketsOverIssue;
 use App\Models\Bus\Bus;
@@ -393,7 +394,7 @@ class BookingController extends Controller
 
     public function whatsappMessage(Request $request)
     {
-        ticketConfirmedMessage(explode('-', $request->ticket_ids),$request->type);
+        return ticketConfirmedMessage(explode('-', $request->ticket_ids),$request->type);
     }
 
 

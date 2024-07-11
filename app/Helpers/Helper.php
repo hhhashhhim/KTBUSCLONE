@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Hrm\Employee\Employee;
+use Illuminate\Support\Facades\Http;
 use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use App\Models\Discount\Discount;
@@ -418,7 +419,7 @@ if (!function_exists('ticketConfirmedMessage')) {
             4 => 'Hamza_4-Device4',
             5 => 'Hamza_4-Device-5'
         ];
-        $randomNumber = rand(1, 5);
+        $randomNumber = rand(5, 5);
         $session = $names[$randomNumber];
 
 
@@ -453,26 +454,15 @@ For any inquiries/complains dial UAN 03111777333
 
 Terms & conditions applied.";
 
-        $headers = array(
-            'accept: application/json',
-            'X-Api-Key: '.$auth_key,
-            'Content-Type: application/json'
-        );
-        $data = array(
+        $response = Http::withHeaders([
+            'X-Api-Key'=>$auth_key,
+        ])->post($url, [
             "session" => $session,
             "message_type" =>  'text',
             "receiver_number" => $mobile, 
             "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed
-        );
-
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-
-        $response = curl_exec($ch);
-        curl_close($ch);
+        ]);
+        return $response;
         }
     }
 }
