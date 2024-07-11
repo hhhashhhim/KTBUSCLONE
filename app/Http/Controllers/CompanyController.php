@@ -102,6 +102,7 @@ class CompanyController extends Controller
                     'contact' => plainContactAndCnic($request->contact),
                     'location' => $request->location,
                     'modules' => $request->modules,
+                    'whatsapp_auth_key' => $request->whatsapp_auth_key,
                     'added_by' => auth()->user()->id,
                 ]);
                 if ($request->logo) {

@@ -11,6 +11,7 @@ use App\Models\Route\RouteFare;
 use App\Models\Discount\Discount;
 use App\Models\Schedule\Schedule;
 use App\Models\Booking\TicketIsPartial;
+use App\Models\Company;
 use App\Models\Terminal\TerminalTimeDifference;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\TerminalDiscount;
@@ -379,7 +380,9 @@ if (!function_exists('updateAdvancedSeat')) {
 if (!function_exists('ticketConfirmedMessage')) {
     function ticketConfirmedMessage($tickets,$type)
     {
-        
+        $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
+        if($auth_key)
+        {
         $seats = implode(",",Ticket::whereIn("id",$tickets)->pluck("seat_no")->toArray());
         $detail = Ticket::where("id",$tickets[0])->with("departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
         
@@ -406,14 +409,24 @@ if (!function_exists('ticketConfirmedMessage')) {
         }
 
         
-        
+        // to choose random device
+        // Define an array of names
+        $names = [
+            1 => 'Hamza_4-Device1',
+            2 => 'Hamza_4-Device2',
+            3 => 'Hamza_4-Device3',
+            4 => 'Hamza_4-Device4',
+            5 => 'Hamza_4-Device-5'
+        ];
+        $randomNumber = rand(4, 5);
+        $session = $names[$randomNumber];
 
 
         
          
         $url = "https://whatsapp.sarzone.com/api/send-messages";
         $mobile = "92".substr($detail->customer->contact, -10);
-        $session = 'Hamza_4-Device1';
+        $session = $names[$randomNumber];
         $messageConfirmed = "Dear ".$detail->customer->name.",
 Seat# $seats, ".$detail->departure_city->name." to ".$detail->destination_city->name."
 Date ".$detail->date."
@@ -442,7 +455,7 @@ Terms & conditions applied.";
 
         $headers = array(
             'accept: application/json',
-            'X-Api-Key: (fC3dUv&PtG$%TeMgdE1TegI#1(tP&CgmDSb)No+jkV#c7l*qh',
+            'X-Api-Key: '.$auth_key,
             'Content-Type: application/json'
         );
         $data = array(
@@ -460,7 +473,7 @@ Terms & conditions applied.";
 
         $response = curl_exec($ch);
         curl_close($ch);
-
+        }
     }
 }
 //Updated Already advanced Booked Seat Api
