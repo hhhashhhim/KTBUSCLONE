@@ -3475,7 +3475,7 @@ export default {
                     }
                 }, 700);
 
-                resBookingDetail = await this.callApi("post", "booking/whatsapp/message", {ticket_ids: resTicket.data.ids});
+                resBookingDetail = await this.callApi("post", "booking/whatsapp/message", {ticket_ids: resTicket.data.ids,type:bookType});
 
 
             } else {

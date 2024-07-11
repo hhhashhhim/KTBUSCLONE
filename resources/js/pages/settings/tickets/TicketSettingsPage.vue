@@ -26,7 +26,6 @@
                                                         <tr>
                                                             <th>Sr No.</th>
                                                             <th>Name</th>
-                                                            <th>Address</th>
                                                             <th>UAN #</th>
                                                             <th>Phone #</th>
                                                             <th>Terms & Condition</th>
@@ -38,7 +37,6 @@
                                                         <tr v-for="(template, i) in templates" :key="i">
                                                             <td>{{ i + 1 }}</td>
                                                             <td>{{ template.name }}</td>
-                                                            <td class="text-break">{{ template.address }}</td>
                                                             <td>{{ template.uan }}</td>
                                                             <td>{{ template.phone }}</td>
                                                             <td class="text-break">{{ template.terms_condition }}</td>
@@ -123,13 +121,13 @@
                             <lable class="mx-1">Yes</lable>
                         </div>
                     </div>
-                    <div class="form-group col-md-12">
+                    <!-- <div class="form-group col-md-12">
                         <label for="address">Address<span class="text-danger ml-1">*</span></label>
                         <textarea class="form-control" id="address" spellcheck="false" maxlength="45"
                             @keypress="countWords(this.addForm.address.length, 'address', 45)"
                             v-model="addForm.address"></textarea>
                         <span class="text-danger">Length : {{ this.countAddressLength }}/45</span>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="row mt-3">
                     <div class="form-group col-md-12">
@@ -200,12 +198,6 @@
                             <input type="checkbox" v-model="dataEdit.show_coupen">
                             <lable class="mx-1">Yes</lable>
                         </div>
-                    </div>
-                    <div class="form-group col-md-12">
-                        <label for="address">Address<span class="text-danger ml-1">*</span></label>
-                        <textarea class="form-control" id="address" spellcheck="false" maxlength="45"
-                            v-model="dataEdit.address"></textarea>
-
                     </div>
                     <div class="form-group col-md-12">
                         <label for="refOfHiring">Terms & Condition <span class="text-danger ml-1">*</span></label>
@@ -398,14 +390,6 @@ export default {
                     timer: 2000,
                 });
             }
-            if (this.addForm.address == '' || typeof this.addForm.address == 'undefined') {
-                return swal({
-                    title: "Required !!!",
-                    text: "Address is Required",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
             if (this.addForm.termsCondition == '' || typeof this.addForm.termsCondition == 'undefined') {
                 return swal({
                     title: "Required !!!",
@@ -511,14 +495,6 @@ export default {
                 return swal({
                     title: "Required !!!",
                     text: "Phone Number is Required",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
-            if (this.dataEdit.address == '' || typeof this.dataEdit.address == 'undefined') {
-                return swal({
-                    title: "Required !!!",
-                    text: "Address is Required",
                     icon: "error",
                     timer: 2000,
                 });

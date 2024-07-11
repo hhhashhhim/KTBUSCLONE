@@ -82,7 +82,6 @@
                                                 >
                                                     <thead>
                                                     <tr>
-                                                        <th>Sr No.</th>
                                                         <th>Via</th>
                                                         <th>Start Date</th>
                                                         <th>End Date</th>
@@ -97,7 +96,6 @@
                                                     </thead>
                                                     <tbody>
                                                     <tr v-for="(schedule, i) in schedules" :key="i">
-                                                        <td>{{ i + 1 }}</td>
                                                         <td>{{ schedule.schedule.name }}</td>
                                                         <td>{{ schedule.schedule.start_date }}</td>
                                                         <td>{{ schedule.schedule.end_date }}</td>
