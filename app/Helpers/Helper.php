@@ -449,7 +449,7 @@ Seat# $seats,
 ".$detail->departure_city->name." to ".$detail->destination_city->name."
 $html
 Date ".$detail->date." Is Reserved
-Buy your Ticket within 02hrs of reservation else your seat consider on change 
+Buy your Ticket within 02hrs of reservation else your seat consider on chance 
 For any inquiries/complains dial UAN 03111777333
 
 Terms & conditions applied.";

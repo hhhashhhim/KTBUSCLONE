@@ -22,7 +22,7 @@ class CreateTicketsTemplatesTable extends Migration
             $table->string('footer_text')->nullable();
             $table->integer('show_coupen');
             $table->string('address')->nullable();
-            $table->string('terms_condition')->nullable();
+            $table->text('terms_condition')->nullable();
             $table->string('status')->nullable();
             $table->integer('company_id')->nullable();
             $table->integer('added_by')->nullable();
