@@ -51046,7 +51046,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (newValue) {
         this.addForm.phoneNumber = "";
       } else {
-        this.addForm.phoneNumber = '0000-0000000';
+        this.addForm.phoneNumber = '';
       }
     }
   },
@@ -51177,21 +51177,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 6:
-                if (!(_this4.addForm.phoneNumber == '' || typeof _this4.addForm.phoneNumber == 'undefined')) {
-                  _context3.next = 8;
-                  break;
-                }
-
-                return _context3.abrupt("return", swal({
-                  title: "Required !!!",
-                  text: "Phone Number is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 8:
                 if (!(_this4.addForm.termsCondition == '' || typeof _this4.addForm.termsCondition == 'undefined')) {
-                  _context3.next = 10;
+                  _context3.next = 8;
                   break;
                 }
 
@@ -51202,9 +51189,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 10:
+              case 8:
                 if (!(_this4.addForm.footerText == '0')) {
-                  _context3.next = 12;
+                  _context3.next = 10;
                   break;
                 }
 
@@ -51215,12 +51202,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 12:
+              case 10:
                 _this4.loading = true;
-                _context3.next = 15;
+                _context3.next = 13;
                 return _this4.callApi("post", 'settings/tickets/store', _this4.addForm);
 
-              case 15:
+              case 13:
                 resAddTemplate = _context3.sent;
 
                 if (resAddTemplate.status == 201) {
@@ -51261,7 +51248,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 18:
+              case 16:
               case "end":
                 return _context3.stop();
             }
@@ -51350,21 +51337,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 6:
-                if (!(_this6.dataEdit.phone == '' || typeof _this6.dataEdit.phone == 'undefined')) {
-                  _context5.next = 8;
-                  break;
-                }
-
-                return _context5.abrupt("return", swal({
-                  title: "Required !!!",
-                  text: "Phone Number is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 8:
                 if (!(_this6.dataEdit.terms_condition == '' || typeof _this6.dataEdit.terms_condition == 'undefined')) {
-                  _context5.next = 10;
+                  _context5.next = 8;
                   break;
                 }
 
@@ -51375,9 +51349,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 10:
+              case 8:
                 if (!(_this6.dataEdit.footer_text == '0' || _this6.dataEdit.footer_text == null)) {
-                  _context5.next = 12;
+                  _context5.next = 10;
                   break;
                 }
 
@@ -51388,12 +51362,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 12:
+              case 10:
                 _this6.loadingEdit = true;
-                _context5.next = 15;
+                _context5.next = 13;
                 return _this6.callApi("post", 'settings/tickets/update', _this6.dataEdit);
 
-              case 15:
+              case 13:
                 resEditTemplate = _context5.sent;
 
                 if (resEditTemplate.status == 200) {
@@ -51432,7 +51406,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 18:
+              case 16:
               case "end":
                 return _context5.stop();
             }
@@ -85424,9 +85398,7 @@ var _hoisted_50 = {
 
 var _hoisted_51 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "phoneNumber"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Phone Number "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-  "class": "text-danger ml-1"
-}, "*")], -1
+}, "Phone Number", -1
 /* HOISTED */
 );
 
@@ -85539,9 +85511,7 @@ var _hoisted_73 = {
 
 var _hoisted_74 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "phoneNumber"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Phone Number "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-  "class": "text-danger ml-1"
-}, "*")], -1
+}, "Phone Number", -1
 /* HOISTED */
 );
 

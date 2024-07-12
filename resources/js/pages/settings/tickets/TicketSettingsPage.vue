@@ -106,7 +106,7 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>
+                        <label for="phoneNumber">Phone Number</label>
 
                         <vue-mask id="phoneNumber" class="form-control" v-model="addForm.phoneNumber" mask="0000-0000000"
                             :raw="false" :options="optionsPhone">
@@ -177,7 +177,7 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-3">
-                        <label for="phoneNumber">Phone Number <span class="text-danger ml-1">*</span></label>
+                        <label for="phoneNumber">Phone Number</label>
 
                         <vue-mask id="phoneNumber" class="form-control" v-model="dataEdit.phone" mask="0000-0000000"
                             :raw="false" :options="optionsPhone">
@@ -298,7 +298,7 @@ export default {
             }
             else
             {
-                this.addForm.phoneNumber = '0000-0000000';
+                this.addForm.phoneNumber = '';
             }
         },
     },
@@ -378,14 +378,6 @@ export default {
                 return swal({
                     title: "Required !!!",
                     text: "UAN Number is Required",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
-            if (this.addForm.phoneNumber == '' || typeof this.addForm.phoneNumber == 'undefined') {
-                return swal({
-                    title: "Required !!!",
-                    text: "Phone Number is Required",
                     icon: "error",
                     timer: 2000,
                 });
@@ -487,14 +479,6 @@ export default {
                 return swal({
                     title: "Required !!!",
                     text: "UAN Number is Required",
-                    icon: "error",
-                    timer: 2000,
-                });
-            }
-            if (this.dataEdit.phone == '' || typeof this.dataEdit.phone == 'undefined') {
-                return swal({
-                    title: "Required !!!",
-                    text: "Phone Number is Required",
                     icon: "error",
                     timer: 2000,
                 });
