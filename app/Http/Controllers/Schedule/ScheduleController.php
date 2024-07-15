@@ -54,7 +54,7 @@ class ScheduleController extends Controller
         })
         ->where(['company_id' => Auth::user()->company_id])
         ->orderby("schedule_date","DESC")
-        ->orderby("created_at","ASC")
+        ->orderby("id","ASC")
         ->get()->unique("schedule_id");
 
         return $schedules;
