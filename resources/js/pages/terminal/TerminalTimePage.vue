@@ -50,7 +50,7 @@
                                                             </button>
                                                             <button class="btn btn-outline-danger"
                                                                     @click="removeRow($event, index)"
-                                                                    v-if="loop != 1">Remove
+                                                                    >Remove
                                                             </button>
                                                         </td>
                                                         <td v-else></td>
@@ -192,14 +192,14 @@ export default {
         async add() {
 
             // validation for empty data
-            if (!this.postData.terminal_id || this.postData.route.length == 0 || this.postData.time.length == 0) {
-                return swal({
-                    title: "Error",
-                    text: "Please Fill All Field",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+            // if (!this.postData.terminal_id || this.postData.route.length == 0 || this.postData.time.length == 0) {
+            //     return swal({
+            //         title: "Error",
+            //         text: "Please Fill All Field",
+            //         icon: "error",
+            //         timer: 2000
+            //     });
+            // }
 
             // check if any index is empty or null in object
             for (var i = 0; i < this.postData.route.length; i++) {

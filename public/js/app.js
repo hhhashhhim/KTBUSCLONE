@@ -53676,29 +53676,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                if (!(!_this4.postData.terminal_id || _this4.postData.route.length == 0 || _this4.postData.time.length == 0)) {
-                  _context4.next = 2;
-                  break;
-                }
-
-                return _context4.abrupt("return", swal({
-                  title: "Error",
-                  text: "Please Fill All Field",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 2:
                 i = 0;
 
-              case 3:
+              case 1:
                 if (!(i < _this4.postData.route.length)) {
-                  _context4.next = 9;
+                  _context4.next = 7;
                   break;
                 }
 
                 if (!(!_this4.postData.route[i] || !_this4.postData.time[i])) {
-                  _context4.next = 6;
+                  _context4.next = 4;
                   break;
                 }
 
@@ -53709,17 +53696,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 6:
+              case 4:
                 i++;
-                _context4.next = 3;
+                _context4.next = 1;
                 break;
 
-              case 9:
+              case 7:
                 _this4.loading = true;
-                _context4.next = 12;
+                _context4.next = 10;
                 return _this4.callApi("post", "terminals/times/store", _this4.postData);
 
-              case 12:
+              case 10:
                 res = _context4.sent;
 
                 if (res.status === 200) {
@@ -53767,7 +53754,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 14:
+              case 12:
               case "end":
                 return _context4.stop();
             }
@@ -88721,15 +88708,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: _cache[0] || (_cache[0] = function () {
         return $options.addRow && $options.addRow.apply($options, arguments);
       })
-    }, "Add "), $data.loop != 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-      key: 0,
+    }, "Add "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
       "class": "btn btn-outline-danger",
       onClick: function onClick($event) {
         return $options.removeRow($event, index);
       }
     }, "Remove ", 8
     /* PROPS */
-    , _hoisted_20)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_21))]);
+    , _hoisted_20)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_21))]);
   }), 128
   /* KEYED_FRAGMENT */
   ))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [!$data.editAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
