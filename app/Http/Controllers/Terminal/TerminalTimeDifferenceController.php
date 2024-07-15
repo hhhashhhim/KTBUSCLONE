@@ -29,6 +29,7 @@ class TerminalTimeDifferenceController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+        return $request;
         try {
                 DB::beginTransaction();
                 if ($request->created == 0) {

@@ -45,11 +45,11 @@ class ScheduleController extends Controller
         ->where(function($q)use($request){
             if($request->departure_date)
             {
-                return $q->where("schedule_date",$request->departure_date);
+                $q->where("schedule_date",$request->departure_date);
             }
             if($request->bus_class)
             {
-                return $q->where("bus_class_id",$request->bus_class);
+                $q->where("bus_class_id",$request->bus_class);
             }
         })
         ->where(['company_id' => Auth::user()->company_id])

@@ -120,7 +120,6 @@ class TicketsTemplateController extends Controller
                     'terminal_ids' => 'required',
                     'name' => 'required',
                     'uan' => 'required',
-                    'phone' => 'required',
                     'terms_condition' => 'required',
                     'footer_text' => 'required',
                 ];
@@ -129,7 +128,6 @@ class TicketsTemplateController extends Controller
                     'terminal_ids.required' => 'Please Select Any Terminal',
                     'name.required' => 'Name is required',
                     'uan.required' => 'UAN Number is required',
-                    'phone.required' => 'Phone Number is required',
                     'terms_condition.required' => 'Terms & Condition is required',
                     'footer_text.required' => 'Footer Text is required',
                 ];
@@ -137,8 +135,8 @@ class TicketsTemplateController extends Controller
                 
                 $template = TicketsTemplate::where('id', $request->id)->update([
                     'name' => $request->name,
-                    'uan' => plainContactAndCnic($request->uan),
-                    'phone' => plainContactAndCnic($request->phone),
+                    'uan' => $request->uan,
+                    'phone' => $request->phone,
                     'show_phone' => $request->show_phone,
                     'show_coupen' => $request->show_coupen,
                     'footer_text' => $request->footer_text,

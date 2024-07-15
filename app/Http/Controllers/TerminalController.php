@@ -360,8 +360,6 @@ class TerminalController extends Controller
                 DB::beginTransaction();
                 $request->validate([
                     "terminal_id" => 'required',
-                    "route" => 'required',
-                    "time" => 'required',
                 ]);
 
                 TerminalTimeDifference::where("terminal_id", $request->terminal_id)->delete();

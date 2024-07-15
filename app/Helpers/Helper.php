@@ -223,8 +223,16 @@ if (!function_exists('checkDiscountAmount')) {
             $discounted_fare = $discounted_fare - $tdiscount;
         }
         
-        $discount = $fare - $discounted_fare;
-        return $discount - ($discount % 10);
+        $discount = round($fare - $discounted_fare);
+        $result = $discount % 10;
+        if($result == 0)
+        {
+            return $discount;
+        }
+        else
+        {
+            return $discount - $result;
+        }
     }
 }
 
@@ -420,7 +428,6 @@ if (!function_exists('ticketConfirmedMessage')) {
             5 => 'Hamza_4-Device-5'
         ];
         $randomNumber = rand(1, 5);
-        $session = $names[$randomNumber];
 
 
         
@@ -777,8 +784,8 @@ if (!function_exists('codeImage')) {
 if (!function_exists('customRound')) {
     function customRound($value)
     {
-        
         // multiple of 10
+        $value = round($value);
         $result = $value % 10;
         // $new = 10 - ($result==0 ? 10 : $result);
         if($result == 0)
