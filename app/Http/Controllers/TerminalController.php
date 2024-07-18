@@ -352,7 +352,6 @@ class TerminalController extends Controller
 
     public function timeStore(Request $request)
     {
-        return $request;
         if(!checkPermissionButtons("edit-terminal"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
