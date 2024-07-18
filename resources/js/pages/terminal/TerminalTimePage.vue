@@ -20,7 +20,9 @@
                                                     <tr>
                                                         <th>Route</th>
                                                         <th>Time Difference</th>
-                                                        <th>Action</th>
+                                                        <th>Name</th>
+                                                        <th>Show in list</th>
+                                                        <th style="width: 200px">Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -43,6 +45,12 @@
                                                                    placeholder=""
                                                                    :value="postData.time[index]"
                                                                    :disabled="editAble"/>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control" :value="postData.name[index]" @change="saveRow($event, 'third', index)" :disabled="editAble">
+                                                        </td>
+                                                        <td>
+                                                            <input type="checkbox" :checked="postData.show[index]" @change="saveRow($event, 'fourth', index)" :disabled="editAble">
                                                         </td>
                                                         <td v-if="!editAble">
                                                             <button class="btn btn-outline-primary mx-2"
@@ -113,8 +121,10 @@ export default {
             // deleteFormID:'delete_city_form',
             postData: {
                 terminal_id: "",
+                name: [],
                 route: [],
                 time: [],
+                show: [],
             },
             success: false,
             errors: false,
@@ -162,6 +172,8 @@ export default {
                     for (var i = 0; i < time.length; i++) {
                         this.postData.route.push(time[i].route_id);
                         this.postData.time.push(time[i].time_difference);
+                        this.postData.name.push(time[i].display_name);
+                        this.postData.show.push(time[i].show);
                     }
                 } else {
                     this.loop = 1;
@@ -177,6 +189,12 @@ export default {
             if (fieldName == "second") {
                 this.postData.time[index] = event.target.value;
             }
+            if (fieldName == "third") {
+                this.postData.name[index] = event.target.value;
+            }
+            if (fieldName == "fourth") {
+                this.postData.show[index] = event.target.checked;
+            }
         },
         addRow() {
             this.loop++;
@@ -184,6 +202,8 @@ export default {
         removeRow(event, index) {
             this.postData.route.splice(index, 1);
             this.postData.time.splice(index, 1);
+            this.postData.name.splice(index, 1);
+            this.postData.show.splice(index, 1);
             this.loop--;
         },
         closeTab() {
@@ -203,7 +223,7 @@ export default {
 
             // check if any index is empty or null in object
             for (var i = 0; i < this.postData.route.length; i++) {
-                if (!this.postData.route[i] || !this.postData.time[i]) {
+                if (!this.postData.route[i] || !this.postData.time[i] || !this.postData.name[i]) {
                     return swal({
                         title: "Error",
                         text: "Please Fill All Field Or Remove Extra",
@@ -220,6 +240,8 @@ export default {
                 // $('#expense').DataTable().destroy();
                 this.postData.route = [];
                 this.postData.time = [];
+                this.postData.name = [];
+                this.postData.show = [];
 
                 this.loop = 0;
                 this.editAble = true;

@@ -1254,6 +1254,12 @@
                                                         <p class="mb-0">{{ innerItem.destination_city.name }}</p>
                                                     </div>
                                                 </div>
+                                                <div class="col-md-4">
+                                                    <div class="d-flex">
+                                                        <p class="mb-0 font-weight-bold mr-3">Tracking Id</p>
+                                                        <p class="mb-0">T{{ innerItem.id }}@{{ innerItem.invoice_id }}</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <!--Buttons-->
                                             <div class="row mt-3">
