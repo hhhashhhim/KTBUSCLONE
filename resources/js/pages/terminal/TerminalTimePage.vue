@@ -173,7 +173,7 @@ export default {
                         this.postData.route.push(time[i].route_id);
                         this.postData.time.push(time[i].time_difference);
                         this.postData.name.push(time[i].display_name);
-                        this.postData.show.push(time[i].show);
+                        this.postData.show.push(time[i].show ? true : false);
                     }
                 } else {
                     this.loop = 1;
