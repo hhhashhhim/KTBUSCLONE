@@ -397,24 +397,19 @@ if (!function_exists('ticketConfirmedMessage')) {
         
         // this is for timing from different terminal
         $html = "";
-        $terminalTime = TerminalTimeDifference::where(['company_id' => $detail->company_id, 'city_id' => $detail->departure_city_id, 'route_id' => $detail->route_id])->with("terminal:id,name")->get();
+        $terminalTime = TerminalTimeDifference::where(['company_id' => $detail->company_id, 'city_id' => $detail->departure_city_id, 'route_id' => $detail->route_id,'show'=>1])->with("terminal:id,name")->get();
         if($terminalTime->count() > 0)
         {
             foreach($terminalTime as $single)
             {
                 $sub = 0;
                 $sub = $single->time_difference * 60;
-                $html .= "*".$single->terminal->name.":* ".date("h:i A", strtotime($detail->date . " " . $detail->schedule_time) + $sub)."\n";
-                $terminal_id = $single->terminal_id;
-            }
-            if($detail->terminal_id != $terminal_id)
-            {
-                $html .= "*".$detail->terminal->name.":* ".date("h:i A", strtotime($detail->schedule_time))."\n";
+                $html .= "*".($single->display_name ? $single->display_name : 'Time').":* ".date("h:i A", strtotime($detail->date . " " . $detail->schedule_time) + $sub)."\n";
             }
         }
         else
         {
-            $html .= "*".$detail->terminal->name.":* ".date("h:i A", strtotime($detail->schedule_time));
+            $html .= "*Time:* ".date("h:i A", strtotime($detail->schedule_time));
         }
 
         

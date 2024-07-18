@@ -103,7 +103,8 @@
         <br>
         <div id="barcode-area">
             <div class="clear-both">
-                <p class="my-5 font-weight-bold float-left">{{ "TKT".$data['tickets'][$key]['id']."INV".$data['tickets'][$key]['invoice_id'] }}</p>
+                <p class="my-5 font-weight-bold float-left">Tracking Id</p>
+                <p class="my-5 float-right">{{ "T".$data['tickets'][$key]['id']."@".$data['tickets'][$key]['invoice_id'] }}</p>
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Customer Name :</p>

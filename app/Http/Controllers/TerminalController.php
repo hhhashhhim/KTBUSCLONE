@@ -371,6 +371,8 @@ class TerminalController extends Controller
                             'terminal_id' => $request->terminal_id,
                             'city_id' => $city_id,
                             'route_id' => $request->route[$key],
+                            'display_name' => $request->name[$key],
+                            'show' => $request->show[$key],
                             'time_difference' => $request->time[$key],
                             'company_id' => Auth::user()->company_id,
                             'added_by' => Auth::user()->id,
