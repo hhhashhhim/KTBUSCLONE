@@ -59,7 +59,7 @@ class ConfirmCancellationReportController extends Controller
             $q->type = $q->cancel_ticket->type;
             $q->cancel_reason = $q->cancel_ticket->reason;
             $q->cancel_by = User::find($q->cancel_ticket->added_by)->name??'N/A';
-            $q->cancel_date = $q->cancel_ticket->time;
+            $q->cancel_date = date("h:i A | d-m-y",strtotime($q->cancel_ticket->time));
             $q->bus_time = date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time));
             $q->passenger_name = Customer::find($q->customer_id)->name;
             $q->passenger_contact = formatContact(Customer::find($q->customer_id)->contact);
