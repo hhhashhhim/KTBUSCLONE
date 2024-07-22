@@ -558,6 +558,7 @@ class BookingApiController extends Controller
                 $schedule->bus_class->seat_map = $seatMap;
                 $data = $schedule->bus_class;
                 $data->total_seats = $count;
+                $data->terminal_times = terminalTimes($scheduleDetail,$schedule->route_id);
 
 
 

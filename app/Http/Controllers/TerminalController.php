@@ -198,6 +198,7 @@ class TerminalController extends Controller
                     'active_sms' => $request->active_sms ? 1 : 0,
                     'status' => (int)$request->status,
                     'other_terminal_passenger_detail' => $request->other_terminal_passenger_detail,
+                    'send_message' => $request->send_message,
                 ]);
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,

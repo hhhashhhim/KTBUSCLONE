@@ -11,6 +11,7 @@ use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use App\Models\Discount\Discount;
 use App\Models\Schedule\Schedule;
+use App\Models\Terminal;
 use App\Models\Booking\TicketIsPartial;
 use App\Models\Company;
 use App\Models\Terminal\TerminalTimeDifference;
@@ -316,7 +317,7 @@ if (!function_exists('updateAdvancedSeat')) {
                 'schedule_time' => $request->departure_time,
                 'invoice_id' => $invoice->id,
                 'seat_fare' => $request->reservedFare[$key],
-                'discount' => $checkDiscount + ($request->discount ? round($request->discount / count($request->alreadyBookedId)) : ($finalAmountDiscount ? ($finalAmountDiscount / count($request->alreadyBookedId)) : 0)),
+                'discount' => ($request->discount ? round($request->discount / count($request->alreadyBookedId)) : ($finalAmountDiscount ? ($finalAmountDiscount / count($request->alreadyBookedId)) : 0)),
                 'display_discount' => $checkDiscount,
                 'remarks' => $request->remarks,
                 'customer_id' => $customerData->id,
@@ -385,12 +386,42 @@ if (!function_exists('updateAdvancedSeat')) {
     }
 }
 
+if (!function_exists('terminalTimes')) {
+    function terminalTimes($detail,$route)
+    {
+        $departure_times = [];
+        $terminalTime = TerminalTimeDifference::where(['company_id' => Auth::user()->company_id, 'city_id' => $detail->departure_id, 'route_id' => $route,'show'=>1])->with("terminal:id,name")->get();
+        if($terminalTime->count() > 0)
+        {
+            foreach($terminalTime as $single)
+            {
+                $time = (object)[];
+                $sub = 0;
+                $sub = $single->time_difference * 60;
+                $time->terminal_name = $single->display_name ? $single->display_name : 'time';
+                $time->terminal_time = date("h:i A", strtotime($detail->departure_date . " " . $detail->departure_time) + $sub);
+                $departure_times[] = $time;
+            }
+        }
+        else
+        {
+            $time = (object)[];
+            $time->terminal_name = 'time';
+            $time->terminal_time = date("h:i A", strtotime($detail->departure_time));
+            $departure_times[] = $time;
+        }
+
+        return $departure_times;
+    }
+}
+
 
 if (!function_exists('ticketConfirmedMessage')) {
     function ticketConfirmedMessage($tickets,$type)
     {
         $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
-        if($auth_key)
+        $message_allow = Terminal::where("id",Auth::user()->terminal_id)->first()->send_message;
+        if($auth_key && $message_allow)
         {
         $seats = implode(",",Ticket::whereIn("id",$tickets)->pluck("seat_no")->toArray());
         $detail = Ticket::where("id",$tickets[0])->with("departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
