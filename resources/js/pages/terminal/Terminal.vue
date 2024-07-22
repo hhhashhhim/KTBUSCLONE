@@ -359,6 +359,13 @@
                             <lable class="mx-1">Show detail</lable>
                         </div>
                     </div>
+                    <div class="form-group col-md-4">
+                        <label for="phoneNumber">Send whatsapp message</label>
+                        <div class="d-block">
+                            <input type="checkbox" v-model="dataEdit.send_message">
+                            <lable class="mx-1">yes</lable>
+                        </div>
+                    </div>
                     <!-- <div class="form-group col-md-2 d-flex align-items-center">
                         <label class="mt-4" for="active">Online Availability </label>
                         <label class="colorinput mx-3 mt-3">
@@ -757,6 +764,7 @@ export default {
         async editTerminal(single) {
             this.dataEdit = single;
             this.dataEdit.other_terminal_passenger_detail = single.other_terminal_passenger_detail == 1 ? true : false;
+            this.dataEdit.send_message = single.send_message == 1 ? true : false;
         },
         async terminalDetail(id) {
             const getTerminalRes = await this.callApi("post", "terminals/getTerminal", {id: id});
