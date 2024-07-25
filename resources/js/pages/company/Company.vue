@@ -394,6 +394,15 @@ export default {
                             allow: true,
                         },
                         {
+                            name: "sub-routes",
+                            allow: true,
+                            buttons: [
+                                {name: "add-sub-route", allow: true},
+                                {name: "edit-sub-route", allow: true},
+                                {name: "delete-sub-route", allow: true}
+                            ],
+                        },
+                        {
                             name: "routes",
                             allow: true,
                             buttons: [

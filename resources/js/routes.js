@@ -9,6 +9,7 @@ import Login from "./pages/auth/Login.vue";
 import Terminal from "./pages/terminal/Terminal.vue";
 import Dashboard from "./pages/auth/Dashboard.vue";
 import FareTable from "./pages/fareTable/FareTable.vue";
+import SubRoute from "./pages/route/SubRoutePage.vue";
 import RoutePage from "./pages/route/RoutePage.vue";
 import CitiesPage from "./pages/city/CitiesPage.vue";
 import DiscountPage from "./pages/discount/DiscountPage.vue";
@@ -112,6 +113,11 @@ const routes = [
         path: url + "fare-table",
         component: FareTable,
         name: "fare-table"
+    },
+    {
+        path: url + "sub-routes",
+        component: SubRoute,
+        name: "sub-routes"
     },
     {
         path: url + "fare-class",

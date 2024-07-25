@@ -46,6 +46,11 @@
                                 <i class="fas fa-table"></i> Fare Table
                             </router-link>
                         </li>
+                        <li class="dropdown" v-if="checkForSubmenu('sub-routes')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'sub-routes' }">
+                                <i class="fas fa-city"></i> Sub Routes
+                            </router-link>
+                        </li>
                         <li class="dropdown" v-if="checkForSubmenu('routes')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'routes-page' }">
                                 <i class="fas fa-route"></i> Routes
