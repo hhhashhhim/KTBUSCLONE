@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\RouteController;
+use App\Http\Controllers\SubRouteController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,14 @@ Route::group(['prefix' => 'web/v1/routes','middleware' => ['auth:sanctum']], fun
         Route::post('/update', [RouteController::class, 'visibilityUpdate']);
     
     });
+
+    Route::group(['prefix' => '/sub-routes'], function () {
+        Route::post('/', [SubRouteController::class, 'index']);
+        Route::post('/store', [SubRouteController::class, 'store']);
+        Route::post('/update', [SubRouteController::class, 'update']);
+    
+    });
+
 });
 
 ?>

@@ -11,6 +11,7 @@ use App\Models\Route\Route;
 use App\Models\Route\RouteFare;
 use App\Models\Discount\Discount;
 use App\Models\Schedule\Schedule;
+use App\Models\Route\SubRoute;
 use App\Models\Terminal;
 use App\Models\Booking\TicketIsPartial;
 use App\Models\Company;
@@ -425,7 +426,7 @@ if (!function_exists('ticketConfirmedMessage')) {
         {
         $seats = implode(",",Ticket::whereIn("id",$tickets)->pluck("seat_no")->toArray());
         $detail = Ticket::where("id",$tickets[0])->with("departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
-        
+        $cancelMessage = SubRoute::where(["from_city"=>$detail->departure_city_id,"to_city"=>$detail->destination_city_id])->first()->cancel_message??'';
         // this is for timing from different terminal
         $html = "";
         $terminalTime = TerminalTimeDifference::where(['company_id' => $detail->company_id, 'city_id' => $detail->departure_city_id, 'route_id' => $detail->route_id,'show'=>1])->with("terminal:id,name")->get();
@@ -482,8 +483,7 @@ Seat# $seats,
 ".$detail->departure_city->name." to ".$detail->destination_city->name."
 $html
 Date ".$detail->date." Is Reserved
-Buy your Ticket within 02hrs of reservation else your seat consider on chance 
-For any inquiries/complains dial UAN 03111777333
+".$cancelMessage."
 
 Terms & conditions applied.";
 
