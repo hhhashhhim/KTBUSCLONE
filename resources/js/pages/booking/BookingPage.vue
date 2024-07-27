@@ -3991,7 +3991,7 @@ export default {
                 single.departure_time = this.rescheduleData.departure_time;
             });
             this.loadingRescheduleButton = true;
-            const resReschedule = await this.callApi("post", "booking/reschedule", {'data': this.mainAllRescheduleData});
+            const resReschedule = await this.callApi("post", "booking/store", {'data': this.mainAllRescheduleData,"rc_flag": 1});
             if (resReschedule.status == 200) {
                 this.loadingRescheduleButton = false;
                 swal({
