@@ -91,7 +91,7 @@
         <div><span><b>UAN(24/7) : </b>{{isset($data['format']->uan) ? $data['format']->uan : "03-111-777-333"}}</span></div>
         @if(isset($data['format']->phone) && $data['format']->show_phone == 0)
         @else
-        <div><span><b>Phone : </b> {{ isset($data['format']->phone) ?  formatContact($data['format']->phone) : formatContact(auth()->user()->terminal->contact) }}</span>
+        <div><span><b>Phone : </b> {{ $data['format']->show_phone == 1 ?  formatContact($data['format']->phone) : formatContact(auth()->user()->terminal->contact) }}</span>
         </div>
         @endif
     </div>
