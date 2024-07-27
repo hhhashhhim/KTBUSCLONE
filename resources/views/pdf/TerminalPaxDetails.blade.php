@@ -88,7 +88,7 @@
             </div>
             @endif
         @else
-        <div><span><b>Phone : </b> formatContact(auth()->user()->terminal->contact) </span>
+        <div><span><b>Phone : </b> {{ formatContact(auth()->user()->terminal->contact) }} </span>
         </div>
         @endif
     </div>
