@@ -103,6 +103,11 @@ class BookingController extends Controller
 
         try {
             $lock = Cache::lock("tickets")->block(7, function () use ($request) {
+            // this is for cache lock accuracy so i am calling reschedule method from there.
+            if(isset($request->rc_flag))
+            {
+                return $this->singleReschedule($request);
+            }
             DB::beginTransaction();
             if ($request->terminalId == 0 && is_null(Auth::user()->terminal_id)) {
                 //Check if terminal is assigned to user
@@ -398,12 +403,13 @@ class BookingController extends Controller
     }
 
 
-    public function singleReschedule(Request $request)
+    private function singleReschedule($request)
     {
         if(!checkPermissionButtons("reschedule-seats"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+  
         try {
             DB::beginTransaction();
             foreach ($request->data as $key => $item) {

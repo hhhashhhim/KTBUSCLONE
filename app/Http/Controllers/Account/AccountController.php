@@ -21,7 +21,7 @@ class AccountController extends Controller
         $secondLevel = Account::where('account_id' , '!=' ,'0')->get();
        
         $fourthLevel = AccountGroup::where('parent_id','!=','0')
-        ->with('account:id,name,code', 'group:id,name,code')
+        ->with('level_two:id,name,code', 'level_three:id,name,code')
         ->orderBy('name')
         ->get();
 
@@ -68,6 +68,100 @@ class AccountController extends Controller
 
             DB::commit();
             return $group;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
+
+    }
+
+    public function groupUpdate(Request $request)
+    {
+        // return $request->group->name;
+        try {
+            $request->validate([
+                'account_id' => [
+                    'required',
+                    'integer',
+                    'gt:0', // Ensures that the account_id is greater than 0
+                ],
+                'category' => [
+                    'required',
+                ],
+            ]);
+            
+            if($request->category == "parent")
+            {
+                $request->validate([
+                    'level_three.name' => [
+                        'required',
+                        Rule::unique('account_groups', 'name')->ignore($request->level_three['id']),
+                    ],
+                ]);
+            }
+            else
+            {
+                $request->validate([
+                    'name' => [
+                        'required',
+                        Rule::unique('account_groups', 'name')->ignore($request->id),
+                    ],
+                    'parent_id' => [
+                        'required',
+                        'integer',
+                        'gt:0',
+                    ],
+                ]);
+            }
+            DB::beginTransaction();
+
+            return 'helo';
+
+            if($request->category == "parent")
+            {
+                if($request->account_id == $request->level_two['id'])
+                {
+                    AccountGroup::where('id', $request->id )->update([
+                        'name'       => strtoupper($request->name),
+                    ]);
+                }
+                else
+                {
+                    $code = AccountGroup::latest('id')->where('account_id', $request->account_id )->where('parent_id', 0 )->limit(1)->value('code') + 1;
+                    $code = str_pad($code, 2, '0', STR_PAD_LEFT);
+
+                    AccountGroup::where('id', $request->id )->update([
+                        'name'       => strtoupper($request->name),
+                        'code'       => $code,
+                        'account_id' => $request->account_id, 
+                        'parent_id'  => 0,
+                    ]);
+                }
+            }
+            else
+            {
+                if($request->parent_id == $request->level_three['id'])
+                {
+                    AccountGroup::where('id', $request->id )->update([
+                        'name'       => strtoupper($request->name),
+                    ]);
+                }
+                else
+                {
+                    $code = AccountGroup::latest('id')->where('parent_id', $request->parent_id )->limit(1)->value('code') + 1;
+                    $code = str_pad($code, 3, '0', STR_PAD_LEFT);
+
+                    AccountGroup::where('id', $request->id )->update([
+                        'name'       => strtoupper($request->name),
+                        'code'       => $code,
+                        'account_id' => $request->account_id, 
+                        'parent_id'  => $request->parent_id,
+                    ]);
+                }
+            }
+
+            DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Database transaction error: ' . $e->getMessage());

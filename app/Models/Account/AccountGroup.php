@@ -12,11 +12,11 @@ class AccountGroup extends Model
     use HasFactory, softDeletes;
     protected $guarded = [];
 
-    public function account(){
+    public function level_two(){
         return $this->belongsTo( Account::class, 'account_id', 'id');
     }
 
-    public function group(){
+    public function level_three(){
         return $this->belongsTo( AccountGroup::class, 'parent_id', 'id');
     }
 }
