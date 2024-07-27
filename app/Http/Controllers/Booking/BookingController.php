@@ -1758,7 +1758,12 @@ class BookingController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $ticketsElt = TicketELT::with('schedule', 'customer', 'ticket.seatClass:id,name', 'destination', 'departure')->where(['company_id' => Auth::user()->company_id, 'id' => $request->elt_ids])->first();
-        $format = TicketsTemplate::where(['company_id' => Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id])->first();
+        $format = TicketsTemplate::with("terminal")
+        ->join("ticket_template_terminals","ticket_template_terminals.ticket_template_id","tickets_templates.id")
+        ->whereNull('tickets_templates.deleted_at')
+        ->whereNull('ticket_template_terminals.deleted_at')
+        ->where(['tickets_templates.company_id'=> Auth::user()->company_id,"ticket_template_terminals.terminal_id"=>Auth::user()->terminal_id])->where('tickets_templates.status', 1)
+        ->first();;
         $finalData = [
             'elt' => $ticketsElt,
             'format' => $format,

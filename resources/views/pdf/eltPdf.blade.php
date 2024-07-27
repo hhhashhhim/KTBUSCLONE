@@ -155,10 +155,18 @@
             <br>
 {{--            {{dd($data['format'])}}--}}
 
-            <div class="companyname" style="margin-bottom: 15px;"><span>Kainat Travels</span></div>
-            <div class="companyAddress"><span>{{ isset($data['format']->address) ? $data['format']->address : "Mian Pirwadhai Mor Peshawar Road Rawalpindi"}}</span>
-                <div><span><b>UAN(24/7) : </b>03-111-777-333</span></div>
-                <div><span><b>Phone : </b> {{ isset($data['format']->phone) ?  formatContact($data['format']->phone) : "0310-8886286" }}</span></div>
+            <div class="companyname" style="margin-bottom: 15px;"><span>{{isset($data['format']->name) ? $data['format']->name : "Kainat Travels"}}</span></div>
+            <div class="companyAddress"><span>{{ auth()->user()->terminal->address }}</span>
+                <div><span><b>UAN(24/7) : </b>{{isset($data['format']->uan) ? $data['format']->uan : "03-111-777-333"}}</span></div>
+                @if(isset($data['format']) && $data['format']->show_phone == 1)
+                    @if(isset($data['format']->phone))
+                    <div><span><b>Phone : </b> {{ formatContact($data['format']->phone) }}</span>
+                    </div>
+                    @endif
+                @else
+                <div><span><b>Phone : </b> {{ formatContact(auth()->user()->terminal->contact) }} </span>
+                </div>
+                @endif
             </div>
             <div class="custinfo" id="custinfo">
                 <div class="fa fa-qrcode" id="barcode-area">
