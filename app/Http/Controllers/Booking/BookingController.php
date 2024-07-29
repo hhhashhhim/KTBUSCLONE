@@ -412,6 +412,69 @@ class BookingController extends Controller
   
         try {
             DB::beginTransaction();
+            $scheduleDetail = ScheduleDetail::where([
+                'company_id' => Auth::user()->company_id,
+                'departure_date' => $request->data[0]['rescheduleDate'],
+                'departure_id' => $request->data[0]['dataDepartureCity'],
+                'destination_id' => $request->data[0]['dataDestination'],
+                'schedule_id' => $request->data[0]['rescheduleSchedule'],
+                'departure_time' =>  date("H:i:s",strtotime($request->data[0]['departure_time'])),
+            ])->first();
+            $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$scheduleDetail->schedule_id,"schedule_date"=>$scheduleDetail->schedule_date])->first();
+            $schedule = Schedule::where('id', $request->data[0]['newDepartureTime'])->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+            /*
+            *   Validation
+            *   Only Purpose to Seat Avoid Duplication 
+            *   $lastDestination means last destination Route will have, Route are saved as 
+            *   Route 1) RWP to Moro
+            *   Route 2) Moro to Karachi 
+            *   $lastDestination will have Karachi
+            *   $allFaresOfRout will have RWP and Moro
+            *   
+            */
+            $lastDestination = $schedule->route->fares->last();
+            $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
+            //RWP MORO KARACHI are now single Array
+            array_push($allFaresOfRoute, $lastDestination->destination_city_id);
+            //Example MORO departure will have 1 index  
+            $scheduleDepIndex = array_search( $scheduleDetail->departure_id, $allFaresOfRoute );
+            //Example Karachi destination will have 2 index  
+            $scheduleDesIndex = array_search( $scheduleDetail->destination_id, $allFaresOfRoute );
+
+         
+            
+            
+           
+
+            foreach($request->data as $key => $item)
+            {
+                //Seat 35
+                $tkt = Ticket::where( "seat_no", $item['selected_seatNo'] )
+                ->where([
+                    'company_id'    => Auth::user()->company_id, 
+                    'schedule_date' => date('Y-m-d', strtotime($scheduleDetail->schedule_date) ), 
+                    'schedule_id'   => $schedule->id
+                ])
+                ->first();
+                //Check if Ticket is Booked for RWP to MORO Target is to book MORO to Karachi
+                // $ticketDepIndex will have 0 as Karachi is at index 0
+                $ticketDepIndex = array_search( $tkt->departure_city_id, $allFaresOfRoute );
+                // $ticketDesIndex will have 1 as MORO is at index 1 
+                $ticketDesIndex = array_search( $tkt->destination_city_id, $allFaresOfRoute );
+
+                /*
+                *   $ticketDepIndex for RWP will have 0 and $scheduleDepIndex will have 1 for MORO $scheduleDesIndex will have 2 For Karachi
+                *   Condition 1) ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex)
+                *   Output 0 >= 1 && 0 < 2 Result False
+                *   Condition 2 )($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
+                *   Output 1 > 1 > 1 && 1 <= 2 Result False
+                */
+                if( ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
+                    || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
+                {
+                    return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
+                }
+            }
             foreach ($request->data as $key => $item) {
                 $ticket = $item['dataAll'];
                 if ($item['existingDate'] == $item['rescheduleDate']) {
@@ -421,17 +484,10 @@ class BookingController extends Controller
                     $bookingNo = Ticket::where('date', $item['rescheduleDate'])->latest()->first()->booking_no ?? 0;
                     ++$bookingNo;
                 }
+                
              
-                $scheduleDetail = ScheduleDetail::where([
-                    'company_id' => Auth::user()->company_id,
-                    'departure_date' => $item['rescheduleDate'],
-                    'departure_id' => $item['dataDepartureCity'],
-                    'destination_id' => $item['dataDestination'],
-                    'schedule_id' => $item['rescheduleSchedule'],
-                    'departure_time' =>  date("H:i:s",strtotime($item['departure_time'])),
-                ])->first();
                 $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$scheduleDetail->schedule_id,"schedule_date"=>$scheduleDetail->schedule_date])->first();
-                $schedule = Schedule::where('id', $ticket['schedule_id'])->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                $schedule = Schedule::where('id', $item['newDepartureTime'])->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                 
                 
                 $departure_city_id = $schedule->route->fares->first()->departure_city_id;
@@ -1763,7 +1819,7 @@ class BookingController extends Controller
         ->whereNull('tickets_templates.deleted_at')
         ->whereNull('ticket_template_terminals.deleted_at')
         ->where(['tickets_templates.company_id'=> Auth::user()->company_id,"ticket_template_terminals.terminal_id"=>Auth::user()->terminal_id])->where('tickets_templates.status', 1)
-        ->first();;
+        ->first();
         $finalData = [
             'elt' => $ticketsElt,
             'format' => $format,
