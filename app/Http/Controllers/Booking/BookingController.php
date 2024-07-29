@@ -421,7 +421,7 @@ class BookingController extends Controller
                 'departure_time' =>  date("H:i:s",strtotime($request->data[0]['departure_time'])),
             ])->first();
             $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$scheduleDetail->schedule_id,"schedule_date"=>$scheduleDetail->schedule_date])->first();
-            $schedule = Schedule::where('id', $request->data[0]['newDepartureTime'])->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+            $schedule = Schedule::where('id', $scheduleDetail->schedule_id)->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             /*
             *   Validation
             *   Only Purpose to Seat Avoid Duplication 
@@ -456,23 +456,26 @@ class BookingController extends Controller
                     'schedule_id'   => $schedule->id
                 ])
                 ->first();
-                //Check if Ticket is Booked for RWP to MORO Target is to book MORO to Karachi
-                // $ticketDepIndex will have 0 as Karachi is at index 0
-                $ticketDepIndex = array_search( $tkt->departure_city_id, $allFaresOfRoute );
-                // $ticketDesIndex will have 1 as MORO is at index 1 
-                $ticketDesIndex = array_search( $tkt->destination_city_id, $allFaresOfRoute );
-
-                /*
-                *   $ticketDepIndex for RWP will have 0 and $scheduleDepIndex will have 1 for MORO $scheduleDesIndex will have 2 For Karachi
-                *   Condition 1) ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex)
-                *   Output 0 >= 1 && 0 < 2 Result False
-                *   Condition 2 )($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
-                *   Output 1 > 1 > 1 && 1 <= 2 Result False
-                */
-                if( ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
-                    || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
+                if($tkt)
                 {
-                    return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
+                    //Check if Ticket is Booked for RWP to MORO Target is to book MORO to Karachi
+                    // $ticketDepIndex will have 0 as Karachi is at index 0
+                    $ticketDepIndex = array_search( $tkt->departure_city_id, $allFaresOfRoute );
+                    // $ticketDesIndex will have 1 as MORO is at index 1 
+                    $ticketDesIndex = array_search( $tkt->destination_city_id, $allFaresOfRoute );
+
+                    /*
+                    *   $ticketDepIndex for RWP will have 0 and $scheduleDepIndex will have 1 for MORO $scheduleDesIndex will have 2 For Karachi
+                    *   Condition 1) ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex)
+                    *   Output 0 >= 1 && 0 < 2 Result False
+                    *   Condition 2 )($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
+                    *   Output 1 > 1 > 1 && 1 <= 2 Result False
+                    */
+                    if( ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
+                        || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
+                    {
+                        return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
+                    }
                 }
             }
             foreach ($request->data as $key => $item) {
