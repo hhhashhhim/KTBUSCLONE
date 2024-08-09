@@ -100,9 +100,9 @@
                                                                 <th>Invoice</th>
                                                                 <th>Terminal Name</th>
                                                                 <th>Status</th>
+                                                                <th>Action By</th>
                                                                 <th>Sale / Refund</th>
                                                                 <th>Commission</th>
-                                                                <th>Action By</th>
                                                             </tr>
                                                             </thead>
 
@@ -119,8 +119,8 @@
                                                                 <td>{{ data.invoice_id }}</td>
                                                                 <td>{{ data.terminal.name }}</td>
                                                                 <td>{{ data.type }}</td>
-                                                                <td>{{ data.type == 'canceled' ? data.refund : (data.seat_fare - data.discount) }}</td>
                                                                 <td>{{ data.updated_name.name }}</td>
+                                                                <td>{{ data.type == 'canceled' ? data.refund : (data.seat_fare - data.discount) }}</td>
                                                                 <td>{{ data.comsn }}</td>
                                                             </tr>
                                                             <tr v-if="filters.record.length > 0">
