@@ -27998,7 +27998,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           // Ensure that data.seat_fare and data.discount are numeric values
           var comsn = Number(data.comsn) || 0; // Add the difference to the sum
 
-          return sum + comsn;
+          if (data.type == 'canceled') {
+            return sum + 0;
+          } else {
+            return sum + comsn;
+          }
         }, 0);
       } else {
         return 0; // or handle the case when there are no records
@@ -60579,7 +60583,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.type == 'canceled' ? data.refund : data.seat_fare - data.discount), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.comsn), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.type == 'canceled' ? 0 : data.comsn), 1
     /* TEXT */
     )]);
   }), 128

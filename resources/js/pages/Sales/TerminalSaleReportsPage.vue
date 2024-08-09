@@ -121,7 +121,7 @@
                                                                 <td>{{ data.type }}</td>
                                                                 <td>{{ data.updated_name.name }}</td>
                                                                 <td>{{ data.type == 'canceled' ? data.refund : (data.seat_fare - data.discount) }}</td>
-                                                                <td>{{ data.comsn }}</td>
+                                                                <td>{{ data.type == 'canceled' ? 0 : data.comsn }}</td>
                                                             </tr>
                                                             <tr v-if="filters.record.length > 0">
                                                                 <th colspan="7"></th>
@@ -289,7 +289,15 @@ export default {
                     const comsn = Number(data.comsn) || 0;
 
                     // Add the difference to the sum
-                    return sum + comsn;
+                    
+                    if(data.type == 'canceled')
+                    {
+                        return sum + 0;
+                    }
+                    else
+                    {
+                        return sum + comsn;
+                    }
                 }, 0);
             } else {
                 return 0; // or handle the case when there are no records
