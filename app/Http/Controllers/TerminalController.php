@@ -400,12 +400,27 @@ class TerminalController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $tickets = Ticket::with('updated_name:id,name', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number","customer:id,name,cnic,contact","route:id,name,via")
+        $tickets = Ticket::with(
+                'updated_name:id,name',
+                'terminal:id,name',
+                'busClass:id,name',
+                'schedule:id,name,time',
+                "bus:id,bus_number",
+                "customer:id,name,cnic,contact",
+                "route:id,name,via",
+                "cancel_ticket:id,percentage,ticket_id"
+            )
             ->withTrashed()
             ->where('company_id', Auth::user()->company_id)
             ->where(function ($query) {
                 $query->where("type", "booked")
-                      ->orWhere("type", "over-issue");
+                      ->orWhere("type", "over-issue")
+                      ->orWhere(function($query) {
+                            $query->where("type", "canceled")
+                                ->whereHas('cancel_ticket', function ($query) {
+                                    $query->where('percentage', '>', 0);
+                                });
+                        });
                 })
             ->where(function($query) use ($request){
                 if($request->terminal)
@@ -424,14 +439,14 @@ class TerminalController extends Controller
                 return $query->whereIn('route_id', $request->route);
             })
             ->orderBy('date', 'desc')
-            ->get(["id","terminal_id","route_id","bus_class_id","schedule_date","schedule_time","updated_by","bus_id","invoice_id","seat_fare","discount","seat_no","customer_id","route_id"]);
+            ->get(["id","terminal_id","route_id","bus_class_id","schedule_date","schedule_time","updated_by","bus_id","invoice_id","seat_fare","discount","seat_no","customer_id","route_id","type"]);
 
         $tickets->map(function ($single) {
             $single->load(['commission'=>function($q){
                 $q->where("route_id",2);
                 $q->select("id","terminal_id","route_id","fix_commission","percentage_commission");
             }]);
-            
+
             if ($single->commission) 
             {
                 if($single->commission->fix_commission == 0)
@@ -451,8 +466,13 @@ class TerminalController extends Controller
                 $single->comsn =  0; 
             }
 
+            $refundValue = 0;
+            if($single->type == "canceled")
+            {
+                $refundValue = (($single->seat_fare - $single->discount) * $single->cancel_ticket->percentage) / 100;
+            }
 
-
+            $single->refund = $refundValue;
             $single->schedule_date_time = date('Y-m-d H:i:s', strtotime($single->schedule_date . ' ' . $single->schedule_time));
             return $single;
         });

@@ -19,7 +19,7 @@ class CreateAccountGroupsTable extends Migration
             $table->string('code');
             $table->integer('account_id');
             $table->integer('parent_id');
-            $table->integer('location_id');
+            $table->integer('company_id');
             $table->integer('added_by');
             $table->softDeletes();
             $table->timestamps();

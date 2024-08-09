@@ -17,11 +17,10 @@ class CreateAccountHeadsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('code');
+            $table->integer('parent_account_id');
             $table->integer('account_id');
-            $table->integer('child_account_id');
+            $table->integer('parent_group_id');
             $table->integer('group_id');
-            $table->integer('parent_id');
-            $table->integer('location_id');
             $table->integer('company_id');
             $table->integer('added_by');
             $table->integer('updated_by')->nullable();

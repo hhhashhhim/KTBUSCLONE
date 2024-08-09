@@ -18,7 +18,7 @@ class AccountController extends Controller
 
     public function accountGroups(Request $request)
     {
-        $secondLevel = Account::where('account_id' , '!=' ,'0')->get();
+        $secondLevel = Account::where('parent_id' , '!=' ,'0')->get();
        
         $fourthLevel = AccountGroup::where('parent_id','!=','0')
         ->with('level_two:id,name,code', 'level_three:id,name,code')
@@ -62,7 +62,7 @@ class AccountController extends Controller
                 'code'       => $code,
                 'account_id' => $request->secondLevel, 
                 'parent_id'  => $request->thirdLevel,
-                'location_id'  => 0,
+                'company_id'  => 0,
                 'added_by'         => Auth::user()->id
             ]);
 
@@ -80,86 +80,20 @@ class AccountController extends Controller
     {
         // return $request->group->name;
         try {
+            
             $request->validate([
-                'account_id' => [
+                'name' => [
                     'required',
-                    'integer',
-                    'gt:0', // Ensures that the account_id is greater than 0
-                ],
-                'category' => [
-                    'required',
+                    Rule::unique('account_groups', 'name')->ignore($request->id),
                 ],
             ]);
             
-            if($request->category == "parent")
-            {
-                $request->validate([
-                    'level_three.name' => [
-                        'required',
-                        Rule::unique('account_groups', 'name')->ignore($request->level_three['id']),
-                    ],
-                ]);
-            }
-            else
-            {
-                $request->validate([
-                    'name' => [
-                        'required',
-                        Rule::unique('account_groups', 'name')->ignore($request->id),
-                    ],
-                    'parent_id' => [
-                        'required',
-                        'integer',
-                        'gt:0',
-                    ],
-                ]);
-            }
             DB::beginTransaction();
 
-            return 'helo';
-
-            if($request->category == "parent")
-            {
-                if($request->account_id == $request->level_two['id'])
-                {
-                    AccountGroup::where('id', $request->id )->update([
-                        'name'       => strtoupper($request->name),
-                    ]);
-                }
-                else
-                {
-                    $code = AccountGroup::latest('id')->where('account_id', $request->account_id )->where('parent_id', 0 )->limit(1)->value('code') + 1;
-                    $code = str_pad($code, 2, '0', STR_PAD_LEFT);
-
-                    AccountGroup::where('id', $request->id )->update([
-                        'name'       => strtoupper($request->name),
-                        'code'       => $code,
-                        'account_id' => $request->account_id, 
-                        'parent_id'  => 0,
-                    ]);
-                }
-            }
-            else
-            {
-                if($request->parent_id == $request->level_three['id'])
-                {
-                    AccountGroup::where('id', $request->id )->update([
-                        'name'       => strtoupper($request->name),
-                    ]);
-                }
-                else
-                {
-                    $code = AccountGroup::latest('id')->where('parent_id', $request->parent_id )->limit(1)->value('code') + 1;
-                    $code = str_pad($code, 3, '0', STR_PAD_LEFT);
-
-                    AccountGroup::where('id', $request->id )->update([
-                        'name'       => strtoupper($request->name),
-                        'code'       => $code,
-                        'account_id' => $request->account_id, 
-                        'parent_id'  => $request->parent_id,
-                    ]);
-                }
-            }
+               
+            AccountGroup::where('id', $request->id )->update([
+                'name'       => strtoupper($request->name),
+            ]);
 
             DB::commit();
         } catch (Exception $e) {
@@ -168,5 +102,32 @@ class AccountController extends Controller
             return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
         }
 
+    }
+
+    public function secondLevelOfFirst($first)
+    {
+        $secondLevel = Account::where(["parent_id" => $first])->orderBy('id')->get(["id","name"]);
+        
+        return [
+            "secondLevel" => $secondLevel,
+        ];
+    }
+    
+    public function thirdLevelOfSecond($second)
+    {
+        $thirdLevel = AccountGroup::where(["account_id" => $second])->where('parent_id','0')->orderBy('id')->get(["id","name"]);
+        
+        return [
+            "thirdLevel" => $thirdLevel,
+        ];
+    }
+    
+    public function fourthLevelOfThird($third)
+    {
+        $fourthLevel = AccountGroup::where(["parent_id" => $third])->orderBy('id')->get(["id","name"]);
+        
+        return [
+            "fourthLevel" => $fourthLevel,
+        ];
     }
 }

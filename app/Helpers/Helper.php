@@ -8,6 +8,7 @@ use App\Models\FareTable;
 use App\Models\Hrm\Employee\Employee;
 use Illuminate\Support\Facades\Http;
 use App\Models\Route\Route;
+use App\Models\account\AccountHead;
 use App\Models\Route\RouteFare;
 use App\Models\Discount\Discount;
 use App\Models\Schedule\Schedule;
@@ -989,5 +990,27 @@ if (!function_exists('updateCloseSchedule')) {
             "ticket_merge_id" => null,
         ]);
         $closings->delete();
+    }
+
+    //  this function for creation of account head / Tier 5
+    if (!function_exists('accountHeadCreate')) {
+        function accountHeadCreate($name, $first, $second, $third, $fourth) {
+
+            $code = AccountHead::latest('id')->where('group_id', $fourth )->limit(1)->value('code') + 1;
+            $code = str_pad($code, 4, '0', STR_PAD_LEFT);
+
+            $head = AccountHead::create([
+                'name' => strtoupper($name),
+                'code' => $code,
+                'parent_account_id' => $first,
+                'account_id' => $second,
+                'parent_group_id' => $third,
+                'group_id' => $fourth,
+                'company_id' => Auth::user()->company_id,
+                'added_by' => Auth::user()->id
+            ]);
+
+            return $head;
+        }
     }
 }
