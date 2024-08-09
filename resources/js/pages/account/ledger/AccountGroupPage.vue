@@ -28,7 +28,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <label for="terminalFilter">Tier 4 name</label>
+                                    <label for="terminalFilter">{{addData.thirdLevel == '0' ? 'New Tier 3' : 'New Tier 4'}}</label>
                                     <input type="text" class="form-control" v-model="addData.groupName">
                                 </div>
                                 <div class="col-md-3">
@@ -89,40 +89,25 @@
                 :editForm="editFormID"
             >
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label for="">Tier 2</label>
-                        <select :disabled="category == 'group'" id="" class="form-control" v-model="dataEdit.account_id" @change="getThirdLevel($event.target.value)">
+                        <select disabled id="" class="form-control" v-model="dataEdit.account_id" @change="getThirdLevel($event.target.value)">
                             <option value="0">Select tier 2</option>
                             <option v-for="(single, i) in secondLevelData" :key="i" :value="single.id">
                                 {{ single.name }}
                             </option>
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label for="">Select</label>
-                        <div>
-                            <input type="radio" value="parent" v-model="category" />
-                            <label for="" class="ml-2">Tier 3</label>
-                        </div>
-                        <div>
-                            <input type="radio" value="group" v-model="category" />
-                            <label for="" class="ml-2">Tier 4</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6" v-if="category == 'parent'">
-                        <label for="">Tier 3 name</label>
-                        <input type="text" class="form-control" v-model="dataEdit.level_three.name">
-                    </div>
-                    <div class="col-md-3" v-if="category == 'group'">
+                    <div class="col-md-4">
                         <label for="">Tier 3</label>
-                        <select id="" class="form-control" v-model="dataEdit.parent_id">
+                        <select disabled id="" class="form-control" v-model="dataEdit.parent_id">
                             <option value="0">Select tier 3</option>
                             <option v-for="(single, i) in thirdLevelData" :key="i" :value="single.id">
                                 {{ single.name }}
                             </option>
                         </select>
                     </div>
-                    <div class="col-md-3" v-if="category == 'group'">
+                    <div class="col-md-4">
                         <label for="">Tier 4 name</label>
                         <input type="text" class="form-control" v-model="dataEdit.name">
                     </div>
@@ -182,7 +167,7 @@ export default {
     methods: {
         async fetchAccountGroups() {
 
-            const resGroups = await this.callApi("post", 'accounts/coa/groups');
+            const resGroups = await this.callApi("post", 'accounts/groups');
             if (resGroups.status == 200) {
                 this.fourthLevelData = resGroups.data.fourthLevel
                 this.secondLevelData = resGroups.data.secondLevel
@@ -197,7 +182,7 @@ export default {
         
         async getThirdLevel(id) {
 
-            const res = await this.callApi("post", 'accounts/coa/second/groups', {id:id});
+            const res = await this.callApi("post", 'accounts/groups/second', {id:id});
             if (res.status == 200) {
                 this.thirdLevelData = res.data.thirdLevel
             } else {
@@ -219,7 +204,7 @@ export default {
         
         async addGroup() {
             this.validationErrors = [];
-            if (this.dataEdit.account_id == "0")
+            if (this.addData.secondLevel == "0")
                 return swal({
                     title: "Required!",
                     text: "Please Select Tier 2",
@@ -235,7 +220,7 @@ export default {
                 });
 
             this.loading = true;
-            const resCategory = await this.callApi("post", "accounts/coa/group/store", this.addData);
+            const resCategory = await this.callApi("post", "accounts/groups/store", this.addData);
             if (resCategory.status == 201) {
                 this.loading = false;
                 swal({
@@ -276,50 +261,17 @@ export default {
         },
         async updateGroup() {
             this.validationErrors = [];
-            if (this.dataEdit.account_id == "0")
+            
+            if (this.dataEdit.name == "")
                 return swal({
                     title: "Required!",
-                    text: "Please Select Tier 2",
+                    text: "Group name is required",
                     icon: "error",
                     timer: 2000
-                });
-            if (this.category == "")
-                return swal({
-                    title: "Required!",
-                    text: "Please Select Category",
-                    icon: "error",
-                    timer: 2000
-                });
-            if(this.category == "parent")
-            {
-                if (this.dataEdit.level_three.name == "")
-                    return swal({
-                        title: "Required!",
-                        text: "Parent Group name is required",
-                        icon: "error",
-                        timer: 2000
-                    });
-            }
-            else
-            {
-                if (this.dataEdit.parent_id == "0")
-                    return swal({
-                        title: "Required!",
-                        text: "Parent Group is required",
-                        icon: "error",
-                        timer: 2000
-                    });
-                if (this.dataEdit.name == "")
-                    return swal({
-                        title: "Required!",
-                        text: "Group name is required",
-                        icon: "error",
-                        timer: 2000
-                    });
-            }
-            this.dataEdit.category = this.category;
+            });
+            
             this.loading = true;
-            const resCategory = await this.callApi("post", "accounts/coa/group/update", this.dataEdit);
+            const resCategory = await this.callApi("post", "accounts/groups/update", this.dataEdit);
             if (resCategory.status == 200) {
                 this.loading = false;
                 swal({

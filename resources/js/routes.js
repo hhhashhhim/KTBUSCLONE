@@ -45,7 +45,10 @@ import TerminalCommissionPage from "./pages/terminal/TerminalCommissionPage.vue"
 import TerminalDiscountPage from "./pages/terminal/TerminalDiscountPage.vue";
 import TerminalTimePage from "./pages/terminal/TerminalTimePage.vue";
 import TerminalTimeDifferencePage from "./pages/terminal/TerminalTimeDifferencePage.vue";
-import AccountGroupPage from "./pages/account/tiers/AccountGroupPage.vue";
+import AccountGroupPage from "./pages/account/ledger/AccountGroupPage.vue";
+import AccountHeadPage from './pages/account/ledger/AccountHeadPage.vue';
+import AccountHeadBankPage from './pages/account/ledger/AccountHeadBankPage.vue';
+import AccountHeadCashPage from './pages/account/ledger/AccountHeadCashPage.vue';
 import loyaltyCardPage from "./pages/loyalityCard/CardCategoriesPage.vue";
 import loyaltyCardAssignPage from "./pages/loyalityCard/CardAssignPage.vue";
 import ReportsHeadersPage from "./pages/ReportsHeader/ReportsHeaderPage.vue";
@@ -300,9 +303,24 @@ const routes = [
         name: "terminal-difference"
     },
     {
-        path: url + "accounts/coa/groups",
+        path: url + "accounts/groups",
         component: AccountGroupPage,
         name: "account-groups"
+    },
+    {
+        path: url + "accounts/heads",
+        component: AccountHeadPage,
+        name: "account-head"
+    },
+    {
+        path: url + "accounts/heads/banks",
+        component: AccountHeadBankPage,
+        name: "account-head-bank"
+    },
+    {
+        path: url + "accounts/heads/cash",
+        component: AccountHeadCashPage,
+        name: "account-head-cash"
     },
     {
         path: url + "loyalty/card/categories",

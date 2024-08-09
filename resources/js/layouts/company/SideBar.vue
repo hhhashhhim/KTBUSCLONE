@@ -356,11 +356,20 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li class="dropdown" v-if="checkForSubmenu('chart-of-accounts')">
-                            <a href="#" class="has-dropdown">Chart Of Account</a>
+                            <a href="#" class="has-dropdown">Add Ledger</a>
                             <ul class="dropdown-menu">
                                 <li>
                                     <router-link class="nav-link text-capitalize" :to="{ name: 'account-groups' }">
-                                        <i class="fas fa-street-view"></i> Tier 3
+                                        <i class="fas fa-street-view"></i> Tier 3/4
+                                    </router-link>
+                                    <router-link class="nav-link text-capitalize" :to="{ name: 'account-head' }">
+                                        <i class="fas fa-street-view"></i> Ledger
+                                    </router-link>
+                                    <router-link class="nav-link text-capitalize" :to="{ name: 'account-head-bank' }">
+                                        <i class="fas fa-street-view"></i> Bank-Ledger
+                                    </router-link>
+                                    <router-link class="nav-link text-capitalize" :to="{ name: 'account-head-cash' }">
+                                        <i class="fas fa-street-view"></i> Cash-Ledger
                                     </router-link>
                                 </li>
                             </ul>

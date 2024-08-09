@@ -118,7 +118,7 @@
                                                                 <td>{{ data.invoice_id }}</td>
                                                                 <td>{{ data.terminal.name }}</td>
                                                                 <td>{{ data.updated_name.name }}</td>
-                                                                <td>{{ data.seat_fare - data.discount }}</td>
+                                                                <td>{{ data.type == 'canceled' ? data.refund : (data.seat_fare - data.discount) }}</td>
                                                                 <td>{{ data.comsn }}</td>
                                                             </tr>
                                                             <tr v-if="filters.record.length > 0">
@@ -262,11 +262,19 @@ export default {
             if (this.filters.record && Array.isArray(this.filters.record)) {
                 return this.filters.record.reduce((sum, data) => {
                     // Ensure that data.seat_fare and data.discount are numeric values
-                    const seatFare = Number(data.seat_fare) || 0;
-                    const discount = Number(data.discount) || 0;
-
-                    // Add the difference to the sum
-                    return sum + (seatFare - discount);
+                    if(data.type == 'canceled')
+                    {
+                        const refundValue = Number(data.refund) || 0;
+                        return sum + refundValue
+                    }
+                    else
+                    {
+                        const seatFare = Number(data.seat_fare) || 0;
+                        const discount = Number(data.discount) || 0;
+                        // Add the difference to the sum
+                        return sum + (seatFare - discount);
+                    }
+                    
                 }, 0);
             } else {
                 return 0; // or handle the case when there are no records
