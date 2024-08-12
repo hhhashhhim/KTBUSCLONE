@@ -399,7 +399,7 @@ class BookingController extends Controller
 
     public function whatsappMessage(Request $request)
     {
-        return ticketConfirmedMessage(explode('-', $request->ticket_ids),$request->type);
+        return ticketConfirmedMessage(explode('-', $request->invoice_id),$request->type);
     }
 
 
@@ -478,6 +478,8 @@ class BookingController extends Controller
                     }
                 }
             }
+            $old_tickets = [];
+            $new_tickets = [];
             foreach ($request->data as $key => $item) {
                 $ticket = $item['dataAll'];
                 if ($item['existingDate'] == $item['rescheduleDate']) {
@@ -547,7 +549,7 @@ class BookingController extends Controller
                     'route_id' => $schedule->route_id,
                     'remarks' => $item['reason']??"",
                     'gender' => $ticket['gender'],
-                    'type' => $item['rescheduleType'],
+                    'type' => $ticket['type'],
                     'reschedule_type' => $item['overIssueReschedule'],
                     'added_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,
@@ -586,6 +588,8 @@ class BookingController extends Controller
                 $old_ticket->update([
                     'type' => 'reschedule'
                 ]);
+                $old_tickets[] = $ticket['id'];
+                $new_tickets[] = $newTicket->id;
                 $old_ticket->delete();
             }
             ActivityLog::create([
@@ -595,6 +599,7 @@ class BookingController extends Controller
                 "company_id" => Auth::user()->company_id
             ]);
             DB::commit();
+            ticketRescheduledMessage($old_tickets,$new_tickets);
             return response()->json(['success' => 'Success'], 200);
 
         } catch (\Exception $e) {
@@ -1507,6 +1512,7 @@ class BookingController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
+                ticketCanceledMessage([$ticket->id]);
                 return $ticket->delete();
             
             } catch (\Exception $e) {
@@ -1573,6 +1579,7 @@ class BookingController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
+                ticketCanceledMessage($tickets->pluck('id'));
             
             } catch (\Exception $e) {
                 DB::rollBack();

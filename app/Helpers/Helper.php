@@ -419,14 +419,213 @@ if (!function_exists('terminalTimes')) {
 
 
 if (!function_exists('ticketConfirmedMessage')) {
-    function ticketConfirmedMessage($tickets,$type)
+    function ticketConfirmedMessage($invoice_id,$type)
     {
         $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
         $message_allow = Terminal::where("id",Auth::user()->terminal_id)->first()->send_message;
         if($auth_key && $message_allow)
         {
-        $seats = implode(",",Ticket::whereIn("id",$tickets)->pluck("seat_no")->toArray());
-        $detail = Ticket::where("id",$tickets[0])->with("departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
+        $seats = implode(",",Ticket::where("invoice_id",$invoice_id)->pluck("seat_no")->toArray());
+        $detail = Ticket::where("invoice_id",$invoice_id)->with("departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
+        $cancelMessage = SubRoute::where(["from_city"=>$detail->departure_city_id,"to_city"=>$detail->destination_city_id])->first()->cancel_message??'';
+        // this is for timing from different terminal
+        $html = "";
+        $terminalTime = TerminalTimeDifference::where(['company_id' => $detail->company_id, 'city_id' => $detail->departure_city_id, 'route_id' => $detail->route_id,'show'=>1])->with("terminal:id,name")->get();
+        if($terminalTime->count() > 0)
+        {
+            foreach($terminalTime as $single)
+            {
+                $sub = 0;
+                $sub = $single->time_difference * 60;
+                $html .= "*".($single->display_name ? $single->display_name : 'Time').":* ".date("h:i A", strtotime($detail->date . " " . $detail->schedule_time) + $sub)."\n";
+            }
+        }
+        else
+        {
+            $html .= "*Time:* ".date("h:i A", strtotime($detail->schedule_time))."\n";
+        }
+
+        
+        // to choose random device
+        // Define an array of names
+        $names = [
+            1 => 'Hamza_4-Device1',
+            2 => 'Hamza_4-Device2',
+            3 => 'Hamza_4-Device3',
+            4 => 'Hamza_4-Device4',
+            5 => 'Hamza_4-Device-5'
+        ];
+        $randomNumber = rand(1, 4);
+
+
+        
+         
+        $url = "https://whatsapp.sarzone.com/api/send-messages";
+        $mobile = "92".substr($detail->customer->contact, -10);
+        $session = $names[$randomNumber];
+        $messageConfirmed = "Dear ".$detail->customer->name.",
+Seat# $seats,
+".$detail->departure_city->name." to ".$detail->destination_city->name."
+Date ".$detail->date."
+has been Confirmed
+Departure at:
+$html
+For any inquiries/Complains Dial UAN 03111777333
+
+Terms & conditions applied
+1:Arrive terminal 30 before departure Bus will not delayed for passenger.
+2: Per person allowed luggage is upto 30kg only,Commercial or additional luggage will booked additionally.
+3: Wifi upto 350mb,Refreshment/Food & Multimedia services are Complementary & non claimable.
+4:For passenger safety Bus will not pick/drop passengers from Roadside or outside Company Terminal
+5: Keep your personal belongings Safe Company is not responsible for any loss or damage.";
+
+        $messageReserved = "Dear ".$detail->customer->name.",
+Seat# $seats,
+".$detail->departure_city->name." to ".$detail->destination_city->name."
+Date ".$detail->date."
+Is Reserved
+Departure at:
+$html
+".$cancelMessage."
+
+Terms & conditions applied.";
+
+        $response = Http::withHeaders([
+            'X-Api-Key'=>$auth_key,
+        ])->post($url, [
+            "session" => $session,
+            "message_type" =>  'text',
+            "receiver_number" => $mobile, 
+            "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed
+        ]);
+        return $response;
+        }
+    }
+}
+
+if (!function_exists('ticketRescheduledMessage')) {
+    function ticketRescheduledMessage($old_tickets,$new_tickets)
+    {
+        $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
+        $message_allow = Terminal::where("id",Auth::user()->terminal_id)->first()->send_message;
+        if($auth_key && $message_allow)
+        {
+        $old_seats = implode(",",Ticket::withTrashed()->whereIn("id",$old_tickets)->pluck("seat_no")->toArray());
+        $new_seats = implode(",",Ticket::whereIn("id",$new_tickets)->pluck("seat_no")->toArray());
+        $old_detail = Ticket::withTrashed()->where("id",$old_tickets[0])->with("departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
+        $new_detail = Ticket::where("id",$new_tickets[0])->with("departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
+        $cancelMessage = SubRoute::where(["from_city"=>$old_detail->departure_city_id,"to_city"=>$old_detail->destination_city_id])->first()->cancel_message??'';
+        $type = $new_detail->type;
+        // this is for timing from different terminal
+        $old_html = "";
+        $oldTerminalTime = TerminalTimeDifference::where(['company_id' => $old_detail->company_id, 'city_id' => $old_detail->departure_city_id, 'route_id' => $old_detail->route_id,'show'=>1])->with("terminal:id,name")->get();
+        if($oldTerminalTime->count() > 0)
+        {
+            foreach($oldTerminalTime as $single)
+            {
+                $sub = 0;
+                $sub = $single->time_difference * 60;
+                $old_html .= "*".($single->display_name ? $single->display_name : 'Time').":* ".date("h:i A", strtotime($old_detail->date . " " . $old_detail->schedule_time) + $sub)."\n";
+            }
+        }
+        else
+        {
+            $old_html .= "*Time:* ".date("h:i A", strtotime($old_detail->schedule_time))."\n";
+        }
+
+        $new_html = "";
+        $newTerminalTime = TerminalTimeDifference::where(['company_id' => $new_detail->company_id, 'city_id' => $new_detail->departure_city_id, 'route_id' => $new_detail->route_id,'show'=>1])->with("terminal:id,name")->get();
+        if($newTerminalTime->count() > 0)
+        {
+            foreach($newTerminalTime as $new)
+            {
+                $sub = 0;
+                $sub = $new->time_difference * 60;
+                $new_html .= "*".($new->display_name ? $new->display_name : 'Time').":* ".date("h:i A", strtotime($new_detail->date . " " . $new_detail->schedule_time) + $sub)."\n";
+            }
+        }
+        else
+        {
+            $new_html .= "*Time:* ".date("h:i A", strtotime($new_detail->schedule_time))."\n";
+        }
+
+        
+        // to choose random device
+        // Define an array of names
+        $names = [
+            1 => 'Hamza_4-Device1',
+            2 => 'Hamza_4-Device2',
+            3 => 'Hamza_4-Device3',
+            4 => 'Hamza_4-Device4',
+            5 => 'Hamza_4-Device-5'
+        ];
+        $randomNumber = rand(1, 4);
+
+
+        
+         
+        $url = "https://whatsapp.sarzone.com/api/send-messages";
+        $mobile = "92".substr($old_detail->customer->contact, -10);
+        $session = $names[$randomNumber];
+        $messageConfirmed = "Dear ".$old_detail->customer->name.",
+Seat# $old_seats,
+".$old_detail->departure_city->name." to ".$old_detail->destination_city->name."
+Date ".$old_detail->date."
+Departure at:
+$old_html
+Is shifted to
+
+Seat# $new_seats,
+".$new_detail->departure_city->name." to ".$new_detail->destination_city->name."
+Date ".$new_detail->date."
+Departure at:
+$new_html
+For any inquiries/Complains Dial UAN 03111777333
+
+Terms & conditions applied
+1:Arrive terminal 30 before departure Bus will not delayed for passenger.
+2: Per person allowed luggage is upto 30kg only,Commercial or additional luggage will booked additionally.
+3: Wifi upto 350mb,Refreshment/Food & Multimedia services are Complementary & non claimable.
+4:For passenger safety Bus will not pick/drop passengers from Roadside or outside Company Terminal
+5: Keep your personal belongings Safe Company is not responsible for any loss or damage.";
+
+        $messageReserved = "Dear ".$old_detail->customer->name.",
+Seat# $old_seats,
+".$old_detail->departure_city->name." to ".$old_detail->destination_city->name."
+Date ".$old_detail->date."
+$old_html
+Is shifted to
+
+Seat# $new_seats,
+".$new_detail->departure_city->name." to ".$new_detail->destination_city->name."
+Date ".$new_detail->date." 
+$new_html
+".$cancelMessage."
+
+Terms & conditions applied.";
+
+        $response = Http::withHeaders([
+            'X-Api-Key'=>$auth_key,
+        ])->post($url, [
+            "session" => $session,
+            "message_type" =>  'text',
+            "receiver_number" => $mobile, 
+            "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed
+        ]);
+        return $response;
+        }
+    }
+}
+
+if (!function_exists('ticketcanceledMessage')) {
+    function ticketCanceledMessage($tickets)
+    {
+        $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
+        $message_allow = Terminal::where("id",Auth::user()->terminal_id)->first()->send_message;
+        if($auth_key && $message_allow)
+        {
+        $seats = implode(",",Ticket::withTrashed()->whereIn("id",$tickets)->pluck("seat_no")->toArray());
+        $detail = Ticket::withTrashed()->where("id",$tickets[0])->with("cancel_ticket:id,ticket_id,percentage","departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
         $cancelMessage = SubRoute::where(["from_city"=>$detail->departure_city_id,"to_city"=>$detail->destination_city_id])->first()->cancel_message??'';
         // this is for timing from different terminal
         $html = "";
@@ -455,7 +654,7 @@ if (!function_exists('ticketConfirmedMessage')) {
             4 => 'Hamza_4-Device4',
             5 => 'Hamza_4-Device-5'
         ];
-        $randomNumber = rand(1, 5);
+        $randomNumber = rand(1, 4);
 
 
         
@@ -463,28 +662,20 @@ if (!function_exists('ticketConfirmedMessage')) {
         $url = "https://whatsapp.sarzone.com/api/send-messages";
         $mobile = "92".substr($detail->customer->contact, -10);
         $session = $names[$randomNumber];
-        $messageConfirmed = "Dear ".$detail->customer->name.",
-Seat# $seats, ".$detail->departure_city->name." to ".$detail->destination_city->name."
-Date ".$detail->date."
-has been Confirmed
-Departure at:
-$html
-
-For any inquiries/Complains Dial UAN 03111777333
-
-Terms & conditions applied
-1:Arrive terminal 30 before departure Bus will not delayed for passenger.
-2: Per person allowed luggage is upto 30kg only,Commercial or additional luggage will booked additionally.
-3: Wifi upto 350mb,Refreshment/Food & Multimedia services are Complementary & non claimable.
-4:For passenger safety Bus will not pick/drop passengers from Roadside or outside Company Terminal
-5: Keep your personal belongings Safe Company is not responsible for any loss or damage.";
-
-        $messageReserved = "Dear ".$detail->customer->name.",
+        $canceledMessage = "Dear ".$detail->customer->name.",
 Seat# $seats,
-".$detail->departure_city->name." to ".$detail->destination_city->name."
+*".$detail->departure_city->name."* to *".$detail->destination_city->name."*
 $html
-Date ".$detail->date." Is Reserved
-".$cancelMessage."
+
+Date ".$detail->date." Is cancelled
+at ".$detail->cancel_ticket->percentage."% deduction charges
+
+Please visit  counter from where ticket purchased or relevant online platform form claim
+
+For any inquiries/Complains Dial
+03108886220
+Or
+UAN 03111777333
 
 Terms & conditions applied.";
 
@@ -494,7 +685,7 @@ Terms & conditions applied.";
             "session" => $session,
             "message_type" =>  'text',
             "receiver_number" => $mobile, 
-            "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed
+            "message_body" => $canceledMessage
         ]);
         return $response;
         }
