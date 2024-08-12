@@ -1269,6 +1269,7 @@
                                                             @click="duplicateTicket(innerItem)">Duplicate Ticket
                                                     </button>
                                                     <button v-if="checkForSubmenuButtons('resend-sms')" type="button"
+                                                            @click="resendSms(innerItem.invoice_id,innerItem.type)"
                                                             class="btn btn-success ml-2">Resend SMS
                                                     </button>
                                                     <button v-if="checkForSubmenuButtons('add-elt')" type="button"
@@ -3481,7 +3482,7 @@ export default {
                     }
                 }, 700);
 
-                resBookingDetail = await this.callApi("post", "booking/whatsapp/message", {ticket_ids: resTicket.data.ids,type:bookType});
+                resBookingDetail = await this.callApi("post", "booking/whatsapp/message", {invoice_id: resTicket.data.ticket[0].invoice_id,type:bookType});
 
 
             } else {
@@ -3509,8 +3510,19 @@ export default {
                     this.bookingLoading = false;
                 }, 1000);
             }
-        }
-        ,
+        },
+        
+        async resendSms(invoice_id,type) {
+            const resMessage = await this.callApi("post", "booking/whatsapp/message", {invoice_id: invoice_id,type:type});
+            if (resMessage.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "Sent Succesfuly",
+                    icon: "success",
+                    timer: 2000
+                });
+            }
+        },
 
         async resetArrays() {
             this.selectedSeats = [];
