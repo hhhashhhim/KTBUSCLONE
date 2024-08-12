@@ -439,7 +439,7 @@ class TerminalController extends Controller
                 return $query->whereIn('route_id', $request->route);
             })
             ->orderBy('date', 'desc')
-            ->get(["id","terminal_id","route_id","bus_class_id","schedule_date","schedule_time","schedule_time","updated_by","bus_id","invoice_id","seat_fare","discount","seat_no","customer_id","route_id","type"]);
+            ->get(["id","terminal_id","route_id","bus_class_id","schedule_date","schedule_time","schedule_time_exact","updated_by","bus_id","invoice_id","seat_fare","discount","seat_no","customer_id","route_id","type"]);
 
         $tickets->map(function ($single) {
             $single->load(['commission'=>function($q){
