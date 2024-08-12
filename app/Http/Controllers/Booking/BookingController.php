@@ -1713,8 +1713,13 @@ class BookingController extends Controller
                 'company_id' => Auth::user()->company_id,
                 'schedule_id' => $request->schedule_id,
                 'schedule_date' => $uniqueDate,
-                'type' => "canceled",
             ])
+            ->where(function($query) {
+                $query->where("type", "canceled")
+                    ->whereHas('cancel_ticket', function ($query) {
+                        $query->where('percentage', '>', 0);
+                    });
+            })
             ->with("cancel_ticket:id,ticket_id,percentage","terminal:id,name")
             ->get(["id","seat_fare","discount","terminal_id","seat_no"])->groupBy("terminal_id");
 
