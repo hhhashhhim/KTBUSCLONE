@@ -213,7 +213,7 @@
         </th>
     </tr>
     <tr>
-        <th style="width: 75% !important;"> Terminal Ticket Refund</th>
+        <th style="width: 75% !important;"> Ticket Cancellation Charges</th>
         <th style="width: 25% !important;">{{ $data['refund'] }}</th>
     </tr>
     <tr>
