@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Booking;
 use App\Http\Controllers\Controller;
 use App\Models\Booking\BookingCancel;
 use App\Models\Booking\RescheduleExtraAmount;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Booking\TicketAdvancedBooked;
 use App\Models\Booking\TicketELT;
+use App\Models\Company;
 use App\Models\Booking\TicketIsPartial;
 use Illuminate\Support\Facades\Http;
 use App\Models\Booking\TicketReschedule;
@@ -399,7 +401,7 @@ class BookingController extends Controller
 
     public function whatsappMessage(Request $request)
     {
-        return ticketConfirmedMessage(explode('-', $request->invoice_id),$request->type);
+        return ticketConfirmedMessage($request->invoice_id);
     }
 
 
@@ -1817,7 +1819,7 @@ class BookingController extends Controller
             'format' => $format,
             'duplicate' => (int)$request->duplicate,
         ];
-        // return view('pdf/pdf', ['data' => $finalData]);
+        
         return view('pdf/pdf', ['data' => $finalData]);
     }
 

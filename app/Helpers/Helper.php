@@ -8,6 +8,7 @@ use App\Models\FareTable;
 use App\Models\Hrm\Employee\Employee;
 use Illuminate\Support\Facades\Http;
 use App\Models\Route\Route;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\account\AccountHead;
 use App\Models\Route\RouteFare;
 use App\Models\Discount\Discount;
@@ -419,31 +420,50 @@ if (!function_exists('terminalTimes')) {
 
 
 if (!function_exists('ticketConfirmedMessage')) {
-    function ticketConfirmedMessage($invoice_id,$type)
+    function ticketConfirmedMessage($invoice_id)
     {
         $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
         $message_allow = Terminal::where("id",Auth::user()->terminal_id)->first()->send_message;
         if($auth_key && $message_allow)
         {
-        $seats = implode(",",Ticket::where("invoice_id",$invoice_id)->pluck("seat_no")->toArray());
-        $detail = Ticket::where("invoice_id",$invoice_id)->with("departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
-        $cancelMessage = SubRoute::where(["from_city"=>$detail->departure_city_id,"to_city"=>$detail->destination_city_id])->first()->cancel_message??'';
-        // this is for timing from different terminal
-        $html = "";
-        $terminalTime = TerminalTimeDifference::where(['company_id' => $detail->company_id, 'city_id' => $detail->departure_city_id, 'route_id' => $detail->route_id,'show'=>1])->with("terminal:id,name")->get();
-        if($terminalTime->count() > 0)
-        {
-            foreach($terminalTime as $single)
-            {
+            $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->withTrashed()->where("invoice_id",$invoice_id)->get();
+            $tickets->map(function ($item) {
+                $item->acutal_time = $item->date . " " . $item->schedule_time; //if ticket booked from another terminal
+
                 $sub = 0;
-                $sub = $single->time_difference * 60;
-                $html .= "*".($single->display_name ? $single->display_name : 'Time').":* ".date("h:i A", strtotime($detail->date . " " . $detail->schedule_time) + $sub)."\n";
+                $terminalTime = TerminalTimeDifference::where(['company_id' => $item->company_id, 'terminal_id' => $item->terminal_id, 'route_id' => $item->route_id])->first();
+                if($terminalTime)
+                {
+                    $sub = $terminalTime->time_difference * 60;
+                }
+
+                $item->acutal_time = date("Y-m-d H:i:00", strtotime($item->date . " " . $item->schedule_time) + $sub);
+            });
+            $format = TicketsTemplate::with("terminal")
+                    ->join("ticket_template_terminals","ticket_template_terminals.ticket_template_id","tickets_templates.id")
+                    ->whereNull('tickets_templates.deleted_at')
+                    ->whereNull('ticket_template_terminals.deleted_at')
+                    ->where(['tickets_templates.company_id'=> Auth::user()->company_id,"ticket_template_terminals.terminal_id"=>Auth::user()->terminal_id])->where('tickets_templates.status', 1)
+                    ->first();
+
+            $type = $tickets[0]->type;
+            $cancelMessage = SubRoute::where(["from_city"=>$tickets[0]->departure_city_id,"to_city"=>$tickets[0]->destination_city_id])->first()->cancel_message??'';
+            // this is for timing from different terminal
+            $html = "";
+            $terminalTime = TerminalTimeDifference::where(['company_id' => $tickets[0]->company_id, 'city_id' => $tickets[0]->departure_city_id, 'route_id' => $tickets[0]->route_id,'show'=>1])->with("terminal:id,name")->get();
+            if($terminalTime->count() > 0)
+            {
+                foreach($terminalTime as $single)
+                {
+                    $sub = 0;
+                    $sub = $single->time_difference * 60;
+                    $html .= "*".($single->display_name ? $single->display_name : 'Time').":* ".date("h:i A", strtotime($tickets[0]->date . " " . $tickets[0]->schedule_time) + $sub)."\n";
+                }
             }
-        }
-        else
-        {
-            $html .= "*Time:* ".date("h:i A", strtotime($detail->schedule_time))."\n";
-        }
+            else
+            {
+                $html .= "*Time:* ".date("h:i A", strtotime($tickets[0]->schedule_time))."\n";
+            }
 
         
         // to choose random device
@@ -461,15 +481,17 @@ if (!function_exists('ticketConfirmedMessage')) {
         
          
         $url = "https://whatsapp.sarzone.com/api/send-messages";
-        $mobile = "92".substr($detail->customer->contact, -10);
+        $mobile = "92".substr($tickets[0]->customer->contact, -10);
         $session = $names[$randomNumber];
-        $messageConfirmed = "Dear ".$detail->customer->name.",
-Seat# $seats,
-".$detail->departure_city->name." to ".$detail->destination_city->name."
-Date ".$detail->date."
+        $messageConfirmed = "Dear ".$tickets[0]->customer->name.",
+Seat# ".implode(',',$tickets->pluck('seat_no')->toArray()).",
+".$tickets[0]->departure_city->name." to ".$tickets[0]->destination_city->name."
+Date ".$tickets[0]->date."
 has been Confirmed
 Departure at:
 $html
+*This E-Ticket can be used for boarding and there is no need of hard copy/printed ticket.*
+
 For any inquiries/Complains Dial UAN 03111777333
 
 Terms & conditions applied
@@ -479,10 +501,10 @@ Terms & conditions applied
 4:For passenger safety Bus will not pick/drop passengers from Roadside or outside Company Terminal
 5: Keep your personal belongings Safe Company is not responsible for any loss or damage.";
 
-        $messageReserved = "Dear ".$detail->customer->name.",
-Seat# $seats,
-".$detail->departure_city->name." to ".$detail->destination_city->name."
-Date ".$detail->date."
+        $messageReserved = "Dear ".$tickets[0]->customer->name.",
+Seat# ".implode(',',$tickets->pluck('seat_no')->toArray()).",
+".$tickets[0]->departure_city->name." to ".$tickets[0]->destination_city->name."
+Date ".$tickets[0]->date."
 Is Reserved
 Departure at:
 $html
@@ -490,13 +512,29 @@ $html
 
 Terms & conditions applied.";
 
+        $finalData = [
+            'tickets' => $tickets,
+            'format' => $format,
+        ];
+
+        $pdf = Pdf::loadView('pdf/singleTicket', ['data' => $finalData]);
+
+        // Render the PDF and get the output as a string
+        $pdfOutput = $pdf->output();
+
+        // Convert the PDF output to a Base64 string
+        $base64Pdf = base64_encode($pdfOutput);
+
         $response = Http::withHeaders([
             'X-Api-Key'=>$auth_key,
         ])->post($url, [
             "session" => $session,
-            "message_type" =>  'text',
             "receiver_number" => $mobile, 
-            "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed
+            "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed,
+            "message_type" =>  $type == "advance booking" ? 'text' : 'media',
+            "file_type" => $type == "advance booking" ? null : "base64",
+            "file" => $type == "advance booking" ? null : $base64Pdf,
+            "file_name" => $type == "advance booking" ? null : $tickets[0]->customer->name
         ]);
         return $response;
         }
