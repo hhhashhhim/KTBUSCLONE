@@ -1139,9 +1139,14 @@ class BookingController extends Controller
                                 $seatMap[$i][$j]['fare'] = $fare + $scheduleSurcharge->flat;
                             }
                         }
+                        // check if any discount/surcharge apply then it should apply custom round other wise show fix fare
+                        if($fare != $seatMap[$i][$j]['fare'])
+                        {
+                            $seatMap[$i][$j]['fare'] = customRound($seatMap[$i][$j]['fare']??0);
+                        }
                     }
                 }
-                $seatMap[$i][$j]['fare'] = customRound($seatMap[$i][$j]['fare']??0);
+                
             }
         }
         $schedule->bus_class->seat_map = $seatMap;

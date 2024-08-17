@@ -226,7 +226,12 @@ if (!function_exists('checkDiscountAmount')) {
             $tdiscount = ((int)$fare / 100) * (float)$terminalDiscount->discount;
             $discounted_fare = $discounted_fare - $tdiscount;
         }
-        
+        // check if any discount/surcharge apply then it should apply custom round other wise show fix fare
+        if($fare == $discounted_fare)
+        {
+            return 0;
+        }
+
         $discount = round($fare - $discounted_fare);
         $result = $discount % 10;
         if($result == 0)
@@ -1040,36 +1045,37 @@ if (!function_exists('codeImage')) {
 if (!function_exists('customRound')) {
     function customRound($value)
     {
-        // multiple of 10
         $value = round($value);
-        $result = $value % 10;
-        // $new = 10 - ($result==0 ? 10 : $result);
-        if($result == 0)
-        {
-            return $value;
-        }
-        else
-        {
-            return $value - $result + 10;
-        }
-        
         // round 50 multiple
-        // $result = $value % 100;
-        // if($result < 25)
-        // {
-        //     $round = 0;
-        // }
-        // elseif($result >= 25 && $result < 75)
-        // {
-        //     $round = 50;
-        // }
-        // elseif($result >= 75 )
-        // {
-        //     $round = 100;
-        // }
-        // $result = $value - $result + $round;
+        $result = $value % 100;
+        if($result < 25)
+        {
+            $round = 0;
+        }
+        elseif($result >= 25 && $result < 75)
+        {
+            $round = 50;
+        }
+        elseif($result >= 75 )
+        {
+            $round = 100;
+        }
+        $result = $value - $result + $round;
         
-        // return $result;
+        return $result;
+
+
+        // multiple of 10
+        // $result = $value % 10;
+        // if($result == 0)
+        // {
+        //     return $value;
+        // }
+        // else
+        // {
+        //     return $value - $result + 10;
+        // }
+        
     }
 }
 

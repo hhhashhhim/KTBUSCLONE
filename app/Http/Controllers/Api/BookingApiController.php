@@ -261,10 +261,12 @@ class BookingApiController extends Controller
                                 $editFare = (int)$editFare + $scheduleSurcharge->flat;
                             }
                         }
-                        /////////
+                        // check if any discount/surcharge apply then it should apply custom round other wise show fix fare
+                        if($fare != $editFare)
+                        {
+                            $discounted_fare[] = ["name"=>$name,"fare"=>customRound((int)$editFare)];
+                        }
 
-                        // after discount
-                        $discounted_fare[] = ["name"=>$name,"fare"=>customRound((int)$editFare)];
                     }
 
                     $faresOriginal = array_column($original_fare, 'fare');
@@ -549,10 +551,13 @@ class BookingApiController extends Controller
                                         $seatMap[$i][$j]['fare'] = $fare + $scheduleSurcharge->flat;
                                     }
                                 }
+                                // check if any discount/surcharge apply then it should apply custom round other wise show fix fare
+                                if($fare != $seatMap[$i][$j]['fare'])
+                                {
+                                    $seatMap[$i][$j]['fare'] = customRound($seatMap[$i][$j]['fare']??0);
+                                }
                             }
                         }
-                        
-                        $seatMap[$i][$j]['fare'] = customRound($seatMap[$i][$j]['fare']??0);
                     }
                 }
                 $schedule->bus_class->seat_map = $seatMap;
