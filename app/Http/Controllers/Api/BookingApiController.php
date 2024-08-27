@@ -266,6 +266,10 @@ class BookingApiController extends Controller
                         {
                             $discounted_fare[] = ["name"=>$name,"fare"=>customRound((int)$editFare)];
                         }
+                        else
+                        {
+                            $discounted_fare[] = ["name"=>$name,"fare"=>(int)$editFare];
+                        }
 
                     }
 

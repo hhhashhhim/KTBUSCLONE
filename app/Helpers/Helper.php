@@ -475,8 +475,8 @@ if (!function_exists('ticketConfirmedMessage')) {
         // Define an array of names
         $names = [
             1 => 'Hamza_4-Device1',
-            2 => 'Hamza_4-Device2',
-            3 => 'Hamza_4-Device3',
+            2 => 'Hamza_4-Device2-201-samsung-a20',
+            3 => 'Hamza_4-Device3-204-samsung-a20',
             4 => 'Hamza_4-Device4',
             5 => 'Hamza_4-Device-5'
         ];
@@ -597,8 +597,8 @@ if (!function_exists('ticketRescheduledMessage')) {
         // Define an array of names
         $names = [
             1 => 'Hamza_4-Device1',
-            2 => 'Hamza_4-Device2',
-            3 => 'Hamza_4-Device3',
+            2 => 'Hamza_4-Device2-201-samsung-a20',
+            3 => 'Hamza_4-Device3-204-samsung-a20',
             4 => 'Hamza_4-Device4',
             5 => 'Hamza_4-Device-5'
         ];
@@ -692,8 +692,8 @@ if (!function_exists('ticketcanceledMessage')) {
         // Define an array of names
         $names = [
             1 => 'Hamza_4-Device1',
-            2 => 'Hamza_4-Device2',
-            3 => 'Hamza_4-Device3',
+            2 => 'Hamza_4-Device2-201-samsung-a20',
+            3 => 'Hamza_4-Device3-204-samsung-a20',
             4 => 'Hamza_4-Device4',
             5 => 'Hamza_4-Device-5'
         ];
