@@ -1519,7 +1519,10 @@ class BookingController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
-                ticketCanceledMessage([$ticket->id]);
+                if($type == "booked")
+                {
+                    ticketCanceledMessage([$ticket->id]);
+                }
                 return $ticket->delete();
             
             } catch (\Exception $e) {
@@ -1586,7 +1589,10 @@ class BookingController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
-                ticketCanceledMessage($tickets->pluck('id'));
+                if($tickets[0]->type == "booked")
+                {
+                    ticketCanceledMessage($tickets->pluck('id'));
+                }
             
             } catch (\Exception $e) {
                 DB::rollBack();
