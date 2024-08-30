@@ -1541,7 +1541,7 @@ class BookingController extends Controller
         try {
                 DB::beginTransaction();
                 $tickets = Ticket::whereIn("id",$request->cancelAllSeat)->where(['company_id' => Auth::user()->company_id])->get();
-
+                $status = $tickets[0]->type;
                 foreach($tickets as $ticket)
                 {
                     $delElt = TicketELT::where('ticket_id', $ticket->id)->first();
@@ -1589,7 +1589,7 @@ class BookingController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
-                if($tickets[0]->type == "booked")
+                if($status == "booked")
                 {
                     ticketCanceledMessage($tickets->pluck('id'));
                 }
