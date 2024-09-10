@@ -9,7 +9,7 @@ use App\Models\Hrm\Employee\Employee;
 use Illuminate\Support\Facades\Http;
 use App\Models\Route\Route;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\account\AccountHead;
+use App\Models\Account\AccountHead;
 use App\Models\Route\RouteFare;
 use App\Models\Discount\Discount;
 use App\Models\Schedule\Schedule;
