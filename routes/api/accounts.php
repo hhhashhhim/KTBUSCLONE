@@ -2,6 +2,11 @@
 
 use App\Http\Controllers\Account\AccountController;
 use App\Http\Controllers\Account\AccountHeadController;
+use App\Http\Controllers\Account\Pdf\TransactionPdfController;
+use App\Http\Controllers\Account\report\FinanceReportController;
+use App\Http\Controllers\Account\BankTransactionController;
+use App\Http\Controllers\Account\CashTransactionController;
+use App\Http\Controllers\Account\JournalTransactionController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +38,49 @@ Route::group(['prefix' => 'web/v1/accounts','middleware' => ['auth:sanctum']], f
                 Route::post('/add', [AccountHeadController::class,'headCashStore']);
                 Route::get('/', [AccountHeadController::class,'accountHeadCash']);
                 Route::post('/update', [AccountHeadController::class,'headCashUpdate']);
+            });
+        });
+
+        Route::prefix('transactions')->group(function () {
+
+            Route::prefix('bank-transactions')->group(function () {
+                Route::post('/add', [BankTransactionController::class,'bankTransactionAdd']);
+                Route::get('/', [BankTransactionController::class,'bankTransactions']);
+                Route::post('/edit', [BankTransactionController::class,'bankTransaction']);
+                Route::post('/show', [BankTransactionController::class,'bankTransactionDetail']);
+                Route::post('/do/approve', [BankTransactionController::class,'approveBankTransaction']);
+                Route::post('/update', [BankTransactionController::class,'bankTransactionUpdate']);
+            });
+            
+            Route::prefix('cash-transactions')->group(function () {
+                Route::post('/add', [CashTransactionController::class,'cashTransactionAdd']);
+                Route::get('/', [CashTransactionController::class,'cashTransactions']);
+                Route::post('/edit', [CashTransactionController::class,'cashTransaction']);
+                Route::post('/show', [CashTransactionController::class,'cashTransactionDetail']);
+                Route::post('/do/approve', [CashTransactionController::class,'approveCashTransaction']);
+                Route::post('/update', [CashTransactionController::class,'cashTransactionUpdate']);
+            });
+            
+            Route::prefix('journal-transactions')->group(function () {
+                Route::post('/add', [JournalTransactionController::class,'journalTransactionAdd']);
+                Route::get('/', [JournalTransactionController::class,'journalTransactions']);
+                Route::post('/edit', [JournalTransactionController::class,'journalTransaction']);
+                Route::post('/show', [JournalTransactionController::class,'journalTransactionDetail']);
+                Route::post('/do/approve', [JournalTransactionController::class,'approveJournalTransaction']);
+                Route::post('/update', [JournalTransactionController::class,'journalTransactionUpdate']);
+            });
+
+        });
+
+        Route::prefix('reports')->group(function () {
+            Route::get('/helper/data', [FinanceReportController::class,'helperData']);
+            Route::prefix('finance')->group(function () {
+                Route::post('/receipts', [FinanceReportController::class,'receiptReport']);
+                Route::post('/general/ledger', [FinanceReportController::class,'generalLedgerReport']);
+                Route::post('/ledger', [FinanceReportController::class,'ledgerReport']);
+                Route::post('/general/journal', [FinanceReportController::class,'journalReport']);
+                Route::post('/trial/sheet', [FinanceReportController::class,'trialSheetReport']);
+                Route::post('/daily/report', [FinanceReportController::class,'dailyReport']);
             });
         });
 });

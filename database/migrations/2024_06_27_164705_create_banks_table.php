@@ -19,7 +19,7 @@ class CreateBanksTable extends Migration
             $table->string('address');
             $table->string('iban');
             $table->string('account_number');
-            $table->double('balance', 15, 2);
+            $table->double('balance', 20, 2);
             $table->string('status');
             $table->integer('account_head_id');
             $table->integer('company_id');

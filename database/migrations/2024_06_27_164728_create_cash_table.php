@@ -15,7 +15,7 @@ class CreateCashTable extends Migration
     {
         Schema::create('cash', function (Blueprint $table) {
             $table->id();
-            $table->decimal('amount', 15, 2);
+            $table->decimal('amount', 20, 2);
             $table->integer('account_head_id');
             $table->integer('company_id');
             $table->integer('added_by');

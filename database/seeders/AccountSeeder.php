@@ -23,6 +23,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 2,
@@ -31,6 +33,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 3,
@@ -39,6 +43,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 4,
@@ -47,6 +53,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 5,
@@ -55,6 +63,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 6,
@@ -63,6 +73,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 1,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 7,
@@ -71,6 +83,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 1,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 8,
@@ -79,6 +93,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 2,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 9,
@@ -87,6 +103,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 2,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 10,
@@ -95,6 +113,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 3,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 11,
@@ -103,6 +123,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 3,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 12,
@@ -111,6 +133,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 4,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 13,
@@ -119,6 +143,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 4,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 14,
@@ -127,6 +153,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 5,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 15,
@@ -135,6 +163,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 5,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ]
         ]);
 
@@ -149,6 +179,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 2,
@@ -158,6 +190,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 1,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 3,
@@ -167,6 +201,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 4,
@@ -176,6 +212,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 3,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 5,
@@ -185,6 +223,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 6,
@@ -194,6 +234,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 35,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 7,
@@ -203,6 +245,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 5,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 8,
@@ -212,6 +256,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 5,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 9,
@@ -221,6 +267,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 10,
@@ -230,6 +278,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 9,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 11,
@@ -239,6 +289,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 12,
@@ -248,6 +300,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 11,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 13,
@@ -257,6 +311,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 14,
@@ -266,6 +322,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 13,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 15,
@@ -275,6 +333,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 16,
@@ -284,6 +344,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 17,
@@ -293,6 +355,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 18,
@@ -302,6 +366,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 19,
@@ -311,6 +377,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 20,
@@ -320,6 +388,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 21,
@@ -329,6 +399,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 22,
@@ -338,6 +410,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 23,
@@ -347,6 +421,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 24,
@@ -356,6 +432,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 25,
@@ -365,6 +443,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 26,
@@ -374,6 +454,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 28,
@@ -383,6 +465,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 29,
@@ -392,6 +476,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 30,
@@ -401,6 +487,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 29,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 31,
@@ -410,6 +498,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 29,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 33,
@@ -419,6 +509,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 34,
@@ -428,6 +520,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 33,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 35,
@@ -437,6 +531,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 36,
@@ -446,6 +542,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 37,
@@ -455,6 +553,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 36,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 38,
@@ -464,6 +564,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 36,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 39,
@@ -473,6 +575,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 36,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 40,
@@ -482,6 +586,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 41,
@@ -491,6 +597,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 40,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 42,
@@ -500,6 +608,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 9,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 43,
@@ -509,6 +619,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 44,
@@ -518,6 +630,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 43,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 45,
@@ -527,6 +641,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 46,
@@ -536,6 +652,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 47,
@@ -545,6 +663,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 9,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 48,
@@ -554,6 +674,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 49,
@@ -563,6 +685,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 48,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 50,
@@ -572,6 +696,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 0,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 51,
@@ -581,6 +707,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 50,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 52,
@@ -590,6 +718,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 9,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 53,
@@ -599,6 +729,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 15,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 54,
@@ -608,6 +740,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 13,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
                 "id" => 55,
@@ -617,6 +751,8 @@ class AccountSeeder extends Seeder
                 "parent_id" => 9,
                 "company_id" => 0,
                 "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
             ]
         ]);
     }
