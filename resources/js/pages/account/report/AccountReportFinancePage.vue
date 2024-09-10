@@ -36,6 +36,16 @@
                             Daily Report
                         </button>
                     </div>
+                    <div class="col-md-2 text-center">
+                        <button class="btn btn-block btn-info rounded-0" @click="alert('in process')">
+                            P/L Statement
+                        </button>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <button class="btn btn-block btn-info rounded-0" @click="alert('in process')">
+                            Balance Sheet
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
