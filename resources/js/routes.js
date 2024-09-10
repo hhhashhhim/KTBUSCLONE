@@ -49,6 +49,10 @@ import AccountGroupPage from "./pages/account/ledger/AccountGroupPage.vue";
 import AccountHeadPage from './pages/account/ledger/AccountHeadPage.vue';
 import AccountHeadBankPage from './pages/account/ledger/AccountHeadBankPage.vue';
 import AccountHeadCashPage from './pages/account/ledger/AccountHeadCashPage.vue';
+import BankTransactionPage from './pages/account/transaction/BankTransactionPage.vue';
+import CashTransactionPage from './pages/account/transaction/CashTransactionPage.vue';
+import JournalTransactionPage from './pages/account/transaction/JournalTransactionPage.vue';
+import AccountReportFinancePage from './pages/account/report/AccountReportFinancePage.vue';
 import loyaltyCardPage from "./pages/loyalityCard/CardCategoriesPage.vue";
 import loyaltyCardAssignPage from "./pages/loyalityCard/CardAssignPage.vue";
 import ReportsHeadersPage from "./pages/ReportsHeader/ReportsHeaderPage.vue";
@@ -321,6 +325,26 @@ const routes = [
         path: url + "accounts/heads/cash",
         component: AccountHeadCashPage,
         name: "account-head-cash"
+    },
+    { 
+        path: url + 'accounts/transactions/bank-transactions',
+        component: BankTransactionPage,
+        name: "account-transaction-bank-transactions",
+    },
+    { 
+        path: url + 'accounts/transactions/cash-transactions',
+        component: CashTransactionPage,
+        name: "account-transaction-cash-transactions",
+    },
+    { 
+        path: url + 'accounts/transactions/journal-transactions',
+        component: JournalTransactionPage,
+        name: "account-transaction-journal-transactions",
+    },
+    { 
+        path: url + 'accounts/reports/finance',
+        component: AccountReportFinancePage,
+        name: "account-report-finance",
     },
     {
         path: url + "loyalty/card/categories",

@@ -374,6 +374,30 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="dropdown">
+                            <a href="#" class="has-dropdown"><i class="far fa-money-bill-alt"></i><span>Transaction</span></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <router-link :to="{name:'account-transaction-bank-transactions'}" class="nav-link"><i class="far fa-dot-circle"></i><span>Bank Transaction</span></router-link
+                                        >
+                                </li>
+                                <li>
+                                    <router-link :to="{name:'account-transaction-cash-transactions'}" class="nav-link"><i class="far fa-dot-circle"></i><span>Cash Transaction</span></router-link
+                                        >
+                                </li>
+                                <li>
+                                    <router-link :to="{name:'account-transaction-journal-transactions'}" class="nav-link"><i class="far fa-dot-circle"></i><span>Journal Transaction</span></router-link
+                                        >
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="has-dropdown"><i class="far fa-file-alt"></i><span>Reports</span></a>
+                            <ul class="dropdown-menu">
+                                <li><router-link :to="{name:'account-report-finance'}" class="nav-link"><i class="far fa-dot-circle"></i><span>Finance</span></router-link>
+                                </li>
+                            </ul>
+                        </li>
                     </ul>
                 </li>
                 <!-- settings panel -->
