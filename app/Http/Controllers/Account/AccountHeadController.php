@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Account;
 
-use App\Models\account\Account;
-use App\Models\company\account\AccountGroup;
-use App\Models\account\AccountHead;
-use App\Models\account\Bank;
-use App\Models\account\Cash;
+use App\Models\Account\Account;
+use App\Models\Account\AccountGroup;
+use App\Models\Account\AccountHead;
+use App\Models\Account\Bank;
+use App\Models\Account\Cash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\ActivityLog;
