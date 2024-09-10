@@ -37,12 +37,12 @@
                         </button>
                     </div>
                     <div class="col-md-2 text-center mt-4">
-                        <button class="btn btn-block btn-info rounded-0" @click="alert('in process')">
+                        <button class="btn btn-block btn-info rounded-0" @click="showAlert()">
                             P/L Statement
                         </button>
                     </div>
                     <div class="col-md-2 text-center mt-4">
-                        <button class="btn btn-block btn-info rounded-0" @click="alert('in process')">
+                        <button class="btn btn-block btn-info rounded-0" @click="showAlert()">
                             Balance Sheet
                         </button>
                     </div>
@@ -754,6 +754,9 @@ export default {
             this.$refs.transactionFormPdf.submit();
         }, 500);
     },
+    showAlert() {
+      alert('In process'); // Custom alert message
+    }
     }
 };
 </script>

@@ -31223,6 +31223,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       setTimeout(function () {
         _this14.$refs.transactionFormPdf.submit();
       }, 500);
+    },
+    showAlert: function showAlert() {
+      alert('In process'); // Custom alert message
     }
   }
 });
@@ -70062,12 +70065,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, " Daily Report ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "btn btn-block btn-info rounded-0",
     onClick: _cache[6] || (_cache[6] = function ($event) {
-      return _ctx.alert('in process');
+      return $options.showAlert();
     })
   }, " P/L Statement ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "btn btn-block btn-info rounded-0",
     onClick: _cache[7] || (_cache[7] = function ($event) {
-      return _ctx.alert('in process');
+      return $options.showAlert();
     })
   }, " Balance Sheet ")])])])]), $data.abstep == 1 && $data.filter == true ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [_hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "form-control",
