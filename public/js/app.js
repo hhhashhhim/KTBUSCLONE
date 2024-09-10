@@ -69637,10 +69637,10 @@ var _hoisted_10 = {
   "class": "col-md-2 text-center"
 };
 var _hoisted_11 = {
-  "class": "col-md-2 text-center"
+  "class": "col-md-2 text-center mt-4"
 };
 var _hoisted_12 = {
-  "class": "col-md-2 text-center"
+  "class": "col-md-2 text-center mt-4"
 };
 var _hoisted_13 = {
   key: 0,
