@@ -11,7 +11,7 @@
             </div>
             <div class="row mt-4 px-0">
                 <div class="col-md-4">
-                    <h5 class="mb-0">General Ledger | According</h5>
+                    <h5 class="mb-0">General Ledger Trial Statement</h5>
                 </div>
                 <div class="col-md-4 text-center">
                     <h6 class="mb-0">From : {{ data.from }}</h6>
@@ -20,9 +20,9 @@
                     <h6 class="mb-0">To : {{ data.to }}</h6>
                 </div>
             </div>
-            <div class="row mt-4 px-0 text-capitalize" v-if="data.project">
+            <div class="row mt-4 px-0 text-capitalize" v-if="data.terminal">
                 <div class="col-md-4">
-                    <h5 class="mb-0">Project : {{ data.project }}</h5>
+                    <h5 class="mb-0">Terminal : {{ data.terminal }}</h5>
                 </div>
             </div>
         </div>

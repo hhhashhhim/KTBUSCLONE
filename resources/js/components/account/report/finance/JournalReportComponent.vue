@@ -20,9 +20,9 @@
                     <h6 class="mb-0">To : {{ journals.to }}</h6>
                 </div>
             </div>
-            <div class="row mt-4 px-0 text-capitalize" v-if="journals.project">
+            <div class="row mt-4 px-0 text-capitalize" v-if="journals.terminal">
                 <div class="col-md-4">
-                    <h5 class="mb-0">Project : {{ journals.project }}</h5>
+                    <h5 class="mb-0">Terminal : {{ journals.terminal }}</h5>
                 </div>
             </div>
         </div>

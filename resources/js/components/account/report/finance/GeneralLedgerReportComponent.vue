@@ -20,9 +20,9 @@
                     <h6 class="mb-0">To : {{ general_ledgers.to }}</h6>
                 </div>
             </div>
-            <div class="row mt-4 px-0 text-capitalize" v-if="general_ledgers.project">
+            <div class="row mt-4 px-0 text-capitalize" v-if="general_ledgers.terminal">
                 <div class="col-md-4">
-                    <h5 class="mb-0">Project : {{ general_ledgers.project }}</h5>
+                    <h5 class="mb-0">Terminal : {{ general_ledgers.terminal }}</h5>
                 </div>
             </div>
         </div>

@@ -13,7 +13,7 @@
                         <tr>
                             <th scope="col">Date</th>
                             <th scope="col">Account</th>
-                            <th scope="col">Project</th>
+                            <th scope="col">Terminal</th>
                             <th scope="col">Receipt</th>
                             <th scope="col">Voucher</th>
                             <th scope="col">Amount</th>
@@ -25,7 +25,7 @@
                         <tr v-for="(receipt, index) in receipts" :key="index">
                             <td>{{formatDate(receipt.created_at)}}</td>
                             <td>{{receipt.account_head.name}}</td>
-                            <td>{{receipt.project ? receipt.project.name : 'N/A'}}</td>
+                            <td>{{receipt.terminal ? receipt.terminal.name : 'N/A'}}</td>
                             <td>{{receipt.receipt_id}}</td>
                             <td><a href="#" @click="$emit('print-voucher', receipt.document_id, receipt.type)">{{receipt.type}}-{{receipt.document_id}}</a></td>
                             <td>{{receipt.credit > 0 ? receipt.credit : receipt.debit }}</td>

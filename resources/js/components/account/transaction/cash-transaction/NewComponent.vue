@@ -39,7 +39,7 @@
                         <div class="form-group col-md-12">
                             <label>Terminal</label>
                             <select class="form-control" v-model="addData.terminal">
-                                <option value="0">Select Bus Class</option>
+                                <option value="0">Select From Following</option>
                                 <option
                                     v-for="(terminal, i) in terminals"
                                     :key="i"
@@ -52,7 +52,7 @@
                         <div class="form-group col-md-6">
                             <label>Cash Ledger <span class="text-danger">*</span></label>
                             <select class="form-control" v-model="addData.cash_ledger">
-                                <option value="0">Select Bus Class</option>
+                                <option value="0">Select From Following</option>
                                 <option
                                     v-for="(bank, i) in cashes"
                                     :key="i"
@@ -91,7 +91,7 @@
                         <div class="row" v-for="(i, index) in transactionLoop" :key="index">
                             <div class="form-group mb-2 col-md-4">
                                 <select class="form-control" v-model="addData.ledgers[index]">
-                                    <option value="0">Select Bus Class</option>
+                                    <option value="0">Select From Following</option>
                                     <option
                                         v-for="(head, i) in heads"
                                         :key="i"

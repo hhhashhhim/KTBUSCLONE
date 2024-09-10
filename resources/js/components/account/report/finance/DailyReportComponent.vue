@@ -11,7 +11,7 @@
             </div>
             <div class="row mt-4 px-0">
                 <div class="col-md-4">
-                    <h5 class="mb-0">Project : {{ daily_data.project }}</h5>
+                    <h5 class="mb-0">Terminal : {{ daily_data.terminal }}</h5>
                 </div>
                 <div class="col-md-4 text-center">
                     <h6 class="mb-0">Date : {{ daily_data.current }}</h6>
