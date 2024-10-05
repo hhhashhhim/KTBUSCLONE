@@ -34,6 +34,7 @@ use App\Models\Schedule\ScheduleTerminalVisibility;
 use App\Models\City;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\BreakResource;
+use Illuminate\Support\Facades\Cache;
 use Exception;
 
 class BookingApiController extends Controller
@@ -631,6 +632,7 @@ class BookingApiController extends Controller
     public function bookSeat(Request $request)
     {
         try {
+            $lock = Cache::lock("tickets")->block(7, function () use ($request) {
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
 
@@ -924,7 +926,8 @@ class BookingApiController extends Controller
                 DB::commit();
 
                 return new CreatedResource(["invoice_id"=>$invoice->id]);
-
+            });
+            return $lock;
             } catch (\Exception $e) {
                 return new BreakResource($e->getMessage());
         }
