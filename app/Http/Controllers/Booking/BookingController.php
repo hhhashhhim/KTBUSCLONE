@@ -224,7 +224,6 @@ class BookingController extends Controller
                 ->get();
             }
 
-            
             foreach($checkAlreadyBooked as $tkt)
             {
                 //Check if Ticket is Booked for RWP to MORO Target is to book MORO to Karachi
@@ -240,6 +239,11 @@ class BookingController extends Controller
                 *   Condition 2 )($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
                 *   Output 1 > 1 > 1 && 1 <= 2 Result False
                 */
+                if( ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
+                    || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
+                {
+                    return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
+                }
                 if( ($scheduleDepIndex >= $ticketDepIndex && $scheduleDepIndex < $ticketDesIndex) // Will Check Partial Seat 
                     || ($scheduleDesIndex > $ticketDepIndex && $scheduleDesIndex <= $ticketDesIndex))
                 {
