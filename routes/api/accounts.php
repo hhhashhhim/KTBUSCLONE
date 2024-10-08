@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Account\AccountController;
 use App\Http\Controllers\Account\AccountHeadController;
+use App\Http\Controllers\Account\AccountClosingController;
 use App\Http\Controllers\Account\Pdf\TransactionPdfController;
 use App\Http\Controllers\Account\report\FinanceReportController;
 use App\Http\Controllers\Account\BankTransactionController;
@@ -11,6 +12,8 @@ use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'web/v1/accounts','middleware' => ['auth:sanctum']], function () {
+
+    Route::post('/closing/update', [AccountClosingController::class, 'accountClosingUpdate']);
 
     Route::get('/{first}/second', [AccountController::class,'secondLevelOfFirst']);
 

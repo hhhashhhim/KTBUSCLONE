@@ -551,6 +551,7 @@ class BookingController extends Controller
                     'date' => $item['rescheduleDate'],
                     'schedule_details_id' => $scheduleDetail->id,
                     'customer_id' => $item['dataCustomer'],
+                    'terminal_name'       => Terminal::find($ticket['terminal_id'])->name,
                     'online_terminal' => Terminal::find($ticket['terminal_id'])->is_online_terminal,
                     'schedule_id' => $item['newDepartureTime'],
                     'route_id' => $schedule->route_id,

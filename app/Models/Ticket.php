@@ -7,6 +7,7 @@ use App\Models\Booking\TicketsOverIssue;
 use App\Models\Bus\BusClass;
 use App\Models\Bus\Bus;
 use App\Models\Booking\BookingCancel;
+use App\Models\Booking\TicketReschedule;
 use App\Models\Schedule\Schedule;
 use App\Models\Route\Route;
 use App\Models\Schedule\ScheduleDetail;
@@ -119,5 +120,10 @@ class Ticket extends Model
     public function overIssueSeats()
     {
         return $this->hasOne(TicketsOverIssue::class, 'ticket_id', 'id');
+    }
+    
+    public function reschedule_seat()
+    {
+        return $this->hasOne(TicketReschedule::class, 'old_ticket_id', 'id');
     }
 }
