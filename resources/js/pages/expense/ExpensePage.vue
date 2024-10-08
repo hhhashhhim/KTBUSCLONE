@@ -100,6 +100,9 @@
                                                     </tbody>
                                                 </table>
                                                 <div class="d-flex justify-content-end">
+                                                    <button type="button" class="btn btn-danger mr-4"  v-if="editAble"
+                                                        @click="updateAccount" :disabled="loading">Update Account
+                                                    </button>
                                                     <button type="button" class="btn btn-outline-success mr-4"
                                                             @click="add" :disabled="loading" v-if="!editAble">
                                                         {{ loading ? 'Loading...' : 'Save' }}
@@ -308,6 +311,53 @@ export default {
                 this.$refs.refDailySummaryReport.submit();
                 this.fetchData();
                 this.existingExpenses();
+                this.loading = false;
+            } else {
+                this.loading = false;
+                if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
+                    }
+                }
+            }
+        },
+        async updateAccount() {
+
+            // validation for empty data
+            if (!this.postData.ticket_merge_id) {
+                return swal({
+                    title: "Error",
+                    text: "Something is missing please refresh page",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
+            this.loading = true;
+            const res = await this.callApi("post", "accounts/closing/update", {ticket_merge_id:this.postData.ticket_merge_id});
+            if (res.status === 200) {
+                this.loading = false;
+                swal({
+                    title: "Success",
+                    text: "Updated",
+                    icon: "success",
+                    timer: 2000
+                });
                 this.loading = false;
             } else {
                 this.loading = false;

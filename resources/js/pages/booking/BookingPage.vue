@@ -3202,7 +3202,9 @@ export default {
         },
 
         reScheduleSelectSeat: function (row, col, data) {
-            if (this.reScheduleSeatMap.bus_class.seat_map[row][col].type == 0) {
+            if (this.reScheduleSeatMap.bus_class.seat_map[row][col].type == 0
+                || this.reScheduleSeatMap.bus_class.seat_map[row][col].type == undefined) 
+            {
                 let index = this.alreadyBookedSeat.indexOf(data.seatNo);
                 if (index != -1) {
                     this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;

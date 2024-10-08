@@ -63,11 +63,13 @@ import TerminalCommissionReportsPage from "./pages/Sales/TerminalCommissionRepor
 import TerminalSaleReportsPage from "./pages/Sales/TerminalSaleReportsPage.vue";
 import ScheduleDropReportPage from "./pages/ScheduleDrop/ScheduleDropReportPage.vue";
 import ConfirmCancellationPage from "./pages/Cancel/ConfirmCancelationPage.vue";
+import OverIssuePage from "./pages/Cancel/OverIssuePage.vue";
+import ReschedulePage from "./pages/Cancel/ReschedulePage.vue";
 import CounterExpensesPage from "./pages/expense/CounterExpensesPage.vue";
 import OfficeExpensesPage from "./pages/expense/OfficeExpensesPage.vue";
 
-// const url = '/kt-dev/'
-const url = '/'
+const url = '/kt-dev/'
+// const url = '/'
 
 
 const routes = [
@@ -395,6 +397,16 @@ const routes = [
         path: url + "reports/confirm/cancel",
         component: ConfirmCancellationPage,
         name: "confirm-cancel-report"
+    },
+    {
+        path: url + "reports/over/issue",
+        component: OverIssuePage,
+        name: "over-issue-report"
+    },
+    {
+        path: url + "reports/reschedule",
+        component: ReschedulePage,
+        name: "reschedule-report"
     },
     {
         path: url + "counter/expenses",

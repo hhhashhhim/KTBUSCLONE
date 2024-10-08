@@ -104,6 +104,7 @@
                                                             <option value="">---Select Status---</option>
                                                             <option value="booked">Booked / Confirm Booked</option>
                                                             <option value="advance booking">Advance Booked / Reserved</option>
+                                                            <option value="over-issue">Over Issue</option>
                                                             <option value="canceled">Cancelled</option>
         <!--                                                            <option value="reschedule">Reschedule Ticket</option>-->
         <!--                                                            <option value="over-issue">Over Issue Ticket</option>-->
@@ -152,6 +153,8 @@
                                                             <th>Booking Time</th>
                                                             <th>Canceled By</th>
                                                             <th>Canceled Date</th>
+                                                            <th>Over issue By</th>
+                                                            <th>Over Issue Date</th>
                                                             <th>Status</th>
                                                         </tr>
                                                         </thead>
@@ -185,6 +188,10 @@
                                                             <td>{{ record.type == "canceled" ? record.cancel_ticket.added_by_name ? record.cancel_ticket.added_by_name.name : 'Auto' : 'N/A' }}
                                                             </td>
                                                             <td>{{ record.type == "canceled" ? formatDate(record.cancel_ticket.created_at) : 'N/A' }}
+                                                            </td>
+                                                            <td>{{ record.type == "over-issue" ? record.over_issue_seats.overissue_by.name : 'N/A' }}
+                                                            </td>
+                                                            <td>{{ record.type == "over-issue" ? formatDate(record.over_issue_seats.created_at) : 'N/A' }}
                                                             </td>
                                                             <td>{{ record.type }}</td>
                                                         </tr>

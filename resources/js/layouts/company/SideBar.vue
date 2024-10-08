@@ -86,6 +86,16 @@
                                 <i class="fas fa-city"></i> Confirmed Canceled
                             </router-link>
                         </li>
+                        <li class="dropdown" v-if="checkForSubmenu('confirm-cancel')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'over-issue-report' }">
+                                <i class="fas fa-city"></i> Over Issue Report
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('confirm-cancel')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'reschedule-report' }">
+                                <i class="fas fa-city"></i> Reschedule Report
+                            </router-link>
+                        </li>
                         <li class="dropdown" v-if="checkForSubmenu('sales')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'advance-sale-report' }">
                                 <i class="fa fa-landmark"></i> Advance Sales Report
