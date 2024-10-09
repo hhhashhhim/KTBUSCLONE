@@ -68,8 +68,8 @@ import ReschedulePage from "./pages/Cancel/ReschedulePage.vue";
 import CounterExpensesPage from "./pages/expense/CounterExpensesPage.vue";
 import OfficeExpensesPage from "./pages/expense/OfficeExpensesPage.vue";
 
-const url = '/kt-dev/'
-// const url = '/'
+// const url = '/kt-dev/'
+const url = '/'
 
 
 const routes = [
