@@ -632,7 +632,7 @@ class BookingApiController extends Controller
     public function bookSeat(Request $request)
     {
         try {
-            $lock = Cache::lock("tickets")->block(7, function () use ($request) {
+            $lock = Cache::lock("ticket-stay-lock")->block(7, function () use ($request) {
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
 

@@ -104,7 +104,7 @@ class BookingController extends Controller
         */
 
         try {
-            $lock = Cache::lock("tickets")->block(7, function () use ($request) {
+            $lock = Cache::lock("ticket-stay-lock")->block(7, function () use ($request) {
             // this is for cache lock accuracy so i am calling reschedule method from there.
             if(isset($request->rc_flag))
             {
