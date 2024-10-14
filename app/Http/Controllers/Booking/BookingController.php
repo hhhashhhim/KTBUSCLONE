@@ -103,300 +103,305 @@ class BookingController extends Controller
         * 2) Reserved Seat can be issue with Flag 1
         */
 
+        $scheduleId = $request->schedule;
+        $lockName = "stayLock:" . $scheduleId;  // Dynamic lock based on schedule ID
         try {
-            $lock = Cache::lock("stayLock")->block(7, function () use ($request) {
-            // this is for cache lock accuracy so i am calling reschedule method from there.
-            if(isset($request->rc_flag))
-            {
-                return $this->singleReschedule($request);
-            }
-            DB::beginTransaction();
-            if ($request->terminalId == 0 && is_null(Auth::user()->terminal_id)) {
-                //Check if terminal is assigned to user
-                return response()->json(["errors" => ["Booking Error" => ["If You Are Company Admin Please Assign Terminal To Your Account  For Booking the Ticket, If You Are Employee Of Company Please Contact Your Administrator Or IT Team! "]]], 422);
-            }
-            //Get the Exact Schedule from Database
-            $detail = ScheduleDetail::where("departure_id", $request->departureCity)
-                ->where("destination_id", $request->destinationCity)
-                ->where('schedule_id', $request->schedule)
-                ->where('departure_date', $request->date)
-                ->where('company_id', Auth::user()->company_id)
-                ->where('departure_time', date("H:i:s",strtotime($request->departure_time)))
-                ->first();
+                $lock = Cache::lock($lockName, 7);  // 7-second timeout
 
-            //  $schedule_time_exact ( Date At which bus will leave from first terminal ) 
-            $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$detail->schedule_id,"schedule_date"=>$detail->schedule_date])->first();
-            // $schedule To get Route Details ( Example Child City for example Karachi to RWP contains Karachi to Moro and more ) 
-            $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
-            // $existingTicket Tickets which are already booked or reserved
-            $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->orderBy('id', 'desc')->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
-            
-            //To create Invoice Number
-            $invoice = Invoice::create([
-                "schedule_id"   => $schedule->id,
-                "route_id"      => $schedule->route_id,
-                "terminal_id"   => $request->terminalId ?? Auth::user()->terminal_id,
-                "schedule_date" => $detail->schedule_date,
-                "schedule_time" => $detail->departure_time,
-                "company_id"    => Auth::user()->company_id,
-                "added_by"      => Auth::user()->id,
-            ]);
-
-            $finalAmountDiscount = 0;
-            if((isset($request->flag) && $request->flag == 1) || $request->type == 'booked')
-            {
-                if ($request->usagePoints == true) {
-//                  Get Customer's Loyalty Card
-                    $cardAssign = CardAssign::where(['id' => $request->pointsCardId, 'company_id' => Auth::user()->company_id])->first();
-                    $card = CardCategory::where(['id' => $cardAssign->card_category_id, 'company_id' => Auth::user()->company_id])->first();
-                    
-                    if ($card->discount_type == 'percentage') {
-                        $amountInPercent = (int)$card->percentage_discount * $request->pointsUseInput;
-                        $finalAmountDiscount = (int)(($request->totalFare * $amountInPercent) / 100);
-                        $cardAssign->update([
-                            'starting_points' => $cardAssign->starting_points - $request->pointsUseInput,
-                        ]);
-                    }
-                    if ($card->discount_type == 'flat') {
-                        $finalAmountDiscount = (int)$card->flat_discount * $request->pointsUseInput;
-                        $cardAssign->update([
-                            'starting_points' => $cardAssign->starting_points - $request->pointsUseInput,
-                        ]);
-                    }
+                if ($lock->get()) {
+                // this is for cache lock accuracy so i am calling reschedule method from there.
+                if(isset($request->rc_flag))
+                {
+                    return $this->singleReschedule($request);
                 }
-                // loyalty card point addition
-                if (!is_null($request->customerCNIC)) {
-                    $checkCard = CardAssign::where(['cnic' => plainContactAndCnic($request->customerCNIC), 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
-                    if ($checkCard) {
-                        if ($checkCard->cardCategory->point_type == "flatPoints") {
-                            $addPoint = $request->totalAmount / $checkCard->cardCategory->point_flat;
-                        } else {
-                            $distance = FareTable::where(['from_city_id' => $request->departureCity, 'to_city_id' => $request->destinationCity, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
-                            if ($distance) {
-                                $addPoint = $distance / $checkCard->cardCategory->point_distance;
-                            } else {
-                                return response()->json(["errors" => ["Error" => ["Please Fill The Distance In Kilometer Field In fare Table"]]], 422);
-                            }
+                DB::beginTransaction();
+                if ($request->terminalId == 0 && is_null(Auth::user()->terminal_id)) {
+                    //Check if terminal is assigned to user
+                    return response()->json(["errors" => ["Booking Error" => ["If You Are Company Admin Please Assign Terminal To Your Account  For Booking the Ticket, If You Are Employee Of Company Please Contact Your Administrator Or IT Team! "]]], 422);
+                }
+                //Get the Exact Schedule from Database
+                $detail = ScheduleDetail::where("departure_id", $request->departureCity)
+                    ->where("destination_id", $request->destinationCity)
+                    ->where('schedule_id', $request->schedule)
+                    ->where('departure_date', $request->date)
+                    ->where('company_id', Auth::user()->company_id)
+                    ->where('departure_time', date("H:i:s",strtotime($request->departure_time)))
+                    ->first();
+
+                //  $schedule_time_exact ( Date At which bus will leave from first terminal ) 
+                $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$detail->schedule_id,"schedule_date"=>$detail->schedule_date])->first();
+                // $schedule To get Route Details ( Example Child City for example Karachi to RWP contains Karachi to Moro and more ) 
+                $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                // $existingTicket Tickets which are already booked or reserved
+                $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->orderBy('id', 'desc')->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
+                
+                //To create Invoice Number
+                $invoice = Invoice::create([
+                    "schedule_id"   => $schedule->id,
+                    "route_id"      => $schedule->route_id,
+                    "terminal_id"   => $request->terminalId ?? Auth::user()->terminal_id,
+                    "schedule_date" => $detail->schedule_date,
+                    "schedule_time" => $detail->departure_time,
+                    "company_id"    => Auth::user()->company_id,
+                    "added_by"      => Auth::user()->id,
+                ]);
+
+                $finalAmountDiscount = 0;
+                if((isset($request->flag) && $request->flag == 1) || $request->type == 'booked')
+                {
+                    if ($request->usagePoints == true) {
+    //                  Get Customer's Loyalty Card
+                        $cardAssign = CardAssign::where(['id' => $request->pointsCardId, 'company_id' => Auth::user()->company_id])->first();
+                        $card = CardCategory::where(['id' => $cardAssign->card_category_id, 'company_id' => Auth::user()->company_id])->first();
+                        
+                        if ($card->discount_type == 'percentage') {
+                            $amountInPercent = (int)$card->percentage_discount * $request->pointsUseInput;
+                            $finalAmountDiscount = (int)(($request->totalFare * $amountInPercent) / 100);
+                            $cardAssign->update([
+                                'starting_points' => $cardAssign->starting_points - $request->pointsUseInput,
+                            ]);
                         }
-                        $checkCard->increment("starting_points", $addPoint);
+                        if ($card->discount_type == 'flat') {
+                            $finalAmountDiscount = (int)$card->flat_discount * $request->pointsUseInput;
+                            $cardAssign->update([
+                                'starting_points' => $cardAssign->starting_points - $request->pointsUseInput,
+                            ]);
+                        }
+                    }
+                    // loyalty card point addition
+                    if (!is_null($request->customerCNIC)) {
+                        $checkCard = CardAssign::where(['cnic' => plainContactAndCnic($request->customerCNIC), 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
+                        if ($checkCard) {
+                            if ($checkCard->cardCategory->point_type == "flatPoints") {
+                                $addPoint = $request->totalAmount / $checkCard->cardCategory->point_flat;
+                            } else {
+                                $distance = FareTable::where(['from_city_id' => $request->departureCity, 'to_city_id' => $request->destinationCity, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
+                                if ($distance) {
+                                    $addPoint = $distance / $checkCard->cardCategory->point_distance;
+                                } else {
+                                    return response()->json(["errors" => ["Error" => ["Please Fill The Distance In Kilometer Field In fare Table"]]], 422);
+                                }
+                            }
+                            $checkCard->increment("starting_points", $addPoint);
+                        }
                     }
                 }
-            }
-            /*
-            *   Validation
-            *   Only Purpose to Seat Avoid Duplication 
-            *   $lastDestination means last destination Route will have, Route are saved as 
-            *   Route 1) RWP to Moro
-            *   Route 2) Moro to Karachi 
-            *   $lastDestination will have Karachi
-            *   $allFaresOfRout will have RWP and Moro
-            *   
-            */
-            $lastDestination = $schedule->route->fares->last();
-            $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
-            //RWP MORO KARACHI are now single Array
-            array_push($allFaresOfRoute, $lastDestination->destination_city_id);
-            //Example MORO departure will have 1 index  
-            $scheduleDepIndex = array_search( $request->departureCity, $allFaresOfRoute );
-            //Example Karachi destination will have 2 index  
-            $scheduleDesIndex = array_search( $request->destinationCity, $allFaresOfRoute );
-
-            // if seat are going to update then case will be different from newly created
-            if (isset($request->flag) && $request->flag == 1) {
-                //Seat 35
-                $checkAlreadyBooked = Ticket::whereIn( "seat_no", $request->selectedSeats )
-                ->where([
-                    'company_id'    => Auth::user()->company_id, 
-                    'schedule_date' => date('Y-m-d', strtotime($detail->schedule_date) ), 
-                    'schedule_id'   => $request->schedule,
-                    "type"          => "booked"
-                ])
-                ->get();
-            }
-            else {
-                //Seat 35
-                $checkAlreadyBooked = Ticket::whereIn( "seat_no", $request->selectedSeats )
-                ->where([
-                    'company_id'    => Auth::user()->company_id, 
-                    'schedule_date' => date('Y-m-d', strtotime($detail->schedule_date) ), 
-                    'schedule_id'   => $request->schedule
-                ])
-                ->get();
-            }
-
-            foreach($checkAlreadyBooked as $tkt)
-            {
-                //Check if Ticket is Booked for RWP to MORO Target is to book MORO to Karachi
-                // $ticketDepIndex will have 0 as Karachi is at index 0
-                $ticketDepIndex = array_search( $tkt->departure_city_id, $allFaresOfRoute );
-                // $ticketDesIndex will have 1 as MORO is at index 1 
-                $ticketDesIndex = array_search( $tkt->destination_city_id, $allFaresOfRoute );
-
                 /*
-                *   $ticketDepIndex for RWP will have 0 and $scheduleDepIndex will have 1 for MORO $scheduleDesIndex will have 2 For Karachi
-                *   Condition 1) ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex)
-                *   Output 0 >= 1 && 0 < 2 Result False
-                *   Condition 2 )($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
-                *   Output 1 > 1 > 1 && 1 <= 2 Result False
+                *   Validation
+                *   Only Purpose to Seat Avoid Duplication 
+                *   $lastDestination means last destination Route will have, Route are saved as 
+                *   Route 1) RWP to Moro
+                *   Route 2) Moro to Karachi 
+                *   $lastDestination will have Karachi
+                *   $allFaresOfRout will have RWP and Moro
+                *   
                 */
-                if( ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
-                    || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
-                {
-                    return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
+                $lastDestination = $schedule->route->fares->last();
+                $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
+                //RWP MORO KARACHI are now single Array
+                array_push($allFaresOfRoute, $lastDestination->destination_city_id);
+                //Example MORO departure will have 1 index  
+                $scheduleDepIndex = array_search( $request->departureCity, $allFaresOfRoute );
+                //Example Karachi destination will have 2 index  
+                $scheduleDesIndex = array_search( $request->destinationCity, $allFaresOfRoute );
+
+                // if seat are going to update then case will be different from newly created
+                if (isset($request->flag) && $request->flag == 1) {
+                    //Seat 35
+                    $checkAlreadyBooked = Ticket::whereIn( "seat_no", $request->selectedSeats )
+                    ->where([
+                        'company_id'    => Auth::user()->company_id, 
+                        'schedule_date' => date('Y-m-d', strtotime($detail->schedule_date) ), 
+                        'schedule_id'   => $request->schedule,
+                        "type"          => "booked"
+                    ])
+                    ->get();
                 }
-                if( ($scheduleDepIndex >= $ticketDepIndex && $scheduleDepIndex < $ticketDesIndex) // Will Check Partial Seat 
-                    || ($scheduleDesIndex > $ticketDepIndex && $scheduleDesIndex <= $ticketDesIndex))
-                {
-                    return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
+                else {
+                    //Seat 35
+                    $checkAlreadyBooked = Ticket::whereIn( "seat_no", $request->selectedSeats )
+                    ->where([
+                        'company_id'    => Auth::user()->company_id, 
+                        'schedule_date' => date('Y-m-d', strtotime($detail->schedule_date) ), 
+                        'schedule_id'   => $request->schedule
+                    ])
+                    ->get();
                 }
-            }
-            //Reservation To Booking
-            if (isset($request->flag) && $request->flag == 1) {
-                //If Reserved seat is converted into Issued/Booked
-                $allTicket = updateAdvancedSeat($request, $invoice,$finalAmountDiscount);
+
+                foreach($checkAlreadyBooked as $tkt)
+                {
+                    //Check if Ticket is Booked for RWP to MORO Target is to book MORO to Karachi
+                    // $ticketDepIndex will have 0 as Karachi is at index 0
+                    $ticketDepIndex = array_search( $tkt->departure_city_id, $allFaresOfRoute );
+                    // $ticketDesIndex will have 1 as MORO is at index 1 
+                    $ticketDesIndex = array_search( $tkt->destination_city_id, $allFaresOfRoute );
+
+                    /*
+                    *   $ticketDepIndex for RWP will have 0 and $scheduleDepIndex will have 1 for MORO $scheduleDesIndex will have 2 For Karachi
+                    *   Condition 1) ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex)
+                    *   Output 0 >= 1 && 0 < 2 Result False
+                    *   Condition 2 )($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
+                    *   Output 1 > 1 > 1 && 1 <= 2 Result False
+                    */
+                    if( ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
+                        || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
+                    {
+                        return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
+                    }
+                    if( ($scheduleDepIndex >= $ticketDepIndex && $scheduleDepIndex < $ticketDesIndex) // Will Check Partial Seat 
+                        || ($scheduleDesIndex > $ticketDepIndex && $scheduleDesIndex <= $ticketDesIndex))
+                    {
+                        return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
+                    }
+                }
+                //Reservation To Booking
+                if (isset($request->flag) && $request->flag == 1) {
+                    //If Reserved seat is converted into Issued/Booked
+                    $allTicket = updateAdvancedSeat($request, $invoice,$finalAmountDiscount);
+                    
+                    ActivityLog::create([
+                        "activity_by"    => Auth::user()->id,
+                        "message"        => Auth::user()->name." | update ticket from advance to confirm | time : $detail->schedule_date $detail->departure_time | ".json_encode($request->alreadyBookedId)." --- ".$request->totalFare,
+                        "requested_host" => $request->ip(),
+                        "company_id"     => Auth::user()->company_id
+                    ]);
+                } else {
+                    //Book || Issue || Reserve
+                    if (count($request->selectedSeats) == 0) {
+                        //Check If Seat is already Booked
+                        return response()->json(["errors" => ["Error" => ["Please refresh your seat map you entered some wrong/duplicate entry"]]], 422);
+                    }
+                    
+                    $departure_city_id   = $schedule->route->fares->first()->departure_city_id;
+                    $destination_city_id = $schedule->route->fares->last()->destination_city_id;
+                    $isPartial = 0;
+                    if ($request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id) {
+                        $isPartial = 1;
+                    }
+                    if ($request->customerCNIC && $request->type == 'booked') {
+                        $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->where('company_id', Auth::user()->company_id)->first();
+                    } else if ($request->type == 'advance booking') {
+                        $customer = Customer::where('contact', plainContactAndCnic($request->contact))->where('company_id', Auth::user()->company_id)->first();
+                    } else {
+                        $customer = false;
+                    }
+                    // Fare Fetching About the Schedule
+                    if ($customer && $request->type == "booked") {
+                        $customer->name = $request->customerName;
+                        $customer->cnic = is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC);
+                        $customer->contact = plainContactAndCnic($request->contact);
+                        $customer->save();
+                    } else {
+                        $customer = Customer::create([
+                            'company_id' => Auth::user()->company_id,
+                            'added_by' => Auth::user()->id,
+                            'name' => $request->customerName,
+                            'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
+                            'contact' => plainContactAndCnic($request->contact),
+                        ]);
+                    }
+                    // Getting Already Booked Tickets
+                    if ($request->date == date('Y-m-d')) {
+                        $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
+                        ++$bookingNo;
+                    } else {
+                        $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
+                        ++$bookingNo;
+                    }
+                    
+                    $allTicket = [];
+                    foreach ($request->selectedSeats as $i => $seat) {
+                        $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->selectedSeatsClass[$i]);
+                        $ticket = Ticket::create([
+                            'company_id'          => Auth::user()->company_id,
+                            'departure_city_id'   => $request->departureCity,
+                            'destination_city_id' => $request->destinationCity,
+                            'seat_no'             => $seat,
+                            'bus_class_id'        => $detail->bus_class_id,
+                            'seat_fare'           => $request->selectedSeatsFare[$i],
+                            'is_partial'          => $isPartial,
+                            'booking_no'          => $bookingNo,
+                            'invoice_id'          => $invoice->id,
+                            'schedule_date'       => $detail->schedule_date,
+                            'schedule_time'       => $detail->departure_time,
+                            'schedule_time_exact' => $schedule_time_exact->departure_time,
+                            'date'                => $request->date,
+                            'customer_id'         => $customer->id,
+                            'schedule_id'         => $schedule->id,
+                            'route_id'            => $schedule->route_id,
+                            'ticket_closing_id'   => $existingTicket ? $existingTicket->ticket_closing_id : null,
+                            'ticket_merge_id'     => $existingTicket ? $existingTicket->ticket_merge_id : null,
+                            'bus_id'              => $existingTicket ? $existingTicket->bus_id : null,
+                            'schedule_details_id' => $detail->id,
+                            'terminal_id'         => $request->terminalId ?? Auth::user()->terminal_id,
+                            'terminal_name'       => Terminal::find($request->terminalId ?? Auth::user()->terminal_id)->name,
+                            'online_terminal'     => Terminal::find($request->terminalId ?? Auth::user()->terminal_id)->is_online_terminal,
+                            'remarks'             => $request->remarks,
+                            'gender'              => $request->gender,
+                            'type'                => $request->type,
+                            'discount_type'       => $request->usagePoints ? 'card' : null,
+                            'booked_time'         => date("Y-m-d H:i:s"),
+                            'added_by'            => Auth::user()->id,
+                            'updated_by'          => Auth::user()->id,
+                            'discount'            => ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
+                            'display_discount'    => $checkDiscount,
+                            'points_usage'        => $request->pointsUseInput / count($request->selectedSeats),
+                        ]);
+                        if ($isPartial == 1) {
+                            TicketIsPartial::create([
+                                'company_id'          => Auth::user()->company_id,
+                                'departure_city_id'   => $ticket->departure_city_id,
+                                'destination_city_id' => $ticket->destination_city_id,
+                                'ticket_id'           => $ticket->id,
+                                'seat_no'             => $ticket->seat_no,
+                                'seat_fare'           => $ticket->seat_fare,
+                                'booking_no'          => $ticket->booking_no,
+                                'date'                => $ticket->date,
+                                'customer_id'         => $ticket->customer_id,
+                                'schedule_id'         => $ticket->schedule_id,
+                                'gender'              => $ticket->gender,
+                                'type'                => $ticket->type,
+                                'added_by'            => Auth::user()->id,
+                            ]);
+                        }
+
+                        if ($request->type == 'advance booking') {
+                            TicketAdvancedBooked::create([
+                                'company_id'          => Auth::user()->company_id,
+                                'departure_city_id'   => $ticket->departure_city_id,
+                                'destination_city_id' => $ticket->destination_city_id,
+                                'ticket_id'           => $ticket->id,
+                                'seat_no'             => $ticket->seat_no,
+                                'seat_fare'           => $ticket->seat_fare,
+                                'booking_no'          => $ticket->booking_no,
+                                'date'                => $ticket->date,
+                                'customer_id'         => $ticket->customer_id,
+                                'schedule_id'         => $ticket->schedule_id,
+                                'gender'              => $ticket->gender,
+                                'type'                => $ticket->type,
+                                'added_by'            => Auth::user()->id,
+                            ]);
+                        }
+                        $allTicket[] = $ticket->id;
+                    }
+                    ActivityLog::create([
+                        "activity_by"    => Auth::user()->id,
+                        "message"        => Auth::user()->name." ($checkDiscount)| stored ticket ($request->type) | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->selectedSeats)." --- ".json_encode($request->selectedSeatsFare),
+                        "requested_host" => $request->ip(),
+                        "company_id"     => Auth::user()->company_id
+                    ]);
+                }
+
                 
-                ActivityLog::create([
-                    "activity_by"    => Auth::user()->id,
-                    "message"        => Auth::user()->name." | update ticket from advance to confirm | time : $detail->schedule_date $detail->departure_time | ".json_encode($request->alreadyBookedId)." --- ".$request->totalFare,
-                    "requested_host" => $request->ip(),
-                    "company_id"     => Auth::user()->company_id
-                ]);
+                DB::commit();
+                return [
+                    'ids' => implode('-', $allTicket),
+                    'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
+                    'authTerminalId' => Auth::user()->terminal_id,
+                ];
             } else {
-                //Book || Issue || Reserve
-                if (count($request->selectedSeats) == 0) {
-                    //Check If Seat is already Booked
-                    return response()->json(["errors" => ["Error" => ["Please refresh your seat map you entered some wrong/duplicate entry"]]], 422);
-                }
-                
-                $departure_city_id   = $schedule->route->fares->first()->departure_city_id;
-                $destination_city_id = $schedule->route->fares->last()->destination_city_id;
-                $isPartial = 0;
-                if ($request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id) {
-                    $isPartial = 1;
-                }
-                if ($request->customerCNIC && $request->type == 'booked') {
-                    $customer = Customer::where('cnic', plainContactAndCnic($request->customerCNIC))->where('company_id', Auth::user()->company_id)->first();
-                } else if ($request->type == 'advance booking') {
-                    $customer = Customer::where('contact', plainContactAndCnic($request->contact))->where('company_id', Auth::user()->company_id)->first();
-                } else {
-                    $customer = false;
-                }
-                // Fare Fetching About the Schedule
-                if ($customer && $request->type == "booked") {
-                    $customer->name = $request->customerName;
-                    $customer->cnic = is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC);
-                    $customer->contact = plainContactAndCnic($request->contact);
-                    $customer->save();
-                } else {
-                    $customer = Customer::create([
-                        'company_id' => Auth::user()->company_id,
-                        'added_by' => Auth::user()->id,
-                        'name' => $request->customerName,
-                        'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
-                        'contact' => plainContactAndCnic($request->contact),
-                    ]);
-                }
-                // Getting Already Booked Tickets
-                if ($request->date == date('Y-m-d')) {
-                    $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
-                    ++$bookingNo;
-                } else {
-                    $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
-                    ++$bookingNo;
-                }
-                
-                $allTicket = [];
-                foreach ($request->selectedSeats as $i => $seat) {
-                    $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->selectedSeatsClass[$i]);
-                    $ticket = Ticket::create([
-                        'company_id'          => Auth::user()->company_id,
-                        'departure_city_id'   => $request->departureCity,
-                        'destination_city_id' => $request->destinationCity,
-                        'seat_no'             => $seat,
-                        'bus_class_id'        => $detail->bus_class_id,
-                        'seat_fare'           => $request->selectedSeatsFare[$i],
-                        'is_partial'          => $isPartial,
-                        'booking_no'          => $bookingNo,
-                        'invoice_id'          => $invoice->id,
-                        'schedule_date'       => $detail->schedule_date,
-                        'schedule_time'       => $detail->departure_time,
-                        'schedule_time_exact' => $schedule_time_exact->departure_time,
-                        'date'                => $request->date,
-                        'customer_id'         => $customer->id,
-                        'schedule_id'         => $schedule->id,
-                        'route_id'            => $schedule->route_id,
-                        'ticket_closing_id'   => $existingTicket ? $existingTicket->ticket_closing_id : null,
-                        'ticket_merge_id'     => $existingTicket ? $existingTicket->ticket_merge_id : null,
-                        'bus_id'              => $existingTicket ? $existingTicket->bus_id : null,
-                        'schedule_details_id' => $detail->id,
-                        'terminal_id'         => $request->terminalId ?? Auth::user()->terminal_id,
-                        'terminal_name'       => Terminal::find($request->terminalId ?? Auth::user()->terminal_id)->name,
-                        'online_terminal'     => Terminal::find($request->terminalId ?? Auth::user()->terminal_id)->is_online_terminal,
-                        'remarks'             => $request->remarks,
-                        'gender'              => $request->gender,
-                        'type'                => $request->type,
-                        'discount_type'       => $request->usagePoints ? 'card' : null,
-                        'booked_time'         => date("Y-m-d H:i:s"),
-                        'added_by'            => Auth::user()->id,
-                        'updated_by'          => Auth::user()->id,
-                        'discount'            => ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
-                        'display_discount'    => $checkDiscount,
-                        'points_usage'        => $request->pointsUseInput / count($request->selectedSeats),
-                    ]);
-                    if ($isPartial == 1) {
-                        TicketIsPartial::create([
-                            'company_id'          => Auth::user()->company_id,
-                            'departure_city_id'   => $ticket->departure_city_id,
-                            'destination_city_id' => $ticket->destination_city_id,
-                            'ticket_id'           => $ticket->id,
-                            'seat_no'             => $ticket->seat_no,
-                            'seat_fare'           => $ticket->seat_fare,
-                            'booking_no'          => $ticket->booking_no,
-                            'date'                => $ticket->date,
-                            'customer_id'         => $ticket->customer_id,
-                            'schedule_id'         => $ticket->schedule_id,
-                            'gender'              => $ticket->gender,
-                            'type'                => $ticket->type,
-                            'added_by'            => Auth::user()->id,
-                        ]);
-                    }
-
-                    if ($request->type == 'advance booking') {
-                        TicketAdvancedBooked::create([
-                            'company_id'          => Auth::user()->company_id,
-                            'departure_city_id'   => $ticket->departure_city_id,
-                            'destination_city_id' => $ticket->destination_city_id,
-                            'ticket_id'           => $ticket->id,
-                            'seat_no'             => $ticket->seat_no,
-                            'seat_fare'           => $ticket->seat_fare,
-                            'booking_no'          => $ticket->booking_no,
-                            'date'                => $ticket->date,
-                            'customer_id'         => $ticket->customer_id,
-                            'schedule_id'         => $ticket->schedule_id,
-                            'gender'              => $ticket->gender,
-                            'type'                => $ticket->type,
-                            'added_by'            => Auth::user()->id,
-                        ]);
-                    }
-                    $allTicket[] = $ticket->id;
-                }
-                ActivityLog::create([
-                    "activity_by"    => Auth::user()->id,
-                    "message"        => Auth::user()->name." ($checkDiscount)| stored ticket ($request->type) | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->selectedSeats)." --- ".json_encode($request->selectedSeatsFare),
-                    "requested_host" => $request->ip(),
-                    "company_id"     => Auth::user()->company_id
-                ]);
+                return response()->json(["errors" => ["Error" => ['System is busy. Please try again.']]], 422);
             }
-
-            
-            DB::commit();
-            return [
-                'ids' => implode('-', $allTicket),
-                'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
-                'authTerminalId' => Auth::user()->terminal_id,
-            ];
-        });
-        return $lock;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Database transaction error: ' . $e->getMessage());
