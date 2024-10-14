@@ -171,10 +171,9 @@
             <p> &#169; {{isset($data['format']->footer_text) ? $data['format']->footer_text : "Rights Reserved by Kainat Travels"}}</p>
         </div>
 
-        <div style="page-break-before:always">&nbsp;</div>
-
         @if((isset($data['format']) && $data['format']->show_coupen == 0))
         @else
+        <div style="page-break-before:always">&nbsp;</div>
         <div class="custinfo" id="custinfo">
             <div class="clear-both">
                 <p class="font-weight-bold float-left">Seat No :</p>
