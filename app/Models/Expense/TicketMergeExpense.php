@@ -2,6 +2,7 @@
 
 namespace App\Models\Expense;
 
+use App\Models\Schedule\TicketClosingMerge;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
@@ -22,6 +23,11 @@ class TicketMergeExpense extends Model
     public function expense_category()
     {
         return $this->hasOne(ExpenseCategory::class, 'id', 'expense_category_id');
+    }
+    
+    public function merge()
+    {
+        return $this->belongsTo(TicketClosingMerge::class, 'ticket_merge_id', 'id');
     }
 
 }
