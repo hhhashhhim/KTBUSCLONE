@@ -18,8 +18,8 @@ return new class extends Migration
             $table->integer('terminal_id');
             $table->integer('account_head_id');
             $table->integer('other_account_head_id');
-            $table->decimal('debit', 20, 2)->default(0);
-            $table->decimal('credit', 20, 2)->default(0);
+            $table->decimal('debit', 20,0)->default(0);
+            $table->decimal('credit', 20,0)->default(0);
             $table->integer('document_id');
             $table->string('type');
             $table->text('narration')->nullable();

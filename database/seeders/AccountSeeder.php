@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Account\Account;
 use App\Models\Account\AccountGroup;
+use App\Models\Account\AccountHead;
 
 class AccountSeeder extends Seeder
 {
@@ -776,6 +777,17 @@ class AccountSeeder extends Seeder
                 "created_at" => now(),
                 "updated_at" => now(),
             ],
+        ]);
+
+        AccountHead::create([
+            'name' => strtoupper("CASH IN HAND |CASH LEDGER"),
+            'code' => "0001",
+            'parent_account_id' => 1,// ASSETS
+            'account_id' => 6,// CURRENT ASSETS
+            'parent_group_id' => 29,// CASH AND BANK BALANCES
+            'group_id' => 30,// CASH LEDGERS
+            'added_by' => 0,
+            'company_id' => 1,
         ]);
     }
 }
