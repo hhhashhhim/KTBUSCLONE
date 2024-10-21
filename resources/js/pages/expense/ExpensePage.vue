@@ -100,8 +100,9 @@
                                                     </tbody>
                                                 </table>
                                                 <div class="d-flex justify-content-end">
-                                                    <button type="button" class="btn btn-danger mr-4"  v-if="editAble"
-                                                        @click="updateAccount" :disabled="loading">Update Account
+                                                    <button v-if="!checkClosing" type="button" class=" text-light btn btn-danger mr-1" 
+                                                        data-target="#accountModal" data-toggle="modal"
+                                                        :disabled="loading">Update Account
                                                     </button>
                                                     <button type="button" class="btn btn-outline-success mr-4"
                                                             @click="add" :disabled="loading" v-if="!editAble">
@@ -133,6 +134,81 @@
                 <input type="hidden" name="token" :value="this.$store.state.token">
                 <input type="hidden" name="ticket_merge_id" :value="this.postData.ticket_merge_id">
             </form>
+
+            <div
+                class="modal fade"
+                id="accountModal"
+                tabindex="-1"
+                role="dialog"
+                aria-labelledby="modelTitleId"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body pt-5">
+                            <div class="card card-danger">
+                                <div class="card-header d-flex justify-content-between">
+                                    <h4
+                                        class="modal-title text-center text-danger"
+                                        style="width: 97%"
+                                    >
+                                        <i class="fas fa-exclamation-circle fa-2x"></i> Confirmation
+                                    </h4>
+                                    <button
+                                        type="button"
+                                        class="close"
+                                        data-dismiss="modal"
+                                        aria-label="Close"
+                                       @click="closeModal()"
+                                    >
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div
+                                        class="alert alert-danger alert-dismissible fade show"
+                                        role="alert"
+                                        v-if="success"
+                                    >
+                                        <button
+                                            type="button"
+                                            class="close"
+                                            data-dismiss="alert"
+                                            aria-label="Close"
+                                            @click="closeModal()"
+                                        >
+                                            <span aria-hidden="true">&times;</span>
+                                            <span class="sr-only">Close</span>
+                                        </button>
+                                    </div>
+                                    <p class="font-weight-bold">
+                                        You can't edit this once you close the summary. Do you want to procceed ?
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer d-block pt-0">
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-block"
+                                data-dismiss="modal"
+                                :disabled="loading"
+                                @click="updateAccount"
+                            >
+                                Yes
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-secondary btn-block"
+                                data-dismiss="modal"
+                                @click="closeModal()"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 </template>
@@ -163,6 +239,8 @@ export default {
             totalAmount: 0,
             totalSale: 0,
             netProfit: 0,
+            netProfit: 0,
+            checkClosing: true,
             postData: {
                 ticket_merge_id: "",
                 category: [],
@@ -202,6 +280,9 @@ export default {
     },
 
     methods: {
+        closeModal() {
+            $("#accountModal").click();
+        },
         clearForm: function () {
             this.data = {};
         },
@@ -216,6 +297,7 @@ export default {
             if (res.status == 200) {
                 const expenses = res.data.expenses;
                 this.totalSale = res.data.sale;
+                this.checkClosing = res.data.closing;
                 if (expenses != "") {
                     this.loop = expenses.length;
                     for (var i = 0; i < expenses.length; i++) {
@@ -352,6 +434,8 @@ export default {
             const res = await this.callApi("post", "accounts/closing/update", {ticket_merge_id:this.postData.ticket_merge_id});
             if (res.status === 200) {
                 this.loading = false;
+                this.closeModal();
+                this.existingExpenses();
                 swal({
                     title: "Success",
                     text: "Updated",

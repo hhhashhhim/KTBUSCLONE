@@ -3484,10 +3484,10 @@ export default {
                     }
                 }, 700);
 
-                resBookingDetail = await this.callApi("post", "booking/whatsapp/message", {invoice_id: resTicket.data.ticket[0].invoice_id,type:bookType});
+                const resBookingDetail = await this.callApi("post", "booking/whatsapp/message", {invoice_id: resTicket.data.ticket[0].invoice_id,type:bookType});
 
 
-            } else {
+            } else {``
                 if (resTicket.status == 422) {
                     let errorContent = "";
                     let count = 0;
