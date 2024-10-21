@@ -45,7 +45,7 @@ class AccountClosingController extends BaseController
             $q->where("route_id",$closing_pair[0]->schedule->route_id);
         }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[0]->id)->with('terminal:id,name','bus:id,bus_number', 'schedule:id,discount_id')->get()->groupBy(['terminal_id']);
 
-        $data->schedule_return = Ticket:: withTrashed()
+        $data->schedule_return = Ticket::withTrashed()
             ->where(function ($query) {
                 $query->where("type", "booked")
                       ->orWhere("type", "over-issue");
@@ -162,50 +162,53 @@ class AccountClosingController extends BaseController
                 }
             }
             // $sale = ($item->sum('seat_fare') - $item->sum('discount') - $item->sum('discount')) + $startElt - $startCommission - $startAdjustCommission - $startFixCommission;
-            
-            // ticket price to terminal
+            return $data;
+            // ticket price to terminal sale head
             $this->updateSaleTransaction(
                 $startLedgers->terminalSaleHead, // head
                 $startLedgers->busSaleHead->id,//other head id
                 0, //credit
-                $item->sum('seat_fare') - $item->sum('discount'), //debit
+                $item->sum('seat_fare'), //debit
                 $document_id, //document id
-                "Schedule Departure Ticket Amount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                "Schedule Departure Ticket Amount to ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                 $ticket_merge_id //posting id
             );
-            $startSaleAmount += $item->sum('seat_fare') - $item->sum('discount');
-            // ticket price from terminal
-            $this->updateSaleTransaction(
-                $startLedgers->terminalSaleHead, // head
-                $startLedgers->busCashHead->id,//other head id
-                $item->sum('seat_fare') - $item->sum('discount'), //credit
-                0, //debit
-                ($document_id + 1), //document id
-                "Schedule Departure Ticket Amount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
-                $ticket_merge_id //posting id
-            );
-            $startDriverAmount += $item->sum('seat_fare') - $item->sum('discount');
+            $startSaleAmount += $item->sum('seat_fare');
+            // ticket price from terminal sale head to driver
+            if($item[0]->online_terminal != 1)
+            {
+                $this->updateSaleTransaction(
+                    $startLedgers->terminalSaleHead, // head
+                    $startLedgers->busCashHead->id,//other head id
+                    $item->sum('seat_fare') - round($startCommission) - round($startFixCommission), //credit
+                    0, //debit
+                    ($document_id + 2), //document id
+                    "Schedule Departure Ticket Amount From ".$item[0]->terminal->name." To Driver Against Merge-$ticket_merge_id",
+                    $ticket_merge_id //posting id
+                );
+                $startDriverAmount += $item->sum('seat_fare') - $item->sum('discount') - round($startCommission) - round($startFixCommission);
+            }
             if($startElt > 0)
             {
-                // ticket elt to terminal
+                // ticket elt to terminal elt head
                 $this->updateSaleTransaction(
                     $startLedgers->terminalEltHead, // head
                     $startLedgers->busSaleHead->id,//other head id
                     0, //credit
                     $startElt, //debit
                     $document_id, //document id
-                    "Schedule Departure Ticket Elt of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    "Schedule Departure Ticket Elt Amount to ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
                 $startSaleAmount += $startElt;
-                // ticket elt from terminal
+                // ticket elt from terminal elt head to driver
                 $this->updateSaleTransaction(
                     $startLedgers->terminalEltHead, // head
                     $startLedgers->busCashHead->id,//other head id
                     $startElt, //credit
                     0, //debit
-                    ($document_id + 1), //document id
-                    "Schedule Departure Ticket Elt of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    ($document_id + 2), //document id
+                    "Schedule Departure Ticket Elt Amount from ".$item[0]->terminal->name." To Driver Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
                 $startDriverAmount += $startElt;
@@ -213,85 +216,124 @@ class AccountClosingController extends BaseController
             $startRefund = $startRefundTerminal->where("id",$item[0]->terminal->id)->first();
             if($startRefund && $startRefund->amount > 0)
             {
-                // ticket refund charges to terminal
+                // ticket refund charges to terminal refund head
                 $this->updateSaleTransaction(
                     $startLedgers->refundChargesHead, // head
                     $startLedgers->busSaleHead->id,//other head id
                     0, //credit
                     $startRefund->amount, //debit
                     $document_id, //document id
-                    "Schedule Departure Ticket Elt of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    "Schedule Departure Ticket Cancellation Charges to ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
                 $startSaleAmount += $startRefund->amount;
-                // ticket refund charges from terminal
+                // ticket refund charges from terminal refund head to driver
                 $this->updateSaleTransaction(
                     $startLedgers->refundChargesHead, // head
                     $startLedgers->busCashHead->id,//other head id
-                    $startElt, //credit
+                    $startRefund->amount, //credit
                     0, //debit
-                    ($document_id + 1), //document id
-                    "Schedule Departure Ticket Elt of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    ($document_id + 2), //document id
+                    "Schedule Departure Ticket Cancellation Charges From ".$item[0]->terminal->name." To Driver Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
                 $startDriverAmount += $startRefund->amount;
             }
             if($item->sum('discount') > 0)
             {
-                // ticket simple discount to terminal
+                // ticket simple discount to terminal discount head
                 $this->updateSaleTransaction(
                     $startLedgers->manualDiscHead, // head
                     $startLedgers->busSaleHead->id,//other head id
                     0, //credit
                     $item->sum('discount'), //debit
                     $document_id, //document id
-                    "Schedule Departure Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    "Schedule Departure Discount To ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
-                $startSaleAmount += $item->sum('discount');
+                // ticket simple discount from terminal sale head to discount head
+                $this->updateSaleTransaction(
+                    $startLedgers->terminalSaleHead, // head
+                    $startLedgers->busSaleHead->id,//other head id
+                    $item->sum('discount'), //credit
+                    0, //debit
+                    ($document_id + 1), //document id
+                    "Schedule Departure Discount From ".$item[0]->terminal->name." To Expense Against Merge-$ticket_merge_id",
+                    $ticket_merge_id //posting id
+                );
             }
             if($startCommission > 0)
             {
-                // ticket simple discount to terminal
+                // per ticket commission to expense
                 $this->updateSaleTransaction(
                     $startLedgers->perTicketComHead, // head
                     $startLedgers->busCashHead->id,//other head id
                     0, //credit
-                    $startCommission, //debit
-                    ($document_id + 2), //document id
-                    "Schedule Departure Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    round($startCommission), //debit
+                    ($document_id + 1), //document id
+                    "Schedule Departure Per Ticket Commission To ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
-                $startTotalCommission += $startCommission;
+                // per ticket commission from terminal
+                $this->updateSaleTransaction(
+                    $startLedgers->terminalSaleHead, // head
+                    $startLedgers->busCashHead->id,//other head id
+                    round($startCommission), //credit
+                    0, //debit
+                    ($document_id + 1), //document id
+                    "Schedule Departure Per ticket Commission Of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
+                    $ticket_merge_id //posting id
+                );
+                $startTotalCommission += round($startCommission);
             }
             if($startFixCommission > 0)
             {
-                // ticket simple discount to terminal
+                // terminal fixed commission to expense
                 $this->updateSaleTransaction(
                     $startLedgers->fixedComHead, // head
                     $startLedgers->busCashHead->id,//other head id
                     0, //credit
-                    $startFixCommission, //debit
-                    ($document_id + 2), //document id
-                    "Schedule Departure Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    round($startFixCommission), //debit
+                    ($document_id + 1), //document id
+                    "Schedule Departure Fixed Commission To ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
+                    $ticket_merge_id //posting id
+                );
+                // terminal fixed commission from terminal
+                $this->updateSaleTransaction(
+                    $startLedgers->terminalSaleHead, // head
+                    $startLedgers->busCashHead->id,//other head id
+                    round($startFixCommission), //credit
+                    0, //debit
+                    ($document_id + 1), //document id
+                    "Schedule Departure Fixed Commission of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
                 $startTotalCommission += $startFixCommission;
             }
-            if($startAdjustCommission > 0)
-            {
-                // ticket simple discount to terminal
-                $this->updateSaleTransaction(
-                    $startLedgers->adjustmentComHead, // head
-                    $startLedgers->busCashHead->id,//other head id
-                    0, //credit
-                    $startAdjustCommission, //debit
-                    ($document_id + 2), //document id
-                    "Schedule Departure Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
-                    $ticket_merge_id //posting id
-                );
-                $startTotalCommission += $startAdjustCommission;
-            }
+            // if($startAdjustCommission > 0)
+            // {
+            //     // adjustment commission to expense
+            //     $this->updateSaleTransaction(
+            //         $startLedgers->adjustmentComHead, // head
+            //         $startLedgers->busCashHead->id,//other head id
+            //         0, //credit
+            //         $startAdjustCommission, //debit
+            //         ($document_id + 1), //document id
+            //         "Schedule Departure Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+            //         $ticket_merge_id //posting id
+            //     );
+            //     // adjustment simple discount to terminal
+            //     $this->updateSaleTransaction(
+            //         $startLedgers->adjustmentComHead, // head
+            //         $startLedgers->busCashHead->id,//other head id
+            //         0, //credit
+            //         $startAdjustCommission, //debit
+            //         ($document_id + 1), //document id
+            //         "Schedule Departure Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+            //         $ticket_merge_id //posting id
+            //     );
+            //     $startTotalCommission += round($startAdjustCommission);
+            // }
         }
         // total sale sum
         $this->updateSaleTransaction(
@@ -300,7 +342,7 @@ class AccountClosingController extends BaseController
             $startSaleAmount, //credit
             0, //debit
             $document_id, //document id
-            "Schedule Departure Total Amount Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+            "Schedule Departure Total Sale Against Merge-$ticket_merge_id",
             $ticket_merge_id //posting id
         );
         // total driver amount
@@ -309,20 +351,20 @@ class AccountClosingController extends BaseController
             $startLedgers->terminalSaleHead->id,//other head id
             0, //credit
             $startDriverAmount, //debit
-            ($document_id + 1), //document id
-            "Schedule Departure Total Amount Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
-            $ticket_merge_id //posting id
-        );
-        // total commission amount
-        $this->updateSaleTransaction(
-            $startLedgers->busCashHead, // head
-            $startLedgers->adjustmentComHead->id,//other head id
-            $startTotalCommission, //credit
-            0, //debit
             ($document_id + 2), //document id
-            "Schedule Departure Total Amount Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+            "Schedule Departure Total Amount Against Merge-$ticket_merge_id",
             $ticket_merge_id //posting id
         );
+        // // total commission amount
+        // $this->updateSaleTransaction(
+        //     $startLedgers->busCashHead, // head
+        //     $startLedgers->adjustmentComHead->id,//other head id
+        //     $startTotalCommission, //credit
+        //     0, //debit
+        //     ($document_id + 2), //document id
+        //     "Schedule Departure Total Amount Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+        //     $ticket_merge_id //posting id
+        // );
          // arrival
          $returnSaleAmount = 0;
          $returnDriverAmount = 0;
@@ -360,49 +402,53 @@ class AccountClosingController extends BaseController
                     $returnElt += $ticket->elt->elt_price;
                 }
             }
-            // ticket price to terminal
+            // ticket price to terminal sale head
             $this->updateSaleTransaction(
                 $endLedgers->terminalSaleHead, // head
                 $endLedgers->busSaleHead->id,//other head id
                 0, //credit
-                $item->sum('seat_fare') - $item->sum('discount'), //debit
+                $item->sum('seat_fare'), //debit
                 ($document_id + 3), //document id
-                "Schedule Return Ticket Amount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                "Schedule Return Ticket Amount to ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                 $ticket_merge_id //posting id
             );
-            $returnSaleAmount += $item->sum('seat_fare') - $item->sum('discount');
-            // ticket price from terminal
-            $this->updateSaleTransaction(
-                $endLedgers->terminalSaleHead, // head
-                $endLedgers->busCashHead->id,//other head id
-                $item->sum('seat_fare') - $item->sum('discount'), //credit
-                0, //debit
-                ($document_id + 4), //document id
-                "Schedule Return Ticket Amount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
-                $ticket_merge_id //posting id
-            );
-            $returnDriverAmount += $item->sum('seat_fare') - $item->sum('discount');
+            $returnSaleAmount += $item->sum('seat_fare');
+            // ticket price from terminal sale head to driver
+            if($item[0]->online_terminal != 1)
+            {
+                $this->updateSaleTransaction(
+                    $endLedgers->terminalSaleHead, // head
+                    $endLedgers->busCashHead->id,//other head id
+                    $item->sum('seat_fare') - round($returnCommission) - round($returnFixCommission), //credit
+                    0, //debit
+                    ($document_id + 5), //document id
+                    "Schedule Return Ticket Amount From ".$item[0]->terminal->name." To Driver Against Merge-$ticket_merge_id",
+                    $ticket_merge_id //posting id
+                );
+                $returnDriverAmount += $item->sum('seat_fare') - $item->sum('discount') - round($returnCommission) - round($returnFixCommission);
+            }
+
             if($returnElt > 0)
             {
-                // ticket elt to terminal
+                // ticket elt to terminal elt head
                 $this->updateSaleTransaction(
                     $endLedgers->terminalEltHead, // head
                     $endLedgers->busSaleHead->id,//other head id
                     0, //credit
                     $returnElt, //debit
                     ($document_id + 3), //document id
-                    "Schedule Return Ticket Elt of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    "Schedule Return Ticket Elt Amount to ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
                 $returnSaleAmount += $returnElt;
-                // ticket elt from terminal
+                // ticket elt from terminal elt head to driver
                 $this->updateSaleTransaction(
                     $endLedgers->terminalEltHead, // head
                     $endLedgers->busCashHead->id,//other head id
                     $returnElt, //credit
                     0, //debit
-                    ($document_id + 4), //document id
-                    "Schedule Departure Ticket Elt of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    ($document_id + 5), //document id
+                    "Schedule Return Ticket Elt Amount from ".$item[0]->terminal->name." To Driver Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
                 $returnDriverAmount += $returnElt;
@@ -410,85 +456,114 @@ class AccountClosingController extends BaseController
             $returnRefund = $returnRefundTerminal->where("id",$item[0]->terminal->id)->first();
             if($returnRefund && $returnRefund->amount > 0)
             {
-                // ticket refund charges to terminal
+                // ticket refund charges to terminal refund head
                 $this->updateSaleTransaction(
-                    $endLedgers->terminalEltHead, // head
+                    $endLedgers->refundChargesHead, // head
                     $endLedgers->busSaleHead->id,//other head id
                     0, //credit
                     $returnRefund->amount, //debit
                     ($document_id + 3), //document id
-                    "Schedule Return Ticket Elt of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    "Schedule Departure Ticket Cancellation Charges to ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
                 $returnSaleAmount += $returnRefund->amount;
-                // ticket refund charges from terminal
+                // ticket refund charges from terminal refund head to driver
                 $this->updateSaleTransaction(
-                    $endLedgers->terminalEltHead, // head
+                    $endLedgers->refundChargesHead, // head
                     $endLedgers->busCashHead->id,//other head id
                     $returnRefund->amount, //credit
                     0, //debit
-                    ($document_id + 4), //document id
-                    "Schedule Departure Ticket Elt of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    ($document_id + 5), //document id
+                    "Schedule Return Ticket Cancellation Charges From ".$item[0]->terminal->name." To Driver Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
                 $returnDriverAmount += $returnRefund->amount;
             }
             if($item->sum('discount') > 0)
             {
-                // ticket simple discount to terminal
+                // ticket simple discount to terminal discount head
                 $this->updateSaleTransaction(
                     $endLedgers->manualDiscHead, // head
                     $endLedgers->busSaleHead->id,//other head id
                     0, //credit
                     $item->sum('discount'), //debit
                     ($document_id + 3), //document id
-                    "Schedule Return Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    "Schedule Return Discount To ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
-                $returnSaleAmount += $item->sum('discount');
+                // ticket simple discount from terminal sale head to discount head
+                $this->updateSaleTransaction(
+                    $endLedgers->terminalSaleHead, // head
+                    $endLedgers->busSaleHead->id,//other head id
+                    $item->sum('discount'), //credit
+                    0, //debit
+                    ($document_id + 4), //document id
+                    "Schedule Return Discount From ".$item[0]->terminal->name." To Expense Against Merge-$ticket_merge_id",
+                    $ticket_merge_id //posting id
+                );
             }
             if($returnCommission > 0)
             {
-                // ticket simple discount to terminal
+                // per ticket commission to expense
                 $this->updateSaleTransaction(
                     $endLedgers->perTicketComHead, // head
                     $endLedgers->busCashHead->id,//other head id
                     0, //credit
-                    $returnCommission, //debit
-                    ($document_id + 5), //document id
-                    "Schedule Return Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    round($returnCommission), //debit
+                    ($document_id + 4), //document id
+                    "Schedule Departure Per Ticket Commission To ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
-                $returnTotalCommission += $returnCommission;
+                // per ticket commission from terminal
+                $this->updateSaleTransaction(
+                    $endLedgers->terminalSaleHead, // head
+                    $endLedgers->busCashHead->id,//other head id
+                    round($returnCommission), //credit
+                    0, //debit
+                    ($document_id + 4), //document id
+                    "Schedule Return Per ticket Commission Of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
+                    $ticket_merge_id //posting id
+                );
+                $returnTotalCommission += round($returnCommission);
             }
             if($returnFixCommission > 0)
             {
-                // ticket simple discount to terminal
+                // terminal fixed commission to expense
                 $this->updateSaleTransaction(
                     $endLedgers->fixedComHead, // head
                     $endLedgers->busCashHead->id,//other head id
                     0, //credit
-                    $returnFixCommission, //debit
-                    ($document_id + 5), //document id
-                    "Schedule Return Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    round($returnFixCommission), //debit
+                    ($document_id + 4), //document id
+                    "Schedule Return Fixed Commission To ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
-                $returnTotalCommission += $returnFixCommission;
-            }
-            if($returnAdjustCommission > 0)
-            {
                 // ticket simple discount to terminal
                 $this->updateSaleTransaction(
-                    $endLedgers->adjustmentComHead, // head
+                    $endLedgers->terminalSaleHead, // head
                     $endLedgers->busCashHead->id,//other head id
-                    0, //credit
-                    $returnAdjustCommission, //debit
-                    ($document_id + 5), //document id
-                    "Schedule Return Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+                    round($returnFixCommission), //credit
+                    0, //debit
+                    ($document_id + 4), //document id
+                    "Schedule Return Fixed Commission of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
-                $returnTotalCommission += $returnAdjustCommission;
+                $returnTotalCommission += round($returnFixCommission);
             }
+            // if($returnAdjustCommission > 0)
+            // {
+            //     // ticket simple discount to terminal
+            //     $this->updateSaleTransaction(
+            //         $endLedgers->adjustmentComHead, // head
+            //         $endLedgers->busCashHead->id,//other head id
+            //         0, //credit
+            //         $returnAdjustCommission, //debit
+            //         ($document_id + 5), //document id
+            //         "Schedule Return Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+            //         $ticket_merge_id //posting id
+            //     );
+            //     $returnTotalCommission += $returnAdjustCommission;
+            // }
         }
         // total sale sum
         $this->updateSaleTransaction(
@@ -497,7 +572,7 @@ class AccountClosingController extends BaseController
             $returnSaleAmount, //credit
             0, //debit
             ($document_id + 3), //document id
-            "Schedule Return Total Amount Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+            "Schedule Return Total Sale Against Merge-$ticket_merge_id",
             $ticket_merge_id //posting id
         );
         // total driver amount
@@ -506,20 +581,20 @@ class AccountClosingController extends BaseController
             $endLedgers->terminalSaleHead->id,//other head id
             0, //credit
             $returnDriverAmount, //debit
-            ($document_id + 4), //document id
-            "Schedule Return Total Amount Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
-            $ticket_merge_id //posting id
-        );
-        // total commission amount
-        $this->updateSaleTransaction(
-            $endLedgers->busCashHead, // head
-            $endLedgers->adjustmentComHead->id,//other head id
-            $returnTotalCommission, //credit
-            0, //debit
             ($document_id + 5), //document id
-            "Schedule Return Total Amount Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+            "Schedule Return Total Amount Against Merge-$ticket_merge_id",
             $ticket_merge_id //posting id
         );
+        // // total commission amount
+        // $this->updateSaleTransaction(
+        //     $endLedgers->busCashHead, // head
+        //     $endLedgers->adjustmentComHead->id,//other head id
+        //     $returnTotalCommission, //credit
+        //     0, //debit
+        //     ($document_id + 5), //document id
+        //     "Schedule Return Total Amount Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
+        //     $ticket_merge_id //posting id
+        // );
         // expense
         $expenseTotal = 0;
         foreach($data->expense as $item)
@@ -552,13 +627,13 @@ class AccountClosingController extends BaseController
         $handCashHead = AccountHead::where(["company_id"=>Auth::user()->company_id,"id"=>1])->first();
         $driverDebit = AccountTransaction::where(["company_id"=>Auth::user()->company_id,"posting_id"=>$ticket_merge_id,"account_head_id"=>$endLedgers->busCashHead->id])->sum('debit');
         $driverCredit = AccountTransaction::where(["company_id"=>Auth::user()->company_id,"posting_id"=>$ticket_merge_id,"account_head_id"=>$endLedgers->busCashHead->id])->sum('credit');
-        $netDriverCash = $driverCredit - $driverDebit;
+       
         // driver cash
         $this->updateSaleTransaction(
             $endLedgers->busCashHead, // head
             $handCashHead->id,//cash in hand ledger
-            $netDriverCash > 0 ? $netDriverCash : 0 , //credit
-            $netDriverCash > 0 ? 0 : $netDriverCash, //debit
+            $driverCredit > $driverDebit ? 0 : ($driverDebit - $driverCredit) , //credit
+            $driverCredit > $driverDebit ? ($driverCredit - $driverDebit) : 0, //debit
             ($document_id + 7), //document id
             "Bus Cash Ledger Against Merge-$ticket_merge_id",
             $ticket_merge_id //posting id
@@ -567,8 +642,8 @@ class AccountClosingController extends BaseController
         $this->updateSaleTransaction(
             $handCashHead, // head
             $endLedgers->busCashHead->id,//cash in hand ledger
-            $netDriverCash > 0 ? 0 : $netDriverCash , //credit
-            $netDriverCash > 0 ? $netDriverCash : 0, //debit
+            $driverCredit > $driverDebit ? ($driverCredit - $driverDebit) : 0 , //credit
+            $driverCredit > $driverDebit ? 0 : ($driverDebit - $driverCredit), //debit
             ($document_id + 7), //document id
             "Cash In Hand Ledger Against Merge-$ticket_merge_id",
             $ticket_merge_id //posting id

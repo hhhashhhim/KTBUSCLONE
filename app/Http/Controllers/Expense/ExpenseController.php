@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Expense;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account\AccountTransaction;
 use App\Models\Schedule\TicketClosing;
 use App\Models\Schedule\TicketClosingMerge;
 use App\Models\Schedule\Schedule;
@@ -111,10 +112,11 @@ class ExpenseController extends Controller
 
         $merge->refund += $refundAmount;
         
-
+        $checkClosing = AccountTransaction::where(["company_id"=>Auth::user()->company_id,"posting_id"=>$request->ticket_merge_id])->first();
         return [
             "expenses" => $expenses,
             "sale" => $merge->seat_fare - $merge->discount - $merge->commission + $merge->elt + $merge->refund,
+            "closing" => $checkClosing ? true : false,
         ];
     }
 
