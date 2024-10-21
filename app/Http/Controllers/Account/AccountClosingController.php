@@ -162,7 +162,7 @@ class AccountClosingController extends BaseController
                 }
             }
             // $sale = ($item->sum('seat_fare') - $item->sum('discount') - $item->sum('discount')) + $startElt - $startCommission - $startAdjustCommission - $startFixCommission;
-            return $data;
+            
             // ticket price to terminal sale head
             $this->updateSaleTransaction(
                 $startLedgers->terminalSaleHead, // head
