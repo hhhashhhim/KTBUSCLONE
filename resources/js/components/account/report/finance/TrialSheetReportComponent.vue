@@ -82,10 +82,10 @@
                             </tr>
                             <tr>
                                 <td class="border">Total</td>
-                                <td class="border">{{ calculateBalance("previous_debits") }}</td>
-                                <td class="border">{{ calculateBalance("previous_credits") }}</td>
-                                <td class="border">{{ calculateBalance("current_debits") }}</td>
-                                <td class="border">{{ calculateBalance("current_credits") }}</td>
+                                <td class="border">{{ calculateBalance("previous_debits",index) }}</td>
+                                <td class="border">{{ calculateBalance("previous_credits",index) }}</td>
+                                <td class="border">{{ calculateBalance("current_debits",index) }}</td>
+                                <td class="border">{{ calculateBalance("current_credits",index) }}</td>
                                 <td class="border">-</td>
                                 <td class="border">-</td>
                             </tr>
@@ -108,39 +108,31 @@ export default {
         };
     },
   methods: {
-    calculateBalance(flag) {
+    calculateBalance(flag,group) {
         let previousBalance = 0;
 
         if(flag == "previous_debits")
         {
-            for (let i = 0; i < this.data.record.length; i++) {
-                for (let j = 0; j < this.data.record[i].level_four.length; j++) {
-                    previousBalance += parseFloat(this.data.record[i].level_four[j].previous_debits);
-                }
+            for (let j = 0; j < this.data.record[group].level_four.length; j++) {
+                previousBalance += parseFloat(this.data.record[group].level_four[j].previous_debits);
             }
         }
         if(flag == "previous_credits")
         {
-            for (let i = 0; i < this.data.record.length; i++) {
-                for (let j = 0; j < this.data.record[i].level_four.length; j++) {
-                    previousBalance += parseFloat(this.data.record[i].level_four[j].previous_credits);
-                }
+            for (let j = 0; j < this.data.record[group].level_four.length; j++) {
+                previousBalance += parseFloat(this.data.record[group].level_four[j].previous_credits);
             }
         }
         if(flag == "current_debits")
         {
-            for (let i = 0; i < this.data.record.length; i++) {
-                for (let j = 0; j < this.data.record[i].level_four.length; j++) {
-                    previousBalance += parseFloat(this.data.record[i].level_four[j].current_debits);
-                }
+            for (let j = 0; j < this.data.record[group].level_four.length; j++) {
+                previousBalance += parseFloat(this.data.record[group].level_four[j].current_debits);
             }
         }
         if(flag == "current_credits")
         {
-            for (let i = 0; i < this.data.record.length; i++) {
-                for (let j = 0; j < this.data.record[i].level_four.length; j++) {
-                    previousBalance += parseFloat(this.data.record[i].level_four[j].current_credits);
-                }
+            for (let j = 0; j < this.data.record[group].level_four.length; j++) {
+                previousBalance += parseFloat(this.data.record[group].level_four[j].current_credits);
             }
         }
         // if(flag == "closing_debits")

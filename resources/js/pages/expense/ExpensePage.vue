@@ -293,11 +293,14 @@ export default {
             }
         },
         async existingExpenses() {
+           
+            
             const res = await this.callApi("post", 'expenses', {ticket_merge_id: this.postData.ticket_merge_id});
             if (res.status == 200) {
                 const expenses = res.data.expenses;
                 this.totalSale = res.data.sale;
                 this.checkClosing = res.data.closing;
+          
                 if (expenses != "") {
                     this.loop = expenses.length;
                     for (var i = 0; i < expenses.length; i++) {
@@ -308,6 +311,7 @@ export default {
                     }
                     this.totalAmount = this.postData.amount.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
                     this.netProfit = this.totalSale - this.totalAmount;
+                    
                 } else {
                     this.loop = 1;
                     this.editAble = false;
@@ -435,6 +439,12 @@ export default {
             if (res.status === 200) {
                 this.loading = false;
                 this.closeModal();
+                this.postData.category = [];
+                this.postData.description = [];
+                this.postData.amount = [];
+                this.postData.invoice = [];
+                this.loop = 0;
+                this.editAble = true;
                 this.existingExpenses();
                 swal({
                     title: "Success",

@@ -26526,38 +26526,30 @@ __webpack_require__.r(__webpack_exports__);
     return {};
   },
   methods: {
-    calculateBalance: function calculateBalance(flag) {
+    calculateBalance: function calculateBalance(flag, group) {
       var previousBalance = 0;
 
       if (flag == "previous_debits") {
-        for (var i = 0; i < this.data.record.length; i++) {
-          for (var j = 0; j < this.data.record[i].level_four.length; j++) {
-            previousBalance += parseFloat(this.data.record[i].level_four[j].previous_debits);
-          }
+        for (var j = 0; j < this.data.record[group].level_four.length; j++) {
+          previousBalance += parseFloat(this.data.record[group].level_four[j].previous_debits);
         }
       }
 
       if (flag == "previous_credits") {
-        for (var _i = 0; _i < this.data.record.length; _i++) {
-          for (var _j = 0; _j < this.data.record[_i].level_four.length; _j++) {
-            previousBalance += parseFloat(this.data.record[_i].level_four[_j].previous_credits);
-          }
+        for (var _j = 0; _j < this.data.record[group].level_four.length; _j++) {
+          previousBalance += parseFloat(this.data.record[group].level_four[_j].previous_credits);
         }
       }
 
       if (flag == "current_debits") {
-        for (var _i2 = 0; _i2 < this.data.record.length; _i2++) {
-          for (var _j2 = 0; _j2 < this.data.record[_i2].level_four.length; _j2++) {
-            previousBalance += parseFloat(this.data.record[_i2].level_four[_j2].current_debits);
-          }
+        for (var _j2 = 0; _j2 < this.data.record[group].level_four.length; _j2++) {
+          previousBalance += parseFloat(this.data.record[group].level_four[_j2].current_debits);
         }
       }
 
       if (flag == "current_credits") {
-        for (var _i3 = 0; _i3 < this.data.record.length; _i3++) {
-          for (var _j3 = 0; _j3 < this.data.record[_i3].level_four.length; _j3++) {
-            previousBalance += parseFloat(this.data.record[_i3].level_four[_j3].current_credits);
-          }
+        for (var _j3 = 0; _j3 < this.data.record[group].level_four.length; _j3++) {
+          previousBalance += parseFloat(this.data.record[group].level_four[_j3].current_credits);
         }
       } // if(flag == "closing_debits")
       // {
@@ -43098,6 +43090,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   _this5.loading = false;
 
                   _this5.closeModal();
+
+                  _this5.postData.category = [];
+                  _this5.postData.description = [];
+                  _this5.postData.amount = [];
+                  _this5.postData.invoice = [];
+                  _this5.loop = 0;
+                  _this5.editAble = true;
 
                   _this5.existingExpenses();
 
@@ -62160,13 +62159,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       )]);
     }), 128
     /* KEYED_FRAGMENT */
-    )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.calculateBalance("previous_debits")), 1
+    )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.calculateBalance("previous_debits", index)), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.calculateBalance("previous_credits")), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.calculateBalance("previous_credits", index)), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.calculateBalance("current_debits")), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.calculateBalance("current_debits", index)), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.calculateBalance("current_credits")), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.calculateBalance("current_credits", index)), 1
     /* TEXT */
     ), _hoisted_40, _hoisted_41])], 64
     /* STABLE_FRAGMENT */
