@@ -180,7 +180,7 @@ class AccountClosingController extends BaseController
                 $this->updateSaleTransaction(
                     $startLedgers->terminalSaleHead, // head
                     $startLedgers->busCashHead->id,//other head id
-                    $item->sum('seat_fare') - round($startCommission) - round($startFixCommission), //credit
+                    $item->sum('seat_fare') - $item->sum('discount') - round($startCommission) - round($startFixCommission), //credit
                     0, //debit
                     ($document_id + 2), //document id
                     "Schedule Departure Ticket Amount From ".$item[0]->terminal->name." To Driver Against Merge-$ticket_merge_id",
@@ -419,7 +419,7 @@ class AccountClosingController extends BaseController
                 $this->updateSaleTransaction(
                     $endLedgers->terminalSaleHead, // head
                     $endLedgers->busCashHead->id,//other head id
-                    $item->sum('seat_fare') - round($returnCommission) - round($returnFixCommission), //credit
+                    $item->sum('seat_fare') - $item->sum('discount') - round($returnCommission) - round($returnFixCommission), //credit
                     0, //debit
                     ($document_id + 5), //document id
                     "Schedule Return Ticket Amount From ".$item[0]->terminal->name." To Driver Against Merge-$ticket_merge_id",

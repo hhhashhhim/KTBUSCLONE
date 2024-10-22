@@ -76,12 +76,12 @@
         </tr>
     </table>
     <br>
-    <div style=" display: grid; grid-template-columns: auto auto auto;">
+    <div>
         <!-- City 1 -->
-        <div>
+        <div style="width:50%;float: left; margin-bottom: 10px">
             <table border="2" style="text-align: center;">
-                <tr>
-                    <th colspan="4">{{$singleData->city_one}}</th>
+                <tr style="background-color: black; color: white;">
+                    <th colspan="5">{{$singleData->city_one}}</th>
                 </tr>
                 <tr>
                     <th>Sr No</th>
@@ -147,18 +147,18 @@
             <table border="2" style="text-align: center;">
                 <tr>
                     <td style="width: 44%">Total</td>
-                    <td style="width: 32%">{{$startTotalPass}}</td>
-                    <td style="width: 17%">{{$startTotalAmount}}</td>
+                    <td style="width: 34%">{{$startTotalPass}}</td>
+                    <td style="width: 16%; background-color: yellow;">{{$startTotalAmount}}</td>
                     <td style="">{{$startTotalElt}}</td>
                 </tr>
             </table>
 
         </div>
         <!-- City 2 -->
-        <div>
-            <table border="2" style="text-align: center;border-left: none;border-right: none;">
-                <tr>
-                    <th colspan="4"
+        <div style="width:50%;float: left; margin-bottom: 10px">
+            <table border="2" style="text-align: center;border-left: none;">
+                <tr style="background-color: black; color: white;">
+                    <th colspan="5"
                         style="border-left: none !important; border-right: none !important;">{{$singleData->city_two}}</th>
                 </tr>
                 <tr>
@@ -223,35 +223,38 @@
             </table>
             <table border="2" style="text-align: center;">
                 <tr>
-                    <td style="width: 43%">Total</td>
-                    <td style="width: 38%">{{$returnTotalPass}}</td>
-                    <td style="width: 17.5%">{{$returnTotalAmount}}</td>
+                    <td style="width: 53%">Total</td>
+                    <td style="width: 28%">{{$returnTotalPass}}</td>
+                    <td style="width: 14%; background-color: yellow;">{{$returnTotalAmount}}</td>
                     <td style=""> {{$returnTotalElt}}</td>
                 </tr>
 
             </table>
         </div>
-        <!-- City3 -->
+    </div>
+    <div style="clear: both;">
         <div>
             <table border="2" style="text-align: center;">
-                <tr>
-                    <th colspan="2">Expenses</th>
+                <tr style="background-color: black; color: white;">
+                    <th colspan="3">Expenses</th>
                 </tr>
                 <tr>
                     <th>Expenses Details</th>
+                    <th>Description</th>
                     <th>Amount</th>
                 </tr>
                 @foreach($data->expense as $item)
                     <tr>
                         <td>{{$item->expense_category->name}}</td>
+                        <td>{{$item->description}}</td>
                         <td>{{$item->amount}}</td>
                     </tr>
                 @endforeach
             </table>
             <table border="2" style="text-align: center;">
                 <tr>
-                    <td style="width: 46%">Total</td>
-                    <td style="width: 17.5%">{{$data->expense->sum("amount")}}</td>
+                    <td style="width: 91%">Total</td>
+                    <td style="width: 12%; background-color: yellow;">{{$data->expense->sum("amount")}}</td>
                 </tr>
             </table>
         </div>
@@ -259,7 +262,7 @@
             $startTotalAmount +=$startTotalElt;
             $returnTotalAmount +=$returnTotalElt;
         @endphp
-        <div style="margin-top: 30px;">
+        <div style="margin-top: 30px; background-color: #bdbdbd;">
             <table border="2" style="text-align: center;">
                 <tr>
                     <td style="width: 46%">{{$singleData->city_one}}</td>

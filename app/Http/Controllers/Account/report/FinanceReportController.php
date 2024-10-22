@@ -139,6 +139,7 @@ class FinanceReportController extends BaseController
             $q->where('created_at', '<=', $request->to." 23:59:59");
         })
         ->orderBy("created_at",'ASC')
+        ->orderBy('document_id')
         ->get();
 
         $general_ledgers = (object)[];
@@ -230,6 +231,7 @@ class FinanceReportController extends BaseController
             $q->where('created_at', '<=', $request->to." 23:59:59");
         })
         ->orderBy("created_at",'ASC')
+        ->orderBy('document_id')
         ->get();
 
         $ledgers = (object)[];
@@ -314,6 +316,7 @@ class FinanceReportController extends BaseController
             $q->where('created_at', '<=', $request->to." 23:59:59");
         })
         ->orderBy("created_at",'ASC')
+        ->orderBy('document_id')
         ->get();
 
         $journals = (object)[];
@@ -428,7 +431,7 @@ class FinanceReportController extends BaseController
             $q->where('created_at', '<=', $request->current." 23:59:59");
         })
         ->with("account_head:id,name,code","level_four:id,name,code")
-        ->orderBy("id",'ASC')
+        ->orderBy("document_id",'ASC')
         ->get()
         ->groupBy(["type","document_id"]);
 
