@@ -43,7 +43,7 @@ class AccountClosingController extends BaseController
                 })
             ->with("elt")->with(["commission"=>function($q) use ($closing_pair){
             $q->where("route_id",$closing_pair[0]->schedule->route_id);
-        }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[0]->id)->with('terminal:id,name','bus:id,bus_number', 'schedule:id,discount_id')->get()->groupBy(['terminal_id']);
+        }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[0]->id)->with('terminal:id,name', 'schedule:id,discount_id')->get()->groupBy(['terminal_id']);
 
         $data->schedule_return = Ticket::withTrashed()
             ->where(function ($query) {
@@ -52,7 +52,7 @@ class AccountClosingController extends BaseController
                 })
             ->with("elt")->with(["commission"=>function($q) use ($closing_pair){
             $q->where("route_id",$closing_pair[1]->schedule->route_id);
-        }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[1]->id)->with('terminal:id,name','bus:id,bus_number', 'schedule:id,discount_id')->get()->groupBy(['terminal_id']);
+        }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[1]->id)->with('terminal:id,name', 'schedule:id,discount_id')->get()->groupBy(['terminal_id']);
     
         $data->expense = TicketMergeExpense::where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $ticket_merge_id])
         ->with("expense_category:id,name","merge.bus:id,bus_number","merge:id,bus_id")->get();
@@ -704,6 +704,8 @@ class AccountClosingController extends BaseController
     // ledger opening
     function getSaleLedger($item) 
     {
+        $merge = TicketClosingMerge::find($item[0]->ticket_merge_id);
+        $bus = Bus::find($merge->bus_id);
         // sale side terminal group at level four with terminal name
         $terminalSaleGroup = $this->accountGroupFourthCreate(
             $item[0]->terminal->name.'-'.$item[0]->terminal->id." |SALE GROUP",
@@ -789,13 +791,13 @@ class AccountClosingController extends BaseController
 
         // sale side bus group at level four with bus number
         $busSaleGroup = $this->accountGroupFourthCreate(
-           $item[0]->bus->bus_number.'-'.$item[0]->bus->id." |SALE GROUP",
+           $bus->bus_number.'-'.$bus->id." |SALE GROUP",
             13, // SERVICE REVENUE, SALES
             56, // STATION WISE REVENUE
         );
         // sale side bus ledger at level five with bus number
         $busSaleHead = $this->accountHeadCreate(
-            $item[0]->bus->bus_number.'-'.$item[0]->bus->id.' |SALE LEDGER',
+            $bus->bus_number.'-'.$bus->id.' |SALE LEDGER',
             4, // REVENUE
             13, // SERVICE REVENUE, SALES
             56, // STATION WISE REVENUE
@@ -804,13 +806,13 @@ class AccountClosingController extends BaseController
 
         // cash side bus group at level four with bus number
         $busCashGroup = $this->accountGroupFourthCreate(
-            $item[0]->bus->bus_number.'-'.$item[0]->bus->id." |CASH GROUP",
+            $bus->bus_number.'-'.$bus->id." |CASH GROUP",
             6, // CURRENT ASSETS
             29, // CASH AND BANK BALANCES
          );
         // cash side bus ledger at level five with bus number
         $busCashHead = $this->accountHeadCreate(
-            $item[0]->bus->bus_number.'-'.$item[0]->bus->id.' |CASH LEDGER',
+            $bus->bus_number.'-'.$bus->id.' |CASH LEDGER',
             1, // ASSETS
             6, // CURRENT ASSETS
             29, // CASH AND BANK BALANCES
