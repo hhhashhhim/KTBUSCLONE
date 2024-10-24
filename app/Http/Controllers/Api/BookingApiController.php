@@ -633,7 +633,7 @@ class BookingApiController extends Controller
     {
         $scheduleId = $request->schedule_id;
         $lockName = "stayLock:" . $scheduleId;  // Dynamic lock based on schedule ID
-        try {
+        // try {
                 $lock = Cache::lock($lockName, 7);  // 7-second timeout
 
                 if ($lock->get()) {
@@ -660,7 +660,7 @@ class BookingApiController extends Controller
                                 'updated_by' => Auth::user()->id,
                                 'booked_time' => date("Y-m-d H:i:s"),
                             ]);
-                            // ticketConfirmedMessage($request->invoice_id);
+                            return $check = ticketConfirmedMessage($request->invoice_id);
                             //////////////////////////////////////////////
                             ActivityLog::create([
                                 "activity_by" => Auth::user()->id,
@@ -941,8 +941,8 @@ class BookingApiController extends Controller
                     $error = ["System is busy. Please try again."];
                     return new ConflictResource($error);
                 }
-            } catch (\Exception $e) {
-                return new BreakResource($e->getMessage());
-        }
+        //     } catch (\Exception $e) {
+        //         return new BreakResource($e->getMessage());
+        // }
     }
 }
