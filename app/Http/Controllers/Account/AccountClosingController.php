@@ -322,7 +322,7 @@ class AccountClosingController extends BaseController
                     "Schedule Departure Adjustment Commission of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
-                // adjustment commission from cash in hand to kt company terminal wise
+                // adjustment commission from cash in hand to kt company terminal wise 
                 $this->updateSaleTransaction(
                     $startLedgers->adjustmentComHead, // head
                     $handCashHead->id,//other head id
