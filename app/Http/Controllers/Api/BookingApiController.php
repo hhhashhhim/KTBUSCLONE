@@ -31,7 +31,6 @@ use App\Models\Terminal;
 use App\Models\Customer;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleTerminalVisibility;
-use Illuminate\Support\Facades\Log;
 use App\Models\City;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\BreakResource;
@@ -661,14 +660,7 @@ class BookingApiController extends Controller
                                 'updated_by' => Auth::user()->id,
                                 'booked_time' => date("Y-m-d H:i:s"),
                             ]);
-                            // Handle potential API error without stopping the execution
-                            try {
-                                ticketConfirmedMessage($request->invoice_id);
-                            } catch (\Exception $e) {
-                                // Log the error for debugging purposes
-                                Log::error("Error in ticketConfirmedMessage: " . $e->getMessage());
-                                // Continue with the remaining code
-                            }
+                            // ticketConfirmedMessage($request->invoice_id);
                             //////////////////////////////////////////////
                             ActivityLog::create([
                                 "activity_by" => Auth::user()->id,
