@@ -344,7 +344,8 @@ class BookingController extends Controller
                             'added_by'            => Auth::user()->id,
                             'updated_by'          => Auth::user()->id,
                             'discount'            => ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
-                            'display_discount'    => $checkDiscount,
+                            'schedule_discount'   => $checkDiscount->schedule_discount,
+                            'terminal_discount'   => $checkDiscount->terminal_discount,
                             'points_usage'        => $request->pointsUseInput / count($request->selectedSeats),
                         ]);
                         if ($isPartial == 1) {
@@ -386,7 +387,7 @@ class BookingController extends Controller
                     }
                     ActivityLog::create([
                         "activity_by"    => Auth::user()->id,
-                        "message"        => Auth::user()->name." ($checkDiscount)| stored ticket ($request->type) | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->selectedSeats)." --- ".json_encode($request->selectedSeatsFare),
+                        "message"        => Auth::user()->name." | stored ticket ($request->type) | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->selectedSeats)." --- ".json_encode($request->selectedSeatsFare),
                         "requested_host" => $request->ip(),
                         "company_id"     => Auth::user()->company_id
                     ]);

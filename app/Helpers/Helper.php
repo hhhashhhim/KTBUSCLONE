@@ -213,15 +213,19 @@ if (!function_exists('checkDiscountAmount')) {
             ->first()->fare;
 
         $discounted_fare = $fare;
+        $sdiscount = 0;
         if ($scheduleDiscount) {
             if ($scheduleDiscount->type == "percentage") {
                 $number = $scheduleDiscount->percentage / 100;
                 $percentage = (int)$fare * $number;
                 $discounted_fare = round((int)$fare - $percentage);
+                $sdiscount = $percentage;
             } else {
                 $discounted_fare = (int)$fare - (int)$scheduleDiscount->flat;
+                $sdiscount = (int)$scheduleDiscount->flat;
             }
         }
+        $tdiscount = 0;
         if ($terminalDiscount) {
             $tdiscount = ((int)$fare / 100) * (float)$terminalDiscount->discount;
             $discounted_fare = $discounted_fare - $tdiscount;
@@ -229,19 +233,50 @@ if (!function_exists('checkDiscountAmount')) {
         // check if any discount/surcharge apply then it should apply custom round other wise show fix fare
         if($fare == $discounted_fare)
         {
-            return 0;
+            return (object)[
+                "schedule_discount" => 0,
+                "terminal_discount" => 0,
+            ];
         }
+        
+        $appliedFare = customRound($discounted_fare);
 
-        $discount = round($fare - $discounted_fare);
-        $result = $discount % 10;
-        if($result == 0)
+        $roundAmount = $discounted_fare - $appliedFare;
+        
+        if($sdiscount > 0 && $tdiscount > 0)
         {
-            return $discount;
+            return (object)[
+                "schedule_discount" => round($sdiscount + ($roundAmount/2)),
+                "terminal_discount" => intVal($tdiscount + ($roundAmount/2)),
+            ];
         }
-        else
+        elseif($sdiscount > 0)
         {
-            return $discount - $result;
+            return (object)[
+                "schedule_discount" => $sdiscount + $roundAmount,
+                "terminal_discount" => 0,
+            ];
         }
+        elseif($tdiscount > 0)
+        {
+            return (object)[
+                "schedule_discount" => 0,
+                "terminal_discount" => $tdiscount + $roundAmount,
+            ];
+        }
+       
+        
+        // $result = $discount % 100;
+        // if($result == 0)
+        // {
+        //     return $discount;
+        // }
+        // else
+        // {
+        //     return $discount - $result;
+        // }
+
+        
     }
 }
 
@@ -326,7 +361,8 @@ if (!function_exists('updateAdvancedSeat')) {
                 'invoice_id' => $invoice->id,
                 'seat_fare' => $request->reservedFare[$key],
                 'discount' => ($request->discount ? round($request->discount / count($request->alreadyBookedId)) : ($finalAmountDiscount ? ($finalAmountDiscount / count($request->alreadyBookedId)) : 0)),
-                'display_discount' => $checkDiscount,
+                'schedule_discount'   => $checkDiscount->schedule_discount,
+                'terminal_discount'   => $checkDiscount->terminal_discount,
                 'remarks' => $request->remarks,
                 'customer_id' => $customerData->id,
                 'updated_by' => Auth::user()->id,

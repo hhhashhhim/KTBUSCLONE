@@ -171,11 +171,11 @@
 
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Fare :</p>
-                <p class="my-5 float-right">{{ collect($data['tickets'])->sum('seat_fare') + collect($data['tickets'])->sum('display_discount') }}</p>
+                <p class="my-5 float-right">{{ collect($data['tickets'])->sum('seat_fare') + collect($data['tickets'])->sum('schedule_discount') + collect($data['tickets'])->sum('terminal_discount') }}</p>
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Discount :</p>
-                <p class="my-5 float-right">{{ (collect($data['tickets'])->sum('discount') ?? 0) + collect($data['tickets'])->sum('display_discount') }}</p>
+                <p class="my-5 float-right">{{ (collect($data['tickets'])->sum('discount') ?? 0) + collect($data['tickets'])->sum('schedule_discount') + collect($data['tickets'])->sum('terminal_discount') }}</p>
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Total Fare :</p>

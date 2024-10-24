@@ -329,7 +329,7 @@ class AccountClosingController extends BaseController
                     0, //credit
                     $startAdjustCommission, //debit
                     ($document_id + 8), //document id
-                    "Schedule Departure Adjustment Commission of Against Merge-$ticket_merge_id",
+                    "Schedule Departure Adjustment Commission of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
             }
@@ -558,7 +558,7 @@ class AccountClosingController extends BaseController
                     0, //credit
                     $returnAdjustCommission, //debit
                     ($document_id + 8), //document id
-                    "Schedule Return Adjustment Commission of Against Merge-$ticket_merge_id",
+                    "Schedule Return Adjustment Commission of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
                     $ticket_merge_id //posting id
                 );
             }

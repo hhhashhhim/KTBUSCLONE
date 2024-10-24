@@ -148,11 +148,11 @@
 
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Fare :</p>
-                <p class="my-5 float-right">{{ $data['tickets'][$key]['seat_fare'] + $data['tickets'][$key]['display_discount'] }}</p>
+                <p class="my-5 float-right">{{ $data['tickets'][$key]['seat_fare'] + $data['tickets'][$key]['schedule_discount'] + $data['tickets'][$key]['terminal_discount'] }}</p>
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Discount :</p>
-                <p class="my-5 float-right">{{ ($data['tickets'][$key]['discount'] ?? 0) + $data['tickets'][$key]['display_discount'] }}</p>
+                <p class="my-5 float-right">{{ ($data['tickets'][$key]['discount'] ?? 0) + $data['tickets'][$key]['schedule_discount'] + $data['tickets'][$key]['terminal_discount'] }}</p>
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Total Fare :</p>

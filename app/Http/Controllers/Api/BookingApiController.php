@@ -886,7 +886,8 @@ class BookingApiController extends Controller
                                 'added_by' => Auth::user()->id,
                                 'updated_by' => Auth::user()->id,
                                 'discount' => 0,
-                                'display_discount'    => $checkDiscount,
+                                'schedule_discount'   => $checkDiscount->schedule_discount,
+                                'terminal_discount'   => $checkDiscount->terminal_discount,
                                 'points_usage' => 0,
                             ]);
                             if ($isPartial == 1) {
