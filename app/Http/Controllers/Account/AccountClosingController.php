@@ -124,7 +124,7 @@ class AccountClosingController extends BaseController
         ->orderBy("document_id","DESC")
         ->first();
         $document_id = $document ? $document->document_id + 1 : 1;
-        
+        $handCashHead = AccountHead::where(["company_id"=>Auth::user()->company_id,"id"=>1])->first();
         // departure
         $startSaleAmount = 0;
         $startDriverAmount = 0;
@@ -310,30 +310,29 @@ class AccountClosingController extends BaseController
                 );
                 $startTotalCommission += $startFixCommission;
             }
-            // if($startAdjustCommission > 0)
-            // {
-            //     // adjustment commission to expense
-            //     $this->updateSaleTransaction(
-            //         $startLedgers->adjustmentComHead, // head
-            //         $startLedgers->busCashHead->id,//other head id
-            //         0, //credit
-            //         $startAdjustCommission, //debit
-            //         ($document_id + 1), //document id
-            //         "Schedule Departure Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
-            //         $ticket_merge_id //posting id
-            //     );
-            //     // adjustment simple discount to terminal
-            //     $this->updateSaleTransaction(
-            //         $startLedgers->adjustmentComHead, // head
-            //         $startLedgers->busCashHead->id,//other head id
-            //         0, //credit
-            //         $startAdjustCommission, //debit
-            //         ($document_id + 1), //document id
-            //         "Schedule Departure Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
-            //         $ticket_merge_id //posting id
-            //     );
-            //     $startTotalCommission += round($startAdjustCommission);
-            // }
+            if($startAdjustCommission > 0)
+            {
+                // adjustment commission from cash in hand to kt company
+                $this->updateSaleTransaction(
+                    $handCashHead, // head
+                    $startLedgers->adjustmentComHead->id,//other head id
+                    $startAdjustCommission, //credit
+                    0, //debit
+                    ($document_id + 8), //document id
+                    "Schedule Departure Adjustment Commission of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
+                    $ticket_merge_id //posting id
+                );
+                // adjustment commission from cash in hand to kt company terminal wise
+                $this->updateSaleTransaction(
+                    $startLedgers->adjustmentComHead, // head
+                    $handCashHead->id,//other head id
+                    0, //credit
+                    $startAdjustCommission, //debit
+                    ($document_id + 8), //document id
+                    "Schedule Departure Adjustment Commission of Against Merge-$ticket_merge_id",
+                    $ticket_merge_id //posting id
+                );
+            }
         }
         // total sale sum
         $this->updateSaleTransaction(
@@ -355,20 +354,10 @@ class AccountClosingController extends BaseController
             "Schedule Departure Total Amount Against Merge-$ticket_merge_id",
             $ticket_merge_id //posting id
         );
-        // // total commission amount
-        // $this->updateSaleTransaction(
-        //     $startLedgers->busCashHead, // head
-        //     $startLedgers->adjustmentComHead->id,//other head id
-        //     $startTotalCommission, //credit
-        //     0, //debit
-        //     ($document_id + 2), //document id
-        //     "Schedule Departure Total Amount Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
-        //     $ticket_merge_id //posting id
-        // );
-         // arrival
-         $returnSaleAmount = 0;
-         $returnDriverAmount = 0;
-         $returnTotalCommission = 0;
+        // arrival
+        $returnSaleAmount = 0;
+        $returnDriverAmount = 0;
+        $returnTotalCommission = 0;
         foreach($data->schedule_return as $item)
         {
             // sales ledgers opening
@@ -550,20 +539,29 @@ class AccountClosingController extends BaseController
                 );
                 $returnTotalCommission += round($returnFixCommission);
             }
-            // if($returnAdjustCommission > 0)
-            // {
-            //     // ticket simple discount to terminal
-            //     $this->updateSaleTransaction(
-            //         $endLedgers->adjustmentComHead, // head
-            //         $endLedgers->busCashHead->id,//other head id
-            //         0, //credit
-            //         $returnAdjustCommission, //debit
-            //         ($document_id + 5), //document id
-            //         "Schedule Return Discount of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
-            //         $ticket_merge_id //posting id
-            //     );
-            //     $returnTotalCommission += $returnAdjustCommission;
-            // }
+            if($returnAdjustCommission > 0)
+            {
+                // adjustment commission from cash in hand to kt company
+                $this->updateSaleTransaction(
+                    $handCashHead, // head
+                    $endLedgers->adjustmentComHead->id,//other head id
+                    $returnAdjustCommission, //credit
+                    0, //debit
+                    ($document_id + 8), //document id
+                    "Schedule Return Adjustment Commission of ".$item[0]->terminal->name." Against Merge-$ticket_merge_id",
+                    $ticket_merge_id //posting id
+                );
+                // adjustment commission from cash in hand to kt company terminal wise
+                $this->updateSaleTransaction(
+                    $endLedgers->adjustmentComHead, // head
+                    $handCashHead->id,//other head id
+                    0, //credit
+                    $returnAdjustCommission, //debit
+                    ($document_id + 8), //document id
+                    "Schedule Return Adjustment Commission of Against Merge-$ticket_merge_id",
+                    $ticket_merge_id //posting id
+                );
+            }
         }
         // total sale sum
         $this->updateSaleTransaction(
@@ -585,16 +583,6 @@ class AccountClosingController extends BaseController
             "Schedule Return Total Amount Against Merge-$ticket_merge_id",
             $ticket_merge_id //posting id
         );
-        // // total commission amount
-        // $this->updateSaleTransaction(
-        //     $endLedgers->busCashHead, // head
-        //     $endLedgers->adjustmentComHead->id,//other head id
-        //     $returnTotalCommission, //credit
-        //     0, //debit
-        //     ($document_id + 5), //document id
-        //     "Schedule Return Total Amount Against Merge-$ticket_merge_id (Elt, Commissions, Discounts Applied)",
-        //     $ticket_merge_id //posting id
-        // );
         // expense
         $expenseTotal = 0;
         foreach($data->expense as $item)
@@ -759,13 +747,6 @@ class AccountClosingController extends BaseController
             11, // VEHICLE SERVICE EXPENSE
             $terminalExpenseGroup->id, // NOW CREATED TERMINAL EXPENSE GROUP ID
         );
-        $adjustmentComHead = $this->accountHeadCreate(
-            $item[0]->terminal->name.'-'.$item[0]->terminal->id.'-ADJUSTMENT COMMISSION |EXPENSE LEDGER',
-            4, // REVENUE
-            15, // OPERATING EXPENSES
-            11, // VEHICLE SERVICE EXPENSE
-            $terminalExpenseGroup->id, // NOW CREATED TERMINAL EXPENSE GROUP ID
-        );
         $terminalDiscHead = $this->accountHeadCreate(
             $item[0]->terminal->name.'-'.$item[0]->terminal->id.'-TERMINAL DISCOUNT |EXPENSE LEDGER',
             4, // REVENUE
@@ -817,6 +798,21 @@ class AccountClosingController extends BaseController
             6, // CURRENT ASSETS
             29, // CASH AND BANK BALANCES
             $busCashGroup->id, // NOW CREATED BUS CASH GROUP ID
+        );
+
+        //  cash group at level four with kt commission
+        $commissionCashGroup = $this->accountGroupFourthCreate(
+            "Adjustment Commission |CASH GROUP",
+            6, // CURRENT ASSETS
+            29, // CASH AND BANK BALANCES
+        );
+        // terminal wise kt commission ledger at level five
+        $adjustmentComHead = $this->accountHeadCreate(
+            $item[0]->terminal->name.'-'.$item[0]->terminal->id.'-ADJUSTMENT COMMISSION |CASH LEDGER',
+            4, // REVENUE
+            15, // OPERATING EXPENSES
+            11, // VEHICLE SERVICE EXPENSE
+            $commissionCashGroup->id, // NOW CREATED TERMINAL EXPENSE GROUP ID
         );
 
         return [

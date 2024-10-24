@@ -230,7 +230,7 @@ class FinanceReportController extends BaseController
         ->when($request->to, function ($q) use ($request) {
             $q->where('created_at', '<=', $request->to." 23:59:59");
         })
-        ->orderBy("created_at",'ASC')
+        ->orderBy("document_id",'ASC')
         ->orderBy('document_id')
         ->get();
 
