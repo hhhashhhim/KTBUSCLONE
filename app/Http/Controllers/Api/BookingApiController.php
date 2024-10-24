@@ -633,7 +633,7 @@ class BookingApiController extends Controller
     {
         $scheduleId = $request->schedule_id;
         $lockName = "stayLock:" . $scheduleId;  // Dynamic lock based on schedule ID
-        // try {
+        try {
                 $lock = Cache::lock($lockName, 7);  // 7-second timeout
 
                 if ($lock->get()) {
@@ -941,8 +941,8 @@ class BookingApiController extends Controller
                     $error = ["System is busy. Please try again."];
                     return new ConflictResource($error);
                 }
-        //     } catch (\Exception $e) {
-        //         return new BreakResource($e->getMessage());
-        // }
+            } catch (\Exception $e) {
+                return new BreakResource($e->getMessage());
+        }
     }
 }
