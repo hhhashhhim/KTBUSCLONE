@@ -681,6 +681,34 @@ class AccountClosingController extends BaseController
         {
             // expense ledgers opening
             $expenseLedger = $this->getExpenseLedger($item);
+            if($item->ledger) // if user want entry should come in ledger so
+            {
+                $liableLedger = $this->getLiableLedger($item);
+                // credit amount to liable ledger
+                $this->updateSaleTransaction(
+                    $liableLedger, // head
+                    $expenseLedger->id,//other head id
+                    $item->amount, //credit
+                    0, //debit
+                    ($document_id + 6), //document id
+                    "Schedule Expense Against Merge-$ticket_merge_id",
+                    $ticket_merge_id //posting id
+                );
+                // debit same ledger if we pay something
+                if($item->paid > 0)
+                {
+                    $this->updateSaleTransaction(
+                        $liableLedger, // head
+                        $endLedgers->busCashHead->id,//other head id
+                        0, //credit
+                        $item->paid, //debit
+                        ($document_id + 6), //document id
+                        "Schedule Expense Against Merge-$ticket_merge_id",
+                        $ticket_merge_id //posting id
+                    );
+                }
+                $expenseTotal -= ($item->amount - $item->paid) ;
+            }
           
             // expense
             $this->updateSaleTransaction(
@@ -940,6 +968,19 @@ class AccountClosingController extends BaseController
             15, // OPERATING EXPENSES
             11, // VEHICLE SERVICE EXPENSE
             $busExpenseGroup->id, // NOW CREATED BUS EXPENSE GROUP ID
+        );
+
+        return $expenseHead;
+    }
+    function getLiableLedger($item) 
+    {
+        // liable side ledger at level five with expense category name
+        $expenseHead = $this->accountHeadCreate(
+            $item->expense_category->name.'-'.$item->expense_category->id.' |LIABLE LEDGER',
+            2, // LIABILITIES
+            8, // CURRENT LIABILITIES
+            58, // ACCOUNT PAYABLE
+            59, // Service/Vendor Payable
         );
 
         return $expenseHead;

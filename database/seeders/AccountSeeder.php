@@ -777,6 +777,28 @@ class AccountSeeder extends Seeder
                 "created_at" => now(),
                 "updated_at" => now(),
             ],
+            [
+                "id" => 58,
+                "name" => strtoupper("ACCOUNT PAYABLE"),
+                "code" => "01",
+                "account_id" => 8,
+                "parent_id" => 0,
+                "company_id" => 1,
+                "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
+            ],
+            [
+                "id" => 59,
+                "name" => strtoupper("Service/Vendor Payable"),
+                "code" => "01",
+                "account_id" => 8,
+                "parent_id" => 58,
+                "company_id" => 1,
+                "added_by" => 0,
+                "created_at" => now(),
+                "updated_at" => now(),
+            ],
         ]);
 
         AccountHead::create([
