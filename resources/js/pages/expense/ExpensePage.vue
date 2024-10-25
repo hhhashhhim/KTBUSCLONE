@@ -21,6 +21,8 @@
                                                         <th>Category</th>
                                                         <th>Description</th>
                                                         <th>Amount</th>
+                                                        <th>Paid</th>
+                                                        <th>Entry In Ledger</th>
                                                         <th>Invoice number</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -51,6 +53,15 @@
                                                                    @keyup="saveRow($event,'third',index)"
                                                                    :value="postData.amount[index]"
                                                                    :disabled="editAble"/>
+                                                        </td>
+                                                        <td>
+                                                            <input v-if="postData.ledger[index]" type="number" min="0" class="form-control"
+                                                                   @keyup="saveRow($event,'five',index)"
+                                                                   :value="postData.paid[index]"
+                                                                   :disabled="editAble"/>
+                                                        </td>
+                                                        <td>
+                                                            <input type="checkbox" :checked="postData.ledger[index]" @change="saveRow($event, 'six', index)" :disabled="editAble">
                                                         </td>
                                                         <td>
                                                             <input type="text" class="form-control"
@@ -246,6 +257,8 @@ export default {
                 category: [],
                 description: [],
                 amount: [],
+                paid: [],
+                ledger: [],
                 invoice: [],
             },
             // dataEdit:{
@@ -307,6 +320,8 @@ export default {
                         this.postData.category.push(expenses[i].expense_category_id);
                         this.postData.description.push(expenses[i].description);
                         this.postData.amount.push(expenses[i].amount);
+                        this.postData.paid.push(expenses[i].paid);
+                        this.postData.ledger.push(expenses[i].ledger == 1 ? true : false);
                         this.postData.invoice.push(expenses[i].invoice);
                     }
                     this.totalAmount = this.postData.amount.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
@@ -331,6 +346,12 @@ export default {
             }
             if (fieldName == "fourth") {
                 this.postData.invoice[index] = event.target.value;
+            }
+            if (fieldName == "five") {
+                this.postData.paid[index] = event.target.value;
+            }
+            if (fieldName == "six") {
+                this.postData.ledger[index] = event.target.checked;
             }
 
             // total amount sum only for show
