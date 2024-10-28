@@ -132,11 +132,9 @@ class ExpenseController extends Controller
                     "ticket_merge_id" => 'required',
                     "category" => 'required',
                     "amount" => 'required',
-                    "paid" => 'required',
                 ], [
                         "category.required" => "Category is  Required",
                         "amount.required" => "Expenses Amount  is Required",
-                        "paid.required" => "Expenses Paid Amount  is Required",
                     ]
                 );
 
@@ -148,8 +146,8 @@ class ExpenseController extends Controller
                         'expense_category_id' => $request->category[$key],
                         'description' => $request->description[$key],
                         'amount' => $request->amount[$key],
-                        'paid' => $request->paid[$key],
-                        'ledger' => $request->ledger[$key],
+                        'paid' => isset($request->paid[$key]) ? $request->paid[$key] : $request->amount[$key],
+                        'ledger' => isset($request->ledger[$key]) ? $request->ledger[$key] : false,
                         'invoice' => "exp-".++$i.'-'.$request->ticket_merge_id,
                         'company_id' => Auth::user()->company_id,
                         'added_by' => Auth::user()->id,

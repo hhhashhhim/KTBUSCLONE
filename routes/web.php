@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\DB;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/test-view', function(){
+    return view('test-view');
+});
 
 Route::get('/', function () {
     return view('welcome');

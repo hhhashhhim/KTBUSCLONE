@@ -25,7 +25,7 @@ class AddColumnToTicketMergeExpense extends Migration
         ');
 
         Schema::table('ticket_merge_expenses', function (Blueprint $table) {
-            $table->string('paid')->nullable(false)->change();
+            $table->decimal('paid',12,2)->nullable(false)->change();
         });
     }
 
