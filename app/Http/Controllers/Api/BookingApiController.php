@@ -660,7 +660,7 @@ class BookingApiController extends Controller
                                 'updated_by' => Auth::user()->id,
                                 'booked_time' => date("Y-m-d H:i:s"),
                             ]);
-                            // ticketConfirmedMessage($request->invoice_id);
+                            ticketConfirmedMessage($request->invoice_id);
                             //////////////////////////////////////////////
                             ActivityLog::create([
                                 "activity_by" => Auth::user()->id,

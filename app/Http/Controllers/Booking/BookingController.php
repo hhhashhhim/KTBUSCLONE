@@ -1530,13 +1530,13 @@ class BookingController extends Controller
                     "requested_host" => $request->ip(),
                     "company_id" => Auth::user()->company_id
                 ]);
-                DB::commit();
+                
                 if($type == "booked")
                 {
                     ticketCanceledMessage([$ticket->id]);
                 }
-                return $ticket->delete();
-            
+                $ticket->delete();
+                DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Database transaction error: ' . $e->getMessage());
@@ -1600,12 +1600,12 @@ class BookingController extends Controller
                     "requested_host" => $request->ip(),
                     "company_id" => Auth::user()->company_id
                 ]);
-                DB::commit();
+                
                 if($status == "booked")
                 {
                     ticketCanceledMessage($tickets->pluck('id'));
                 }
-            
+                DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Database transaction error: ' . $e->getMessage());

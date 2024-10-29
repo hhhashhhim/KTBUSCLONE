@@ -19,7 +19,7 @@
         /* buttons accordian  */
         .ab-button{
             display: inline-block;
-            margin: 5px 2px;
+            margin: 0 2px;
             width: 140px;
             height: 50px;
             background-color: #e7e7e7; 
@@ -28,7 +28,6 @@
             text-align: center;
             overflow: hidden;
             border-radius: 5px;
-            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.01), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
         }
         .ab-button.open{
             background-color: #6777ef!important;
@@ -40,15 +39,16 @@
         }
         .ab-button-row {
             width: 100%; /* Set the width you want for the container */
+            padding: 2px;
+            height: 56px;
             overflow-x: auto; /* Enable horizontal scrolling */
             white-space: nowrap; /* Prevent the content from wrapping to the next line */
             border: 1px solid #ccc; /* Optional: add a border for visual clarity */
-            padding: 5px; /* Optional: add some padding */
         }
         /* buttons add */
         .ab-button-add{
             display: inline-block;
-            margin: 5px 2px;
+            margin: 0 2px;
             width: 150px;
             height: 50px;
             background-color: green; 
@@ -68,6 +68,14 @@
         }
         .ab-data{
             margin: 20px 0;
+        }
+        .ab-button-row::-webkit-scrollbar {
+          display: none; /* Hide scrollbar */
+        }
+
+        .ab-button-row {
+          -ms-overflow-style: none; /* Internet Explorer and Edge */
+          scrollbar-width: none; /* Firefox */
         }
     </style>
 </head>
@@ -458,19 +466,26 @@
                   </div>
                 </div>
                 <div class="card-body">
-                    <div class="ab-main-section">
-                        <div class="ab-row-section">
-                            <div class="ab-button-section">
-                                <span class="ab-button-add" data-level="0">Add</span>
-                                <div class="ab-button-row">
-                                    <!-- data -->
-                                </div>
+                  <div class="ab-main-section">
+                      <div class="ab-row-section">
+                        <div class="ab-button-section mb-3" id="add-btn-0">
+                          <div class="row">
+                            <div class="col-md-2 p-0">
+                              <span class="ab-button-add" data-level="0">Add</span>
                             </div>
+                            <div class="col-md-10 p-0">
+                              <div class="ab-button-row">
+                                  <!-- data -->
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div class="ab-data-section">
-                        
-                        </div>
-                    </div>
+                      </div>
+                      <hr>
+                      <div class="ab-data-section py-1 px-4 bg-blue-grey text-white">
+                      
+                      </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -486,17 +501,23 @@
       </footer>
     </div>
   </div>
-    <div id="clone-data">
+    <div id="clone-data" class="d-none">
         <span class="ab-button"></span>
         <div class="form" data-level="">
             <h6 class="heading">
                 
             </h6>
             <div class="row">
+                <div class="col-md-12">
+                  <label class="text-white">Message</label>
+                  <textarea class="form-control"></textarea>
+                </div>
                 <div class="form-group col-md-3">
+                    <label class="text-white">Comand</label>
                     <input type="text" class="form-control">
                 </div>
                 <div class="form-group col-md-3">
+                    <label class="text-white">Type</label>
                     <select name="" class="form-control msg-type">
                         <option value="0">Selcted</option>
                         <option value="text">Text</option>
@@ -504,14 +525,21 @@
                     </select>
                 </div>
                 <div class="form-group col-md-3">
+                    <label class="text-white">Text</label>
                     <input type="text" class="form-control">
                 </div>
             </div>
         </div>
-        <div class="ab-button-section" id="">
-            <span class="ab-button-add" data-level="0">Add</span>
-            <div class="ab-button-row">
-                <!-- data -->
+        <div class="ab-button-section mb-3" id="add-btn-clone-0">
+            <div class="row">
+              <div class="col-md-2 p-0">
+                <span class="ab-button-add" data-level="0">Add</span>
+              </div>
+              <div class="col-md-10 p-0">
+                <div class="ab-button-row">
+                    <!-- data -->
+                </div>
+              </div>
             </div>
         </div>
     </div>
@@ -531,7 +559,7 @@
     $(document).ready(function(){
         $(document).on('click', '.ab-button-add', function() {
             let level = $(this).data('level');
-            let buttonCount = $(this).next(".ab-button-row").children().length + 1;
+            let buttonCount = $(this).closest(".ab-button-section").find(".ab-button-row").children().length + 1;
             // Clone the button from #clone-data
             let button = $('#clone-data .ab-button').clone();
             // Update the button's text and id
@@ -542,19 +570,21 @@
                 button
                     .text(buttonCount) // Only show the button count
                     .attr('data-tgt', "#data-" + targetId) // Use buttonCount as ID
-                    .attr('data-level',buttonCount); // Remove data-level attribute
+                    .attr('data-level',buttonCount) // Remove data-level attribute
+                    .attr('id',"btn-"+buttonCount); // Remove data-level attribute
             } else {
                 var targetId = level + "-" + buttonCount;
                 // If level is not zero, set the text and id with the level prefix
                 button
                     .text(targetId)
                     .attr('data-tgt', "#data-" + targetId)
-                    .attr('data-level', level+"-"+buttonCount); // Set the data-level attribute
+                    .attr('data-level', level+"-"+buttonCount) // Set the data-level attribute
+                    .attr('id', "btn-"+level+"-"+buttonCount); // Set the data-level attribute
             }
             // $('#clone-data .ab-button-section').attr('id',"row-" + parseInt(level + 1));
             // $('#clone-data .form').attr('data-level',"row-" + parseInt(level + 1));
             // Append the cloned button to the next .ab-button-row
-            $(this).next(".ab-button-row").append(button);
+            $(this).closest(".ab-button-section").find(".ab-button-row").append(button);
 
 
             // now need to add div according to button
@@ -568,16 +598,48 @@
                 .addClass('ab-data'); // Add the class 'ab-data'
             
             // Append the new div to the desired container (for example, the same button section)
-            $(this).closest(".ab-row-section").next(".ab-data-section").append(newDiv);
+            $(this).closest(".ab-main-section").find(".ab-data-section").append(newDiv);
             $("#data-"+targetId + " .form .heading").html("Entry Value For Level: "+targetId);
+            $('.ab-button-row').scrollLeft(4000);
         });
         
         $(document).on('click', '.ab-button', function() {
             let dataId = $(this).data('tgt'); // Get the target ID from the clicked button
-            
+            let level = $(this).data('level'); // Get the target ID from the clicked button
+            const btnIds = level.toString().split('-').map(Number);
+            console.log(btnIds);
+            // this to add open class to it
+            $(".ab-button").removeClass('open');
+            let btnStr = null;
+            $.each(btnIds, function(index, btnId) {
+                if (btnStr === null) {
+                    btnStr += btnId;
+                }
+                else
+                {
+                  btnStr += "-"+btnId;
+                }
+                $('#btn-' + btnStr).addClass('open');
+
+            });
+
+            $(".ab-button-section").hide();
+            $('#add-btn-0').show();
+            $('#add-btn-clone-0').show();
+            let btnSectionStr = null;
+            $.each(btnIds, function(index, btnId) {
+                if (btnSectionStr === null) {
+                    btnSectionStr += btnId;
+                }
+                else
+                {
+                  btnSectionStr += "-"+btnId;
+                }
+                $('#add-btn-' + btnSectionStr).show();
+
+            });
             // Hide all ab-data elements
             $('.ab-data').hide(); // Change to hide() to hide the elements
-
             // Show the specific ab-data element corresponding to the clicked button
             $(dataId).show();
         });
@@ -589,13 +651,13 @@
             if(selectedValue == "submenu")
             {
                 let rowSection = $('#clone-data .ab-button-section').clone();
-                rowSection.attr('id',"btn-"+parent);
+                rowSection.attr('id',"add-btn-"+parent);
                 $(".ab-row-section").append(rowSection);
-                $("#btn-"+parent+" .ab-button-add").attr("data-level",parent);
+                $("#add-btn-"+parent+" .ab-button-add").attr("data-level",parent);
             }
             else
             {
-                $("#btn-"+parent).remove();
+                $("#add-btn-"+parent).remove();
             }
         });
     });
