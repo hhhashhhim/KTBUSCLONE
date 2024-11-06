@@ -634,9 +634,9 @@ class BookingApiController extends Controller
         $scheduleId = $request->schedule_id;
         $lockName = "stayLock:" . $scheduleId;  // Dynamic lock based on schedule ID
         try {
-                $lock = Cache::lock($lockName, 7);  // 7-second timeout
+                $lock = Cache::lock($lockName, 7)->block(10);  // 7-second timeout
 
-                if ($lock->get()) {
+                try {
 
                     $companyId = Auth::user()->company_id;
                     $terminalId = Auth::user()->terminal_id;
@@ -938,9 +938,9 @@ class BookingApiController extends Controller
                     DB::commit();
 
                     return new CreatedResource(["invoice_id"=>$invoice->id]);
-                } else {
-                    $error = ["System is busy. Please try again."];
-                    return new ConflictResource($error);
+                } finally {
+                    // Always release the lock, regardless of success or failure in the inner try block
+                    optional($lock)->release();
                 }
             } catch (\Exception $e) {
                 return new BreakResource($e->getMessage());
