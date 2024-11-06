@@ -40,7 +40,8 @@
                                                             </select>
                                                         </td>
                                                         <td>
-                                                            <input type="number" class="form-control"
+                                                            <input type="text" class="form-control"
+                                                                   @keypress="numberValidate($event,{dot:true})"
                                                                    @keyup="saveRow($event, 'second', index)"
                                                                    placeholder="%"
                                                                    :value="postData.discount[index]"
@@ -293,6 +294,49 @@ export default {
                     }
                 }
             }
+        },
+        numberValidate(event, { dot = false, maxLen = null, negative = false, comma = false } = {}) {
+        
+            const charCode = event.charCode;
+            const value = event.target.value.toString().replace(/,/g, '');
+            
+            // Allow numbers (48-57), dot (46), and control keys (0)
+            if ((charCode >= 48 && charCode <= 57) || charCode === 0) {
+        
+                // Check the length if it's not null
+                if (maxLen !== null && value.length >= maxLen) {
+                    event.preventDefault();
+                    return false;
+                }
+
+                return true;
+            }
+            // Accept dot
+            if (dot && charCode === 46) {
+                // Allow only one dot
+                if (value.includes('.')) {
+                    event.preventDefault();
+                    return false;
+                }
+        
+                // Check the length if it's not null
+                if (maxLen !== null && value.length >= maxLen) {
+                    event.preventDefault();
+                    return false;
+                }
+                return true;
+            }
+            // Accept negative value
+            if (negative && charCode === 45) {
+                if (value.includes('-') || value.length !== 0) {
+                    event.preventDefault();
+                    return false;
+                }
+                return true;
+            }
+        
+            event.preventDefault();
+            return false;
         },
     },
     computed: {

@@ -36071,9 +36071,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                       _this26.addForm.advanceSeatClass.push(data["class"]);
 
-                      _this26.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
-                      _this26.addForm.customerName = data.customer_name;
-                      _this26.addForm.contact = data.customer_phone; // this.addForm.remarks = data.remarks;
+                      if (_this26.auth_terminal.other_terminal_passenger_detail == 1) {
+                        _this26.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
+                        _this26.addForm.customerName = data.customer_name;
+                        _this26.addForm.contact = data.customer_phone;
+                      } // this.addForm.remarks = data.remarks;
+
 
                       _this26.addForm.selectedSeats.push(data.seatNo);
 
@@ -57898,6 +57901,60 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }
         }, _callee4);
       }))();
+    },
+    numberValidate: function numberValidate(event) {
+      var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+          _ref$dot = _ref.dot,
+          dot = _ref$dot === void 0 ? false : _ref$dot,
+          _ref$maxLen = _ref.maxLen,
+          maxLen = _ref$maxLen === void 0 ? null : _ref$maxLen,
+          _ref$negative = _ref.negative,
+          negative = _ref$negative === void 0 ? false : _ref$negative,
+          _ref$comma = _ref.comma,
+          comma = _ref$comma === void 0 ? false : _ref$comma;
+
+      var charCode = event.charCode;
+      var value = event.target.value.toString().replace(/,/g, ''); // Allow numbers (48-57), dot (46), and control keys (0)
+
+      if (charCode >= 48 && charCode <= 57 || charCode === 0) {
+        // Check the length if it's not null
+        if (maxLen !== null && value.length >= maxLen) {
+          event.preventDefault();
+          return false;
+        }
+
+        return true;
+      } // Accept dot
+
+
+      if (dot && charCode === 46) {
+        // Allow only one dot
+        if (value.includes('.')) {
+          event.preventDefault();
+          return false;
+        } // Check the length if it's not null
+
+
+        if (maxLen !== null && value.length >= maxLen) {
+          event.preventDefault();
+          return false;
+        }
+
+        return true;
+      } // Accept negative value
+
+
+      if (negative && charCode === 45) {
+        if (value.includes('-') || value.length !== 0) {
+          event.preventDefault();
+          return false;
+        }
+
+        return true;
+      }
+
+      event.preventDefault();
+      return false;
     }
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['getDeletingObj'])),
@@ -58239,6 +58296,60 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }
         }, _callee4);
       }))();
+    },
+    numberValidate: function numberValidate(event) {
+      var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+          _ref$dot = _ref.dot,
+          dot = _ref$dot === void 0 ? false : _ref$dot,
+          _ref$maxLen = _ref.maxLen,
+          maxLen = _ref$maxLen === void 0 ? null : _ref$maxLen,
+          _ref$negative = _ref.negative,
+          negative = _ref$negative === void 0 ? false : _ref$negative,
+          _ref$comma = _ref.comma,
+          comma = _ref$comma === void 0 ? false : _ref$comma;
+
+      var charCode = event.charCode;
+      var value = event.target.value.toString().replace(/,/g, ''); // Allow numbers (48-57), dot (46), and control keys (0)
+
+      if (charCode >= 48 && charCode <= 57 || charCode === 0) {
+        // Check the length if it's not null
+        if (maxLen !== null && value.length >= maxLen) {
+          event.preventDefault();
+          return false;
+        }
+
+        return true;
+      } // Accept dot
+
+
+      if (dot && charCode === 46) {
+        // Allow only one dot
+        if (value.includes('.')) {
+          event.preventDefault();
+          return false;
+        } // Check the length if it's not null
+
+
+        if (maxLen !== null && value.length >= maxLen) {
+          event.preventDefault();
+          return false;
+        }
+
+        return true;
+      } // Accept negative value
+
+
+      if (negative && charCode === 45) {
+        if (value.includes('-') || value.length !== 0) {
+          event.preventDefault();
+          return false;
+        }
+
+        return true;
+      }
+
+      event.preventDefault();
+      return false;
     }
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['getDeletingObj'])),
@@ -101386,8 +101497,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     ))], 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_15)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-      type: "number",
+      type: "text",
       "class": "form-control",
+      onKeypress: _cache[0] || (_cache[0] = function ($event) {
+        return $options.numberValidate($event, {
+          dot: true
+        });
+      }),
       onKeyup: function onKeyup($event) {
         return $options.saveRow($event, 'second', index);
       },
@@ -101397,8 +101513,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_18)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-      type: "number",
+      type: "text",
       "class": "form-control border-secondary",
+      onKeypress: _cache[1] || (_cache[1] = function ($event) {
+        return $options.numberValidate($event, {
+          dot: true
+        });
+      }),
       onKeyup: function onKeyup($event) {
         return $options.saveRow($event, 'third', index);
       },
@@ -101408,8 +101529,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_19)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-      type: "number",
+      type: "text",
       min: "0",
+      onKeypress: _cache[2] || (_cache[2] = function ($event) {
+        return $options.numberValidate($event, {
+          dot: true
+        });
+      }),
       "class": "form-control border-secondary",
       onKeyup: function onKeyup($event) {
         return $options.saveRow($event, 'fourth', index);
@@ -101420,8 +101546,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_20)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-      type: "number",
+      type: "text",
       "class": "form-control",
+      onKeypress: _cache[3] || (_cache[3] = function ($event) {
+        return $options.numberValidate($event, {
+          dot: true
+        });
+      }),
       onKeyup: function onKeyup($event) {
         return $options.saveRow($event, 'fifth', index);
       },
@@ -101432,7 +101563,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_21)]), !$data.editAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
       "class": "btn btn-outline-primary mx-2",
-      onClick: _cache[0] || (_cache[0] = function () {
+      onClick: _cache[4] || (_cache[4] = function () {
         return $options.addRow && $options.addRow.apply($options, arguments);
       })
     }, "Add "), $data.loop != 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
@@ -101450,7 +101581,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 0,
     type: "button",
     "class": "btn btn-outline-success mr-4",
-    onClick: _cache[1] || (_cache[1] = function () {
+    onClick: _cache[5] || (_cache[5] = function () {
       return $options.add && $options.add.apply($options, arguments);
     }),
     disabled: $data.loading
@@ -101460,7 +101591,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 1,
     type: "button",
     "class": "btn btn-outline-secondary mr-4",
-    onClick: _cache[2] || (_cache[2] = function ($event) {
+    onClick: _cache[6] || (_cache[6] = function ($event) {
       return $data.editAble = false;
     }),
     disabled: $data.loading
@@ -101470,7 +101601,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 2,
     type: "button",
     "class": "btn btn-outline-primary mr-4",
-    onClick: _cache[3] || (_cache[3] = function ($event) {
+    onClick: _cache[7] || (_cache[7] = function ($event) {
       return $data.editAble = true;
     })
   }, "Cancel ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])])])]);
@@ -101595,8 +101726,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     ))], 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_15)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-      type: "number",
+      type: "text",
       "class": "form-control",
+      onKeypress: _cache[0] || (_cache[0] = function ($event) {
+        return $options.numberValidate($event, {
+          dot: true
+        });
+      }),
       onKeyup: function onKeyup($event) {
         return $options.saveRow($event, 'second', index);
       },
@@ -101630,7 +101766,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_20)]), !$data.editAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
       "class": "btn btn-outline-primary mx-2",
-      onClick: _cache[0] || (_cache[0] = function () {
+      onClick: _cache[1] || (_cache[1] = function () {
         return $options.addRow && $options.addRow.apply($options, arguments);
       })
     }, "Add "), $data.loop != 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
@@ -101648,7 +101784,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 0,
     type: "button",
     "class": "btn btn-outline-success mr-4",
-    onClick: _cache[1] || (_cache[1] = function () {
+    onClick: _cache[2] || (_cache[2] = function () {
       return $options.add && $options.add.apply($options, arguments);
     }),
     disabled: $data.loading
@@ -101658,7 +101794,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 1,
     type: "button",
     "class": "btn btn-outline-secondary mr-4",
-    onClick: _cache[2] || (_cache[2] = function ($event) {
+    onClick: _cache[3] || (_cache[3] = function ($event) {
       return $data.editAble = false;
     }),
     disabled: $data.loading
@@ -101668,7 +101804,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 2,
     type: "button",
     "class": "btn btn-outline-primary mr-4",
-    onClick: _cache[3] || (_cache[3] = function ($event) {
+    onClick: _cache[4] || (_cache[4] = function ($event) {
       return $data.editAble = true;
     })
   }, "Cancel ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])])])]);
