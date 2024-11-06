@@ -58680,7 +58680,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                       _this3.postData.name.push(time[i].display_name);
 
-                      _this3.postData.show.push(time[i].show ? true : false);
+                      _this3.postData.show.push(time[i].show == 1 ? true : false);
                     }
                   } else {
                     _this3.loop = 1;
