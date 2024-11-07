@@ -164,6 +164,7 @@
           .info{
             width: 200px;
             text-align: left;
+            padding: 10px;
           }
 
           .image-container{
@@ -574,7 +575,7 @@
                         </div>
                       </div>
                       <hr>
-                      <div class="ab-data-section py-1 px-4 bg-blue-grey text-white">
+                      <div id="form-divs" class="ab-data-section py-1 px-4 bg-blue-grey text-white">
                       
                       </div>
                   </div>
@@ -778,11 +779,11 @@
       <div class="row">
           <div class="col-md-12">
             <label class="text-white">Message</label>
-            <textarea class="form-control"></textarea>
+            <textarea class="form-control message"></textarea>
           </div>
           <div class="form-group col-md-3">
               <label class="text-white">Command</label>
-              <input type="text" class="form-control">
+              <input type="text" class="form-control command">
           </div>
           <div class="form-group col-md-3">
               <label class="text-white">Type</label>
@@ -820,7 +821,7 @@
     <div id="on-change-text-field">
           <div class="form-group col-md-3">
             <label class="text-white">Text</label>
-            <input type="text" class="form-control">
+            <input type="text" class="form-control text">
           </div>
     </div>
     <div id="on-change-media-field">
@@ -829,7 +830,7 @@
             <div class="form-control">
               <a href="#">Not Selected</a>
             </div>
-            <input type="hidden" value="" class="form-control">
+            <input type="hidden" value="" class="form-control media">
           </div>
     </div>
     <div id="on-change-file-field">
@@ -838,41 +839,41 @@
             <div class="form-control">
               <a href="#">Not Selected</a>
             </div>
-            <input type="hidden" value="" class="form-control">
+            <input type="hidden" value="" class="form-control file">
           </div>
     </div>
     <div id="on-change-forwarder-field">
       <div class="form-group col-md-3">
         <label class="text-white">Forwarder</label>
-        <select class="form-control">
+        <select class="form-control forwarder">
           <option value="">Select</option>
-          <option value="">static 1</option>
-          <option value="">static 2</option>
+          <option value="1">static 1</option>
+          <option value="2">static 2</option>
         </select>
       </div>
       <div class="form-group col-md-3">
         <label class="text-white">Forwarder Text</label>
-        <input type="text" class="form-control">
+        <input type="text" class="form-control forwarder-text">
       </div>
     </div>
     <div id="on-change-liveagent-field">
       <div class="form-group col-md-3">
         <label class="text-white">Agent from Department</label>
-        <select class="form-control">
+        <select class="form-control department">
           <option value="">Select</option>
-          <option value="">static 1</option>
-          <option value="">static 2</option>
+          <option value="1">static 1</option>
+          <option value="2">static 2</option>
         </select>
       </div>
     </div>
     <div id="on-change-apicall-field">
       <div class="form-group col-md-3">
           <label class="text-white">Your Api</label>
-          <input type="text" class="form-control">
+          <input type="text" class="form-control api">
       </div>
       <div class="form-group col-md-3">
           <label class="text-white">Message For Api</label>
-          <input type="text" class="form-control">
+          <input type="text" class="form-control api-message">
       </div>
 
     </div>
@@ -891,17 +892,135 @@
 
 <script>
     localStorage.removeItem('aiTree');
+    function validateNode(formData)
+    { 
+      if(formData.message == null)
+      {
+        return false; 
+      }
+      if(formData.command == null)
+      {
+        return false; 
+      }
+      if(formData.reply_type == null)
+      {
+        return false; 
+      }
+      if(formData.reply_type == "text")
+      {
+        if(formData.text == null)
+        {
+          return false; 
+        }
+      }
+      if(formData.reply_type == "media")
+      {
+        if(formData.media == null)
+        {
+          return false; 
+        }
+      }
+      if(formData.reply_type == "file")
+      {
+        if(formData.file == null)
+        {
+          return false; 
+        }
+      }
+      if(formData.reply_type == "forwarder")
+      {
+        if(formData.forwarder == null)
+        {
+          return false; 
+        }
+        if(formData.forwarder_text == null)
+        {
+          return false; 
+        }
+      }
+      if(formData.reply_type == "live agent")
+      {
+        if(formData.department == null)
+        {
+          return false; 
+        }
+      }
+      if(formData.reply_type == "api call")
+      {
+        if(formData.api == null)
+        {
+          return false; 
+        }
+        if(formData.api_message == null)
+        {
+          return false; 
+        }
+      }
+      return true;
+    }
     function updateTreeChart(data) {
+      
       function traverseAndRender(obj) {
-
           for (const key in obj) {
               const item = obj[key];
               // Check if the item is an object with a 'name' property
-              if (typeof item === 'object' && item !== null) {
-                  
+              if (typeof item === 'object' && item !== null && key != "form_data") {
+                  const isComplete = validateNode(item.form_data);
                   const htmlParent = `<div class="node-parent" id="${'trp-'+item.parents}"></div>`;
                   const htmlNode = `<div class="tree-node" id="${'trn-'+item.level}">
-                                      <div class="info">${item.level}</div>
+                                      <div class="info ${isComplete ? 'bg-blue-grey':'bg-danger'}" data-level="${item.level}">
+                                        <div class="form-value-row">
+                                          <span>Level: </span>
+                                          <span>${item.level}</span>
+                                        </div>
+                                        <div class="form-value-row">
+                                          <span>Message: </span>
+                                          <span>${item.form_data.message}</span>
+                                        </div>
+                                        <div class="form-value-row">
+                                          <span>Command: </span>
+                                          <span>${item.form_data.command}</span>
+                                        </div>
+                                        <div class="form-value-row">
+                                          <span>Type: </span>
+                                          <span>${item.form_data.reply_type}</span>
+                                        </div>
+                                        <div class="form-value-row">
+                                          <span>Text: </span>
+                                          <span>${item.form_data.text}</span>
+                                        </div>
+                                        <div class="form-value-row">
+                                          <span>Media: </span>
+                                          <span>${item.form_data.media}</span>
+                                        </div>
+                                        <div class="form-value-row">
+                                          <span>File: </span>
+                                          <span>${item.form_data.file}</span>
+                                        </div>
+                                        <div class="form-value-row">
+                                          <span>Forwarder: </span>
+                                          <span>${item.form_data.forwarder}</span>
+                                        </div>
+                                        <div class="form-value-row">
+                                          <span>Forwarder Text: </span>
+                                          <span>${item.form_data.forwarder_text}</span>
+                                        </div>
+                                        <div class="form-value-row">
+                                          <span>Live Agent: </span>
+                                          <span>${item.form_data.department}</span>
+                                        </div>
+                                        <div class="form-value-row">
+                                          <span>Api: </span>
+                                          <span>${item.form_data.api}</span>
+                                        </div>
+                                        <div class="form-value-row">
+                                          <span>Api Text</span>
+                                          <span>${item.form_data.api_message}</span>
+                                        </div>
+                                        <div class="${isComplete ? 'd-none':'d-flex'} justify-content-end">
+                                          <button class="btn btn-sm btn-dark direct-add">Add</button>
+                                        </div>
+                                      </div>
                                     </div>`;
 
                   if (item.parent == 0) {
@@ -938,7 +1057,7 @@
     }
 
 
-    function updateTreeDataArray(level)
+    function updateTreeDataArray(level,form_data = null)
     {
       // Parse `aiTree` from localStorage and ensure it's an object
       let myData = JSON.parse(localStorage.getItem('aiTree')) || {};
@@ -957,7 +1076,20 @@
           keys.forEach((key, index) => {
               // Define latestData object with parent reference
               const latestData = {
-                  name: "abdul",
+                  form_data: form_data ? form_data : {
+                    level: null,
+                    message: null,
+                    command: null,
+                    reply_type: null,
+                    text: null,
+                    media: null,
+                    file: null,
+                    forwarder: null,
+                    forwarder_text: null,
+                    department: null,
+                    api: null,
+                    api_message: null,
+                  },
                   level: currentLevel,
                   parent: upperLevel, // Set parent to upperLevel
                   parents: upperLevels == 0 ? 0 : upperLevels // Set parent to upperLevel
@@ -977,12 +1109,11 @@
               upperLevels = upperLevels == 0 ? key : upperLevels+'-'+key; // Set upperLevel to the current level
           });
 
-          return obj;
+          return obj
       }
 
       // Build the nested object with `btnIds` array
       myData = buildNestedObject(myData, btnIds, level);
-
       updateTreeChart(myData);
       // Save the updated structure back to localStorage
       localStorage.setItem('aiTree', JSON.stringify(myData));
@@ -1098,7 +1229,7 @@
           {
               let rowSection = $('#clone-data #on-change-media-field').children().clone();
               rowSection.attr("id","file-"+parent)
-              fileValue = "#file-"+parent;
+              fileValue = parent;
               $(this).closest('.row').append(rowSection);
               $("#mediaModal").addClass('show');
               $("#mediaModal .modal-content").addClass('show');
@@ -1108,7 +1239,7 @@
           {
               let rowSection = $('#clone-data #on-change-file-field').children().clone();
               rowSection.attr("id","file-"+parent)
-              fileValue = "#file-"+parent;
+              fileValue = parent;
               $(this).closest('.row').append(rowSection);
               $("#fileModal").addClass('show');
               $("#fileModal .modal-content").addClass('show');
@@ -1146,12 +1277,90 @@
       });
       $(document).on('click', '.image-container', function() {
           const radioValue = $(this).find("input[name='fileRadio']:checked").val();
-          $(fileValue+" a").text(radioValue);
-          $(fileValue+" input").val(radioValue);
+          $("#file-"+fileValue+" a").text(radioValue);
+          $("#file-"+fileValue+" input").val(radioValue);
           $("input[name='fileRadio']").prop("checked", false);
           $('.modal').removeClass("show");
           $('.modal .modal-content').removeClass("show");
+          getFormDataAndUpdate(fileValue);
       });
+      $(document).on('click', '.direct-add', function() {
+          const dataLevel = $(this).closest(".info").data('level');
+          const btnIds = dataLevel.toString().split('-').map(Number);
+          
+          // this to add open class to it
+          $(".ab-button").removeClass('open');
+          let btnStr = null;
+          $.each(btnIds, function(index, btnId) {
+              if (btnStr === null) {
+                  btnStr += btnId;
+              }
+              else
+              {
+                btnStr += "-"+btnId;
+              }
+              console.log('#btn-' + btnStr);
+              $('#btn-' + btnStr).addClass('open');
+
+          });
+
+          $(".ab-button-section").hide();
+          $('#add-btn-0').show();
+          $('#add-btn-clone-0').show();
+          let btnSectionStr = null;
+          $.each(btnIds, function(index, btnId) {
+              if (btnSectionStr === null) {
+                  btnSectionStr += btnId;
+              }
+              else
+              {
+                btnSectionStr += "-"+btnId;
+              }
+              $('#add-btn-' + btnSectionStr).show();
+
+          });
+
+          $('.ab-data').hide();
+          $("#data-"+dataLevel).show();
+
+          $(this).closest('.modal').removeClass("show");
+          $(this).closest('.modal .modal-content').removeClass("show");
+          // alert(dataLevel);
+      });
+
+      // Trigger the function on change or keypress
+      $(document).on('input', '.ab-data input, .ab-data textarea, .ab-data select', function() {
+          var dataLevel = $(this).closest('.ab-data').data('level');
+          
+          getFormDataAndUpdate(dataLevel);
+      });
+      function getFormDataAndUpdate(dataLevel)
+      {
+        // Find the current `.ab-data` section by `data-level`
+        var $abDataSection = $('.ab-data').filter(function() {
+            return $(this).data('level') === dataLevel;
+        });
+
+        // Create an object to store all values
+        var form_data = {
+            level: dataLevel,
+            message: $abDataSection.find('.message').val() ? $abDataSection.find('.message').val() : null,
+            command: $abDataSection.find('.command').val() ? $abDataSection.find('.command').val() : null,
+            reply_type: $abDataSection.find('.msg-type').val() ? $abDataSection.find('.msg-type').val() : null,
+            text: $abDataSection.find('.text').val() ? $abDataSection.find('.text').val() : null,
+            media: $abDataSection.find('.media').val() ? $abDataSection.find('.media').val() : null,
+            file: $abDataSection.find('.file').val() ? $abDataSection.find('.file').val() : null,
+            forwarder: $abDataSection.find('.forwarder').val() ? $abDataSection.find('.forwarder').val() : null,
+            forwarder_text: $abDataSection.find('.forwarder-text').val() ? $abDataSection.find('.forwarder-text').val() : null,
+            department: $abDataSection.find('.department').val() ? $abDataSection.find('.department').val() : null,
+            api: $abDataSection.find('.api').val() ? $abDataSection.find('.api').val() : null,
+            api_message: $abDataSection.find('.api-message').val() ? $abDataSection.find('.api-message').val() : null
+        };
+
+        // Log the collected data or pass it to any other function
+        updateTreeDataArray(dataLevel, form_data);
+        // alert(JSON.stringify(formData)); // For testing, displays the object as a string
+      }
 </script>
 
   <!-- modal js -->
@@ -1173,7 +1382,6 @@
         $('.modal .modal-content').removeClass("show");
       }
   });
-  
 
 </script>
 </html>
