@@ -28,6 +28,7 @@
             text-align: center;
             overflow: hidden;
             border-radius: 5px;
+            position: relative;
         }
         .ab-button.open{
             background-color: #6777ef!important;
@@ -40,7 +41,7 @@
         .ab-button-row {
             width: 100%; /* Set the width you want for the container */
             padding: 2px;
-            height: 56px;
+            height: 62px;
             overflow-x: auto; /* Enable horizontal scrolling */
             white-space: nowrap; /* Prevent the content from wrapping to the next line */
             border: 1px solid #ccc; /* Optional: add a border for visual clarity */
@@ -76,6 +77,18 @@
         .scroll-hide {
           -ms-overflow-style: none; /* Internet Explorer and Edge */
           scrollbar-width: none; /* Firefox */
+        }
+        .cross-button{
+          position: absolute;
+          top: 0px;
+          line-height: 0.9;
+          right: 0;
+          width: 20px;
+          height: 20px;
+          background-color: black;
+          color: white;
+          padding: 3px;
+          z-index: 1;
         }
         
         
@@ -562,6 +575,12 @@
                   <div class="ab-main-section">
                       <div class="ab-row-section">
                         <div class="ab-button-section mb-3" id="add-btn-0">
+                          <div class="row mb-2">
+                            <div class="col-md-12 p-0">
+                              <label>First Message</label>
+                              <textarea class="form-control first_message"></textarea>
+                            </div>
+                          </div>
                           <div class="row">
                             <div class="col-md-2 p-0">
                               <span class="ab-button-add" data-level="0">Add</span>
@@ -800,11 +819,6 @@
               </select>
           </div>
       </div>
-      <div class="row">
-          <div class="col-md-3 offset-9 text-right">
-            <button class="btn btn-dark commit-btn">Commit</button>
-          </div>
-      </div>
     </div>
     <div class="ab-button-section mb-3" id="add-btn-clone-0">
         <div class="row">
@@ -1017,8 +1031,8 @@
                                           <span>Api Text</span>
                                           <span>${item.form_data.api_message}</span>
                                         </div>
-                                        <div class="${isComplete ? 'd-none':'d-flex'} justify-content-end">
-                                          <button class="btn btn-sm btn-dark direct-add">Add</button>
+                                        <div class="d-flex justify-content-end">
+                                          <button class="btn btn-sm btn-dark direct-add">View</button>
                                         </div>
                                       </div>
                                     </div>`;
@@ -1146,6 +1160,11 @@
                   .attr('data-level', level+"-"+buttonCount) // Set the data-level attribute
                   .attr('id', "btn-"+level+"-"+buttonCount); // Set the data-level attribute
           }
+          var closeSpan = $('<span>')
+            .text(' ×') // Add cross symbol
+            .addClass('cross-button'); // Add a class for styling (optional)
+            
+          button.append(closeSpan);
           // $('#clone-data .ab-button-section').attr('id',"row-" + parseInt(level + 1));
           // $('#clone-data .form').attr('data-level',"row-" + parseInt(level + 1));
           // Append the cloned button to the next .ab-button-row
@@ -1334,6 +1353,17 @@
           
           getFormDataAndUpdate(dataLevel);
       });
+      $(document).on('click', '.cross-button', function(e) {
+        let myData = JSON.parse(localStorage.getItem('aiTree')) || {};
+        const level = $(this).closest(".ab-button").data('level');
+        const keys = level.toString().split('-').map(Number);
+        console.log(keys);
+
+        unsetNestedKey(myData, keys);
+        localStorage.setItem('aiTree', JSON.stringify(myData));
+        // alert(level);
+        e.stopPropagation();
+      });
       function getFormDataAndUpdate(dataLevel)
       {
         // Find the current `.ab-data` section by `data-level`
@@ -1361,6 +1391,25 @@
         updateTreeDataArray(dataLevel, form_data);
         // alert(JSON.stringify(formData)); // For testing, displays the object as a string
       }
+      function unsetNestedKey(obj, keys) {
+        if (!obj || !Array.isArray(keys) || keys.length === 0) {
+            return;
+        }
+
+        let current = obj;
+        for (let i = 0; i < keys.length - 1; i++) {
+            // Navigate through the object using the keys
+            if (current[keys[i]] !== undefined) {
+                current = current[keys[i]];
+            } else {
+                // Exit if the path doesn't exist
+                return;
+            }
+        }
+
+        // Delete the last key in the path
+        delete current[keys[keys.length - 1]];
+    }
 </script>
 
   <!-- modal js -->

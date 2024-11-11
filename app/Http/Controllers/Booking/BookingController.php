@@ -1062,6 +1062,7 @@ class BookingController extends Controller
                     $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
                     $seatMap[$i][$j]['partial'] = $tickets[$result]['is_partial'];
                     $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
+                    $seatMap[$i][$j]['terminal'] = $tickets[$result]['terminal_id'];
                     $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'] == null ? 'N/A' : $tickets[$result]['remarks'];
                     $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
                     $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
@@ -1080,6 +1081,7 @@ class BookingController extends Controller
                             $seatMap[$i][$j]['gender'] = $tickets[$singlePartial]['gender'];
                             $seatMap[$i][$j]['partial'] = $tickets[$singlePartial]['is_partial'];
                             $seatMap[$i][$j]['type'] = $tickets[$singlePartial]['type'];
+                            $seatMap[$i][$j]['terminal'] = $tickets[$result]['terminal_id'];
                             $seatMap[$i][$j]['remarks'] = $tickets[$singlePartial]['remarks'] == null ? 'N/A' : $tickets[$singlePartial]['remarks'];
                             $seatMap[$i][$j]['customer_cnic'] = $tickets[$singlePartial]['customer']['cnic'];
                             $seatMap[$i][$j]['customer_name'] = $tickets[$singlePartial]['customer']['name'];
