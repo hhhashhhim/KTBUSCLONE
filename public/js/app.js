@@ -36071,7 +36071,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                       _this26.addForm.advanceSeatClass.push(data["class"]);
 
-                      if (_this26.auth_terminal.other_terminal_passenger_detail == 1 || parseInteger(data.terminal) == _this26.auth_terminal.id) {
+                      console.log(data.terminal);
+                      console.log(_this26.auth_terminal.id);
+                      console.log(data.terminal == _this26.auth_terminal.id);
+
+                      if (_this26.auth_terminal.other_terminal_passenger_detail == 1 || data.terminal == _this26.auth_terminal.id) {
                         _this26.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
                         _this26.addForm.customerName = data.customer_name;
                         _this26.addForm.contact = data.customer_phone;

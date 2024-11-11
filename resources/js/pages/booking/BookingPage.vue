@@ -3174,7 +3174,10 @@ export default {
                         this.addForm.alreadyBookedId.push(data.id);
                         this.addForm.reservedFare.push(data.fare);
                         this.addForm.advanceSeatClass.push(data.class);
-                        if(this.auth_terminal.other_terminal_passenger_detail == 1 || parseInteger(data.terminal) == this.auth_terminal.id)
+                        console.log(data.terminal);
+                        console.log(this.auth_terminal.id);
+                        console.log(data.terminal == this.auth_terminal.id);
+                        if(this.auth_terminal.other_terminal_passenger_detail == 1 || data.terminal == this.auth_terminal.id)
                         {
                             this.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
                             this.addForm.customerName = data.customer_name;
