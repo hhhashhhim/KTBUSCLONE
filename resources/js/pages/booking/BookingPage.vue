@@ -1231,12 +1231,12 @@
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Customer Cnic :</p>
-                                                        <p class="mb-0">{{ cnicFormat(innerItem.customer.cnic) }}</p>
+                                                        <p class="mb-0">{{ auth_terminal.other_terminal_passenger_detail == 1 || innerItem.terminal_id == this.auth_terminal.id ? cnicFormat(innerItem.customer.cnic) : "---" }}</p>
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Customer Phone : </p>
                                                         <p class="mb-0">
-                                                            {{ auth_terminal.other_terminal_passenger_detail == 1 ? phoneFormat(innerItem.customer.contact) : "---" }}
+                                                            {{ auth_terminal.other_terminal_passenger_detail == 1 || innerItem.terminal_id == this.auth_terminal.id ? phoneFormat(innerItem.customer.contact) : "---" }}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -3174,7 +3174,7 @@ export default {
                         this.addForm.alreadyBookedId.push(data.id);
                         this.addForm.reservedFare.push(data.fare);
                         this.addForm.advanceSeatClass.push(data.class);
-                        if(this.auth_terminal.other_terminal_passenger_detail == 1)
+                        if(this.auth_terminal.other_terminal_passenger_detail == 1 || data.terminal == this.auth_terminal.id)
                         {
                             this.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
                             this.addForm.customerName = data.customer_name;
@@ -3341,7 +3341,7 @@ export default {
 
         getTitle: function (col) {
             if (col.type == 'booked' || col.type == 'advance booking' || col.type == 'over-issue' || col.id) {
-                return "Name : " + col.customer_name + '\n' + "Phone : " + (this.auth_terminal.other_terminal_passenger_detail == 1 ? col.customer_phone : "---") + '\n' + "Seat Fare : " + col.seat_fare + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
+                return "Name : " + col.customer_name + '\n' + "Phone : " + (this.auth_terminal.other_terminal_passenger_detail == 1 || col.terminal == this.auth_terminal.id ? col.customer_phone : "---") + '\n' + "Seat Fare : " + col.seat_fare + '\n' + "Remarks : " + col.remarks + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
             }
         },
 
