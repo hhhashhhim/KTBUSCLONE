@@ -30,6 +30,10 @@
             border-radius: 5px;
             position: relative;
         }
+        .is-complete{
+          background-color: #54ca68;
+          color: white;
+        }
         .ab-button.open{
             background-color: #6777ef!important;
             color: white!important;
@@ -559,7 +563,11 @@
             <div class="col-12">
               <div class="card">
                 <div class="card-header">
-                  <h4>Chat Bot <button class="btn btn-dark modal-btn" data-trgt="#tree-modal" id="openModal">Tree Progress</button></h4>
+                  <h4>
+                    Chat Bot 
+                    <button class="btn btn-dark modal-btn mr-2" data-trgt="#tree-modal" id="openModal">Tree Progress</button>
+                    <button class="btn btn-danger" id="clear-all">Clear All</button>
+                  </h4>
                   <div class="card-header-form">
                     <form>
                       <div class="input-group">
@@ -598,6 +606,9 @@
                       
                       </div>
                   </div>
+                  <div class="d-flex justify-content-end mt-2">
+                    <button class="btn btn-primary" id="submit">Submit</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -621,36 +632,7 @@
             <div class="modal-body">
                 <h1>Your Tree</h1>
                 <div id="tree-section">
-                  <!-- <div class="node-parent">
-                      <div class="tree-node">
-                        <span>h</span>
-                        <div class="node-parent">
-                          <div class="tree-node">
-                              <span>h</span>
-                              <div class="node-parent">
-                                <div class="tree-node">
-                                  <span>h</span>
-                                  <div class="node-parent">
-                                      <div class="tree-node">
-                                        <span>h</span>
-                                        <div class="node-parent">
-                                            <div class="tree-node">h</div>
-                                            <div class="tree-node">g</div>
-                                        </div>
-                                      </div>
-                                      <div class="tree-node">g</div>
-                                  </div>
-                                </div>
-                                <div class="tree-node">g</div>
-                            </div>
-                          </div>
-                          <div class="tree-node">g</div>
-                        </div>
-                      </div>
-                      <div class="tree-node">
-                        <span>g</span>
-                      </div>
-                  </div> -->
+                  
                 </div>
                  
             </div>
@@ -791,15 +773,15 @@
   <!-- clone data -->
   <div id="clone-data" class="d-none">
     <span class="ab-button"></span>
+    <div class="col-md-12 clone-message">
+      <label class="text-white">Message</label>
+      <textarea class="form-control message"></textarea>
+    </div>
     <div class="form" data-level="">
       <h6 class="heading">
           
       </h6>
       <div class="row">
-          <div class="col-md-12">
-            <label class="text-white">Message</label>
-            <textarea class="form-control message"></textarea>
-          </div>
           <div class="form-group col-md-3">
               <label class="text-white">Command</label>
               <input type="text" class="form-control command">
@@ -905,18 +887,22 @@
 </body>
 
 <script>
-    localStorage.removeItem('aiTree');
+    // localStorage.removeItem('aiTree');
+    renderHtmlByObject();
     function validateNode(formData)
     { 
-      if(formData.message == null)
+      if(formData.reply_type == "sub menu")
       {
-        return false; 
+        if(formData.message == null)
+        {
+          return false; 
+        }
       }
       if(formData.command == null)
       {
         return false; 
       }
-      if(formData.reply_type == null)
+      if(formData.reply_type == null || formData.reply_type == 0)
       {
         return false; 
       }
@@ -943,7 +929,7 @@
       }
       if(formData.reply_type == "forwarder")
       {
-        if(formData.forwarder == null)
+        if(formData.forwarder == null || formData.forwarder == 0)
         {
           return false; 
         }
@@ -954,7 +940,7 @@
       }
       if(formData.reply_type == "live agent")
       {
-        if(formData.department == null)
+        if(formData.department == null || formData.department == 0)
         {
           return false; 
         }
@@ -1133,6 +1119,240 @@
       localStorage.setItem('aiTree', JSON.stringify(myData));
 
     }
+    // after deleting some element it will reorder the nested object and it's value like parent/parents
+    function reorderObjectKeys(obj) {
+      var obj = JSON.parse(localStorage.getItem('aiTree')) || {};
+      if (typeof obj !== 'object' || obj === null) {
+          return obj;
+      }
+
+      const stack = [{ current: obj, path: [] }];
+      const result = {};
+
+      while (stack.length > 0) {
+          const { current, path } = stack.pop();
+          const keys = Object.keys(current)
+              .map(Number) // Convert keys to numbers for sorting
+              .sort((a, b) => a - b);
+
+          let newKey = 1;
+          keys.forEach((key) => {
+              const newPath = path.concat(newKey);
+              const newLevel = path.concat(newKey);
+              const newParent = newLevel.length >= 2 ? newLevel[newLevel.length - 2] : 0;
+              const newParents = newLevel.slice(0, newLevel.length - 1);
+              
+              let target = result;
+
+              // Navigate to the correct location in the result object using the path
+              for (let i = 0; i < newPath.length - 1; i++) {
+                  target = target[newPath[i]] = target[newPath[i]] || {};
+              }
+
+               // If the current[key] is an object and not null, set the level property and push to the stack
+              if (typeof current[key] === 'object' && current[key] !== null && !Array.isArray(current[key])) {
+                  target[newPath[newPath.length - 1]] = {
+                      ...current[key],
+                      level: newLevel.join('-'),
+                      parent: newParent,
+                      parents:  newParents.length > 0 ? newParents.join("-") : 0,
+                  };
+                  stack.push({ current: current[key], path: newPath });
+              } else {
+                  // If it's not an object, directly assign the value
+                  target[newPath[newPath.length - 1]] = current[key];
+              }
+
+              newKey++;
+          });
+      }
+      localStorage.setItem('aiTree', JSON.stringify(result));
+    }
+
+    // this will make html again if object changes
+    function renderHtmlByObject(){
+      var obj = JSON.parse(localStorage.getItem('aiTree')) || {};
+      
+      $(".ab-row-section").html("");
+      $("#form-divs").html("");
+      if(obj === null || Object.keys(obj).length === 0)
+      {
+        var buttonRowData = `<div class="ab-button-section mb-3" id="add-btn-0">
+                              <div class="row mb-2">
+                                <div class="col-md-12 p-0">
+                                  <label>First Message</label>
+                                  <textarea class="form-control first_message"></textarea>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-md-2 p-0">
+                                  <span class="ab-button-add" data-level="0">Add</span>
+                                </div>
+                                <div class="col-md-10 p-0">
+                                  <div class="ab-button-row scroll-hide">
+                                      <!-- data -->
+                                  </div>
+                                </div>
+                              </div>
+                            </div>`;
+        $(".ab-row-section").html(buttonRowData);
+        return true;
+      }
+      
+      function render(obj){
+        
+        for (const key in obj) {
+          const item = obj[key];
+          // Check if the item is an object with a 'name' property
+          if (typeof item === 'object' && item !== null && key != "form_data") {
+              const isComplete = validateNode(item.form_data);
+              //////////////////////////////////////////////////this is for button section/////////////////////////////////////////////////////
+              var htmlNode = `<span class="ab-button ${isComplete ? 'is-complete':''}" data-tgt="#data-${item.level}" data-level="${item.level}" id="btn-${item.level}">
+                            <div>${item.level} ${item.form_data.command ? `<div>Command: ${item.form_data.command}</div>` : ''}</div>
+                            <span class="cross-button"> ×</span>
+                          </span>
+                          `;
+        
+              
+              if (($("#add-btn-"+item.parents).length) == 0) {
+                var htmlRow = `<div class="ab-button-section mb-3" id="add-btn-${item.parents}">`
+                                if(item.parents == 0)
+                                {
+                                  htmlRow +=`<div class="row mb-2">
+                                              <div class="col-md-12 p-0">
+                                                <label>First Message</label>
+                                                <textarea class="form-control first_message"></textarea>
+                                              </div>
+                                            </div>`;
+                                }
+
+                htmlRow +=  `<div class="row">
+                                    <div class="col-md-2 p-0">
+                                      <span class="ab-button-add" data-level="${item.parents}">Add</span>
+                                    </div>
+                                    <div class="col-md-10 p-0">
+                                      <div class="ab-button-row scroll-hide">
+                                          <!-- data -->
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>`;
+                  
+                  $(".ab-row-section").append(htmlRow);
+              }
+              $("#add-btn-"+item.parents+" .ab-button-row").append(htmlNode);
+              //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+              
+              //////////////////////////////////////////////////this is for data section////////////////////////////////////////////////////////
+              var htmlDataDiv = `<div id="data-${item.level}" data-level="${item.level}" class="ab-data" style="display: none;">
+                                  <div class="form" data-level="">
+                                    <h6 class="heading">Entry Value For Level: ${item.level}</h6>
+                                    <div class="row">`
+                                    if(item.form_data.reply_type == 'sub menu')
+                                        {
+                                          htmlDataDiv += `<div class="col-md-12 clone-message">
+                                                            <label class="text-white">Message</label>
+                                                            <textarea class="form-control message">${item.form_data.message??'' }</textarea>
+                                                          </div>`;
+                                        }
+                                        
+              htmlDataDiv +=             `<div class="form-group col-md-3">
+                                            <label class="text-white">Command</label>
+                                            <input type="text" class="form-control command" value="${item.form_data.command??'' }">
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label class="text-white">Type</label>
+                                            <select name="" class="form-control msg-type">
+                                                <option value="0">Selcted</option>
+                                                <option ${item.form_data.reply_type == 'text' ? 'selected' : ''} value="text">Text</option>
+                                                <option ${item.form_data.reply_type == 'media' ? 'selected' : ''} value="media">Media</option>
+                                                <option ${item.form_data.reply_type == 'file' ? 'selected' : ''} value="file">File</option>
+                                                <option ${item.form_data.reply_type == 'sub menu' ? 'selected' : ''} value="sub menu">Submenu</option>
+                                                <option ${item.form_data.reply_type == 'forwarder' ? 'selected' : ''} value="forwarder">Forwarder</option>
+                                                <option ${item.form_data.reply_type == 'live chat' ? 'selected' : ''} value="live chat">Live Chat</option>
+                                                <option ${item.form_data.reply_type == 'live agent' ? 'selected' : ''} value="live agent">Live Agent</option>
+                                                <option ${item.form_data.reply_type == 'api call' ? 'selected' : ''} value="api call">Api Call</option>
+                                            </select>
+                                        </div>`;
+                                        if(item.form_data.reply_type == 'text')
+                                        {
+                                          htmlDataDiv += `<div class="form-group col-md-3">
+                                                            <label class="text-white">Text</label>
+                                                            <input type="text" class="form-control text"  value="${item.form_data.text??''}">
+                                                          </div>`;
+                                        }
+                                        if(item.form_data.reply_type == 'media')
+                                        {
+                                          htmlDataDiv += `<div class="form-group col-md-3" id="file-${item.level}">
+                                                            <label class="text-white">Media</label>
+                                                            <div class="form-control">
+                                                              <a href="#">${item.form_data.media}</a>
+                                                            </div>
+                                                            <input type="hidden" value="${item.form_data.media}" class="form-control media">
+                                                          </div>`;
+                                        }
+                                        if(item.form_data.reply_type == 'file')
+                                        {
+                                          htmlDataDiv += `<div class="form-group col-md-3" id="file-${item.level}">
+                                                          <label class="text-white">File</label>
+                                                          <div class="form-control">
+                                                            <a href="#">${item.form_data.file}</a>
+                                                          </div>
+                                                          <input type="hidden" value="${item.form_data.file}" class="form-control file">
+                                                        </div>`;
+                                        }
+                                        if(item.form_data.reply_type == 'forwarder')
+                                        {
+                                          htmlDataDiv += `<div class="form-group col-md-3">
+                                                            <label class="text-white">Forwarder</label>
+                                                            <select class="form-control forwarder">
+                                                              <option value="">Select</option>
+                                                              <option ${item.form_data.forwarder == '1' ? 'selected' : ''} value="1">static 1</option>
+                                                              <option ${item.form_data.forwarder == '2' ? 'selected' : ''} value="2">static 2</option>
+                                                            </select>
+                                                          </div>
+                                                          <div class="form-group col-md-3">
+                                                            <label class="text-white">Forwarder Text</label>
+                                                            <input type="text" class="form-control forwarder-text" value="${item.form_data.forwarder_text??''}">
+                                                          </div>`;
+                                        }
+                                        if(item.form_data.reply_type == 'live agent')
+                                        {
+                                          htmlDataDiv += `<div class="form-group col-md-3">
+                                                            <label class="text-white">Agent from Department</label>
+                                                            <select class="form-control department">
+                                                              <option value="0">Select</option>
+                                                              <option ${item.form_data.department == '1' ? 'selected' : ''} value="1">static 1</option>
+                                                              <option ${item.form_data.department == '2' ? 'selected' : ''} value="2">static 2</option>
+                                                            </select>
+                                                          </div>`;
+                                        }
+                                        if(item.form_data.reply_type == 'api call')
+                                        {
+                                          htmlDataDiv += `<div class="form-group col-md-3">
+                                                              <label class="text-white">Your Api</label>
+                                                              <input type="text" class="form-control api" value="${item.form_data.api??''}">
+                                                          </div>
+                                                          <div class="form-group col-md-3">
+                                                              <label class="text-white">Message For Api</label>
+                                                              <input type="text" class="form-control api-message" value="${item.form_data.api_message??''}">
+                                                          </div>`;
+                                        }
+              htmlDataDiv +=        `</div>
+                                    </div>
+                                  </div>`;
+              $("#form-divs").append(htmlDataDiv);
+              //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+              render(item);
+          }
+        }
+      }
+      render(obj);
+      setTimeout(function(){
+        $(".ab-button-section").hide();
+        $('#add-btn-0').show();
+      },500)
+    }
 
 
     
@@ -1147,7 +1367,7 @@
               var targetId = buttonCount;
               // If level is zero, set the text and id without the level prefix
               button
-                  .text(buttonCount) // Only show the button count
+                  .html(`<div>${buttonCount}</div>`) // Only show the button count
                   .attr('data-tgt', "#data-" + targetId) // Use buttonCount as ID
                   .attr('data-level',buttonCount) // Remove data-level attribute
                   .attr('id',"btn-"+buttonCount); // Remove data-level attribute
@@ -1155,7 +1375,7 @@
               var targetId = level + "-" + buttonCount;
               // If level is not zero, set the text and id with the level prefix
               button
-                  .text(targetId)
+                  .html(`<div>${targetId}</div>`)
                   .attr('data-tgt', "#data-" + targetId)
                   .attr('data-level', level+"-"+buttonCount) // Set the data-level attribute
                   .attr('id', "btn-"+level+"-"+buttonCount); // Set the data-level attribute
@@ -1236,7 +1456,8 @@
          
           let selectedValue = $(this).val()
 
-          $(this).closest('.row').children().slice(3).remove();
+          $("#data-"+parent+" .clone-message").remove();
+          $(this).closest('.row').children().slice(2).remove();
           // text
           if(selectedValue == "text")
           {
@@ -1288,6 +1509,9 @@
               rowSection.attr('id',"add-btn-"+parent);
               $(".ab-row-section").append(rowSection);
               $("#add-btn-"+parent+" .ab-button-add").attr("data-level",parent);
+              
+              let formMessage = $('#clone-data .clone-message').clone();
+              $("#data-"+parent+" .row").prepend(formMessage);
           }
           else
           {
@@ -1302,6 +1526,24 @@
           $('.modal').removeClass("show");
           $('.modal .modal-content').removeClass("show");
           getFormDataAndUpdate(fileValue);
+      });
+      $(document).on('click', '#submit', function() {
+         var first_message = $(".first_message").val();
+         var data = JSON.parse(localStorage.getItem('aiTree')) || {};
+         var submitData = {first_message: first_message, data: data};
+
+         if(($(".is-complete").length + 1) != $(".ab-button").length || $(".ab-button").length == 1)
+         {
+          alert("Please some data is missing. please check tree progress");
+          return;
+         }
+         console.log(submitData);
+      });
+      $(document).on('click', '#clear-all', function() {
+        $(".first_message").val("");
+        localStorage.setItem('aiTree',JSON.stringify({}));
+        renderHtmlByObject();
+         
       });
       $(document).on('click', '.direct-add', function() {
           const dataLevel = $(this).closest(".info").data('level');
@@ -1357,10 +1599,11 @@
         let myData = JSON.parse(localStorage.getItem('aiTree')) || {};
         const level = $(this).closest(".ab-button").data('level');
         const keys = level.toString().split('-').map(Number);
-        console.log(keys);
 
         unsetNestedKey(myData, keys);
         localStorage.setItem('aiTree', JSON.stringify(myData));
+        reorderObjectKeys();
+        renderHtmlByObject();
         // alert(level);
         e.stopPropagation();
       });
@@ -1387,6 +1630,23 @@
             api_message: $abDataSection.find('.api-message').val() ? $abDataSection.find('.api-message').val() : null
         };
 
+        if(form_data.command)
+        {
+          $("#btn-"+dataLevel+" div").html('').append(`${dataLevel}<div>Command: ${form_data.command}</div>`);
+        }
+        else
+        {          
+          $("#btn-"+dataLevel+" div").html('').append(`${dataLevel}`);
+        }
+        var isComplete = validateNode(form_data);
+        if(isComplete)
+        {
+          $("#btn-"+dataLevel).addClass("is-complete")
+        }
+        else
+        {
+          $("#btn-"+dataLevel).removeClass("is-complete")
+        }
         // Log the collected data or pass it to any other function
         updateTreeDataArray(dataLevel, form_data);
         // alert(JSON.stringify(formData)); // For testing, displays the object as a string
