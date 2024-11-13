@@ -180,12 +180,31 @@
           }
           .info{
             width: 200px;
+            height: 110px;
             text-align: left;
             padding: 10px;
+            position: relative;
           }
 
           .image-container{
             cursor: pointer;
+          }
+
+          .detail{
+            display: none;
+          }
+
+          .info:hover .detail {
+            display: block;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            color: black;
+            padding: 10px;
+            top: 110px;
+            left: 0;
+            width: 530px;
+            z-index: 1;
           }
     </style>
 </head>
@@ -842,9 +861,7 @@
       <div class="form-group col-md-3">
         <label class="text-white">Forwarder</label>
         <select class="form-control forwarder">
-          <option value="">Select</option>
-          <option value="1">static 1</option>
-          <option value="2">static 2</option>
+          
         </select>
       </div>
       <div class="form-group col-md-3">
@@ -856,9 +873,7 @@
       <div class="form-group col-md-3">
         <label class="text-white">Agent from Department</label>
         <select class="form-control department">
-          <option value="">Select</option>
-          <option value="1">static 1</option>
-          <option value="2">static 2</option>
+          
         </select>
       </div>
     </div>
@@ -884,11 +899,34 @@
   <script src="assets/js/scripts.js"></script>
   <!-- Custom JS File -->
   <script src="assets/js/custom.js"></script>
+  
 </body>
 
 <script>
-    // localStorage.removeItem('aiTree');
+    
+    let forwarderDropdown = [{id:1,name:'forw 1'},{id:2,name:'forw 2'}];
+    let departmentDropdown = [{id:1,name:'dept 1'},{id:2,name:'dept 2'}];
+    let editData = @json($data ?? 'addition');
+
+    if(editData != 'addition')
+    {
+      localStorage.setItem('aiTree', JSON.stringify(editData));
+    }
+
+
+    function forwarderOptions(selected = null) {
+        const defaultOption = '<option value="">Select an option</option>';
+        return defaultOption + forwarderDropdown.map(option => `<option ${selected == option.id ? 'selected' : ''} value="${option.id}">${option.name}</option>`).join('');
+    }
+    function departmentOptions(selected = null) {
+        const defaultOption = '<option value="">Select an option</option>';
+        return defaultOption + departmentDropdown.map(option => `<option ${selected == option.id ? 'selected' : ''} value="${option.id}">${option.name}</option>`).join('');
+    }
+    $("#on-change-forwarder-field .forwarder").html(forwarderOptions());
+    $("#on-change-liveagent-field .department").html(departmentOptions());
+    
     renderHtmlByObject();
+    updateTreeChart();
     function validateNode(formData)
     { 
       if(formData.reply_type == "sub menu")
@@ -958,8 +996,8 @@
       }
       return true;
     }
-    function updateTreeChart(data) {
-      
+    function updateTreeChart() {
+      var data = JSON.parse(localStorage.getItem('aiTree')) || {};
       function traverseAndRender(obj) {
           for (const key in obj) {
               const item = obj[key];
@@ -974,10 +1012,6 @@
                                           <span>${item.level}</span>
                                         </div>
                                         <div class="form-value-row">
-                                          <span>Message: </span>
-                                          <span>${item.form_data.message}</span>
-                                        </div>
-                                        <div class="form-value-row">
                                           <span>Command: </span>
                                           <span>${item.form_data.command}</span>
                                         </div>
@@ -985,41 +1019,47 @@
                                           <span>Type: </span>
                                           <span>${item.form_data.reply_type}</span>
                                         </div>
-                                        <div class="form-value-row">
-                                          <span>Text: </span>
-                                          <span>${item.form_data.text}</span>
-                                        </div>
-                                        <div class="form-value-row">
-                                          <span>Media: </span>
-                                          <span>${item.form_data.media}</span>
-                                        </div>
-                                        <div class="form-value-row">
-                                          <span>File: </span>
-                                          <span>${item.form_data.file}</span>
-                                        </div>
-                                        <div class="form-value-row">
-                                          <span>Forwarder: </span>
-                                          <span>${item.form_data.forwarder}</span>
-                                        </div>
-                                        <div class="form-value-row">
-                                          <span>Forwarder Text: </span>
-                                          <span>${item.form_data.forwarder_text}</span>
-                                        </div>
-                                        <div class="form-value-row">
-                                          <span>Live Agent: </span>
-                                          <span>${item.form_data.department}</span>
-                                        </div>
-                                        <div class="form-value-row">
-                                          <span>Api: </span>
-                                          <span>${item.form_data.api}</span>
-                                        </div>
-                                        <div class="form-value-row">
-                                          <span>Api Text</span>
-                                          <span>${item.form_data.api_message}</span>
+                                        <div class="detail">
+                                          ${item.form_data.message ? `<div class="border p-1 my-2 form-value-row">
+                                            <div><b>Message</b></div>
+                                            <div>${item.form_data.message}</div>
+                                          </div>` : ''}
+                                          ${item.form_data.text ? `<div class="border p-1 my-2 form-value-row">
+                                            <div><b>Text</b></div>
+                                            <div>${item.form_data.text}</div>
+                                          </div>` : ''}
+                                          ${item.form_data.media ? `<div class="border p-1 my-2 form-value-row">
+                                            <div><b>Media</b></div>
+                                            <div>${item.form_data.media}</div>
+                                          </div>` : ''}
+                                          ${item.form_data.file ? `<div class="border p-1 my-2 form-value-row">
+                                            <div><b>File</b></div>
+                                            <div>${item.form_data.file}</div>
+                                          </div>` : ''}
+                                          ${item.form_data.forwarder ? `<div class="border p-1 my-2 form-value-row">
+                                            <div><b>Forwarder</b></div>
+                                            <div>${item.form_data.forwarder}</div>
+                                          </div>` : ''}
+                                          ${item.form_data.forwarder_text ? `<div class="border p-1 my-2 form-value-row">
+                                            <div><b>Forwarder Text</b></div>
+                                            <div>${item.form_data.forwarder_text}</div>
+                                          </div>` : ''}
+                                          ${item.form_data.department ? `<div class="border p-1 my-2 form-value-row">
+                                            <div><b>Live Agent</b></div>
+                                            <div>${item.form_data.department}</div>
+                                          </div>` : ''}
+                                          ${item.form_data.api ? `<div class="border p-1 my-2 form-value-row">
+                                            <div><b>Api</b></div>
+                                            <div>${item.form_data.api}</div>
+                                          </div>` : ''}
+                                          ${item.form_data.api_message ? `<div class="border p-1 my-2 form-value-row">
+                                            <div><b>Api Text</b></div>
+                                            <div>${item.form_data.api_message}</div>
+                                          </div>` : ''}
                                         </div>
                                         <div class="d-flex justify-content-end">
-                                          <button class="btn btn-sm btn-dark direct-add">View</button>
-                                        </div>
+                                            <button class="btn btn-sm btn-dark direct-add">View</button>
+                                          </div>
                                       </div>
                                     </div>`;
 
@@ -1059,6 +1099,7 @@
 
     function updateTreeDataArray(level,form_data = null)
     {
+      
       // Parse `aiTree` from localStorage and ensure it's an object
       let myData = JSON.parse(localStorage.getItem('aiTree')) || {};
 
@@ -1097,7 +1138,10 @@
 
               // If it's the last key, assign the latestData
               if (index === keys.length - 1) {
-                  current[key] = latestData;
+                  current[key] = {
+                                  ...current[key], // Merge existing data
+                                  ...latestData // Merge latestData (only overrides the keys in latestData)
+                                };;
               } else {
                   // If the key does not exist, create an empty object
                   current[key] = current[key] || {};
@@ -1114,9 +1158,9 @@
 
       // Build the nested object with `btnIds` array
       myData = buildNestedObject(myData, btnIds, level);
-      updateTreeChart(myData);
       // Save the updated structure back to localStorage
       localStorage.setItem('aiTree', JSON.stringify(myData));
+      updateTreeChart();
 
     }
     // after deleting some element it will reorder the nested object and it's value like parent/parents
@@ -1173,6 +1217,7 @@
     function renderHtmlByObject(){
       var obj = JSON.parse(localStorage.getItem('aiTree')) || {};
       
+      var firstMessage = $(".first_message").val()??"";
       $(".ab-row-section").html("");
       $("#form-divs").html("");
       if(obj === null || Object.keys(obj).length === 0)
@@ -1181,7 +1226,7 @@
                               <div class="row mb-2">
                                 <div class="col-md-12 p-0">
                                   <label>First Message</label>
-                                  <textarea class="form-control first_message"></textarea>
+                                  <textarea class="form-control first_message">${firstMessage}</textarea>
                                 </div>
                               </div>
                               <div class="row">
@@ -1221,7 +1266,7 @@
                                   htmlRow +=`<div class="row mb-2">
                                               <div class="col-md-12 p-0">
                                                 <label>First Message</label>
-                                                <textarea class="form-control first_message"></textarea>
+                                                <textarea class="form-control first_message">${firstMessage}</textarea>
                                               </div>
                                             </div>`;
                                 }
@@ -1306,9 +1351,7 @@
                                           htmlDataDiv += `<div class="form-group col-md-3">
                                                             <label class="text-white">Forwarder</label>
                                                             <select class="form-control forwarder">
-                                                              <option value="">Select</option>
-                                                              <option ${item.form_data.forwarder == '1' ? 'selected' : ''} value="1">static 1</option>
-                                                              <option ${item.form_data.forwarder == '2' ? 'selected' : ''} value="2">static 2</option>
+                                                              ${forwarderOptions(item.form_data.forwarder)}
                                                             </select>
                                                           </div>
                                                           <div class="form-group col-md-3">
@@ -1321,9 +1364,7 @@
                                           htmlDataDiv += `<div class="form-group col-md-3">
                                                             <label class="text-white">Agent from Department</label>
                                                             <select class="form-control department">
-                                                              <option value="0">Select</option>
-                                                              <option ${item.form_data.department == '1' ? 'selected' : ''} value="1">static 1</option>
-                                                              <option ${item.form_data.department == '2' ? 'selected' : ''} value="2">static 2</option>
+                                                              ${departmentOptions(item.form_data.department)}
                                                             </select>
                                                           </div>`;
                                         }
@@ -1348,10 +1389,8 @@
         }
       }
       render(obj);
-      setTimeout(function(){
-        $(".ab-button-section").hide();
-        $('#add-btn-0').show();
-      },500)
+      $(".ab-button-section").hide();
+      $('#add-btn-0').show();
     }
 
 
@@ -1528,21 +1567,31 @@
           getFormDataAndUpdate(fileValue);
       });
       $(document).on('click', '#submit', function() {
-         var first_message = $(".first_message").val();
-         var data = JSON.parse(localStorage.getItem('aiTree')) || {};
-         var submitData = {first_message: first_message, data: data};
+        var first_message = $(".first_message").val();
+        var data = JSON.parse(localStorage.getItem('aiTree')) || {};
+        var submitData = {first_message: first_message, data: data};
 
-         if(($(".is-complete").length + 1) != $(".ab-button").length || $(".ab-button").length == 1)
-         {
-          alert("Please some data is missing. please check tree progress");
+        if(first_message == "" || first_message == null)
+        {
+          alert("Please enter first message");
           return;
-         }
-         console.log(submitData);
+        }
+        if(($(".is-complete").length + 1) != $(".ab-button").length || $(".ab-button").length == 1)
+        {
+          alert("Some data is missing. please check tree progress");
+          return;
+        }
+        $(".first_message").val("");
+        localStorage.setItem('aiTree',JSON.stringify({}));
+        renderHtmlByObject();
+        updateTreeChart();
+        console.log(submitData);
       });
       $(document).on('click', '#clear-all', function() {
         $(".first_message").val("");
         localStorage.setItem('aiTree',JSON.stringify({}));
         renderHtmlByObject();
+        updateTreeChart();
          
       });
       $(document).on('click', '.direct-add', function() {
@@ -1604,6 +1653,7 @@
         localStorage.setItem('aiTree', JSON.stringify(myData));
         reorderObjectKeys();
         renderHtmlByObject();
+        updateTreeChart();
         // alert(level);
         e.stopPropagation();
       });
