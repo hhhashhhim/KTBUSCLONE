@@ -1509,7 +1509,7 @@ class BookingController extends Controller
 
                     $checkCard->increment("starting_points", $ticket->points_usage);
                 }
-                return 'g';
+
                 $delElt = TicketELT::where('ticket_id', $ticket->id)->first();
                 if ($delElt) {
                     $delElt->delete();
@@ -1533,10 +1533,10 @@ class BookingController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
                 
-                if($type == "booked")
-                {
-                    ticketCanceledMessage([$ticket->id]);
-                }
+                // if($type == "booked")
+                // {
+                //     ticketCanceledMessage([$ticket->id]);
+                // }
                 $ticket->delete();
                 DB::commit();
             } catch (\Exception $e) {
@@ -1603,10 +1603,10 @@ class BookingController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
                 
-                if($status == "booked")
-                {
-                    ticketCanceledMessage($tickets->pluck('id'));
-                }
+                // if($status == "booked")
+                // {
+                //     ticketCanceledMessage($tickets->pluck('id'));
+                // }
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
