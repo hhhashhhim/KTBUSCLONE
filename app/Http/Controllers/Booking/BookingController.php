@@ -1607,6 +1607,7 @@ class BookingController extends Controller
                 // {
                 //     ticketCanceledMessage($tickets->pluck('id'));
                 // }
+                
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
