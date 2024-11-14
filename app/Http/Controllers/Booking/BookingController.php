@@ -414,6 +414,10 @@ class BookingController extends Controller
     {
         return ticketConfirmedMessage($request->invoice_id);
     }
+    public function whatsappCancelMessage(Request $request)
+    {
+        return ticketCanceledMessage($request->tickets);
+    }
 
 
     private function singleReschedule($request)
@@ -1533,12 +1537,16 @@ class BookingController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
                 
-                // if($type == "booked")
-                // {
-                //     ticketCanceledMessage([$ticket->id]);
-                // }
+                $tkts = [];
+                if($type == "booked")
+                {
+                    $tkts[] = $ticket->id;
+                }
                 $ticket->delete();
                 DB::commit();
+                return [
+                    "tickets" => $tkts
+                ];
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Database transaction error: ' . $e->getMessage());
@@ -1603,12 +1611,16 @@ class BookingController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
                 
-                // if($status == "booked")
-                // {
-                //     ticketCanceledMessage($tickets->pluck('id'));
-                // }
+                $tkts = [];
+                if($type == "booked")
+                {
+                    $tkts = $tickets->pluck('id');
+                }
                 
                 DB::commit();
+                return [
+                    "tickets" => $tkts
+                ];
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Database transaction error: ' . $e->getMessage());
