@@ -1475,7 +1475,6 @@ class BookingController extends Controller
     public
     function cancelingBooking(Request $request)
     {
-        return 'h';
         if(!checkPermissionButtons("cancel-ticket") && !checkPermissionButtons("reserved-cancel"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
@@ -1510,7 +1509,7 @@ class BookingController extends Controller
 
                     $checkCard->increment("starting_points", $ticket->points_usage);
                 }
-
+                return 'g';
                 $delElt = TicketELT::where('ticket_id', $ticket->id)->first();
                 if ($delElt) {
                     $delElt->delete();
