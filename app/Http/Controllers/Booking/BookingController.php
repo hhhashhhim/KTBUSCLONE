@@ -1535,7 +1535,7 @@ class BookingController extends Controller
                 
                 if($type == "booked")
                 {
-                    ticketCanceledMessage([$ticket->id]);
+                    // ticketCanceledMessage([$ticket->id]);
                 }
                 $ticket->delete();
                 DB::commit();
@@ -1605,7 +1605,7 @@ class BookingController extends Controller
                 
                 if($status == "booked")
                 {
-                    ticketCanceledMessage($tickets->pluck('id'));
+                    // ticketCanceledMessage($tickets->pluck('id'));
                 }
                 DB::commit();
             } catch (\Exception $e) {
