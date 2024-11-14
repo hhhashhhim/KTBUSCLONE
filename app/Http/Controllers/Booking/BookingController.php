@@ -1475,6 +1475,7 @@ class BookingController extends Controller
     public
     function cancelingBooking(Request $request)
     {
+        return 'h';
         if(!checkPermissionButtons("cancel-ticket") && !checkPermissionButtons("reserved-cancel"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
@@ -1535,7 +1536,7 @@ class BookingController extends Controller
                 
                 if($type == "booked")
                 {
-                    // ticketCanceledMessage([$ticket->id]);
+                    ticketCanceledMessage([$ticket->id]);
                 }
                 $ticket->delete();
                 DB::commit();
@@ -1605,7 +1606,7 @@ class BookingController extends Controller
                 
                 if($status == "booked")
                 {
-                    // ticketCanceledMessage($tickets->pluck('id'));
+                    ticketCanceledMessage($tickets->pluck('id'));
                 }
                 DB::commit();
             } catch (\Exception $e) {
