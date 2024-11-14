@@ -1095,9 +1095,9 @@
                         Are you sure you want to cancel ticket ?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary"
+                        <button type="button" class="btn btn-primary" :disabled="cancelLoading"
                                 @click="cancelBooking(cancelData)">
-                            Cancel Ticket
+                                {{ getSchedule ? "Loading..." : 'Cancel Ticket' }}
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeCancel()">
                             Close
@@ -1140,9 +1140,9 @@
                         Are you sure you want to cancel all ticket ?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary"
+                        <button type="button" class="btn btn-primary" :disabled="cancelLoading"
                                 @click="allSeatCancel()">
-                            Cancel Ticket
+                                {{ getSchedule ? "Loading..." : 'Cancel Ticket' }}
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">
                             Close
@@ -1624,6 +1624,7 @@ export default {
             getSchedule: false,
             showBookingDiv: false,
             showReBookingDiv: false,
+            cancelLoading: false,
             selectedSeats: [],
             selectedSeatsFare: [],
             selectedSeatsClass: [],
@@ -1993,6 +1994,7 @@ export default {
         },
         
         async allSeatCancel() {
+            this.cancelLoading = true;
             const resCancelSeats = await this.callApi("post", "booking/canceling/all", this.cancelAllData);
             if (resCancelSeats.status == 200) {
                 swal({
@@ -2008,6 +2010,7 @@ export default {
                 this.cancelAllData.percentage = "0";
                 this.cancelAllData.reason = "";
                 this.closeModal();
+                const resBookingDetail = await this.callApi("post", "booking/whatsapp/cancel/message", {tickets: resCancelSeats.data.tickets});
             }
             if (resCancelSeats.status == 422) {
                 this.dropScheduleButton = false;
@@ -2030,6 +2033,7 @@ export default {
 
                 }
             }
+            this.cancelLoading = false;
         },
 
         minDateFilter: function () {
@@ -2679,7 +2683,7 @@ export default {
                     timer: 2000
                 });
             }
-            
+            this.getSchedule = true;
             this.resetArrays();
             this.schedule = [];
             this.addForm.customerCNIC = "";
@@ -2817,10 +2821,12 @@ export default {
                 
 
                 if (resSelected.status == 500 && this.addForm.schedule == 0) {
+                    this.getSchedule = false;
                     this.loading = true
                     this.showBookingDiv = false;
                 }
                 if (resSelected.status == 422) {
+                    this.getSchedule = false;
                     this.showBookingDiv = false;
                     this.loading = false;
                     let errorContent = "";
@@ -2842,6 +2848,7 @@ export default {
 
                     }
                 }
+                this.getSchedule = false;
             }
         },
         async revertDropSchedule () {
@@ -3583,6 +3590,7 @@ export default {
         ,
 
         async cancelBooking(dataEnter) {
+            this.cancelLoading = true;
             const data = {
                 date: dataEnter.dataDate,
                 schedule_id: dataEnter.dataSchedule,
@@ -3593,6 +3601,7 @@ export default {
                 percentage: dataEnter.percentage,
                 remarks: dataEnter.reason,
             }
+            
             const resCancelBooking = await this.callApi("post", "booking/canceling", data);
             if (resCancelBooking.status == 200) {
                 swal({
@@ -3605,6 +3614,7 @@ export default {
                 this.fetchScheduleData();
                 this.resetArrays();
                 this.closeModal();
+                const resBookingDetail = await this.callApi("post", "booking/whatsapp/cancel/message", {tickets: resCancelBooking.data.tickets});
             }
             if (resCancelBooking.status == 422) {
                 this.dropScheduleButton = false;
@@ -3627,6 +3637,7 @@ export default {
 
                 }
             }
+            this.cancelLoading = false;
         },
 
         //over issue model complete data
