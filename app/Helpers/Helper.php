@@ -516,7 +516,7 @@ if (!function_exists('ticketConfirmedMessage')) {
             4 => 'Hamza_4-Device4',
             5 => 'Hamza_4-Device-5'
         ];
-        $randomNumber = rand(3, 5);
+        $randomNumber = rand(1, 5);
 
 
         
@@ -733,7 +733,7 @@ if (!function_exists('ticketcanceledMessage')) {
             4 => 'Hamza_4-Device4',
             5 => 'Hamza_4-Device-5'
         ];
-        $randomNumber = rand(1, 5);
+        $randomNumber = rand(3, 5);
 
 
         
