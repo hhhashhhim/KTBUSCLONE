@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bus\Bus;
 use App\Models\Bus\BusClass;
 use App\Models\City;
+use App\Models\Ticket;
 use App\Models\Discount\Discount;
 use App\Models\FareClass;
 use App\Models\FareTable;
@@ -250,19 +251,34 @@ class ScheduleController extends Controller
                         $single->update([
                             "departure_date" => date("Y-m-d",strtotime($updatedTime)),
                             "departure_time" => date("H:i:s",strtotime($updatedTime)),
-                            "schedule_date" => $schedule_date,
+                            // "schedule_date" => $schedule_date,
                         ]);
                         
                     }
                 }
 
-                DB::table('tickets')
-                ->where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$request->schedule_id])
+                // DB::table('tickets')
+                // ->where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$request->schedule_id])
+                // ->whereBetween("schedule_date",[$request->start_date,$request->end_date])
+                // ->update([
+                //     'schedule_time' => DB::raw("DATE_ADD(schedule_time, INTERVAL $request->time MINUTE)"),
+                //     'schedule_time_exact' => DB::raw("DATE_ADD(schedule_time_exact, INTERVAL $request->time MINUTE)")
+                // ]);
+
+                // Add minutes to schedule_time and get new date and time
+                $scheduleTimeWithInterval = DB::raw("DATE_ADD(CONCAT(`date`, ' ', `schedule_time`), INTERVAL $request->time MINUTE)");
+                $scheduleTimeExactWithInterval = DB::raw("DATE_ADD(CONCAT(`date`, ' ', `schedule_time_exact`), INTERVAL $request->time MINUTE)");
+                $updateData = [
+                    'date' => DB::raw("DATE($scheduleTimeWithInterval)"), // Extract the date part
+                    'schedule_time' => DB::raw("TIME($scheduleTimeWithInterval)"), // Extract the time part
+                    'schedule_time_exact' => DB::raw("TIME($scheduleTimeExactWithInterval)")
+                ];
+                // Use the update array in your query
+                Ticket::
+                where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$request->schedule_id])
                 ->whereBetween("schedule_date",[$request->start_date,$request->end_date])
-                ->update([
-                    'schedule_time' => DB::raw("DATE_ADD(schedule_time, INTERVAL $request->time MINUTE)"),
-                    'schedule_time_exact' => DB::raw("DATE_ADD(schedule_time_exact, INTERVAL $request->time MINUTE)")
-                ]);
+                ->update($updateData);
+
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
                     "message" => Auth::user()->name." | updated schedule time from $request->start_date to $request->end_date time ($request->time) | $request->schedule_id",
