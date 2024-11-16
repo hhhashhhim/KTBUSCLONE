@@ -2227,7 +2227,11 @@ export default {
                     timer: 2000
                 });
             this.loading = true;
-            const res = await this.callApi("post", "booking/close/schedule/closing/store", this.dataForClose);
+            const res = await this.callApi("post", "booking/close/schedule/closing/store", {
+                ...this.dataForClose, // Spread the properties from this.dataForClose (assuming it is an object)
+                departureCity: this.addForm.departureCity,
+                destinationCity: this.addForm.destinationCity,
+            });
             if (res.status == 201) {
                 swal({
                     title: "Success",
