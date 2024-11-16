@@ -591,7 +591,7 @@ class ScheduleClosingController extends Controller
                 "requested_host" => $request->ip(),
                 "company_id" => Auth::user()->company_id
             ]);
-            return 'h';
+            
         DB::commit();
         return $closingRecord;
         } catch (\Exception $e) {
