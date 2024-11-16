@@ -34634,7 +34634,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _this10.callApi("post", "booking/close/schedule/closing/store", _objectSpread(_objectSpread({}, _this10.dataForClose), {}, {
                   // Spread the properties from this.dataForClose (assuming it is an object)
                   departureCity: _this10.addForm.departureCity,
-                  destinationCity: _this10.addForm.destinationCity
+                  destinationCity: _this10.addForm.destinationCity,
+                  departure_time: _this10.addForm.departure_time
                 }));
 
               case 14:

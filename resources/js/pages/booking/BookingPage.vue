@@ -2231,6 +2231,7 @@ export default {
                 ...this.dataForClose, // Spread the properties from this.dataForClose (assuming it is an object)
                 departureCity: this.addForm.departureCity,
                 destinationCity: this.addForm.destinationCity,
+                departure_time: this.addForm.departure_time,
             });
             if (res.status == 201) {
                 swal({
