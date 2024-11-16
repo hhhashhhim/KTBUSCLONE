@@ -19,7 +19,7 @@ class FleetMaintenanceController extends Controller
 {
     public function index()
     {
-        if(!checkForSubmenu("maintenance-link"))
+        if(!checkForSubmenu("linking"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
@@ -34,7 +34,7 @@ class FleetMaintenanceController extends Controller
 
     public function fleetSinglePartLink(Request $request)
     {
-        if(!checkForSubmenu("maintenance-link"))
+        if(!checkForSubmenu("part"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
