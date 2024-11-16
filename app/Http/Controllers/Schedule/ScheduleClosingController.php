@@ -513,6 +513,13 @@ class ScheduleClosingController extends Controller
             // this is for get schedule end city
             $destination = RouteFare::where("route_id", $route)->orderBy('id', 'DESC')->first();
             // this is for get schedule departure time
+            return [
+                "schedule_id" => $request->schedule,
+                "departure_id" => $departure->departure_city_id,
+                "destination_id" => $departure->destination_city_id,
+                "departure_date" => $request->date,
+                "company_id" => Auth::user()->company_id
+            ];
             $depTime = ScheduleDetail::where(["schedule_id" => $request->schedule,
                 "departure_id" => $departure->departure_city_id,
                 "destination_id" => $departure->destination_city_id,
