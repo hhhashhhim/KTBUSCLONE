@@ -511,6 +511,7 @@ class ScheduleClosingController extends Controller
                 "departure_id" => $request->departureCity,
                 "destination_id" => $request->destinationCity,
                 "departure_date" => $request->date,
+                'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
                 "company_id" => Auth::user()->company_id
             ])->first();
 
