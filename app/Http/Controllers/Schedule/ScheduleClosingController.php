@@ -500,6 +500,20 @@ class ScheduleClosingController extends Controller
 
     public function store(Request $request)
     {
+        // this is for get route id that will be followed by schedule
+        $route = Schedule::find($request->schedule)->route_id;
+        // this is for get schedule start city
+        $departure = RouteFare::where("route_id", $route)->orderBy('id', 'ASC')->first();
+        // this is for get schedule end city
+        $destination = RouteFare::where("route_id", $route)->orderBy('id', 'DESC')->first();
+        // this is for get schedule departure time
+        return [
+            "schedule_id" => $request->schedule,
+            "departure_id" => $departure->departure_city_id,
+            "destination_id" => $departure->destination_city_id,
+            "departure_date" => $request->date,
+            "company_id" => Auth::user()->company_id
+        ];
         if(!checkPermissionButtons("assign-bus"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
