@@ -503,7 +503,7 @@ class ScheduleClosingController extends Controller
         // this is for get route id that will be followed by schedule
         $route = Schedule::find($request->schedule)->route_id;
         // this is for get schedule start city
-        $departure = RouteFare::where("route_id", $route)->orderBy('id', 'ASC')->first();
+        return $departure = RouteFare::where("route_id", $route)->orderBy('id', 'ASC')->first();
         // this is for get schedule end city
         $destination = RouteFare::where("route_id", $route)->orderBy('id', 'DESC')->first();
         // this is for get schedule departure time
