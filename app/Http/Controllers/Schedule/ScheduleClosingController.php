@@ -249,7 +249,7 @@ class ScheduleClosingController extends Controller
                     $q->where("schedule_departure_date",'<=',$request->to_date);
                 }
             })
-            ->limit(20)
+            ->limit(($request->from_date == '' && $request->to_date == '') ? 20 : 2000)
             ->orderBy("schedule_departure_date","DESC")
             ->get(["id","schedule_departure_date","schedule_return_date","bus_id","closing_date"]);
 
@@ -371,7 +371,7 @@ class ScheduleClosingController extends Controller
                     $q->where("schedule_departure_date",'<=',$request->to_date);
                 }
             })
-            ->limit(20)
+            ->limit(($request->from_date == '' && $request->to_date == '') ? 20 : 2000)
             ->latest("schedule_departure_date")
             ->get(["id","schedule_departure_date","schedule_return_date","bus_id","closing_date"]);
 
