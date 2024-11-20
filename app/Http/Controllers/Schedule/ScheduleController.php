@@ -277,6 +277,7 @@ class ScheduleController extends Controller
                 Ticket::
                 where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$request->schedule_id])
                 ->whereBetween("schedule_date",[$request->start_date,$request->end_date])
+                ->withTrashed()
                 ->update($updateData);
 
                 ActivityLog::create([
