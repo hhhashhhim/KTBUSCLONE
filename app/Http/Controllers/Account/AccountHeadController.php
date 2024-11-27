@@ -57,13 +57,38 @@ class AccountHeadController extends BaseController
             ]);
             DB::beginTransaction();
 
-            accountHeadCreate( 
+            $head = accountHeadCreate( 
                 $request->name,
                 $request->first_level,
                 $request->second_level,
                 $request->third_level,
                 $request->fourth_level
             );
+
+            if($request->fourth_level == 31)
+            {
+                Bank::create([
+                    "name" => $request->name,
+                    "address" => "dumy",
+                    "iban" => "000",
+                    "account_number" => "000",
+                    "balance" => 0,
+                    "status" => "active",
+                    "account_head_id" => $head->id,
+                    'added_by' => Auth::user()->id,
+                    "company_id" => Auth::user()->company_id
+                ]);
+            }
+            
+            if($request->fourth_level == 30)
+            {
+                Cash::create([
+                    "amount" => 0,
+                    "account_head_id" => $head->id,
+                    'added_by' => Auth::user()->id,
+                    "company_id" => Auth::user()->company_id
+                ]);
+            }
 
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
