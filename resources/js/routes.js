@@ -61,6 +61,7 @@ import CloseSummeryReportPage from "./pages/SummeryReports/CloseSummeryReportPag
 import AdvanceSaleReportsPage from "./pages/Sales/AdvanceSaleReportsPage.vue";
 import TerminalCommissionReportsPage from "./pages/Sales/TerminalCommissionReportsPage.vue";
 import TerminalSaleReportsPage from "./pages/Sales/TerminalSaleReportsPage.vue";
+import TerminalDiscountReportsPage from "./pages/Sales/TerminalDiscountReportsPage.vue";
 import ScheduleDropReportPage from "./pages/ScheduleDrop/ScheduleDropReportPage.vue";
 import ConfirmCancellationPage from "./pages/Cancel/ConfirmCancelationPage.vue";
 import OverIssuePage from "./pages/Cancel/OverIssuePage.vue";
@@ -387,6 +388,11 @@ const routes = [
         path: url + "reports/terminal/sale",
         component: TerminalSaleReportsPage,
         name: "terminal-sale-report"
+    },
+    {
+        path: url + "reports/terminal/discount",
+        component: TerminalDiscountReportsPage,
+        name: "terminal-discount-report"
     },
     {
         path: url + "reports/schedules/drop",
