@@ -494,4 +494,57 @@ class TerminalController extends Controller
             ];
 
     }
+    
+    public function filterDataDiscount(Request $request)
+    {
+        if(!checkForSubmenu("terminal-sale"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        $tickets = Ticket::with(
+            'terminal:id,name',
+            'busClass:id,name',
+            'schedule:id,name,time',
+            "bus:id,bus_number",
+            "customer:id,name,cnic,contact",
+            "route:id,name,via",
+        )
+        ->where('company_id', Auth::user()->company_id)
+        ->where("type", "booked")
+        ->where(function ($query) {
+            $query->where('discount', '>', 0)
+                  ->orWhere('terminal_discount', '>', 0)
+                  ->orWhere('schedule_discount', '>', 0);
+        })
+        ->when($request->terminal, function ($query) use ($request) {
+            return $query->where('terminal_id', $request->terminal);
+        })
+        ->when($request->schedule, function ($query) use ($request) {
+            return $query->where('schedule_id', $request->schedule);
+        })
+        ->when($request->route, function ($query) use ($request) {
+            return $query->whereIn('route_id', $request->route);
+        })
+        ->when($request->fromDateTime, function ($query) use ($request) {
+            return $query->whereRaw(
+                "CONCAT(schedule_date, ' ', schedule_time_exact) >= ?", 
+                [date("Y-m-d H:i:s", strtotime($request->fromDateTime))]
+            );
+        })
+        ->when($request->toDateTime, function ($query) use ($request) {
+            return $query->whereRaw(
+                "CONCAT(schedule_date, ' ', schedule_time_exact) <= ?", 
+                [date("Y-m-d H:i:s", strtotime($request->toDateTime))]
+            );
+        })
+        ->orderBy('schedule_date', 'asc')
+        ->get();
+        // return $tickets;
+        $tickets = $tickets->sortBy('schedule_date_time'); 
+            
+        return [
+                'record' => $tickets
+            ];
+
+    }
 }

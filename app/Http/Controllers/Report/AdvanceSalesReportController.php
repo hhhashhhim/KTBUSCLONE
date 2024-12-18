@@ -24,6 +24,15 @@ class AdvanceSalesReportController extends Controller
         return User::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
     }
 
+    public function getSchedules()
+    {
+        if(!checkForSubmenu("sales"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        return Schedule::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
+    }
+
     public function getTerminals()
     {
         if(!checkForSubmenu("sales"))

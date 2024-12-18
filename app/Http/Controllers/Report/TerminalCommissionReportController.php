@@ -25,6 +25,7 @@ class TerminalCommissionReportController extends Controller
         }
         return User::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
     }
+    
 
     public function getTerminals()
     {
