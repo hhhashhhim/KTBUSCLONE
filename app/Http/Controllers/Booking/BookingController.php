@@ -655,7 +655,6 @@ class BookingController extends Controller
         ->get();
         
         foreach ($allSchedules as $key => $single) {
-            
             $sub = 0;
             $terminalTime = TerminalTimeDifference::where(['company_id' => Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id, 'route_id' => $single->schedule->route_id])->first();
             if($terminalTime)
@@ -668,6 +667,19 @@ class BookingController extends Controller
             $single->departure_date_time = date("Y-m-d H:i:s",strtotime($exactDate));
             $single->departure_date = date("m/d/Y", strtotime($exactDate));
             $single->departure_time = date("h:i A", strtotime($exactDate));
+           
+            $visibilty = TerminalVisibility::where(["route_id"=>$single->schedule->route_id,"departure_city_id"=>$single->departure_id,"destination_city_id"=>$single->destination_id])->first();
+            if(Auth::user()->check_booking_minutes && isset($visibilty->booking_minutes) && $visibilty->booking_minutes >= 0)
+            {
+                
+                $bookingTime = strtotime($single->departure_date . ' ' . $single->departure_time) - ($visibilty->booking_minutes * 60);
+                $currentTime = strtotime(date("Y-m-d H:i:s"));
+
+                if ($currentTime < $bookingTime) {
+                    unset($allSchedules[$key]);
+                }
+            }
+            
         }
         // return $allSchedules;
         if(checkPermissionButtons("time-lock"))

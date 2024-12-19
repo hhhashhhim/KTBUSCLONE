@@ -369,7 +369,8 @@ class RouteController extends Controller
                 foreach($request->subroutes as $single)
                 {
                     TerminalVisibility::where("id",$single['subroute_id'])->update([
-                        "online_visibilty" => $single['visibility']
+                        "online_visibilty" => $single['visibility'],
+                        "booking_minutes" => $single['booking_minutes']==null ? null : abs($single['booking_minutes'])
                     ]);
                 }
                 DB::commit();

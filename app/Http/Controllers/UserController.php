@@ -150,6 +150,7 @@ class UserController extends Controller
                     'contact' => !is_null($request->contact) ? formatContact($request->contact) : null,
                     'role_id' => $request->role_id,
                     'online_user' => $request->online_user,
+                    'check_booking_minutes' => $request->check_booking_minutes,
                     'terminal_id' => $request->terminal_id,
                     'destination_city_ids' => json_encode($destination),
                     'departure_city_ids' => json_encode($departure),
