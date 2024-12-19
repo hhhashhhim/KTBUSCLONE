@@ -449,8 +449,8 @@
                             <option value="1">Checked</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="role">User Type <span class="text-danger ml-1">*</span></label>
+                    <div class="form-group col-md-3">
+                        <label for="role">User Type</label>
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input"
                                     id="femaleCheckBoxEdit"
@@ -459,6 +459,18 @@
                                     name="">
                             <label class="custom-control-label"
                                     for="femaleCheckBoxEdit">Online User</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="role">Apply Time Validation</label>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input"
+                                    id="bookinMinute"
+                                    v-bind:checked="dataEdit.check_booking_minutes == 1"
+                                    @click="changeEditMinute($event)"
+                                    name="">
+                            <label class="custom-control-label"
+                                    for="bookinMinute">Yes</label>
                         </div>
                     </div>
                 </div>
@@ -724,6 +736,14 @@ export default {
                 this.dataEdit.online_user = 1;
             } else {
                 this.dataEdit.online_user = 0;
+            }
+        },
+        
+        changeEditMinute: function (e) {
+            if (e.target.checked) {
+                this.dataEdit.check_booking_minutes = 1;
+            } else {
+                this.dataEdit.check_booking_minutes = 0;
             }
         },
 

@@ -1997,6 +1997,7 @@ export default {
             this.cancelLoading = true;
             const resCancelSeats = await this.callApi("post", "booking/canceling/all", this.cancelAllData);
             if (resCancelSeats.status == 200) {
+                this.cancelLoading = true;
                 swal({
                     title: "Success",
                     text: "Seats Canceled Successfully",
@@ -3609,6 +3610,7 @@ export default {
             
             const resCancelBooking = await this.callApi("post", "booking/canceling", data);
             if (resCancelBooking.status == 200) {
+                this.cancelLoading = false;
                 swal({
                     title: "Success",
                     text: "Booking Canceled Successfully",

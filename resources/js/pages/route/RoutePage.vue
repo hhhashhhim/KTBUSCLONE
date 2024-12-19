@@ -235,32 +235,40 @@
                         </div>
                         <div class="modal-body">
                             <div class="row">
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-3">
                                     <label for="name">Departure City</label>
                                 </div>
 
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-3">
                                     <label for="name">Destination City</label>
                                 </div>
                                 
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-3">
+                                    <label for="name" class="d-block">Minutes for advance booking</label>
+                                </div>
+                                
+                                <div class="form-group col-md-3">
                                     <label for="name" class="d-block">Hide Subroute</label>
                                 </div>
                             </div>
                             <div class="row"  v-for="(subroute, i) in subroutes" :key="i">
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-3">
                                     <select class="form-control" >
                                         <option :value="subroute.departure_id" selected>{{subroute.departure_name}}</option>
                                     </select>
                                 </div>
 
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-3">
                                     <select class="form-control">
                                         <option :value="subroute.destination_id" selected>{{subroute.destination_name}}</option>
                                     </select>
                                 </div>
                                 
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-3">
+                                    <input type="number" class="form-control" min="0" v-model="subroutes[i].booking_minutes"/>
+                                </div>
+
+                                <div class="form-group col-md-3">
                                     <input type="checkbox" v-model="subroutes[i].visibility"/>
                                 </div>
                             </div>
@@ -473,6 +481,7 @@ export default {
                             subroute_id:data[i].id , 
                             departure_name:data[i].departure.name , 
                             destination_name:data[i].destination.name,
+                            booking_minutes:data[i].booking_minutes??null,
                             visibility:data[i].online_visibilty==0 ? false : true,
                         });
                 }
