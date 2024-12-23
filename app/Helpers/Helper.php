@@ -6,7 +6,9 @@ use App\Models\Customer;
 use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Hrm\Employee\Employee;
+use App\Http\Resources\ConflictResource;
 use Illuminate\Support\Facades\Http;
+use App\Models\Surcharge\Surcharge;
 use App\Models\Route\Route;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Account\AccountHead;
@@ -277,6 +279,64 @@ if (!function_exists('checkDiscountAmount')) {
         // }
 
         
+    }
+}
+
+if (!function_exists('seatFareIsWrong')) {
+    function seatFareIsWrong($request)
+    {
+        foreach($request->selected_seats_fare as $i => $value)
+        {
+            $fareForAllClasses = FareTable::where('from_city_id', $request->departure_city_id)->where('to_city_id', $request->destination_city_id)
+            ->where('company_id', Auth::user()->company_id)
+            ->get()->unique('fare_class');
+            $schedule = Schedule::where('id', $request->schedule_id)
+            ->where('company_id', Auth::user()->company_id)
+            ->first();
+            $scheduleDiscount = Discount::where('id', $schedule->discount_id)
+            ->where('is_active', 1)
+            ->whereHas("discount_terminals", function ($q){
+                $q->where("terminal_id", Auth::user()->terminal_id);
+            })
+            ->first();
+            $terminalDiscount = TerminalDiscount::where(["terminal_id" => Auth::user()->terminal_id, "route_id" => $schedule->route_id])->first();
+            $scheduleSurcharge = Surcharge::where('id', $schedule->surcharge_id)->where('is_active', 1)->first();
+
+            $data = $fareForAllClasses->where('fare_class', $request->selected_seats_class[$i])->first();
+            $fare = (int)$data->fare;
+            $startFare = (int)$data->fare;
+            if ($scheduleDiscount) {
+                if ($scheduleDiscount->type == "percentage") {
+                    $number = $scheduleDiscount->percentage / 100;
+                    $percentage = (int)$data->fare * $number;
+                    $fare = round((int)$data->fare - $percentage);
+                } else {
+                    $fare = (int)$data->fare - (int)$scheduleDiscount->flat;
+                }
+            }
+            if ($terminalDiscount) {
+                $tdiscount = ((int)$data->fare / 100) * (float)$terminalDiscount->discount;
+                $fare = $fare - $tdiscount;
+            }
+            if ($scheduleSurcharge) {
+                if ($scheduleSurcharge->type == "percentage") {
+                    $number = $scheduleSurcharge->percentage / 100;
+                    $percentage = (int)$data->fare * $number;
+                    $fare = round((int)$data->fare + $percentage);
+                } else {
+                    $fare = (int)$data->fare + $scheduleSurcharge->flat;
+                }
+            }
+            if($fare != $startFare)
+            {
+                $fare = customRound($fare??0);
+            }
+            
+            if($fare != $request->selected_seats_fare[$i])
+            {
+                return true;
+            }
+        }
     }
 }
 

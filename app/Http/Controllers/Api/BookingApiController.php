@@ -631,6 +631,13 @@ class BookingApiController extends Controller
     }
     public function bookSeat(Request $request)
     {
+        // seat fare validation
+        if(seatFareIsWrong($request))
+        {
+            $error = ["Please Enter Valid Fare"];
+            return new ConflictResource($error);
+        }
+
         $scheduleId = $request->schedule_id;
         $lockName = "stayLock:" . $scheduleId;  // Dynamic lock based on schedule ID
         try {
