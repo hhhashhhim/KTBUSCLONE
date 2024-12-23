@@ -671,7 +671,7 @@ class BookingApiController extends Controller
                             //////////////////////////////////////////////
                             ActivityLog::create([
                                 "activity_by" => Auth::user()->id,
-                                "message" => Auth::user()->name." | update ticket (advance to confirm) | time : ".$checkAlreadyBooked[0]->schedule_date." ".$checkAlreadyBooked[0]->schedule_time." | invoice id :".$request->invoice_id,
+                                "message" => Auth::user()->name." | update ticket (advance to confirm) | time : ".$checkAlreadyBooked[0]->schedule_date." ".$checkAlreadyBooked[0]->schedule_time." | invoice id :".$request->invoice_id." /".$request->total_amount,
                                 "requested_host" => $request->ip(),
                                 "company_id" => Auth::user()->company_id
                             ]);
