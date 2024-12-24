@@ -663,8 +663,8 @@ class BookingApiController extends Controller
                             ->first()->amount;
                             if(isset($request->total_amount) && $request->total_amount != $checkTotal)
                             {
-                                $error = ["Please Enter Valid Amount"];
-                                return new ConflictResource($error);
+                                // $error = ["Please Enter Valid Amount"];
+                                // return new ConflictResource($error);
                             }
 
                             Ticket::where("invoice_id",$request->invoice_id)->update([
