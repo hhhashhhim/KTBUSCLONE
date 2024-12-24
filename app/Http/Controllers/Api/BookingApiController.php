@@ -631,12 +631,6 @@ class BookingApiController extends Controller
     }
     public function bookSeat(Request $request)
     {
-        // seat fare validation
-        if(seatFareIsWrong($request))
-        {
-            $error = ["Please Enter Valid Fare"];
-            return new ConflictResource($error);
-        }
 
         $scheduleId = $request->schedule_id;
         $lockName = "stayLock:" . $scheduleId;  // Dynamic lock based on schedule ID
@@ -660,8 +654,19 @@ class BookingApiController extends Controller
                         }
                         // checking only reserved seats will go through this process
                         $checkAlreadyBooked = Ticket::where("invoice_id",$request->invoice_id)->where(['company_id' => $companyId, "type" => "advance booking"])->get();
+                        
                         if($checkAlreadyBooked->count() > 0 )
                         {
+                            // this is for fare validation how much amount received from payment gateway
+                            $checkTotal = Ticket::where("invoice_id",$request->invoice_id)->where(['company_id' => $companyId, "type" => "advance booking"])
+                            ->selectRaw('(SUM(seat_fare) - SUM(discount)) as amount')
+                            ->first()->amount;
+                            if(isset($request->total_amount) && $request->total_amount != $checkTotal)
+                            {
+                                $error = ["Please Enter Valid Amount"];
+                                return new ConflictResource($error);
+                            }
+
                             Ticket::where("invoice_id",$request->invoice_id)->update([
                                 'type' => 'booked',
                                 'updated_by' => Auth::user()->id,
@@ -671,7 +676,7 @@ class BookingApiController extends Controller
                             //////////////////////////////////////////////
                             ActivityLog::create([
                                 "activity_by" => Auth::user()->id,
-                                "message" => Auth::user()->name." | update ticket (advance to confirm) | time : ".$checkAlreadyBooked[0]->schedule_date." ".$checkAlreadyBooked[0]->schedule_time." | invoice id :".$request->invoice_id." /".$request->total_amount,
+                                "message" => Auth::user()->name." | update ticket (advance to confirm) | time : ".$checkAlreadyBooked[0]->schedule_date." ".$checkAlreadyBooked[0]->schedule_time." | invoice id :".$request->invoice_id." / ". (isset($request->total_amount) ? $request->total_amount : "*"),
                                 "requested_host" => $request->ip(),
                                 "company_id" => Auth::user()->company_id
                             ]);
@@ -711,6 +716,13 @@ class BookingApiController extends Controller
                     if($request->book_type != "booked" && $request->book_type != "advance booking")
                     {
                         $error = ["Please Enter Type booked/advance booking"];
+                        return new ConflictResource($error);
+                    }
+
+                    // seat fare validation
+                    if(seatFareIsWrong($request))
+                    {
+                        $error = ["Please Enter Valid Fare"];
                         return new ConflictResource($error);
                     }
 
