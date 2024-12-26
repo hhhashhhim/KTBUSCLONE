@@ -98,6 +98,7 @@
                                                                 <th>Invoice</th>
                                                                 <th>Terminal Name</th>
                                                                 <th>Status</th>
+                                                                <th>Remarks</th>
                                                                 <th>Discount</th>
                                                                 <th>Schedule Discount</th>
                                                                 <th>Terminal Discount</th>
@@ -115,6 +116,7 @@
                                                                 <td>{{ data.invoice_id }}</td>
                                                                 <td>{{ data.terminal.name }}</td>
                                                                 <td>{{ data.type }}</td>
+                                                                <td>{{ data.remarks }}</td>
                                                                 <td>{{ data.discount }}</td>
                                                                 <td>{{ data.schedule_discount }}</td>
                                                                 <td>{{ data.terminal_discount }}</td>
