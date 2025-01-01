@@ -489,7 +489,6 @@ class TerminalController extends Controller
         }
         // return $tickets;
         $tickets = $tickets->sortBy('schedule_date_time'); 
-        return $request;
         return [
                 'record' => $tickets
             ];
