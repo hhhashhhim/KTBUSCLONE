@@ -473,7 +473,7 @@ class TerminalController extends Controller
             }
 
             $single->refund = $refundValue;
-            $single->schedule_date_time = date('Y-m-d H:i:s', strtotime($single->date . ' ' . $single->schedule_time_exact));
+            $single->schedule_date_time = date('Y-m-d H:i:s', strtotime($single->schedule_date . ' ' . $single->schedule_time_exact));
             return $single;
         });
 
@@ -484,12 +484,11 @@ class TerminalController extends Controller
         }
         if($request->toDateTime)
         {
-            return $tickets->count();
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
-        
         // return $tickets;
         $tickets = $tickets->sortBy('schedule_date_time'); 
+            
         return [
                 'record' => $tickets
             ];
