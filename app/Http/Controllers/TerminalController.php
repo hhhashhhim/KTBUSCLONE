@@ -480,7 +480,7 @@ class TerminalController extends Controller
         // date filter
         if($request->fromDateTime)
         {
-            return $request;
+            return $tickets->count();
             $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s",strtotime($request->fromDateTime)));
         }
         if($request->toDateTime)
