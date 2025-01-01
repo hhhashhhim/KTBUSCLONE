@@ -480,6 +480,7 @@ class TerminalController extends Controller
         // date filter
         if($request->fromDateTime)
         {
+            return $request;
             $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s",strtotime($request->fromDateTime)));
         }
         if($request->toDateTime)
@@ -488,7 +489,7 @@ class TerminalController extends Controller
         }
         // return $tickets;
         $tickets = $tickets->sortBy('schedule_date_time'); 
-            
+        return $request;
         return [
                 'record' => $tickets
             ];
