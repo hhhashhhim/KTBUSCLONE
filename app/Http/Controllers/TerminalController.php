@@ -484,9 +484,10 @@ class TerminalController extends Controller
         }
         if($request->toDateTime)
         {
+            return $tickets->count();
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
-        return $tickets->count();
+        
         // return $tickets;
         $tickets = $tickets->sortBy('schedule_date_time'); 
         return [
