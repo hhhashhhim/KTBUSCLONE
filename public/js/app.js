@@ -34685,7 +34685,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this8.drivers = resData.data.drivers;
                   _this8.hosts = resData.data.hosts;
                   _this8.BusNo = resData.data.infoData.bus_no;
-                  _this8.dataForClose.date = resData.data.infoData.departure_date;
+                  _this8.dataForClose.date = resData.data.infoData.schedule_date;
                   _this8.dataForClose.ticket_closing_id = resData.data.infoData.ticket_closing_id;
                   _this8.dataForClose.alreadyAssigned = resData.data.infoData.alreadyAssigned;
                   _this8.dataForClose.ticket_merge_id = resData.data.infoData.merge_id;
