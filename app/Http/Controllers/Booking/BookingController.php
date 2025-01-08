@@ -1348,7 +1348,7 @@ class BookingController extends Controller
         $infoData->ticket_closing_id = $checkAssign ? $checkAssign->id : '';
         $infoData->merge_id = $checkAssign ? $checkAssign->ticket_merge_id : '';
         $infoData->alreadyAssigned = $checkAssign ? 1 : 0;
-        $infoData->schedule_date = $schedule->schedule_date;
+        $infoData->departure_date = $schedule->departure_date;
         $infoData->schedule_id = $schedule->schedule_id;
         $infoData->route_name = $schedule->schedule->route->name;
         $infoData->description = $checkAssign ? $checkAssign->description : '';

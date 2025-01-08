@@ -507,10 +507,10 @@ class ScheduleClosingController extends Controller
         try {
             DB::beginTransaction();
             
-            return $depTime = ScheduleDetail::where(["schedule_id" => $request->schedule,
+            $depTime = ScheduleDetail::where(["schedule_id" => $request->schedule,
                 "departure_id" => $request->departureCity,
                 "destination_id" => $request->destinationCity,
-                "departure_date" => "2025-01-05",
+                "departure_date" => $request->date,
                 'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
                 "company_id" => Auth::user()->company_id
             ])->first();
