@@ -34685,7 +34685,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this8.drivers = resData.data.drivers;
                   _this8.hosts = resData.data.hosts;
                   _this8.BusNo = resData.data.infoData.bus_no;
-                  _this8.dataForClose.date = resData.data.infoData.schedule_date;
+                  _this8.dataForClose.date = resData.data.infoData.departure_date;
                   _this8.dataForClose.ticket_closing_id = resData.data.infoData.ticket_closing_id;
                   _this8.dataForClose.alreadyAssigned = resData.data.infoData.alreadyAssigned;
                   _this8.dataForClose.ticket_merge_id = resData.data.infoData.merge_id;
@@ -104505,9 +104505,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
- // const url = '/kt-dev/'
 
-var url = '/';
+var url = '/kt-dev/'; // const url = '/'
+
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
@@ -104826,8 +104826,8 @@ var store = (0,vuex__WEBPACK_IMPORTED_MODULE_0__.createStore)({
       },
       user: JSON.parse(localStorage.getItem("user")),
       token: localStorage.getItem("token"),
-      main_url: "https://portal.kainattravels.net/",
-      api_url: "https://api.kainattravels.net/",
+      main_url: "http://localhost/kt-dev/",
+      api_url: "http://localhost/kt-api/",
       permissions: JSON.parse(localStorage.getItem("user")) && JSON.parse(localStorage.getItem("user")).role ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
       companyModules: false
     };

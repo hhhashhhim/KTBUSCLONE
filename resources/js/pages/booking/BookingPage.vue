@@ -2124,7 +2124,7 @@ export default {
                 this.drivers = resData.data.drivers;
                 this.hosts = resData.data.hosts;
                 this.BusNo = resData.data.infoData.bus_no;
-                this.dataForClose.date = resData.data.infoData.schedule_date;
+                this.dataForClose.date = resData.data.infoData.departure_date;
                 this.dataForClose.ticket_closing_id = resData.data.infoData.ticket_closing_id;
                 this.dataForClose.alreadyAssigned = resData.data.infoData.alreadyAssigned;
                 this.dataForClose.ticket_merge_id = resData.data.infoData.merge_id;
