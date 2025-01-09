@@ -507,7 +507,7 @@ class ScheduleClosingController extends Controller
         try {
             DB::beginTransaction();
             
-            return $depTime = ScheduleDetail::where(["schedule_id" => $request->schedule,
+            $depTime = ScheduleDetail::where(["schedule_id" => $request->schedule,
                 "departure_id" => $request->departureCity,
                 "destination_id" => $request->destinationCity,
                 "schedule_date" => $request->date,
@@ -521,7 +521,7 @@ class ScheduleClosingController extends Controller
                 return response()->json(["errors" => ["Tickets Error" => ["No Booking Found! \n\n Booked Any Single Seat First"]]], 422);
             }
             // if already assign
-            $checkAssign = TicketClosing::where([
+            return $checkAssign = TicketClosing::where([
                 'company_id' => Auth::user()->company_id,
                 "bus_id" => $request->bus,
                 'schedule_id' => $request->schedule,
