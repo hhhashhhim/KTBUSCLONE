@@ -2118,6 +2118,7 @@ export default {
                 date: this.addForm.date,
                 departureCity: this.addForm.departureCity,
                 destinationCity: this.addForm.destinationCity,
+                departure_time: this.addForm.departure_time,
             });
             if (resData.status == 200) {
                 this.buses = resData.data.buses;

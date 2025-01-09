@@ -34674,7 +34674,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   scheduleId: _this8.addForm.schedule,
                   date: _this8.addForm.date,
                   departureCity: _this8.addForm.departureCity,
-                  destinationCity: _this8.addForm.destinationCity
+                  destinationCity: _this8.addForm.destinationCity,
+                  departure_time: _this8.addForm.departure_time
                 });
 
               case 10:
