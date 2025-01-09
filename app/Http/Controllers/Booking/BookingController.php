@@ -1314,12 +1314,11 @@ class BookingController extends Controller
     public
     function getClosingData(Request $request)
     {
-        return 'h';
         if(!checkPermissionButtons("assign-bus"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return $uniqueDate = ScheduleDetail::where([
+        $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->scheduleId,
             'departure_date' => $request->date,
