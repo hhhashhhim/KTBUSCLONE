@@ -556,7 +556,7 @@ class ScheduleClosingController extends Controller
                 'company_id' => Auth::user()->company_id,
                 'added_by' => Auth::user()->id,
             ]);
-return 'ggadsf';
+
             // for driver
             foreach ($request->drivers as $value) {
 
@@ -580,7 +580,7 @@ return 'ggadsf';
                     'added_by' => Auth::user()->id,
                 ]);
             }
-
+return 'yes';
             Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, "schedule_date" => $request->date])
             ->withTrashed()
             ->update([
