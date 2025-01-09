@@ -580,7 +580,7 @@ class ScheduleClosingController extends Controller
                     'added_by' => Auth::user()->id,
                 ]);
             }
-return 'yes';
+
             Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, "schedule_date" => $request->date])
             ->withTrashed()
             ->update([
@@ -593,7 +593,7 @@ return 'yes';
                 "requested_host" => $request->ip(),
                 "company_id" => Auth::user()->company_id
             ]);
-            
+            return 'no';
         DB::commit();
         return $closingRecord;
         } catch (\Exception $e) {
