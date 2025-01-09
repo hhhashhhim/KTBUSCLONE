@@ -1314,6 +1314,7 @@ class BookingController extends Controller
     public
     function getClosingData(Request $request)
     {
+        return 'h';
         if(!checkPermissionButtons("assign-bus"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
