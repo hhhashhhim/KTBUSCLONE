@@ -1335,7 +1335,7 @@ class BookingController extends Controller
             ->first();
 
         // if already assign
-        return $checkAssign = TicketClosing::where([
+        $checkAssign = TicketClosing::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->scheduleId,
             'schedule_date' => $uniqueDate,
