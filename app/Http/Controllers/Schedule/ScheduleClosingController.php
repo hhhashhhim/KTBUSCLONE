@@ -542,7 +542,7 @@ class ScheduleClosingController extends Controller
                 'added_by' => Auth::user()->id,
             ]);
             
-return 'h';
+
             $closingRecord = TicketClosing::create([
                 "bus_id" => $request->bus,
                 "ticket_merge_id" => $newRecord->id,
@@ -556,7 +556,7 @@ return 'h';
                 'company_id' => Auth::user()->company_id,
                 'added_by' => Auth::user()->id,
             ]);
-
+return 'ggadsf';
             // for driver
             foreach ($request->drivers as $value) {
 
