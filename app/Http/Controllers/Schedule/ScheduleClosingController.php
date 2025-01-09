@@ -521,7 +521,7 @@ class ScheduleClosingController extends Controller
                 return response()->json(["errors" => ["Tickets Error" => ["No Booking Found! \n\n Booked Any Single Seat First"]]], 422);
             }
             // if already assign
-            return $checkAssign = TicketClosing::where([
+            $checkAssign = TicketClosing::where([
                 'company_id' => Auth::user()->company_id,
                 "bus_id" => $request->bus,
                 'schedule_id' => $request->schedule,
@@ -542,7 +542,7 @@ class ScheduleClosingController extends Controller
                 'added_by' => Auth::user()->id,
             ]);
             
-
+return 'h';
             $closingRecord = TicketClosing::create([
                 "bus_id" => $request->bus,
                 "ticket_merge_id" => $newRecord->id,
