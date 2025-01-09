@@ -1318,7 +1318,7 @@ class BookingController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $uniqueDate = ScheduleDetail::where([
+        return $uniqueDate = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->scheduleId,
             'departure_date' => $request->date,
