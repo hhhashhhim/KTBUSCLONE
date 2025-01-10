@@ -60,6 +60,21 @@ if (!function_exists('checkForSubmenu')) {
         return $valid;
     }
 }
+if (!function_exists('countSeatFromMap')) {
+    function countSeatFromMap($seatMap) {
+        
+        $flattenedSeatMap = array_merge(...$seatMap);
+        $reservedSeatsOfType0 = array_filter($flattenedSeatMap, function($seat) {
+            return isset($seat['reserved']) && $seat['reserved'] === true &&
+                isset($seat['type']) && $seat['type'] === 0;
+        });
+        $count = array_reduce($reservedSeatsOfType0, function($carry, $seat) {
+            return $carry + 1;
+        }, 0);
+
+        return $count;
+    }
+}
 if (!function_exists('checkPermissionButtons')) {
     function checkPermissionButtons($name)
     {

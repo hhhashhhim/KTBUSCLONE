@@ -6,6 +6,8 @@ use App\Http\Controllers\Report\AdvanceSalesReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'web/v1/terminals','middleware' => ['auth:sanctum']], function () {
+    Route::post('/dashboard/data', [TerminalController::class, 'dashboardData']);
+
     Route::post('/', [TerminalController::class, 'index']);
     Route::post('/company', [TerminalController::class, 'companies']);
     Route::post('/cities', [TerminalController::class, 'cities']);
