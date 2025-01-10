@@ -2,6 +2,7 @@
     <div>
         <section class="section">
             <h2>Today Overview <button v-if="loading" class="btn btn-secondary btn-progress">abcd</button></h2>
+            
             <div class="row ">
                 <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-xs-12">
                     <div class="card">
