@@ -356,6 +356,13 @@ export default {
                     allow: true,
                     childs: [
                         {
+                            name: "dashboard",
+                            allow: true,
+                            buttons: [
+                                {name: "super-data", allow: true}
+                            ],
+                        },
+                        {
                             name: "cities",
                             allow: true,
                             buttons: [
