@@ -552,8 +552,6 @@ class TerminalController extends Controller
 
     public function dashboardData(Request $request)
     {
-
-        
         if(checkPermissionButtons("super-data"))
         {
             $superdata = false;
@@ -608,7 +606,7 @@ class TerminalController extends Controller
         
         $schedules->map(function($schedule,$key) use ($schedules,$today){
             $schedule->total_seat = countSeatFromMap($schedule->bus_class->seat_map);
-            $schedule->booked_seats = Ticket::where(["schedule_id"=>$schedule->id,"schedule_date"=>$today,"type"=>"booked"])->count();
+            $schedule->booked_seats = Ticket::where(["schedule_id"=>$schedule->id,"schedule_date"=>$today,"type"=>"booked"])->distinct('seat_no')->count();
             $schedule->progress = intVal(($schedule->booked_seats / $schedule->total_seat) * 100);
             $detail = ScheduleDetail::where(["schedule_id"=>$schedule->id,"schedule_date"=>$today])->first();
             $schedule->departure_time = date("h:i A d/m/Y",strtotime($detail->departure_date.' '.$detail->departure_time));

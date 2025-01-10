@@ -22,6 +22,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('reserved:cancel')->everyFifteenMinutes();
+        $schedule->command('daily:report')->dailyAt("11:00");
     }
 
     /**
