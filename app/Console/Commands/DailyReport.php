@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Booking\BookingCancel;
 use Illuminate\Console\Command;
 
-class OnlineReservedCancelTicket extends Command
+class DailyReport extends Command
 {
     /**
      * The name and signature of the console command.
