@@ -105,7 +105,11 @@ class DailyReport extends Command
 * New Customers : *$today_new_customers*
 * Repeated Customers : *$today_old_customers*
 * Gross Sale : *$today_sale*
-* Pending Merges : *$pending_merges*";
+* Pending Merges : *$pending_merges*
+
+This is automated generated report.
+(E&EO)
+";
 
         $response = Http::withHeaders([
             'X-Api-Key'=>$auth_key,
