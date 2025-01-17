@@ -39673,9 +39673,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     editCheckBoxFont: function editCheckBoxFont(e) {
       if (e.target.checked) {
-        this.dataEdit.font_icons = 1;
+        this.dataEdit.front_icons = 1;
       } else {
-        this.dataEdit.font_icons = 0;
+        this.dataEdit.front_icons = 0;
       }
     },
     addBusClass: function addBusClass() {
