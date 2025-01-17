@@ -94,7 +94,7 @@ class BusClassController extends Controller
                 $busClass = BusClass::where('id', $request->id)->update([
                     'name' => $request->name,
                     'color' => $request->busClassColor,
-                    'front_icons' => $request->front_icons == 1 ? 1 : 0,
+                    'front_icons' => $request->front_icons,
                     'seat_map' => $request->seat_map,
                     'no_of_rows' => $request->no_of_rows,
                     'no_of_cols' => $request->no_of_cols,
@@ -102,7 +102,7 @@ class BusClassController extends Controller
                 ]);
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | updated bus class $request->name $request->front_icons ($request->no_of_rows by $request->no_of_cols)",
+                    "message" => Auth::user()->name." | updated bus class $request->name ($request->no_of_rows by $request->no_of_cols)",
                     "requested_host" => $request->ip(),
                     "company_id" => Auth::user()->company_id
                 ]);
