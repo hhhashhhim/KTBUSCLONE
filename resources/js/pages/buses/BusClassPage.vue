@@ -7,12 +7,15 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Bus Class</h4>
                             <div class="card-header-action">
-                                <a v-if="checkForSubmenuButtons('add-bus-class')"
-                                   href="#"
-                                   data-toggle="modal"
-                                   :data-target="'#' + formID"
-                                   class="btn btn-primary"
-                                   @click="clearForm()"
+                                <a
+                                    v-if="
+                                        checkForSubmenuButtons('add-bus-class')
+                                    "
+                                    href="#"
+                                    data-toggle="modal"
+                                    :data-target="'#' + formID"
+                                    class="btn btn-primary"
+                                    @click="clearForm()"
                                 >
                                     Add Bus Class
                                 </a>
@@ -49,51 +52,149 @@
                                                     id="bus_class_table"
                                                 >
                                                     <thead>
-                                                    <tr>
-                                                        <th>Sr No.</th>
-                                                        <th>Name</th>
-                                                        <th>Color</th>
-                                                        <th>Status</th>
-                                                        <th>Added By</th>
-                                                        <th v-if="checkForSubmenuButtons('edit-bus-Class') || checkForSubmenuButtons('duplicate-bus-Class') || checkForSubmenuButtons('delete-bus-class')">
-                                                            Action
-                                                        </th>
-                                                    </tr>
+                                                        <tr>
+                                                            <th>Sr No.</th>
+                                                            <th>Name</th>
+                                                            <th>Color</th>
+                                                            <th>Status</th>
+                                                            <th>Added By</th>
+                                                            <th
+                                                                v-if="
+                                                                    checkForSubmenuButtons(
+                                                                        'edit-bus-Class'
+                                                                    ) ||
+                                                                    checkForSubmenuButtons(
+                                                                        'duplicate-bus-Class'
+                                                                    ) ||
+                                                                    checkForSubmenuButtons(
+                                                                        'delete-bus-class'
+                                                                    )
+                                                                "
+                                                            >
+                                                                Action
+                                                            </th>
+                                                        </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(busClass, i) in busClasses" :key="i">
-                                                        <td>{{ i + 1 }}</td>
-                                                        <td>{{ busClass.name }}</td>
-                                                        <td>
-                                                            <div
-                                                                style=" border-radius: 50%; height: 50px; width: 50px; "
-                                                                :style="{ backgroundColor: busClass.color }"></div>
-                                                        </td>
-                                                        <td> {{ busClass.is_active == 1 ? "Active" : "InActive" }}</td>
-                                                        <td>{{ busClass.added_by.name }}</td>
-                                                        <td v-if="checkForSubmenuButtons('edit-bus-Class') || checkForSubmenuButtons('duplicate-bus-Class') || checkForSubmenuButtons('delete-bus-class')">
-                                                            <button title="Duplicate Bus Class"
-                                                                    v-if="checkForSubmenuButtons('duplicate-bus-Class')"
-                                                                    @click="duplicate(busClass.id, i+1)"
-                                                                    class="btn btn-info mx-1"
-                                                            ><i class="fas fa-clone"></i>
-                                                            </button>
-                                                            <button title="Edit Bus Class"
-                                                                    v-if="checkForSubmenuButtons('edit-bus-Class')"
-                                                                    :data-target="'#' + editFormID"
-                                                                    data-toggle="modal"
-                                                                    @click="edit(busClass)"
-                                                                    class="btn btn-primary mx-1"
+                                                        <tr
+                                                            v-for="(
+                                                                busClass, i
+                                                            ) in busClasses"
+                                                            :key="i"
+                                                        >
+                                                            <td>{{ i + 1 }}</td>
+                                                            <td>
+                                                                {{
+                                                                    busClass.name
+                                                                }}
+                                                            </td>
+                                                            <td>
+                                                                <div
+                                                                    style="
+                                                                        border-radius: 50%;
+                                                                        height: 50px;
+                                                                        width: 50px;
+                                                                    "
+                                                                    :style="{
+                                                                        backgroundColor:
+                                                                            busClass.color,
+                                                                    }"
+                                                                ></div>
+                                                            </td>
+                                                            <td>
+                                                                {{
+                                                                    busClass.is_active ==
+                                                                    1
+                                                                        ? "Active"
+                                                                        : "InActive"
+                                                                }}
+                                                            </td>
+                                                            <td>
+                                                                {{
+                                                                    busClass
+                                                                        .added_by
+                                                                        .name
+                                                                }}
+                                                            </td>
+                                                            <td
+                                                                v-if="
+                                                                    checkForSubmenuButtons(
+                                                                        'edit-bus-Class'
+                                                                    ) ||
+                                                                    checkForSubmenuButtons(
+                                                                        'duplicate-bus-Class'
+                                                                    ) ||
+                                                                    checkForSubmenuButtons(
+                                                                        'delete-bus-class'
+                                                                    )
+                                                                "
                                                             >
-                                                                <i class="far fa-edit"></i>
-                                                            </button>
-                                                            <button v-if="checkForSubmenuButtons('delete-bus-class')"
-                                                                    :data-target="'#' + hideFormID" @click="delId = busClass.id" data-toggle="modal"
-                                                                    class="btn btn-danger">
-                                                                <i class="far fas fa-trash"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
+                                                                <button
+                                                                    title="Duplicate Bus Class"
+                                                                    v-if="
+                                                                        checkForSubmenuButtons(
+                                                                            'duplicate-bus-Class'
+                                                                        )
+                                                                    "
+                                                                    @click="
+                                                                        duplicate(
+                                                                            busClass.id,
+                                                                            i +
+                                                                                1
+                                                                        )
+                                                                    "
+                                                                    class="btn btn-info mx-1"
+                                                                >
+                                                                    <i
+                                                                        class="fas fa-clone"
+                                                                    ></i>
+                                                                </button>
+                                                                <button
+                                                                    title="Edit Bus Class"
+                                                                    v-if="
+                                                                        checkForSubmenuButtons(
+                                                                            'edit-bus-Class'
+                                                                        )
+                                                                    "
+                                                                    :data-target="
+                                                                        '#' +
+                                                                        editFormID
+                                                                    "
+                                                                    data-toggle="modal"
+                                                                    @click="
+                                                                        edit(
+                                                                            busClass
+                                                                        )
+                                                                    "
+                                                                    class="btn btn-primary mx-1"
+                                                                >
+                                                                    <i
+                                                                        class="far fa-edit"
+                                                                    ></i>
+                                                                </button>
+                                                                <button
+                                                                    v-if="
+                                                                        checkForSubmenuButtons(
+                                                                            'delete-bus-class'
+                                                                        )
+                                                                    "
+                                                                    :data-target="
+                                                                        '#' +
+                                                                        hideFormID
+                                                                    "
+                                                                    @click="
+                                                                        delId =
+                                                                            busClass.id
+                                                                    "
+                                                                    data-toggle="modal"
+                                                                    class="btn btn-danger"
+                                                                >
+                                                                    <i
+                                                                        class="far fas fa-trash"
+                                                                    ></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -116,7 +217,9 @@
             >
                 <div class="row">
                     <div class="form-group col-md-6">
-                        <label for="name">Name<span class="text-danger ml-1">*</span></label>
+                        <label for="name"
+                            >Name<span class="text-danger ml-1">*</span></label
+                        >
                         <input
                             type="text"
                             class="form-control"
@@ -126,7 +229,9 @@
                         />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="color">Color<span class="text-danger ml-1">*</span></label>
+                        <label for="color"
+                            >Color<span class="text-danger ml-1">*</span></label
+                        >
                         <input
                             type="color"
                             class="form-control"
@@ -139,22 +244,26 @@
                         <div class="form-group d-flex align-items-center">
                             <label class="mt-4" for="active">Is Active</label>
                             <label class="colorinput mx-3 mt-3">
-                <span>
-                  <input
-                      type="checkbox"
-                      value="1"
-                      checked
-                      class="colorinput-input"
-                      @change="checkBox($event)"
-                  />
-                  <span class="colorinput-color bg-primary"></span>
-                </span>
+                                <span>
+                                    <input
+                                        type="checkbox"
+                                        value="1"
+                                        checked
+                                        class="colorinput-input"
+                                        @change="checkBox($event)"
+                                    />
+                                    <span
+                                        class="colorinput-color bg-primary"
+                                    ></span>
+                                </span>
                             </label>
                         </div>
                     </div>
                     <div class="form-group col-md-3">
                         <label for="name"
-                        >No. of Rows<span class="text-danger ml-1">*</span></label
+                            >No. of Rows<span class="text-danger ml-1"
+                                >*</span
+                            ></label
                         >
                         <input
                             type="text"
@@ -166,7 +275,9 @@
                     </div>
                     <div class="form-group col-md-3">
                         <label for="name"
-                        >No. of Cols<span class="text-danger ml-1">*</span></label
+                            >No. of Cols<span class="text-danger ml-1"
+                                >*</span
+                            ></label
                         >
                         <input
                             type="text"
@@ -200,48 +311,95 @@
                             >
                                 <img
                                     @click="changeStatus(rowIndex, colIndex)"
-                                    :src=" $store.state.api_url + 'assets/img/buses/available_seat_img.gif' " alt=""/>
+                                    :src="
+                                        $store.state.api_url +
+                                        'assets/img/buses/available_seat_img.gif'
+                                    "
+                                    alt=""
+                                />
                             </td>
                         </tr>
                     </div>
-                    <div class="form-group col-md-5 border py-3" style="border-spacing: 5px;">
+                    <div
+                        class="form-group col-md-5 border py-3"
+                        style="border-spacing: 5px"
+                    >
                         <tr
                             class="seat-img p-0 m-0"
                             v-for="(record, rowIndex) in data.seatMap"
-                            :key="rowIndex">
-                            <td v-for="(col, colIndex) in record" :key="colIndex"
+                            :key="rowIndex"
+                        >
+                            <td
+                                v-for="(col, colIndex) in record"
+                                :key="colIndex"
                             >
-                                <small class="font-weight-bold position-absolute text-dark"
-                                       style="font-size: 10px !important"
-                                       v-if="col.reserved">{{
-                                        this.data.seatMap[rowIndex][colIndex].seatNo ?? 'N/A'
-                                    }}</small>
+                                <small
+                                    class="font-weight-bold position-absolute text-dark"
+                                    style="font-size: 10px !important"
+                                    v-if="col.reserved"
+                                    >{{
+                                        this.data.seatMap[rowIndex][colIndex]
+                                            .seatNo ?? "N/A"
+                                    }}</small
+                                >
                                 <img
-                                    :data-toggle="(this.data.seatMap[rowIndex][colIndex].reserved) ? 'modal' : ''"
-                                    :data-target="(this.data.seatMap[rowIndex][colIndex].reserved) ? '#addSeatNumber' : ''"
+                                    :data-toggle="
+                                        this.data.seatMap[rowIndex][colIndex]
+                                            .reserved
+                                            ? 'modal'
+                                            : ''
+                                    "
+                                    :data-target="
+                                        this.data.seatMap[rowIndex][colIndex]
+                                            .reserved
+                                            ? '#addSeatNumber'
+                                            : ''
+                                    "
                                     v-if="col.reserved"
                                     class="position-relative"
                                     :class="col.selected ? 'selected' : ''"
-                                    :style=" col.class ? checkClass(col.class) : '' "
+                                    :style="
+                                        col.class ? checkClass(col.class) : ''
+                                    "
                                     @click="selectSeat(rowIndex, colIndex)"
-                                    :src=" $store.state.api_url + 'assets/img/buses/booked_seat_img.gif' " alt=""/>
+                                    :src="
+                                        $store.state.api_url +
+                                        'assets/img/buses/booked_seat_img.gif'
+                                    "
+                                    alt=""
+                                />
                                 <span v-else></span>
                             </td>
                         </tr>
                     </div>
                     <div class="col-md-2">
-                        <div class="my-2" v-for="(seatClass,i) in allSeatClasses" :key="i">
-                            <div class="circles mr-1 border shadow"
-                                 :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
+                        <div
+                            class="my-2"
+                            v-for="(seatClass, i) in allSeatClasses"
+                            :key="i"
+                        >
+                            <div
+                                class="circles mr-1 border shadow"
+                                :style="{
+                                    border:
+                                        '2px solid ' +
+                                        seatClass.color +
+                                        ' !important',
+                                }"
+                            ></div>
                             <span class="text-wrap">{{ seatClass.name }}</span>
                         </div>
-                        <button class="btn btn-primary"
-                                :data-toggle="checkAllSeatAssign ? 'modal' : ''"
-                                :data-target="checkAllSeatAssign ? '#setSeatClass' : ''"
-                                @click="resetAttributes()">Set Attributes
+                        <button
+                            class="btn btn-primary"
+                            :data-toggle="checkAllSeatAssign ? 'modal' : ''"
+                            :data-target="
+                                checkAllSeatAssign ? '#setSeatClass' : ''
+                            "
+                            @click="resetAttributes()"
+                        >
+                            Set Attributes
                         </button>
                     </div>
-
                 </div>
                 <template v-slot:button>
                     <button
@@ -255,28 +413,65 @@
                 </template>
             </Add>
 
-            <div class="modal fade" id="addSeatNumber" tabindex="-1" aria-labelledby="addSeatNumberLabel"
-                 aria-hidden="true">
+            <div
+                class="modal fade"
+                id="addSeatNumber"
+                tabindex="-1"
+                aria-labelledby="addSeatNumberLabel"
+                aria-hidden="true"
+            >
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="addSeatNumberLabel">Add Seat Number</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeSeat()">
+                            <h5 class="modal-title" id="addSeatNumberLabel">
+                                Add Seat Number
+                            </h5>
+                            <button
+                                type="button"
+                                class="close"
+                                data-dismiss="modal"
+                                aria-label="Close"
+                                @click="closeSeat()"
+                            >
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>Seat Number <span class="text-danger ml-1">*</span></label>
-                                <input type="text" class="form-control" v-model="setSeatNumber.addSeatNO">
+                                <label
+                                    >Seat Number
+                                    <span class="text-danger ml-1"
+                                        >*</span
+                                    ></label
+                                >
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    v-model="setSeatNumber.addSeatNO"
+                                />
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary"
-                                    @click="assignSeatNumber(setSeatNumber.rowId, setSeatNumber.colId)">Assign Seat
-                                Number
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                @click="
+                                    assignSeatNumber(
+                                        setSeatNumber.rowId,
+                                        setSeatNumber.colId
+                                    )
+                                "
+                            >
+                                Assign Seat Number
                             </button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeSeat()">Close</button>
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                data-dismiss="modal"
+                                @click="closeSeat()"
+                            >
+                                Close
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -295,14 +490,16 @@
                     <div class="modal-content">
                         <div class="modal-body">
                             <div class="card card-primary">
-                                <div class="card-header d-flex justify-content-between">
+                                <div
+                                    class="card-header d-flex justify-content-between"
+                                >
                                     <h4 class="modal-title">Seat Detail</h4>
                                     <button
                                         type="button"
                                         class="close"
                                         data-dismiss="modal"
                                         aria-label="Close"
-                                         @click="closeDetail()"
+                                        @click="closeDetail()"
                                     >
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -310,7 +507,9 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="form-group col-md-6">
-                                            <label for="seat_class">Seat Class</label>
+                                            <label for="seat_class"
+                                                >Seat Class</label
+                                            >
                                             <div
                                                 class="float-right badge badge-primary mx-0 mb-1"
                                                 style="cursor: pointer"
@@ -320,10 +519,17 @@
                                             >
                                                 Add Fare Class
                                             </div>
-                                            <select class="form-control" v-model="seatModify.class">
-                                                <option value="0" selected>Select Class</option>
+                                            <select
+                                                class="form-control"
+                                                v-model="seatModify.class"
+                                            >
+                                                <option value="0" selected>
+                                                    Select Class
+                                                </option>
                                                 <option
-                                                    v-for="(fareClass, i) in fareClasses"
+                                                    v-for="(
+                                                        fareClass, i
+                                                    ) in fareClasses"
                                                     :key="i"
                                                     :value="fareClass.id"
                                                 >
@@ -332,13 +538,22 @@
                                             </select>
                                         </div>
                                         <div class="form-group col-md-6">
-                                            <label for="seat_type">Seat Type</label>
-                                            <select class="form-control" v-model="seatModify.type">
-                                                <option value="0" selected>Select Type</option>
+                                            <label for="seat_type"
+                                                >Seat Type</label
+                                            >
+                                            <select
+                                                class="form-control"
+                                                v-model="seatModify.type"
+                                            >
+                                                <option value="0" selected>
+                                                    Select Type
+                                                </option>
                                                 <!--                                                <option value="reserved_for_female">-->
                                                 <!--                                                    Reserved for Female-->
                                                 <!--                                                </option>-->
-                                                <option value="not_for_sale">Not for Sale</option>
+                                                <option value="not_for_sale">
+                                                    Not for Sale
+                                                </option>
                                             </select>
                                         </div>
                                     </div>
@@ -351,7 +566,11 @@
                                                 data-dismiss="modal"
                                                 :disabled="loading"
                                             >
-                                                {{ loading ? "Loading..." : "Add Seat Detail" }}
+                                                {{
+                                                    loading
+                                                        ? "Loading..."
+                                                        : "Add Seat Detail"
+                                                }}
                                             </button>
                                         </div>
                                     </div>
@@ -373,13 +592,15 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Add Fare Class</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">
+                                Add Fare Class
+                            </h5>
                             <button
                                 type="button"
                                 class="close"
                                 data-dismiss="modal"
                                 aria-label="Close"
-                                 @click="closeFare()"
+                                @click="closeFare()"
                             >
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -388,7 +609,9 @@
                             <div class="row">
                                 <div class="form-group col-md-12">
                                     <label for="name"
-                                    >Name<span class="text-danger ml-1">*</span></label
+                                        >Name<span class="text-danger ml-1"
+                                            >*</span
+                                        ></label
                                     >
                                     <input
                                         type="text"
@@ -413,7 +636,7 @@
                                 type="button"
                                 class="btn btn-secondary"
                                 data-dismiss="modal"
-                                 @click="closeFare()"
+                                @click="closeFare()"
                             >
                                 Close
                             </button>
@@ -431,12 +654,18 @@
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label for="SurchargeName"
-                        >Name <span class="text-danger ml-1">*</span></label
+                            >Name <span class="text-danger ml-1">*</span></label
                         >
-                        <input type="text" class="form-control" v-model="dataEdit.name"/>
+                        <input
+                            type="text"
+                            class="form-control"
+                            v-model="dataEdit.name"
+                        />
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="color">Color<span class="text-danger ml-1">*</span></label>
+                        <label for="color"
+                            >Color<span class="text-danger ml-1">*</span></label
+                        >
                         <input
                             type="color"
                             class="form-control"
@@ -451,22 +680,45 @@
                         <div class="form-group d-flex align-items-center">
                             <label class="mt-4" for="active">Is Active</label>
                             <label class="colorinput mx-3 mt-3">
-                <span>
-                  <input
-                      type="checkbox"
-                      class="colorinput-input"
-                      id="editCheckBox"
-                      @change="editCheckBox($event)"
-                      v-bind:checked="dataEdit.is_active == 1"
-                  />
-                  <span class="colorinput-color bg-primary"></span>
-                </span>
+                                <span>
+                                    <input
+                                        type="checkbox"
+                                        class="colorinput-input"
+                                        id="editCheckBox"
+                                        @change="editCheckBox($event)"
+                                        v-bind:checked="dataEdit.is_active == 1"
+                                    />
+                                    <span
+                                        class="colorinput-color bg-primary"
+                                    ></span>
+                                </span>
                             </label>
                         </div>
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-2">
+                        <h5>Front Icons</h5>
+                        <div class="form-group d-flex align-items-center">
+                            <label class="mt-4" for="active">Show</label>
+                            <label class="colorinput mx-3 mt-3">
+                                <span>
+                                    <input
+                                        type="checkbox"
+                                        class="colorinput-input"
+                                        id="editCheckBox"
+                                        @change="editCheckBoxFont($event)"
+                                        v-bind:checked="dataEdit.front_icons == 1"
+                                    />
+                                    <span
+                                        class="colorinput-color bg-primary"
+                                    ></span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-2">
                         <label for="name"
-                        >No. of Rows <span class="text-danger ml-1">*</span></label
+                            >No. of Rows
+                            <span class="text-danger ml-1">*</span></label
                         >
                         <input
                             type="text"
@@ -476,9 +728,10 @@
                             @keypress="isNumber($event)"
                         />
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-2">
                         <label for="name"
-                        >No. of Cols <span class="text-danger ml-1">*</span></label
+                            >No. of Cols
+                            <span class="text-danger ml-1">*</span></label
                         >
                         <input
                             type="text"
@@ -512,12 +765,22 @@
                                 :class="col.reserved ? 'selected border' : ''"
                             >
                                 <img
-                                    @click="changeEditStatus(rowIndex, colIndex)"
-                                    :src=" $store.state.api_url + 'assets/img/buses/available_seat_img.gif' " alt=""/>
+                                    @click="
+                                        changeEditStatus(rowIndex, colIndex)
+                                    "
+                                    :src="
+                                        $store.state.api_url +
+                                        'assets/img/buses/available_seat_img.gif'
+                                    "
+                                    alt=""
+                                />
                             </td>
                         </tr>
                     </div>
-                    <div class="form-group col-md-5 border py-3" style="border-spacing: 5px;">
+                    <div
+                        class="form-group col-md-5 border py-3"
+                        style="border-spacing: 5px"
+                    >
                         <tr
                             class="seat-img p-0 m-0"
                             v-for="(record, rowIndex) in dataEdit.seat_map"
@@ -527,24 +790,45 @@
                                 v-for="(col, colIndex) in record"
                                 :key="colIndex"
                             >
-                                <small class="font-weight-bold position-absolute text-dark"
-                                       style="font-size: 10px !important"
-                                       v-if="col.reserved">{{ col.seatNo ?? 'N/A' }}</small>
+                                <small
+                                    class="font-weight-bold position-absolute text-dark"
+                                    style="font-size: 10px !important"
+                                    v-if="col.reserved"
+                                    >{{ col.seatNo ?? "N/A" }}</small
+                                >
                                 <img
                                     data-toggle="modal"
                                     data-target="#setEditSeatClass"
                                     @click="getSeatDetails(rowIndex, colIndex)"
-                                    :style=" col.class ? checkClass(col.class) : '' "
+                                    :style="
+                                        col.class ? checkClass(col.class) : ''
+                                    "
                                     v-if="col.reserved"
-                                    :src=" $store.state.api_url + 'assets/img/buses/booked_seat_img.gif' " alt=""/>
+                                    :src="
+                                        $store.state.api_url +
+                                        'assets/img/buses/booked_seat_img.gif'
+                                    "
+                                    alt=""
+                                />
                                 <span v-else></span>
                             </td>
                         </tr>
                     </div>
                     <div class="col-md-2">
-                        <div class="my-2" v-for="(seatClass,i) in allSeatClasses" :key="i">
-                            <div class="circles mr-1 border shadow"
-                                 :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
+                        <div
+                            class="my-2"
+                            v-for="(seatClass, i) in allSeatClasses"
+                            :key="i"
+                        >
+                            <div
+                                class="circles mr-1 border shadow"
+                                :style="{
+                                    border:
+                                        '2px solid ' +
+                                        seatClass.color +
+                                        ' !important',
+                                }"
+                            ></div>
                             <span class="text-wrap">{{ seatClass.name }}</span>
                         </div>
                         <!-- <button class="btn btn-primary" data-toggle="modal" data-target="#setSeatClass"
@@ -576,14 +860,18 @@
                     <div class="modal-content">
                         <div class="modal-body">
                             <div class="card card-primary">
-                                <div class="card-header d-flex justify-content-between">
-                                    <h4 class="modal-title">Edit Seat Detail</h4>
+                                <div
+                                    class="card-header d-flex justify-content-between"
+                                >
+                                    <h4 class="modal-title">
+                                        Edit Seat Detail
+                                    </h4>
                                     <button
                                         type="button"
                                         class="close"
                                         data-dismiss="modal"
                                         aria-label="Close"
-                                         @click="closeEditSeat()"
+                                        @click="closeEditSeat()"
                                     >
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -591,14 +879,20 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="form-group col-md-4">
-                                            <label for="seat_class">Seat Class</label>
+                                            <label for="seat_class"
+                                                >Seat Class</label
+                                            >
                                             <select
                                                 class="form-control"
                                                 v-model="editSeatModify.class"
                                             >
-                                                <option value="0" selected>Select Class</option>
+                                                <option value="0" selected>
+                                                    Select Class
+                                                </option>
                                                 <option
-                                                    v-for="(fareClass, i) in fareClasses"
+                                                    v-for="(
+                                                        fareClass, i
+                                                    ) in fareClasses"
                                                     :key="i"
                                                     :value="fareClass.id"
                                                 >
@@ -607,21 +901,33 @@
                                             </select>
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <label for="seat_type">Seat Type</label>
+                                            <label for="seat_type"
+                                                >Seat Type</label
+                                            >
                                             <select
                                                 class="form-control"
                                                 v-model="editSeatModify.type"
                                             >
-                                                <option value="0" selected>Select Type</option>
+                                                <option value="0" selected>
+                                                    Select Type
+                                                </option>
                                                 <!--                                                <option value="reserved_for_female">-->
                                                 <!--                                                    Reserved for Female-->
                                                 <!--                                                </option>-->
-                                                <option value="not_for_sale">Not for Sale</option>
+                                                <option value="not_for_sale">
+                                                    Not for Sale
+                                                </option>
                                             </select>
                                         </div>
                                         <div class="form-group col-md-4">
-                                            <label for="seat_type">Seat Type</label>
-                                            <input type="text" class="form-control" v-model="editSeatModify.seatNo">
+                                            <label for="seat_type"
+                                                >Seat Type</label
+                                            >
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                v-model="editSeatModify.seatNo"
+                                            />
                                         </div>
                                     </div>
                                     <div class="row">
@@ -629,8 +935,14 @@
                                             <button
                                                 type="button"
                                                 class="btn btn-block btn-primary"
-                                                @click=" updateSeatDetail( editSingleSeat.rowId, editSingleSeat.colId ) "
-                                                data-dismiss="modal">
+                                                @click="
+                                                    updateSeatDetail(
+                                                        editSingleSeat.rowId,
+                                                        editSingleSeat.colId
+                                                    )
+                                                "
+                                                data-dismiss="modal"
+                                            >
                                                 Update Seat Data
                                             </button>
                                         </div>
@@ -643,18 +955,21 @@
             </div>
             <!--End Modal-->
 
-            <Hide :hideForm="hideFormID" confirmationMessage="Are You Sure You want To Delete This City ???">
+            <Hide
+                :hideForm="hideFormID"
+                confirmationMessage="Are You Sure You want To Delete This City ???"
+            >
                 <template v-slot:button>
                     <button
                         type="button"
                         class="btn btn-danger btn-block"
-                       :disabled="loading" @click="hideBusClass"
+                        :disabled="loading"
+                        @click="hideBusClass"
                     >
-                    {{ loading ? 'Loading...' : 'Yes, I want to Delete' }}
+                        {{ loading ? "Loading..." : "Yes, I want to Delete" }}
                     </button>
                 </template>
             </Hide>
-
         </div>
     </section>
 </template>
@@ -662,7 +977,7 @@
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Hide from "../../components/Hide.vue";
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
     name: "BusClassPage",
@@ -691,7 +1006,7 @@ export default {
             },
             success: false,
             checkAllSeatAssign: false,
-            addSeatNO: '',
+            addSeatNO: "",
             loading: false,
             error: false,
             isShowDiv: false,
@@ -724,38 +1039,41 @@ export default {
         };
     },
     async created() {
-        $('.modal').remove();
+        $(".modal").remove();
         await this.fetchBussClasses();
 
         this.permissions = this.$store.state.permissions;
         const currentRouteName = this.$route.name;
-        if (currentRouteName == 'booking-page') {
-            window.addEventListener('keydown', this.enterKey);
-            window.addEventListener('keydown', this.altM);
+        if (currentRouteName == "booking-page") {
+            window.addEventListener("keydown", this.enterKey);
+            window.addEventListener("keydown", this.altM);
         } else {
-            window.removeEventListener('keydown', this.enterKey);
-            window.removeEventListener('keydown', this.altM);
+            window.removeEventListener("keydown", this.enterKey);
+            window.removeEventListener("keydown", this.altM);
         }
     },
 
     methods: {
-        closeSeat(){
+        closeSeat() {
             $("#addSeatNumber").click();
         },
-        closeDetail(){
+        closeDetail() {
             $("#setSeatClass").click();
         },
-        closeFare(){
+        closeFare() {
             $("#addFareClass").click();
         },
-        closeEditSeat(){
+        closeEditSeat() {
             $("#setEditSeatClass").click();
         },
         resetAttributes: function () {
             let b = 0;
             this.data.seatMap.map((seat) => {
                 for (let i = seat.length - 1; i >= 0; i--) {
-                    if (seat[i].seatNo == undefined && seat[i].reserved == true) {
+                    if (
+                        seat[i].seatNo == undefined &&
+                        seat[i].reserved == true
+                    ) {
                         b = 1;
                     }
                 }
@@ -775,7 +1093,6 @@ export default {
 
             this.seatModify.class = 0;
             this.seatModify.type = 0;
-
         },
         clearForm: function () {
             this.data = {};
@@ -786,15 +1103,20 @@ export default {
         },
         async fetchBussClasses() {
             const resBusClass = await this.callApi("post", "bus_classes");
-            const resClass = await this.callApi("post", "bus_classes/fare-class")
+            const resClass = await this.callApi(
+                "post",
+                "bus_classes/fare-class"
+            );
             if (resBusClass.status == 200 && resClass.status == 200) {
                 this.busClasses = resBusClass.data;
                 this.allSeatClasses = resClass.data;
-
             } else {
                 console.log(resBusClass);
             }
-            const resFareClass = await this.callApi("post", "bus_classes/fare-class");
+            const resFareClass = await this.callApi(
+                "post",
+                "bus_classes/fare-class"
+            );
             if (resFareClass.status == 200) {
                 this.fareClasses = resFareClass.data;
             } else {
@@ -825,7 +1147,11 @@ export default {
         },
         async saveFareClass() {
             this.loading = true;
-            const resSaveFareClass = await this.callApi("post", "bus_classes/storeFareClass", this.addData);
+            const resSaveFareClass = await this.callApi(
+                "post",
+                "bus_classes/storeFareClass",
+                this.addData
+            );
             if (resSaveFareClass.status == 201) {
                 this.closeFare();
                 swal({
@@ -843,15 +1169,15 @@ export default {
         addSeatData: function () {
             if (this.seatModify.class != 0 || this.seatModify.type != 0) {
                 this.selectedSeats.map((seat) => {
-
                     seat = JSON.parse(seat);
                     let row = seat[0];
                     let col = seat[1];
-                    this.data.seatMap[row][col].class = this.seatModify.class ?? 0;
-                    this.data.seatMap[row][col].type = this.seatModify.type ?? 0;
+                    this.data.seatMap[row][col].class =
+                        this.seatModify.class ?? 0;
+                    this.data.seatMap[row][col].type =
+                        this.seatModify.type ?? 0;
                     delete this.data.seatMap[row][col].selected;
-
-                })
+                });
                 this.selectedSeats = [];
                 this.closeDetail();
                 return swal({
@@ -860,21 +1186,20 @@ export default {
                     icon: "success",
                     timer: 2000,
                 });
-
             } else {
-
                 return swal({
                     title: "Required",
                     text: "Please Select Any Field For Seat Modification !!!!",
                     icon: "error",
                     timer: 2000,
                 });
-
             }
         },
         assignSeatNumber: function (rowId, colId) {
-
-            if (this.setSeatNumber.addSeatNO == '' || typeof this.setSeatNumber.addSeatNO == 'undefined') {
+            if (
+                this.setSeatNumber.addSeatNO == "" ||
+                typeof this.setSeatNumber.addSeatNO == "undefined"
+            ) {
                 return swal({
                     title: "Required !",
                     text: "Please Enter Seat Number",
@@ -883,7 +1208,11 @@ export default {
                 });
             }
             // Check seat number should be unique
-            if (this.uniqueSeatNumber.includes(this.setSeatNumber.addSeatNO.toLowerCase())) {
+            if (
+                this.uniqueSeatNumber.includes(
+                    this.setSeatNumber.addSeatNO.toLowerCase()
+                )
+            ) {
                 return swal({
                     title: "Required !",
                     text: "This seat number already taken",
@@ -893,15 +1222,16 @@ export default {
             }
 
             this.uniqueSeatNumber.push(this.setSeatNumber.addSeatNO);
-            this.data.seatMap[rowId][colId].seatNo = this.setSeatNumber.addSeatNO;
-            this.closeSeat()
+            this.data.seatMap[rowId][colId].seatNo =
+                this.setSeatNumber.addSeatNO;
+            this.closeSeat();
             swal({
                 title: "Success",
                 text: "Successfully Added Seat Number",
                 icon: "success",
                 timer: 2000,
             });
-            this.setSeatNumber.addSeatNO = '';
+            this.setSeatNumber.addSeatNO = "";
         },
         selectSeat(row, col) {
             let index = this.selectedSeats.indexOf(JSON.stringify([row, col]));
@@ -923,8 +1253,7 @@ export default {
                     return "border: 3px solid " + this.allSeatClasses[i].color;
                 }
             }
-        }
-        ,
+        },
         getSeatDetails: function (rowId, colId) {
             this.editSeatModify = {
                 class: this.dataEdit.seat_map[rowId][colId].class ?? 0,
@@ -945,8 +1274,8 @@ export default {
                     icon: "error",
                     timer: 2000,
                 });
-            } 
-            
+            }
+
             if (this.editSeatModify.seatNo == "") {
                 return swal({
                     title: "required",
@@ -954,14 +1283,17 @@ export default {
                     icon: "error",
                     timer: 2000,
                 });
-            } 
-            
+            }
+
             const singleSeatDetails = this.dataEdit.seat_map[rowId][colId];
             this.dataEdit.seat_map[rowId][colId] = {
                 reserved: singleSeatDetails.reserved,
                 seatNo: this.editSeatModify.seatNo,
                 class: this.editSeatModify.class,
-                type: this.editSeatModify.type == "0" ? parseInt(this.editSeatModify.type) : this.editSeatModify.type,
+                type:
+                    this.editSeatModify.type == "0"
+                        ? parseInt(this.editSeatModify.type)
+                        : this.editSeatModify.type,
             };
 
             // let seatNo = 0;
@@ -973,18 +1305,19 @@ export default {
             //     }
             //     return seat;
             // });
-            
+
             const seatNumbersSet = [];
             for (let i = 0; i < this.dataEdit.seat_map.length; i++) {
                 const col = this.dataEdit.seat_map[i];
                 for (let j = 0; j < col.length; j++) {
-                        const obj = col[j];
-                        const seatNo = obj.seatNo;
-                        if (seatNo !== undefined) {
-                            seatNo = seatNo.toString();
-                            if (seatNumbersSet.includes(seatNo)) {
-                            
-                            console.log(`Duplicate seat number found: ${seatNo}`);
+                    const obj = col[j];
+                    const seatNo = obj.seatNo;
+                    if (seatNo !== undefined) {
+                        seatNo = seatNo.toString();
+                        if (seatNumbersSet.includes(seatNo)) {
+                            console.log(
+                                `Duplicate seat number found: ${seatNo}`
+                            );
                             return swal({
                                 title: "required",
                                 text: `Duplicate Seat Number Allowed : ${seatNo}`,
@@ -997,30 +1330,33 @@ export default {
                     }
                 }
             }
-            
-            this.closeEditSeat()
+
+            this.closeEditSeat();
             swal({
                 title: "Success!",
-                text: "Seat Class Update Successfully to Seat Number " + singleSeatDetails.seatNo,
+                text:
+                    "Seat Class Update Successfully to Seat Number " +
+                    singleSeatDetails.seatNo,
                 icon: "success",
                 timer: 2000,
             });
-
         },
-        
+
         async hideBusClass() {
             this.loading = true;
-            const resHide = await this.callApi("post", 'bus_classes/hide', {id:this.delId});
+            const resHide = await this.callApi("post", "bus_classes/hide", {
+                id: this.delId,
+            });
             if (resHide.status == 200) {
                 $(".modal").click();
                 swal({
                     title: "Success",
                     text: "Bus Class Deleted Successfully",
                     icon: "success",
-                    timer: 2000
+                    timer: 2000,
                 });
                 this.loading = false;
-                $('#bus_class_table').DataTable().destroy();
+                $("#bus_class_table").DataTable().destroy();
                 await this.fetchBussClasses();
             } else {
                 if (resHide.status == 422) {
@@ -1032,7 +1368,7 @@ export default {
                     }
                 }
                 setTimeout(() => {
-                    this.loading = false
+                    this.loading = false;
                 }, 3000);
             }
         },
@@ -1060,8 +1396,7 @@ export default {
                     reserved: true,
                 };
             }
-        }
-        ,
+        },
         addFormGenerateMap: function () {
             this.uniqueSeatNumber = [];
             this.validationErrors = [];
@@ -1115,8 +1450,7 @@ export default {
                     timer: 2000,
                 });
             }
-        }
-        ,
+        },
         editGenerateMap: function () {
             this.isShowEditDiv = true;
         },
@@ -1127,17 +1461,21 @@ export default {
             } else {
                 this.data.isActive = 0;
             }
-        }
-        ,
+        },
         editCheckBox: function (e) {
             if (e.target.checked) {
                 this.dataEdit.is_active = 1;
             } else {
                 this.dataEdit.is_active = 0;
             }
-        }
-        ,
-
+        },
+        editCheckBoxFont: function (e) {
+            if (e.target.checked) {
+                this.dataEdit.font_icons = 1;
+            } else {
+                this.dataEdit.font_icons = 0;
+            }
+        },
         async addBusClass() {
             // console.log(this.data.seatMap);
             this.validationErrors = [];
@@ -1150,7 +1488,12 @@ export default {
                     if (seat[i].reserved == true) {
                         c = 1;
                     }
-                    if ((seat[i].class == undefined || seat[i].class == "0" || seat[i].class == 0) && seat[i].reserved == true) {
+                    if (
+                        (seat[i].class == undefined ||
+                            seat[i].class == "0" ||
+                            seat[i].class == 0) &&
+                        seat[i].reserved == true
+                    ) {
                         b = 1;
                     }
                 }
@@ -1182,14 +1525,20 @@ export default {
                     icon: "error",
                     timer: 2000,
                 });
-            if (typeof this.data.noOfRows == "undefined" || this.data.noOfRows == '')
+            if (
+                typeof this.data.noOfRows == "undefined" ||
+                this.data.noOfRows == ""
+            )
                 return swal({
                     title: "Required ",
                     text: "Row Field is Required",
                     icon: "error",
                     timer: 2000,
                 });
-            if (typeof this.data.noOfCols == "undefined" || this.data.noOfCols == '')
+            if (
+                typeof this.data.noOfCols == "undefined" ||
+                this.data.noOfCols == ""
+            )
                 return swal({
                     title: "Required",
                     text: "Col Field is required",
@@ -1197,7 +1546,11 @@ export default {
                     timer: 2000,
                 });
             this.loading = true;
-            const res = await this.callApi("post", "bus_classes/store", this.data);
+            const res = await this.callApi(
+                "post",
+                "bus_classes/store",
+                this.data
+            );
             if (res.status == 201) {
                 $(".modal").click();
                 swal({
@@ -1258,7 +1611,7 @@ export default {
             //     }
             //     return seat;
             // });
-            
+
             this.loading = true;
             const res = await this.callApi(
                 "post",
@@ -1278,30 +1631,23 @@ export default {
                 await this.fetchBussClasses();
             } else {
                 if (res.status == 422) {
-                this.dropScheduleButton = false;
-                let errorContent = "";
-                let count = 0;
-                for (const key in res.data.errors) {
-                    res.data.errors[key].forEach((element) => {
-                        errorContent += (
-                            (++count) + " - " +
-                            element +
-                            "\n"
-                        );
-                    });
-                    swal({
-                        title: "Error",
-                        text: errorContent,
-                        icon: "error",
-                        timer: 2000
-                    });
-
+                    this.dropScheduleButton = false;
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += ++count + " - " + element + "\n";
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000,
+                        });
+                    }
                 }
             }
-            }
-        }
-        ,
-
+        },
         async deleteModal(fare_class, i) {
             const deletingObj = {
                 url: "bus_classes/delete",
@@ -1309,15 +1655,15 @@ export default {
                 index: i,
             };
             this.$store.commit("setDeleteObj", deletingObj);
-        }
-        ,
-
+        },
         edit(bus_class) {
-            this.dataEdit = {...bus_class, busClassColor: bus_class.color};
+            this.dataEdit = { ...bus_class, busClassColor: bus_class.color };
         },
         async duplicate(id, index) {
             this.cloneDone = true;
-            const res = await this.callApi("post", "bus_classes/duplicate", {id: id});
+            const res = await this.callApi("post", "bus_classes/duplicate", {
+                id: id,
+            });
             if (res.status == 201) {
                 swal({
                     title: "Success",
@@ -1327,7 +1673,7 @@ export default {
                 });
                 this.cloneDone = false;
                 $("#bus_class_table").DataTable().destroy();
-                 this.fetchBussClasses();
+                this.fetchBussClasses();
                 this.data = {
                     busClassColor: "#000000",
                 };
@@ -1338,24 +1684,22 @@ export default {
                     let count = 0;
                     for (const key in res.data.errors) {
                         res.data.errors[key].forEach((element) => {
-                            errorContent += (
-                                (++count) + " - " + //creating serial no.
+                            errorContent +=
+                                ++count +
+                                " - " + //creating serial no.
                                 element + // main error
-                                "\n" // creating new line
-                            );
+                                "\n"; // creating new line
                         });
                         swal({
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                            timer: 2000
+                            timer: 2000,
                         });
-
                     }
                 }
             }
-
-        }
+        },
     },
 
     computed: {
@@ -1403,7 +1747,7 @@ export default {
 [tooltip]::before,
 [tooltip]::after {
     text-transform: none; /* opinion 2 */
-    font-size: .9em; /* opinion 3 */
+    font-size: 0.9em; /* opinion 3 */
     line-height: 1;
     user-select: none;
     pointer-events: none;
@@ -1413,7 +1757,7 @@ export default {
 }
 
 [tooltip]::before {
-    content: '';
+    content: "";
     border: 5px solid transparent; /* opinion 4 */
     z-index: 1001; /* absurdity 1 */
 }
@@ -1435,8 +1779,8 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 1ch 1.5ch;
-    border-radius: .3ch;
-    box-shadow: 0 1em 2em -.5em rgba(0, 0, 0, 0.35);
+    border-radius: 0.3ch;
+    box-shadow: 0 1em 2em -0.5em rgba(0, 0, 0, 0.35);
     background: #333;
     color: #fff;
     z-index: 1000; /* absurdity 2 */
@@ -1449,8 +1793,8 @@ export default {
 }
 
 /* don't show empty tooltips */
-[tooltip='']::before,
-[tooltip='']::after {
+[tooltip=""]::before,
+[tooltip=""]::after {
     display: none !important;
 }
 
@@ -1472,23 +1816,22 @@ export default {
 [tooltip][flow^="up"]::before,
 [tooltip][flow^="up"]::after {
     left: 50%;
-    transform: translate(-50%, -.5em);
+    transform: translate(-50%, -0.5em);
 }
 
 /* FLOW: DOWN */
 
-
 /* KEYFRAMES */
 @keyframes tooltips-vert {
     to {
-        opacity: .9;
+        opacity: 0.9;
         transform: translate(-50%, 0);
     }
 }
 
 @keyframes tooltips-horz {
     to {
-        opacity: .9;
+        opacity: 0.9;
         transform: translate(0, -50%);
     }
 }
@@ -1500,7 +1843,6 @@ export default {
 [tooltip][flow^="up"]:hover::after {
     animation: tooltips-vert 300ms ease-out forwards;
 }
-
 
 /* UNRELATED to tooltips */
 
@@ -1518,8 +1860,8 @@ export default {
 }
 
 #mytolltip span {
-    padding: .5em 1em;
-    margin: .5em;
+    padding: 0.5em 1em;
+    margin: 0.5em;
     display: inline-block;
     background: #dedede;
 }
