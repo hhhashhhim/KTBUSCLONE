@@ -159,7 +159,7 @@ class BookingApiController extends Controller
 
                 $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
                 ->whereHas('schedule', function($q){$q->where("hide",0);})
-                ->with("departure_city:id,name","destination_city:id,name","bus_class","bus_class_map:id,name,seat_map")
+                ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name,front_icons","bus_class_map:id,name,seat_map")
                 ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id')
                 ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])
                 ->when($advanceBookingDays!=null, function($q) use ($advanceBookingDays){
@@ -360,7 +360,7 @@ class BookingApiController extends Controller
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
 
-                $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
+                $scheduleDetail = ScheduleDetail::with("bus_class:id,front_icons,seat_map")->where([
                     'company_id' => $companyId,
                     'schedule_id' => $request->schedule_id,
                     'departure_date' => $request->date,
