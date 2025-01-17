@@ -94,7 +94,7 @@ class BusClassController extends Controller
                 $busClass = BusClass::where('id', $request->id)->update([
                     'name' => $request->name,
                     'color' => $request->busClassColor,
-                    'front_icons' => $request->front_icons,
+                    'front_icons' => 0,
                     'seat_map' => $request->seat_map,
                     'no_of_rows' => $request->no_of_rows,
                     'no_of_cols' => $request->no_of_cols,
