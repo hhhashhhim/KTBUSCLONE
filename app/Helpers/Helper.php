@@ -918,7 +918,7 @@ $html
 Date ".$detail->date." Is cancelled
 at ".$detail->cancel_ticket->percentage."% deduction charges
 
-Please visit  counter from where ticket purchased or relevant online platform form claim
+Please visit  counter from where ticket purchased or relevant online platform for claim
 
 For any inquiries/Complains Dial
 03108886220
