@@ -734,21 +734,24 @@ Terms & conditions applied.";
 
         // Convert the PDF output to a Base64 string
         $base64Pdf = base64_encode($pdfOutput);
-        
-        $response = Http::withHeaders([
-            'X-Api-Key'=>$auth_key,
-        ])
-        ->timeout(3)
-        ->post($url, [
-            "session" => $session,
-            "receiver_number" => $mobile, 
-            "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed,
-            "message_type" =>  $type == "advance booking" ? 'text' : 'media',
-            "file_type" => $type == "advance booking" ? null : "base64",
-            "file" => $type == "advance booking" ? null : $base64Pdf,
-            "file_name" => $type == "advance booking" ? null : $tickets[0]->customer->name
-        ]);
-        return $response;
+        try{
+                $response = Http::withHeaders([
+                    'X-Api-Key'=>$auth_key,
+                ])
+                ->timeout(1)
+                ->post($url, [
+                    "session" => $session,
+                    "receiver_number" => $mobile, 
+                    "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed,
+                    "message_type" =>  $type == "advance booking" ? 'text' : 'media',
+                    "file_type" => $type == "advance booking" ? null : "base64",
+                    "file" => $type == "advance booking" ? null : $base64Pdf,
+                    "file_name" => $type == "advance booking" ? null : $tickets[0]->customer->name
+                ]);
+                return $response;
+            } catch (\Exception $e) {
+
+            }
         }
     }
 }
