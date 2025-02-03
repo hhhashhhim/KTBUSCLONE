@@ -734,7 +734,7 @@ Terms & conditions applied.";
 
         // Convert the PDF output to a Base64 string
         $base64Pdf = base64_encode($pdfOutput);
-
+        sleep(20);
         $response = Http::withHeaders([
             'X-Api-Key'=>$auth_key,
         ])
