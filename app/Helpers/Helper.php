@@ -632,7 +632,6 @@ if (!function_exists('superDataWhatsappMessage')) {
 if (!function_exists('ticketConfirmedMessage')) {
     function ticketConfirmedMessage($invoice_id)
     {
-        sleep(20);
         $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
         $message_allow = Terminal::where("id",Auth::user()->terminal_id)->first()->send_message;
         if($auth_key && $message_allow)
@@ -739,7 +738,7 @@ Terms & conditions applied.";
         $response = Http::withHeaders([
             'X-Api-Key'=>$auth_key,
         ])
-        ->timeout(2)
+        ->timeout(3)
         ->post($url, [
             "session" => $session,
             "receiver_number" => $mobile, 
