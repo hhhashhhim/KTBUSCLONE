@@ -737,7 +737,9 @@ Terms & conditions applied.";
 
         $response = Http::withHeaders([
             'X-Api-Key'=>$auth_key,
-        ])->post($url, [
+        ])
+        ->timeout(1)
+        ->post($url, [
             "session" => $session,
             "receiver_number" => $mobile, 
             "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed,
