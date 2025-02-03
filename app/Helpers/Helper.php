@@ -738,7 +738,7 @@ Terms & conditions applied.";
         $response = Http::withHeaders([
             'X-Api-Key'=>$auth_key,
         ])
-        ->timeout(1)
+        ->timeout(2)
         ->post($url, [
             "session" => $session,
             "receiver_number" => $mobile, 
