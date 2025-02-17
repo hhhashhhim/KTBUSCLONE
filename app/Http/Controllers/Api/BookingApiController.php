@@ -155,7 +155,10 @@ class BookingApiController extends Controller
                 $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
                 $advanceBookingDays = Terminal::where("id",Auth::user()->terminal_id)->first()->advance_booking;
 
-             
+             if($companyId == 2)
+             {
+                return $visibleScheduleIds;
+             }
 
                 $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
                 ->whereHas('schedule', function($q){$q->where("hide",0);})
@@ -853,6 +856,7 @@ class BookingApiController extends Controller
                                 'contact' => plainContactAndCnic($request->contact),
                             ]);
                         }
+                        
                         // Getting Already Booked Tickets
                         if ($request->date == date('Y-m-d')) {
                             $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
