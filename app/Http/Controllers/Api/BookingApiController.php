@@ -170,7 +170,7 @@ class BookingApiController extends Controller
                 
                 if($companyId == 2)
                 {
-                    return $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
+                    $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
                     ->whereHas('schedule', function($q){$q->where("hide",0);})
                     ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name,front_icons","bus_class_map:id,name,seat_map")
                     ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id')
