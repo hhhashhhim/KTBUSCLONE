@@ -292,6 +292,13 @@ class BookingApiController extends Controller
 
                 });
 
+                if($companyId == 2)
+                {
+                    return 'h';
+                    return $data;
+                }
+
+
                 $data = $data->where("departure_date_time",'>',date("Y-m-d H:i:s",strtotime(date("Y-m-d H:i:s")) + 5400))->sortBy("departure_date_time");
                 $arrayData = json_decode($data, true);
                 $data = collect(array_values($arrayData));
