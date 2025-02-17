@@ -155,10 +155,7 @@ class BookingApiController extends Controller
                 $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
                 $advanceBookingDays = Terminal::where("id",Auth::user()->terminal_id)->first()->advance_booking;
 
-             if($companyId == 2)
-             {
-                return $visibleScheduleIds;
-             }
+             
 
                 $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
                 ->whereHas('schedule', function($q){$q->where("hide",0);})
@@ -169,7 +166,20 @@ class BookingApiController extends Controller
                     $q->where("departure_date",'<',now()->addDays($advanceBookingDays)->format("Y-m-d"));
                 })
                 ->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date","bus_class_id"]);
-
+                
+                
+                if($companyId == 2)
+                {
+                    return $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
+                    ->whereHas('schedule', function($q){$q->where("hide",0);})
+                    ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name,front_icons","bus_class_map:id,name,seat_map")
+                    ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id')
+                    ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])
+                    ->when($advanceBookingDays!=null, function($q) use ($advanceBookingDays){
+                        $q->where("departure_date",'<',now()->addDays($advanceBookingDays)->format("Y-m-d"));
+                    })
+                    ->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date","bus_class_id"]);
+                }
 
                 $bookedTickets = Ticket::where(["company_id"=>$companyId])->whereIn("schedule_id",$data->pluck("schedule_id"))->whereIn("schedule_date",$data->pluck("schedule_date"))->get(["id","schedule_id","schedule_date"]);
 
