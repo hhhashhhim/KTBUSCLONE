@@ -178,11 +178,11 @@ class BookingApiController extends Controller
                         unset($data[$key]);
                     }
                     // this is subroute visibility to check that this terminal if allow to fetch of specific subroute schedule
-                    // $visibility =TerminalVisibility::where(["departure_city_id"=>$single->departure_id,"destination_city_id"=>$single->destination_id,"route_id"=>$single->schedule->route_id])->first();
-                    // if(isset($visibility) && $visibility->online_visibilty == 1)
-                    // {
-                    //     unset($data[$key]);
-                    // }
+                    $visibility =TerminalVisibility::where(["departure_city_id"=>$single->departure_id,"destination_city_id"=>$single->destination_id,"route_id"=>$single->schedule->route_id])->first();
+                    if(isset($visibility) && $visibility->online_visibilty == 1)
+                    {
+                        unset($data[$key]);
+                    }
 
 
 
