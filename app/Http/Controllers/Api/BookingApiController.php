@@ -149,7 +149,7 @@ class BookingApiController extends Controller
                     return new ValidationResource($validator->errors());
                 }
 
-                return $companyId = Auth::user()->company_id;
+                $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
                 // Data
                 $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
