@@ -294,7 +294,7 @@ class BookingApiController extends Controller
 
                 if($companyId == 2)
                 {
-                    return 'h';
+                    // return 'h';
                     return $data;
                 }
 
