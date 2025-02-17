@@ -168,7 +168,10 @@ class BookingApiController extends Controller
                 ->get(["id","schedule_id","departure_id","destination_id","departure_time","departure_date","schedule_id","schedule_date","bus_class_id"]);
                 
                 
-                
+                if($companyId == 2)
+                {
+                    return $data;
+                }
 
                 $bookedTickets = Ticket::where(["company_id"=>$companyId])->whereIn("schedule_id",$data->pluck("schedule_id"))->whereIn("schedule_date",$data->pluck("schedule_date"))->get(["id","schedule_id","schedule_date"]);
 
@@ -294,11 +297,8 @@ class BookingApiController extends Controller
 
                 });
 
-                if($companyId == 2)
-                {
-                    return $data;
-                }
                 
+
                 $data = $data->where("departure_date_time",'>',date("Y-m-d H:i:s",strtotime(date("Y-m-d H:i:s")) + 5400))->sortBy("departure_date_time");
                 $arrayData = json_decode($data, true);
                 $data = collect(array_values($arrayData));
