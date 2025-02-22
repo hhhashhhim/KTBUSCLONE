@@ -13,7 +13,7 @@ class AddColumnToCustomerTabe extends Migration
      */
     public function up()
     {
-        Schema::table('Customers', function (Blueprint $table) {
+        Schema::table('customers', function (Blueprint $table) {
             $table->timestamp('loyalty_otp_expiration')->after('contact')->nullable();
             $table->integer('loyalty_otp')->after('contact')->nullable();
         });
@@ -26,7 +26,7 @@ class AddColumnToCustomerTabe extends Migration
      */
     public function down()
     {
-        Schema::table('Customers', function (Blueprint $table) {
+        Schema::table('customers', function (Blueprint $table) {
             $table->dropColumn("loyalty_otp");
             $table->dropColumn("loyalty_otp_expiration");
         });
