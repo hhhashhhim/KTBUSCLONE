@@ -41,6 +41,7 @@ use App\Models\Hrm\Employee\Employee;
 use App\Models\Terminal;
 use App\Models\TerminalDiscount;
 use App\Models\Ticket;
+use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
@@ -88,6 +89,7 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+       
         if(!checkForSubmenu("bookings"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
@@ -149,7 +151,7 @@ class BookingController extends Controller
                 $finalAmountDiscount = 0;
                 if((isset($request->flag) && $request->flag == 1) || $request->type == 'booked')
                 {
-                    if ($request->usagePoints == true) {
+                    if ($request->usagePoints == true && $request->otp_valid == true) {
     //                  Get Customer's Loyalty Card
                         $cardAssign = CardAssign::where(['id' => $request->pointsCardId, 'company_id' => Auth::user()->company_id])->first();
                         $card = CardCategory::where(['id' => $cardAssign->card_category_id, 'company_id' => Auth::user()->company_id])->first();
@@ -414,9 +416,29 @@ class BookingController extends Controller
     {
         return ticketConfirmedMessage($request->invoice_id);
     }
+
     public function whatsappCancelMessage(Request $request)
     {
         return ticketCanceledMessage($request->tickets);
+    }
+    
+    public function sendOtp(Request $request)
+    {
+        return sendOtpForTicket($request);
+    }
+    
+    public function verifyOtp(Request $request)
+    {
+        $customer = Customer::where("cnic",plainContactAndCnic($request->customerCNIC))->first();
+        
+        if($customer && $customer->loyalty_otp == $request->otp && $customer->loyalty_otp_expiration > now())
+        {
+            return response()->json(["error" => ["Verified Successfully"]], 200);
+        }
+        else
+        {
+            return response()->json(["error" => ["An error occurred during verification. Please check your data."]], 409);
+        }
     }
 
 

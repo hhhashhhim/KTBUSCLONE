@@ -15,6 +15,8 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
     Route::post('/', [BookingController::class, 'index']);
     Route::post('/cities', [BookingController::class, 'cities']);
     Route::post('/store', [BookingController::class, 'store']);
+    Route::post('/send-otp', [BookingController::class, 'sendOtp']);
+    Route::post('/verify-otp', [BookingController::class, 'verifyOtp']);
     Route::post('/terminals', [BookingController::class, 'getTerminals']);
     // Route::post('/delete', [BookingController::class, 'deleteBooking']);
     Route::post('/getCNIC', [BookingController::class, 'getCnic']);

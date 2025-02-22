@@ -29,6 +29,8 @@ use App\Models\Schedule\TicketClosingMerge;
 use App\Models\admin\Role;
 use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Ticket;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Rawilk\Printing\Facades\Printing;
@@ -942,6 +944,55 @@ Terms & conditions applied.";
         ]);
         return $response;
         }
+    }
+}
+
+if (!function_exists('sendOtpForTicket')) {
+    function sendOtpForTicket($request)
+    {
+        $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
+        
+        $customer = Customer::where("cnic",plainContactAndCnic($request->customerCNIC))->first();
+
+        $otp = rand(100000, 999999); // Generate a 6-digit OTP
+    
+       $customer->update([
+            "loyalty_otp" => $otp,
+            "loyalty_otp_expiration" => Carbon::now()->addMinutes(5),
+       ]);
+
+        
+        if($customer)
+        {
+            $names = [
+                1 => 'Hamza_4-Device1',
+                2 => 'Hamza_4-Device2-201-samsung-a20',
+                3 => 'Hamza_4-Device3-204-samsung-a20',
+                4 => 'Hamza_4-Device4',
+                5 => 'Hamza_4-Device-5'
+            ];
+            $randomNumber = rand(1, 5);
+    
+            $url = "https://whatsapp.sarzone.com/api/send-messages";
+            $mobile = "92".substr($customer->contact, -10);
+            $session = $names[$randomNumber];
+            $message = "Your OTP for verification is $otp";
+    
+            $response = Http::withHeaders([
+                'X-Api-Key'=>$auth_key,
+            ])->post($url, [
+                "session" => $session,
+                "message_type" =>  'text',
+                "receiver_number" => $mobile, 
+                "message_body" => $message
+            ]);
+            return $response;
+        }
+        else
+        {
+            return response()->json(["error" => ['Customer not found']], 409);
+        }
+        
     }
 }
 //Updated Already advanced Booked Seat Api
