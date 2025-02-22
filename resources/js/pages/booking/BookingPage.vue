@@ -106,40 +106,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row" v-if="this.haveLabel">
-                                            <div class="col-md-6">
-                                                <label class="py-2 text-danger" v-if="this.haveLabel">{{
-                                                        this.label
-                                                    }}</label>
-                                            </div>
-                                            <div class="col-md-6" v-if="this.hideCheckBox">
-                                                <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" class="custom-control-input"
-                                                           id="pointsCheckBox"
-                                                           @click="usePoints($event)" :value="this.pointsCardId"
-                                                           name="pointsUsage">
-                                                    <label class="custom-control-label"
-                                                           for="pointsCheckBox">Points Usage</label>
-                                                </div>
-                                                <label class="text-danger">{{
-                                                        this.pointsUsage ? this.pointsUsage : ''
-                                                    }}</label>
-                                            </div>
-                                        </div>
-                                        <div class="row" v-if="this.pointsUsage">
-                                            <div class="col-md-12">
-                                                <div class="form-group mb-0">
-                                                    <label for="points_use">How Many Points you want to utilize</label>
-                                                    <input
-                                                        type="text"
-                                                        class="form-control"
-                                                        id="points_use"
-                                                        placeholder="Leave Input Blank means Zero Points Usage"
-                                                        v-model="addForm.pointsUseInput"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
@@ -165,6 +131,65 @@
                                                         v-model="addForm.remarks"
                                                     />
                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div class="row" v-if="this.haveLabel">
+                                            <div class="col-md-6">
+                                                <label class="py-2 text-danger" v-if="this.haveLabel">{{
+                                                        this.label
+                                                    }}</label>
+                                            </div>
+                                            <div class="col-md-6" v-if="this.hideCheckBox">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input"
+                                                           id="pointsCheckBox"
+                                                           @click="usePoints($event)" :value="this.pointsCardId"
+                                                           name="pointsUsage">
+                                                    <label class="custom-control-label"
+                                                           for="pointsCheckBox">Points Usage</label>
+                                                </div>
+                                                <label class="text-danger">{{
+                                                        this.pointsUsage ? this.pointsUsage : ''
+                                                    }}</label>
+                                            </div>
+                                        </div>
+                                        <div class="row bg-light-green pt-2" v-if="this.pointsUsage">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-0">
+                                                    <label for="points_use">How Many Points you want to utilize</label>
+                                                    <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        id="points_use"
+                                                        placeholder="Leave Input Blank means Zero Points Usage"
+                                                        v-model="addForm.pointsUseInput"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6" v-if="this.pointsUsage && this.addForm.otp_valid == false">
+                                                <div class="form-group mb-0">
+                                                    <label for="points_use">OTP</label>
+                                                    <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        id="points_use"
+                                                        placeholder="Enter 6 digit otp"
+                                                        v-model="addForm.otp"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div v-if="this.addForm.otp_valid" class="bg-light-green pb-3 row">
+                                            <div class="col-md-12 text-center text-dark">
+                                                OTP verified successfully
+                                            </div>
+                                        </div>
+                                        <div class="row pt-3 bg-light-green pb-3" v-if="this.pointsUsage && this.addForm.otp_valid == false">
+                                            <div class="col-md-6">
+                                                <button class="btn btn-block btn-sm btn-dark" :class="{'btn-progress': otpLoader}" @click="sendOtp()">Send OTP</button>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button class="btn btn-block btn-primary btn-sm ml-1" :class="{'btn-progress': otpLoader}" @click="verifyOtp()">Verify OTP</button>
                                             </div>
                                         </div>
                                         <div class="row mt-2">
@@ -1619,6 +1644,7 @@ export default {
             reScheduleDest: '',
             reScheduleDate: '',
             loading: false,
+            otpLoader: false,
             editAble: true,
             editAbleELT: true,
             getSchedule: false,
@@ -1687,6 +1713,9 @@ export default {
                 type: "booked",
                 gender: "1",
                 customerCNIC: "",
+                otp: "",
+                otp_valid: false,
+                otp_cnic: false,
                 id: 0,
                 schedule: 0,
                 departure_time: "",
@@ -2519,6 +2548,7 @@ export default {
                     status: value,
                 });
 
+                this.pointsUsage = false;
                 if (resCnicPoints.data != "" && resCnicPoints.status == 200) {
                     this.label = "This Customer Have a loyalty Card with " + resCnicPoints.data.starting_points + " Points";
                     this.pointsValidation = resCnicPoints.data.starting_points;
@@ -2693,7 +2723,14 @@ export default {
             this.getSchedule = true;
             this.resetArrays();
             this.schedule = [];
+            this.addForm.otp_valid = false;
+            this.addForm.otp = "";
+            this.addForm.otp_cnic = "";
             this.addForm.customerCNIC = "";
+            this.pointsUsage = "";
+            this.checkedUsagePoints = false;
+            this.hideCheckBox = false;
+            this.haveLabel = false;
             this.addForm.customerName = "";
             this.addForm.contact = "";
             this.addForm.flag = 0;
@@ -3440,6 +3477,27 @@ export default {
             }
             this.addForm.pointsCardId = this.pointsCardId;
             this.addForm.usagePoints = this.checkedUsagePoints;
+
+        
+            
+            if(this.addForm.usagePoints == true && this.addForm.otp_valid == false)
+            {
+                return swal({
+                    title: "OOPS!",
+                    text: "Please verify otp to use loyalty card otherwise uncheck the box",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if(this.addForm.usagePoints == true && this.addForm.otp_valid == false && this.addForm.otp_cnic != this.addForm.customerCNIC)
+            {
+                return swal({
+                    title: "OOPS!",
+                    text: "Cnic changed please verify it",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             if(this.bookingLoading)
             {
                 return swal({
@@ -3541,6 +3599,74 @@ export default {
                     timer: 2000
                 });
             }
+        },
+        
+        async sendOtp() {
+            if(!this.addForm.customerCNIC)
+            {
+                return swal({
+                    title: "OOPS!",
+                    text: "Please enter valid cnic",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            this.otpLoader = true;
+            const resMessage = await this.callApi("post", "booking/send-otp",this.addForm)
+            if (resMessage.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "Sent Succesfuly",
+                    icon: "success",
+                    timer: 2000
+                });
+            }
+            if(resMessage.status == 409)
+            {
+                swal({
+                    title: "OOPS!",
+                    text: resMessage.data.error.join("\n"), 
+                    icon: "error",
+                    timer: 2000
+                });
+                console.log(resMessage.data.error);
+            }
+            this.otpLoader = false;
+        },
+        
+        async verifyOtp() {
+            if (!this.addForm.otp || this.addForm.otp.length !== 6) {
+                return swal({
+                    title: "OOPS!",
+                    text: "Please enter a valid 6-digit OTP",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            this.otpLoader = true;
+            const resMessage = await this.callApi("post", "booking/verify-otp",this.addForm)
+            if (resMessage.status == 200) {
+                this.addForm.otp_valid = true;
+                this.addForm.otp_cnic = this.addForm.customerCNIC;
+                swal({
+                    title: "Success",
+                    text: "Verified Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+            }
+            if(resMessage.status == 409)
+            {
+                this.addForm.otp_valid = false
+                swal({
+                    title: "OOPS!",
+                    text: resMessage.data.error.join("\n"), 
+                    icon: "error",
+                    timer: 2000
+                });
+                console.log(resMessage.data.error);
+            }
+            this.otpLoader = false;
         },
 
         async resetArrays() {
