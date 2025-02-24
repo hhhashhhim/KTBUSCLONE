@@ -859,15 +859,23 @@ $new_html
 
 Terms & conditions applied.";
 
-        $response = Http::withHeaders([
-            'X-Api-Key'=>$auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile, 
-            "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed
-        ]);
-        return $response;
+        try{
+            $response = Http::withHeaders([
+                'X-Api-Key'=>$auth_key,
+            ])
+            ->timeout(1)
+            ->post($url, [
+                "session" => $session,
+                "message_type" =>  'text',
+                "receiver_number" => $mobile, 
+                "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed
+            ]);
+            return $response;
+        } 
+        catch (\Exception $e) {
+
+        }
+        
         }
     }
 }
