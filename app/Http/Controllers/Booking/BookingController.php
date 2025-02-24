@@ -639,6 +639,7 @@ class BookingController extends Controller
                 "company_id" => Auth::user()->company_id
             ]);
             DB::commit();
+            return 'h';
             ticketRescheduledMessage($old_tickets,$new_tickets);
             return response()->json(['success' => 'Success'], 200);
 
