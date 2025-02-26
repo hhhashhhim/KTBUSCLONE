@@ -106,7 +106,7 @@
             </div>
             <div class="clear-both">
                 <p class="font-weight-bold float-left">Bus Class :</p>
-                <p class="float-right">{{ ucfirst($data['elt']->ticket->seatClass->name) }}</p>
+                <p class="float-right">{{ ucfirst($data['elt']->ticket->seatClass->name??'NA') }}</p>
             </div>
             <div class="clear-both">
                 <p class="font-weight-bold float-left">Booking Date :</p>
@@ -172,7 +172,7 @@
             <div class="custinfo" id="custinfo">
                 <div class="fa fa-qrcode" id="barcode-area">
                     <img style="width: 130px !important;"
-                         src="{{ asset('/Customers/Elt/'.codeImageElt('Customer Name : '.ucfirst($data['elt']->customer->name)  . ' | ' . 'Customer CNIC : '. formatCNIC($data['elt']->customer->cnic).' | ' . 'Customer Phone : '. formatContact($data['elt']->customer->contact)  .' | '.'Seat No : ' . $data['elt']['seat_no'] .' | '.'Bus Class : ' .ucfirst($data['elt']->ticket->seatClass->name) . ' | '. 'From : ' . ucfirst($data['elt']->departure->name) . ' | ' . 'To : ' . ucfirst($data['elt']->destination->name)  . ' | ' . 'Departure Date : ' . date('d/m/Y', strtotime($data['elt']->ticket->date)) . ' | '. 'Departure Time : ' .  date('H:i A', strtotime($data['elt']->schedule->time)) . ' | ' . ' Booking Date Time : '. date('d/m/Y H:i A', strtotime($data['elt']->ticket->created_at))  . ' | ' . 'Seat Fare : '. $data['elt']->ticket->seat_fare. ' | ' . 'Elt Price : '. $data['elt']['elt_price'] . ' | ' . 'Total :'. ($data['elt']['elt_price'] + $data['elt']->ticket->seat_fare) )) }}"
+                         src="{{ asset('/Customers/Elt/'.codeImageElt('Customer Name : '.ucfirst($data['elt']->customer->name)  . ' | ' . 'Customer CNIC : '. formatCNIC($data['elt']->customer->cnic).' | ' . 'Customer Phone : '. formatContact($data['elt']->customer->contact)  .' | '.'Seat No : ' . $data['elt']['seat_no'] .' | '.'Bus Class : ' .ucfirst($data['elt']->ticket->seatClass->name??'NA') . ' | '. 'From : ' . ucfirst($data['elt']->departure->name) . ' | ' . 'To : ' . ucfirst($data['elt']->destination->name)  . ' | ' . 'Departure Date : ' . date('d/m/Y', strtotime($data['elt']->ticket->date)) . ' | '. 'Departure Time : ' .  date('H:i A', strtotime($data['elt']->schedule->time)) . ' | ' . ' Booking Date Time : '. date('d/m/Y H:i A', strtotime($data['elt']->ticket->created_at))  . ' | ' . 'Seat Fare : '. $data['elt']->ticket->seat_fare. ' | ' . 'Elt Price : '. $data['elt']['elt_price'] . ' | ' . 'Total :'. ($data['elt']['elt_price'] + $data['elt']->ticket->seat_fare) )) }}"
                          class="rounded"/>
                 </div>
             </div>
