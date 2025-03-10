@@ -105481,9 +105481,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // const url = '/kt-dev/'
 
-var url = '/kt-dev/'; // const url = '/'
-
+var url = '/';
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
@@ -105802,8 +105802,8 @@ var store = (0,vuex__WEBPACK_IMPORTED_MODULE_0__.createStore)({
       },
       user: JSON.parse(localStorage.getItem("user")),
       token: localStorage.getItem("token"),
-      main_url: "http://localhost/kt-dev/",
-      api_url: "http://localhost/kt-api/",
+      main_url: "https://portal.kainattravels.net/",
+      api_url: "https://api.kainattravels.net/",
       permissions: JSON.parse(localStorage.getItem("user")) && JSON.parse(localStorage.getItem("user")).role ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
       companyModules: false
     };
