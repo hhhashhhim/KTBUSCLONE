@@ -22,11 +22,13 @@ class BusController extends Controller
 {
     public function index()
     {
-        return $pending_merges = Ticket::whereNull("ticket_merge_id")
-        ->whereNotNull("bus_id")
-        ->where("company_id",Auth::user()->company_id)
-        ->select("schedule_id", "schedule_date") // Select both columns
-        ->distinct()
+        return $closings = TicketClosing::where('company_id', Auth::user()->company_id)
+        ->where("hide",0)
+        ->get()
+        ->groupBy('ticket_merge_id')
+        ->filter(function ($group){
+            return $group->count() == 1;
+        })
         ->count();
     
         if(!checkForSubmenu("buses"))
