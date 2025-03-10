@@ -24,6 +24,7 @@ class BusController extends Controller
     {
         return $pending_merges = Ticket::whereNull("ticket_merge_id")
         ->whereNotNull("bus_id")
+        ->where("company_id",Auth::user()->company_id)
         ->select("schedule_id", "schedule_date") // Select both columns
         ->distinct()
         ->count();
