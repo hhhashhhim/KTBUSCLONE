@@ -402,8 +402,8 @@ class BookingApiController extends Controller
                     ], 422);
                 }
         //        //Apply terminal discount
-                $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $schedule->route_id])->where('start_date', '<=', date("Y-m-d"))
-                ->where('end_date', '>=', date("Y-m-d"))->first();
+                $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $schedule->route_id])->where('start_date', '<=', $request->date)
+                ->where('end_date', '>=', $request->date)->first();
                 $seatChoices =  $schedule->route->online_seat_choices ? explode(",",$schedule->route->online_seat_choices) : null;
                 // Looping Through the seat of the bus
                 $seatMap = $scheduleDetail->bus_class->seat_map;
