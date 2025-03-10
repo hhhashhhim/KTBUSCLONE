@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/datatables.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap-timepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
+    <!-- DataTables Buttons CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}">
     <style>
         html{
@@ -53,6 +55,11 @@
 <script src="{{ asset('assets/js/jquery.inputmask.bundle.min.js') }}"></script>
 <script src="{{ asset('assets/bundles/datatables/datatables.min.js') }}"></script>
 <script src="{{ asset('assets/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
+<!-- DataTables Buttons Extension -->
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+
 
 {{-- Vue App JS --}}
 <script>

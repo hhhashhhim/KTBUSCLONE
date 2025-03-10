@@ -207,7 +207,19 @@ export default {
                     $('#head_table').DataTable().destroy();
                 }
                 setTimeout(function () {
-                    $("#head_table").DataTable();
+                    $("#head_table").DataTable({
+                        dom: 'Bfrtip',  // Enables Buttons
+                        buttons: [
+                            {
+                                extend: 'excelHtml5',
+                                text: 'Export to Excel',
+                                title: 'ledger exported',
+                                exportOptions: {
+                                    columns: [0, 1, 2] // Export only columns 0, 1, and 3
+                                }
+                            }
+                        ]
+                    });
                 }, 300);
             }
             this.tableLoading = false;
@@ -363,3 +375,8 @@ export default {
     }
 };
 </script>
+<style scoped>
+::v-deep(.buttons-excel) {
+    width: 121px !important;
+}
+</style>
