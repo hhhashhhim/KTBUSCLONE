@@ -170,7 +170,7 @@ class BookingApiController extends Controller
 
                 $bookedTickets = Ticket::where(["company_id"=>$companyId])->whereIn("schedule_id",$data->pluck("schedule_id"))->whereIn("schedule_date",$data->pluck("schedule_date"))->get(["id","schedule_id","schedule_date"]);
 
-                $data->map(function($single,$key) use ($data,$companyId,$terminalId,$bookedTickets){
+                $data->map(function($single,$key) use ($data,$companyId,$terminalId,$bookedTickets,$request){
                     // this is for if some schedule is drooped then it should not be throw
                     $scheduleDrop = DropSchedule::where(["schedule_date"=>$single->schedule_date,"schedule_id"=>$single->schedule_id])->first();
                     if($scheduleDrop)
@@ -237,8 +237,8 @@ class BookingApiController extends Controller
                         })
                         ->first();
                         $scheduleSurcharge = Surcharge::where('id', $single->schedule->surcharge_id)->where('is_active', 1)->first();
-                        $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $single->schedule->route_id])->where('start_date', '<=', date("Y-m-d"))
-                        ->where('end_date', '>=', date("Y-m-d"))->first();
+                        $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $single->schedule->route_id])->where('start_date', '<=', $request->date)
+                        ->where('end_date', '>=', $request->date)->first();
 
                         $editFare = $fare;
                         if ($scheduleDiscount) {
