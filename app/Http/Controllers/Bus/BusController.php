@@ -22,15 +22,6 @@ class BusController extends Controller
 {
     public function index()
     {
-        return $closings = TicketClosing::where('company_id', Auth::user()->company_id)
-        ->where("hide",0)
-        ->get()
-        ->groupBy('ticket_merge_id')
-        ->filter(function ($group){
-            return $group->count() == 1;
-        })
-        ->count();
-    
         if(!checkForSubmenu("buses"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
