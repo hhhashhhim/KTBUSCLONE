@@ -22,7 +22,7 @@ class BusController extends Controller
 {
     public function index()
     {
-        return $pending_merges = Ticket::where("ticket_closing_id",'=',null)->where("bus_id",'!=',null)->distinct("schedule_id")->count();
+        return $pending_merges = Ticket::where("ticket_merge_id",'=',null)->where("bus_id",'!=',null)->distinct("schedule_id")->count();
         if(!checkForSubmenu("buses"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
