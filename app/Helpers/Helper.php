@@ -316,7 +316,8 @@ if (!function_exists('seatFareIsWrong')) {
                 $q->where("terminal_id", Auth::user()->terminal_id);
             })
             ->first();
-            $terminalDiscount = TerminalDiscount::where(["terminal_id" => Auth::user()->terminal_id, "route_id" => $schedule->route_id])->first();
+            $terminalDiscount = TerminalDiscount::where(["terminal_id" => Auth::user()->terminal_id, "route_id" => $schedule->route_id])->where('start_date', '<=', $request->date)
+            ->where('end_date', '>=', $request->date)->first();
             $scheduleSurcharge = Surcharge::where('id', $schedule->surcharge_id)->where('is_active', 1)->first();
 
             $data = $fareForAllClasses->where('fare_class', $request->selected_seats_class[$i])->first();
