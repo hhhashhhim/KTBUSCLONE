@@ -1060,8 +1060,8 @@ class BookingController extends Controller
             ], 422);
         }
 //        //Apply terminal discount
-        $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->dropTerminal ?? 0, "route_id" => $schedule->route_id])->where('start_date', '<=', date("Y-m-d"))
-        ->where('end_date', '>=', date("Y-m-d"))->first();
+        $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->dropTerminal ?? 0, "route_id" => $schedule->route_id])->where('start_date', '<=', $request->date)
+        ->where('end_date', '>=', $request->date)->first();
 
         // Looping Through the seat of the bus
         $seatMap = $scheduleDetail->bus_class->seat_map;
@@ -2022,7 +2022,8 @@ class BookingController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $schedule = Schedule::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
-        return $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->dropTerminal ?? 0, "route_id" => $schedule->route_id])->first();
+        return $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->dropTerminal ?? 0, "route_id" => $schedule->route_id])->where('start_date', '<=', $request->date)
+        ->where('end_date', '>=', $request->date)->first();
     }
 
     public

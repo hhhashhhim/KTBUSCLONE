@@ -222,8 +222,8 @@ if (!function_exists('checkDiscountAmount')) {
         ->first();
 
         $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $detail->schedule->route_id])
-        ->where('start_date', '<=', date("Y-m-d"))
-        ->where('end_date', '>=', date("Y-m-d"))->first();
+        ->where('start_date', '<=', $detail->departure_date)
+        ->where('end_date', '>=', $detail->departure_date)->first();
 
         $fare = FareTable::where('from_city_id', $detail->departure_id)
             ->where('to_city_id', $detail->destination_id)
