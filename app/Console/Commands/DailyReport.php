@@ -74,6 +74,7 @@ class DailyReport extends Command
         ->distinct() 
         ->get();
 
+        $cancel_ids = $ticketData->where("date",$today)->where("type","canceled")->pluck('id');
         $pending_merges = Ticket::where("ticket_closing_id",'=',null)->distinct("schedule_id")->count();
 
         $today_confirm = $ticketData->where("date",$today)->where("type","booked")->count();
