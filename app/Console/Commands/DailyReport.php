@@ -78,7 +78,8 @@ class DailyReport extends Command
 
         $today_confirm = $ticketData->where("date",$today)->where("type","booked")->count();
         $today_reserve = $ticketData->where("date",$today)->where("type","advance booking")->count();
-        $today_cancel = $ticketData->where("date",$today)->where("type","canceled")->count();
+        $today_confirm_cancel = BookingCancel::whereIn('ticket_id',$cancel_ids)->where("type","booked")->count();
+        $today_reserve_cancel = BookingCancel::whereIn('ticket_id',$cancel_ids)->where("type","advance booking")->count();
         $today_overissue = $ticketData->where("date",$today)->where("type","over-issue")->count();
         $today_discount = $ticketData->where("type","booked")->where("date",$today)->sum(function ($ticket) {
             return $ticket->discount + $ticket->terminal_discount + $ticket->schedule_discount;
@@ -99,7 +100,8 @@ class DailyReport extends Command
 
 * Total Confirmed Seats : *$today_confirm*
 * Total Reserved Seats : *$today_reserve*
-* Total Cancelled Seats : *$today_cancel*
+* Total Confirmed Cancelled : *$today_confirm_cancel*
+* Total Reserved Cancelled : *$today_reserve_cancel*
 * Total Overissue Seats : *$today_overissue*
 * Total Discount Amount : *$today_discount*
 * New Customers : *$today_new_customers*
@@ -119,21 +121,21 @@ This is automated generated report.
             "receiver_number" => $mobile, 
             "message_body" => $messageConfirmed
         ]);
-        $response2 = Http::withHeaders([
-            'X-Api-Key'=>$auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile2, 
-            "message_body" => $messageConfirmed
-        ]);
-        $response2 = Http::withHeaders([
-            'X-Api-Key'=>$auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile3, 
-            "message_body" => $messageConfirmed
-        ]);
+        // $response2 = Http::withHeaders([
+        //     'X-Api-Key'=>$auth_key,
+        // ])->post($url, [
+        //     "session" => $session,
+        //     "message_type" =>  'text',
+        //     "receiver_number" => $mobile2, 
+        //     "message_body" => $messageConfirmed
+        // ]);
+        // $response2 = Http::withHeaders([
+        //     'X-Api-Key'=>$auth_key,
+        // ])->post($url, [
+        //     "session" => $session,
+        //     "message_type" =>  'text',
+        //     "receiver_number" => $mobile3, 
+        //     "message_body" => $messageConfirmed
+        // ]);
     }
 }
