@@ -122,21 +122,21 @@ This is automated generated report.
             "receiver_number" => $mobile, 
             "message_body" => $messageConfirmed
         ]);
-        // $response2 = Http::withHeaders([
-        //     'X-Api-Key'=>$auth_key,
-        // ])->post($url, [
-        //     "session" => $session,
-        //     "message_type" =>  'text',
-        //     "receiver_number" => $mobile2, 
-        //     "message_body" => $messageConfirmed
-        // ]);
-        // $response2 = Http::withHeaders([
-        //     'X-Api-Key'=>$auth_key,
-        // ])->post($url, [
-        //     "session" => $session,
-        //     "message_type" =>  'text',
-        //     "receiver_number" => $mobile3, 
-        //     "message_body" => $messageConfirmed
-        // ]);
+        $response2 = Http::withHeaders([
+            'X-Api-Key'=>$auth_key,
+        ])->post($url, [
+            "session" => $session,
+            "message_type" =>  'text',
+            "receiver_number" => $mobile2, 
+            "message_body" => $messageConfirmed
+        ]);
+        $response2 = Http::withHeaders([
+            'X-Api-Key'=>$auth_key,
+        ])->post($url, [
+            "session" => $session,
+            "message_type" =>  'text',
+            "receiver_number" => $mobile3, 
+            "message_body" => $messageConfirmed
+        ]);
     }
 }
