@@ -65,7 +65,7 @@
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ route.name }}</td>
                                                         <td>{{ route.via??'N/A' }}</td>
-                                                        <td>{{ route.commission_route ? 'Yes' : 'No' }}</td>
+                                                        <td>{{ route.commission_route == 1 ? 'Yes' : 'No' }}</td>
                                                         <td>{{ route.added_by.name }}</td>
                                                         <td v-if="checkForSubmenuButtons('edit-routes') || checkForSubmenuButtons('details-routes') || checkForSubmenuButtons('delete-routes')">
                                                             <button title="Show Route Details" v-if="checkForSubmenuButtons('details-routes')"
