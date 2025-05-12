@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Schedule;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account\AccountHead;
+use App\Models\Account\AccountTransaction;
 use App\Models\Bus\Bus;
 use App\Models\Bus\BusClass;
 use App\Models\City;
@@ -21,6 +23,7 @@ use App\Models\Terminal;
 use App\Models\Ticket;
 use Carbon\Carbon;
 use DateTime;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -61,7 +64,7 @@ class ScheduleClosingController extends Controller
         }
         $closings = TicketClosing::where('company_id', Auth::user()->company_id)
         ->with("bus:id,bus_number", "schedule:id,name,route_id", "schedule.route:id,name")
-        ->where("hide",0)
+        ->where(["hide"=>0,"commission_route"=>0])
         ->get()
         ->groupBy('ticket_merge_id')
         ->filter(function ($group){
@@ -71,6 +74,88 @@ class ScheduleClosingController extends Controller
             "closings" => $closings,
         ];
         return $data;
+    }
+    
+    public function commissionClosing()
+    {
+        if(!checkForSubmenu("closing"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        $closings = TicketClosing::where('company_id', Auth::user()->company_id)
+        ->with("bus:id,bus_number", "schedule:id,name,route_id", "schedule.route:id,name")
+        ->with(["account_transaction"=>function($q){
+            $q->where("posting_type","ticket_closing");
+        }])
+        ->where(["hide"=>0,"commission_route"=>1])
+        ->get()
+        ->groupBy('ticket_merge_id')
+        ->filter(function ($group){
+            return $group->count() == 1;
+        });
+        $data = [
+            "closings" => $closings,
+        ];
+        return $data;
+    }
+    
+    public function commissionClosingStore(Request $request)
+    {
+        if(!checkForSubmenu("closing"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $request->validate([
+            'ledgers' => ['required'],
+            'credits' => ['required'],
+            'debits' => ['required'],
+            'narrations' => ['required'],
+        ]);
+
+        try {
+            DB::beginTransaction();
+            
+            
+            $document = AccountTransaction::where(["company_id"=>Auth::user()->company_id])
+            ->where("type","JV")
+            ->orderBy("document_id","DESC")
+            ->first();
+            $document_id = $document ? $document->document_id + 1 : 1;
+
+    
+            foreach ($request->ledgers as $i => $value) {
+                AccountTransaction::create([
+                    'terminal_id' => $request->terminal,
+                    'account_head_id' => $request->ledgers[$i],
+                    'other_account_head_id' => $request->ledgers[$i + 1]??$request->ledgers[$i],
+                    'credit' => $request->credits[$i] > 0 ? $request->credits[$i] : 0,
+                    'debit' => $request->credits[$i] > 0 ? 0 : $request->debits[$i],
+                    'document_id' => $document_id,
+                    'type' => "JV",
+                    'narration' => strtoupper($request->narrations[$i]),
+                    'posting_type' => 'ticket_closing',
+                    'posting_id' => $request->closeId,
+                    'added_by' => Auth::user()->id,
+                    'company_id' => Auth::user()->company_id,
+                ]);
+            }
+
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name." | Added Transaction JV-".$document_id,
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
+
+            DB::commit();
+            return response()->json([],201);
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
+       
     }
     
     public function hideUnclosing(Request $request)
@@ -497,6 +582,25 @@ class ScheduleClosingController extends Controller
             ->orderBy('id')
             ->get(["id", "name"]);
     }
+    
+    public function journalHelper(Request $request)
+    {
+        $terminals = Terminal::where(["company_id"=>Auth::user()->company_id])->get(["id","name"]);
+        $heads = AccountHead::with('level_four:id,name')
+        ->get()
+        ->map(function($single) {
+            return [
+                'id' => $single->id,
+                'text' => $single->name . ' (' . $single->level_four->name . ')',
+                'name' => $single->name,
+            ];
+        });
+
+        return [
+            "terminals" => $terminals,
+            "heads" => $heads,
+        ];
+    }
 
     public function store(Request $request)
     {
@@ -515,6 +619,8 @@ class ScheduleClosingController extends Controller
                 "company_id" => Auth::user()->company_id
             ])->first();
 
+            $schedule = Schedule::where("id",$request->schedule)->first();
+            $route = Route::where("id",$schedule->route_id)->first();
             
             $bookingAvailable = Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, 'schedule_date' => $depTime->schedule_date])->get();
             if (count($bookingAvailable) == 0) {
@@ -551,6 +657,7 @@ class ScheduleClosingController extends Controller
                 "schedule_time" => $depTime->departure_time,
                 "schedule_start" => $request->departureCity,
                 "schedule_end" => $request->destinationCity,
+                "commission_route" => $route->commission_route,
                 "schedule_return" => 0,
                 "description" => $request->description,
                 'company_id' => Auth::user()->company_id,

@@ -41,7 +41,7 @@ class JournalTransactionController extends BaseController
         $journalTransactions = AccountTransaction::
         where(["company_id"=>Auth::user()->company_id])
         ->where("type","JV")
-        ->orderBy("id",'ASC')
+        ->orderBy("id",'DESC')
         ->get()
         ->groupBy('document_id')
         ->map(function ($group) {

@@ -48,7 +48,7 @@ class CashTransactionController extends BaseController
             $q->where("type","CP");
             $q->orWhere("type","CR");
         })
-        ->orderBy("id",'ASC')
+        ->orderBy("id",'DESC')
         ->get()
         ->groupBy('document_id')
         ->map(function ($group) {

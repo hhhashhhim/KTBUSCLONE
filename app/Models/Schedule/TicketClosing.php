@@ -2,6 +2,7 @@
 
 namespace App\Models\Schedule;
 
+use App\Models\Account\AccountTransaction;
 use App\Models\Bus\Bus;
 use App\Models\Bus\BusClass;
 use App\Models\City;
@@ -42,6 +43,10 @@ class TicketClosing extends Model
     public function tickets()
     {
         return $this->hasMany( Ticket::class, 'ticket_closing_id', 'id' );
+    }
+    public function account_transaction()
+    {
+        return $this->hasMany( AccountTransaction::class, 'posting_id', 'id' );
     }
 
 }

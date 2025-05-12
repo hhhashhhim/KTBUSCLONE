@@ -56,6 +56,7 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
     // Schedule Closing
     Route::group(['prefix' => '/close/schedule', [CustomMiddleware::class]], function () {
         Route::post('/fetch', [ScheduleClosingController::class, 'fetchSchedule']);
+        Route::post('/helper', [ScheduleClosingController::class, 'journalHelper']);
 
         Route::group(['prefix' => '/unclosing', [CustomMiddleware::class]], function () {
             Route::post('/', [ScheduleClosingController::class, 'unclosing']);
@@ -63,10 +64,12 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
             Route::post('/spare', [ScheduleClosingController::class, 'spareUnclosing']);
             Route::post('/revert', [ScheduleClosingController::class, 'revertUnclosing']);
         });
-
-
+        
+        
         Route::group(['prefix' => '/closing', [CustomMiddleware::class]], function () {
             Route::post('/', [ScheduleClosingController::class, 'closing']);
+            Route::post('/commission', [ScheduleClosingController::class, 'commissionClosing']);
+            Route::post('/commission/store', [ScheduleClosingController::class, 'commissionClosingStore']);
             Route::post('/store', [ScheduleClosingController::class, 'store']);
             Route::post('/merge', [ScheduleClosingController::class, 'mergeClosing']);
             Route::post('/release', [ScheduleClosingController::class, 'releaseClosing']);

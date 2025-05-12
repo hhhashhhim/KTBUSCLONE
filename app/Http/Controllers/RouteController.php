@@ -80,6 +80,7 @@ class RouteController extends Controller
             $route = Route::create([
                 'name' => $request['routeStart'] . '-' . $request['routeEnd'],
                 'via' => $request['routeVia'],
+                'commission_route' => $request['commissioRoute'],
                 'company_id' => Auth::user()->company_id,
                 'added_by' => auth()->user()->id
             ]);
@@ -123,6 +124,7 @@ class RouteController extends Controller
                 $route = Route::create([
                     'name' => $request['routeEnd'] . '-' . $request['routeStart'],
                     'via' => $request['routeVia'],
+                    'commission_route' => $request['commissioRoute'],
                     'company_id' => Auth::user()->company_id,
                     'added_by' => auth()->user()->id
                 ]);
@@ -210,6 +212,7 @@ class RouteController extends Controller
                 ])->update([
                     'name' => $request['routeStartName'] . '-' . $request['routeEndName'],
                     'via' => $request['routeVia'],
+                    'commission_route' => $request['commissionRoute'],
                     'online_seat_choices' => $request['online_seat_choices'],
                 ]);
                 // now we will delete all route detail and will insert new one

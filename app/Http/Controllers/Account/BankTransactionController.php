@@ -47,7 +47,7 @@ class BankTransactionController extends BaseController
             $q->where("type","BP");
             $q->orWhere("type","BR");
         })
-        ->orderBy("document_id",'ASC')
+        ->orderBy("document_id",'DESC')
         ->get()
         ->groupBy('document_id')
         ->map(function ($group) {
