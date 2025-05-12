@@ -55,6 +55,7 @@
                                                         <th>Sr No.</th>
                                                         <th>Name</th>
                                                         <th>Via</th>
+                                                        <th>Commission Route</th>
                                                         <th>Added By</th>
                                                         <th v-if="checkForSubmenuButtons('edit-routes') || checkForSubmenuButtons('details-routes') || checkForSubmenuButtons('delete-routes')">Action</th>
                                                     </tr>
@@ -64,6 +65,7 @@
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ route.name }}</td>
                                                         <td>{{ route.via??'N/A' }}</td>
+                                                        <td>{{ route.commission_route ? 'Yes' : 'No' }}</td>
                                                         <td>{{ route.added_by.name }}</td>
                                                         <td v-if="checkForSubmenuButtons('edit-routes') || checkForSubmenuButtons('details-routes') || checkForSubmenuButtons('delete-routes')">
                                                             <button title="Show Route Details" v-if="checkForSubmenuButtons('details-routes')"
@@ -132,11 +134,19 @@
                         <div class="col-md-6">
                             <h5>Select Cities</h5>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label for="reverseSeats" class="text-dark mr-3">Reverse Route</label>
                             <label class="colorinput">
                                 <input name="color" type="checkbox" id="reverseSeats" class="colorinput-input"
                                        :checked="this.reverseRoute == 1" @change="checkBox($event)">
+                                <span class="colorinput-color bg-primary"></span>
+                            </label>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="commissionRoute" class="text-dark mr-3">Commission Route</label>
+                            <label class="colorinput">
+                                <input name="color" type="checkbox" id="commissionRoute" class="colorinput-input"
+                                      v-model="commissioRoute">
                                 <span class="colorinput-color bg-primary"></span>
                             </label>
                         </div>
@@ -302,7 +312,7 @@
                         <label for="name">Via</label>
                         <input type="text" class="form-control" v-model="dataEdit.routeVia"/>
                     </div>
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-6">
                         <label for="available_seats">Online Allowed Seats</label>
                         <vue-mask
                             class="form-control"
@@ -311,6 +321,14 @@
                             :raw="false"
                             :options="optionComma">
                         </vue-mask>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="commissionRouteEdit" class="text-dark mr-3">Commission Route</label>
+                        <label class="colorinput">
+                            <input name="color" type="checkbox" id="commissionRouteEdit" class="colorinput-input"
+                                    v-model="dataEdit.commissionRoute">
+                            <span class="colorinput-color bg-primary"></span>
+                        </label>
                     </div>
                     <div class="form-group col-md-12 d-flex align-items-center">
                         <table class="table table-striped">
@@ -415,6 +433,7 @@ export default {
             loop: 1,
             routeStartName: '',
             routeVia: '',
+            commissioRoute: false,
             routeEndName: '',
             reverseRoute: 1,
             routeDetails: [],
@@ -463,6 +482,7 @@ export default {
                     routeStartName: routeData.data.route.name.split('-')[0],
                     routeEndName: routeData.data.route.name.split('-')[1],
                     routeVia: routeData.data.route.via,
+                    commissionRoute: routeData.data.route.commission_route ? true : false,
                     cityIds: routeData.data.cityIds,
                     online_seat_choices: routeData.data.route.online_seat_choices
                 }
@@ -580,6 +600,7 @@ export default {
                 routeStart: this.routeStartName,
                 routeEnd: this.routeEndName,
                 routeVia: this.routeVia,
+                commissioRoute: this.commissioRoute,
                 cities: this.addCities,
                 revereRoute: this.reverseRoute,
                 terminals: this.addTerminalsOnClick,

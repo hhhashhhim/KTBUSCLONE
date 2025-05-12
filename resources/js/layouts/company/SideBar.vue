@@ -210,6 +210,11 @@
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('closing')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'booking-commission-closing' }">
+                                <i class="fas fa-bookmark"></i> Commission Closing
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('closing')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'booking-schedule-unclosing-spare' }">
                                 <i class="fas fa-bookmark"></i> Spare Unclosing
                             </router-link>

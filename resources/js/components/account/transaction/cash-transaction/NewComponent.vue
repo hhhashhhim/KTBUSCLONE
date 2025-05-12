@@ -102,7 +102,7 @@
                                 </select>
                             </div>
                             <div class="form-group mb-2 col-md-3">
-                                <input class="form-control" type="text" :value="addData.amounts[index]" @keyup="saveTransactionRow($event, 'second', index)" onkeypress="numberValidate(event,{dot:true})">
+                                <input class="form-control" type="text" :value="addData.amounts[index]" @keyup="saveTransactionRow($event, 'second', index)" @keypress="$numberValidate($event,{dot:true})">
                             </div>
                             <div class="form-group mb-2 col-md-3">
                                 <input class="form-control" type="text" :value="addData.narrations[index]" @change="saveTransactionRow($event, 'third', index)" @keyup.enter="addTransactionRow" />
