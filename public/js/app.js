@@ -53054,7 +53054,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     routeStartName: routeData.data.route.name.split('-')[0],
                     routeEndName: routeData.data.route.name.split('-')[1],
                     routeVia: routeData.data.route.via,
-                    commissionRoute: routeData.data.route.commission_route ? true : false,
+                    commissionRoute: routeData.data.route.commission_route == 1 ? true : false,
                     cityIds: routeData.data.cityIds,
                     online_seat_choices: routeData.data.route.online_seat_choices
                   };
