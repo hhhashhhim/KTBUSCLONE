@@ -29,7 +29,6 @@ class ScheduleController extends Controller
 {
     public function index(Request $request)
     {
-        return 'h';
         if(!checkForSubmenu("schedules"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
