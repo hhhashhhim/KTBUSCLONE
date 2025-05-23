@@ -33,6 +33,27 @@ class ScheduleController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+
+        $schedules = ScheduleDetail::with('schedule.route', 'bus_class')
+    ->whereHas('schedule', function($q) use ($request) {
+        $q->where("hide", 0);
+        if ($request->route) {
+            $q->where("route_id", $request->route);
+        }
+    })
+    ->where(function($q) use ($request) {
+        if ($request->departure_date) {
+            $q->where("schedule_date", $request->departure_date);
+        }
+        if ($request->bus_class) {
+            $q->where("bus_class_id", $request->bus_class);
+        }
+    })
+    ->where('company_id', Auth::user()?->company_id)
+    ->orderBy("schedule_date", "DESC")
+    ->orderBy("id", "ASC");
+
+return $schedules->toSql();
         
         $schedules = ScheduleDetail::
         with('schedule.route','bus_class')
