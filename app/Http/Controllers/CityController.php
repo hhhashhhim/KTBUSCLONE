@@ -29,24 +29,24 @@ class CityController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        try {
-                DB::beginTransaction();
-                $rules = [
-                    'name' => ['required', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-                ];
+        DB::beginTransaction();
+        $rules = [
+            'name' => ['required', Rule::unique('cities', 'name')->where('company_id', Auth::user()->company_id)->where("hide",0)->whereNull('deleted_at')],
+        ];
 
-                $customMessages = [
-                    'name.required' => 'Name Field is Required!',
-                    'name.unique' => 'City Name is Already Exist',
-                ];
-                $this->validate($request, $rules, $customMessages);
+        $customMessages = [
+            'name.required' => 'Name Field is Required!',
+            'name.unique' => 'City Name is Already Exist',
+        ];
+        $this->validate($request, $rules, $customMessages);
+        try {
                 $city = City::create([
                     'name' => $request->name,
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
                 ]);
                 $this->cityCombinations($city);
-                updateFareTable(Auth::user()->company_id);
+                // updateFareTable(Auth::user()->company_id);
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
                     "message" => Auth::user()->name." | added city ($request->name)",
