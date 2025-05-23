@@ -961,20 +961,7 @@ export default {
         },
         async fetchSchedule() {
             this.tableLoading = true;
-            const res = await this.callApi("post", "schedule",this.filterData);
-            if (res.status == 200) {
-                this.tableLoading = false;
-                this.schedules = res.data;
-            } else {
-                console.log(res);
-            }
-            // setTimeout(() => {
-            //     $('#schedule_table').DataTable({
-            //         language: {
-            //             info: '' // Set the 'info' language option to an empty string to hide the line
-            //         }
-            //     });
-            // }, 300);
+
             const resGetAllRoutes = await this.callApi("post", "schedule/getRoute");
             this.routes = resGetAllRoutes.data;
             
@@ -992,6 +979,22 @@ export default {
 
             const resDiscount = await this.callApi("post", "schedule/discount/getSelective");
             this.discounts = resDiscount.data;
+            
+            const res = await this.callApi("post", "schedule",this.filterData);
+            if (res.status == 200) {
+                this.tableLoading = false;
+                this.schedules = res.data;
+            } else {
+                console.log(res);
+            }
+            // setTimeout(() => {
+            //     $('#schedule_table').DataTable({
+            //         language: {
+            //             info: '' // Set the 'info' language option to an empty string to hide the line
+            //         }
+            //     });
+            // }, 300);
+            
         },
 
         async getEntireForm() {
