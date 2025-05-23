@@ -1105,61 +1105,127 @@ if (!function_exists('updateFareTable')) {
     function updateFareTable($company_id)
     {
         $fareClasses = FareClass::where('company_id', $company_id)->get();
-        // Loop through each fare class
+        $cities = City::where('company_id', $company_id)->get();
+        $cityIds = $cities->pluck('id')->all();
+
+        // Step 1: Get all existing fares in one go
+        $existingFares = FareTable::where('company_id', $company_id)->get()->keyBy(function ($item) {
+            return $item->fare_class . '_' . $item->from_city_id . '_' . $item->to_city_id;
+        });
+
+        // Step 2: Prepare insert data
+        $insertData = [];
+        $firstFareClassId = $fareClasses->first()->id;
+        $firstFareMap = FareTable::where('company_id', $company_id)
+            ->where('fare_class', $firstFareClassId)
+            ->get()
+            ->keyBy(function ($item) {
+                return $item->from_city_id . '_' . $item->to_city_id;
+            });
+
         foreach ($fareClasses as $fareClass) {
-            // Get all cities for the company
-            $cities = City::where('company_id', $company_id)->get();
-            // Loop through each city as the first city
-            foreach ($cities as $firstCity) {
-                // Loop through each city as the second city
-                foreach ($cities as $secondCity) {
-                    // Check if the first city and second city are different
-                    if ($firstCity->id != $secondCity->id) {
-                        // Check if there is an existing fare for the fare class, first city, and second city
-                        $oldFare = FareTable::where([
-                            'company_id' => $company_id,
-                            "fare_class" => $fareClass->id,
-                            "from_city_id" => $firstCity->id,
-                            "to_city_id" => $secondCity->id,
-                        ])->first();
-                        // If there is no existing fare, create a new one with a fare of 0
-                        if (!$oldFare) {
-                            FareTable::create([
-                                "fare" => 0,
-                                "fare_class" => $fareClass->id,
-                                "from_city_id" => $firstCity->id,
-                                "to_city_id" => $secondCity->id,
-                                "company_id" => $company_id,
-                                "time_difference" => $fareClass->time_difference,
-                                "distance_in_km" => $fareClass->distance_in_km,
-                                "added_by" => Auth::user()->id,
-                            ]);
-                            // If the fare class is not the first fare class, update the new fare with the fare from the first fare class
-                            if ($fareClass->id != $fareClasses->first()->id) {
-                                $firstFare = FareTable::where([
-                                    'company_id' => $company_id,
-                                    "fare_class" => $fareClasses->first()->id,
-                                    "from_city_id" => $firstCity->id,
-                                    "to_city_id" => $secondCity->id,
-                                ])->first();
-                                if ($firstFare) {
-                                    $newFare = FareTable::where([
-                                        'company_id' => $company_id,
-                                        "fare_class" => $fareClass->id,
-                                        "from_city_id" => $firstCity->id,
-                                        "to_city_id" => $secondCity->id,
-                                    ])->first();
-                                    $newFare->time_difference = $firstFare->time_difference;
-                                    $newFare->distance_in_km = $firstFare->distance_in_km;
-                                    $newFare->save();
-                                }
+            foreach ($cityIds as $fromId) {
+                foreach ($cityIds as $toId) {
+                    if ($fromId == $toId) continue;
+
+                    $key = $fareClass->id . '_' . $fromId . '_' . $toId;
+
+                    // If fare does not exist
+                    if (!isset($existingFares[$key])) {
+                        $defaultTime = $fareClass->time_difference;
+                        $defaultDistance = $fareClass->distance_in_km;
+
+                        // Copy from first fare class if needed
+                        if ($fareClass->id != $firstFareClassId) {
+                            $firstKey = $fromId . '_' . $toId;
+                            if (isset($firstFareMap[$firstKey])) {
+                                $defaultTime = $firstFareMap[$firstKey]->time_difference;
+                                $defaultDistance = $firstFareMap[$firstKey]->distance_in_km;
                             }
                         }
+
+                        $insertData[] = [
+                            "fare" => 0,
+                            "fare_class" => $fareClass->id,
+                            "from_city_id" => $fromId,
+                            "to_city_id" => $toId,
+                            "company_id" => $company_id,
+                            "time_difference" => $defaultTime,
+                            "distance_in_km" => $defaultDistance,
+                            "added_by" => Auth::id(),
+                            "created_at" => now(),
+                            "updated_at" => now(),
+                        ];
                     }
                 }
             }
         }
+
+        // Step 3: Insert all at once (chunked if large)
+        if (!empty($insertData)) {
+            foreach (array_chunk($insertData, 1000) as $chunk) {
+                FareTable::insert($chunk);
+            }
+        }
     }
+    // function updateFareTable($company_id)
+    // {
+    //     $fareClasses = FareClass::where('company_id', $company_id)->get();
+    //     // Loop through each fare class
+    //     foreach ($fareClasses as $fareClass) {
+    //         // Get all cities for the company
+    //         $cities = City::where('company_id', $company_id)->get();
+    //         // Loop through each city as the first city
+    //         foreach ($cities as $firstCity) {
+    //             // Loop through each city as the second city
+    //             foreach ($cities as $secondCity) {
+    //                 // Check if the first city and second city are different
+    //                 if ($firstCity->id != $secondCity->id) {
+    //                     // Check if there is an existing fare for the fare class, first city, and second city
+    //                     $oldFare = FareTable::where([
+    //                         'company_id' => $company_id,
+    //                         "fare_class" => $fareClass->id,
+    //                         "from_city_id" => $firstCity->id,
+    //                         "to_city_id" => $secondCity->id,
+    //                     ])->first();
+    //                     // If there is no existing fare, create a new one with a fare of 0
+    //                     if (!$oldFare) {
+    //                         FareTable::create([
+    //                             "fare" => 0,
+    //                             "fare_class" => $fareClass->id,
+    //                             "from_city_id" => $firstCity->id,
+    //                             "to_city_id" => $secondCity->id,
+    //                             "company_id" => $company_id,
+    //                             "time_difference" => $fareClass->time_difference,
+    //                             "distance_in_km" => $fareClass->distance_in_km,
+    //                             "added_by" => Auth::user()->id,
+    //                         ]);
+    //                         // If the fare class is not the first fare class, update the new fare with the fare from the first fare class
+    //                         if ($fareClass->id != $fareClasses->first()->id) {
+    //                             $firstFare = FareTable::where([
+    //                                 'company_id' => $company_id,
+    //                                 "fare_class" => $fareClasses->first()->id,
+    //                                 "from_city_id" => $firstCity->id,
+    //                                 "to_city_id" => $secondCity->id,
+    //                             ])->first();
+    //                             if ($firstFare) {
+    //                                 $newFare = FareTable::where([
+    //                                     'company_id' => $company_id,
+    //                                     "fare_class" => $fareClass->id,
+    //                                     "from_city_id" => $firstCity->id,
+    //                                     "to_city_id" => $secondCity->id,
+    //                                 ])->first();
+    //                                 $newFare->time_difference = $firstFare->time_difference;
+    //                                 $newFare->distance_in_km = $firstFare->distance_in_km;
+    //                                 $newFare->save();
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 //Print Ticket function

@@ -45,7 +45,7 @@ class CityController extends Controller
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
                 ]);
-                $this->cityCombinations($city);
+                // $this->cityCombinations($city);
                 updateFareTable(Auth::user()->company_id);
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
