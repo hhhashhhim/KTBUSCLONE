@@ -821,6 +821,7 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
 
+        this.fetchHelperData();
         this.fetchSchedule();
         this.permissions = this.$store.state.permissions;
     },
@@ -959,7 +960,7 @@ export default {
                     }
                 }
         },
-        async fetchSchedule() {
+        async fetchHelperData() {
             this.tableLoading = true;
 
             const resGetAllRoutes = await this.callApi("post", "schedule/getRoute");
@@ -979,7 +980,9 @@ export default {
 
             const resDiscount = await this.callApi("post", "schedule/discount/getSelective");
             this.discounts = resDiscount.data;
-            
+        },
+        async fetchSchedule() {
+
             const res = await this.callApi("post", "schedule",this.filterData);
             if (res.status == 200) {
                 this.tableLoading = false;

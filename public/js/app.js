@@ -55455,11 +55455,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
+              _this.fetchHelperData();
+
               _this.fetchSchedule();
 
               _this.permissions = _this.$store.state.permissions;
 
-            case 5:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -55640,11 +55642,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee3);
       }))();
     },
-    fetchSchedule: function fetchSchedule() {
+    fetchHelperData: function fetchHelperData() {
       var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var resGetAllRoutes, resGetAllTerminals, resGetAllClasses, resGetBusClasses, resSurcharge, resDiscount, res;
+        var resGetAllRoutes, resGetAllTerminals, resGetAllClasses, resGetBusClasses, resSurcharge, resDiscount;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
@@ -55686,15 +55688,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 23:
                 resDiscount = _context4.sent;
                 _this5.discounts = resDiscount.data;
-                _context4.next = 27;
-                return _this5.callApi("post", "schedule", _this5.filterData);
 
-              case 27:
-                res = _context4.sent;
+              case 25:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      }))();
+    },
+    fetchSchedule: function fetchSchedule() {
+      var _this6 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                _context5.next = 2;
+                return _this6.callApi("post", "schedule", _this6.filterData);
+
+              case 2:
+                res = _context5.sent;
 
                 if (res.status == 200) {
-                  _this5.tableLoading = false;
-                  _this5.schedules = res.data;
+                  _this6.tableLoading = false;
+                  _this6.schedules = res.data;
                 } else {
                   console.log(res);
                 } // setTimeout(() => {
@@ -55706,40 +55726,40 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 // }, 300);
 
 
-              case 29:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4);
-      }))();
-    },
-    getEntireForm: function getEntireForm() {
-      var _this6 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var resEntire;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                _context5.next = 2;
-                return _this6.callApi("post", "schedule/getEntire", _this6.data);
-
-              case 2:
-                resEntire = _context5.sent;
-                _this6.dataPreview = resEntire.data;
-                _this6.dataPreview.start_date = _this6.data.StartDate;
-                _this6.dataPreview.end_date = _this6.data.EndDate;
-                _this6.dataPreview.Name = _this6.data.name;
-                _this6.dataPreview.time = _this6.data.time;
-
-              case 8:
+              case 4:
               case "end":
                 return _context5.stop();
             }
           }
         }, _callee5);
+      }))();
+    },
+    getEntireForm: function getEntireForm() {
+      var _this7 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        var resEntire;
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _context6.next = 2;
+                return _this7.callApi("post", "schedule/getEntire", _this7.data);
+
+              case 2:
+                resEntire = _context6.sent;
+                _this7.dataPreview = resEntire.data;
+                _this7.dataPreview.start_date = _this7.data.StartDate;
+                _this7.dataPreview.end_date = _this7.data.EndDate;
+                _this7.dataPreview.Name = _this7.data.name;
+                _this7.dataPreview.time = _this7.data.time;
+
+              case 8:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6);
       }))();
     },
     tConvert: function tConvert(time) {
@@ -55869,22 +55889,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     addSchedule: function addSchedule() {
-      var _this7 = this;
+      var _this8 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
-                _this7.validationErrors = [];
+                _this8.validationErrors = [];
 
-                if (!(_this7.data.name == "")) {
-                  _context6.next = 3;
+                if (!(_this8.data.name == "")) {
+                  _context7.next = 3;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Via Field is Required ",
                   icon: "error",
@@ -55892,12 +55912,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 3:
-                if (!(_this7.data.StartDate == "")) {
-                  _context6.next = 5;
+                if (!(_this8.data.StartDate == "")) {
+                  _context7.next = 5;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Start Date is Required",
                   icon: "error",
@@ -55905,12 +55925,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 5:
-                if (!(_this7.data.EndDate == "")) {
-                  _context6.next = 7;
+                if (!(_this8.data.EndDate == "")) {
+                  _context7.next = 7;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "End Date is Required",
                   icon: "error",
@@ -55918,12 +55938,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 7:
-                if (!(_this7.data.time == "")) {
-                  _context6.next = 9;
+                if (!(_this8.data.time == "")) {
+                  _context7.next = 9;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Schedule Time is Required",
                   icon: "error",
@@ -55931,12 +55951,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 9:
-                if (!(_this7.data.busClass == "")) {
-                  _context6.next = 11;
+                if (!(_this8.data.busClass == "")) {
+                  _context7.next = 11;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Bus Class is Required",
                   icon: "error",
@@ -55944,12 +55964,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 11:
-                if (!(_this7.data.route == "")) {
-                  _context6.next = 13;
+                if (!(_this8.data.route == "")) {
+                  _context7.next = 13;
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context7.abrupt("return", swal({
                   title: "Required!",
                   text: "Route is Required",
                   icon: "error",
@@ -55957,16 +55977,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 13:
-                _this7.data.cities = _this7.cities;
-                _this7.loading = true;
-                _context6.next = 17;
-                return _this7.callApi("post", "schedule/store", _this7.data);
+                _this8.data.cities = _this8.cities;
+                _this8.loading = true;
+                _context7.next = 17;
+                return _this8.callApi("post", "schedule/store", _this8.data);
 
               case 17:
-                res = _context6.sent;
+                res = _context7.sent;
 
                 if (res.status == 201) {
-                  _this7.close();
+                  _this8.close();
 
                   swal({
                     title: "Success",
@@ -55975,16 +55995,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
 
-                  _this7.clearForm();
+                  _this8.clearForm();
 
                   $('#schedule_table').DataTable().destroy();
-                  _this7.loading = false;
+                  _this8.loading = false;
 
-                  _this7.fetchSchedule();
+                  _this8.fetchSchedule();
                 } else {
                   if (res.status == 422) {
                     (function () {
-                      _this7.loading = false;
+                      _this8.loading = false;
                       var errorContent = "";
                       var count = 0;
 
@@ -56008,126 +56028,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 19:
               case "end":
-                return _context6.stop();
-            }
-          }
-        }, _callee6);
-      }))();
-    },
-    updateSchedule: function updateSchedule() {
-      var _this8 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-        var resEdit;
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                if (!(_this8.dataEdit.schedules.name == "" || typeof _this8.dataEdit.schedules.name == "undefined")) {
-                  _context7.next = 2;
-                  break;
-                }
-
-                return _context7.abrupt("return", swal({
-                  title: "Required!",
-                  text: "name is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 2:
-                if (!(_this8.dataEdit.schedules.start_date == "" || typeof _this8.dataEdit.schedules.start_date == "undefined")) {
-                  _context7.next = 4;
-                  break;
-                }
-
-                return _context7.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Start Date is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 4:
-                if (!(_this8.dataEdit.schedules.end_date == "" || typeof _this8.dataEdit.schedules.end_date == "undefined")) {
-                  _context7.next = 6;
-                  break;
-                }
-
-                return _context7.abrupt("return", swal({
-                  title: "Required!",
-                  text: "End Date is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 6:
-                if (!(_this8.dataEdit.schedules.time == "" || typeof _this8.dataEdit.schedules.time == "undefined")) {
-                  _context7.next = 8;
-                  break;
-                }
-
-                return _context7.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Schedule Time is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 8:
-                _this8.loading = true;
-                _context7.next = 11;
-                return _this8.callApi("post", "schedule/update", _this8.dataEdit);
-
-              case 11:
-                resEdit = _context7.sent;
-
-                if (resEdit.status == 200) {
-                  $("#".concat(_this8.editFormID)).modal('hide');
-                  swal({
-                    title: "Success",
-                    text: "Schedule Updated Successfully",
-                    icon: "success",
-                    timer: 4000
-                  });
-                  $("#schedule_table").DataTable().destroy();
-                  _this8.loading = false;
-
-                  _this8.fetchSchedule();
-                } else {
-                  if (resEdit.status == 422) {
-                    (function () {
-                      _this8.cloneDone = false;
-                      var errorContent = "";
-                      var count = 0;
-
-                      for (var key in resEdit.data.errors) {
-                        resEdit.data.errors[key].forEach(function (element) {
-                          errorContent += ++count + " - " + //creating serial no.
-                          element + // main error
-                          "\n" // creating new line
-                          ;
-                        });
-                        swal({
-                          title: "Error",
-                          text: errorContent,
-                          icon: "error",
-                          timer: 2000
-                        });
-                      }
-                    })();
-                  }
-                }
-
-              case 13:
-              case "end":
                 return _context7.stop();
             }
           }
         }, _callee7);
       }))();
     },
-    updateScheduleTime: function updateScheduleTime() {
+    updateSchedule: function updateSchedule() {
       var _this9 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
@@ -56136,8 +56043,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                if (!(_this9.dataEditTime.start_date == "" || typeof _this9.dataEditTime.start_date == "undefined")) {
+                if (!(_this9.dataEdit.schedules.name == "" || typeof _this9.dataEdit.schedules.name == "undefined")) {
                   _context8.next = 2;
+                  break;
+                }
+
+                return _context8.abrupt("return", swal({
+                  title: "Required!",
+                  text: "name is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 2:
+                if (!(_this9.dataEdit.schedules.start_date == "" || typeof _this9.dataEdit.schedules.start_date == "undefined")) {
+                  _context8.next = 4;
                   break;
                 }
 
@@ -56148,9 +56068,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 2:
-                if (!(_this9.dataEditTime.end_date == "" || typeof _this9.dataEditTime.end_date == "undefined")) {
-                  _context8.next = 4;
+              case 4:
+                if (!(_this9.dataEdit.schedules.end_date == "" || typeof _this9.dataEdit.schedules.end_date == "undefined")) {
+                  _context8.next = 6;
                   break;
                 }
 
@@ -56161,9 +56081,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 4:
-                if (!(_this9.dataEditTime.time == "" || typeof _this9.dataEditTime.time == "undefined")) {
-                  _context8.next = 6;
+              case 6:
+                if (!(_this9.dataEdit.schedules.time == "" || typeof _this9.dataEdit.schedules.time == "undefined")) {
+                  _context8.next = 8;
                   break;
                 }
 
@@ -56174,12 +56094,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 6:
+              case 8:
                 _this9.loading = true;
-                _context8.next = 9;
-                return _this9.callApi("post", "schedule/time/update", _this9.dataEditTime);
+                _context8.next = 11;
+                return _this9.callApi("post", "schedule/update", _this9.dataEdit);
 
-              case 9:
+              case 11:
                 resEdit = _context8.sent;
 
                 if (resEdit.status == 200) {
@@ -56219,7 +56139,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 }
 
-              case 11:
+              case 13:
               case "end":
                 return _context8.stop();
             }
@@ -56227,27 +56147,127 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee8);
       }))();
     },
-    edit: function edit(schedule) {
+    updateScheduleTime: function updateScheduleTime() {
       var _this10 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
-        var resEditSchedule;
+        var resEdit;
         return _regeneratorRuntime().wrap(function _callee9$(_context9) {
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
-                _context9.next = 2;
-                return _this10.callApi("post", "schedule/edit", {
+                if (!(_this10.dataEditTime.start_date == "" || typeof _this10.dataEditTime.start_date == "undefined")) {
+                  _context9.next = 2;
+                  break;
+                }
+
+                return _context9.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Start Date is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 2:
+                if (!(_this10.dataEditTime.end_date == "" || typeof _this10.dataEditTime.end_date == "undefined")) {
+                  _context9.next = 4;
+                  break;
+                }
+
+                return _context9.abrupt("return", swal({
+                  title: "Required!",
+                  text: "End Date is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 4:
+                if (!(_this10.dataEditTime.time == "" || typeof _this10.dataEditTime.time == "undefined")) {
+                  _context9.next = 6;
+                  break;
+                }
+
+                return _context9.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Schedule Time is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 6:
+                _this10.loading = true;
+                _context9.next = 9;
+                return _this10.callApi("post", "schedule/time/update", _this10.dataEditTime);
+
+              case 9:
+                resEdit = _context9.sent;
+
+                if (resEdit.status == 200) {
+                  $("#".concat(_this10.editFormID)).modal('hide');
+                  swal({
+                    title: "Success",
+                    text: "Schedule Updated Successfully",
+                    icon: "success",
+                    timer: 4000
+                  });
+                  $("#schedule_table").DataTable().destroy();
+                  _this10.loading = false;
+
+                  _this10.fetchSchedule();
+                } else {
+                  if (resEdit.status == 422) {
+                    (function () {
+                      _this10.cloneDone = false;
+                      var errorContent = "";
+                      var count = 0;
+
+                      for (var key in resEdit.data.errors) {
+                        resEdit.data.errors[key].forEach(function (element) {
+                          errorContent += ++count + " - " + //creating serial no.
+                          element + // main error
+                          "\n" // creating new line
+                          ;
+                        });
+                        swal({
+                          title: "Error",
+                          text: errorContent,
+                          icon: "error",
+                          timer: 2000
+                        });
+                      }
+                    })();
+                  }
+                }
+
+              case 11:
+              case "end":
+                return _context9.stop();
+            }
+          }
+        }, _callee9);
+      }))();
+    },
+    edit: function edit(schedule) {
+      var _this11 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
+        var resEditSchedule;
+        return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+          while (1) {
+            switch (_context10.prev = _context10.next) {
+              case 0:
+                _context10.next = 2;
+                return _this11.callApi("post", "schedule/edit", {
                   id: schedule.id
                 });
 
               case 2:
-                resEditSchedule = _context9.sent;
+                resEditSchedule = _context10.sent;
 
                 if (resEditSchedule.status == 200) {
-                  _this10.dataEdit.schedules = resEditSchedule.data.schedules;
-                  _this10.dataEdit.terminals = resEditSchedule.data.visibilities;
-                  _this10.dataEdit.discountTerminals = resEditSchedule.data.discountTerminals;
+                  _this11.dataEdit.schedules = resEditSchedule.data.schedules;
+                  _this11.dataEdit.terminals = resEditSchedule.data.visibilities;
+                  _this11.dataEdit.discountTerminals = resEditSchedule.data.discountTerminals;
                   setTimeout(function () {
                     $("#editTerminal").select2({
                       closeOnSelect: false
@@ -56258,27 +56278,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }, 200);
                 }
 
-                $("#".concat(_this10.editFormID)).modal('show');
+                $("#".concat(_this11.editFormID)).modal('show');
 
               case 5:
-              case "end":
-                return _context9.stop();
-            }
-          }
-        }, _callee9);
-      }))();
-    },
-    editTime: function editTime(schedule) {
-      var _this11 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
-        return _regeneratorRuntime().wrap(function _callee10$(_context10) {
-          while (1) {
-            switch (_context10.prev = _context10.next) {
-              case 0:
-                _this11.dataEditTime.schedule_id = schedule.id;
-
-              case 1:
               case "end":
                 return _context10.stop();
             }
@@ -56286,25 +56288,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee10);
       }))();
     },
-    genericData: function genericData() {
+    editTime: function editTime(schedule) {
       var _this12 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
-        var resCommon;
         return _regeneratorRuntime().wrap(function _callee11$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
               case 0:
-                _context11.next = 2;
-                return _this12.callApi("post", "schedule/genericCommon");
+                _this12.dataEditTime.schedule_id = schedule.id;
 
-              case 2:
-                resCommon = _context11.sent;
-                _this12.editDiscounts = resCommon.data.discount;
-                _this12.editSurcharges = resCommon.data.surcharge;
-                _this12.editRoutes = resCommon.data.route;
-
-              case 6:
+              case 1:
               case "end":
                 return _context11.stop();
             }
@@ -56312,24 +56306,50 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee11);
       }))();
     },
-    hideSchedule: function hideSchedule() {
+    genericData: function genericData() {
       var _this13 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
-        var resHide, _loop, key;
-
+        var resCommon;
         return _regeneratorRuntime().wrap(function _callee12$(_context12) {
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
-                _this13.loading = true;
-                _context12.next = 3;
-                return _this13.callApi("post", 'schedule/hide', {
-                  id: _this13.delId
+                _context12.next = 2;
+                return _this13.callApi("post", "schedule/genericCommon");
+
+              case 2:
+                resCommon = _context12.sent;
+                _this13.editDiscounts = resCommon.data.discount;
+                _this13.editSurcharges = resCommon.data.surcharge;
+                _this13.editRoutes = resCommon.data.route;
+
+              case 6:
+              case "end":
+                return _context12.stop();
+            }
+          }
+        }, _callee12);
+      }))();
+    },
+    hideSchedule: function hideSchedule() {
+      var _this14 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13() {
+        var resHide, _loop, key;
+
+        return _regeneratorRuntime().wrap(function _callee13$(_context13) {
+          while (1) {
+            switch (_context13.prev = _context13.next) {
+              case 0:
+                _this14.loading = true;
+                _context13.next = 3;
+                return _this14.callApi("post", 'schedule/hide', {
+                  id: _this14.delId
                 });
 
               case 3:
-                resHide = _context12.sent;
+                resHide = _context13.sent;
 
                 if (resHide.status == 200) {
                   $(".modal").click();
@@ -56339,17 +56359,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     icon: "success",
                     timer: 2000
                   });
-                  _this13.loading = false;
+                  _this14.loading = false;
                   $('#schedule_table').DataTable().destroy();
 
-                  _this13.fetchSchedule();
+                  _this14.fetchSchedule();
                 } else {
                   if (resHide.status == 422) {
-                    _this13.loading = false;
+                    _this14.loading = false;
 
                     _loop = function _loop(key) {
                       resHide.data.errors[key].forEach(function (element) {
-                        _this13.errorsArray(element, key);
+                        _this14.errorsArray(element, key);
                       });
                     };
 
@@ -56359,26 +56379,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
 
                   setTimeout(function () {
-                    _this13.loading = false;
+                    _this14.loading = false;
                   }, 3000);
                 }
 
               case 5:
               case "end":
-                return _context12.stop();
+                return _context13.stop();
             }
           }
-        }, _callee12);
+        }, _callee13);
       }))();
     }
   },
   watch: {
     'data.addTerminalsOnClick': {
       handler: function handler() {
-        var _this14 = this;
+        var _this15 = this;
 
         this.terminalNames = this.data.addTerminalsOnClick.map(function (item) {
-          var terminalObject = _this14.cities.find(function (terminal) {
+          var terminalObject = _this15.cities.find(function (terminal) {
             return terminal.terminal.some(function (t) {
               return t.id == item.terminal_id;
             });
@@ -56393,10 +56413,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     'dataEdit.schedules.route_city_terminal': {
       handler: function handler() {
-        var _this15 = this;
+        var _this16 = this;
 
         this.dataEdit.editSequence = this.dataEdit.schedules.route_city_terminal.map(function (item) {
-          var terminalObject = _this15.dataEdit.cities.find(function (terminal) {
+          var terminalObject = _this16.dataEdit.cities.find(function (terminal) {
             return terminal.terminal.some(function (t) {
               return t.id == item.terminal_id;
             });
