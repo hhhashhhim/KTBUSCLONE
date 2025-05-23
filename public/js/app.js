@@ -55644,16 +55644,52 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var res, resGetAllRoutes, resGetAllTerminals, resGetAllClasses, resGetBusClasses, resSurcharge, resDiscount;
+        var resGetAllRoutes, resGetAllTerminals, resGetAllClasses, resGetBusClasses, resSurcharge, resDiscount, res;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 _this5.tableLoading = true;
                 _context4.next = 3;
-                return _this5.callApi("post", "schedule", _this5.filterData);
+                return _this5.callApi("post", "schedule/getRoute");
 
               case 3:
+                resGetAllRoutes = _context4.sent;
+                _this5.routes = resGetAllRoutes.data;
+                _context4.next = 7;
+                return _this5.callApi("post", "schedule/getTerminals");
+
+              case 7:
+                resGetAllTerminals = _context4.sent;
+                _this5.allTerminals = resGetAllTerminals.data;
+                _context4.next = 11;
+                return _this5.callApi("post", "schedule/fare-class");
+
+              case 11:
+                resGetAllClasses = _context4.sent;
+                _this5.fareClasses = resGetAllClasses.data;
+                _context4.next = 15;
+                return _this5.callApi("post", "schedule/bus_classes");
+
+              case 15:
+                resGetBusClasses = _context4.sent;
+                _this5.busClasses = resGetBusClasses.data;
+                _context4.next = 19;
+                return _this5.callApi("post", "schedule/surcharge/getSelective");
+
+              case 19:
+                resSurcharge = _context4.sent;
+                _this5.surcharges = resSurcharge.data;
+                _context4.next = 23;
+                return _this5.callApi("post", "schedule/discount/getSelective");
+
+              case 23:
+                resDiscount = _context4.sent;
+                _this5.discounts = resDiscount.data;
+                _context4.next = 27;
+                return _this5.callApi("post", "schedule", _this5.filterData);
+
+              case 27:
                 res = _context4.sent;
 
                 if (res.status == 200) {
@@ -55669,43 +55705,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 //     });
                 // }, 300);
 
-
-                _context4.next = 7;
-                return _this5.callApi("post", "schedule/getRoute");
-
-              case 7:
-                resGetAllRoutes = _context4.sent;
-                _this5.routes = resGetAllRoutes.data;
-                _context4.next = 11;
-                return _this5.callApi("post", "schedule/getTerminals");
-
-              case 11:
-                resGetAllTerminals = _context4.sent;
-                _this5.allTerminals = resGetAllTerminals.data;
-                _context4.next = 15;
-                return _this5.callApi("post", "schedule/fare-class");
-
-              case 15:
-                resGetAllClasses = _context4.sent;
-                _this5.fareClasses = resGetAllClasses.data;
-                _context4.next = 19;
-                return _this5.callApi("post", "schedule/bus_classes");
-
-              case 19:
-                resGetBusClasses = _context4.sent;
-                _this5.busClasses = resGetBusClasses.data;
-                _context4.next = 23;
-                return _this5.callApi("post", "schedule/surcharge/getSelective");
-
-              case 23:
-                resSurcharge = _context4.sent;
-                _this5.surcharges = resSurcharge.data;
-                _context4.next = 27;
-                return _this5.callApi("post", "schedule/discount/getSelective");
-
-              case 27:
-                resDiscount = _context4.sent;
-                _this5.discounts = resDiscount.data;
 
               case 29:
               case "end":
