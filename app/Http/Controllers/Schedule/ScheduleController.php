@@ -33,7 +33,7 @@ class ScheduleController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return ScheduleDetail::get();
+        return ScheduleDetail::limit(5000)->get();
         $schedules = ScheduleDetail::
         with('schedule.route','bus_class')
         ->whereHas('schedule', function($q)use($request){
