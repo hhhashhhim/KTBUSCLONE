@@ -35,7 +35,7 @@ class ScheduleController extends Controller
         }
         
         $schedules = ScheduleDetail::
-        with('schedule.route','bus_class')
+        // with('schedule.route','bus_class')
         // ->whereHas('schedule', function($q)use($request){
         //     // $q->where("hide",0);
         //     if($request->route)
@@ -53,10 +53,10 @@ class ScheduleController extends Controller
         //         $q->where("bus_class_id",$request->bus_class);
         //     }
         // })
-        ->where(['company_id' => Auth::user()->company_id])
-        ->orderby("schedule_date","DESC")
-        ->orderby("id","ASC")
-        ->get()->unique("schedule_id");
+        // ->where(['company_id' => Auth::user()->company_id])
+        // ->orderby("schedule_date","DESC")
+        // ->orderby("id","ASC")
+        get()->unique("schedule_id");
 
         return $schedules;
     }
