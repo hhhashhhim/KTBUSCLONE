@@ -1,9 +1,3 @@
-# Extend PHP execution time
-<IfModule mod_php7.c>
-    php_value max_execution_time 300
-    php_value memory_limit 512M
-</IfModule>
-
 RewriteEngine On
 
 RewriteCond %{REQUEST_FILENAME} -d [OR]
