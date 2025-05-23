@@ -55,6 +55,7 @@ class ScheduleController extends Controller
         })
         ->where(['company_id' => Auth::user()->company_id])
         ->orderby("id","ASC")
+        ->limit(50)
         ->get()->unique("schedule_id");
 
         return $schedules;
