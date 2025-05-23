@@ -36,13 +36,13 @@ class ScheduleController extends Controller
         
         $schedules = ScheduleDetail::
         with('schedule.route','bus_class')
-        ->whereHas('schedule', function($q)use($request){
-            // $q->where("hide",0);
-            if($request->route)
-            {
-                return $q->where("route_id",$request->route);
-            }
-        })
+        // ->whereHas('schedule', function($q)use($request){
+        //     // $q->where("hide",0);
+        //     if($request->route)
+        //     {
+        //         return $q->where("route_id",$request->route);
+        //     }
+        // })
         ->where(function($q)use($request){
             if($request->departure_date)
             {
