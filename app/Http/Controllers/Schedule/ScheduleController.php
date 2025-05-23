@@ -33,32 +33,37 @@ class ScheduleController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        
-        $schedules = ScheduleDetail::
-        with('schedule.route','bus_class')
-        ->whereHas('schedule', function($q)use($request){
-            $q->where("hide",0);
-            if($request->route)
-            {
-                return $q->where("route_id",$request->route);
-            }
-        })
-        ->where(function($q)use($request){
-            if($request->departure_date)
-            {
-                $q->where("schedule_date",$request->departure_date);
-            }
-            if($request->bus_class)
-            {
-                $q->where("bus_class_id",$request->bus_class);
-            }
-        })
-        ->where(['company_id' => Auth::user()->company_id])
-        ->orderby("id","ASC")
-        ->limit(50)
-        ->get()->unique("schedule_id");
+        try {
+            $schedules = ScheduleDetail::
+            with('schedule.route','bus_class')
+            ->whereHas('schedule', function($q)use($request){
+                $q->where("hide",0);
+                if($request->route)
+                {
+                    return $q->where("route_id",$request->route);
+                }
+            })
+            ->where(function($q)use($request){
+                if($request->departure_date)
+                {
+                    $q->where("schedule_date",$request->departure_date);
+                }
+                if($request->bus_class)
+                {
+                    $q->where("bus_class_id",$request->bus_class);
+                }
+            })
+            ->where(['company_id' => Auth::user()->company_id])
+            ->orderby("id","ASC")
+            ->limit(200)
+            ->get()->unique("schedule_id");
 
-        return $schedules;
+            return $schedules;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
     }
 
     public function storeSchedule(Request $request)
