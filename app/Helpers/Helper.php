@@ -1104,6 +1104,9 @@ if (!function_exists('updateAdvancedSeatApi')) {
 if (!function_exists('updateFareTable')) {
     function updateFareTable($company_id)
     {
+        // these method create record in fare table with combination of fare class|city from|city to
+
+        
         $fareClasses = FareClass::where('company_id', $company_id)->get();
         $cities = City::where('company_id', $company_id)->get();
         $cityIds = $cities->pluck('id')->all();
