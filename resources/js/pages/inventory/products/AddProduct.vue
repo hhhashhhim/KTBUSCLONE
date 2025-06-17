@@ -123,7 +123,7 @@
                           <label>Product Name <span class="text-danger">*</span></label>
                           <input type="text" class="form-control" required placeholder="Enter Product Name" v-model="data.name" />
                         </div>
-                        <div class="col-md-12 text-right"> 
+                        <div class="col-md-12 text-right mb-4"> 
                           <button type="button" class="btn btn-primary px-3" :disabled="loading" @click="createProduct">
                             {{ loading ? 'Loading...' : 'Add' }}
                           </button>
@@ -357,7 +357,7 @@
           const response = await this.callApi('post', 'inventory-product/store', this.data);
           console.log(response); 
           if (response.status === 200 || response.status === 201) {
-            //this.clearForm();
+            this.clearForm();
             this.fetchProducts();
             this.loading = false;
             return Swal.fire({
@@ -426,12 +426,13 @@
     },
     async deleteProduct() {
         try {
-          await this.callApi('post', 'inventory-product/delete', { id: this.deleteId });
+          const response = await this.callApi('post', 'inventory-product/delete', { id: this.deleteId });
           this.success = 'Product deleted successfully.';
           this.fetchProducts(); // Refresh list
           this.deleteId = null; // Reset
           if (response.status === 200 || response.status === 201) {
             this.loading = false;
+            $("#deleteConfirmModal").click();
             this.fetchProducts();
             //this.clearForm();
             return Swal.fire({

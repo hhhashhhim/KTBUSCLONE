@@ -322,6 +322,7 @@ import AddProductModal from '../modal/addProductsModal.vue';
         const response = await this.callApi('post', 'mr/store', payload);
         if (response.status === 200 || response.status === 201) { 
             this.loading = false;
+            this.productsList = [];
             this.fetchMRs();
             return Swal.fire({
               icon: 'success',
@@ -368,6 +369,7 @@ import AddProductModal from '../modal/addProductsModal.vue';
           const response = await this.callApi('post', 'mr/detail-update', payload);
           if (response.status === 200 || response.status === 201) { 
             this.loading = false;
+            $("#viewMRModal").click();
             this.fetchMRs();
             this.clearForm();
             return Swal.fire({

@@ -9,7 +9,7 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body p-0">
+                    <div class="modal-body p-0" style="overflow-y:unset">
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="name">Name <span class="text-danger ml-1">*</span></label>
@@ -23,7 +23,7 @@
                             close
                         </button>
                     </div>
-                    <div class="card m-2 p-2">  
+                    <div class="card m-2 p-2 overflow-auto">  
                         <div class="table-responsive">
                     <table class="table table-striped table-hover dataTable1">
                       <thead>

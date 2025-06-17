@@ -252,11 +252,13 @@ export default {
           cnic: this.data.cnic
         };
         const response = await this.callApi('post', 'supplier/store', payload);
-        $(".dataTable1").DataTable().destroy();
+      
 
         if (response.status === 200 || response.status === 201) {
+          
           $(".dataTable1").DataTable().destroy();
             this.loading = false;
+            this.clearForm();
             this.fetchSuppliers(); 
             return Swal.fire({
               icon: 'success',
@@ -324,13 +326,14 @@ export default {
     },
 
     async deleteSupplier() {
-     const response = await this.callApi('post', `supplier/delete`,{ id: this.deleteId }); 
-        $(".dataTable1").DataTable().destroy();
+      try {
+        const response = await this.callApi('post', `supplier/delete`,{ id: this.deleteId }); 
+        
         if (response.status === 200 || response.status === 201) {
           $(".dataTable1").DataTable().destroy();
             this.loading = false;
+            
             this.fetchSuppliers();
-            this.clearForm();
             return Swal.fire({
               icon: 'success',
               title: 'Deleted',
@@ -348,7 +351,11 @@ export default {
         else{
             Swal.fire('Error', err.response?.data , 'error');
         } 
+      } catch (error) {
+        console.error('Error deleting product:', error);
+      }
     }
+    
   }
 };
 </script>

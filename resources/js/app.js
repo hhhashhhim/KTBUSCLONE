@@ -8,6 +8,8 @@ import store from './store.js';
 import  router  from './routes.js';
 import globalFunctions from './helpers/GlobalFunctions.js'
 
+window.Swal = require('sweetalert2');
+
 // Admin Panel Customization
 // Vue.mixin(common); // Adding Common Functions
 
