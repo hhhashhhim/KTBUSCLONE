@@ -17,6 +17,90 @@
                 <li class="dropdown" v-if="checkPermission('admin')">
                     <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
                         <span>
+                            Inventory
+                        </span>  
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown">
+                        <router-link
+                            class="nav-link text-capitalize d-flex justify-content-between"
+                            :to="{ name: 'MR' }"
+                        >
+                            <span><i class="far fa-file"></i> MR</span>
+                          </router-link>
+                        </li>
+                        <li class="dropdown">
+                            <router-link
+                                class="nav-link text-capitalize d-flex justify-content-between"
+                                :to="{ name: 'PR' }"
+                            >
+                                <span><i class="far fa-file"></i> PRN</span>
+                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ mrsQty || 0 }}</span>
+                            </router-link>
+                            </li>
+                            <li class="dropdown">
+                            <router-link
+                                class="nav-link text-capitalize d-flex justify-content-between"
+                                :to="{ name: 'BidSummary' }"
+                            >
+                                <span><i class="far fa-file"></i>Bid Summary</span>
+                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ prnsQty || 0 }}</span>
+                            </router-link>
+                            </li>
+                            <li class="dropdown">
+                            <router-link
+                                class="nav-link text-capitalize d-flex justify-content-between"
+                                :to="{ name: 'PO' }"
+                            >
+                                <span><i class="far fa-file"></i> PO</span>
+                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ bidsQty || 0 }}</span>
+                            </router-link>
+                            </li>
+                        <li class="dropdown" v-if="checkForSubmenu('terminals')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'stockInward' }">
+                                <span><i class="fa fa-warehouse"></i>  Stock Inward</span>
+                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ posQty || 0 }}</span>
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('terminals')">
+                        <router-link class="nav-link text-capitalize" :to="{ name: 'stockOutward' }"> 
+                            <span><i class="fa fa-warehouse"></i>  Stock Outward</span>
+                            <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ mrsQty || 0 }}</span>
+                        </router-link>  
+                        </li>
+                        <!-- <li class="dropdown" v-if="checkForSubmenu('terminals')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'stock' }">
+                                <i class="fa fa-landmark"></i> Stock
+                            </router-link>
+                        </li> -->
+                        <li class="dropdown" v-if="checkForSubmenu('terminals')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'products' }">
+                                <i class="fab fa-product-hunt"></i> Products
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('cities')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'suppliers' }">
+                                <i class="fas fa-user-tag"></i> Suppliers
+                            </router-link>
+                        </li>
+                      
+                        <!-- <li class="dropdown" v-if="checkForSubmenu('cities')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'gpo' }">
+                                <i class="fas fa-city"></i> GPO
+                            </router-link>
+                        </li> -->
+
+                        <li class="dropdown">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'reports' }">
+                                <i class="far fa-file"></i> Reports
+                            </router-link>
+                        </li>
+                        
+                    </ul>
+                </li>
+                <li class="dropdown" v-if="checkPermission('admin')">
+                    <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
+                        <span>
                             Admin
                         </span>
                     </a>

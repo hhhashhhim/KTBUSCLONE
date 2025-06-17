@@ -69,6 +69,17 @@ import OverIssuePage from "./pages/Cancel/OverIssuePage.vue";
 import ReschedulePage from "./pages/Cancel/ReschedulePage.vue";
 import CounterExpensesPage from "./pages/expense/CounterExpensesPage.vue";
 import OfficeExpensesPage from "./pages/expense/OfficeExpensesPage.vue";
+import InventoryProduct from "./pages/inventory/products/AddProduct.vue";
+import Stock from "./pages/inventory/products/Stock.vue";
+import StockInward from "./pages/inventory/products/StockInward.vue";
+import StockOutward from "./pages/inventory/products/StockOutward.vue";
+import Suppliers from "./pages/inventory/products/Supplier.vue";
+import GPO from "./pages/inventory/products/Gpo.vue";
+import PO from "./pages/inventory/products/PurchaseOrder.vue";
+import MR from "./pages/inventory/products/MaterialRequest.vue";
+import Reports from "./pages/inventory/products/reports.vue";
+import BidSummary from "./pages/inventory/products/BidSummary.vue";
+import PR from "./pages/inventory/products/PurchaseRequisitionNote.vue";
 
 // const url = '/kt-dev/'
 const url = '/'
@@ -424,6 +435,62 @@ const routes = [
         path: url + "counter/expenses",
         component: CounterExpensesPage,
         name: "counter-expenses-page"
+    },
+
+    {
+        path: url + "inventory/products",
+        component: InventoryProduct,
+        name: "products"
+    },
+    {
+        path: url + "inventory/stock",
+        component: Stock,
+        name: "stock"
+    },
+    {
+        path: url + "inventory/stock-inwards",
+        component: StockInward,
+        name: "stockInward"
+    },
+    {
+        path: url + "inventory/stock-outwards",
+        component: StockOutward,
+        name: "stockOutward"
+    },
+    {
+        path: url + "inventory/suppliers",
+        component: Suppliers,
+        name: "suppliers"
+    },
+    {
+        path: url + "inventory/gpo",
+        component: GPO,
+        name: "gpo"
+    },
+    {
+        path: url + "inventory/MR",
+        component: MR,
+        name: "MR"
+    },
+    {
+        path: url + "inventory/PO",
+        component: PO,
+        name: "PO"
+    },
+    {
+        path: url + "inventory/reports",
+        component: Reports,
+        name: "reports"
+    },
+    {
+        path: url + "inventory/BidSummary",
+        component: BidSummary,
+        name: "BidSummary"
+    },
+    {
+        path: url + "inventory/PR",
+        component: PR,
+        name: "PR"
     },
 ]
 const router = createRouter({
