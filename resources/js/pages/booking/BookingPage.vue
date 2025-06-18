@@ -416,15 +416,28 @@
                                                 <span v-else></span>
                                             </div>
                                         </div>
-                                        <div v-else style="position: absolute;left: 40%; top: 40%;" class="lds-roller">
-                                            <div></div>
-                                            <div></div>
-                                            <div></div>
-                                            <div></div>
-                                            <div></div>
-                                            <div></div>
-                                            <div></div>
-                                            <div></div>
+                                        <!-- loader -->
+                                        <div v-else class="seat-map">
+                                            <div
+                                            v-for="rowIndex in 10"
+                                            :key="'loader-row-' + rowIndex"
+                                            class="seat-row"
+                                            >
+                                            <!-- Left 2 seat skeletons -->
+                                            <div class="d-flex">
+                                                <div class="seat-skeleton" />
+                                                <div class="seat-skeleton" />
+                                            </div>
+                                    
+                                            <!-- Aisle -->
+                                            <div class="aisle"></div>
+                                    
+                                            <!-- Right 2 seat skeletons -->
+                                            <div class="d-flex">
+                                                <div class="seat-skeleton" />
+                                                <div class="seat-skeleton" />
+                                            </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <!-- side bar -->
@@ -1814,6 +1827,16 @@ export default {
                 this.busDropCheck();
             });
         }, 500);
+
+        // loader
+        setTimeout(() => {
+            this.seatData = Array.from({ length: 40 }, (_, i) => ({
+            id: i + 1,
+            number: `S${i + 1}`,
+            occupied: Math.random() < 0.3,
+            }));
+            this.loading = false;
+        }, 2000);
     },
     methods: {
         // modal close
@@ -4419,6 +4442,14 @@ export default {
             const now = new Date();
             return this.allReSchedules.filter(option => new Date(option.departure_date + ' ' + option.departure_time) < now);
         },
+        // loader
+        rows() {
+            const result = [];
+            for (let i = 0; i < this.seatData.length; i += 4) {
+            result.push(this.seatData.slice(i, i + 4));
+            }
+            return result;
+        },
     },
 }
 ;
@@ -4688,4 +4719,62 @@ img {
     }
 }
 
+/* loader */
+.bus-seat-wrapper {
+  max-width: 420px;
+  margin: auto;
+  text-align: center;
+}
+
+.seat-map {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.seat-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.seat,
+.seat-skeleton {
+  width: 50px;
+  height: 35px;
+  line-height: 35px;
+  font-size: 13px;
+  border-radius: 6px;
+  margin: 2px; /* 👈 add spacing between seats */
+}
+
+.seat {
+  background-color: #e3f2fd;
+}
+
+.seat.occupied {
+  background-color: #ffcdd2;
+}
+
+.seat-skeleton {
+  background-color: #ccc;
+  animation: pulse 1.5s infinite;
+}
+
+.aisle {
+  width: 30px;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #ccc;
+  }
+  50% {
+    background-color: #ddd;
+  }
+  100% {
+    background-color: #ccc;
+  }
+}
 </style>
