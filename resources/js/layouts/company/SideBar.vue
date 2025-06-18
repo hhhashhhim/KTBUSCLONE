@@ -14,7 +14,7 @@
                         <i class="fas fa-desktop"></i><span>Dashboard</span></a>
                 </li>
                 <!-- Admin Panel -->
-                <li class="dropdown" v-if="checkPermission('admin')">
+                <li class="dropdown" v-if="checkPermission('fleet-maintenance')">
                     <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
                         <span>
                             Inventory
