@@ -401,7 +401,7 @@
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-parts' }"
                                          v-if="checkForSubmenu('part')">
-                                <i class="fas fa-users"></i> Maintenance Parts
+                                <i class="fas fa-users"></i> Parts Addition
                             </router-link>
                         </li>
                         <!-- <li>
@@ -413,7 +413,7 @@
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-due' }"
                                          v-if="checkForSubmenu('dues')">
-                                <i class="fas fa-users"></i> Maintenance Due
+                                <i class="fas fa-users"></i> Maintenance
                             </router-link>
                         </li>
                         <!-- <li>
