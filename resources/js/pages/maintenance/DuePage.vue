@@ -11,7 +11,7 @@
                                     href="#"
                                     data-toggle="modal"
                                     :data-target="'#' + readingFormID"
-                                    class="btn btn-primary" @click="clearForm()"
+                                    class="btn btn-warning" @click="clearForm()"
                                 >
                                     Update Meter Reading
                                 </a>
@@ -20,9 +20,14 @@
                                     href="#"
                                     data-target="#maintenance_add"
                                     data-toggle="modal"
-                                    class="btn btn-primary mx-1" @click="dueMaintenanceFrom( data=null , 1)"
+                                    class="btn btn-info mx-1" @click="dueMaintenanceFrom( data=null , 1)"
                                 >
                                     Irregular Maintenance
+                                </a>
+
+                                <a v-if="checkForSubmenuButtons('link-maintenance')" href="#" data-toggle="modal"
+                                    :data-target="'#' + linkFormID" class="btn btn-primary" @click="clearForm()">
+                                    Link New Maintenance
                                 </a>
                             </div>
                         </div>
@@ -62,26 +67,33 @@
                                                     <thead>
                                                     <tr>
                                                         <th>Fleet Name/Number</th>
-                                                        <th>Part</th>
                                                         <th>Current Reading</th>
-                                                        <th>Required Maintenance At</th>
-                                                        <th>Last Maintenance Date</th>
+                                                        <th>Total Parts</th>
+                                                        <th>Due Parts</th>
                                                         <th v-if="checkForSubmenuButtons('add-maintenance')">Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
                                                     <tr v-for="(data, i) in mainData" :key="i">
-                                                        <td>{{ data.bus_number }}</td>
-                                                        <td>{{ data.name }} </td>
-                                                        <td>{{ data.current_reading }} (km)</td>
-                                                        <td>{{ parseFloat(data.maintenance_after) + parseFloat(data.maintenance_at) }} (km)</td>
-                                                        <td>{{ data.maintenance_date??'N/A' }} </td>
-                                                        <td v-if="checkForSubmenuButtons('add-maintenance')">
-                                                            <button v-if="checkForSubmenuButtons('add-maintenance')" class="btn btn-primary mx-1"
-                                                                    data-target="#maintenance_add"
-                                                                    data-toggle="modal"
-                                                                    @click="dueMaintenanceFrom( data , 0)" title="Add Maintenance">
-                                                                    <i class="fas fa-plus"></i>
+                                                        <td :class="{'border border-danger border-right-0' : data.due_parts > 0}">{{ data.bus_number }}</td>
+                                                        <td :class="{'border border-danger border-right-0 border-left-0' : data.due_parts > 0}">{{ data.current_reading }} (km)</td>
+                                                        <td :class="{'border border-danger border-right-0 border-left-0' : data.due_parts > 0}">{{ data.total_parts }}</td>
+                                                        <td :class="{'border border-danger border-right-0 border-left-0' : data.due_parts > 0}">{{ data.due_parts }}</td>
+                                                        <td :class="{'border border-danger border-left-0' : data.due_parts > 0}">
+                                                            <button
+                                                                v-if="checkForSubmenuButtons('edit-link-maintenance')"
+                                                                class="btn btn-primary ml-1"
+                                                                data-target="#editLinking_form" data-toggle="modal"
+                                                                @click="editFleetDetails(data.bus_id)"
+                                                                title="Edit Link Part">
+                                                                <i class="far fa-edit"></i>
+                                                            </button>
+                                                            <button
+                                                                class="btn btn-info mx-1" data-toggle="modal"
+                                                                data-target="#showDetails"
+                                                                @click="fetchDueFleetDetail(data.bus_id)"
+                                                                title="View Link Part">
+                                                                <i class="far fa-eye"></i>
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -221,6 +233,332 @@
             </template>
             </Add>
 
+            <div class="modal fade" id="showDetails" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Fleet Detail</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal()">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="d-flex">
+                                        <p class="mb-0"><b>Bus Number: </b></p>
+                                        <p class="pl-2 mb-0"> {{ due_bus.bus_number??'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="d-flex">
+                                        <p class="mb-0"><b>Current Reading: </b></p>
+                                        <p class="pl-2 mb-0"> {{ due_bus.current_reading??'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div></div>
+                            </div>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+
+                                        <th>Fleet Part</th>
+                                        <th>Maintenance Required After</th>
+                                        <th>Last Maintenance At</th>
+                                        <th>Last Maintenance Date</th>
+                                        <th>Due Maintenance At</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(single, i) in due_bus.sortedPartLink" :key="i" :class="{ 'border border-danger': single.due === true }">
+
+                                        <td> {{ single.maintenance_part.name }}</td>
+                                        <td> {{ single.maintenance_after  }} (km)</td>
+                                        <td> {{ single.maintenance_at  }} (km)</td>
+                                        <td> {{ single.maintenance_date ?? 'N/A' }}</td>
+                                        <td> {{ parseInt(single.maintenance_after) + parseInt(single.maintenance_at)  }} (km)</td>
+                                        <td> 
+                                            <span v-if="single.due == true" class="badge badge-danger">Due</span>
+                                            <span v-else class="badge badge-success">Up To Date</span>
+                                        </td>
+                                        <td>
+                                            <button v-if="checkForSubmenuButtons('add-maintenance') && single.due == true" class="btn btn-primary mx-1"
+                                                    data-target="#maintenance_add"
+                                                    data-toggle="modal"
+                                                    @click="dueMaintenanceFrom( {bus_id:single.bus_id,part_id:single.part_id} , 0)" title="Add Maintenance">
+                                                    <i class="fas fa-plus"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button
+                                class="btn btn-primary mx-1" data-toggle="modal"
+                                data-target="#maintenanceRecord"
+                                @click="maintenanceRecord(due_bus.id)"
+                                title="View Link Part">
+                                Maintenance Record
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal fade" id="maintenanceRecord" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Fleet Detail</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal()">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover" id="maintenance_table">
+                                    <thead>
+                                        <tr>
+                                            <th>Evidence</th>
+                                            <th>Part</th>
+                                            <th>Company Paid</th>
+                                            <th>Maintenance Type</th>
+                                            <th>Detail</th>
+                                            <th>Date</th>
+                                            <th v-if="checkForSubmenuButtons('edit-maintenance')">Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(data, i) in record" :key="i">
+                                            <td>
+                                                <a :href="($store.state.app_url + 'uploads/maintenance/' + data.evidence)"
+                                                    target="_blank">
+                                                    <img :src="($store.state.app_url + 'uploads/maintenance/' + data.evidence)"
+                                                        style="width:70px;height:70px;" alt="">
+                                                </a>
+                                            </td>
+                                            <td>{{ data.part_name.name }} </td>
+                                            <td>{{ data.company_paid }} </td>
+                                            <td>{{ data.maintenance_type == 1 ? 'Irregular' : 'Due' }} </td>
+                                            <td>{{ data.detail }} </td>
+                                            <td>{{ data.time }} </td>
+                                            <td v-if="checkForSubmenuButtons('edit-maintenance')">
+                                                <button v-if="checkForSubmenuButtons('edit-maintenance')"
+                                                    class="btn btn-primary mx-1"
+                                                    data-target="#maintenance_udpate" data-toggle="modal"
+                                                    @click="updateMaintenanceFrom(data)"
+                                                    title="Edit Maintenance">
+                                                    <i class="far fa-edit"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <Edit :heading="'Due Maintenance Update'" :errors="this.validationErrors" :success="success" :editForm="'maintenance_udpate'">
+                <div class="row">
+                    <div class=" form-group col-md-6">
+                        <label for="city_id">Fleet <span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" v-model="editData.fleetId" disabled>
+                            <option value="">Select Fleet</option>
+                            <option v-for="(fleet, i) in fleets" :key="i" :value="fleet.id">
+                                {{ fleet.bus_number }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class=" form-group col-md-6">
+                        <label for="city_id">Part <span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" v-model="editData.partId" disabled>
+                            <option value="">Select Part</option>
+                            <option v-for="(part, i) in parts" :key="i" :value="part.id">
+                                {{ part.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="name">Total Amount <span class="text-danger ml-1">*</span></label>
+                        <input type="number" class="form-control" placeholder="Total Amount" v-model="editData.amount" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="name">Paid By Company <span class="text-danger ml-1">*</span></label>
+                        <input type="number" class="form-control" placeholder="" v-model="editData.companyPaid" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="name">Evidence</label>
+                        <input type="file" class="form-control" placeholder="" @change="editEvidenceImage($event)" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <a :href="($store.state.app_url + 'uploads/maintenance/' + editData.evidence)" target="_blank">
+                            <img :src="($store.state.app_url + 'uploads/maintenance/' + editData.evidence)"
+                                style="width:70px;height:70px;border: 1px solid grey;" alt="">
+                            Click to Prview
+                        </a>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label for="refOfHiring">Detail <span class="text-danger ml-1">*</span></label>
+                        <textarea class="form-control" v-model="editData.detail">
+                        </textarea>
+                    </div>
+                </div>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="dueMaintenanceUpdate"
+                        :disabled="loading">{{ loading ? 'Loading...' : 'Update' }}
+                    </button>
+                </template>
+            </Edit>
+
+            <Add :heading="'Link Part With Bus'" :errors="this.validationErrors" :success="success" :formID="linkFormID">
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label for="name">Select Bus <span class="text-danger ml-1">*</span></label>
+                        <select class="form-control rounded-0" v-model="fleetId">
+                            <option value="" selected>Select Bus</option>
+                            <option v-for="(fleet, i) in fleets" :value="fleet.id" :key="i">
+                                {{ fleet.bus_number }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label for="name">Current Reading (km) <span class="text-danger ml-1">*</span></label>
+                        <input type="number" class="form-control" min="0" v-model="currentReading" />
+                    </div>
+                    <div class="col-md-12 d-flex align-items-center">
+                        <div class="col-md-6">
+                            <h5>Select Part For Maintenance</h5>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-12 d-flex align-items-center">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Part</th>
+                                    <th>Maintenance Required After (km)</th>
+                                    <th>Last Maintenance At (km)</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="index in loop" :key="index">
+                                    <td>
+                                        <select class="form-control rounded-0" @change="saveRow($event, 'rowPart')">
+                                            <option value="" selected>Select Part </option>
+                                            <option v-for="(part, i) in parts" :value="part.id" :key="i">
+                                                {{ part.name }}
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control" min="0"
+                                            @keyup="saveRow($event, 'rowAfter')" />
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control" min="0"
+                                            @keyup="saveRow($event, 'rowLast')" />
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
+                                        <button class="btn btn-outline-danger" v-if="index != 1"
+                                            @click="removeRow($event)">Remove</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="linkMaintenance" :disabled="loading">{{ loading ?
+                        'Loading...' : 'Link' }}
+                    </button>
+                </template>
+            </Add>
+
+            <Edit heading="Edit Maintenance" :errors="this.validationErrors" :success="success" :editForm="editLinkFormID">
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label for="name">Select Bus <span class="text-danger ml-1">*</span></label>
+                        <select class="form-control rounded-0" v-model="edit.fleetId">
+                            <option value="" selected>Select Bus</option>
+                            <option v-for="(fleet, i) in fleets" :value="fleet.id" :key="i">
+                                {{ fleet.bus_number }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label for="name">Current Reading (km) <span class="text-danger ml-1">*</span></label>
+                        <input type="number" class="form-control" min="0" v-model="edit.currentReading" />
+                    </div>
+                    <div class="col-md-12 d-flex align-items-center">
+                        <div class="col-md-6">
+                            <h5>Select Part For Maintenance</h5>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-12 d-flex align-items-center">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Part</th>
+                                    <th>Maintenance Required After (km)</th>
+                                    <th>Last Maintenance At (km)</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr v-for="index in edit.loop" :key="index" v-if="edit.fleetDetails.maintenance_part_link">
+                                    <td>
+                                        <select class="form-control rounded-0" @change="editSaveRow($event, 'rowPart')"
+                                            :value="edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].part_id : ''">
+                                            <option value="" selected>Select Part </option>
+                                            <option v-for="(part, i) in parts" :value="part.id" :key="i">
+                                                {{ part.name }}
+                                            </option>
+                                        </select>
+                                    </td>
+                                    <td>
+
+                                        <input type="number" class="form-control" min="0"
+                                            @keyup="editSaveRow($event, 'rowAfter')"
+                                            :value="edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_after : ''" />
+                                    </td>
+                                    <td>
+                                        <input type="number" class="form-control" min="0"
+                                            @keyup="editSaveRow($event, 'rowLast')"
+                                            :value="edit.fleetDetails.maintenance_part_link[index - 1] ? edit.fleetDetails.maintenance_part_link[index - 1].maintenance_at : ''" />
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-outline-primary mx-2" @click="editAddRow">Add</button>
+                                        <button class="btn btn-outline-danger" v-if="index != 1"
+                                            @click="editRemoveRow($event)">Remove</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="updateLinkMaintenance"
+                        :disabled="loading">{{ loading ? 'Loading...' : 'Link' }}
+                    </button>
+                </template>
+            </Edit>
+
         </div>
     </section>
 </template>
@@ -238,11 +576,22 @@ export default {
     },
     data() {
         return {
+            linkFormID: "link_add",
+            editLinkFormID: "editLinking_form",
             formID: "maintenance_add",
             readingFormID: "reading_update",
             loading : false,
             checkDisable : false,
             validationErrors: [],
+            due_bus: [],
+            record: [],
+            fleetId: "",
+            currentReading: "",
+            fleetPart: [],
+            maintenanceAfter: [],
+            maintenanceAt: [],
+            fleetDetails: [],
+            fleetParts: [],
             mainData: [],
             fleets: [],
             parts: [],
@@ -257,10 +606,31 @@ export default {
                 detail: '',
                 maintenanceType: '',
             },
+            editData: {
+                maintenanceId: '',
+                fleetId: '',
+                partId: '',
+                currentReading: '',
+                amount: '',
+                companyPaid: '',
+                evidence: '',
+                detail: '',
+                maintenanceType: '',
+            },
+            edit: {
+                fleetDetails: [],
+                fleetId: "",
+                currentReading: "",
+                fleetPart: [],
+                maintenanceAfter: [],
+                maintenanceAt: [],
+                loop: 1,
+            },
             readingData: {
                 fleetId: '',
                 currentReading: '',
             },
+            loop: 1,
         };
     },
     created() {
@@ -273,6 +643,9 @@ export default {
           this.data = {};
           this.reverseRoute = 1;
         },
+        closeModal(){
+            $(".modal").click();
+        },
         async fetchData() {
             const fleetRes = await this.callApi("post", "fleet/maintenance/due");
             if (fleetRes.status === 200) {
@@ -283,7 +656,9 @@ export default {
             }
 
             setTimeout(() => {
-                $('#maintenance_table').DataTable();
+                $('#maintenance_table').DataTable({
+                    ordering: false
+                });
             }, 300);
         },
         async dueMaintenanceFrom(data,type) {
@@ -298,6 +673,29 @@ export default {
             $("#imageField").val('');
             this.checkDisable = data ? true : false;
         },
+        async fetchDueFleetDetail(id) {
+            const fleetDetailRes = await this.callApi("post", "fleet/single/due/detail", {
+                id: id
+            });
+            if (fleetDetailRes.status === 200) {
+                this.due_bus = fleetDetailRes.data.due_bus;
+            }
+        },
+        async maintenanceRecord(id) {
+            const maintenanceRes = await this.callApi("post", "fleet/maintenance/record",{
+                bus_id: id
+            });
+            if (maintenanceRes.status === 200) {
+
+                this.record = maintenanceRes.data.mainData;
+            }
+
+            setTimeout(() => {
+                $('#maintenance_table').DataTable({
+                    ordering: false
+                });
+            }, 300);
+        },
         async evidenceImage(e) {
             if (e.target.files[0].name.match(/\.(jpg|jpeg|png|pdf|docx|doc)$/i)) {
 
@@ -308,6 +706,112 @@ export default {
             } else {
                 e.target.value = '';
                 this.postData.evidence = '';
+                return swal({
+                    title: "Invalid Format",
+                    text: "Uploaded File must be in .jpg, .jpeg, .png, .pdf, .docx, .doc",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+        },
+        async updateMaintenanceFrom(data) {
+            this.editData.maintenanceType = data.maintenance_type;
+            this.editData.maintenanceId = data.id;
+            this.editData.fleetId = data.bus_id;
+            this.editData.partId = data.part_id;
+            this.editData.currentReading = data.bus_name.current_reading;
+            this.editData.amount = data.amount;
+            this.editData.companyPaid = data.company_paid;
+            this.editData.evidence = data.evidence;
+            this.editData.detail = data.detail;
+        },
+        async dueMaintenanceUpdate() {
+            // validation for empty data
+            if (!this.editData.fleetId || !this.editData.partId || !this.editData.currentReading || !this.editData.amount ||
+                !this.editData.companyPaid || !this.editData.detail) {
+                return swal({
+                    title: "Error",
+                    text: "Please Fill All Field",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
+            this.loading = true;
+
+            const config = {
+                headers: { 'content-type': 'multipart/form-data' }
+            }
+
+            let formData = new FormData();
+            formData.append('maintenanceId', this.editData.maintenanceId);
+            formData.append('fleetId', this.editData.fleetId);
+            formData.append('partId', this.editData.partId);
+            formData.append('currentReading', this.editData.currentReading);
+            formData.append('amount', this.editData.amount);
+            formData.append('companyPaid', this.editData.companyPaid);
+            formData.append('evidence', this.editData.evidence);
+            formData.append('detail', this.editData.detail);
+            formData.append('maintenanceType', this.editData.maintenanceType);
+
+
+            const res = await this.callApi("post", "fleet/maintenance/due/update", formData, config);
+            if (res.status === 200) {
+                this.loading = false;
+                $('#maintenance_table').DataTable().destroy();
+                $('#maintenance_udpate').click();
+                this.editData.maintenanceId = "";
+                this.editData.maintenanceType = "";
+                this.editData.fleetId = "";
+                this.editData.partId = "";
+                this.editData.currentReading = "";
+                this.editData.amount = "";
+                this.editData.companyPaid = "";
+                this.editData.evidence = "";
+                this.editData.detail = "";
+                swal({
+                    title: "Success",
+                    text: "Maintenance Update",
+                    icon: "success",
+                    timer: 2000
+                });
+                await this.fetchData();
+                this.loading = false;
+            }
+            else {
+                this.loading = false;
+                if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
+                    }
+                }
+            }
+        },
+        async editEvidenceImage(e) {
+            if (e.target.files[0].name.match(/\.(jpg|jpeg|png|pdf|docx|doc)$/i)) {
+
+                const eviImage = e.target.files[0];
+                this.editData.evidence = eviImage;
+
+
+            } else {
+                e.target.value = '';
+                this.editData.evidence = '';
                 return swal({
                     title: "Invalid Format",
                     text: "Uploaded File must be in .jpg, .jpeg, .png, .pdf, .docx, .doc",
@@ -445,12 +949,244 @@ export default {
                 }
             }
         },
-        // changeInfo(from, to) {
-        //     this.from = from.name;
-        //     this.to = to.name;
-        //     this.data.from = from.id;
-        //     this.data.to = to.id;
-        // },
+        clearForm: function () {
+            this.data = {};
+            this.reverseRoute = 1;
+        },
+        saveRow(event, fieldName) {
+
+            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+            if (fieldName == "rowPart") {
+                this.fleetPart[getRowNumber - 1] = event.target.value;
+            }
+            if (fieldName == "rowAfter") {
+                this.maintenanceAfter[getRowNumber - 1] = event.target.value;
+            }
+            if (fieldName == "rowLast") {
+                this.maintenanceAt[getRowNumber - 1] = event.target.value;
+            }
+        },
+        editSaveRow(event, fieldName) {
+
+            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+
+            if (fieldName == "rowPart") {
+                this.edit.fleetPart[getRowNumber - 1] = event.target.value;
+            }
+            if (fieldName == "rowAfter") {
+                this.edit.maintenanceAfter[getRowNumber - 1] = event.target.value;
+            }
+            if (fieldName == "rowLast") {
+                this.edit.maintenanceAt[getRowNumber - 1] = event.target.value;
+            }
+        },
+        async linkMaintenance() {
+
+            // validation for empty data
+            if (!this.fleetId || !this.currentReading || this.fleetPart.length == 0 ||
+                this.maintenanceAfter.length == 0 || this.maintenanceAt.length == 0) {
+                return swal({
+                    title: "Error",
+                    text: "Please Fill All Field",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
+            // check if any index is empty or null in object
+            for (var i = 0; i < this.fleetPart.length; i++) {
+                if (!this.fleetPart[i] || !this.maintenanceAfter[i] || !this.maintenanceAt[i]) {
+                    return swal({
+                        title: "Error",
+                        text: "Please Fill All Field Or Remove Extra",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            }
+
+            // post data
+            const data = {
+                fleetId: this.fleetId,
+                currentReading: this.currentReading,
+                fleetPart: this.fleetPart,
+                maintenanceAfter: this.maintenanceAfter,
+                maintenanceAt: this.maintenanceAt,
+            }
+
+            this.loading = true;
+            const res = await this.callApi("post", "fleet/part/link", data);
+            if (res.status === 200) {
+                $(".modal").click();
+                this.loading = false;
+                $('#maintenance_table').DataTable().destroy();
+                this.fleetId = "";
+                this.currentReading = "";
+                this.loop = 0;
+                this.fleetPart = [];
+                this.maintenanceAfter = [];
+                this.maintenanceAt = [];
+                swal({
+                    title: "Success",
+                    text: "Maintenance Added",
+                    icon: "success",
+                    timer: 2000
+                });
+                setInterval(() => {
+                    this.loop = 1;
+                }, 2000);
+                await this.fetchData();
+                this.loading = false;
+            }
+            else {
+                this.loading = false;
+                if (res.status == 422) {
+                    this.cloneDone = false;
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
+                    }
+                }
+            }
+        },
+        async updateLinkMaintenance() {
+
+            // validation for empty data
+            if (!this.edit.fleetId || !this.edit.currentReading || this.edit.fleetPart.length == 0 ||
+                this.edit.maintenanceAfter.length == 0 || this.edit.maintenanceAt.length == 0) {
+                return swal({
+                    title: "Error",
+                    text: "Please Fill All Field",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
+            // check if any index is empty or null in object
+            for (var i = 0; i < this.edit.fleetPart.length; i++) {
+                if (!this.edit.fleetPart[i] || !this.edit.maintenanceAfter[i] || !this.edit.maintenanceAt[i]) {
+                    return swal({
+                        title: "Error",
+                        text: "Please Fill All Field Or Remove Extra",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            }
+
+            // post data
+            const data = {
+                fleetId: this.edit.fleetId,
+                currentReading: this.edit.currentReading,
+                fleetPart: this.edit.fleetPart,
+                maintenanceAfter: this.edit.maintenanceAfter,
+                maintenanceAt: this.edit.maintenanceAt,
+            }
+            this.loading = true;
+            const res = await this.callApi("post", "fleet/part/link/update", data);
+            if (res.status === 200) {
+                $(".modal").click();
+                this.loading = false;
+                $('#maintenance_table').DataTable().destroy();
+                this.edit.fleetId = "";
+                this.edit.currentReading = "";
+                this.edit.loop = 0;
+                this.edit.fleetPart = [];
+                this.edit.maintenanceAfter = [];
+                this.edit.maintenanceAt = [];
+                swal({
+                    title: "Success",
+                    text: "Maintenance Updated",
+                    icon: "success",
+                    timer: 2000
+                });
+                await this.fetchData();
+                this.loading = false;
+            }
+            else {
+                this.loading = false;
+                if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (
+                                (++count) + " - " + //creating serial no.
+                                element + // main error
+                                "\n" // creating new line
+                            );
+                        });
+                        swal({
+                            title: "Error",
+                            text: errorContent,
+                            icon: "error",
+                            timer: 2000
+                        });
+
+                    }
+                }
+            }
+        },
+        addRow() {
+            this.loop++;
+        },
+        removeRow(event) {
+            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+            this.fleetPart.splice((getRowNumber - 1), 1);
+            this.maintenanceAfter.splice((getRowNumber - 1), 1);
+            this.maintenanceAt.splice((getRowNumber - 1), 1);
+            event.target.parentElement.parentElement.remove();
+            // this.loop--;
+        },
+        editAddRow() {
+            this.edit.loop++;
+        },
+        editRemoveRow(event) {
+            const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+            this.edit.fleetPart.splice((getRowNumber - 1), 1);
+            this.edit.maintenanceAfter.splice((getRowNumber - 1), 1);
+            this.edit.maintenanceAt.splice((getRowNumber - 1), 1);
+            event.target.parentElement.parentElement.remove();
+        },
+        async editFleetDetails(id) {
+            const fleetDetailRes = await this.callApi("post", "fleet/single/part/link", {
+                id: id
+            });
+            if (fleetDetailRes.status === 200) {
+
+                // Array Empty
+                this.edit.loop = 0;
+                this.edit.fleetPart = [];
+                this.edit.maintenanceAfter = [];
+                this.edit.maintenanceAt = [];
+
+                this.edit.loop = fleetDetailRes.data.maintenance_part_link.length;
+                this.edit.fleetDetails = fleetDetailRes.data;
+                this.edit.fleetId = fleetDetailRes.data.id;
+                this.edit.currentReading = fleetDetailRes.data.current_reading;
+
+                for (var i = 0; i < fleetDetailRes.data.maintenance_part_link.length; i++) {
+                    this.edit.fleetPart.push(fleetDetailRes.data.maintenance_part_link[i].part_id);
+                    this.edit.maintenanceAfter.push(fleetDetailRes.data.maintenance_part_link[i].maintenance_after);
+                    this.edit.maintenanceAt.push(fleetDetailRes.data.maintenance_part_link[i].maintenance_at);
+                }
+
+            }
+        },
 
     },
     computed: {

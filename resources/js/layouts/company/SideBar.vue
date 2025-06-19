@@ -404,24 +404,24 @@
                                 <i class="fas fa-users"></i> Maintenance Parts
                             </router-link>
                         </li>
-                        <li>
+                        <!-- <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-link' }"
                                          v-if="checkForSubmenu('linking')">
                                 <i class="fas fa-users"></i> Maintenance Linking
                             </router-link>
-                        </li>
+                        </li> -->
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-due' }"
                                          v-if="checkForSubmenu('dues')">
                                 <i class="fas fa-users"></i> Maintenance Due
                             </router-link>
                         </li>
-                        <li>
+                        <!-- <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-record' }"
                                          v-if="checkForSubmenu('records')">
                                 <i class="fas fa-users"></i> Maintenance Record
                             </router-link>
-                        </li>
+                        </li> -->
                     </ul>
                 </li>
                 <!-- Rereshment Panel -->
