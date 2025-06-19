@@ -193,11 +193,34 @@ class FleetMaintenanceController extends Controller
         ->sortByDesc('due_parts')
         ->values(); // Reset keys (optional)
 
+        $buses = Bus::with('maintenancePartLink')->get();
+
+        $dueBusCount = 0;
+        $updateBusCount = 0;
+
+        foreach ($buses as $bus) {
+            $hasDuePart = $bus->maintenancePartLink->contains(function ($part) use ($bus) {
+                return $bus->current_reading >= ($part->maintenance_after + $part->maintenance_at);
+            });
+
+            if ($hasDuePart) {
+                $dueBusCount++;
+            } else {
+                $updateBusCount++;
+            }
+        }
+
+        $busChart = (object)[
+            'labels' => ['Due Buss', 'Update Buss'],
+            'series' => [$dueBusCount, $updateBusCount]
+        ];
+
         
         $data = [
             "mainData" => $due,
             "busDrop" => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","bus_number","current_reading"]),
             "partDrop" => MaintenancePart::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","name"]),
+            "busChart" => $busChart,
         ];
         return $data;
     }
