@@ -47,6 +47,24 @@ class FleetMaintenanceController extends Controller
             ->first();
 
     }
+    
+    public function fleetDueDetail(Request $request)
+    {
+        
+        $bus = Bus::with('maintenancePartLink.maintenancePart')->findOrFail($request->id);
+
+        $currentReading = $bus->current_reading;
+
+        $bus->sortedPartLink = $bus->maintenancePartLink->map(function ($part) use ($currentReading) {
+            // Add a "due" flag to each part
+            $part->due = $currentReading >= ($part->maintenance_after + $part->maintenance_at);
+            return $part;
+        })->sortByDesc('due')->values(); 
+
+        return [
+            "due_bus" => $bus
+        ];
+    }
 
     public function fleetPartLink(Request $request)
     {
@@ -157,16 +175,25 @@ class FleetMaintenanceController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $due = Bus::
-        where("buses.company_id",Auth::user()->company_id)
-        ->join("maintenance_part_links","maintenance_part_links.bus_id","buses.id")
-        ->join("fleet_maintenance_parts","fleet_maintenance_parts.id","maintenance_part_links.part_id")
-        ->whereRaw('buses.current_reading >= maintenance_part_links.maintenance_after + maintenance_part_links.maintenance_at')
-        ->select('buses.bus_number','buses.current_reading','maintenance_part_links.bus_id','maintenance_part_links.part_id',
-                'maintenance_part_links.maintenance_after','maintenance_part_links.maintenance_at',
-                'maintenance_part_links.maintenance_date','fleet_maintenance_parts.name')
-        ->get();
+        $due = Bus::with('maintenancePartLink')
+        ->get()
+        ->map(function ($bus) {
+            $dueParts = $bus->maintenancePartLink->filter(function ($part) use ($bus) {
+                return $bus->current_reading >= ($part->maintenance_after + $part->maintenance_at);
+            });
+    
+            return [
+                'bus_id' => $bus->id,
+                'bus_number' => $bus->bus_number,
+                'current_reading' => $bus->current_reading,
+                'due_parts' => $dueParts->count(),
+                'total_parts' => $bus->maintenancePartLink->count(),
+            ];
+        })
+        ->sortByDesc('due_parts')
+        ->values(); // Reset keys (optional)
 
+        
         $data = [
             "mainData" => $due,
             "busDrop" => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","bus_number","current_reading"]),
@@ -227,7 +254,7 @@ class FleetMaintenanceController extends Controller
         }
         try {
                 DB::beginTransaction();
-                if($request->evidence)
+                if($request->hasFile("evidence"))
                 {
                     FleetMaintenance::where("id",$request->maintenanceId)->update([
                         "evidence" => $this->image($request->evidence)??null,
@@ -291,14 +318,14 @@ class FleetMaintenanceController extends Controller
             }
     }
 
-    public function maintenanceRecord()
+    public function maintenanceRecord(Request $request)
     {
         if(!checkForSubmenu("records"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $maintenances = FleetMaintenance::
-            where("company_id", Auth::user()->company_id)
+            where(["company_id"=> Auth::user()->company_id,"bus_id"=>$request->bus_id])
             ->with("busName:id,bus_number,current_reading","partName:id,name")
             ->orderBy('time','DESC')
             ->get();

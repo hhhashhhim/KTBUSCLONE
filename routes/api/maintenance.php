@@ -21,6 +21,7 @@ Route::group(['prefix' => 'web/v1/fleet','middleware' => ['auth:sanctum']], func
     Route::post('/part/link/update', [FleetMaintenanceController::class, 'updateFleetPartLink']);
     Route::post('/single/part/link', [FleetMaintenanceController::class, 'fleetSinglePartLink']);
     Route::post('/meter/reading/update', [FleetMaintenanceController::class, 'updateMeterReading']);
+    Route::post('/single/due/detail', [FleetMaintenanceController::class, 'fleetDueDetail']);
 });
 
 
