@@ -2,6 +2,7 @@
 
 namespace App\Models\Maintenance;
 
+use App\Models\Bus\Bus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\User;
 use App\Models\Company;
@@ -27,6 +28,10 @@ class MaintenancePartLink extends Model
 
     public function company(){
         return $this->hasOne( Company::class,'id','company_id' );
+    }
+    
+    public function bus(){
+        return $this->belongsTo( Bus::class,'bus_id','id' );
     }
 
 }

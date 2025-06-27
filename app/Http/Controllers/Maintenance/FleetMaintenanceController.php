@@ -61,8 +61,28 @@ class FleetMaintenanceController extends Controller
             return $part;
         })->sortByDesc('due')->values(); 
 
+
+        $partLinks = MaintenancePartLink::with('bus')->where("bus_id",$request->id)->get();
+        $duePartCount = 0;
+        $updatePartCount = 0;
+        foreach ($partLinks as $single) {
+            
+            $hasDuePart = $single->bus->current_reading >= ($single->maintenance_after + $single->maintenance_at);
+
+            if ($hasDuePart) {
+                $duePartCount++;
+            } else {
+                $updatePartCount++;
+            }
+        }
+        $partChart = (object)[
+            'labels' => ['Due Part', 'Update Part'],
+            'series' => [$duePartCount, $updatePartCount]
+        ];
+
         return [
-            "due_bus" => $bus
+            "due_bus" => $bus,
+            "singleBusChart" => $partChart
         ];
     }
 
@@ -194,10 +214,8 @@ class FleetMaintenanceController extends Controller
         ->values(); // Reset keys (optional)
 
         $buses = Bus::with('maintenancePartLink')->get();
-
         $dueBusCount = 0;
         $updateBusCount = 0;
-
         foreach ($buses as $bus) {
             $hasDuePart = $bus->maintenancePartLink->contains(function ($part) use ($bus) {
                 return $bus->current_reading >= ($part->maintenance_after + $part->maintenance_at);
@@ -209,10 +227,27 @@ class FleetMaintenanceController extends Controller
                 $updateBusCount++;
             }
         }
-
         $busChart = (object)[
             'labels' => ['Due Buss', 'Update Buss'],
             'series' => [$dueBusCount, $updateBusCount]
+        ];
+
+        $partLinks = MaintenancePartLink::with('bus')->get();
+        $duePartCount = 0;
+        $updatePartCount = 0;
+        foreach ($partLinks as $single) {
+            
+            $hasDuePart = $single->bus->current_reading >= ($single->maintenance_after + $single->maintenance_at);
+
+            if ($hasDuePart) {
+                $duePartCount++;
+            } else {
+                $updatePartCount++;
+            }
+        }
+        $partChart = (object)[
+            'labels' => ['Due Part', 'Update Part'],
+            'series' => [$duePartCount, $updatePartCount]
         ];
 
         
@@ -221,6 +256,7 @@ class FleetMaintenanceController extends Controller
             "busDrop" => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","bus_number","current_reading"]),
             "partDrop" => MaintenancePart::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","name"]),
             "busChart" => $busChart,
+            "partChart" => $partChart,
         ];
         return $data;
     }

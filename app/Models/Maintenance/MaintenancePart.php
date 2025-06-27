@@ -23,5 +23,9 @@ class MaintenancePart extends Model
     public function company(){
         return $this->hasOne( Company::class,'id','company_id' );
     }
+    public function maintenancePartLink()
+    {
+        return $this->hasMany(maintenancePartLink::class, 'part_id', 'id');
+    }
 
 }
