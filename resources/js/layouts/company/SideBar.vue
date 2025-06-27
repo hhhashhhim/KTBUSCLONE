@@ -56,13 +56,13 @@
                                 <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ bidsQty || 0 }}</span>
                             </router-link>
                             </li>
-                        <li class="dropdown" v-if="checkForSubmenu('terminals')">
+                        <li class="dropdown">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'stockInward' }">
                                 <span><i class="fa fa-warehouse"></i>  Stock Inward</span>
                                 <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ posQty || 0 }}</span>
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('terminals')">
+                        <li class="dropdown">
                         <router-link class="nav-link text-capitalize" :to="{ name: 'stockOutward' }"> 
                             <span><i class="fa fa-warehouse"></i>  Stock Outward</span>
                             <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ mrsQty || 0 }}</span>
@@ -73,12 +73,12 @@
                                 <i class="fa fa-landmark"></i> Stock
                             </router-link>
                         </li> -->
-                        <li class="dropdown" v-if="checkForSubmenu('terminals')">
+                        <li class="dropdown">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'products' }">
                                 <i class="fab fa-product-hunt"></i> Products
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('cities')">
+                        <li class="dropdown">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'suppliers' }">
                                 <i class="fas fa-user-tag"></i> Suppliers
                             </router-link>
