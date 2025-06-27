@@ -32,6 +32,20 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            <div class="row">
+                                <div class="col-6 col-md-6 col-lg-6">
+                                    <h5>Total Bus Chart</h5>
+                                    <div class="recent-report__chart">
+                                        <div id="busChart"></div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-6 col-lg-6">
+                                    <h5>Total Part Chart</h5>
+                                    <div class="recent-report__chart">
+                                        <div id="partChart"></div>
+                                    </div>
+                                </div>
+                            </div>
                             <transition name="fade">
                                 <div
                                     class="alert alert-danger alert-dismissible fade show"
@@ -244,6 +258,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
+                            <div id="partChartInModal" style="max-width: 360px; margin: 0 auto 20px;"></div>
                             <div class="d-flex justify-content-between">
                                 <div>
                                     <div class="d-flex">
@@ -631,6 +646,9 @@ export default {
                 currentReading: '',
             },
             loop: 1,
+            chartData: null,
+            partData: null,
+            singleBusChart: null,
         };
     },
     created() {
@@ -653,6 +671,8 @@ export default {
                 this.mainData = fleetRes.data.mainData;
                 this.fleets = fleetRes.data.busDrop;
                 this.parts = fleetRes.data.partDrop;
+                this.chartData = fleetRes.data.busChart;
+                this.partData = fleetRes.data.partChart;
             }
 
             setTimeout(() => {
@@ -679,6 +699,12 @@ export default {
             });
             if (fleetDetailRes.status === 200) {
                 this.due_bus = fleetDetailRes.data.due_bus;
+                this.singleBusChart = fleetDetailRes.data.singleBusChart;
+
+
+                
+                this.renderModalPartChart();
+                
             }
         },
         async maintenanceRecord(id) {
@@ -1187,7 +1213,109 @@ export default {
 
             }
         },
+        renderModalPartChart() {
+            if (!this.singleBusChart || !this.singleBusChart.labels || !this.singleBusChart.series) {
+                return; // ⛔ don't render if data is incomplete
+            }
+            // Destroy previous chart if needed (optional for repeated openings)
+            if (this.modalPartChartInstance) {
+                this.modalPartChartInstance.destroy();
+            }
 
+            const options = {
+                chart: {
+                    type: 'pie',
+                    width: 360,
+                    height: 220
+                },
+                labels: this.singleBusChart.labels,
+                series: this.singleBusChart.series, // static sample values
+                legend: {
+                    position: 'bottom',
+                    fontSize: '12px',
+                    itemMargin: {
+                        vertical: 2
+                    }
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: { width: 200, height: 200 },
+                        legend: { position: 'bottom' }
+                    }
+                }]
+            };
+
+            this.modalPartChartInstance = new ApexCharts(
+                document.querySelector("#partChartInModal"),
+                options
+            );
+
+            this.modalPartChartInstance.render();
+        }
+
+    },
+    beforeUnmount() {
+        if (this.busChartInstance) {
+            this.busChartInstance.destroy();
+        }
+        if (this.partChartInstance) {
+            this.partChartInstance.destroy();
+        }
+    },
+    mounted() {
+        this.$watch('chartData', (newVal) => {
+            if (newVal) {
+
+                const options = {
+                    chart: { width: 360, height: 220, type: 'pie' },
+                    labels: newVal.labels,
+                    series: newVal.series,
+                    responsive: [{
+                        breakpoint: 480,
+                        options: {
+                            chart: { width: 200, height: 200 },
+                            legend: { position: 'bottom' }
+                        }
+                    }],
+                    legend: {
+                        position: 'bottom',
+                        fontSize: '12px',
+                        itemMargin: { vertical: 2 }
+                    }
+                };
+
+                this.busChartInstance = new ApexCharts(document.querySelector("#busChart"), options);
+                this.busChartInstance.render();
+            }
+        });
+
+        this.$watch('partData', (newVal) => {
+            if (newVal) {
+                const options = {
+                    chart: { width: 360, height: 220, type: 'pie' },
+                    labels: newVal.labels,
+                    series: newVal.series,
+                    responsive: [{
+                        breakpoint: 480,
+                        options: {
+                            chart: { width: 200, height: 200 },
+                            legend: { position: 'bottom' }
+                        }
+                    }],
+                    legend: {
+                        position: 'bottom',
+                        fontSize: '12px',
+                        itemMargin: { vertical: 2 }
+                    }
+                };
+
+                this.partChartInstance = new ApexCharts(document.querySelector("#partChart"), options);
+                this.partChartInstance.render();
+            }
+        });
+
+        this.renderModalPartChart();
     },
     computed: {
         ...mapGetters(["getDeletingObj"]),
