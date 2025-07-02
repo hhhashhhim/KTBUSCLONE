@@ -1380,8 +1380,8 @@ class BookingController extends Controller
         $infoData->drivers = $checkAssign ? $checkAssign->members->where("type", 1)->pluck('user_id') : [];
         $infoData->hosts = $checkAssign ? $checkAssign->members->where("type", 2)->pluck('user_id') : [];
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
-        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id,"hide"=>0])->orderBy('id')->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
-        $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id,"hide"=>0])->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
+        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id,"hide"=>0 ,"status" => "w"])->orderBy('id')->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
+        $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id,"hide"=>0 ,"status" => "w"])->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
         
         $data = [
             "buses" => $buses,

@@ -50,7 +50,6 @@ class FleetMaintenanceController extends Controller
     
     public function fleetDueDetail(Request $request)
     {
-        
         $bus = Bus::with('maintenancePartLink.maintenancePart')->findOrFail($request->id);
 
         $currentReading = $bus->current_reading;
@@ -58,6 +57,16 @@ class FleetMaintenanceController extends Controller
         $bus->sortedPartLink = $bus->maintenancePartLink->map(function ($part) use ($currentReading) {
             // Add a "due" flag to each part
             $part->due = $currentReading >= ($part->maintenance_after + $part->maintenance_at);
+            // this is for progress bar
+            $part->current_reading = $currentReading;
+            $part->alert_reading = $part->maintenance_after + $part->maintenance_at;
+            if ($part->current_reading <= $part->maintenance_at) {
+                $part->percentage = 0;
+            } else if ($part->current_reading >= $part->alert_reading) {
+                $part->percentage = 100;
+            } else {
+                $part->percentage = intVal((($part->current_reading - $part->maintenance_at) / ($part->alert_reading - $part->maintenance_at)) * 100);
+            }
             return $part;
         })->sortByDesc('due')->values(); 
 
