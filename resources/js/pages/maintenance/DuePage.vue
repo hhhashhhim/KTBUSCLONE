@@ -249,7 +249,7 @@
 
             <div class="modal fade" id="showDetails" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
-                <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Fleet Detail</h5>
@@ -258,7 +258,38 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <div id="partChartInModal" style="max-width: 360px; margin: 0 auto 20px;"></div>
+                            <div class="row">
+                                <div class="col-md-6">
+
+                                    <div id="partChartInModal" style="max-width: 360px; margin: 0 auto 20px;"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="">
+                                        <thead>
+                                            <tr>
+                                                <th width="200px">Fleet Part</th>
+                                                <th width="300px">Due Bar</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(single, i) in due_bus.sortedPartLink" :key="i">
+
+                                                <td> {{ single.maintenance_part.name }}</td>
+                                                <td class="align-middle">
+                                                    <div class="progress-text">{{ single.percentage }}%</div>
+                                                    <div class="progress" data-height="6">
+                                                        <div 
+                                                            class="progress-bar" 
+                                                            :class="getProgressColor(single.percentage)" 
+                                                            :style="{ width: single.percentage + '%' }"
+                                                        ></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                             <div class="d-flex justify-content-between">
                                 <div>
                                     <div class="d-flex">
@@ -283,6 +314,7 @@
                                         <th>Last Maintenance At</th>
                                         <th>Last Maintenance Date</th>
                                         <th>Due Maintenance At</th>
+                                        <th width="300px">Due Bar</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -295,6 +327,16 @@
                                         <td> {{ single.maintenance_at  }} (km)</td>
                                         <td> {{ single.maintenance_date ?? 'N/A' }}</td>
                                         <td> {{ parseInt(single.maintenance_after) + parseInt(single.maintenance_at)  }} (km)</td>
+                                        <td class="align-middle">
+                                            <div class="progress-text">{{ single.percentage }}%</div>
+                                            <div class="progress" data-height="6">
+                                                <div 
+                                                    class="progress-bar" 
+                                                    :class="getProgressColor(single.percentage)" 
+                                                    :style="{ width: single.percentage + '%' }"
+                                                ></div>
+                                            </div>
+                                        </td>
                                         <td> 
                                             <span v-if="single.due == true" class="badge badge-danger">Due</span>
                                             <span v-else class="badge badge-success">Up To Date</span>
@@ -705,6 +747,17 @@ export default {
                 
                 this.renderModalPartChart();
                 
+            }
+        },
+        getProgressColor(percentage) {
+            if (percentage <= 25) {
+                return 'bg-success';
+            } else if (percentage <= 50) {
+                return 'bg-grey';
+            } else if (percentage <= 75) {
+                return 'bg-orange'; // custom class
+            } else {
+                return 'bg-danger';
             }
         },
         async maintenanceRecord(id) {
