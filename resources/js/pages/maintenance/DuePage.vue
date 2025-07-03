@@ -259,35 +259,9 @@
                         </div>
                         <div class="modal-body">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
 
                                     <div id="partChartInModal" style="max-width: 360px; margin: 0 auto 20px;"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <table class="">
-                                        <thead>
-                                            <tr>
-                                                <th width="200px">Fleet Part</th>
-                                                <th width="300px">Due Bar</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-for="(single, i) in due_bus.sortedPartLink" :key="i">
-
-                                                <td> {{ single.maintenance_part.name }}</td>
-                                                <td class="align-middle">
-                                                    <div class="progress-text">{{ single.percentage }}%</div>
-                                                    <div class="progress" data-height="6">
-                                                        <div 
-                                                            class="progress-bar" 
-                                                            :class="getProgressColor(single.percentage)" 
-                                                            :style="{ width: single.percentage + '%' }"
-                                                        ></div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-between">
