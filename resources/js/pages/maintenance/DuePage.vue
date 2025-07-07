@@ -260,7 +260,6 @@
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-md-12">
-
                                     <div id="partChartInModal" style="max-width: 360px; margin: 0 auto 20px;"></div>
                                 </div>
                             </div>
@@ -288,7 +287,7 @@
                                         <th>Last Maintenance At</th>
                                         <th>Last Maintenance Date</th>
                                         <th>Due Maintenance At</th>
-                                        <th width="300px">Due Bar</th>
+                                        <th width="300px">Health Status</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -724,14 +723,14 @@ export default {
             }
         },
         getProgressColor(percentage) {
-            if (percentage <= 25) {
-                return 'bg-success';
-            } else if (percentage <= 50) {
-                return 'bg-grey';
-            } else if (percentage <= 75) {
-                return 'bg-orange'; // custom class
+            if (percentage >= 75) {
+                return 'bg-success'; // new / fresh
+            } else if (percentage >= 50) {
+                return 'bg-grey'; // moderate
+            } else if (percentage >= 25) {
+                return 'bg-orange'; // warning
             } else {
-                return 'bg-danger';
+                return 'bg-danger'; // due / expired
             }
         },
         async maintenanceRecord(id) {

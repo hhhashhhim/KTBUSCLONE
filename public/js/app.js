@@ -54179,14 +54179,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     getProgressColor: function getProgressColor(percentage) {
-      if (percentage <= 25) {
-        return 'bg-success';
-      } else if (percentage <= 50) {
-        return 'bg-grey';
-      } else if (percentage <= 75) {
-        return 'bg-orange'; // custom class
+      if (percentage >= 75) {
+        return 'bg-success'; // new / fresh
+      } else if (percentage >= 50) {
+        return 'bg-grey'; // moderate
+      } else if (percentage >= 25) {
+        return 'bg-orange'; // warning
       } else {
-        return 'bg-danger';
+        return 'bg-danger'; // due / expired
       }
     },
     maintenanceRecord: function maintenanceRecord(id) {
@@ -106122,7 +106122,7 @@ var _hoisted_82 = {
 var _hoisted_83 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fleet Part"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Maintenance Required After"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Last Maintenance At"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Last Maintenance Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Due Maintenance At"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     width: "300px"
-  }, "Due Bar"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
+  }, "Health Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
   /* HOISTED */
   );
 });
