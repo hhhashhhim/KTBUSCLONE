@@ -7,6 +7,7 @@ use App\Models\FareClass;
 use App\Models\FareTable;
 use App\Models\Terminal\TerminalVisibility;
 use App\Models\ActivityLog;
+use App\Models\LimitedSeat;
 use App\Models\Route\Route;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
@@ -80,6 +81,7 @@ class RouteController extends Controller
             $route = Route::create([
                 'name' => $request['routeStart'] . '-' . $request['routeEnd'],
                 'via' => $request['routeVia'],
+                'online_seats' => $request['routeSeat']??0,
                 'commission_route' => $request['commissioRoute'],
                 'company_id' => Auth::user()->company_id,
                 'added_by' => auth()->user()->id
@@ -124,6 +126,7 @@ class RouteController extends Controller
                 $route = Route::create([
                     'name' => $request['routeEnd'] . '-' . $request['routeStart'],
                     'via' => $request['routeVia'],
+                    'online_seats' => $request['routeSeat']??0,
                     'commission_route' => $request['commissioRoute'],
                     'company_id' => Auth::user()->company_id,
                     'added_by' => auth()->user()->id
@@ -212,6 +215,7 @@ class RouteController extends Controller
                 ])->update([
                     'name' => $request['routeStartName'] . '-' . $request['routeEndName'],
                     'via' => $request['routeVia'],
+                    'online_seats' => $request['routeSeat']??0,
                     'commission_route' => $request['commissionRoute'],
                     'online_seat_choices' => $request['online_seat_choices'],
                 ]);
@@ -353,6 +357,7 @@ class RouteController extends Controller
         }
         return [
             'visibilities' => TerminalVisibility::where(["route_id"=>$request->id,"company_id"=>Auth::user()->company_id])->with("departure:id,name","destination:id,name")->get(),
+            'limitedSeats' => LimitedSeat::where(["route_id"=>$request->id,"company_id"=>Auth::user()->company_id])->with("departure:id,name","destination:id,name")->get(),
         ];
     }
     public function visibilityUpdate(Request $request)
@@ -369,12 +374,24 @@ class RouteController extends Controller
                     "requested_host" => $request->ip(),
                     "company_id" => Auth::user()->company_id
                 ]);
+                $tervis = TerminalVisibility::where("id",$request->subroutes[0]['subroute_id'])->first();
+                LimitedSeat::where(["route_id"=>$tervis->route_id])->delete();
                 foreach($request->subroutes as $single)
                 {
-                    TerminalVisibility::where("id",$single['subroute_id'])->update([
+                    $visibility = TerminalVisibility::where("id",$single['subroute_id'])->first();
+                    LimitedSeat::create([
+                        "route_id" => $visibility->route_id,
+                        "departure_city_id" => $visibility->departure_city_id,
+                        "destination_city_id" => $visibility->destination_city_id,
+                        "limited_seat" => $single['seat'],
+                        "company_id" => Auth::user()->company_id,
+                        "added_by" => Auth::user()->id,
+                    ]);
+                    $visibility->update([
                         "online_visibilty" => $single['visibility'],
                         "booking_minutes" => $single['booking_minutes']==null ? null : abs($single['booking_minutes'])
                     ]);
+                    
                 }
                 DB::commit();
             

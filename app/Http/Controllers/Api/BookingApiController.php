@@ -34,6 +34,7 @@ use App\Models\Schedule\ScheduleTerminalVisibility;
 use App\Models\City;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\BreakResource;
+use App\Models\LimitedSeat;
 use Illuminate\Support\Facades\Cache;
 use Exception;
 
@@ -377,7 +378,7 @@ class BookingApiController extends Controller
                 $schedule = Schedule::where('id', $request->schedule_id)
                     ->where('company_id', $companyId)
                     ->select('id', 'route_id', 'bus_class_id', 'time', 'discount_id', 'surcharge_id')
-                    ->with('route:id,name,online_seat_choices', 'route.fares:id,route_id,departure_city_id,destination_city_id')
+                    ->with('route:id,name,online_seat_choices,online_seats', 'route.fares:id,route_id,departure_city_id,destination_city_id')
                     ->first();
                 $scheduleDiscount = Discount::where('id', $schedule->discount_id)
                 ->where('is_active', 1)
@@ -407,6 +408,14 @@ class BookingApiController extends Controller
                 $seatChoices =  $schedule->route->online_seat_choices ? explode(",",$schedule->route->online_seat_choices) : null;
                 // Looping Through the seat of the bus
                 $seatMap = $scheduleDetail->bus_class->seat_map;
+                $quota = $schedule->route->online_seats - $tickets->where("online_terminal",1)->count();
+                $checkLimitedSeat = LimitedSeat::where([
+                    'company_id' => $companyId,
+                    'route_id' => $schedule->route_id,
+                    'departure_city_id' => $request->departure_city_id,
+                    'destination_city_id' => $request->destination_city_id,
+                    'limited_seat' =>  1,
+                ])->first() ? true : false;
                 $count = 0;
                 foreach ($seatMap as $i => &$iValue) {
                     foreach ($iValue as $j => &$column) {
@@ -462,9 +471,16 @@ class BookingApiController extends Controller
                                 }
                             }
 
+                            // check midway quota route base seats
+                            if($checkLimitedSeat && ($quota < 1))
+                            {
+                                $column['terminal_allow'] = false;
+                            }
 
-
-
+                            if($column['terminal_allow'] == true)
+                            {
+                                $quota--;
+                            }
 
                         }
                         $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
