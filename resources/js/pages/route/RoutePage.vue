@@ -117,18 +117,22 @@
                 :formID="formID"
             >
                 <div class="row">
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="name">Route Start Point Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="routeStartName"/>
                     </div>
 
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="name">Route End Point Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="routeEndName"/>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="name">Via</label>
                         <input type="text" class="form-control" v-model="routeVia"/>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="name">Online Seats</label>
+                        <input type="number" class="form-control" v-model="routeSeat"/>
                     </div>
                     <div class="col-md-12 d-flex align-items-center">
                         <div class="col-md-6">
@@ -253,12 +257,15 @@
                                     <label for="name">Destination City</label>
                                 </div>
                                 
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-2">
                                     <label for="name" class="d-block">Minutes for advance booking</label>
                                 </div>
                                 
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-2">
                                     <label for="name" class="d-block">Hide Subroute</label>
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="name" class="d-block">Limited Seats</label>
                                 </div>
                             </div>
                             <div class="row"  v-for="(subroute, i) in subroutes" :key="i">
@@ -274,12 +281,15 @@
                                     </select>
                                 </div>
                                 
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-2">
                                     <input type="number" class="form-control" min="0" v-model="subroutes[i].booking_minutes"/>
                                 </div>
 
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-2">
                                     <input type="checkbox" v-model="subroutes[i].visibility"/>
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <input type="checkbox" v-model="subroutes[i].seat"/>
                                 </div>
                             </div>
                         </div>
@@ -298,19 +308,23 @@
                 :editForm="editFormID"
             >
                 <div class="row">
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="name">Route Start Point Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.routeStartName"/>
                     </div>
 
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="name">Route End Point Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.routeEndName"/>
                     </div>
                     
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-3">
                         <label for="name">Via</label>
                         <input type="text" class="form-control" v-model="dataEdit.routeVia"/>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="name">Online Seats</label>
+                        <input type="number" class="form-control" v-model="dataEdit.routeSeat"/>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="available_seats">Online Allowed Seats</label>
@@ -433,6 +447,7 @@ export default {
             loop: 1,
             routeStartName: '',
             routeVia: '',
+            routeSeat: '',
             commissioRoute: false,
             routeEndName: '',
             reverseRoute: 1,
@@ -482,6 +497,7 @@ export default {
                     routeStartName: routeData.data.route.name.split('-')[0],
                     routeEndName: routeData.data.route.name.split('-')[1],
                     routeVia: routeData.data.route.via,
+                    routeSeat: routeData.data.route.online_seats,
                     commissionRoute: routeData.data.route.commission_route == 1 ? true : false,
                     cityIds: routeData.data.cityIds,
                     online_seat_choices: routeData.data.route.online_seat_choices
@@ -495,6 +511,7 @@ export default {
             });
             if (routeVisibilities.status === 200) {
                 const data = routeVisibilities.data.visibilities;
+                const seatData = routeVisibilities.data.limitedSeats;
                 for (let i = 0; i < data.length; i++) {
                     this.subroutes.push(
                         { 
@@ -503,6 +520,7 @@ export default {
                             destination_name:data[i].destination.name,
                             booking_minutes:data[i].booking_minutes??null,
                             visibility:data[i].online_visibilty==0 ? false : true,
+                            seat:!!seatData[i]?.limited_seat,
                         });
                 }
             }
@@ -600,6 +618,7 @@ export default {
                 routeStart: this.routeStartName,
                 routeEnd: this.routeEndName,
                 routeVia: this.routeVia,
+                routeSeat: this.routeSeat,
                 commissioRoute: this.commissioRoute,
                 cities: this.addCities,
                 revereRoute: this.reverseRoute,
@@ -620,6 +639,7 @@ export default {
                 this.routeStartName = "";
                 this.routeEndName = "";
                 this.routeVia = "";
+                this.routeSeat = "";
                 this.loop = 1;
                 this.addCities = 0;
                 this.cities = 0;
