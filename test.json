@@ -405,6 +405,10 @@
                         "allow": true
                     },
                     {
+                        "name": "message-bus",
+                        "allow": false
+                    },
+                    {
                         "name": "bus-class",
                         "allow": true
                     },

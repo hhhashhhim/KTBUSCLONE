@@ -422,6 +422,11 @@ class BookingController extends Controller
         return ticketCanceledMessage($request->tickets);
     }
     
+    public function sendMessageToBus(Request $request)
+    {
+        return sendMessageToAllBus($request);
+    }
+    
     public function sendOtp(Request $request)
     {
         return sendOtpForTicket($request);

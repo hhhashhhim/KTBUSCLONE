@@ -963,6 +963,69 @@ Terms & conditions applied.";
     }
 }
 
+if (!function_exists('sendMessageToAllBus')) {
+    function sendMessageToAllBus($request)
+    {
+        $scheduleDetail = ScheduleDetail::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $request->scheduleId,
+            'departure_date' => $request->date,
+            'departure_id' => $request->departureCity,
+            'destination_id' => $request->destinationCity,
+            'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
+        ])->first();
+
+        $customerIds =  Ticket::where(["schedule_id"=>$scheduleDetail->schedule_id,"schedule_date"=>$scheduleDetail->schedule_date])
+        ->distinct("invoice_no")->pluck("customer_id")->toArray();
+
+        $customers = Customer::whereIn("id",$customerIds)->get();
+
+        $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
+        
+        foreach($customers as $key=>$customer)
+        {
+            // to choose random device
+            // Define an array of names
+            $names = [
+                1 => 'Hamza_4-Device1',
+                2 => 'Hamza_4-Device2-201-samsung-a20',
+                3 => 'Hamza_4-Device3-204-samsung-a20',
+                4 => 'Hamza_4-Device4',
+                5 => 'Hamza_4-Device-5'
+            ];
+            $randomNumber = rand(1, 5);
+
+
+            
+            
+            $url = "https://whatsapp.sarzone.com/api/send-messages";
+            $mobile = "92".substr($customer->contact, -10);
+            $session = $names[$randomNumber];
+            $messageConfirmed = "*$request->title*
+            
+$request->body";
+
+
+            try{
+                    $response = Http::withHeaders([
+                        'X-Api-Key'=>$auth_key,
+                    ])
+                    ->timeout(1)
+                    ->post($url, [
+                        "session" => $session,
+                        "receiver_number" => $mobile, 
+                        "message_body" => $messageConfirmed,
+                        "message_type" => 'text'
+                    ]);
+                    return $response;
+            } catch (\Exception $e) {
+
+            }
+            
+        }
+    }
+}
+
 if (!function_exists('sendOtpForTicket')) {
     function sendOtpForTicket($request)
     {
