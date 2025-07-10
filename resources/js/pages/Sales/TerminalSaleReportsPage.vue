@@ -101,7 +101,8 @@
                                                                 <th>Terminal Name</th>
                                                                 <th>Status</th>
                                                                 <th>Action By</th>
-                                                                <th>Sale / Refund</th>
+                                                                <th>Sale</th>
+                                                                <th>Refund</th>
                                                                 <th>Commission</th>
                                                             </tr>
                                                             </thead>
@@ -120,15 +121,16 @@
                                                                 <td>{{ data.terminal.name }}</td>
                                                                 <td>{{ data.type }}</td>
                                                                 <td>{{ data.updated_name.name }}</td>
-                                                                <td>{{ data.type == 'canceled' ? data.refund : (data.seat_fare - data.discount) }}</td>
+                                                                <td>{{ data.type != 'canceled' ? (data.seat_fare - data.discount) : 0 }}</td>
+                                                                <td>{{ data.type == 'canceled' ? data.refund : 0 }}</td>
                                                                 <td>{{ data.type == 'canceled' ? 0 : data.comsn }}</td>
                                                             </tr>
                                                             <tr v-if="filters.record.length > 0">
                                                                 <th colspan="7"></th>
                                                                 <th>{{ filters.record.length }}</th>
                                                                 <th colspan="4"></th>
-                                                                <th>{{ totalSeatFare() }}</th>
-                                                                <th>{{ totalCommission() }}</th>
+                                                                <th>{{ totalSaleAmount() }}</th>
+                                                                <th>{{ totalRefundAmount() }}</th>
                                                             </tr>
                                                             </tbody>
                                                         </table>
@@ -260,27 +262,30 @@ export default {
                 });
             this.$refs.salePrint.submit();
         },
-        totalSeatFare: function () {
+        totalSaleAmount: function () {
             if (this.filters.record && Array.isArray(this.filters.record)) {
                 return this.filters.record.reduce((sum, data) => {
-                    // Ensure that data.seat_fare and data.discount are numeric values
-                    if(data.type == 'canceled')
-                    {
-                        const refundValue = Number(data.refund) || 0;
-                        return sum + refundValue
-                    }
-                    else
-                    {
+                    if (data.type !== 'canceled') {
                         const seatFare = Number(data.seat_fare) || 0;
                         const discount = Number(data.discount) || 0;
-                        // Add the difference to the sum
                         return sum + (seatFare - discount);
                     }
-                    
+                    return sum;
                 }, 0);
-            } else {
-                return 0; // or handle the case when there are no records
             }
+            return 0;
+        },
+        totalRefundAmount: function () {
+            if (this.filters.record && Array.isArray(this.filters.record)) {
+                return this.filters.record.reduce((sum, data) => {
+                    if (data.type === 'canceled') {
+                        const refundValue = Number(data.refund) || 0;
+                        return sum + refundValue;
+                    }
+                    return sum;
+                }, 0);
+            }
+            return 0;
         },
         totalCommission: function () {
             if (this.filters.record && Array.isArray(this.filters.record)) {
