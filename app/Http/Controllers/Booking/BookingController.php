@@ -2042,7 +2042,7 @@ class BookingController extends Controller
         $tickets = Ticket::withTrashed()->with('overIssueSeats','overIssueSeats.overissue_by', 'scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'busClass')->where(["schedule_date" => $uniqueDate->schedule_date, "schedule_id" => $uniqueDate->schedule_id, 'type' => 'over-issue'])->get();
         foreach ($tickets as $key => $single) {
             $single->bookingDate = date('d/m/Y H:i A', strtotime($single->booked_time));
-            $single->OverIssueDate = date('d/m/Y H:i A', strtotime($single->overIssueSeats->time));
+            $single->OverIssueDate = date('d/m/Y H:i A', strtotime($single->overIssueSeats->created_at));
             $single->overIssueBy = $single->overIssueSeats->overissue_by->name??"N/A";
         }
         return $tickets;
