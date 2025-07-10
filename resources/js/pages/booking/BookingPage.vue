@@ -347,6 +347,12 @@
                                                         @click="seatDetails()">
                                                     Seat Details
                                                 </button>
+                                                <a v-if="checkForSubmenuButtons('message-bus') && hideDivButtonsDrop"
+                                                   href="#"
+                                                   class="btn btn-outline-success btn-sm mr-2" data-target="#message_modal"
+                                                   data-toggle="modal">
+                                                    Message
+                                                </a>
                                                 <button v-if="checkForSubmenuButtons('bus-class')"
                                                         class="btn btn-outline-secondary btn-sm text-dark mr-2"
                                                         @click="busClass()">
@@ -648,6 +654,48 @@
                     </div>
                     <div class="modal-footer bg-whitesmoke br">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeEltDetail()">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!--        Message MOdel-->
+        <div class="modal fade" id="message_modal" tabindex="-1" aria-labelledby="eltDetailModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Message Data</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                @click="closeMessageModal()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body m-1 p-1">
+                        <div class="card-body my-0 py-0">
+                            <div class="row mb-3">
+                            <!-- Message Title -->
+                            <div class="col-md-12">
+                                <label for="message_title" class="form-label">Message Title <span class="text-danger ml-1">*</span></label>
+                                <input type="text" id="message_title" class="form-control" v-model="messageData.title" placeholder="Enter message title">
+                            </div>
+
+                            <!-- Message Body -->
+                            <div class="col-md-12">
+                                <label for="message_body" class="form-label">Message <span class="text-danger ml-1">*</span></label>
+                                <textarea id="message_body" class="form-control" v-model="messageData.body" rows="3" placeholder="Write your message here..."></textarea>
+                            </div>
+                        </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke br">
+                        <button type="button" class="btn btn-primary" :class="{'btn-progress': messageLoader}" @click="sendMessageToBus()">
+                            Send
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeMessageModal()">
                             Close
                         </button>
                     </div>
@@ -1630,6 +1678,7 @@ export default {
                 date: '',
                 schedule_id: '',
             },
+            messageLoader : false,
             isActive: 1,
             formAddID: "addBooking",
             deleteFormID: "delete_addBooking",
@@ -1771,6 +1820,11 @@ export default {
                 ticket: [],
                 customer: [],
             },
+            
+            messageData: {
+                title: '',
+                body: ''
+            },
 
         };
     },
@@ -1851,6 +1905,9 @@ export default {
         },
         closeElt() {
             $("#addELTModel").modal('hide');
+        },
+        closeMessageModal() {
+            $(".modal").click();
         },
         closeReschedule() {
             $("#reschedule_modal").modal('hide');
@@ -2195,6 +2252,59 @@ export default {
                     $("#assignHost").select2();
                 }, 200);
             }
+        },
+        
+        async sendMessageToBus() {
+            if (this.addForm.schedule == 0) {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please open schedule first",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.messageData.title == "") {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please enter title ",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            if (this.messageData.body == "") {
+                return swal({
+                    title: "OOPS!!",
+                    text: "Please enter message body ",
+                    icon: "error",
+                    timer: 2000,
+                });
+            }
+            
+            this.messageLoader = true;
+
+            this.messageData = {
+                ...this.messageData,
+                scheduleId: this.addForm.schedule,
+                date: this.addForm.date,
+                departureCity: this.addForm.departureCity,
+                destinationCity: this.addForm.destinationCity,
+                departure_time: this.addForm.departure_time,
+            }
+
+            const resData = await this.callApi("post", "booking/whatsapp/bus/send-message",this.messageData);
+            if (resData.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "Message Sent Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+
+                this.messageData.title = "";
+                this.messageData.body = "";
+                $(".modal").click();
+            }
+            this.messageLoader = false;
         },
         
         async busClass() {

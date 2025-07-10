@@ -583,6 +583,7 @@ export default {
                                 {name: "bus-invoice", allow: true},
                                 {name: "pax-list", allow: true},
                                 {name: "seat-details", allow: true},
+                                {name: "message-bus", allow: true},
                                 {name: "bus-class", allow: true},
                                 {name: "drop-schedule", allow: true},
                                 {name: "seat-details-shortcut", allow: true},
