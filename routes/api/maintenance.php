@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CityController;
+use App\Http\Controllers\Maintenance\FaultClaimController;
 use App\Http\Controllers\Maintenance\FleetMaintenancePartController;
 use App\Http\Controllers\Maintenance\FleetMaintenanceController;
 use App\Http\Middleware\CustomMiddleware;
@@ -30,4 +32,21 @@ Route::group(['prefix' => 'web/v1/fleet/maintenance','middleware' => ['auth:sanc
     Route::post('/due/add', [FleetMaintenanceController::class, 'dueMaintenanceAdd']);
     Route::post('/record', [FleetMaintenanceController::class, 'maintenanceRecord']);
     Route::post('/due/update', [FleetMaintenanceController::class, 'dueMaintenanceUpdate']);
+});
+
+Route::middleware('auth:sanctum')->prefix('web/v1/fleet/fault-claims')->group(function () {
+    Route::post('/', [FaultClaimController::class, 'index']);
+    Route::post('/store', [FaultClaimController::class, 'store']);
+    Route::post('/show', [FaultClaimController::class, 'show']);
+});
+
+Route::middleware('auth:sanctum')->prefix('web/v1/fleet/dock-requests')->group(function () {
+    Route::post('/', [FaultClaimController::class, 'requests']);
+    Route::post('/show', [FaultClaimController::class, 'showRequest']);
+    Route::post('/approve', [FaultClaimController::class, 'approveDockRequest']);
+});
+
+Route::middleware('auth:sanctum')->prefix('web/v1/fleet/inspection-result')->group(function () {
+    Route::post('/data', [FaultClaimController::class, 'helperData']);
+    Route::post('/submit', [FaultClaimController::class, 'submitResult']);
 });
