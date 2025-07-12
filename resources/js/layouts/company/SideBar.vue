@@ -416,6 +416,14 @@
                                 <i class="fas fa-users"></i> Maintenance
                             </router-link>
                         </li>
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'fault-claim' }">
+                                <i class="fas fa-tools"></i> Fault Claim
+                            </router-link>
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'dock-request' }">
+                                <i class="fas fa-warehouse"></i> Dock Requests
+                            </router-link>
+                        </li>
                         <!-- <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-record' }"
                                          v-if="checkForSubmenu('records')">
