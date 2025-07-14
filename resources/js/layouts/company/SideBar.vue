@@ -417,10 +417,10 @@
                             </router-link>
                         </li>
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'fault-claim' }">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'fault-claim' }" v-if="checkForSubmenu('fault-claim')">
                                 <i class="fas fa-tools"></i> Fault Claim
                             </router-link>
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'dock-request' }">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'dock-request' }" v-if="checkForSubmenu('dock-request')">
                                 <i class="fas fa-warehouse"></i> Dock Requests
                             </router-link>
                         </li>

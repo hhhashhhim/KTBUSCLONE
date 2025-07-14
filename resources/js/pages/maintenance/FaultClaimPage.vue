@@ -6,7 +6,7 @@
                     <h4>Fault Claims</h4>
                     <div class="card-header-action">
                         <button class="btn btn-primary" data-toggle="modal" data-target="#faultModal"
-                            @click="clearForm">
+                            @click="clearForm" v-if="checkForSubmenuButtons('initiate-request')">
                             Initiate Request
                         </button>
                     </div>
@@ -31,10 +31,10 @@
                                     <span :class="getStatusClass(item.status)">{{ item.status }}</span>
                                 </td>
                                 <td>
-                                    <button class="btn btn-info btn-sm" @click="viewDetails(item)">
+                                    <button class="btn btn-info btn-sm" @click="viewDetails(item)" v-if="checkForSubmenuButtons('view-claim')">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button v-if="item.status === 'dock time'" class="btn btn-success btn-sm ml-2"
+                                    <button v-if="item.status === 'dock time' && checkForSubmenuButtons('add-result')" class="btn btn-success btn-sm ml-2"
                                         @click="openDockModal(item)">
                                         <i class="fas fa-plus"></i>
                                     </button>
@@ -506,6 +506,7 @@ export default {
             buses: [],
             drivers: [],
             inspection: [],
+            permissions: [],
             data: {
                 bus_id: '',
                 driver_id: '',
@@ -546,6 +547,7 @@ export default {
         await this.fetchData();
         this.addDataReset = JSON.parse(JSON.stringify(this.data));
         this.resultDataReset = JSON.parse(JSON.stringify(this.result));
+        this.permissions = this.$store.state.permissions;
     },
     watch: {
         'data.bus_id'(newVal) {

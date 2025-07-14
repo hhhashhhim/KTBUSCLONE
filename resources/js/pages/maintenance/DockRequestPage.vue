@@ -27,7 +27,7 @@
                                 </td>
                                 <td>{{ item.dock_requests ? item.dock_requests[item.dock_requests.length -1].dock_time : 'N/A' }}</td>
                                 <td>
-                                    <button class="btn btn-info btn-sm" @click="viewDetails(item)">
+                                    <button class="btn btn-info btn-sm" @click="viewDetails(item)" v-if="checkForSubmenuButtons('view-request')">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </td>
@@ -137,7 +137,7 @@
                                                                         <button class="btn btn-secondary btn-sm mr-2"
                                                                             @click="resetApproval()">Cancel</button>
                                                                         <button class="btn btn-success btn-sm"
-                                                                            @click="approveDock(dock)">
+                                                                            @click="approveDock(dock)" v-if="checkForSubmenuButtons('approve-request')">
                                                                             <i class="fas fa-check"></i> Confirm
                                                                             Approval
                                                                         </button>
@@ -294,6 +294,7 @@ export default {
             faults: [],
             inspection: [],
             selectedFault: null,
+            permissions: [],
             approvingId: null,
             approvalComment: '',
             dockTime: '', // Renamed from approvalDateTime
@@ -301,6 +302,7 @@ export default {
     },
     async created() {
         await this.fetchData();
+        this.permissions = this.$store.state.permissions;
     },
     methods: {
         async fetchData() {

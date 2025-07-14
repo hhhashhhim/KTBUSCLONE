@@ -771,6 +771,38 @@ export default {
                             ]
                         },
                         {
+                            name: "fault-claim",
+                            allow: true,
+                            buttons: [
+                                {
+                                    name: "initiate-request",
+                                    allow: true,
+                                },
+                                {
+                                    name: "view-claim",
+                                    allow: true,
+                                },
+                                {
+                                    name: "add-result",
+                                    allow: true
+                                },
+                            ]
+                        },
+                        {
+                            name: "dock-request",
+                            allow: true,
+                            buttons: [
+                                {
+                                    name: "view-request",
+                                    allow: true,
+                                },
+                                {
+                                    name: "approve-request",
+                                    allow: true
+                                },
+                            ]
+                        },
+                        {
                             name: "records",
                             allow: true,
                             buttons: [
