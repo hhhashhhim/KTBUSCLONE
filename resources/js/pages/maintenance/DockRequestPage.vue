@@ -46,7 +46,7 @@
                                 <i class="fas fa-tools mr-2"></i> Fault Claim Details
                             </h5>
                             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"
-                                @click="selectedFault = null">
+                                >
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
