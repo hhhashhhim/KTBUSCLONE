@@ -168,7 +168,7 @@
             <p>{{ isset($data['format']->terms_condition) ? $data['format']->terms_condition : "Refreshment,WIFI upto 350MB, And MOD is Complimentary Refreshment,WIFI Bus will not drop passengers without Company TerminalBus will not drop" }}</p>
 
             <br>
-            <p> &#169; {{isset($data['format']->footer_text) ? $data['format']->footer_text : "Rights Reserved by Kainat Travels"}}</p>
+            <p> &#169; {{isset($data['format']->footer_text) ? $data['format']->footer_text : "Rights Reserved by Kainat Travels. Developed by SAR ZONE."}}</p>
         </div>
 
         @if((isset($data['format']) && $data['format']->show_coupen == 0))
