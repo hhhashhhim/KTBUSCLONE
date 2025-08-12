@@ -69,7 +69,7 @@ class FleetMaintenanceController extends Controller
                 $totalDays = max($startDate->diffInDays($endDate), 1);
                 $daysPassed = $startDate->diffInDays($now);
                 $usedPercent = ($daysPassed / $totalDays) * 100;
-                $part->percentage = max(100 - intval($usedPercent), 0);
+               $part->percentage = min(max(100 - intval($usedPercent), 0), 100);
                 $part->due = false;
             }
 
@@ -85,7 +85,7 @@ class FleetMaintenanceController extends Controller
                 $distanceTravelled = $currentReading - $part->maintenance_at;
                 $totalDistance = max($alertReading - $part->maintenance_at, 1);
                 $usedPercent = ($distanceTravelled / $totalDistance) * 100;
-                $part->percentage = max(100 - intval($usedPercent), 0);
+                $part->percentage = min(max(100 - intval($usedPercent), 0), 100);
                 $part->due = false;
             }
 
