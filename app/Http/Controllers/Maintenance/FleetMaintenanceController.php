@@ -49,88 +49,86 @@ class FleetMaintenanceController extends Controller
     }
 
 
-    public function fleetDueDetail(Request $request)
-    {
-        $bus = Bus::with('maintenancePartLink.maintenancePart')->findOrFail($request->id);
-        $currentReading = $bus->current_reading;
+   public function fleetDueDetail(Request $request)
+{
+    $bus = Bus::with('maintenancePartLink.maintenancePart')->findOrFail($request->id);
+    $currentReading = $bus->current_reading;
 
-      $bus->sortedPartLink = $bus->maintenancePartLink->map(function ($part) use ($currentReading) {
+    // Helper function for percentage & due calculation
+    $calculateStatus = function ($part) use ($currentReading) {
+        if ($part->maintenance_days && $part->maintenance_days_date) {
+            // Date-based calculation
+            $startDate = Carbon::parse($part->maintenance_days_date);
+            $endDate = $startDate->copy()->addDays($part->maintenance_days);
+            $now = Carbon::now();
 
-    if ($part->maintenance_days && $part->maintenance_days_date) {
-        $nextMaintenanceDate = Carbon::parse($part->maintenance_days_date)->addDays($part->maintenance_days);
-        $part->next_maintenance_date = $nextMaintenanceDate->toDateString(); // pass this separately
-        $part->due = Carbon::now()->greaterThanOrEqualTo($nextMaintenanceDate);
-    } else {
-        $part->next_maintenance_date = null;
-        $part->due = $currentReading >= ($part->maintenance_after + $part->maintenance_at);
-    }
-
-    $part->current_reading = $currentReading;
-    $part->alert_reading = $part->maintenance_after + $part->maintenance_at;
-
-   if ($part->maintenance_days && $part->maintenance_days_date) {
-    // Date-based progress
-    $startDate = Carbon::parse($part->maintenance_days_date);
-    $endDate = $startDate->copy()->addDays($part->maintenance_days);
-    $now = Carbon::now();
-
-    if ($now->lessThanOrEqualTo($startDate)) {
-        $part->percentage = 100;
-    } elseif ($now->greaterThanOrEqualTo($endDate)) {
-        $part->percentage = 0;
-    } else {
-        $totalDays = $startDate->diffInDays($endDate);
-        $passedDays = $startDate->diffInDays($now);
-        $remainingPercentage = 100 - intval(($passedDays / $totalDays) * 100);
-        $part->percentage = max(min($remainingPercentage, 100), 0);
-    }
-} else {
-    // Reading-based progress
-    if ($part->current_reading <= $part->maintenance_at) {
-        $part->percentage = 100;
-    } elseif ($part->current_reading >= $part->alert_reading) {
-        $part->percentage = 0;
-    } else {
-        $calculated = (($part->current_reading - $part->maintenance_at) / ($part->alert_reading - $part->maintenance_at)) * 100;
-        $part->percentage = intval(100 - $calculated);
-    }
-}
-
-
-    return $part;
-})->sortByDesc('due')->values();
-
-
-        // Chart data
-        $partLinks = MaintenancePartLink::with('bus')->where("bus_id", $request->id)->get();
-        $duePartCount = 0;
-        $updatePartCount = 0;
-
-        foreach ($partLinks as $single) {
-            if ($single->maintenance_days && $single->maintenance_date) {
-                $nextMaintenanceDate = Carbon::parse($single->maintenance_date)->addDays($single->maintenance_days);
-                $hasDuePart = Carbon::now()->greaterThanOrEqualTo($nextMaintenanceDate);
+            if ($now->greaterThanOrEqualTo($endDate)) {
+                $part->percentage = 0;
+                $part->due = true;
             } else {
-                $hasDuePart = $single->bus->current_reading >= ($single->maintenance_after + $single->maintenance_at);
+                $totalDays = max($startDate->diffInDays($endDate), 1);
+                $daysPassed = $startDate->diffInDays($now);
+                $usedPercent = ($daysPassed / $totalDays) * 100;
+                $part->percentage = max(100 - intval($usedPercent), 0);
+                $part->due = false;
             }
 
-            if ($hasDuePart) {
-                $duePartCount++;
+            $part->next_maintenance_date = $endDate->toDateString();
+        } else {
+            // Reading-based calculation
+            $alertReading = $part->maintenance_after + $part->maintenance_at;
+
+            if ($currentReading >= $alertReading) {
+                $part->percentage = 0;
+                $part->due = true;
             } else {
-                $updatePartCount++;
+                $distanceTravelled = $currentReading - $part->maintenance_at;
+                $totalDistance = max($alertReading - $part->maintenance_at, 1);
+                $usedPercent = ($distanceTravelled / $totalDistance) * 100;
+                $part->percentage = max(100 - intval($usedPercent), 0);
+                $part->due = false;
             }
+
+            $part->next_maintenance_date = null;
         }
 
-        $partChart = (object)[
-            'labels' => ['Due Part', 'Update Part'],
-            'series' => [$duePartCount, $updatePartCount]
-        ];
+        $part->current_reading = $currentReading;
+        $part->alert_reading = $part->maintenance_after + $part->maintenance_at;
 
-        return [
-            "due_bus" => $bus,
-            "singleBusChart" => $partChart
-        ];
+        return $part;
+    };
+
+    // Apply calculation to each part
+    $bus->sortedPartLink = $bus->maintenancePartLink
+        ->map($calculateStatus)
+        ->sortByDesc('due')
+        ->values();
+
+    // Chart data
+    $partLinks = MaintenancePartLink::with('bus')->where("bus_id", $request->id)->get();
+    $duePartCount = 0;
+    $updatePartCount = 0;
+
+    foreach ($partLinks as $single) {
+        $status = $calculateStatus($single);
+        if ($status->due) {
+            $duePartCount++;
+        } else {
+            $updatePartCount++;
+        }
     }
+
+    $partChart = (object)[
+        'labels' => ['Due Part', 'Update Part'],
+        'series' => [$duePartCount, $updatePartCount]
+    ];
+
+    return [
+        "due_bus" => $bus,
+        "singleBusChart" => $partChart
+    ];
+}
+
     public function fleetPartLink(Request $request)
     {
         // return $request;
@@ -276,36 +274,76 @@ class FleetMaintenanceController extends Controller
 
     public function dueMaintenance()
     {
-       
         if (!checkForSubmenu("dues")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+
+        $today = \Carbon\Carbon::today();
+
+        // Main table data
         $due = Bus::with('maintenancePartLink')
             ->get()
-            ->map(function ($bus) {
-                $dueParts = $bus->maintenancePartLink->filter(function ($part) use ($bus) {
-                    return $bus->current_reading >= ($part->maintenance_after + $part->maintenance_at);
-                });
+            ->map(function ($bus) use ($today) {
+                $dueParts = $bus->maintenancePartLink->filter(function ($part) use ($bus, $today) {
+                    // Reading-based check
+                    $readingDue = false;
+                    if (!empty($part->maintenance_after) && !empty($part->maintenance_at)) {
+                        $readingDue = $bus->current_reading >= ($part->maintenance_after + $part->maintenance_at);
+                    }
+
+                    // Days+Date check
+                    $daysDateDue = false;
+                    $plusDate = null;
+                    if (!empty($part->maintenance_days) && !empty($part->maintenance_days_date)) {
+                        $plusDate = \Carbon\Carbon::parse($part->maintenance_days_date)
+                            ->addDays($part->maintenance_days)
+                            ->format('Y-m-d');
+                        $daysDateDue = $today->greaterThanOrEqualTo($plusDate);
+                    }
+
+                    $part->maintenance_days_plus_date = $plusDate;
+
+                    return $readingDue || $daysDateDue;
+                })->values();
 
                 return [
-                    'bus_id' => $bus->id,
-                    'bus_number' => $bus->bus_number,
-                    'current_reading' => $bus->current_reading,
-                    'due_parts' => $dueParts->count(),
-                    'total_parts' => $bus->maintenancePartLink->count(),
+                    'bus_id'              => $bus->id,
+                    'bus_number'          => $bus->bus_number,
+                    'current_reading'     => $bus->current_reading,
+                    'due_parts'           => $dueParts->count(), // for table display
+                    'total_parts'         => $bus->maintenancePartLink->count(),
+                    'due_parts_list'      => $dueParts->map(function ($p) {
+                        return [
+                            'part_id'                     => $p->id,
+                            'part_name'                   => $p->part_name ?? '',
+                            'maintenance_days'            => $p->maintenance_days,
+                            'maintenance_days_date'       => $p->maintenance_days_date,
+                            'maintenance_days_plus_date'  => $p->maintenance_days_plus_date
+                        ];
+                    })->values()
                 ];
             })
             ->sortByDesc('due_parts')
-            ->values(); // Reset keys (optional)
+            ->values();
 
+        // Bus chart counts
         $buses = Bus::with('maintenancePartLink')->get();
         $dueBusCount = 0;
         $updateBusCount = 0;
         foreach ($buses as $bus) {
-            $hasDuePart = $bus->maintenancePartLink->contains(function ($part) use ($bus) {
-                return $bus->current_reading >= ($part->maintenance_after + $part->maintenance_at);
+            $hasDuePart = $bus->maintenancePartLink->contains(function ($part) use ($bus, $today) {
+                $readingDue = false;
+                if (!empty($part->maintenance_after) && !empty($part->maintenance_at)) {
+                    $readingDue = $bus->current_reading >= ($part->maintenance_after + $part->maintenance_at);
+                }
+                $daysDateDue = false;
+                if (!empty($part->maintenance_days) && !empty($part->maintenance_days_date)) {
+                    $plusDate = \Carbon\Carbon::parse($part->maintenance_days_date)
+                        ->addDays($part->maintenance_days);
+                    $daysDateDue = $today->greaterThanOrEqualTo($plusDate);
+                }
+                return $readingDue || $daysDateDue;
             });
-
             if ($hasDuePart) {
                 $dueBusCount++;
             } else {
@@ -317,14 +355,22 @@ class FleetMaintenanceController extends Controller
             'series' => [$dueBusCount, $updateBusCount]
         ];
 
+        // Part chart counts
         $partLinks = MaintenancePartLink::with('bus')->get();
         $duePartCount = 0;
         $updatePartCount = 0;
         foreach ($partLinks as $single) {
-
-            $hasDuePart = $single->bus->current_reading >= ($single->maintenance_after + $single->maintenance_at);
-
-            if ($hasDuePart) {
+            $readingDue = false;
+            if (!empty($single->maintenance_after) && !empty($single->maintenance_at)) {
+                $readingDue = $single->bus->current_reading >= ($single->maintenance_after + $single->maintenance_at);
+            }
+            $daysDateDue = false;
+            if (!empty($single->maintenance_days) && !empty($single->maintenance_days_date)) {
+                $plusDate = \Carbon\Carbon::parse($single->maintenance_days_date)
+                    ->addDays($single->maintenance_days);
+                $daysDateDue = $today->greaterThanOrEqualTo($plusDate);
+            }
+            if ($readingDue || $daysDateDue) {
                 $duePartCount++;
             } else {
                 $updatePartCount++;
@@ -335,16 +381,15 @@ class FleetMaintenanceController extends Controller
             'series' => [$duePartCount, $updatePartCount]
         ];
 
-
-        $data = [
+        return [
             "mainData" => $due,
-            "busDrop" => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id", "bus_number", "current_reading"]),
+            "busDrop"  => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id", "bus_number", "current_reading"]),
             "partDrop" => MaintenancePart::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id", "name"]),
             "busChart" => $busChart,
             "partChart" => $partChart,
         ];
-        return $data;
     }
+
 
     public function dueMaintenanceAdd(Request $request)
     {
