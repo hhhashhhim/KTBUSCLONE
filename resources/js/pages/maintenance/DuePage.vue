@@ -255,7 +255,7 @@
                                         </td>
                                         <td>
                                             <p v-if="single.maintenance_days_date">
-                                                {{ single.maintenance_days_date }} 
+                                                {{ single.maintenance_days_date }}
                                             </p>
                                             <p v-else>
                                                 {{ single.maintenance_at }} (km)
@@ -274,20 +274,20 @@
 
 
 
-             <td class="align-middle">
-  <div class="progress-text">
-    {{ single.due ? single.percentage + '%' : '100%' }}
-  </div>
-  <div class="progress" data-height="6">
-    <div class="progress-bar"
-         :class="getProgressColor(single.due ? single.percentage : 100)"
-         :style="{ width: (single.due ? single.percentage : 100) + '%' }">
-    </div>
-  </div>
-  <div v-if="single.next_maintenance_date" class="text-muted small mt-1">
-    Next Maintenance: {{ single.next_maintenance_date }}
-  </div>
-</td>
+                                        <td class="align-middle">
+                                            <div class="progress-text">
+                                                {{ single.percentage + '%' }}
+                                            </div>
+                                            <div class="progress" data-height="6">
+                                                <div class="progress-bar" :class="getProgressColor(single.percentage)"
+                                                    :style="{ width: single.percentage + '%' }">
+                                                </div>
+                                            </div>
+
+                                            <div v-if="single.next_maintenance_date" class="text-muted small mt-1">
+                                                Next Maintenance: {{ single.next_maintenance_date }}
+                                            </div>
+                                        </td>
 
                                         <td>
                                             <span v-if="single.due == true" class="badge badge-danger">Due</span>
