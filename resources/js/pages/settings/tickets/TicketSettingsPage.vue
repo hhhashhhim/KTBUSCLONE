@@ -106,8 +106,8 @@
                         </div>
 
                         <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-primary" @click="sendWhatsApp">
-                                Send
+                            <button type="button" class="btn btn-primary" :disabled="messageLoading" @click="sendWhatsApp">
+                                {{messageLoading ? "Sending..." : "Send"}}
                             </button>
                             <button type="button" class="btn btn-secondary" @click="closeModal">
                                 Close
@@ -293,6 +293,7 @@ export default {
             },
             dataEdit: {},
             loading: false,
+            messageLoading: false,
             loadingEdit: false,
             validationErrors: [],
             formID: "ticket_template",
@@ -364,6 +365,7 @@ export default {
                     date: this.date
                 };
 
+                this.messageLoading = true;
                 // Use your helper callApi
                 const resTicketTemplate = await this.callApi("post", "settings/tickets/send-whatsapp", payload);
 
@@ -378,10 +380,13 @@ export default {
                     this.body = "";
                     this.date = "";
                     $('.modal').click();
+                    this.messageLoading = false;
                 } else {
+                    this.messageLoading = false;
                     alert(resTicketTemplate.message || "Failed to send message");
                 }
             } catch (error) {
+                this.messageLoading = false;
                 console.error(error);
                 alert(error.message || "Error sending message");
             }
