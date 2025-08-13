@@ -7,9 +7,13 @@ use App\Models\Setting\Tickets\TicketsTemplate;
 use App\Models\Setting\Tickets\TicketTemplateTerminal;
 use App\Models\Terminal;
 use App\Models\ActivityLog;
+use App\Models\Company;
+use App\Models\Customer;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class TicketsTemplateController extends Controller
@@ -61,7 +65,7 @@ class TicketsTemplateController extends Controller
 
                 $template = TicketsTemplate::create([
                     'company_id' => Auth::user()->company_id,
-                    'name' => $request->name,
+                    'name' => $request->name, 
                     'uan' => $request->uanNumber,
                     'phone' => $request->phoneNumber,
                     'show_phone' => $request->show_phone,
@@ -185,5 +189,61 @@ class TicketsTemplateController extends Controller
             ->select(['*', DB::raw('DATE_FORMAT(created_at, "%h:%i %p | %Y-%m-%d") as formatted_created_at')])
             ->orderBy("created_at","DESC")
             ->get();
+    }
+
+
+
+    public function sendMessage(Request $request)
+    {
+        
+
+        $customerIds =  Ticket::where(["date"=>$request->date])
+        ->distinct("invoice_no")->pluck("customer_id")->toArray();
+
+        $customers = Customer::whereIn("id",$customerIds)->get();
+
+        $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
+        
+        foreach($customers as $key=>$customer)
+        {
+            // to choose random device
+            // Define an array of names
+            $names = [
+                1 => 'Hamza_4-Device1',
+                2 => 'Hamza_4-Device2-201-samsung-a20',
+                3 => 'Hamza_4-Device3-204-samsung-a20',
+                4 => 'Hamza_4-Device4',
+                5 => 'Hamza_4-Device-5'
+            ];
+            $randomNumber = rand(1, 5);
+
+
+            
+            
+            $url = "https://whatsapp.sarzone.com/api/send-messages";
+            $mobile = "92".substr($customer->contact, -10);
+            $session = $names[$randomNumber];
+            $messageConfirmed = "*$request->title*
+            
+$request->body";
+
+
+            try{
+                    $response = Http::withHeaders([
+                        'X-Api-Key'=>$auth_key,
+                    ])
+                    ->timeout(1)
+                    ->post($url, [
+                        "session" => $session,
+                        "receiver_number" => $mobile, 
+                        "message_body" => $messageConfirmed,
+                        "message_type" => 'text'
+                    ]);
+                    return $response;
+            } catch (\Exception $e) {
+
+            }
+            
+        }
     }
 }
