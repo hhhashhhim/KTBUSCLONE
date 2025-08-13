@@ -11,7 +11,7 @@
                                     :data-target="'#' + formID" class="btn btn-primary" @click="clearForm()">
                                     Add New Template
                                 </a>
-                                <a href="#" class="btn btn-primary mr-2" data-target="#ticket_modal"
+                                <a href="#" class="btn btn-outline-success mx-2" data-target="#ticket_modal"
                                     data-toggle="modal">
                                     Message
                                 </a>
@@ -194,7 +194,7 @@
                             <option value="0" selected>Select Terminal</option>
                             <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{
                                 terminal.city.name
-                                }} - {{ terminal.name }}
+                            }} - {{ terminal.name }}
                             </option>
                         </select>
                     </div>
@@ -346,37 +346,49 @@ export default {
     },
     methods: {
 
-          async sendWhatsApp() {
-      if (!this.title || !this.body || !this.date) {
-        alert('Please fill all fields!');
-        return;
-      }
+        async sendWhatsApp() {
+            if (!this.title || !this.body || !this.date) {
+                return swal({
+                    title: "Required !!!",
+                    text: "All fields are required",
+                    icon: "error",
+                    timer: 2000,
+                });
+               
+            }
 
-      try {
-        const payload = {
-          title: this.title,
-          body: this.body,
-          date: this.date
-        };
+            try {
+                const payload = {
+                    title: this.title,
+                    body: this.body,
+                    date: this.date
+                };
 
-        // Use your helper callApi
-        const resTicketTemplate = await this.callApi("post", "settings/tickets/send-whatsapp", payload);
+                // Use your helper callApi
+                const resTicketTemplate = await this.callApi("post", "settings/tickets/send-whatsapp", payload);
 
-        if (resTicketTemplate.status === "success") {
-          alert(resTicketTemplate.message || "Message sent successfully!");
-          this.resetForm();
-          this.closeModal();
-        } else {
-          alert(resTicketTemplate.message || "Failed to send message");
-        }
-      } catch (error) {
-        console.error(error);
-        alert(error.message || "Error sending message");
-      }
-    },
-    closeModal() {
-      $('#ticket_modal').modal('hide');
-    },
+                if (resTicketTemplate.status == 200) {
+                    swal({
+                        title: "Success !!",
+                        text: "Message Sent Successfully",
+                        icon: "success",
+                        timer: 2000,
+                    });
+                    this.title = "";
+                    this.body = "";
+                    this.date = "";
+                    $('.modal').click();
+                } else {
+                    alert(resTicketTemplate.message || "Failed to send message");
+                }
+            } catch (error) {
+                console.error(error);
+                alert(error.message || "Error sending message");
+            }
+        },
+        closeModal() {
+            $('#ticket_modal').modal('hide');
+        },
         clearForm: function () {
             this.addForm.terminal = 0;
             this.addForm.termsCondition = '';
