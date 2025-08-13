@@ -11,6 +11,10 @@
                                     :data-target="'#' + formID" class="btn btn-primary" @click="clearForm()">
                                     Add New Template
                                 </a>
+                                <a href="#" class="btn btn-primary mr-2" data-target="#ticket_modal"
+                                    data-toggle="modal">
+                                    Message
+                                </a>
                             </div>
                         </div>
                         <div class="card-body">
@@ -30,7 +34,8 @@
                                                             <th>Phone #</th>
                                                             <th>Terms & Condition</th>
                                                             <th>status</th>
-                                                            <th v-if="checkForSubmenuButtons('edit-template')">Action</th>
+                                                            <th v-if="checkForSubmenuButtons('edit-template')">Action
+                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -68,7 +73,50 @@
                     </div>
                 </div>
             </div>
+            <div class="modal fade" id="ticket_modal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Message Data</h5>
+                            <button type="button" class="close" @click="closeModal">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
 
+                        <div class="modal-body m-1 p-1">
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label for="message_title">Message Title <span class="text-danger">*</span></label>
+                                    <input type="text" v-model="title" class="form-control"
+                                        placeholder="Enter message title">
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label for="message_body">Message <span class="text-danger">*</span></label>
+                                    <textarea v-model="body" class="form-control" rows="3"
+                                        placeholder="Write your message here..."></textarea>
+                                </div>
+
+                                <div class="col-md-12 mt-2">
+                                    <label for="phone">Select Booking Date <span class="text-danger">*</span></label>
+                                    <input type="date" v-model="date" class="form-control"
+                                        placeholder="Enter phone number with country code">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer bg-whitesmoke br">
+                            <button type="button" class="btn btn-primary" @click="sendWhatsApp">
+                                Send
+                            </button>
+                            <button type="button" class="btn btn-secondary" @click="closeModal">
+                                Close
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
             <!-- Add Modal -->
             <Add :heading="'Add Template'" :errors="this.validationErrors" :success="success" :formID="formID">
                 <div class="row mt-3">
@@ -77,7 +125,8 @@
                                 Admin)</span></label>
                         <select class="form-control" id="terminals" v-model="addForm.terminals" multiple>
                             <option value="0" selected>Select Terminal</option>
-                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{ terminal.name }} -
+                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{ terminal.name }}
+                                -
                                 ({{ terminal.city.name }})
                             </option>
                         </select>
@@ -96,20 +145,15 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>
-                        <vue-mask id="uanNumber"
-                                    class="form-control"
-                                    v-model="addForm.uanNumber"
-                                    mask="00-000-000-000"
-                                    :raw="false"
-                                    :options="optionsUan"
-                        >
+                        <vue-mask id="uanNumber" class="form-control" v-model="addForm.uanNumber" mask="00-000-000-000"
+                            :raw="false" :options="optionsUan">
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="phoneNumber">Phone Number</label>
 
-                        <vue-mask id="phoneNumber" class="form-control" v-model="addForm.phoneNumber" mask="0000-0000000"
-                            :raw="false" :options="optionsPhone">
+                        <vue-mask id="phoneNumber" class="form-control" v-model="addForm.phoneNumber"
+                            mask="0000-0000000" :raw="false" :options="optionsPhone">
                         </vue-mask>
                         <input type="checkbox" v-model="addForm.show_phone">
                         <lable class="mx-1">Show phone on ticket</lable>
@@ -148,8 +192,9 @@
                         <label for="terminals">Terminals <span class="text-danger">*</span></label>
                         <select class="form-control" id="editTerminals" v-model="dataEdit.terminal_ids" multiple>
                             <option value="0" selected>Select Terminal</option>
-                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{ terminal.city.name
-                            }} - {{ terminal.name }}
+                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{
+                                terminal.city.name
+                                }} - {{ terminal.name }}
                             </option>
                         </select>
                     </div>
@@ -167,13 +212,8 @@
                     </div>
                     <div class="form-group col-md-3">
                         <label for="uanNumber">UAN Number <span class="text-danger ml-1">*</span></label>
-                        <vue-mask id=""
-                                    class="form-control"
-                                    v-model="dataEdit.uan"
-                                    mask="00-000-000-000"
-                                    :raw="false"
-                                    :options="optionsUan"
-                        >
+                        <vue-mask id="" class="form-control" v-model="dataEdit.uan" mask="00-000-000-000" :raw="false"
+                            :options="optionsUan">
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-3">
@@ -258,6 +298,9 @@ export default {
             formID: "ticket_template",
             editFormID: "edit_ticket_template",
             deleteFormID: "delete_ticket_template",
+            title: '',
+            body: '',
+            date: ''
         };
     },
     async created() {
@@ -285,7 +328,7 @@ export default {
             // Handle Select2 change event
             const self = this;
 
-            terminals.on('change', function() {
+            terminals.on('change', function () {
                 const selectedValues = $(this).val();
                 self.addForm.terminals = selectedValues;
             });
@@ -296,13 +339,44 @@ export default {
             if (newValue) {
                 this.addForm.phoneNumber = "";
             }
-            else
-            {
+            else {
                 this.addForm.phoneNumber = '';
             }
         },
     },
     methods: {
+
+          async sendWhatsApp() {
+      if (!this.title || !this.body || !this.date) {
+        alert('Please fill all fields!');
+        return;
+      }
+
+      try {
+        const payload = {
+          title: this.title,
+          body: this.body,
+          date: this.date
+        };
+
+        // Use your helper callApi
+        const resTicketTemplate = await this.callApi("post", "settings/tickets/send-whatsapp", payload);
+
+        if (resTicketTemplate.status === "success") {
+          alert(resTicketTemplate.message || "Message sent successfully!");
+          this.resetForm();
+          this.closeModal();
+        } else {
+          alert(resTicketTemplate.message || "Failed to send message");
+        }
+      } catch (error) {
+        console.error(error);
+        alert(error.message || "Error sending message");
+      }
+    },
+    closeModal() {
+      $('#ticket_modal').modal('hide');
+    },
         clearForm: function () {
             this.addForm.terminal = 0;
             this.addForm.termsCondition = '';
@@ -451,7 +525,7 @@ export default {
                 // Handle Select2 change event
                 const self = this;
 
-                terminals.on('change', function() {
+                terminals.on('change', function () {
                     const selectedValues = $(this).val();
                     self.dataEdit.terminal_ids = selectedValues;
                 });
