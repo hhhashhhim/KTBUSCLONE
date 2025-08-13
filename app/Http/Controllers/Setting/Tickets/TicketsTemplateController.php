@@ -197,7 +197,7 @@ class TicketsTemplateController extends Controller
     {
         
 
-        $customerIds =  Ticket::where(["date"=>$request->date])
+        $customerIds =  Ticket::where(["date"=>$request->date,"type"=>"booked"])
         ->distinct("invoice_no")->pluck("customer_id")->toArray();
 
         $customers = Customer::whereIn("id",$customerIds)->get();
