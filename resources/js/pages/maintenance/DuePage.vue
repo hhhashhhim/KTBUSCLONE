@@ -329,6 +329,21 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            
+                           <div>
+                             <h5 class="">History</h5>
+<div v-for="(his, i) in history" :key="i" class="card mb-3 shadow">
+  <div class="card-header p-3 d-flex justify-content-between">
+    <h6 class="mb-0">Part Name: {{ his.part_name.name }}</h6>
+    <h6 class="mb-0">Maintenance Date: {{ formatDate(his.time) }}
+</h6>
+  </div>
+  <div class="card-body p-3 m-0">
+
+    <p class="mb-0">{{ his.detail }}</p>
+  </div>
+</div>
+                           </div>
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn-primary mx-1" data-toggle="modal" data-target="#maintenanceRecord"
@@ -745,6 +760,7 @@ export default {
             maintenanceDays: [],
             maintenanceDateDays: [],
             useDaysPerRow: [],
+            history:[],
         };
     },
     created() {
@@ -804,6 +820,7 @@ export default {
             if (fleetDetailRes.status === 200) {
                 this.due_bus = fleetDetailRes.data.due_bus;
                 this.singleBusChart = fleetDetailRes.data.singleBusChart;
+                this.history = fleetDetailRes.data.maintenancesHistory;
                 this.renderModalPartChart();
             }
         },
