@@ -123,9 +123,12 @@ class FleetMaintenanceController extends Controller
         'series' => [$duePartCount, $updatePartCount]
     ];
 
+    $maintenancesHistory = FleetMaintenance::where('bus_id',$request->id)->with('partName')->orderBy('id','DESC')->get();  
+
     return [
         "due_bus" => $bus,
-        "singleBusChart" => $partChart
+        "singleBusChart" => $partChart,
+        "maintenancesHistory" => $maintenancesHistory
     ];
 }
 
