@@ -25,7 +25,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="row">
+                            <!-- <div class="row">
                                 <div class="col-6 col-md-6 col-lg-6">
                                     <h5>Total Bus Chart</h5>
                                     <div class="recent-report__chart">
@@ -38,7 +38,7 @@
                                         <div id="partChart"></div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <transition name="fade">
                                 <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="error">
                                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"
@@ -1132,80 +1132,108 @@ export default {
             }
         },
 
-        async linkMaintenance() {
-            if (!this.fleetId || !this.currentReading || this.fleetPart.length === 0) {
-                return swal({ title: "Error", text: "Please fill all required fields.", icon: "error", timer: 2000 });
+       async linkMaintenance() {
+    if (!this.fleetId || !this.currentReading || this.fleetPart.length === 0) {
+        return swal({
+            title: "Error",
+            text: "Please fill all required fields.",
+            icon: "error",
+            timer: 2000
+        });
+    }
+
+    for (let i = 0; i < this.fleetPart.length; i++) {
+        const part = this.fleetPart[i];
+        const isUsingDays = this.useDaysPerRow[i];
+        const after = this.maintenanceAfter[i];
+        const at = this.maintenanceAt[i];
+        const days = this.maintenanceDays[i];
+        const dates = this.maintenanceDateDays[i];
+
+        if (!part) {
+            return swal({
+                title: "Error",
+                text: `Please select a part for row ${i + 1}.`,
+                icon: "error",
+                timer: 2000
+            });
+        }
+
+        if (isUsingDays) {
+            if (!days || !dates) {
+                return swal({
+                    title: "Error",
+                    text: `Please enter maintenance days for row ${i + 1}.`,
+                    icon: "error",
+                    timer: 2000
+                });
             }
-
-            for (let i = 0; i < this.fleetPart.length; i++) {
-                const part = this.fleetPart[i];
-                const isUsingDays = this.useDaysPerRow[i];
-                const after = this.maintenanceAfter[i];
-                const at = this.maintenanceAt[i];
-                const days = this.maintenanceDays[i];
-                const dates = this.maintenanceDateDays[i];
-
-                if (!part) {
-                    return swal({ title: "Error", text: `Please select a part for row ${i + 1}.`, icon: "error", timer: 2000 });
-                }
-
-                if (isUsingDays) {
-                    if (!days || !dates) {
-                        return swal({ title: "Error", text: `Please enter maintenance days for row ${i + 1}.`, icon: "error", timer: 2000 });
-                    }
-                } else {
-                    if (!after || !at) {
-                        return swal({ title: "Error", text: `Please enter both KM fields for row ${i + 1} or switch to Days.`, icon: "error", timer: 2000 });
-                    }
-                }
+        } else {
+            if (!after || !at) {
+                return swal({
+                    title: "Error",
+                    text: `Please enter both KM fields for row ${i + 1} or switch to Days.`,
+                    icon: "error",
+                    timer: 2000
+                });
             }
+        }
+    }
 
-            const data = {
-                fleetId: this.fleetId,
-                currentReading: this.currentReading,
-                fleetPart: this.fleetPart,
-                maintenanceAfter: this.maintenanceAfter,
-                maintenanceAt: this.maintenanceAt,
-                maintenanceDays: this.maintenanceDays,
-                maintenanceDateDays: this.maintenanceDateDays,
-                useDaysPerRow: this.useDaysPerRow
-            };
+    // ✅ Clean data before sending (convert "" → null, cast to int where needed)
+    const data = {
+        fleetId: this.fleetId,
+        currentReading: this.currentReading,
+        fleetPart: this.fleetPart,
+        maintenanceAfter: this.maintenanceAfter.map(v => v === "" ? null : (v !== null ? parseInt(v) : null)),
+        maintenanceAt: this.maintenanceAt.map(v => v === "" ? null : (v !== null ? parseInt(v) : null)),
+        maintenanceDays: this.maintenanceDays.map(v => v === "" ? null : (v !== null ? parseInt(v) : null)),
+        maintenanceDateDays: this.maintenanceDateDays.map(v => v === "" ? null : v), // keep as string (date)
+        useDaysPerRow: this.useDaysPerRow
+    };
 
-            this.loading = true;
-            const res = await this.callApi("post", "fleet/part/link", data);
+    this.loading = true;
+    const res = await this.callApi("post", "fleet/part/link", data);
 
-            if (res.status === 200) {
-                $(".modal").click();
-                this.loading = false;
-                $('#maintenance_table').DataTable().destroy();
+    if (res.status === 200) {
+        $(".modal").click();
+        this.loading = false;
+        $('#maintenance_table').DataTable().destroy();
 
-                this.fleetId = "";
-                this.currentReading = "";
-                this.loop = 0;
-                this.fleetPart = [];
-                this.maintenanceAfter = [];
-                this.maintenanceAt = [];
-                this.maintenanceDays = [];
-                this.maintenanceDateDays = [];
-                this.useDaysPerRow = [];
+        // ✅ Reset fields
+        this.fleetId = "";
+        this.currentReading = "";
+        this.loop = 0;
+        this.fleetPart = [];
+        this.maintenanceAfter = [];
+        this.maintenanceAt = [];
+        this.maintenanceDays = [];
+        this.maintenanceDateDays = [];
+        this.useDaysPerRow = [];
 
-                swal({ title: "Success", text: "Maintenance Added", icon: "success", timer: 2000 });
-                setTimeout(() => { this.loop = 1; }, 2000);
-                await this.fetchData();
-            } else {
-                this.loading = false;
-                if (res.status == 422) {
-                    let errorContent = "";
-                    let count = 0;
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            errorContent += (++count) + " - " + element + "\n";
-                        });
-                    }
-                    swal({ title: "Error", text: errorContent, icon: "error", timer: 2000 });
-                }
+        swal({
+            title: "Success",
+            text: "Maintenance Added",
+            icon: "success",
+            timer: 2000
+        });
+
+        setTimeout(() => { this.loop = 1; }, 2000);
+        await this.fetchData();
+    } else {
+        this.loading = false;
+        if (res.status == 422) {
+            let errorContent = "";
+            let count = 0;
+            for (const key in res.data.errors) {
+                res.data.errors[key].forEach((element) => {
+                    errorContent += (++count) + " - " + element + "\n";
+                });
             }
-        },
+            swal({ title: "Error", text: errorContent, icon: "error", timer: 2000 });
+        }
+    }
+},
 
         async updateLinkMaintenance() {
             if (!this.edit.fleetId || !this.edit.currentReading || this.edit.fleetPart.length === 0) {
