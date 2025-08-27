@@ -14,7 +14,7 @@ use App\Jobs\UpdateSchedulesTime;
 use Illuminate\Support\Facades\Log;
 
 class FareTableController extends Controller
-{
+{ 
     // public function store(Request $request)
     // {
     //     try {

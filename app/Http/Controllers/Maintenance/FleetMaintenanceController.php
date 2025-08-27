@@ -138,7 +138,7 @@ class FleetMaintenanceController extends Controller
         return response()->json(["Error" => ['You are not authorized to access this URL']], 403);
     }
 
-    try {
+    try { 
         DB::beginTransaction();
 
         $rules = [

@@ -8,7 +8,7 @@ use App\Http\Controllers\Account\report\FinanceReportController;
 use App\Http\Controllers\Account\BankTransactionController;
 use App\Http\Controllers\Account\CashTransactionController;
 use App\Http\Controllers\Account\JournalTransactionController;
-use App\Http\Middleware\CustomMiddleware;
+use App\Http\Middleware\CustomMiddleware; 
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'web/v1/accounts','middleware' => ['auth:sanctum']], function () {
