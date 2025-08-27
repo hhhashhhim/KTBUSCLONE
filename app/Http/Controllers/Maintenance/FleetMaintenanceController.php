@@ -49,229 +49,254 @@ class FleetMaintenanceController extends Controller
     }
 
 
-   public function fleetDueDetail(Request $request)
-{
-    $bus = Bus::with('maintenancePartLink.maintenancePart')->findOrFail($request->id);
-    $currentReading = $bus->current_reading;
+    public function fleetDueDetail(Request $request)
+    {
+        $bus = Bus::with('maintenancePartLink.maintenancePart')->findOrFail($request->id);
+        $currentReading = $bus->current_reading;
 
-    // Helper function for percentage & due calculation
-    $calculateStatus = function ($part) use ($currentReading) {
-        if ($part->maintenance_days && $part->maintenance_days_date) {
-            // Date-based calculation
-            $startDate = Carbon::parse($part->maintenance_days_date);
-            $endDate = $startDate->copy()->addDays($part->maintenance_days);
-            $now = Carbon::now();
+        // Helper function for percentage & due calculation
+        $calculateStatus = function ($part) use ($currentReading) {
+            if ($part->maintenance_days && $part->maintenance_days_date) {
+                // Date-based calculation
+                $startDate = Carbon::parse($part->maintenance_days_date);
+                $endDate = $startDate->copy()->addDays($part->maintenance_days);
+                $now = Carbon::now();
 
-            if ($now->greaterThanOrEqualTo($endDate)) {
-                $part->percentage = 0;
-                $part->due = true;
+                if ($now->greaterThanOrEqualTo($endDate)) {
+                    $part->percentage = 0;
+                    $part->due = true;
+                } else {
+                    $totalDays = max($startDate->diffInDays($endDate), 1);
+                    $daysPassed = $startDate->diffInDays($now);
+                    $usedPercent = ($daysPassed / $totalDays) * 100;
+                    $part->percentage = min(max(100 - intval($usedPercent), 0), 100);
+                    $part->due = false;
+                }
+
+                $part->next_maintenance_date = $endDate->toDateString();
             } else {
-                $totalDays = max($startDate->diffInDays($endDate), 1);
-                $daysPassed = $startDate->diffInDays($now);
-                $usedPercent = ($daysPassed / $totalDays) * 100;
-               $part->percentage = min(max(100 - intval($usedPercent), 0), 100);
-                $part->due = false;
+                // Reading-based calculation
+                $alertReading = $part->maintenance_after + $part->maintenance_at;
+
+                if ($currentReading >= $alertReading) {
+                    $part->percentage = 0;
+                    $part->due = true;
+                } else {
+                    $distanceTravelled = $currentReading - $part->maintenance_at;
+                    $totalDistance = max($alertReading - $part->maintenance_at, 1);
+                    $usedPercent = ($distanceTravelled / $totalDistance) * 100;
+                    $part->percentage = min(max(100 - intval($usedPercent), 0), 100);
+                    $part->due = false;
+                }
+
+                $part->next_maintenance_date = null;
             }
 
-            $part->next_maintenance_date = $endDate->toDateString();
-        } else {
-            // Reading-based calculation
-            $alertReading = $part->maintenance_after + $part->maintenance_at;
+            $part->current_reading = $currentReading;
+            $part->alert_reading = $part->maintenance_after + $part->maintenance_at;
 
-            if ($currentReading >= $alertReading) {
-                $part->percentage = 0;
-                $part->due = true;
+            return $part;
+        };
+
+        // Apply calculation to each part
+        $bus->sortedPartLink = $bus->maintenancePartLink
+            ->map($calculateStatus)
+            ->sortByDesc('due')
+            ->values();
+
+        // Chart data
+        $partLinks = MaintenancePartLink::with('bus')->where("bus_id", $request->id)->get();
+        $duePartCount = 0;
+        $updatePartCount = 0;
+
+        foreach ($partLinks as $single) {
+            $status = $calculateStatus($single);
+            if ($status->due) {
+                $duePartCount++;
             } else {
-                $distanceTravelled = $currentReading - $part->maintenance_at;
-                $totalDistance = max($alertReading - $part->maintenance_at, 1);
-                $usedPercent = ($distanceTravelled / $totalDistance) * 100;
-                $part->percentage = min(max(100 - intval($usedPercent), 0), 100);
-                $part->due = false;
+                $updatePartCount++;
             }
-
-            $part->next_maintenance_date = null;
         }
 
-        $part->current_reading = $currentReading;
-        $part->alert_reading = $part->maintenance_after + $part->maintenance_at;
+        $partChart = (object)[
+            'labels' => ['Due Part', 'Update Part'],
+            'series' => [$duePartCount, $updatePartCount]
+        ];
 
-        return $part;
-    };
+        $maintenancesHistory = FleetMaintenance::where('bus_id', $request->id)->with('partName')->orderBy('id', 'DESC')->get();
 
-    // Apply calculation to each part
-    $bus->sortedPartLink = $bus->maintenancePartLink
-        ->map($calculateStatus)
-        ->sortByDesc('due')
-        ->values();
-
-    // Chart data
-    $partLinks = MaintenancePartLink::with('bus')->where("bus_id", $request->id)->get();
-    $duePartCount = 0;
-    $updatePartCount = 0;
-
-    foreach ($partLinks as $single) {
-        $status = $calculateStatus($single);
-        if ($status->due) {
-            $duePartCount++;
-        } else {
-            $updatePartCount++;
-        }
+        return [
+            "due_bus" => $bus,
+            "singleBusChart" => $partChart,
+            "maintenancesHistory" => $maintenancesHistory
+        ];
     }
-
-    $partChart = (object)[
-        'labels' => ['Due Part', 'Update Part'],
-        'series' => [$duePartCount, $updatePartCount]
-    ];
-
-    $maintenancesHistory = FleetMaintenance::where('bus_id',$request->id)->with('partName')->orderBy('id','DESC')->get();  
-
-    return [
-        "due_bus" => $bus,
-        "singleBusChart" => $partChart,
-        "maintenancesHistory" => $maintenancesHistory
-    ];
-}
 
     public function fleetPartLink(Request $request)
-    {
-        // return $request;
-
-        if (!checkPermissionButtons("link-maintenance")) {
-            return response()->json(["Error" => ['You are not authorized to access this URL']], 403);
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $rules = [
-                'fleetId' => 'required',
-                'currentReading' => 'required',
-                'fleetPart' => 'required|array',
-                'useDaysPerRow' => 'required|array',
-                'maintenanceAfter' => 'nullable|array',
-                'maintenanceAt' => 'nullable|array',
-                'maintenanceDays' => 'nullable|array',
-                'maintenanceDateDays' => 'nullable|array',
-            ];
-            $this->validate($request, $rules);
-
-            // Update bus current reading
-            Bus::where("id", $request->fleetId)->update([
-                "current_reading" => $request->currentReading
-            ]);
-            foreach ($request->fleetPart as $key => $partId) {
-                $checkExist = MaintenancePartLink::where([
-                    "bus_id" => $request->fleetId,
-                    "part_id" => $partId,
-                    "company_id" => Auth::user()->company_id
-                ])->first();
-
-                if (!$checkExist) {
-                    // return "f";
-                    $useDays = isset($request->useDaysPerRow[$key]) ? $request->useDaysPerRow[$key] : false;
-
-                    $createData = [
-                        "bus_id" => $request->fleetId,
-                        "part_id" => $partId,
-                        "added_by" => Auth::user()->id,
-                        "company_id" => Auth::user()->company_id,
-                    ];
-
-                    if ($useDays) {
-                        $createData['maintenance_days'] = $request->maintenanceDays[$key] ?? null;
-                        $createData['maintenance_days_date'] = $request->maintenanceDateDays[$key] ?? null;
-                    } else {
-                        $createData['maintenance_after'] = $request->maintenanceAfter[$key] ?? null;
-                        $createData['maintenance_at'] = $request->maintenanceAt[$key] ?? null;
-                    }
-
-                    MaintenancePartLink::create($createData);
-                }
-            }
-
-            ActivityLog::create([
-                "activity_by" => Auth::user()->id,
-                "message" => Auth::user()->name . " | linked maintenance part at reading (" . $request->currentReading . ")",
-                "requested_host" => $request->ip(),
-                "company_id" => Auth::user()->company_id
-            ]);
-
-            DB::commit();
-
-            return response()->json(["message" => "Maintenance parts linked successfully."], 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Database transaction error: ' . $e->getMessage());
-            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-        }
+{
+    if (!checkPermissionButtons("link-maintenance")) {
+        return response()->json(["Error" => ['You are not authorized to access this URL']], 403);
     }
 
+    try {
+        DB::beginTransaction();
 
-    public function updateFleetPartLink(Request $request)
-    {
+        $rules = [
+            'fleetId'             => 'required',
+            'currentReading'      => 'required',
+            'fleetPart'           => 'required|array',
+            'useDaysPerRow'       => 'nullable|array',
+            'maintenanceAfter'    => 'nullable|array',
+            'maintenanceAt'       => 'nullable|array',
+            'maintenanceDays'     => 'nullable|array',
+            'maintenanceDateDays' => 'nullable|array',
+        ];
+        $this->validate($request, $rules);
 
-        if (!checkPermissionButtons("edit-link-maintenance")) {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        // ✅ Update bus reading
+        Bus::where("id", $request->fleetId)->update([
+            "current_reading" => $request->currentReading
+        ]);
+
+        foreach ($request->fleetPart as $key => $partId) {
+            $checkExist = MaintenancePartLink::where([
+                "bus_id"     => $request->fleetId,
+                "part_id"    => $partId,
+                "company_id" => Auth::user()->company_id
+            ])->first();
+
+            if (!$checkExist) {
+                $useDays = isset($request->useDaysPerRow[$key]) ? $request->useDaysPerRow[$key] : false;
+
+                $createData = [
+                    "bus_id"     => $request->fleetId,
+                    "part_id"    => $partId,
+                    "added_by"   => Auth::user()->id,
+                    "company_id" => Auth::user()->company_id,
+                ];
+
+                if ($useDays) {
+                    $createData['maintenance_days'] = isset($request->maintenanceDays[$key]) && $request->maintenanceDays[$key] !== ""
+                        ? (int) $request->maintenanceDays[$key] : null;
+
+                    $createData['maintenance_days_date'] = isset($request->maintenanceDateDays[$key]) && $request->maintenanceDateDays[$key] !== ""
+                        ? $request->maintenanceDateDays[$key] : null;
+                } else {
+                    $createData['maintenance_after'] = isset($request->maintenanceAfter[$key]) && $request->maintenanceAfter[$key] !== ""
+                        ? (int) $request->maintenanceAfter[$key] : null;
+
+                    $createData['maintenance_at'] = isset($request->maintenanceAt[$key]) && $request->maintenanceAt[$key] !== ""
+                        ? (int) $request->maintenanceAt[$key] : null;
+                }
+
+                MaintenancePartLink::create($createData);
+            }
         }
 
-        try {
-            DB::beginTransaction();
+        // ✅ Log activity
+        ActivityLog::create([
+            "activity_by"    => Auth::user()->id,
+            "message"        => Auth::user()->name . " | linked maintenance part at reading (" . $request->currentReading . ")",
+            "requested_host" => $request->ip(),
+            "company_id"     => Auth::user()->company_id
+        ]);
 
-            $rules = [
-                'fleetId' => 'required',
-                'currentReading' => 'required',
-                'fleetPart' => 'required|array',
-                'maintenanceAfter' => 'required|array',
-                'maintenanceAt' => 'required|array',
-                'maintenanceDays' => 'nullable|array',
-                'maintenanceDateDays' => 'nullable|array',
+        DB::commit();
+
+        return response()->json(["message" => "Maintenance parts linked successfully."], 200);
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        Log::error('Database transaction error: ' . $e->getMessage() . ' Line: ' . $e->getLine());
+
+        return response()->json([
+            "errors" => [
+                "Error" => [$e->getMessage(), "Line: " . $e->getLine()]
+            ]
+        ], 422);
+    }
+}
+
+
+public function updateFleetPartLink(Request $request)
+{
+    if (!checkPermissionButtons("edit-link-maintenance")) {
+        return response()->json(["Error" => ['You are not authorized to access this URL']], 403);
+    }
+
+    try {
+        DB::beginTransaction();
+
+        $rules = [
+            'fleetId'             => 'required',
+            'currentReading'      => 'required',
+            'fleetPart'           => 'required|array',
+            'useDaysPerRow'       => 'required|array',
+            'maintenanceAfter'    => 'nullable|array',
+            'maintenanceAt'       => 'nullable|array',
+            'maintenanceDays'     => 'nullable|array',
+            'maintenanceDateDays' => 'nullable|array',
+        ];
+        $this->validate($request, $rules);
+
+        // ✅ Update bus reading
+        Bus::where("id", $request->fleetId)->update([
+            "current_reading" => $request->currentReading
+        ]);
+
+        // ✅ Delete old links
+        MaintenancePartLink::where([
+            "bus_id"     => $request->fleetId,
+            "company_id" => Auth::user()->company_id
+        ])->delete();
+
+        foreach ($request->fleetPart as $key => $partId) {
+            $useDays = isset($request->useDaysPerRow[$key]) ? $request->useDaysPerRow[$key] : false;
+
+            $createData = [
+                "bus_id"     => $request->fleetId,
+                "part_id"    => $partId,
+                "added_by"   => Auth::user()->id,
+                "company_id" => Auth::user()->company_id,
             ];
-            $this->validate($request, $rules);
 
-            Bus::where("id", $request->fleetId)->update([
-                "current_reading" => $request->currentReading
-            ]);
+            if ($useDays) {
+                $createData['maintenance_days'] = isset($request->maintenanceDays[$key]) && $request->maintenanceDays[$key] !== ""
+                    ? (int) $request->maintenanceDays[$key] : null;
 
-            MaintenancePartLink::where([
-                "bus_id" => $request->fleetId,
-                "company_id" => Auth::user()->company_id
-            ])->delete();
+                $createData['maintenance_days_date'] = isset($request->maintenanceDateDays[$key]) && $request->maintenanceDateDays[$key] !== ""
+                    ? $request->maintenanceDateDays[$key] : null;
+            } else {
+                $createData['maintenance_after'] = isset($request->maintenanceAfter[$key]) && $request->maintenanceAfter[$key] !== ""
+                    ? (int) $request->maintenanceAfter[$key] : null;
 
-            foreach ($request->fleetPart as $key => $value) {
-                $checkExist = MaintenancePartLink::where([
-                    "bus_id" => $request->fleetId,
-                    "part_id" => $value,
-                    "company_id" => Auth::user()->company_id
-                ])->first();
-
-                if (!$checkExist) {
-                    MaintenancePartLink::create([
-                        "bus_id" => $request->fleetId,
-                        "part_id" => $value,
-                        "maintenance_after" => $request->maintenanceAfter[$key],
-                        "maintenance_at" => $request->maintenanceAt[$key],
-                        "maintenance_days" => $request->maintenanceDays[$key] ?? null,
-                        "maintenance_days_date" => $request->maintenanceDateDays[$key] ?? null,
-                        'added_by' => Auth::user()->id,
-                        'company_id' => Auth::user()->company_id,
-                    ]);
-                }
+                $createData['maintenance_at'] = isset($request->maintenanceAt[$key]) && $request->maintenanceAt[$key] !== ""
+                    ? (int) $request->maintenanceAt[$key] : null;
             }
 
-            ActivityLog::create([
-                "activity_by" => Auth::user()->id,
-                "message" => Auth::user()->name . " | updated maintenance part at reading ($request->currentReading)",
-                "requested_host" => $request->ip(),
-                "company_id" => Auth::user()->company_id
-            ]);
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Database transaction error: ' . $e->getMessage());
-            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            MaintenancePartLink::create($createData);
         }
+
+        ActivityLog::create([
+            "activity_by"    => Auth::user()->id,
+            "message"        => Auth::user()->name . " | updated maintenance part at reading (" . $request->currentReading . ")",
+            "requested_host" => $request->ip(),
+            "company_id"     => Auth::user()->company_id
+        ]);
+
+        DB::commit();
+
+        return response()->json(["message" => "Maintenance parts updated successfully."], 200);
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        Log::error('Database transaction error: ' . $e->getMessage() . ' Line: ' . $e->getLine());
+
+        return response()->json([
+            "errors" => ["Error" => [$e->getMessage(), "Line: " . $e->getLine()]]
+        ], 422);
     }
+}
 
 
 
