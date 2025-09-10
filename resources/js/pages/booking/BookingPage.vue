@@ -6,23 +6,20 @@
                     <div class="card card-primary mb-0">
                         <div class="card-body pb-0 pt-2">
                             <div class="row">
-                                <div class="col-md-12 row">  <!--v-if="showBookingDiv"-->
+                                <div class="col-md-12 row"> <!--v-if="showBookingDiv"-->
                                     <div class="col-md-6">
                                         <div class="p-3" style="background-color: #eceeef !important;">
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group mb-0">
                                                         <label for="departureCity" class="mb-0">Departure City <span
-                                                            class="text-danger">*</span></label>
+                                                                class="text-danger">*</span></label>
                                                         <select class="form-control" id="departureCity"
-                                                                @change="fetchSpecificSchedules(); getDestinationCity()"
-                                                                :disabled="depLoading"
-                                                                v-model="addForm.departureCity">
+                                                            @change="fetchSpecificSchedules(); getDestinationCity()"
+                                                            :disabled="depLoading" v-model="addForm.departureCity">
                                                             <option value="0" selected>Select Departure City</option>
-                                                            <option v-for="(city, i) in cities"
-                                                                    :value="city.id"
-                                                                    :key="i"
-                                                            >
+                                                            <option v-for="(city, i) in cities" :value="city.id"
+                                                                :key="i">
                                                                 {{ changeToUpperCase(city.name) }}
                                                             </option>
                                                         </select>
@@ -33,12 +30,11 @@
                                                         <label for="destinationCity" class="mb-0">Destination
                                                             City<span class="text-danger ml-1">*</span></label>
                                                         <select class="form-control" id="destinationCity"
-                                                                @change="fetchSpecificSchedules()"
-                                                                :disabled="desLoading"
-                                                                v-model="addForm.destinationCity">
+                                                            @change="fetchSpecificSchedules()" :disabled="desLoading"
+                                                            v-model="addForm.destinationCity">
                                                             <option value="0" selected>Select Destination City</option>
                                                             <option v-for="(city, i) in specificCities" :value="city.id"
-                                                                    :key="i">
+                                                                :key="i">
                                                                 {{ changeToUpperCase(city.name) }}
                                                             </option>
                                                         </select>
@@ -49,28 +45,26 @@
                                                 <div class="col-md-6">
                                                     <div class="form-group mb-0">
                                                         <label for="date" class="mb-0">Date <span
-                                                            class="text-danger ml-1">*</span></label>
-                                                        <input type="date" :min="checkForSubmenuButtons('previous-date') ? '' : minDateFilter()" class="form-control"
-                                                               id="dynamicDate"
-                                                               v-model="addForm.date"
-                                                               @change="fetchSpecificSchedules()"/>
+                                                                class="text-danger ml-1">*</span></label>
+                                                        <input type="date"
+                                                            :min="checkForSubmenuButtons('previous-date') ? '' : minDateFilter()"
+                                                            class="form-control" id="dynamicDate" v-model="addForm.date"
+                                                            @change="fetchSpecificSchedules()" />
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group mb-0">
                                                         <label for="scheduleName" class="mb-0">Departure Time <span
-                                                            class="text-danger">*</span></label>
+                                                                class="text-danger">*</span></label>
                                                         <select class="form-control" id="scheduleName"
-                                                                @change="setScheduleValue(); fetchScheduleData(); busDropCheck();"
-                                                                v-model="addForm.id">
+                                                            @change="setScheduleValue(); fetchScheduleData(); busDropCheck();"
+                                                            v-model="addForm.id">
                                                             <option value="0">Select Departure Time</option>
                                                             <option v-for="(schedule, i) in allSchedules"
-                                                                    :value="schedule.id"
-
-                                                                    :key="i">
+                                                                :value="schedule.id" :key="i">
                                                                 {{ scheduleDropdown(schedule) }}
                                                             </option>
-                                                            
+
                                                         </select>
                                                     </div>
                                                 </div>
@@ -81,15 +75,11 @@
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label>CNIC <span class="text-danger"
-                                                                      v-if="this.addForm.type != 'advance booking'">*</span></label>
+                                                            v-if="this.addForm.type != 'advance booking'">*</span></label>
                                                     <vue-mask
                                                         v-on:blur="getCustomer('addFormCNIC'), getPoints('addFormCNIC')"
-                                                        class="form-control"
-                                                        v-model="addForm.customerCNIC"
-                                                        mask="00000-0000000-0"
-                                                        :raw="false"
-                                                        :options="options"
-                                                    >
+                                                        class="form-control" v-model="addForm.customerCNIC"
+                                                        mask="00000-0000000-0" :raw="false" :options="options">
                                                     </vue-mask>
 
                                                 </div>
@@ -97,12 +87,8 @@
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label>Full Name <span class="text-danger ml-1">*</span></label>
-                                                    <input
-                                                        type="text"
-                                                        class="form-control"
-                                                        id="fullName"
-                                                        v-model="addForm.customerName"
-                                                    />
+                                                    <input type="text" class="form-control" id="fullName"
+                                                        v-model="addForm.customerName" />
                                                 </div>
                                             </div>
                                         </div>
@@ -110,46 +96,35 @@
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label>Contact <span class="text-danger ml-1">*</span></label>
-                                                    <vue-mask
-                                                        
-                                                        class="form-control"
-                                                        v-model="addForm.contact"
-                                                        mask="0000-0000000"
-                                                        :raw="false"
-                                                        :options="optionsPhone"
-                                                    >
+                                                    <vue-mask class="form-control" v-model="addForm.contact"
+                                                        mask="0000-0000000" :raw="false" :options="optionsPhone">
                                                     </vue-mask>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label>Remarks</label>
-                                                    <input
-                                                        type="text"
-                                                        class="form-control"
-                                                        id="remarks"
-                                                        v-model="addForm.remarks"
-                                                    />
+                                                    <input type="text" class="form-control" id="remarks"
+                                                        v-model="addForm.remarks" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row" v-if="this.haveLabel">
                                             <div class="col-md-6">
                                                 <label class="py-2 text-danger" v-if="this.haveLabel">{{
-                                                        this.label
+                                                    this.label
                                                     }}</label>
                                             </div>
                                             <div class="col-md-6" v-if="this.hideCheckBox">
                                                 <div class="custom-control custom-checkbox">
                                                     <input type="checkbox" class="custom-control-input"
-                                                           id="pointsCheckBox"
-                                                           @click="usePoints($event)" :value="this.pointsCardId"
-                                                           name="pointsUsage">
-                                                    <label class="custom-control-label"
-                                                           for="pointsCheckBox">Points Usage</label>
+                                                        id="pointsCheckBox" @click="usePoints($event)"
+                                                        :value="this.pointsCardId" name="pointsUsage">
+                                                    <label class="custom-control-label" for="pointsCheckBox">Points
+                                                        Usage</label>
                                                 </div>
                                                 <label class="text-danger">{{
-                                                        this.pointsUsage ? this.pointsUsage : ''
+                                                    this.pointsUsage ? this.pointsUsage : ''
                                                     }}</label>
                                             </div>
                                         </div>
@@ -157,25 +132,17 @@
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label for="points_use">How Many Points you want to utilize</label>
-                                                    <input
-                                                        type="text"
-                                                        class="form-control"
-                                                        id="points_use"
+                                                    <input type="text" class="form-control" id="points_use"
                                                         placeholder="Leave Input Blank means Zero Points Usage"
-                                                        v-model="addForm.pointsUseInput"
-                                                    />
+                                                        v-model="addForm.pointsUseInput" />
                                                 </div>
                                             </div>
-                                            <div class="col-md-6" v-if="this.pointsUsage && this.addForm.otp_valid == false">
+                                            <div class="col-md-6"
+                                                v-if="this.pointsUsage && this.addForm.otp_valid == false">
                                                 <div class="form-group mb-0">
                                                     <label for="points_use">OTP</label>
-                                                    <input
-                                                        type="text"
-                                                        class="form-control"
-                                                        id="points_use"
-                                                        placeholder="Enter 6 digit otp"
-                                                        v-model="addForm.otp"
-                                                    />
+                                                    <input type="text" class="form-control" id="points_use"
+                                                        placeholder="Enter 6 digit otp" v-model="addForm.otp" />
                                                 </div>
                                             </div>
                                         </div>
@@ -184,12 +151,17 @@
                                                 OTP verified successfully
                                             </div>
                                         </div>
-                                        <div class="row pt-3 bg-light-green pb-3" v-if="this.pointsUsage && this.addForm.otp_valid == false">
+                                        <div class="row pt-3 bg-light-green pb-3"
+                                            v-if="this.pointsUsage && this.addForm.otp_valid == false">
                                             <div class="col-md-6">
-                                                <button class="btn btn-block btn-sm btn-dark" :class="{'btn-progress': otpLoader}" @click="sendOtp()">Send OTP</button>
+                                                <button class="btn btn-block btn-sm btn-dark"
+                                                    :class="{ 'btn-progress': otpLoader }" @click="sendOtp()">Send
+                                                    OTP</button>
                                             </div>
                                             <div class="col-md-6">
-                                                <button class="btn btn-block btn-primary btn-sm ml-1" :class="{'btn-progress': otpLoader}" @click="verifyOtp()">Verify OTP</button>
+                                                <button class="btn btn-block btn-primary btn-sm ml-1"
+                                                    :class="{ 'btn-progress': otpLoader }" @click="verifyOtp()">Verify
+                                                    OTP</button>
                                             </div>
                                         </div>
                                         <div class="row mt-2">
@@ -197,50 +169,62 @@
                                                 <div class="form-group mb-0">
                                                     <label for="Terminals" class="mb-0"> Terminal ID</label>
                                                     <select class="form-control" id="Terminals"
-                                                            @change="fetchScheduleData();"
-                                                            v-model="addForm.terminalId">
+                                                        @change="fetchScheduleData();" v-model="addForm.terminalId">
                                                         <option value="0">Select Terminal</option>
-                                                        <option
-                                                            v-for="(terminal, i) in terminals"
-                                                            :value="terminal.id"
-                                                            :key="i"
-                                                        >{{ changeToUpperCase(terminal.city.name) }} -
+                                                        <option v-for="(terminal, i) in terminals" :value="terminal.id"
+                                                            :key="i">{{ changeToUpperCase(terminal.city.name) }} -
                                                             {{ changeToUpperCase(terminal.name) }}
                                                         </option>
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-0" v-if="showDropdown"
+                                                       >
+                                                    <label for="Terminals" class="mb-0">Select Bank</label>
+                                                    <select class="form-control"  v-model="selectedOption">
+                                                        <option disabled value="">Select an option</option>
+                                                        <option value="option1">Option 1</option>
+                                                        <option value="option2">Option 2</option>
+                                                        <option value="option3">Option 3</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                             <div
-                                                :class="!checkForSubmenuButtons('terminal-id') ? 'col-md-12 mt-3 mb-3' : 'col-md-6 mt-3'">
+                                                :class="!checkForSubmenuButtons('terminal-id') ? 'col-md-12 mt-3 mb-3' : 'col-md-12 mt-3'">
                                                 <div class="row">
-                                                    <div
-                                                        :class="!checkForSubmenuButtons('terminal-id') ? 'col-md-6' : 'col-md-6'"
+                                                    <div :class="!checkForSubmenuButtons('terminal-id') ? 'col-md-4' : 'col-md-4'"
                                                         class="align-self-center">
                                                         <div class="custom-control custom-checkbox">
                                                             <input type="checkbox" class="custom-control-input"
-                                                                   id="femaleCheckBox"
-                                                                   v-bind:checked="addForm.gender == 0"
-                                                                   @click="changeGender($event)" value="0"
-                                                                   name="gender">
+                                                                id="femaleCheckBox" v-bind:checked="addForm.gender == 0"
+                                                                @click="changeGender($event)" value="0" name="gender">
                                                             <label class="custom-control-label"
-                                                                   for="femaleCheckBox">Female</label>
+                                                                for="femaleCheckBox">Female</label>
                                                         </div>
                                                     </div>
-                                                    <div
-                                                        :class="!checkForSubmenuButtons('terminal-id') ? 'col-md-6' : 'col-md-6'"
+                                                    <div :class="!checkForSubmenuButtons('terminal-id') ? 'col-md-4' : 'col-md-4'"
                                                         v-if="checkForSubmenuButtons('advance-booking')"
                                                         class="align-self-center">
                                                         <div class="custom-control custom-checkbox">
                                                             <input type="checkbox" class="custom-control-input"
-                                                                   id="bookingTypeCheckBox"
-                                                                   v-bind:checked="addForm.type == 'advance booking'"
-                                                                   @click="changeType($event)"
-                                                                   value="advance booking"
-                                                                   name="bookingType">
+                                                                id="bookingTypeCheckBox"
+                                                                v-bind:checked="addForm.type == 'advance booking'"
+                                                                @click="changeType($event)" value="advance booking"
+                                                                name="bookingType">
                                                             <label class="custom-control-label"
-                                                                   for="bookingTypeCheckBox">Advanced</label>
+                                                                for="bookingTypeCheckBox">Advanced</label>
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-4 align-self-center">
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" class="custom-control-input"
+                                                                id="bookingTypeCheckBox1" v-model="showDropdown">
+                                                            <label class="custom-control-label"
+                                                                for="bookingTypeCheckBox1">Banks</label>
+                                                        </div>
+                                                    </div>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -248,88 +232,63 @@
                                             <div class="col-md-4 pl-0">
                                                 <div class="form-group mb-0">
                                                     <label>Seat No.</label>
-                                                    <input
-                                                        type="text"
-                                                        readonly
-                                                        class="form-control"
-                                                        id="seatNo"
-                                                        v-model="addForm.selectedSeats"
-                                                    />
+                                                    <input type="text" readonly class="form-control" id="seatNo"
+                                                        v-model="addForm.selectedSeats" />
                                                 </div>
                                             </div>
                                             <div class="col-md-2 pl-0">
                                                 <div class="form-group mb-0">
                                                     <label>Seats</label>
-                                                    <input
-                                                        type="text"
-                                                        readonly
-                                                        class="form-control"
-                                                        id="totalNoSeats"
-                                                        v-model="selectedSeats.length"
-                                                    />
+                                                    <input type="text" readonly class="form-control" id="totalNoSeats"
+                                                        v-model="selectedSeats.length" />
                                                 </div>
                                             </div>
                                             <div class="col-md-2 pl-0">
                                                 <div class="form-group mb-0">
                                                     <label>Total Fare</label>
-                                                    <input
-                                                        type="text"
-                                                        readonly
-                                                        class="form-control font-weight-bold"
-                                                        id="totalFare"
-                                                        v-model="addForm.totalFare"
-                                                    />
+                                                    <input type="text" readonly class="form-control font-weight-bold"
+                                                        id="totalFare" v-model="addForm.totalFare" />
                                                 </div>
                                             </div>
                                             <div class="col-md-2 pl-0">
                                                 <div class="form-group mb-0">
-                                                    <label>Discount <span
-                                                        class="ml-2 text-muted"></span></label>
-                                                    <input
-                                                        type="text" @keypress="isNumberDiscount($event)"
+                                                    <label>Discount <span class="ml-2 text-muted"></span></label>
+                                                    <input type="text" @keypress="isNumberDiscount($event)"
                                                         @keyup="calculateTotal()"
                                                         :readonly="!checkForSubmenuButtons('discount-field')"
-                                                        class="form-control"
-                                                        id="fareDiscount"
-                                                        v-model="addForm.discount"
-                                                    />
+                                                        class="form-control" id="fareDiscount"
+                                                        v-model="addForm.discount" />
                                                 </div>
                                             </div>
                                             <div class="col-md-2 pl-0">
                                                 <div class="form-group mb-0">
                                                     <label>Receivable </label>
-                                                    <input type="text"
-                                                           class="form-control"
-                                                           readonly
-                                                           v-model="addForm.totalAmount"
-                                                    />
+                                                    <input type="text" class="form-control" readonly
+                                                        v-model="addForm.totalAmount" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="my-2">
-                                            <div class="form-group text-center mt-2 mb-2"
-                                            >
+                                            <div class="form-group text-center mt-2 mb-2">
                                                 <a v-if="checkForSubmenuButtons('assign-bus') && hideDivButtonsDrop"
-                                                   href="#"
-                                                   class="btn btn-primary btn-sm" @click="closingData()">
+                                                    href="#" class="btn btn-primary btn-sm" @click="closingData()">
                                                     Assign Bus
                                                 </a>
                                                 <button v-if="checkForSubmenuButtons('terminal-invoice')"
-                                                        class="btn btn-info ml-1 btn-sm" @click="getTerminalInvoice()">
+                                                    class="btn btn-info ml-1 btn-sm" @click="getTerminalInvoice()">
                                                     Terminal Invoice
                                                 </button>
                                                 <button v-if="checkForSubmenuButtons('bus-invoice')"
-                                                        class="btn btn-warning ml-1 btn-sm" @click="getBusInvoice()">
+                                                    class="btn btn-warning ml-1 btn-sm" @click="getBusInvoice()">
                                                     Bus Invoice
                                                 </button>
                                                 <button v-if="checkForSubmenuButtons('pax-list')"
-                                                        class="btn btn-danger ml-1 btn-sm" @click="getCustomerList()">
+                                                    class="btn btn-danger ml-1 btn-sm" @click="getCustomerList()">
                                                     Pax List
                                                 </button>
                                                 <button v-if="hideDivButtonsDrop" class="btn btn-success ml-1 btn-sm"
-                                                        v-on:click="add()"
-                                                        :disabled="bookingLoading"
-                                                        v-on:keyup.enter="add()">
+                                                    v-on:click="add()" :disabled="bookingLoading"
+                                                    v-on:keyup.enter="add()">
                                                     {{
                                                         this.addForm.type == 'advance booking' ? 'Reserved Seat' :
                                                             'Generate Ticket'
@@ -338,24 +297,23 @@
                                             </div>
                                             <div class="text-center mb-2">
                                                 <a v-if="checkForSubmenuButtons('drop-schedule') && !hideDivButtonsDrop"
-                                                    href="#"
-                                                    class="btn btn-outline-secondary mr-1 btn-sm" @click="revertDropSchedule()" :disabled="revertScheduleButton">
+                                                    href="#" class="btn btn-outline-secondary mr-1 btn-sm"
+                                                    @click="revertDropSchedule()" :disabled="revertScheduleButton">
                                                     Revert Schedule
                                                 </a>
                                                 <button v-if="checkForSubmenuButtons('seat-details')"
-                                                        class="btn btn-outline-secondary btn-sm text-dark mr-2"
-                                                        @click="seatDetails()">
+                                                    class="btn btn-outline-secondary btn-sm text-dark mr-2"
+                                                    @click="seatDetails()">
                                                     Seat Details
                                                 </button>
                                                 <a v-if="checkForSubmenuButtons('message-bus') && hideDivButtonsDrop"
-                                                   href="#"
-                                                   class="btn btn-outline-success btn-sm mr-2" data-target="#message_modal"
-                                                   data-toggle="modal">
+                                                    href="#" class="btn btn-outline-success btn-sm mr-2"
+                                                    data-target="#message_modal" data-toggle="modal">
                                                     Message
                                                 </a>
                                                 <button v-if="checkForSubmenuButtons('bus-class')"
-                                                        class="btn btn-outline-secondary btn-sm text-dark mr-2"
-                                                        @click="busClass()">
+                                                    class="btn btn-outline-secondary btn-sm text-dark mr-2"
+                                                    @click="busClass()">
                                                     Bus class
                                                 </button>
                                                 <button
@@ -365,7 +323,7 @@
                                                     Drop Schedule
                                                 </button>
                                                 <button class="btn btn-secondary btn-sm text-dark"
-                                                        @click="fetchScheduleData()" :disabled="getSchedule">
+                                                    @click="fetchScheduleData()" :disabled="getSchedule">
                                                     {{ getSchedule ? "Loading..." : 'Refresh' }}
                                                 </button>
                                             </div>
@@ -377,20 +335,17 @@
                                     <!--                                        Seat Map-->
                                     <div class="col-md-4 overflow-auto" id="seatMapDiv">
                                         <div v-if="showBookingDiv"
-                                             class="d-flex seat-img p-0 m-0 justify-content-center"
-                                             v-for="(record, rowIndex) in schedule.bus_class.seat_map" :key="rowIndex">
+                                            class="d-flex seat-img p-0 m-0 justify-content-center"
+                                            v-for="(record, rowIndex) in schedule.bus_class.seat_map" :key="rowIndex">
                                             <div v-for="(col, colIndex) in record" :key="colIndex">
                                                 <div v-if="col.reserved">
-                                                    <div
-                                                        v-if="allowedSeats !== 0 ? allowedSeats.includes(parseInt(col.seatNo)) : true"
+                                                    <div v-if="allowedSeats !== 0 ? allowedSeats.includes(parseInt(col.seatNo)) : true"
                                                         class="image-span d-block text-center text-white shadow"
-                                                        @click="selectSeat(rowIndex, colIndex, col.seatNo, col.fare, col.class); updateBookedSeat(col) "
-                                                        :class="getClasses(col)"
-                                                        :title="getTitle(col)"
-                                                        :style="getStyle(col)"
-                                                    >
+                                                        @click="selectSeat(rowIndex, colIndex, col.seatNo, col.fare, col.class); updateBookedSeat(col)"
+                                                        :class="getClasses(col)" :title="getTitle(col)"
+                                                        :style="getStyle(col)">
                                                         <small>{{ col.seatNo }}</small>
-                                                        <br/>
+                                                        <br />
                                                         <small v-if="col.type && col.type == 'booked'">
                                                             <i class="type-icons fas fa-check-double"></i>
                                                         </small>
@@ -406,14 +361,11 @@
                                                             <i class="fas fa-minus-circle text-light"></i>
                                                         </small>
                                                     </div>
-                                                    <div v-else
-                                                         class="image-span d-block text-center text-white shadow"
-                                                         :class="getClasses(col)"
-                                                         :title="getTitle(col)"
-                                                         style="pointer-events: none !important; background-color: #444444 !important;"
-                                                    >
+                                                    <div v-else class="image-span d-block text-center text-white shadow"
+                                                        :class="getClasses(col)" :title="getTitle(col)"
+                                                        style="pointer-events: none !important; background-color: #444444 !important;">
                                                         <small>{{ col.seatNo }}</small>
-                                                        <br/>
+                                                        <br />
                                                         <small>
                                                             <i class="type-icons fa fa-times text-danger"></i>
                                                         </small>
@@ -424,25 +376,22 @@
                                         </div>
                                         <!-- loader -->
                                         <div v-else class="seat-map">
-                                            <div
-                                            v-for="rowIndex in 10"
-                                            :key="'loader-row-' + rowIndex"
-                                            class="seat-row"
-                                            >
-                                            <!-- Left 2 seat skeletons -->
-                                            <div class="d-flex">
-                                                <div class="seat-skeleton" />
-                                                <div class="seat-skeleton" />
-                                            </div>
-                                    
-                                            <!-- Aisle -->
-                                            <div class="aisle"></div>
-                                    
-                                            <!-- Right 2 seat skeletons -->
-                                            <div class="d-flex">
-                                                <div class="seat-skeleton" />
-                                                <div class="seat-skeleton" />
-                                            </div>
+                                            <div v-for="rowIndex in 10" :key="'loader-row-' + rowIndex"
+                                                class="seat-row">
+                                                <!-- Left 2 seat skeletons -->
+                                                <div class="d-flex">
+                                                    <div class="seat-skeleton" />
+                                                    <div class="seat-skeleton" />
+                                                </div>
+
+                                                <!-- Aisle -->
+                                                <div class="aisle"></div>
+
+                                                <!-- Right 2 seat skeletons -->
+                                                <div class="d-flex">
+                                                    <div class="seat-skeleton" />
+                                                    <div class="seat-skeleton" />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -452,61 +401,58 @@
                                             <div class="col-md-12 mb-2 px-0 d-flex flex-wrap">
                                                 <div class="border-bottom w-100">
                                                     <div class="my-1">
-                                                        <div 
-                                                            class="bg-danger text-dark circles mr-1 border shadow">
-                                                            <i class="fas fa-minus-circle"></i></div>
+                                                        <div class="bg-danger text-dark circles mr-1 border shadow">
+                                                            <i class="fas fa-minus-circle"></i>
+                                                        </div>
                                                         <span class="text-wrap">Not For Sale</span>
                                                     </div>
                                                     <div class="my-1">
-                                                        <div
-                                                            class="selected circles mr-1 border shadow"></div>
+                                                        <div class="selected circles mr-1 border shadow"></div>
                                                         <span class="text-wrap">Selected</span>
                                                     </div>
                                                     <div class="my-1">
-                                                        <div
-                                                            class="for-male-reserved circles mr-1 border shadow"></div>
+                                                        <div class="for-male-reserved circles mr-1 border shadow"></div>
                                                         <span class="text-wrap">Male Reserved</span>
                                                     </div>
                                                     <div class="my-1">
-                                                        <div
-                                                            class="for-female-reserved circles mr-1 border shadow"></div>
+                                                        <div class="for-female-reserved circles mr-1 border shadow">
+                                                        </div>
                                                         <span class="text-wrap">Female Reserved</span>
                                                     </div>
                                                     <div class="my-1">
-                                                        <div
-                                                            class="for-male-booked circles mr-1 border shadow"></div>
+                                                        <div class="for-male-booked circles mr-1 border shadow"></div>
                                                         <span class="text-wrap">Male Confirmed</span>
                                                     </div>
                                                     <div class="my-1">
-                                                        <div
-                                                            class="for-female-booked circles mr-1 border shadow"></div>
+                                                        <div class="for-female-booked circles mr-1 border shadow"></div>
                                                         <span class="text-wrap">Female Confirmed</span>
                                                     </div>
                                                     <div class="my-1">
                                                         <div
-                                                            class="for-online-male-reserved circles mr-1 border shadow"></div>
+                                                            class="for-online-male-reserved circles mr-1 border shadow">
+                                                        </div>
                                                         <span class="text-wrap">Online M Reserved</span>
                                                     </div>
                                                     <div class="my-1">
                                                         <div
-                                                            class="for-online-female-reserved circles mr-1 border shadow"></div>
+                                                            class="for-online-female-reserved circles mr-1 border shadow">
+                                                        </div>
                                                         <span class="text-wrap">Online F Reserved</span>
                                                     </div>
                                                     <div class="my-1">
-                                                        <div
-                                                            class="for-online-male-booked circles mr-1 border shadow"></div>
+                                                        <div class="for-online-male-booked circles mr-1 border shadow">
+                                                        </div>
                                                         <span class="text-wrap">Online M Confirmed</span>
                                                     </div>
                                                     <div class="my-1">
                                                         <div
-                                                            class="for-online-female-booked circles mr-1 border shadow"></div>
+                                                            class="for-online-female-booked circles mr-1 border shadow">
+                                                        </div>
                                                         <span class="text-wrap">Online F Confirmed</span>
                                                     </div>
                                                     <div class="my-1">
-                                                        <div
-                                                            class="partial-seat circles mr-1 border shadow"></div>
-                                                        <span class="text-wrap"
-                                                              >Partial Seat</span>
+                                                        <div class="partial-seat circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap">Partial Seat</span>
                                                     </div>
                                                 </div>
                                                 <!-- <div class="border-bottom w-100">
@@ -543,60 +489,58 @@
                                                     </div>
                                                 </div> -->
 
-                                                <div class="my-1" v-for="(seatClass,i) in allSeatClasses" :key="i">
+                                                <div class="my-1" v-for="(seatClass, i) in allSeatClasses" :key="i">
                                                     <div class="circles mr-1 border shadow"
-                                                         :style="{border:'2px solid '+seatClass.color+' !important'}"></div>
+                                                        :style="{ border: '2px solid ' + seatClass.color + ' !important' }">
+                                                    </div>
                                                     <span class="text-wrap">{{ seatClass.name }}</span>
                                                 </div>
                                                 <div class="my-1 border-top w-100" v-if="showBookingDiv">
                                                     <br>
                                                     <span>Bus: <span class="text-dark"
-                                                                        style="font-weight: 700 !important">{{
-                                                            this.BusNo
-                                                        }}</span> </span><br>
+                                                            style="font-weight: 700 !important">{{
+                                                                this.BusNo
+                                                            }}</span> </span><br>
                                                     <span>Booked: <span class="text-dark"
-                                                                        style="font-weight: 700 !important">{{
-                                                            this.totalSeatsBooked
-                                                        }}</span> </span><br>
+                                                            style="font-weight: 700 !important">{{
+                                                                this.totalSeatsBooked
+                                                            }}</span> </span><br>
                                                     <span>Issued: <span class="text-dark"
-                                                                        style="font-weight: 700 !important">{{
-                                                            this.totalSeatsIssued
-                                                        }}</span></span><br>
+                                                            style="font-weight: 700 !important">{{
+                                                                this.totalSeatsIssued
+                                                            }}</span></span><br>
                                                     <span>Available: <span class="text-dark"
-                                                                           style="font-weight: 700 !important">{{
-                                                            this.totalSeatsAvailable
-                                                        }}</span></span><br>
+                                                            style="font-weight: 700 !important">{{
+                                                                this.totalSeatsAvailable
+                                                            }}</span></span><br>
                                                     <span>ELT:
-                                                        <button title="View ELT Details"
-                                                                data-target="#elt_detail_modal"
-                                                                data-toggle="modal"
-                                                                :disabled=" eltDetailsModel.length == 0 "
-                                                                class="btn-primary btn btn-sm">{{
+                                                        <button title="View ELT Details" data-target="#elt_detail_modal"
+                                                            data-toggle="modal" :disabled="eltDetailsModel.length == 0"
+                                                            class="btn-primary btn btn-sm">{{
                                                                 this.eltDetailsModel.length
                                                             }}</button>
-                                                        </span><br>
+                                                    </span><br>
                                                     <span>OverIssue Seat:
                                                         <button title="View Over Issue Seat  Details"
-                                                                data-target="#overIssue_detail_modal"
-                                                                data-toggle="modal"
-                                                                :disabled=" overIssueSeatsRevert.length == 0 "
-                                                                class="btn-primary btn btn-sm">{{
+                                                            data-target="#overIssue_detail_modal" data-toggle="modal"
+                                                            :disabled="overIssueSeatsRevert.length == 0"
+                                                            class="btn-primary btn btn-sm">{{
                                                                 this.overIssueSeatsRevert.length
                                                             }}</button>
-                                                        </span>
+                                                    </span>
                                                     <br>
                                                     <span>T/Discount: <span class="text-dark"
-                                                                            style="font-weight: 700 !important">{{
-                                                            this.terminalDiscount
-                                                        }}</span></span><br>
+                                                            style="font-weight: 700 !important">{{
+                                                                this.terminalDiscount
+                                                            }}</span></span><br>
                                                     <span>S/Discount: <span class="text-dark"
-                                                                            style="font-weight: 700 !important">{{
-                                                            this.appliedDiscount
-                                                        }}</span></span><br>
+                                                            style="font-weight: 700 !important">{{
+                                                                this.appliedDiscount
+                                                            }}</span></span><br>
                                                     <span>Surcharge: <span class="text-dark"
-                                                                           style="font-weight: 700 !important">{{
-                                                            this.appliedSurcharge
-                                                        }}</span></span>
+                                                            style="font-weight: 700 !important">{{
+                                                                this.appliedSurcharge
+                                                            }}</span></span>
                                                 </div>
                                                 <br>
                                             </div>
@@ -612,13 +556,13 @@
 
         <!--        ELT Deatils MOdel-->
         <div class="modal fade" id="elt_detail_modal" tabindex="-1" aria-labelledby="eltDetailModalLabel"
-             aria-hidden="true">
+            aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">ELT Details</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                @click="closeEltDetail()">
+                            @click="closeEltDetail()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -629,22 +573,22 @@
                                 <div class="col-12">
                                     <table class="table table-striped table-hover">
                                         <thead>
-                                        <tr>
-                                            <th>Sr No.</th>
-                                            <th>Customer Name</th>
-                                            <th>Seat No</th>
-                                            <th>ELT Weight</th>
-                                            <th>ELT Price</th>
-                                        </tr>
+                                            <tr>
+                                                <th>Sr No.</th>
+                                                <th>Customer Name</th>
+                                                <th>Seat No</th>
+                                                <th>ELT Weight</th>
+                                                <th>ELT Price</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                        <tr v-for="(single, i) in eltDetailsModel" :key="i">
-                                            <td>{{ i + 1 }}</td>
-                                            <td>{{ single.customer.name }}</td>
-                                            <td>{{ single.seat_no }}</td>
-                                            <td>{{ single.elt_weight }}</td>
-                                            <td>{{ single.elt_price }}</td>
-                                        </tr>
+                                            <tr v-for="(single, i) in eltDetailsModel" :key="i">
+                                                <td>{{ i + 1 }}</td>
+                                                <td>{{ single.customer.name }}</td>
+                                                <td>{{ single.seat_no }}</td>
+                                                <td>{{ single.elt_weight }}</td>
+                                                <td>{{ single.elt_price }}</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -660,42 +604,48 @@
                 </div>
             </div>
         </div>
-        
+
         <!--        Message MOdel-->
         <div class="modal fade" id="message_modal" tabindex="-1" aria-labelledby="eltDetailModalLabel"
-             aria-hidden="true">
+            aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Message Data</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                @click="closeMessageModal()">
+                            @click="closeMessageModal()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body m-1 p-1">
                         <div class="card-body my-0 py-0">
                             <div class="row mb-3">
-                            <!-- Message Title -->
-                            <div class="col-md-12">
-                                <label for="message_title" class="form-label">Message Title <span class="text-danger ml-1">*</span></label>
-                                <input type="text" id="message_title" class="form-control" v-model="messageData.title" placeholder="Enter message title">
-                            </div>
+                                <!-- Message Title -->
+                                <div class="col-md-12">
+                                    <label for="message_title" class="form-label">Message Title <span
+                                            class="text-danger ml-1">*</span></label>
+                                    <input type="text" id="message_title" class="form-control"
+                                        v-model="messageData.title" placeholder="Enter message title">
+                                </div>
 
-                            <!-- Message Body -->
-                            <div class="col-md-12">
-                                <label for="message_body" class="form-label">Message <span class="text-danger ml-1">*</span></label>
-                                <textarea id="message_body" class="form-control" v-model="messageData.body" rows="3" placeholder="Write your message here..."></textarea>
+                                <!-- Message Body -->
+                                <div class="col-md-12">
+                                    <label for="message_body" class="form-label">Message <span
+                                            class="text-danger ml-1">*</span></label>
+                                    <textarea id="message_body" class="form-control" v-model="messageData.body" rows="3"
+                                        placeholder="Write your message here..."></textarea>
+                                </div>
                             </div>
-                        </div>
 
                         </div>
                     </div>
                     <div class="modal-footer bg-whitesmoke br">
-                        <button type="button" class="btn btn-primary" :class="{'btn-progress': messageLoader}" @click="sendMessageToBus()">
+                        <button type="button" class="btn btn-primary" :class="{ 'btn-progress': messageLoader }"
+                            @click="sendMessageToBus()">
                             Send
                         </button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeMessageModal()">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                            @click="closeMessageModal()">
                             Close
                         </button>
                     </div>
@@ -705,13 +655,13 @@
 
         <!--        OverIssue Detail Modal -->
         <div class="modal fade" id="overIssue_detail_modal" tabindex="-1" aria-labelledby="overIssueDetailModalLabel"
-             aria-hidden="true">
+            aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="overIssueDetailModalLabel">OverIssue Seat Details</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                @click="closeOverIssueDetail()">
+                            @click="closeOverIssueDetail()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -719,7 +669,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="card" v-for="(singleSeat,  i) in overIssueSeatsRevert">
+                                    <div class="card" v-for="(singleSeat, i) in overIssueSeatsRevert">
                                         <div class="card-body p-3">
                                             <div class="row ml-2 border-bottom">
                                                 <div class="col-md-4 d-flex justify-content-start">
@@ -733,7 +683,7 @@
                                                 <div class="col-md-4 d-flex justify-content-end">
                                                     <h4 class="mb-0 font-weight-bold mr-3">Type:</h4>
                                                     <h4 class="mb-0 text-muted text-capitalize">{{
-                                                            singleSeat.type
+                                                        singleSeat.type
                                                         }}</h4>
                                                 </div>
                                             </div>
@@ -796,12 +746,11 @@
                                             <div class="row mt-3">
                                                 <div class="col-md-12 text-right">
                                                     <button type="button" class="btn btn-secondary text-dark"
-                                                            v-if="checkForSubmenuButtons('duplicate-ticket')"
-                                                            @click="duplicateTicket(singleSeat)">Duplicate Ticket
+                                                        v-if="checkForSubmenuButtons('duplicate-ticket')"
+                                                        @click="duplicateTicket(singleSeat)">Duplicate Ticket
                                                     </button>
-                                                    <button @click="revertOverIssueFunction(singleSeat)"
-                                                            type="button" class="btn btn-info ml-2"
-                                                            :disabled="loadingRevertButton">{{
+                                                    <button @click="revertOverIssueFunction(singleSeat)" type="button"
+                                                        class="btn btn-info ml-2" :disabled="loadingRevertButton">{{
                                                             loadingRevertButton ? 'Loading...' : 'Revert Over Issue'
                                                         }}
                                                     </button>
@@ -815,7 +764,7 @@
                     </div>
                     <div class="modal-footer bg-whitesmoke br">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"
-                                @click="closeOverIssueDetail()">
+                            @click="closeOverIssueDetail()">
                             Close
                         </button>
                     </div>
@@ -839,27 +788,18 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="weight">Weight <span class="text-muted mr-1">(In Kg's)</span> <span
-                                        class="text-danger">*</span></label>
-                                    <input
-                                        type="text"
-                                        class="form-control" placeholder="Enter Elt Weight" @keypress="isNumber($event)"
-                                        id="weight"
-                                        :disabled="editAbleELT"
-                                        v-model="eltData.eltWeight"
-                                    />
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" placeholder="Enter Elt Weight"
+                                        @keypress="isNumber($event)" id="weight" :disabled="editAbleELT"
+                                        v-model="eltData.eltWeight" />
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group"
-                                >
+                                <div class="form-group">
                                     <label>Price<span class="text-danger ml-1">*</span></label>
-                                    <input
-                                        type="text"
-                                        class="form-control" placeholder="Enter Elt Price" @keypress="isNumber($event)"
-                                        id="fullName"
-                                        :disabled="editAbleELT"
-                                        v-model="eltData.eltPrice"
-                                    />
+                                    <input type="text" class="form-control" placeholder="Enter Elt Price"
+                                        @keypress="isNumber($event)" id="fullName" :disabled="editAbleELT"
+                                        v-model="eltData.eltPrice" />
                                 </div>
                             </div>
                         </div>
@@ -868,24 +808,21 @@
                                 <div class="form-group">
                                     <label for="description">Description</label>
                                     <textarea class="form-control" id="description" placeholder="Enter Elt Description"
-                                              :disabled="editAbleELT"
-                                              v-model="eltData.dataDescription"
-                                    ></textarea>
+                                        :disabled="editAbleELT" v-model="eltData.dataDescription"></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary"
-                                @click="addEltToTicket(eltData)" v-if="EltButton || !editAbleELT">
+                        <button type="button" class="btn btn-primary" @click="addEltToTicket(eltData)"
+                            v-if="EltButton || !editAbleELT">
                             {{ this.EltButton ? 'Loading...' : 'Add ELT Button' }}
                         </button>
-                        <button type="button" class="btn btn-outline-info"
-                                @click="editAbleELT = false" v-if="editAbleELT">Edit
+                        <button type="button" class="btn btn-outline-info" @click="editAbleELT = false"
+                            v-if="editAbleELT">Edit
                         </button>
-                        <button type="button" class="btn btn-outline-danger"
-                                @click="editAbleELT = true "
-                                v-if="!editAbleELT">Cancel
+                        <button type="button" class="btn btn-outline-danger" @click="editAbleELT = true"
+                            v-if="!editAbleELT">Cancel
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeElt()">Close
                         </button>
@@ -896,13 +833,13 @@
 
         <!--Over Issue Model-->
         <div class="modal fade" id="overIssue_model" tabindex="1" aria-labelledby="exampleModalLabel"
-             aria-hidden="true">
+            aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Over-Issued Seats</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                @click="closeOverissue()">
+                            @click="closeOverissue()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -910,13 +847,11 @@
                         <div class="form-group">
                             <label for="over_issue_remarks">Remarks <span class="text-danger ml-1">*</span></label>
                             <textarea type="text" class="form-control" id="over_issue_remarks"
-                                      v-model="overIssueData.reason"
-                                      placeholder="Reason for over-issue a seat"></textarea>
+                                v-model="overIssueData.reason" placeholder="Reason for over-issue a seat"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-primary mx-1"
-                                @click="addOverIssueTicket(overIssueData)">
+                        <button class="btn btn-primary mx-1" @click="addOverIssueTicket(overIssueData)">
                             Over-Issue Ticket
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeOverissue()">
@@ -929,13 +864,13 @@
 
         <!--Model Reschedule-->
         <div class="modal fade" id="reschedule_modal" tabindex="2" aria-labelledby="reschedule_modalLabel"
-             aria-hidden="true">
+            aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="reschedule_modalLabel">Reschedule Seats</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                @click="closeReschedule()">
+                            @click="closeReschedule()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -943,16 +878,12 @@
                         <div class="row">
                             <div class="col-md-2">
                                 <label for="departureCity" class="mb-0">Departure City <span
-                                    class="text-danger">*</span></label>
+                                        class="text-danger">*</span></label>
                                 <select class="form-control" id="reScheduleDepartureCity"
-                                        @change="fetchReSpecificSchedules(); getReDestinationCity()"
-                                        v-model="rescheduleData.dataDepartureCity">
+                                    @change="fetchReSpecificSchedules(); getReDestinationCity()"
+                                    v-model="rescheduleData.dataDepartureCity">
                                     <option value="0" selected>Select Departure City</option>
-                                    <option
-                                        v-for="(city, i) in cities"
-                                        :value="city.id"
-                                        :key="i"
-                                    >
+                                    <option v-for="(city, i) in cities" :value="city.id" :key="i">
                                         {{ city.name }}
                                     </option>
                                 </select>
@@ -961,11 +892,10 @@
                                 <label for="destinationCity" class="mb-0">Destination
                                     City<span class="text-danger ml-1">*</span></label>
                                 <select class="form-control" id="reScheduleDestinationCity"
-                                        @change="fetchReSpecificSchedules()"
-                                        v-model="rescheduleData.rescheduleDestinationCity">
+                                    @change="fetchReSpecificSchedules()"
+                                    v-model="rescheduleData.rescheduleDestinationCity">
                                     <option value="0" selected>Select Destination City</option>
-                                    <option v-for="(city, i) in reSpecificCities" :value="city.id"
-                                            :key="i">
+                                    <option v-for="(city, i) in reSpecificCities" :value="city.id" :key="i">
                                         {{ city.name }}
                                     </option>
                                 </select>
@@ -973,18 +903,17 @@
                             <div class="col-md-2 class">
                                 <label for="date" class="mb-0">Date <span class="text-danger ml-1">*</span></label>
                                 <input type="date" :min="minDateFilter()" class="form-control"
-                                       v-model="rescheduleData.rescheduleDate"
-                                       @change="fetchReSpecificSchedules()"/>
+                                    v-model="rescheduleData.rescheduleDate" @change="fetchReSpecificSchedules()" />
                             </div>
                             <div class="col-md-3 class">
                                 <label for="scheduleName" class="mb-0">Departure Time <span
-                                    class="text-danger">*</span></label>
-                                <select class="form-control" id="reScheduleName" @change="setRescheduleValue($event); fetchReScheduleData()"
-                                        v-model="rescheduleData.id">
+                                        class="text-danger">*</span></label>
+                                <select class="form-control" id="reScheduleName"
+                                    @change="setRescheduleValue($event); fetchReScheduleData()"
+                                    v-model="rescheduleData.id">
                                     <option value="0" selected>Select Schedule</option>
-                                    <option v-for="(schedule, i) in allReSchedules"
-
-                                            :value="schedule.id" :key="i">{{ scheduleDropdown(schedule) }}
+                                    <option v-for="(schedule, i) in allReSchedules" :value="schedule.id" :key="i">{{
+                                        scheduleDropdown(schedule) }}
                                     </option>
                                 </select>
                                 <!--                                :disabled="disabledOptionsReschedule.includes(schedule)"-->
@@ -992,7 +921,7 @@
                             <div class="col-md-3">
                                 <label for="rescheduleReason" class="mb-0">Reason</label>
                                 <input id="rescheduleReason" class="form-control" v-model="rescheduleData.reason"
-                                       placeholder="Please Give me a Reason!!">
+                                    placeholder="Please Give me a Reason!!">
                             </div>
                         </div>
 
@@ -1001,8 +930,8 @@
                             <div class="col-md-3">
                                 <h4 class="mb-2">Old Booking</h4><br>
                                 <div class="mb-2"><span class="h6">Old Fare : Rs {{
-                                        mainAllRescheduleData.totalFare
-                                    }} </span>
+                                    mainAllRescheduleData.totalFare
+                                        }} </span>
                                 </div>
                                 <br>
                                 <div class="mb-2"><span class="h6"> Booked Seat Numbers </span><br>
@@ -1011,19 +940,16 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="d-flex justify-content-center seat-img p-0 m-0"
-                                     v-for="(record, rowIndex) in reScheduleSeatMap.bus_class.seat_map" :key="rowIndex">
+                                    v-for="(record, rowIndex) in reScheduleSeatMap.bus_class.seat_map" :key="rowIndex">
                                     <div v-for="(col, colIndex) in record" :key="colIndex">
                                         <div v-if="col.reserved">
-                                            <div
-                                                v-if="allowedSeats !== 0 ? allowedSeats.includes(parseInt(col.seatNo)) : true"
+                                            <div v-if="allowedSeats !== 0 ? allowedSeats.includes(parseInt(col.seatNo)) : true"
                                                 class="image-span d-block text-center text-white shadow"
                                                 @click="reScheduleSelectSeat(rowIndex, colIndex, col)"
-                                                :class="getClassesReschedule(col)"
-                                                :title="getTitle(col)"
-                                                :style="{border:'2px solid ' + col.color + ' !important',}"
-                                            >
+                                                :class="getClassesReschedule(col)" :title="getTitle(col)"
+                                                :style="{ border: '2px solid ' + col.color + ' !important', }">
                                                 <small>{{ col.seatNo }} </small>
-                                                <br/>
+                                                <br />
                                                 <small v-if="col.type && col.type == 'booked'">
                                                     <i class="type-icons fas fa-check-double">
                                                     </i>
@@ -1040,14 +966,11 @@
                                                     <i class="fas fa-minus-circle text-light"></i>
                                                 </small>
                                             </div>
-                                            <div v-else
-                                                 class="image-span d-block text-center text-white shadow"
-                                                 :class="getClasses(col)"
-                                                 :title="getTitle(col)"
-                                                 style="pointer-events: none !important; background-color: #444444 !important;"
-                                            >
+                                            <div v-else class="image-span d-block text-center text-white shadow"
+                                                :class="getClasses(col)" :title="getTitle(col)"
+                                                style="pointer-events: none !important; background-color: #444444 !important;">
                                                 <small>{{ col.seatNo }}</small>
-                                                <br/>
+                                                <br />
                                                 <small>
                                                     <i class="type-icons fa fa-times text-danger"></i>
                                                 </small>
@@ -1060,8 +983,8 @@
                             <div class="col-md-3">
                                 <h4 class="mb-3">Current Booking</h4>
                                 <div class="mb-2"><span class="h6"> New Fare : Rs {{
-                                        totalAlreadyBookedSeatFare ?? ""
-                                    }} </span>
+                                    totalAlreadyBookedSeatFare ?? ""
+                                        }} </span>
                                 </div>
                                 <br>
                                 <div class="mb-2"><span class="h6"> Selected Seats Numbers </span><br>
@@ -1072,8 +995,7 @@
                                         <span class="h6">Over Issue Reschedule : </span>
                                         <label class="colorinput">
                                             <input name="overIssueReschedule" type="checkbox" value="1"
-                                                   class="colorinput-input"
-                                                   @click="getApprovalOverIssueSeat($event)">
+                                                class="colorinput-input" @click="getApprovalOverIssueSeat($event)">
                                             <span class="colorinput-color bg-primary"></span>
                                         </label>
                                     </div>
@@ -1082,20 +1004,15 @@
                                         <span class="h6">Advance Booked :</span>
                                         <label class="colorinput">
                                             <input name="overIssueRescheduleAdvance" type="checkbox" value="1"
-                                                   class="colorinput-input"
-                                                   @click="changeTypeReschedule($event)">
+                                                class="colorinput-input" @click="changeTypeReschedule($event)">
                                             <span class="colorinput-color bg-primary"></span>
                                         </label>
                                     </div>
                                     <br>
                                     <div class="form-group">
                                         <label for="name">Discount </label>
-                                        <input
-                                            type="text"
-                                            @keypress="isNumberDiscount($event)"
-                                            class="form-control"
-                                            v-model="rescheduleDiscount"
-                                        />
+                                        <input type="text" @keypress="isNumberDiscount($event)" class="form-control"
+                                            v-model="rescheduleDiscount" />
                                     </div>
                                 </div>
 
@@ -1121,7 +1038,7 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="dropScheduleLabel">Drop Schedule</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                @click="closeModal()">
+                            @click="closeModal()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -1129,13 +1046,12 @@
                         <div class="form-group">
                             <label for="dropSheduleRemarks">Remarks</label>
                             <textarea type="text" class="form-control" id="dropSheduleRemarks"
-                                      v-model="dropScheduleFormData.reason"
-                                      placeholder="Reason for drop schedule"></textarea>
+                                v-model="dropScheduleFormData.reason" placeholder="Reason for drop schedule"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary"
-                                @click="dropScheduleData()" :disabled="dropScheduleButton">
+                        <button type="button" class="btn btn-primary" @click="dropScheduleData()"
+                            :disabled="dropScheduleButton">
                             Drop Schedule
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">
@@ -1152,14 +1068,14 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="cancelModelLabel">Cancel Ticket</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                @click="closeCancel()">
+                            @click="closeCancel()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body" v-if="cancelData.dataType == 'booked' ">
+                    <div class="modal-body" v-if="cancelData.dataType == 'booked'">
                         <div class="form-group">
-                            <label for="cancel_percentage">Percentage  {{cancelData.dataType}}<span
-                                class="text-muted ml-2">(Optional)</span></label>
+                            <label for="cancel_percentage">Percentage {{ cancelData.dataType }}<span
+                                    class="text-muted ml-2">(Optional)</span></label>
                             <select id="cancel_percentage" class="form-control" v-model="cancelData.percentage">
                                 <option value="first">Select Cancellation Percentage</option>
                                 <option value="0">0%</option>
@@ -1173,17 +1089,17 @@
                         <div class="form-group">
                             <label for="caceling_remakrs">Remarks</label>
                             <textarea type="text" class="form-control" id="caceling_remakrs" v-model="cancelData.reason"
-                                      placeholder="Reason for canceling a seat"></textarea>
+                                placeholder="Reason for canceling a seat"></textarea>
                         </div>
                     </div>
-                    <div class="modal-body" v-if="cancelData.dataType == 'advance booking' ">
-                        
+                    <div class="modal-body" v-if="cancelData.dataType == 'advance booking'">
+
                         Are you sure you want to cancel ticket ?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" :disabled="cancelLoading"
-                                @click="cancelBooking(cancelData)">
-                                {{ getSchedule ? "Loading..." : 'Cancel Ticket' }}
+                            @click="cancelBooking(cancelData)">
+                            {{ getSchedule ? "Loading..." : 'Cancel Ticket' }}
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeCancel()">
                             Close
@@ -1193,17 +1109,18 @@
             </div>
         </div>
         <!-- Model Cancel All ticket-->
-        <div class="modal fade" id="cancel_all_ticket" tabindex="4" aria-labelledby="cancelAllModelLabel" aria-hidden="true">
+        <div class="modal fade" id="cancel_all_ticket" tabindex="4" aria-labelledby="cancelAllModelLabel"
+            aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="cancelAllModelLabel">Cancel Ticket</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                @click="closeModal()">
+                            @click="closeModal()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body" v-if="cancelAllData.cancelAllSeatType[0] == 'booked' ">
+                    <div class="modal-body" v-if="cancelAllData.cancelAllSeatType[0] == 'booked'">
                         <div class="form-group">
                             <label for="cancel_percentage">Percentage</label>
                             <select id="cancel_percentage" class="form-control" v-model="cancelAllData.percentage">
@@ -1219,16 +1136,16 @@
                         <div class="form-group">
                             <label for="">Remarks</label>
                             <textarea type="text" class="form-control" id="" v-model="cancelAllData.reason"
-                                      placeholder="Reason for canceling a seat"></textarea>
+                                placeholder="Reason for canceling a seat"></textarea>
                         </div>
                     </div>
-                    <div class="modal-body" v-if="cancelAllData.cancelAllSeatType[0] =='advance booking'">
+                    <div class="modal-body" v-if="cancelAllData.cancelAllSeatType[0] == 'advance booking'">
                         Are you sure you want to cancel all ticket ?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" :disabled="cancelLoading"
-                                @click="allSeatCancel()">
-                                {{ getSchedule ? "Loading..." : 'Cancel Ticket' }}
+                            @click="allSeatCancel()">
+                            {{ getSchedule ? "Loading..." : 'Cancel Ticket' }}
                         </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">
                             Close
@@ -1240,13 +1157,13 @@
 
         <!--Modal for details-->
         <div class="modal fade" id="seatAllDetailsModal" tabindex="-1" aria-labelledby="seatAllDetailsModalLabel"
-             aria-hidden="true">
+            aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="seatAllDetailsModalLabel">Seat Details</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                @click="closeModal()">
+                            @click="closeModal()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -1257,26 +1174,25 @@
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <button type="button" class=" shadow-style btn btn-primary ml-2"
-                                            v-if="this.allRescheduleButton && checkForSubmenuButtons('reschedule-seats')"
-                                            @click="allRescheduleData(); this.rescheduleData.rescheduleSchedule = 0 ; this.seatMapReschedule = false"
-                                    >Reschedule All
+                                        v-if="this.allRescheduleButton && checkForSubmenuButtons('reschedule-seats')"
+                                        @click="allRescheduleData(); this.rescheduleData.rescheduleSchedule = 0; this.seatMapReschedule = false">Reschedule
+                                        All
                                     </button>
                                     <button v-if="this.duplicateAllSeatType[0] == 'booked'" type="button"
-                                            @click="allTicketDuplicate();"
-                                            class="btn btn-secondary text-dark ml-2">
+                                        @click="allTicketDuplicate();" class="btn btn-secondary text-dark ml-2">
                                         Duplicate All Ticket
                                     </button>
-                                    <button v-if="(this.cancelAllData.cancelAllSeatType[0] == 'booked' && checkForSubmenuButtons('cancel-ticket') || this.cancelAllData.cancelAllSeatType[0] == 'advance booking' && checkForSubmenuButtons('reserved-cancel'))" type="button"
-                                            @click="cancelAllModal();"
-                                            class="btn btn-danger ml-2">
+                                    <button
+                                        v-if="(this.cancelAllData.cancelAllSeatType[0] == 'booked' && checkForSubmenuButtons('cancel-ticket') || this.cancelAllData.cancelAllSeatType[0] == 'advance booking' && checkForSubmenuButtons('reserved-cancel'))"
+                                        type="button" @click="cancelAllModal();" class="btn btn-danger ml-2">
                                         Cancel All Ticket
                                     </button>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="card" v-for="(singleItems,  i) in selectedSeatDataBackEnd">
-                                        <div class="card-body p-3" v-for="(innerItem,key , j) in singleItems">
+                                    <div class="card" v-for="(singleItems, i) in selectedSeatDataBackEnd">
+                                        <div class="card-body p-3" v-for="(innerItem, key, j) in singleItems">
                                             <div class="row ml-2 border-bottom" v-if="key == 0">
                                                 <div class="col-md-4 d-flex justify-content-start">
                                                     <h4 class="mb-0 font-weight-bold mr-3">Seat :</h4>
@@ -1289,9 +1205,9 @@
                                                 <div class="col-md-4 d-flex justify-content-end">
                                                     <h4 class="mb-0 font-weight-bold mr-3">Type:</h4>
                                                     <h4 class="mb-0 text-muted text-capitalize"><span
-                                                        v-if="innerItem.is_partial == 1">Partial - </span>{{
-                                                            innerItem.type
-                                                        }}</h4>
+                                                            v-if="innerItem.is_partial == 1">Partial - </span>{{
+                                                                innerItem.type
+                                                            }}</h4>
                                                 </div>
 
                                             </div>
@@ -1317,12 +1233,16 @@
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Customer Cnic :</p>
-                                                        <p class="mb-0">{{ auth_terminal.other_terminal_passenger_detail == 1 || innerItem.terminal_id == this.auth_terminal.id ? cnicFormat(innerItem.customer.cnic) : "---" }}</p>
+                                                        <p class="mb-0">{{ auth_terminal.other_terminal_passenger_detail
+                                                            == 1 || innerItem.terminal_id == this.auth_terminal.id ?
+                                                            cnicFormat(innerItem.customer.cnic) : "---" }}</p>
                                                     </div>
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Customer Phone : </p>
                                                         <p class="mb-0">
-                                                            {{ auth_terminal.other_terminal_passenger_detail == 1 || innerItem.terminal_id == this.auth_terminal.id ? phoneFormat(innerItem.customer.contact) : "---" }}
+                                                            {{ auth_terminal.other_terminal_passenger_detail == 1 ||
+                                                                innerItem.terminal_id == this.auth_terminal.id ?
+                                                                phoneFormat(innerItem.customer.contact) : "---" }}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -1343,7 +1263,8 @@
                                                 <div class="col-md-4">
                                                     <div class="d-flex">
                                                         <p class="mb-0 font-weight-bold mr-3">Tracking Id</p>
-                                                        <p class="mb-0">T{{ innerItem.id }}@{{ innerItem.invoice_id }}</p>
+                                                        <p class="mb-0">T{{ innerItem.id }}@{{ innerItem.invoice_id }}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1351,31 +1272,31 @@
                                             <div class="row mt-3">
                                                 <div class="col-md-12 text-right">
                                                     <button type="button" class="btn btn-secondary text-dark"
-                                                            v-if="innerItem.type == 'booked'  && checkForSubmenuButtons('duplicate-ticket')"
-                                                            @click="duplicateTicket(innerItem)">Duplicate Ticket
+                                                        v-if="innerItem.type == 'booked' && checkForSubmenuButtons('duplicate-ticket')"
+                                                        @click="duplicateTicket(innerItem)">Duplicate Ticket
                                                     </button>
                                                     <button v-if="checkForSubmenuButtons('resend-sms')" type="button"
-                                                            @click="resendSms(innerItem.invoice_id,innerItem.type)"
-                                                            class="btn btn-success ml-2">Resend SMS
+                                                        @click="resendSms(innerItem.invoice_id, innerItem.type)"
+                                                        class="btn btn-success ml-2">Resend SMS
                                                     </button>
                                                     <button v-if="checkForSubmenuButtons('add-elt')" type="button"
-                                                            class="btn btn-info ml-2"
-                                                            @click="passDataToEltModel(innerItem)">
+                                                        class="btn btn-info ml-2"
+                                                        @click="passDataToEltModel(innerItem)">
                                                         Add ELT
                                                     </button>
                                                     <button v-if="checkForSubmenuButtons('reschedule-seats')"
-                                                            type="button" class="btn btn-primary ml-2"
-                                                            @click="passDataToRescheduleModel(innerItem); this.rescheduleData.rescheduleSchedule = 0 ; this.seatMapReschedule = false"
-                                                    >Reschedule
+                                                        type="button" class="btn btn-primary ml-2"
+                                                        @click="passDataToRescheduleModel(innerItem); this.rescheduleData.rescheduleSchedule = 0; this.seatMapReschedule = false">Reschedule
                                                     </button>
                                                     <button v-if="checkForSubmenuButtons('overissue-seat')"
-                                                            type="button" class="btn btn-warning ml-2"
-                                                            @click="passDataToOverIssueModel(innerItem);this.overIssueData.percentage = 0">
+                                                        type="button" class="btn btn-warning ml-2"
+                                                        @click="passDataToOverIssueModel(innerItem); this.overIssueData.percentage = 0">
                                                         Over Issue
                                                     </button>
-                                                    <button v-if="(checkForSubmenuButtons('cancel-ticket') && innerItem.type=='booked') || (checkForSubmenuButtons('reserved-cancel') && innerItem.type=='advance booking')" type="button"
-                                                            class="btn btn-danger ml-2"
-                                                            @click="passDataToCancelModel(innerItem); this.cancelData.percentage = 0 ">
+                                                    <button
+                                                        v-if="(checkForSubmenuButtons('cancel-ticket') && innerItem.type == 'booked') || (checkForSubmenuButtons('reserved-cancel') && innerItem.type == 'advance booking')"
+                                                        type="button" class="btn btn-danger ml-2"
+                                                        @click="passDataToCancelModel(innerItem); this.cancelData.percentage = 0">
                                                         Cancel Ticket
                                                     </button>
                                                 </div>
@@ -1389,15 +1310,15 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="modal fade" id="busClassModal" tabindex="-1" aria-labelledby="seatAllDetailsModalLabel"
-             aria-hidden="true">
+            aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="">Bus Class Update</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                @click="closeModal()">
+                            @click="closeModal()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -1410,7 +1331,7 @@
                                     <label for="city_id">Bus Class<span class="text-danger ml-1">*</span></label>
                                     <select class="form-control" v-model="busClassData.bus_class">
                                         <option value="0">Select Bus Class</option>
-                                        <option v-for="(bus_class,i) in bus_classes" :key="i" :value="bus_class.id">
+                                        <option v-for="(bus_class, i) in bus_classes" :key="i" :value="bus_class.id">
                                             {{ bus_class.name }}
                                         </option>
                                     </select>
@@ -1428,121 +1349,72 @@
         </div>
 
         <!-- Close Schedule -->
-        <Add
-            heading="Close Schedule"
-            :errors="this.validationErrors"
-            :success="success"
-            :formID="formAddID"
-        >
+        <Add heading="Close Schedule" :errors="this.validationErrors" :success="success" :formID="formAddID">
             <div class="row">
                 <div class=" form-group col-md-6">
                     <label for="city_id">Bus <span class="text-danger ml-1">*</span></label>
                     <select class="form-control" v-model="dataForClose.bus">
                         <option value="">Select Bus Class</option>
-                        <option
-                            v-for="(bus, i) in buses"
-                            :key="i"
-                            :value="bus.id"
-                        >
+                        <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
                             {{ bus.bus_number }}
                         </option>
                     </select>
                 </div>
                 <div class=" form-group col-md-6">
                     <label for="city_id">Route</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        placeholder="N/A"
-                        readonly
-                        v-model="dataForClose.route_name"
-                    />
+                    <input type="text" class="form-control" placeholder="N/A" readonly
+                        v-model="dataForClose.route_name" />
                 </div>
                 <div class="form-group col-md-6">
                     <label for="name">Date <span class="text-danger ml-1">*</span></label>
-                    <input
-                        type="date"
-                        class="form-control"
-                        placeholder="Enter Bus Name"
-                        readonly
-                        v-model="dataForClose.date"
-                    />
+                    <input type="date" class="form-control" placeholder="Enter Bus Name" readonly
+                        v-model="dataForClose.date" />
                 </div>
                 <div class=" form-group col-md-6">
                     <label for="city_id">Schedule <span class="text-danger ml-1">*</span></label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        placeholder="N/A"
-                        readonly
-                        v-model="dataForClose.schedule_detail"
-                    />
+                    <input type="text" class="form-control" placeholder="N/A" readonly
+                        v-model="dataForClose.schedule_detail" />
                 </div>
                 <div class="form-group col-md-6">
                     <label for="name">Bus Driver <span class="text-danger ml-1">*</span></label>
-                    <select class="form-control rounded-0" id="assignDriver" v-model="dataForClose.drivers" multiple
-                    >
-                        <option
-                            v-for="(driver, i) in drivers"
-                            :key="i"
-                            :value="driver.id"
-                        >
+                    <select class="form-control rounded-0" id="assignDriver" v-model="dataForClose.drivers" multiple>
+                        <option v-for="(driver, i) in drivers" :key="i" :value="driver.id">
                             {{ driver.name }}
                         </option>
                     </select>
                 </div>
                 <div class="form-group col-md-6">
                     <label for="name">Bus Host <span class="text-danger ml-1">*</span></label>
-                    <select class="form-control rounded-0" id="assignHost" v-model="dataForClose.hosts" multiple
-                    >
-                        <option
-                            v-for="(host, i) in hosts"
-                            :key="i"
-                            :value="host.user_id"
-                        >
+                    <select class="form-control rounded-0" id="assignHost" v-model="dataForClose.hosts" multiple>
+                        <option v-for="(host, i) in hosts" :key="i" :value="host.user_id">
                             {{ host.name }}
                         </option>
                     </select>
                 </div>
                 <div class="form-group col-md-12">
                     <label for="location">Description</label>
-                    <textarea
-                        class="form-control"
-                        placeholder="Enter Description"
-                        id="location"
-                        v-model="dataForClose.description"
-                        cols="30"
-                        rows="10"
-                    ></textarea>
+                    <textarea class="form-control" placeholder="Enter Description" id="location"
+                        v-model="dataForClose.description" cols="30" rows="10"></textarea>
                 </div>
             </div>
             <template v-slot:button>
                 <!-- v-if="!checkCloseData || !editAble" -->
-                <button
-                    v-if="checkCloseData"
-                    type="button"
-                    class="btn btn-primary"
-                    @click="updateCloseSchedule" :disabled="loading"
-                >
+                <button v-if="checkCloseData" type="button" class="btn btn-primary" @click="updateCloseSchedule"
+                    :disabled="loading">
                     {{ loading ? 'Loading...' : 'Update Schedule' }}
                 </button>
-                <button
-                    v-else
-                    type="button"
-                    class="btn btn-primary"
-                    @click="closeSchedule" :disabled="loading"
-                >
+                <button v-else type="button" class="btn btn-primary" @click="closeSchedule" :disabled="loading">
                     {{ loading ? 'Loading...' : 'Close Booking' }}
                 </button>
             </template>
         </Add>
 
         <!--Modal for seat details end-->
-        <DetailsModal :formID="detailsFormId" :details="bookingDetails" :deleteFormID="deleteFormID"/>
+        <DetailsModal :formID="detailsFormId" :details="bookingDetails" :deleteFormID="deleteFormID" />
 
         <!--Print Passesnger List Form-->
-        <form :action="$store.state.api_url + 'api/web/v1/print/pdf/passenger/list'" method="POST" ref="refPassengerList"
-              target="_blank">
+        <form :action="$store.state.api_url + 'api/web/v1/print/pdf/passenger/list'" method="POST"
+            ref="refPassengerList" target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="destination_city_id" :value="this.addForm.destinationCity">
             <input type="hidden" name="departure_city_id" :value="this.addForm.departureCity">
@@ -1551,8 +1423,8 @@
             <input type="hidden" name="departure_time" :value="this.addForm.departure_time">
         </form>
         <!--Print Terminal Invoice-->
-        <form :action="$store.state.api_url + 'api/web/v1/print/pdf/terminal/invoice'" method="POST" ref="refTerminalInvoice"
-              target="_blank">
+        <form :action="$store.state.api_url + 'api/web/v1/print/pdf/terminal/invoice'" method="POST"
+            ref="refTerminalInvoice" target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="destination_city_id" :value="this.addForm.destinationCity">
             <input type="hidden" name="departure_city_id" :value="this.addForm.departureCity">
@@ -1563,7 +1435,7 @@
         </form>
         <!--Print Bus Invoice -->
         <form :action="$store.state.api_url + 'api/web/v1/print/pdf/bus/invoice'" method="POST" ref="refBusInvoice"
-              target="_blank">
+            target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="destination_city_id" :value="this.addForm.destinationCity">
             <input type="hidden" name="departure_city_id" :value="this.addForm.departureCity">
@@ -1573,28 +1445,28 @@
         </form>
         <!--        print Customer Ticket Print-->
         <form :action="$store.state.api_url + 'api/web/v1/print/pdf/customer/ticket'" method="POST" ref="refTicket"
-              target="_blank">
+            target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="ticket_ids" :value="this.ticketsIds">
             <input type="hidden" name="duplicate" value=0>
         </form>
         <!--        print Customer Duplicate Ticket Print-->
-        <form :action="$store.state.api_url + 'api/web/v1/print/pdf/customer/ticket'" method="POST" ref="refDuplicateTicket"
-              target="_blank">
+        <form :action="$store.state.api_url + 'api/web/v1/print/pdf/customer/ticket'" method="POST"
+            ref="refDuplicateTicket" target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="ticket_id" :value="this.ticketsId">
             <input type="hidden" name="duplicate" value=1>
         </form>
         <!--        print Customer Duplicate All Ticket Print-->
-        <form :action="$store.state.api_url + 'api/web/v1/print/pdf/customer/ticket'" method="POST" ref="refDuplicateAllTicket"
-              target="_blank">
+        <form :action="$store.state.api_url + 'api/web/v1/print/pdf/customer/ticket'" method="POST"
+            ref="refDuplicateAllTicket" target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="ticket_ids" :value="this.duplicateAllTicket">
             <input type="hidden" name="duplicate" value=0>
         </form>
         <!--        Elt Customer PDF Form  -->
         <form :action="$store.state.api_url + 'api/web/v1/print/pdf/customer/elt'" method="POST" ref="refElt"
-              target="_blank">
+            target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="elt_ids" :value="this.eltIds">
         </form>
@@ -1631,6 +1503,8 @@ export default {
             optionsPhone: {
                 placeholder: "03xx-xxxxxxx",
             },
+            showDropdown: false,
+            selectedOption: "",
             buses: [],
             BusNo: "N/A",
             bus_classes: [],
@@ -1653,7 +1527,7 @@ export default {
                 percentage: '0',
                 cancelAllSeat: [],
                 cancelAllSeatType: [],
-                reason:"",
+                reason: "",
             },
             duplicateAllTicket: [],
             duplicateAllSeatType: [],
@@ -1678,7 +1552,7 @@ export default {
                 date: '',
                 schedule_id: '',
             },
-            messageLoader : false,
+            messageLoader: false,
             isActive: 1,
             formAddID: "addBooking",
             deleteFormID: "delete_addBooking",
@@ -1768,7 +1642,7 @@ export default {
             depLoading: false,
             desLoading: false,
             busClassData: {
-                bus_class : "0",
+                bus_class: "0",
             },
             addForm: {
                 date: new Date().toISOString().substr(0, 10),
@@ -1820,7 +1694,7 @@ export default {
                 ticket: [],
                 customer: [],
             },
-            
+
             messageData: {
                 title: '',
                 body: ''
@@ -1846,19 +1720,19 @@ export default {
         const self = this;
         // assignDriver
         const assignDriver = $('#assignDriver');
-        assignDriver.on('change', function() {
+        assignDriver.on('change', function () {
             const selectedValues = $(this).val();
             self.dataForClose.drivers = selectedValues;
         });
         // assignHost
         const assignHost = $('#assignHost');
-        assignHost.on('change', function() {
+        assignHost.on('change', function () {
             const selectedValues = $(this).val();
             self.dataForClose.hosts = selectedValues;
         });
-        
+
         setTimeout(() => {
-            
+
             // departureCity
             const departureCity = $('#departureCity');
             departureCity.on('change', (e) => {
@@ -1885,9 +1759,9 @@ export default {
         // loader
         setTimeout(() => {
             this.seatData = Array.from({ length: 40 }, (_, i) => ({
-            id: i + 1,
-            number: `S${i + 1}`,
-            occupied: Math.random() < 0.3,
+                id: i + 1,
+                number: `S${i + 1}`,
+                occupied: Math.random() < 0.3,
             }));
             this.loading = false;
         }, 2000);
@@ -2046,14 +1920,12 @@ export default {
                     });
 
                     // to check all ticket type are same or not
-                    if(!this.cancelAllData.cancelAllSeatType.every(value => value === this.cancelAllData.cancelAllSeatType[0]))
-                    {
+                    if (!this.cancelAllData.cancelAllSeatType.every(value => value === this.cancelAllData.cancelAllSeatType[0])) {
                         this.cancelAllData.cancelAllSeat = [];
                         this.cancelAllData.cancelAllSeatType = [];
                     }
                     // to check all ticket type are same or not
-                    if(!this.duplicateAllSeatType.every(value => value === this.duplicateAllSeatType[0]))
-                    {
+                    if (!this.duplicateAllSeatType.every(value => value === this.duplicateAllSeatType[0])) {
                         this.duplicateAllTicket = [];
                         this.duplicateAllSeatType = [];
                     }
@@ -2094,14 +1966,14 @@ export default {
 
         async getFilterRecord() {
             this.allBookings = [];
-            const resDateFilter = await this.callApi("post", "booking", {date: this.filterDate});
+            const resDateFilter = await this.callApi("post", "booking", { date: this.filterDate });
             if (resDateFilter.status == 200) {
                 if (resDateFilter.data.length != 0) {
                     this.allBookings = resDateFilter.data;
                 }
             }
         },
-        
+
         async allSeatCancel() {
             this.cancelLoading = true;
             const resCancelSeats = await this.callApi("post", "booking/canceling/all", this.cancelAllData);
@@ -2120,7 +1992,7 @@ export default {
                 this.cancelAllData.percentage = "0";
                 this.cancelAllData.reason = "";
                 this.closeModal();
-                const resBookingDetail = await this.callApi("post", "booking/whatsapp/cancel/message", {tickets: resCancelSeats.data.tickets});
+                const resBookingDetail = await this.callApi("post", "booking/whatsapp/cancel/message", { tickets: resCancelSeats.data.tickets });
             }
             if (resCancelSeats.status == 422) {
                 this.dropScheduleButton = false;
@@ -2157,15 +2029,15 @@ export default {
                 day = '0' + day.toString();
             return year + '-' + month + '-' + day;
         },
-        
+
         setScheduleValue(event) {
-            this.addForm.departure_time = this.allSchedules[event.target.selectedIndex-1].departure_city_time;
-            this.addForm.schedule = this.allSchedules[event.target.selectedIndex-1].schedule_id;
+            this.addForm.departure_time = this.allSchedules[event.target.selectedIndex - 1].departure_city_time;
+            this.addForm.schedule = this.allSchedules[event.target.selectedIndex - 1].schedule_id;
         },
-        
+
         setRescheduleValue(event) {
-            this.rescheduleData.departure_time = this.allReSchedules[event.target.selectedIndex-1].departure_city_time;
-            this.rescheduleData.rescheduleSchedule = this.allReSchedules[event.target.selectedIndex-1].schedule_id;
+            this.rescheduleData.departure_time = this.allReSchedules[event.target.selectedIndex - 1].departure_city_time;
+            this.rescheduleData.rescheduleSchedule = this.allReSchedules[event.target.selectedIndex - 1].schedule_id;
         },
 
         async getDestinationCity() {
@@ -2175,7 +2047,7 @@ export default {
             if (this.addForm.departureCity == '0') {
                 this.addForm.destinationCity = 0;
             } else {
-                const resDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.addForm.departureCity});
+                const resDepartureCity = await this.callApi("post", "booking/getDestination", { id: this.addForm.departureCity });
                 if (resDepartureCity.length == 0) {
                     this.addForm.destinationCity = 0
                     this.desLoading = false;
@@ -2253,7 +2125,7 @@ export default {
                 }, 200);
             }
         },
-        
+
         async sendMessageToBus() {
             if (this.addForm.schedule == 0) {
                 return swal({
@@ -2279,7 +2151,7 @@ export default {
                     timer: 2000,
                 });
             }
-            
+
             this.messageLoader = true;
 
             this.messageData = {
@@ -2291,7 +2163,7 @@ export default {
                 departure_time: this.addForm.departure_time,
             }
 
-            const resData = await this.callApi("post", "booking/whatsapp/bus/send-message",this.messageData);
+            const resData = await this.callApi("post", "booking/whatsapp/bus/send-message", this.messageData);
             if (resData.status == 200) {
                 swal({
                     title: "Success",
@@ -2306,7 +2178,7 @@ export default {
             }
             this.messageLoader = false;
         },
-        
+
         async busClass() {
             if (this.addForm.departureCity == 0) {
                 return swal({
@@ -2523,8 +2395,7 @@ export default {
         },
         async updateBusClass() {
             this.validationErrors = [];
-            if (this.busClassData.bus_class == 0)
-            {
+            if (this.busClassData.bus_class == 0) {
                 return swal({
                     title: "Required",
                     text: "Bus Class is required",
@@ -2532,16 +2403,16 @@ export default {
                     timer: 2000
                 });
             }
-          
+
             const res = await this.callApi("post", "booking/busclass/update", {
-                    id: this.addForm.schedule,
-                    date: this.addForm.date,
-                    departureCity: this.addForm.departureCity,
-                    destinationCity: this.addForm.destinationCity,
-                    dropTerminal: this.addForm.terminalId,
-                    departure_time: this.addForm.departure_time,
-                    bus_class: this.busClassData.bus_class,
-                });
+                id: this.addForm.schedule,
+                date: this.addForm.date,
+                departureCity: this.addForm.departureCity,
+                destinationCity: this.addForm.destinationCity,
+                dropTerminal: this.addForm.terminalId,
+                departure_time: this.addForm.departure_time,
+                bus_class: this.busClassData.bus_class,
+            });
             if (res.status == 200) {
                 swal({
                     title: "Success",
@@ -2551,9 +2422,9 @@ export default {
                 });
                 this.fetchScheduleData();
                 this.closeModal();
-                
 
-                
+
+
             } else {
                 if (res.status == 422) {
                     this.loading = false;
@@ -2584,7 +2455,7 @@ export default {
             if (parseInt(this.rescheduleData.dataDepartureCity) == 0) {
                 this.rescheduleData.rescheduleDestinationCity = 0;
             } else {
-                const resReDepartureCity = await this.callApi("post", "booking/getDestination", {id: parseInt(this.rescheduleData.dataDepartureCity)});
+                const resReDepartureCity = await this.callApi("post", "booking/getDestination", { id: parseInt(this.rescheduleData.dataDepartureCity) });
                 if (resReDepartureCity.length == 0) {
                     this.rescheduleData.rescheduleDestinationCity = 0
                 } else {
@@ -2995,7 +2866,7 @@ export default {
                     this.allowedSeats = 0;
                 }
 
-                
+
 
                 if (resSelected.status == 500 && this.addForm.schedule == 0) {
                     this.getSchedule = false;
@@ -3028,7 +2899,7 @@ export default {
                 this.getSchedule = false;
             }
         },
-        async revertDropSchedule () {
+        async revertDropSchedule() {
 
             if (this.addForm.departureCity == 0) {
                 return swal({
@@ -3159,7 +3030,7 @@ export default {
             });
             if (resDropCheck.status == 200) {
                 if (resDropCheck.data.checkDrop) {
-                    this.labelDrop = "This schedule is dropped by " + resDropCheck.data.checkDrop.drop_by.name??'N/A';
+                    this.labelDrop = "This schedule is dropped by " + resDropCheck.data.checkDrop.drop_by.name ?? 'N/A';
                     this.hideDivButtonsDrop = false;
                 } else {
                     this.hideDivButtonsDrop = true;
@@ -3230,11 +3101,11 @@ export default {
                     timer: 2000
                 });
             }
-            
+
             if (this.schedule.bus_class.seat_map[row][col].type && this.selectedSeats.length == 0) {
                 let index = this.selectedBookedSeats.indexOf(seatNo);
                 if (index != -1) {
-                   
+
                     this.schedule.bus_class.seat_map[row][col].selected = false;
                     this.selectedBookedSeats.splice(index, 1);
                     this.checkSameType.splice(index, 1);
@@ -3245,7 +3116,7 @@ export default {
                     });
                     this.addForm.totalFare -= parseFloat(this.schedule.bus_class.seat_map[row][col].fare);
                 } else {
-                    
+
                     this.schedule.bus_class.seat_map[row][col].selected = true;
                     this.checkSameType.push(this.schedule.bus_class.seat_map[row][col].type);
                     this.selectedBookedSeats.push(seatNo);
@@ -3255,10 +3126,10 @@ export default {
                 this.addForm.totalAmount = this.addForm.totalFare;
                 this.addForm.selectedBookedSeats = this.selectedBookedSeats;
             } else if (!this.schedule.bus_class.seat_map[row][col].type && this.selectedBookedSeats.length == 0) {
-                
+
                 let index = this.selectedSeats.indexOf(seatNo);
                 if (index != -1) {
-                    
+
 
                     this.schedule.bus_class.seat_map[row][col].selected = false;
                     this.selectedSeats.splice(index, 1);
@@ -3266,8 +3137,8 @@ export default {
                     this.selectedSeatsClass.splice(index, 1);
                     this.addForm.totalFare -= this.schedule.bus_class.seat_map[row][col].fare;
                 } else {
-                    
-                  
+
+
                     this.schedule.bus_class.seat_map[row][col].selected = true;
                     this.selectedSeats.push(seatNo);
                     this.selectedSeatsFare.push(fare);
@@ -3279,7 +3150,7 @@ export default {
                 this.addForm.selectedSeatsFare = this.selectedSeatsFare;
                 this.addForm.selectedSeatsClass = this.selectedSeatsClass;
             } else {
-             
+
                 this.runUpdateFun = false;
                 this.fetchScheduleData();
                 this.resetArrays();
@@ -3291,7 +3162,7 @@ export default {
                 });
             }
 
-            
+
             /*Over Issue Seats*/
             if (this.schedule.bus_class.seat_map[row][col].over_issue && this.selectedOverIssueSeats.length == 0) {
                 let index = this.selectedBookedOverIssueSeats.indexOf(seatNo);
@@ -3331,13 +3202,12 @@ export default {
                     timer: 2000
                 });
             }
-           
+
         },
 
         // update Form After  advanced Booked seat
         async updateBookedSeat(data) {
-            if(this.runUpdateFun == true)
-            {
+            if (this.runUpdateFun == true) {
                 if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
                     let index = this.advanceSeat.indexOf(data.seatNo);
                     if (index != -1) {
@@ -3349,8 +3219,7 @@ export default {
                         this.addForm.customerName = "";
                         this.addForm.customerCNIC = "";
                         this.addForm.contact = "";
-                        if(this.advanceSeat.length == 0)
-                        {
+                        if (this.advanceSeat.length == 0) {
                             this.addForm.flag = 0;
                         }
                         this.getPoints('addFormCNIC')
@@ -3358,8 +3227,7 @@ export default {
                         this.addForm.alreadyBookedId.push(data.id);
                         this.addForm.reservedFare.push(data.fare);
                         this.addForm.advanceSeatClass.push(data.class);
-                        if(this.auth_terminal.other_terminal_passenger_detail == 1 || data.terminal == this.auth_terminal.id)
-                        {
+                        if (this.auth_terminal.other_terminal_passenger_detail == 1 || data.terminal == this.auth_terminal.id) {
                             this.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
                             this.addForm.customerName = data.customer_name;
                             this.addForm.contact = data.customer_phone;
@@ -3374,8 +3242,7 @@ export default {
             }
             // this validation only for if types is different selected liked booked or advance booking mixed
             const uniqueArray = [...new Set(this.checkSameType)];
-            if(uniqueArray.length > 1)
-            {
+            if (uniqueArray.length > 1) {
                 this.fetchScheduleData();
                 this.resetArrays();
                 return swal({
@@ -3385,13 +3252,12 @@ export default {
                     timer: 2000
                 });
             }
-           
+
         },
 
         reScheduleSelectSeat: function (row, col, data) {
             if (this.reScheduleSeatMap.bus_class.seat_map[row][col].type == 0
-                || this.reScheduleSeatMap.bus_class.seat_map[row][col].type == undefined) 
-            {
+                || this.reScheduleSeatMap.bus_class.seat_map[row][col].type == undefined) {
                 let index = this.alreadyBookedSeat.indexOf(data.seatNo);
                 if (index != -1) {
                     this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
@@ -3432,44 +3298,35 @@ export default {
 
         getClasses: function (col) {
             let gender = "";
-            if(col.online_terminal == 0 && col.gender == 1 && col.type == "advance booking")
-            {
+            if (col.online_terminal == 0 && col.gender == 1 && col.type == "advance booking") {
                 gender = "for-male-reserved";
             }
-            else if(col.online_terminal == 0 && col.gender == 1 && col.type == "booked")
-            {
+            else if (col.online_terminal == 0 && col.gender == 1 && col.type == "booked") {
                 gender = "for-male-booked";
             }
-            else if(col.online_terminal == 0 && col.gender == 0 && col.type == "advance booking")
-            {
+            else if (col.online_terminal == 0 && col.gender == 0 && col.type == "advance booking") {
                 gender = "for-female-reserved";
             }
-            else if(col.online_terminal == 0 && col.gender == 0 && col.type == "booked")
-            {
+            else if (col.online_terminal == 0 && col.gender == 0 && col.type == "booked") {
                 gender = "for-female-booked";
             }
 
-            else if(col.online_terminal == 1 && col.gender == 1 && col.type == "advance booking")
-            {
+            else if (col.online_terminal == 1 && col.gender == 1 && col.type == "advance booking") {
                 gender = "for-online-male-reserved";
             }
-            else if(col.online_terminal == 1 && col.gender == 1 && col.type == "booked")
-            {
+            else if (col.online_terminal == 1 && col.gender == 1 && col.type == "booked") {
                 gender = "for-online-male-booked";
             }
-            else if(col.online_terminal == 1 && col.gender == 0 && col.type == "advance booking")
-            {
+            else if (col.online_terminal == 1 && col.gender == 0 && col.type == "advance booking") {
                 gender = "for-online-female-reserved";
             }
-            else if(col.online_terminal == 1 && col.gender == 0 && col.type == "booked")
-            {
+            else if (col.online_terminal == 1 && col.gender == 0 && col.type == "booked") {
                 gender = "for-online-female-booked";
             }
-            else
-            {
+            else {
                 gender = "";
             }
-            
+
             let selected = col.selected ? "selected" : "";
             let partial = col.partial == 1 ? "partial" : "";
             let over = col.type == 'over-issue' ? "bg-secondary" : "";
@@ -3479,41 +3336,32 @@ export default {
 
         getClassesReschedule: function (col) {
             let gender = "";
-            if(col.online_terminal == 0 && col.gender == 1 && col.type == "advance booking")
-            {
+            if (col.online_terminal == 0 && col.gender == 1 && col.type == "advance booking") {
                 gender = "for-male-reserved";
             }
-            else if(col.online_terminal == 0 && col.gender == 1 && col.type == "booked")
-            {
+            else if (col.online_terminal == 0 && col.gender == 1 && col.type == "booked") {
                 gender = "for-male-booked";
             }
-            else if(col.online_terminal == 0 && col.gender == 0 && col.type == "advance booking")
-            {
+            else if (col.online_terminal == 0 && col.gender == 0 && col.type == "advance booking") {
                 gender = "for-female-reserved";
             }
-            else if(col.online_terminal == 0 && col.gender == 0 && col.type == "booked")
-            {
+            else if (col.online_terminal == 0 && col.gender == 0 && col.type == "booked") {
                 gender = "for-female-booked";
             }
 
-            else if(col.online_terminal == 1 && col.gender == 1 && col.type == "advance booking")
-            {
+            else if (col.online_terminal == 1 && col.gender == 1 && col.type == "advance booking") {
                 gender = "for-online-male-reserved";
             }
-            else if(col.online_terminal == 1 && col.gender == 1 && col.type == "booked")
-            {
+            else if (col.online_terminal == 1 && col.gender == 1 && col.type == "booked") {
                 gender = "for-online-male-booked";
             }
-            else if(col.online_terminal == 1 && col.gender == 0 && col.type == "advance booking")
-            {
+            else if (col.online_terminal == 1 && col.gender == 0 && col.type == "advance booking") {
                 gender = "for-online-female-reserved";
             }
-            else if(col.online_terminal == 1 && col.gender == 0 && col.type == "booked")
-            {
+            else if (col.online_terminal == 1 && col.gender == 0 && col.type == "booked") {
                 gender = "for-online-female-booked";
             }
-            else
-            {
+            else {
                 gender = "";
             }
             let selected = col.alreadyBooked ? "selected" : "";
@@ -3611,10 +3459,9 @@ export default {
             this.addForm.pointsCardId = this.pointsCardId;
             this.addForm.usagePoints = this.checkedUsagePoints;
 
-        
-            
-            if(this.addForm.usagePoints == true && this.addForm.otp_valid == false)
-            {
+
+
+            if (this.addForm.usagePoints == true && this.addForm.otp_valid == false) {
                 return swal({
                     title: "OOPS!",
                     text: "Please verify otp to use loyalty card otherwise uncheck the box",
@@ -3622,8 +3469,7 @@ export default {
                     timer: 2000
                 });
             }
-            if(this.addForm.usagePoints == true && this.addForm.otp_valid == false && this.addForm.otp_cnic != this.addForm.customerCNIC)
-            {
+            if (this.addForm.usagePoints == true && this.addForm.otp_valid == false && this.addForm.otp_cnic != this.addForm.customerCNIC) {
                 return swal({
                     title: "OOPS!",
                     text: "Cnic changed please verify it",
@@ -3631,8 +3477,7 @@ export default {
                     timer: 2000
                 });
             }
-            if(this.bookingLoading)
-            {
+            if (this.bookingLoading) {
                 return swal({
                     title: "OOPS!",
                     text: "Please Wait",
@@ -3662,7 +3507,7 @@ export default {
                     gender: "1",
                     customerCNIC: "",
                 };
-                
+
                 this.label = "";
                 this.hideCheckBox = false;
                 this.haveLabel = false;
@@ -3676,14 +3521,14 @@ export default {
                 this.addForm.schedule = resTicket.data.ticket[0].schedule_id;
                 this.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
                 this.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
-                this.selectedSeats.length = 0; 
-                this.addForm.alreadyBookedId = [];           
-                this.addForm.reservedFare = [];           
-                this.addForm.advanceSeatClass = [];           
+                this.selectedSeats.length = 0;
+                this.addForm.alreadyBookedId = [];
+                this.addForm.reservedFare = [];
+                this.addForm.advanceSeatClass = [];
                 this.fetchScheduleData();
                 this.resetArrays();
 
-                 setTimeout(() => {
+                setTimeout(() => {
                     this.bookingLoading = false;
                 }, 1000);
                 setTimeout(() => {
@@ -3692,10 +3537,11 @@ export default {
                     }
                 }, 700);
 
-                const resBookingDetail = await this.callApi("post", "booking/whatsapp/message", {invoice_id: resTicket.data.ticket[0].invoice_id,type:bookType});
+                const resBookingDetail = await this.callApi("post", "booking/whatsapp/message", { invoice_id: resTicket.data.ticket[0].invoice_id, type: bookType });
 
 
-            } else {``
+            } else {
+                ``
                 if (resTicket.status == 422) {
                     let errorContent = "";
                     let count = 0;
@@ -3721,9 +3567,9 @@ export default {
                 }, 1000);
             }
         },
-        
-        async resendSms(invoice_id,type) {
-            const resMessage = await this.callApi("post", "booking/whatsapp/message", {invoice_id: invoice_id,type:type});
+
+        async resendSms(invoice_id, type) {
+            const resMessage = await this.callApi("post", "booking/whatsapp/message", { invoice_id: invoice_id, type: type });
             if (resMessage.status == 200) {
                 swal({
                     title: "Success",
@@ -3733,10 +3579,9 @@ export default {
                 });
             }
         },
-        
+
         async sendOtp() {
-            if(!this.addForm.customerCNIC)
-            {
+            if (!this.addForm.customerCNIC) {
                 return swal({
                     title: "OOPS!",
                     text: "Please enter valid cnic",
@@ -3745,7 +3590,7 @@ export default {
                 });
             }
             this.otpLoader = true;
-            const resMessage = await this.callApi("post", "booking/send-otp",this.addForm)
+            const resMessage = await this.callApi("post", "booking/send-otp", this.addForm)
             if (resMessage.status == 200) {
                 swal({
                     title: "Success",
@@ -3754,11 +3599,10 @@ export default {
                     timer: 2000
                 });
             }
-            if(resMessage.status == 409)
-            {
+            if (resMessage.status == 409) {
                 swal({
                     title: "OOPS!",
-                    text: resMessage.data.error.join("\n"), 
+                    text: resMessage.data.error.join("\n"),
                     icon: "error",
                     timer: 2000
                 });
@@ -3766,7 +3610,7 @@ export default {
             }
             this.otpLoader = false;
         },
-        
+
         async verifyOtp() {
             if (!this.addForm.otp || this.addForm.otp.length !== 6) {
                 return swal({
@@ -3777,7 +3621,7 @@ export default {
                 });
             }
             this.otpLoader = true;
-            const resMessage = await this.callApi("post", "booking/verify-otp",this.addForm)
+            const resMessage = await this.callApi("post", "booking/verify-otp", this.addForm)
             if (resMessage.status == 200) {
                 this.addForm.otp_valid = true;
                 this.addForm.otp_cnic = this.addForm.customerCNIC;
@@ -3788,12 +3632,11 @@ export default {
                     timer: 2000
                 });
             }
-            if(resMessage.status == 409)
-            {
+            if (resMessage.status == 409) {
                 this.addForm.otp_valid = false
                 swal({
                     title: "OOPS!",
-                    text: resMessage.data.error.join("\n"), 
+                    text: resMessage.data.error.join("\n"),
                     icon: "error",
                     timer: 2000
                 });
@@ -3825,7 +3668,7 @@ export default {
 
         async details(date, schedule_id) {
             $("#" + this.detailsFormId + " table").DataTable().destroy();
-            const resBookingDetail = await this.callApi("post", "booking/details", {date, schedule_id});
+            const resBookingDetail = await this.callApi("post", "booking/details", { date, schedule_id });
             if (resBookingDetail.status === 200) {
                 this.bookingDetails = resBookingDetail.data;
                 setTimeout(() => {
@@ -3849,7 +3692,7 @@ export default {
             }
             $("#cancelModel").modal('show');
         },
-        
+
         cancelAllModal: function () {
             $("#cancel_all_ticket").modal('show');
         }
@@ -3867,7 +3710,7 @@ export default {
                 percentage: dataEnter.percentage,
                 remarks: dataEnter.reason,
             }
-            
+
             const resCancelBooking = await this.callApi("post", "booking/canceling", data);
             if (resCancelBooking.status == 200) {
                 this.cancelLoading = false;
@@ -3881,7 +3724,7 @@ export default {
                 this.fetchScheduleData();
                 this.resetArrays();
                 this.closeModal();
-                const resBookingDetail = await this.callApi("post", "booking/whatsapp/cancel/message", {tickets: resCancelBooking.data.tickets});
+                const resBookingDetail = await this.callApi("post", "booking/whatsapp/cancel/message", { tickets: resCancelBooking.data.tickets });
             }
             if (resCancelBooking.status == 422) {
                 this.dropScheduleButton = false;
@@ -4142,7 +3985,7 @@ export default {
             if (parseInt(this.rescheduleData.dataDepartureCity) == 0) {
                 this.rescheduleData.rescheduleDestinationCity = 0;
             } else {
-                const resReDepartureCity = await this.callApi("post", "booking/getDestination", {id: this.mainAllRescheduleData[0].dataDepartureCity});
+                const resReDepartureCity = await this.callApi("post", "booking/getDestination", { id: this.mainAllRescheduleData[0].dataDepartureCity });
                 if (resReDepartureCity.length == 0) {
                     this.rescheduleData.rescheduleDestinationCity = 0
                 } else {
@@ -4177,7 +4020,7 @@ export default {
             if (parseInt(this.rescheduleData.dataDepartureCity) == 0) {
                 this.rescheduleData.rescheduleDestinationCity = 0;
             } else {
-                const resReDepartureCity = await this.callApi("post", "booking/getDestination", {id: parseInt(this.rescheduleData.dataDepartureCity)});
+                const resReDepartureCity = await this.callApi("post", "booking/getDestination", { id: parseInt(this.rescheduleData.dataDepartureCity) });
                 if (resReDepartureCity.length == 0) {
                     this.rescheduleData.rescheduleDestinationCity = 0
                 } else {
@@ -4286,7 +4129,7 @@ export default {
                 single.departure_time = this.rescheduleData.departure_time;
             });
             this.loadingRescheduleButton = true;
-            const resReschedule = await this.callApi("post", "booking/store", {'data': this.mainAllRescheduleData,"rc_flag": 1});
+            const resReschedule = await this.callApi("post", "booking/store", { 'data': this.mainAllRescheduleData, "rc_flag": 1 });
             if (resReschedule.status == 200) {
                 this.loadingRescheduleButton = false;
                 swal({
@@ -4345,12 +4188,12 @@ export default {
         ,
         // Duplicate All Ticket
         allTicketDuplicate: function () {
-            this.duplicateAllTicket =  this.duplicateAllTicket.join('-');
-           setTimeout(() => {
-               this.$refs.refDuplicateAllTicket.submit();
-               this.closeModal();
-           }, 700);
-                
+            this.duplicateAllTicket = this.duplicateAllTicket.join('-');
+            setTimeout(() => {
+                this.$refs.refDuplicateAllTicket.submit();
+                this.closeModal();
+            }, 700);
+
         }
         ,
 
@@ -4556,18 +4399,17 @@ export default {
         rows() {
             const result = [];
             for (let i = 0; i < this.seatData.length; i += 4) {
-            result.push(this.seatData.slice(i, i + 4));
+                result.push(this.seatData.slice(i, i + 4));
             }
             return result;
         },
     },
 }
-;
+    ;
 
 </script>
 
 <style scoped>
-
 .image-span {
     background-color: #a2a3a7;
     border-radius: 10px;
@@ -4602,12 +4444,15 @@ export default {
 .for-male-reserved {
     background-color: #3d8ff2 !important;
 }
+
 .for-female-reserved {
     background-color: hotpink !important;
 }
+
 .for-male-booked {
     background-color: #731631 !important;
 }
+
 .for-female-booked {
     background-color: #ff7276 !important;
 }
@@ -4615,12 +4460,15 @@ export default {
 .for-online-male-reserved {
     background-color: #0c6077 !important;
 }
+
 .for-online-female-reserved {
     background-color: #9d92f0 !important;
 }
+
 .for-online-male-booked {
     background-color: #343434 !important;
 }
+
 .for-online-female-booked {
     background-color: #d71e7a !important;
 }
@@ -4698,7 +4546,7 @@ img {
     justify-content: center;
 }
 
-.circles + span {
+.circles+span {
     position: relative;
     top: -4px;
     padding: 5px;
@@ -4824,6 +4672,7 @@ img {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
@@ -4831,60 +4680,63 @@ img {
 
 /* loader */
 .bus-seat-wrapper {
-  max-width: 420px;
-  margin: auto;
-  text-align: center;
+    max-width: 420px;
+    margin: auto;
+    text-align: center;
 }
 
 .seat-map {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .seat-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
 .seat,
 .seat-skeleton {
-  width: 50px;
-  height: 35px;
-  line-height: 35px;
-  font-size: 13px;
-  border-radius: 6px;
-  margin: 2px; /* 👈 add spacing between seats */
+    width: 50px;
+    height: 35px;
+    line-height: 35px;
+    font-size: 13px;
+    border-radius: 6px;
+    margin: 2px;
+    /* 👈 add spacing between seats */
 }
 
 .seat {
-  background-color: #e3f2fd;
+    background-color: #e3f2fd;
 }
 
 .seat.occupied {
-  background-color: #ffcdd2;
+    background-color: #ffcdd2;
 }
 
 .seat-skeleton {
-  background-color: #ccc;
-  animation: pulse 1.5s infinite;
+    background-color: #ccc;
+    animation: pulse 1.5s infinite;
 }
 
 .aisle {
-  width: 30px;
+    width: 30px;
 }
 
 @keyframes pulse {
-  0% {
-    background-color: #ccc;
-  }
-  50% {
-    background-color: #ddd;
-  }
-  100% {
-    background-color: #ccc;
-  }
+    0% {
+        background-color: #ccc;
+    }
+
+    50% {
+        background-color: #ddd;
+    }
+
+    100% {
+        background-color: #ccc;
+    }
 }
 </style>

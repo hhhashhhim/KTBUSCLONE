@@ -86,7 +86,7 @@ import PR from "./pages/inventory/products/PurchaseRequisitionNote.vue";
 // const url = '/kt-dev/'
 const url = '/'
 
-
+ 
 const routes = [
     {
         path: url + "",

@@ -65,6 +65,7 @@
                                                             <th>Current Reading</th>
                                                             <th>Total Parts</th>
                                                             <th>Due Parts</th>
+                                                            <th class="w-25">Health Status</th>
                                                             <th v-if="checkForSubmenuButtons('add-maintenance')">Action
                                                             </th>
                                                         </tr>
@@ -73,16 +74,31 @@
                                                         <tr v-for="(data, i) in mainData" :key="i">
                                                             <td
                                                                 :class="{ 'border border-danger border-right-0': data.due_parts > 0 }">
-                                                                {{ data.bus_number }}</td>
+                                                                {{ data.bus_number }}
+                                                            </td>
                                                             <td
                                                                 :class="{ 'border border-danger border-right-0 border-left-0': data.due_parts > 0 }">
-                                                                {{ data.current_reading }} (km)</td>
+                                                                {{ data.current_reading }} (km)
+                                                            </td>
                                                             <td
                                                                 :class="{ 'border border-danger border-right-0 border-left-0': data.due_parts > 0 }">
-                                                                {{ data.total_parts }}</td>
+                                                                {{ data.total_parts }}
+                                                            </td>
                                                             <td
                                                                 :class="{ 'border border-danger border-right-0 border-left-0': data.due_parts > 0 }">
-                                                                {{ data.due_parts }}</td>
+                                                                {{ data.due_parts }}
+                                                            </td>
+                                                            <!-- ✅ Health progress bar -->
+                                                            <td
+                                                                :class="{ 'border border-danger border-right-0 border-left-0': data.due_parts > 0 }">
+                                                                <div class="progress" style="height: 20px;">
+                                                                    <div class="progress-bar" role="progressbar"
+                                                                        :class="getStatusClass(data.health_percentage)"
+                                                                        :style="{ width: data.health_percentage + '%' }">
+                                                                        {{ data.health_percentage }}%
+                                                                    </div>
+                                                                </div>
+                                                            </td>
                                                             <td
                                                                 :class="{ 'border border-danger border-left-0': data.due_parts > 0 }">
                                                                 <button
@@ -103,6 +119,8 @@
                                                         </tr>
                                                     </tbody>
                                                 </table>
+
+
                                             </div>
                                         </div>
                                     </div>
@@ -115,7 +133,7 @@
             </div>
 
             <!-- Add Modal Maintenance-->
-           <Add :heading="'Due Maintenance Add'" :errors="this.validationErrors" :success="success" :formID="formID">
+<Add :heading="'Due Maintenance Add'" :errors="this.validationErrors" :success="success" :formID="formID">
     <div class="row">
         <!-- Fleet -->
         <div class="form-group col-md-6">
@@ -139,22 +157,11 @@
             </select>
         </div>
 
-        <!-- Days (Conditional) -->
-        <div class="form-group col-md-6" v-if="showDaysInput">
-            <label>Maintenance Days <span class="text-danger ml-1">*</span></label>
-            <input type="number" class="form-control" v-model="postData.days" placeholder="Enter days">
-        </div>
-
-        <!-- Date (Conditional) -->
-        <div class="form-group col-md-6" v-if="showDateInput">
-            <label>Maintenance Date <span class="text-danger ml-1">*</span></label>
-            <input type="date" class="form-control" v-model="postData.date">
-        </div>
-
         <!-- Current Reading -->
         <div class="form-group col-md-6">
             <label>Current Reading <span class="text-danger ml-1">*</span></label>
-            <input type="number" class="form-control" placeholder="Meter Reading" v-model="postData.currentReading" />
+            <input type="number" class="form-control" placeholder="Meter Reading"
+                   v-model="postData.currentReading" />
         </div>
 
         <!-- Amount -->
@@ -188,6 +195,10 @@
         </button>
     </template>
 </Add>
+
+
+
+
 
 
             <!-- Model for update metere reading -->
@@ -321,29 +332,29 @@
                                                 v-if="checkForSubmenuButtons('add-maintenance') && single.due == true"
                                                 class="btn btn-primary mx-1" data-target="#maintenance_add"
                                                 data-toggle="modal"
-                                                @click="dueMaintenanceFrom({ bus_id: single.bus_id, part_id: single.part_id }, 0)"
-                                                title="Add Maintenance">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
+                                                @click="dueMaintenanceFrom({ bus_id: single.bus_id, part_id: single.part_id, dueType: (single.maintenance_days && single.maintenance_days_date) ? 'days' : 'reading', maintenance_days: single.maintenance_days, maintenance_days_date: single.maintenance_days_date }, 0)"
+                                                title="Add Maintenance"> <i class="fas fa-plus"></i> </button>
+
+
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
-                            
-                           <div>
-                             <h5 class="">History</h5>
-<div v-for="(his, i) in history" :key="i" class="card mb-3 shadow">
-  <div class="card-header p-3 d-flex justify-content-between">
-    <h6 class="mb-0">Part Name: {{ his.part_name.name }}</h6>
-    <h6 class="mb-0">Maintenance Date: {{ formatDate(his.time) }}
-</h6>
-  </div>
-  <div class="card-body p-3 m-0">
 
-    <p class="mb-0">{{ his.detail }}</p>
-  </div>
-</div>
-                           </div>
+                            <div>
+                                <h5 class="">History</h5>
+                                <div v-for="(his, i) in history" :key="i" class="card mb-3 shadow">
+                                    <div class="card-header p-3 d-flex justify-content-between">
+                                        <h6 class="mb-0">Part Name: {{ his.part_name.name }}</h6>
+                                        <h6 class="mb-0">Maintenance Date: {{ formatDate(his.time) }}
+                                        </h6>
+                                    </div>
+                                    <div class="card-body p-3 m-0">
+
+                                        <p class="mb-0">{{ his.detail }}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button class="btn btn-primary mx-1" data-toggle="modal" data-target="#maintenanceRecord"
@@ -760,7 +771,7 @@ export default {
             maintenanceDays: [],
             maintenanceDateDays: [],
             useDaysPerRow: [],
-            history:[],
+            history: [],
         };
     },
     created() {
@@ -787,34 +798,49 @@ export default {
             $(".modal").click();
         },
         async fetchData() {
-            const fleetRes = await this.callApi("post", "fleet/maintenance/due");
-            if (fleetRes.status === 200) {
+    const fleetRes = await this.callApi("post", "fleet/maintenance/due");
+    if (fleetRes.status === 200) {
+        this.mainData = fleetRes.data.mainData;
+        this.fleets = fleetRes.data.busDrop;
+        this.parts = fleetRes.data.partDrop;
+        this.chartData = fleetRes.data.busChart;
+        this.partData = fleetRes.data.partChart;
+    }
 
-                this.mainData = fleetRes.data.mainData;
-                this.fleets = fleetRes.data.busDrop;
-                this.parts = fleetRes.data.partDrop;
-                this.chartData = fleetRes.data.busChart;
-                this.partData = fleetRes.data.partChart;
-            }
+    setTimeout(() => {
+        $('#maintenance_table').DataTable({
+            ordering: false
+        });
+    }, 300);
 
-            setTimeout(() => {
-                $('#maintenance_table').DataTable({
-                    ordering: false
-                });
-            }, 300);
+    // ✅ Close modal after reload
+  
+   $(".modal").click();
+},
+
+        getStatusClass(percentage) {
+            if (percentage >= 20) return "bg-success";
+            return "bg-danger";                          // Critical
         },
-        async dueMaintenanceFrom(data, type) {
-            this.postData.maintenanceType = type;
-            this.postData.fleetId = data ? data.bus_id : '';
-            this.postData.partId = data ? data.part_id : '';
-            this.postData.currentReading = "";
-            this.postData.amount = "";
-            this.postData.companyPaid = "";
-            this.postData.evidence = "";
-            this.postData.detail = "";
-            $("#imageField").val('');
-            this.checkDisable = data ? true : false;
-        },
+       async dueMaintenanceFrom(data, type) {
+    this.postData.maintenanceType = type;
+    this.postData.fleetId = data ? data.bus_id : '';
+    this.postData.partId = data ? data.part_id : '';
+    this.postData.currentReading = "";
+    this.postData.amount = "";
+    this.postData.companyPaid = "";
+    this.postData.evidence = "";
+    this.postData.detail = "";
+
+    $("#imageField").val('');
+    this.checkDisable = !!data;
+
+    // no showDaysInput / showDateInput logic anymore
+    this.$nextTick(() => {
+        $('#maintenance_add').modal('show');
+    });
+},
+
         async fetchDueFleetDetail(id) {
             const fleetDetailRes = await this.callApi("post", "fleet/single/due/detail", { id: id });
             if (fleetDetailRes.status === 200) {
@@ -825,12 +851,8 @@ export default {
             }
         },
         getProgressColor(percentage) {
-            if (percentage >= 75) {
+            if (percentage > 20) {
                 return 'bg-success'; // new / fresh
-            } else if (percentage >= 50) {
-                return 'bg-grey'; // moderate
-            } else if (percentage >= 25) {
-                return 'bg-orange'; // warning
             } else {
                 return 'bg-danger'; // due / expired
             }
@@ -869,93 +891,78 @@ export default {
             }
         },
         async updateMaintenanceFrom(data) {
-            this.editData.maintenanceType = data.maintenance_type;
-            this.editData.maintenanceId = data.id;
-            this.editData.fleetId = data.bus_id;
-            this.editData.partId = data.part_id;
-            this.editData.currentReading = data.bus_name.current_reading;
-            this.editData.amount = data.amount;
-            this.editData.companyPaid = data.company_paid;
-            this.editData.evidence = data.evidence;
-            this.editData.detail = data.detail;
-        },
-        async dueMaintenanceUpdate() {
-            // validation for empty data
-            if (!this.editData.fleetId || !this.editData.partId || !this.editData.currentReading || !this.editData.amount ||
-                !this.editData.companyPaid || !this.editData.detail) {
-                return swal({
-                    title: "Error",
-                    text: "Please Fill All Field",
-                    icon: "error",
-                    timer: 2000
+    this.editData.maintenanceType = data.maintenance_type;
+    this.editData.maintenanceId = data.id;
+    this.editData.fleetId = data.bus_id;
+    this.editData.partId = data.part_id;
+    this.editData.currentReading = data.bus_name.current_reading;
+    this.editData.amount = data.amount;
+    this.editData.companyPaid = data.company_paid;
+    this.editData.evidence = data.evidence;
+    this.editData.detail = data.detail;
+
+    // keep old days
+    this.editData.days = data.maintenance_days;
+    // new date will be set in update
+    this.editData.date = "";
+},
+      async dueMaintenanceUpdate() {
+    if (!this.editData.fleetId || !this.editData.partId || !this.editData.currentReading ||
+        !this.editData.amount || !this.editData.companyPaid || !this.editData.detail) {
+        return Swal.fire({
+            title: "Error",
+            text: "Please Fill All Fields",
+            icon: "error",
+            timer: 2000
+        });
+    }
+
+    this.loading = true;
+    const config = { headers: { 'content-type': 'multipart/form-data' } };
+    let formData = new FormData();
+    formData.append('maintenanceId', this.editData.maintenanceId);
+    formData.append('fleetId', this.editData.fleetId);
+    formData.append('partId', this.editData.partId);
+    formData.append('currentReading', this.editData.currentReading);
+    formData.append('amount', this.editData.amount);
+    formData.append('companyPaid', this.editData.companyPaid);
+    formData.append('evidence', this.editData.evidence);
+    formData.append('detail', this.editData.detail);
+    formData.append('maintenanceType', this.editData.maintenanceType);
+
+    const res = await this.callApi("post", "fleet/maintenance/due/update", formData, config);
+
+    if (res.status === 200) {
+        this.loading = false;
+        $('#maintenance_table').DataTable().destroy();
+        $('#maintenance_udpate').click();
+        this.editData = {
+            maintenanceId: "",
+            maintenanceType: "",
+            fleetId: "",
+            partId: "",
+            currentReading: "",
+            amount: "",
+            companyPaid: "",
+            evidence: "",
+            detail: ""
+        };
+        Swal.fire({ title: "Success", text: "Maintenance Updated", icon: "success", timer: 2000 });
+        await this.fetchData();
+    } else {
+        this.loading = false;
+        if (res.status == 422) {
+            let errorContent = "";
+            let count = 0;
+            for (const key in res.data.errors) {
+                res.data.errors[key].forEach((element) => {
+                    errorContent += (++count) + " - " + element + "\n";
                 });
             }
-
-            this.loading = true;
-
-            const config = {
-                headers: { 'content-type': 'multipart/form-data' }
-            }
-
-            let formData = new FormData();
-            formData.append('maintenanceId', this.editData.maintenanceId);
-            formData.append('fleetId', this.editData.fleetId);
-            formData.append('partId', this.editData.partId);
-            formData.append('currentReading', this.editData.currentReading);
-            formData.append('amount', this.editData.amount);
-            formData.append('companyPaid', this.editData.companyPaid);
-            formData.append('evidence', this.editData.evidence);
-            formData.append('detail', this.editData.detail);
-            formData.append('maintenanceType', this.editData.maintenanceType);
-
-
-            const res = await this.callApi("post", "fleet/maintenance/due/update", formData, config);
-            if (res.status === 200) {
-                this.loading = false;
-                $('#maintenance_table').DataTable().destroy();
-                $('#maintenance_udpate').click();
-                this.editData.maintenanceId = "";
-                this.editData.maintenanceType = "";
-                this.editData.fleetId = "";
-                this.editData.partId = "";
-                this.editData.currentReading = "";
-                this.editData.amount = "";
-                this.editData.companyPaid = "";
-                this.editData.evidence = "";
-                this.editData.detail = "";
-                swal({
-                    title: "Success",
-                    text: "Maintenance Update",
-                    icon: "success",
-                    timer: 2000
-                });
-                await this.fetchData();
-                this.loading = false;
-            }
-            else {
-                this.loading = false;
-                if (res.status == 422) {
-                    let errorContent = "";
-                    let count = 0;
-                    for (const key in res.data.errors) {
-                        res.data.errors[key].forEach((element) => {
-                            errorContent += (
-                                (++count) + " - " + //creating serial no.
-                                element + // main error
-                                "\n" // creating new line
-                            );
-                        });
-                        swal({
-                            title: "Error",
-                            text: errorContent,
-                            icon: "error",
-                            timer: 2000
-                        });
-
-                    }
-                }
-            }
-        },
+            Swal.fire({ title: "Error", text: errorContent, icon: "error", timer: 2000 });
+        }
+    }
+},
         async editEvidenceImage(e) {
             if (e.target.files[0].name.match(/\.(jpg|jpeg|png|pdf|docx|doc)$/i)) {
 
@@ -974,52 +981,68 @@ export default {
                 });
             }
         },
-         async dueMaintenanceAdd() {
-        // Basic validation
-        if (!this.postData.fleetId || !this.postData.partId || !this.postData.currentReading ||
-            !this.postData.amount || !this.postData.companyPaid || !this.postData.evidence || !this.postData.detail ||
-            (this.showDaysInput && !this.postData.days) ||
-            (this.showDateInput && !this.postData.date)
-        ) {
-            return swal({ title: "Error", text: "Please Fill All Required Fields", icon: "error", timer: 2000 });
+   async dueMaintenanceAdd() {
+    if (!this.postData.fleetId || !this.postData.partId || !this.postData.currentReading ||
+        !this.postData.amount || !this.postData.companyPaid || !this.postData.evidence || !this.postData.detail) {
+        return Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Please Fill All Required Fields",
+            timer: 2000,
+            showConfirmButton: false
+        });
+    }
+
+    this.loading = true;
+    const config = { headers: { 'content-type': 'multipart/form-data' } };
+    let formData = new FormData();
+    formData.append('fleetId', this.postData.fleetId);
+    formData.append('partId', this.postData.partId);
+    formData.append('currentReading', this.postData.currentReading);
+    formData.append('amount', this.postData.amount);
+    formData.append('companyPaid', this.postData.companyPaid);
+    formData.append('evidence', this.postData.evidence);
+    formData.append('detail', this.postData.detail);
+    formData.append('maintenanceType', this.postData.maintenanceType);
+
+    const res = await this.callApi("post", "fleet/maintenance/due/add", formData, config);
+
+    if (res.status === 201) {
+        // ✅ Close all modals first
+        $(".modal").modal("hide");
+
+      
+        setTimeout(() => {
+            Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: "Maintenance Added",
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }, 400); // adjust delay if needed
+
+        this.resetForm();
+        await this.fetchData();
+    } else if (res.status === 422) {
+        let errorContent = "";
+        let count = 0;
+        for (const key in res.data.errors) {
+            res.data.errors[key].forEach((element) => {
+                errorContent += (++count) + " - " + element + "\n";
+            });
         }
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: errorContent,
+            timer: 2000,
+            showConfirmButton: false
+        });
+    }
 
-        this.loading = true;
-        const config = { headers: { 'content-type': 'multipart/form-data' } };
-        let formData = new FormData();
-        formData.append('fleetId', this.postData.fleetId);
-        formData.append('partId', this.postData.partId);
-        formData.append('currentReading', this.postData.currentReading);
-        formData.append('amount', this.postData.amount);
-        formData.append('companyPaid', this.postData.companyPaid);
-        formData.append('evidence', this.postData.evidence);
-        formData.append('detail', this.postData.detail);
-        formData.append('maintenanceType', this.postData.maintenanceType);
-        formData.append('days', this.showDaysInput ? this.postData.days : '');
-        formData.append('date', this.showDateInput ? this.postData.date : '');
-
-        const res = await this.callApi("post", "fleet/maintenance/due/add", formData, config);
-
-        if (res.status === 201) {
-            $(".modal").click();
-            $('#maintenance_table').DataTable().destroy();
-            this.resetForm();
-            swal({ title: "Success", text: "Maintenance Added", icon: "success", timer: 2000 });
-            await this.fetchData();
-        } else {
-            if (res.status === 422) {
-                let errorContent = "";
-                let count = 0;
-                for (const key in res.data.errors) {
-                    res.data.errors[key].forEach((element) => {
-                        errorContent += (++count) + " - " + element + "\n";
-                    });
-                }
-                swal({ title: "Error", text: errorContent, icon: "error", timer: 2000 });
-            }
-        }
-        this.loading = false;
-    },
+    this.loading = false;
+},
         async readingUpdate() {
             // validation for empty data
             if (!this.readingData.fleetId || !this.readingData.currentReading) {
@@ -1132,108 +1155,108 @@ export default {
             }
         },
 
-       async linkMaintenance() {
-    if (!this.fleetId || !this.currentReading || this.fleetPart.length === 0) {
-        return swal({
-            title: "Error",
-            text: "Please fill all required fields.",
-            icon: "error",
-            timer: 2000
-        });
-    }
-
-    for (let i = 0; i < this.fleetPart.length; i++) {
-        const part = this.fleetPart[i];
-        const isUsingDays = this.useDaysPerRow[i];
-        const after = this.maintenanceAfter[i];
-        const at = this.maintenanceAt[i];
-        const days = this.maintenanceDays[i];
-        const dates = this.maintenanceDateDays[i];
-
-        if (!part) {
-            return swal({
-                title: "Error",
-                text: `Please select a part for row ${i + 1}.`,
-                icon: "error",
-                timer: 2000
-            });
-        }
-
-        if (isUsingDays) {
-            if (!days || !dates) {
+        async linkMaintenance() {
+            if (!this.fleetId || !this.currentReading || this.fleetPart.length === 0) {
                 return swal({
                     title: "Error",
-                    text: `Please enter maintenance days for row ${i + 1}.`,
+                    text: "Please fill all required fields.",
                     icon: "error",
                     timer: 2000
                 });
             }
-        } else {
-            if (!after || !at) {
-                return swal({
-                    title: "Error",
-                    text: `Please enter both KM fields for row ${i + 1} or switch to Days.`,
-                    icon: "error",
+
+            for (let i = 0; i < this.fleetPart.length; i++) {
+                const part = this.fleetPart[i];
+                const isUsingDays = this.useDaysPerRow[i];
+                const after = this.maintenanceAfter[i];
+                const at = this.maintenanceAt[i];
+                const days = this.maintenanceDays[i];
+                const dates = this.maintenanceDateDays[i];
+
+                if (!part) {
+                    return swal({
+                        title: "Error",
+                        text: `Please select a part for row ${i + 1}.`,
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+
+                if (isUsingDays) {
+                    if (!days || !dates) {
+                        return swal({
+                            title: "Error",
+                            text: `Please enter maintenance days for row ${i + 1}.`,
+                            icon: "error",
+                            timer: 2000
+                        });
+                    }
+                } else {
+                    if (!after || !at) {
+                        return swal({
+                            title: "Error",
+                            text: `Please enter both KM fields for row ${i + 1} or switch to Days.`,
+                            icon: "error",
+                            timer: 2000
+                        });
+                    }
+                }
+            }
+
+            // ✅ Clean data before sending (convert "" → null, cast to int where needed)
+            const data = {
+                fleetId: this.fleetId,
+                currentReading: this.currentReading,
+                fleetPart: this.fleetPart,
+                maintenanceAfter: this.maintenanceAfter.map(v => v === "" ? null : (v !== null ? parseInt(v) : null)),
+                maintenanceAt: this.maintenanceAt.map(v => v === "" ? null : (v !== null ? parseInt(v) : null)),
+                maintenanceDays: this.maintenanceDays.map(v => v === "" ? null : (v !== null ? parseInt(v) : null)),
+                maintenanceDateDays: this.maintenanceDateDays.map(v => v === "" ? null : v), // keep as string (date)
+                useDaysPerRow: this.useDaysPerRow
+            };
+
+            this.loading = true;
+            const res = await this.callApi("post", "fleet/part/link", data);
+
+            if (res.status === 200) {
+                $(".modal").click();
+                this.loading = false;
+                $('#maintenance_table').DataTable().destroy();
+
+                // ✅ Reset fields
+                this.fleetId = "";
+                this.currentReading = "";
+                this.loop = 0;
+                this.fleetPart = [];
+                this.maintenanceAfter = [];
+                this.maintenanceAt = [];
+                this.maintenanceDays = [];
+                this.maintenanceDateDays = [];
+                this.useDaysPerRow = [];
+
+                swal({
+                    title: "Success",
+                    text: "Maintenance Added",
+                    icon: "success",
                     timer: 2000
                 });
+
+                setTimeout(() => { this.loop = 1; }, 2000);
+                await this.fetchData();
+            } else {
+                this.loading = false;
+                if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (++count) + " - " + element + "\n";
+                        });
+                    }
+                    swal({ title: "Error", text: errorContent, icon: "error", timer: 2000 });
+                }
             }
-        }
-    }
-
-    // ✅ Clean data before sending (convert "" → null, cast to int where needed)
-    const data = {
-        fleetId: this.fleetId,
-        currentReading: this.currentReading,
-        fleetPart: this.fleetPart,
-        maintenanceAfter: this.maintenanceAfter.map(v => v === "" ? null : (v !== null ? parseInt(v) : null)),
-        maintenanceAt: this.maintenanceAt.map(v => v === "" ? null : (v !== null ? parseInt(v) : null)),
-        maintenanceDays: this.maintenanceDays.map(v => v === "" ? null : (v !== null ? parseInt(v) : null)),
-        maintenanceDateDays: this.maintenanceDateDays.map(v => v === "" ? null : v), // keep as string (date)
-        useDaysPerRow: this.useDaysPerRow
-    };
-
-    this.loading = true;
-    const res = await this.callApi("post", "fleet/part/link", data);
-
-    if (res.status === 200) {
-        $(".modal").click();
-        this.loading = false;
-        $('#maintenance_table').DataTable().destroy();
-
-        // ✅ Reset fields
-        this.fleetId = "";
-        this.currentReading = "";
-        this.loop = 0;
-        this.fleetPart = [];
-        this.maintenanceAfter = [];
-        this.maintenanceAt = [];
-        this.maintenanceDays = [];
-        this.maintenanceDateDays = [];
-        this.useDaysPerRow = [];
-
-        swal({
-            title: "Success",
-            text: "Maintenance Added",
-            icon: "success",
-            timer: 2000
-        });
-
-        setTimeout(() => { this.loop = 1; }, 2000);
-        await this.fetchData();
-    } else {
-        this.loading = false;
-        if (res.status == 422) {
-            let errorContent = "";
-            let count = 0;
-            for (const key in res.data.errors) {
-                res.data.errors[key].forEach((element) => {
-                    errorContent += (++count) + " - " + element + "\n";
-                });
-            }
-            swal({ title: "Error", text: errorContent, icon: "error", timer: 2000 });
-        }
-    }
-},
+        },
 
         async updateLinkMaintenance() {
             if (!this.edit.fleetId || !this.edit.currentReading || this.edit.fleetPart.length === 0) {
@@ -1253,6 +1276,7 @@ export default {
                 const savedAfterKm = linkData.maintenance_after;
                 const savedAtKm = linkData.maintenance_at;
                 const savedAfterDays = linkData.maintenance_days;
+                const savedAfterDateDays = linkData.maintenance_days_date;
 
                 if (!partId) {
                     return swal({ title: "Error", text: `Row ${i + 1}: Part is missing.`, icon: "error", timer: 2000 });
@@ -1266,9 +1290,14 @@ export default {
                         return swal({ title: "Error", text: `Row ${i + 1}: Required After (Days) is missing.`, icon: "error", timer: 2000 });
                     }
 
+                    // reset km fields
                     this.edit.maintenanceAfter[i] = null;
                     this.edit.maintenanceAt[i] = null;
+
+                    // set days fields
                     this.edit.maintenanceDays[i] = hasDays ? afterDays : savedAfterDays;
+                    this.edit.maintenanceDateDays[i] = afterDateDays ?? savedAfterDateDays ?? null;
+
                 } else {
                     const finalAfterKm = afterKm ?? savedAfterKm;
                     const finalAtKm = atKm ?? savedAtKm;
@@ -1276,9 +1305,13 @@ export default {
                         return swal({ title: "Error", text: `Row ${i + 1}: Required After (km) or Last Maintenance At (km) is missing.`, icon: "error", timer: 2000 });
                     }
 
+                    // set km fields
                     this.edit.maintenanceAfter[i] = finalAfterKm;
                     this.edit.maintenanceAt[i] = finalAtKm;
+
+                    // reset days fields
                     this.edit.maintenanceDays[i] = null;
+                    this.edit.maintenanceDateDays[i] = null;
                 }
             }
 
@@ -1502,19 +1535,19 @@ export default {
         },
     },
     watch: {
-    'postData.partId'(newVal) {
-        if (!newVal) {
-            this.showDaysInput = false;
-            this.showDateInput = false;
-            return;
+        'postData.partId'(newVal) {
+            if (!newVal) {
+                this.showDaysInput = false;
+                this.showDateInput = false;
+                return;
+            }
+            const selectedPart = this.parts.find(p => p.id === newVal);
+            if (selectedPart) {
+                this.showDaysInput = !!selectedPart.maintenance_days;
+                this.showDateInput = !!selectedPart.maintenance_days_date;
+            }
         }
-        const selectedPart = this.parts.find(p => p.id === newVal);
-        if (selectedPart) {
-            this.showDaysInput = !!selectedPart.maintenance_days;
-            this.showDateInput = !!selectedPart.maintenance_days_date;
-        }
-    }
-},
+    },
 };
 </script>
 <style scoped>
