@@ -133,68 +133,68 @@
             </div>
 
             <!-- Add Modal Maintenance-->
-<Add :heading="'Due Maintenance Add'" :errors="this.validationErrors" :success="success" :formID="formID">
-    <div class="row">
-        <!-- Fleet -->
-        <div class="form-group col-md-6">
-            <label>Fleet <span class="text-danger ml-1">*</span></label>
-            <select class="form-control" v-model="postData.fleetId" :disabled="checkDisable">
-                <option value="">Select Fleet</option>
-                <option v-for="(fleet, i) in fleets" :key="i" :value="fleet.id">
-                    {{ fleet.bus_number }}
-                </option>
-            </select>
-        </div>
+            <Add :heading="'Due Maintenance Add'" :errors="this.validationErrors" :success="success" :formID="formID">
+                <div class="row">
+                    <!-- Fleet -->
+                    <div class="form-group col-md-6">
+                        <label>Fleet <span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" v-model="postData.fleetId" :disabled="checkDisable">
+                            <option value="">Select Fleet</option>
+                            <option v-for="(fleet, i) in fleets" :key="i" :value="fleet.id">
+                                {{ fleet.bus_number }}
+                            </option>
+                        </select>
+                    </div>
 
-        <!-- Part -->
-        <div class="form-group col-md-6">
-            <label>Part <span class="text-danger ml-1">*</span></label>
-            <select class="form-control" v-model="postData.partId" :disabled="checkDisable">
-                <option value="">Select Part</option>
-                <option v-for="(part, i) in parts" :key="i" :value="part.id">
-                    {{ part.name }}
-                </option>
-            </select>
-        </div>
+                    <!-- Part -->
+                    <div class="form-group col-md-6">
+                        <label>Part <span class="text-danger ml-1">*</span></label>
+                        <select class="form-control" v-model="postData.partId" :disabled="checkDisable">
+                            <option value="">Select Part</option>
+                            <option v-for="(part, i) in parts" :key="i" :value="part.id">
+                                {{ part.name }}
+                            </option>
+                        </select>
+                    </div>
 
-        <!-- Current Reading -->
-        <div class="form-group col-md-6">
-            <label>Current Reading <span class="text-danger ml-1">*</span></label>
-            <input type="number" class="form-control" placeholder="Meter Reading"
-                   v-model="postData.currentReading" />
-        </div>
+                    <!-- Current Reading -->
+                    <div class="form-group col-md-6">
+                        <label>Current Reading <span class="text-danger ml-1">*</span></label>
+                        <input type="number" class="form-control" placeholder="Meter Reading"
+                            v-model="postData.currentReading" />
+                    </div>
 
-        <!-- Amount -->
-        <div class="form-group col-md-6">
-            <label>Total Amount <span class="text-danger ml-1">*</span></label>
-            <input type="number" class="form-control" v-model="postData.amount" />
-        </div>
+                    <!-- Amount -->
+                    <div class="form-group col-md-6">
+                        <label>Total Amount <span class="text-danger ml-1">*</span></label>
+                        <input type="number" class="form-control" v-model="postData.amount" />
+                    </div>
 
-        <!-- Company Paid -->
-        <div class="form-group col-md-6">
-            <label>Paid By Company <span class="text-danger ml-1">*</span></label>
-            <input type="number" class="form-control" v-model="postData.companyPaid" />
-        </div>
+                    <!-- Company Paid -->
+                    <div class="form-group col-md-6">
+                        <label>Paid By Company <span class="text-danger ml-1">*</span></label>
+                        <input type="number" class="form-control" v-model="postData.companyPaid" />
+                    </div>
 
-        <!-- Evidence -->
-        <div class="form-group col-md-6">
-            <label>Evidence <span class="text-danger ml-1">*</span></label>
-            <input type="file" class="form-control" @change="evidenceImage($event)" id="imageField" />
-        </div>
+                    <!-- Evidence -->
+                    <div class="form-group col-md-6">
+                        <label>Evidence <span class="text-danger ml-1">*</span></label>
+                        <input type="file" class="form-control" @change="evidenceImage($event)" id="imageField" />
+                    </div>
 
-        <!-- Detail -->
-        <div class="form-group col-md-12">
-            <label>Detail <span class="text-danger ml-1">*</span></label>
-            <textarea class="form-control" v-model="postData.detail"></textarea>
-        </div>
-    </div>
+                    <!-- Detail -->
+                    <div class="form-group col-md-12">
+                        <label>Detail <span class="text-danger ml-1">*</span></label>
+                        <textarea class="form-control" v-model="postData.detail"></textarea>
+                    </div>
+                </div>
 
-    <template v-slot:button>
-        <button type="button" class="btn btn-primary" @click="dueMaintenanceAdd" :disabled="loading">
-            {{ loading ? 'Loading...' : 'Add' }}
-        </button>
-    </template>
-</Add>
+                <template v-slot:button>
+                    <button type="button" class="btn btn-primary" @click="dueMaintenanceAdd" :disabled="loading">
+                        {{ loading ? 'Loading...' : 'Add' }}
+                    </button>
+                </template>
+            </Add>
 
 
 
@@ -798,48 +798,48 @@ export default {
             $(".modal").click();
         },
         async fetchData() {
-    const fleetRes = await this.callApi("post", "fleet/maintenance/due");
-    if (fleetRes.status === 200) {
-        this.mainData = fleetRes.data.mainData;
-        this.fleets = fleetRes.data.busDrop;
-        this.parts = fleetRes.data.partDrop;
-        this.chartData = fleetRes.data.busChart;
-        this.partData = fleetRes.data.partChart;
-    }
+            const fleetRes = await this.callApi("post", "fleet/maintenance/due");
+            if (fleetRes.status === 200) {
+                this.mainData = fleetRes.data.mainData;
+                this.fleets = fleetRes.data.busDrop;
+                this.parts = fleetRes.data.partDrop;
+                this.chartData = fleetRes.data.busChart;
+                this.partData = fleetRes.data.partChart;
+            }
 
-    setTimeout(() => {
-        $('#maintenance_table').DataTable({
-            ordering: false
-        });
-    }, 300);
+            setTimeout(() => {
+                $('#maintenance_table').DataTable({
+                    ordering: false
+                });
+            }, 300);
 
-    // ✅ Close modal after reload
-  
-   $(".modal").click();
-},
+            // ✅ Close modal after reload
+
+            $(".modal").click();
+        },
 
         getStatusClass(percentage) {
             if (percentage >= 20) return "bg-success";
             return "bg-danger";                          // Critical
         },
-       async dueMaintenanceFrom(data, type) {
-    this.postData.maintenanceType = type;
-    this.postData.fleetId = data ? data.bus_id : '';
-    this.postData.partId = data ? data.part_id : '';
-    this.postData.currentReading = "";
-    this.postData.amount = "";
-    this.postData.companyPaid = "";
-    this.postData.evidence = "";
-    this.postData.detail = "";
+        async dueMaintenanceFrom(data, type) {
+            this.postData.maintenanceType = type;
+            this.postData.fleetId = data ? data.bus_id : '';
+            this.postData.partId = data ? data.part_id : '';
+            this.postData.currentReading = "";
+            this.postData.amount = "";
+            this.postData.companyPaid = "";
+            this.postData.evidence = "";
+            this.postData.detail = "";
 
-    $("#imageField").val('');
-    this.checkDisable = !!data;
+            $("#imageField").val('');
+            this.checkDisable = !!data;
 
-    // no showDaysInput / showDateInput logic anymore
-    this.$nextTick(() => {
-        $('#maintenance_add').modal('show');
-    });
-},
+            // no showDaysInput / showDateInput logic anymore
+            this.$nextTick(() => {
+                $('#maintenance_add').modal('show');
+            });
+        },
 
         async fetchDueFleetDetail(id) {
             const fleetDetailRes = await this.callApi("post", "fleet/single/due/detail", { id: id });
@@ -891,78 +891,78 @@ export default {
             }
         },
         async updateMaintenanceFrom(data) {
-    this.editData.maintenanceType = data.maintenance_type;
-    this.editData.maintenanceId = data.id;
-    this.editData.fleetId = data.bus_id;
-    this.editData.partId = data.part_id;
-    this.editData.currentReading = data.bus_name.current_reading;
-    this.editData.amount = data.amount;
-    this.editData.companyPaid = data.company_paid;
-    this.editData.evidence = data.evidence;
-    this.editData.detail = data.detail;
+            this.editData.maintenanceType = data.maintenance_type;
+            this.editData.maintenanceId = data.id;
+            this.editData.fleetId = data.bus_id;
+            this.editData.partId = data.part_id;
+            this.editData.currentReading = data.bus_name.current_reading;
+            this.editData.amount = data.amount;
+            this.editData.companyPaid = data.company_paid;
+            this.editData.evidence = data.evidence;
+            this.editData.detail = data.detail;
 
-    // keep old days
-    this.editData.days = data.maintenance_days;
-    // new date will be set in update
-    this.editData.date = "";
-},
-      async dueMaintenanceUpdate() {
-    if (!this.editData.fleetId || !this.editData.partId || !this.editData.currentReading ||
-        !this.editData.amount || !this.editData.companyPaid || !this.editData.detail) {
-        return Swal.fire({
-            title: "Error",
-            text: "Please Fill All Fields",
-            icon: "error",
-            timer: 2000
-        });
-    }
-
-    this.loading = true;
-    const config = { headers: { 'content-type': 'multipart/form-data' } };
-    let formData = new FormData();
-    formData.append('maintenanceId', this.editData.maintenanceId);
-    formData.append('fleetId', this.editData.fleetId);
-    formData.append('partId', this.editData.partId);
-    formData.append('currentReading', this.editData.currentReading);
-    formData.append('amount', this.editData.amount);
-    formData.append('companyPaid', this.editData.companyPaid);
-    formData.append('evidence', this.editData.evidence);
-    formData.append('detail', this.editData.detail);
-    formData.append('maintenanceType', this.editData.maintenanceType);
-
-    const res = await this.callApi("post", "fleet/maintenance/due/update", formData, config);
-
-    if (res.status === 200) {
-        this.loading = false;
-        $('#maintenance_table').DataTable().destroy();
-        $('#maintenance_udpate').click();
-        this.editData = {
-            maintenanceId: "",
-            maintenanceType: "",
-            fleetId: "",
-            partId: "",
-            currentReading: "",
-            amount: "",
-            companyPaid: "",
-            evidence: "",
-            detail: ""
-        };
-        Swal.fire({ title: "Success", text: "Maintenance Updated", icon: "success", timer: 2000 });
-        await this.fetchData();
-    } else {
-        this.loading = false;
-        if (res.status == 422) {
-            let errorContent = "";
-            let count = 0;
-            for (const key in res.data.errors) {
-                res.data.errors[key].forEach((element) => {
-                    errorContent += (++count) + " - " + element + "\n";
+            // keep old days
+            this.editData.days = data.maintenance_days;
+            // new date will be set in update
+            this.editData.date = "";
+        },
+        async dueMaintenanceUpdate() {
+            if (!this.editData.fleetId || !this.editData.partId || !this.editData.currentReading ||
+                !this.editData.amount || !this.editData.companyPaid || !this.editData.detail) {
+                return Swal.fire({
+                    title: "Error",
+                    text: "Please Fill All Fields",
+                    icon: "error",
+                    timer: 2000
                 });
             }
-            Swal.fire({ title: "Error", text: errorContent, icon: "error", timer: 2000 });
-        }
-    }
-},
+
+            this.loading = true;
+            const config = { headers: { 'content-type': 'multipart/form-data' } };
+            let formData = new FormData();
+            formData.append('maintenanceId', this.editData.maintenanceId);
+            formData.append('fleetId', this.editData.fleetId);
+            formData.append('partId', this.editData.partId);
+            formData.append('currentReading', this.editData.currentReading);
+            formData.append('amount', this.editData.amount);
+            formData.append('companyPaid', this.editData.companyPaid);
+            formData.append('evidence', this.editData.evidence);
+            formData.append('detail', this.editData.detail);
+            formData.append('maintenanceType', this.editData.maintenanceType);
+
+            const res = await this.callApi("post", "fleet/maintenance/due/update", formData, config);
+
+            if (res.status === 200) {
+                this.loading = false;
+                $('#maintenance_table').DataTable().destroy();
+                $('#maintenance_udpate').click();
+                this.editData = {
+                    maintenanceId: "",
+                    maintenanceType: "",
+                    fleetId: "",
+                    partId: "",
+                    currentReading: "",
+                    amount: "",
+                    companyPaid: "",
+                    evidence: "",
+                    detail: ""
+                };
+                Swal.fire({ title: "Success", text: "Maintenance Updated", icon: "success", timer: 2000 });
+                await this.fetchData();
+            } else {
+                this.loading = false;
+                if (res.status == 422) {
+                    let errorContent = "";
+                    let count = 0;
+                    for (const key in res.data.errors) {
+                        res.data.errors[key].forEach((element) => {
+                            errorContent += (++count) + " - " + element + "\n";
+                        });
+                    }
+                    Swal.fire({ title: "Error", text: errorContent, icon: "error", timer: 2000 });
+                }
+            }
+        },
         async editEvidenceImage(e) {
             if (e.target.files[0].name.match(/\.(jpg|jpeg|png|pdf|docx|doc)$/i)) {
 
@@ -981,68 +981,68 @@ export default {
                 });
             }
         },
-   async dueMaintenanceAdd() {
-    if (!this.postData.fleetId || !this.postData.partId || !this.postData.currentReading ||
-        !this.postData.amount || !this.postData.companyPaid || !this.postData.evidence || !this.postData.detail) {
-        return Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Please Fill All Required Fields",
-            timer: 2000,
-            showConfirmButton: false
-        });
-    }
+        async dueMaintenanceAdd() {
+            if (!this.postData.fleetId || !this.postData.partId || !this.postData.currentReading ||
+                !this.postData.amount || !this.postData.companyPaid || !this.postData.evidence || !this.postData.detail) {
+                return Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Please Fill All Required Fields",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
 
-    this.loading = true;
-    const config = { headers: { 'content-type': 'multipart/form-data' } };
-    let formData = new FormData();
-    formData.append('fleetId', this.postData.fleetId);
-    formData.append('partId', this.postData.partId);
-    formData.append('currentReading', this.postData.currentReading);
-    formData.append('amount', this.postData.amount);
-    formData.append('companyPaid', this.postData.companyPaid);
-    formData.append('evidence', this.postData.evidence);
-    formData.append('detail', this.postData.detail);
-    formData.append('maintenanceType', this.postData.maintenanceType);
+            this.loading = true;
+            const config = { headers: { 'content-type': 'multipart/form-data' } };
+            let formData = new FormData();
+            formData.append('fleetId', this.postData.fleetId);
+            formData.append('partId', this.postData.partId);
+            formData.append('currentReading', this.postData.currentReading);
+            formData.append('amount', this.postData.amount);
+            formData.append('companyPaid', this.postData.companyPaid);
+            formData.append('evidence', this.postData.evidence);
+            formData.append('detail', this.postData.detail);
+            formData.append('maintenanceType', this.postData.maintenanceType);
 
-    const res = await this.callApi("post", "fleet/maintenance/due/add", formData, config);
+            const res = await this.callApi("post", "fleet/maintenance/due/add", formData, config);
 
-    if (res.status === 201) {
-        // ✅ Close all modals first
-        $(".modal").modal("hide");
+            if (res.status === 201) {
+                // ✅ Close all modals first
+                $(".modal").modal("hide");
 
-      
-        setTimeout(() => {
-            Swal.fire({
-                icon: "success",
-                title: "Success",
-                text: "Maintenance Added",
-                timer: 2000,
-                showConfirmButton: false
-            });
-        }, 400); // adjust delay if needed
 
-        this.resetForm();
-        await this.fetchData();
-    } else if (res.status === 422) {
-        let errorContent = "";
-        let count = 0;
-        for (const key in res.data.errors) {
-            res.data.errors[key].forEach((element) => {
-                errorContent += (++count) + " - " + element + "\n";
-            });
-        }
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: errorContent,
-            timer: 2000,
-            showConfirmButton: false
-        });
-    }
+                setTimeout(() => {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Success",
+                        text: "Maintenance Added",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }, 400); // adjust delay if needed
 
-    this.loading = false;
-},
+                this.resetForm();
+                await this.fetchData();
+            } else if (res.status === 422) {
+                let errorContent = "";
+                let count = 0;
+                for (const key in res.data.errors) {
+                    res.data.errors[key].forEach((element) => {
+                        errorContent += (++count) + " - " + element + "\n";
+                    });
+                }
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: errorContent,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+
+            this.loading = false;
+        },
         async readingUpdate() {
             // validation for empty data
             if (!this.readingData.fleetId || !this.readingData.currentReading) {

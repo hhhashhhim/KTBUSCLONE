@@ -5,13 +5,65 @@
                 <div class="card-header">
                     <h4>Fault Claims</h4>
                     <div class="card-header-action">
-                        <button class="btn btn-primary" data-toggle="modal" data-target="#faultModal"
-                            @click="clearForm" v-if="checkForSubmenuButtons('initiate-request')">
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#faultModal" @click="clearForm"
+                            v-if="checkForSubmenuButtons('initiate-request')">
                             Initiate Request
                         </button>
                     </div>
                 </div>
                 <div class="card-body">
+                    <div class="">
+                        <form @submit.prevent="applyFilters" class="row g-3 align-items-end">
+
+                            <!-- From Date -->
+                            <div class="col-md-3">
+                                <label for="from_date" class="form-label">From Date</label>
+                                <input type="date" v-model="filters.from_date" id="from_date" class="form-control">
+                            </div>
+
+                            <!-- To Date -->
+                            <div class="col-md-3">
+                                <label for="to_date" class="form-label">To Date</label>
+                                <input type="date" v-model="filters.to_date" id="to_date" class="form-control">
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select v-model="filters.status" id="status" class="form-control">
+                                    <option value="">All</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="dock time">dock time</option>
+                                    <option value="resolved">Resolved</option>
+                                </select>
+                            </div>
+
+                            <!-- Bus -->
+                            <div class="col-md-3">
+                                <label for="bus_id" class="form-label">Bus</label>
+                                <select ref="busFilterSelect" v-model="filters.bus_id" id="bus_id" class="form-control">
+                                    <option value="">All Buses</option>
+                                    <option v-for="bus in buses" :key="bus.id" :value="bus.id">
+                                        {{ bus.bus_number || 'Bus #' + bus.id }}
+                                    </option>
+                                </select>
+                            </div>
+
+
+                            <div class="col-md-12 my-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button type="button" @click="resetFilters"
+                                            class="btn btn-danger w-100">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
                     <table class="table table-bordered" id="fault_table">
                         <thead>
                             <tr>
@@ -31,11 +83,12 @@
                                     <span :class="getStatusClass(item.status)">{{ item.status }}</span>
                                 </td>
                                 <td>
-                                    <button class="btn btn-info btn-sm" @click="viewDetails(item)" v-if="checkForSubmenuButtons('view-claim')">
+                                    <button class="btn btn-info btn-sm" @click="viewDetails(item)"
+                                        v-if="checkForSubmenuButtons('view-claim')">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <button v-if="item.status === 'dock time' && checkForSubmenuButtons('add-result')" class="btn btn-success btn-sm ml-2"
-                                        @click="openDockModal(item)">
+                                    <button v-if="item.status === 'dock time' && checkForSubmenuButtons('add-result')"
+                                        class="btn btn-success btn-sm ml-2" @click="openDockModal(item)">
                                         <i class="fas fa-plus"></i>
                                     </button>
                                 </td>
@@ -122,8 +175,7 @@
                             <h5 class="modal-title">
                                 <i class="fas fa-tools mr-2"></i> Fault Claim Details
                             </h5>
-                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"
-                                >
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -152,7 +204,7 @@
                                                                 formatDateTime(dock.dock_start_time) : 'Not Assigned' }}
                                                             </h6>
                                                             <span :class="getStatusClass(dock.status)">{{ dock.status
-                                                            }}</span>
+                                                                }}</span>
                                                         </div>
                                                         <div class="row">
                                                             <div class="col-md-6 mt-2">
@@ -253,7 +305,7 @@
                                                     <div class="col-md-4">
                                                         <strong>Current Reading:</strong>
                                                         {{ inspection.current_reading ? inspection.current_reading +
-                                                        'KM' : 'N/A' }}
+                                                            'KM' : 'N/A' }}
                                                     </div>
                                                     <div class="col-md-4">
                                                         <strong>Maintenance Date:</strong> {{
@@ -277,8 +329,7 @@
 
                                             <!-- Dock Info -->
                                             <!-- Last Dock Request Header -->
-                                            <div
-                                                class="px-3 py-2 mb-2 d-flex align-items-center">
+                                            <div class="px-3 py-2 mb-2 d-flex align-items-center">
                                                 <i class="fas fa-tools mr-2"></i>
                                                 <strong class="text-dark text-uppercase mb-0">Last Dock Request</strong>
                                             </div>
@@ -289,15 +340,15 @@
                                                     <strong>Dock Time:</strong>
                                                     {{ inspection.dock_request.dock_time
                                                         ? inspection.dock_request.dock_time.replace(':', 'h ') + 'm'
-                                                    : 'N/A' }}
+                                                        : 'N/A' }}
                                                 </div>
                                                 <div class="col-md-4">
                                                     <strong>Priority:</strong> {{ inspection.dock_request.periority ||
-                                                    'N/A' }}
+                                                        'N/A' }}
                                                 </div>
                                                 <div class="col-md-4">
                                                     <strong>Dock Description:</strong> {{
-                                                    inspection.dock_request.description || 'N/A' }}
+                                                        inspection.dock_request.description || 'N/A' }}
                                                 </div>
                                             </div>
 
@@ -386,7 +437,7 @@
                                         <label>Parts</label>
                                         <select class="form-control" multiple v-model="result.parts" ref="partsSelect">
                                             <option v-for="part in parts" :key="part.id" :value="part.id">{{ part.name
-                                                }}</option>
+                                            }}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -538,6 +589,12 @@ export default {
                 periority: '',
                 dock_description: '',
             },
+            filters: {
+                from_date: '',
+                to_date: '',
+                status: '',
+                bus_id: ''
+            },
             resultDataReset: {},
             parts: [],
             vendors: []
@@ -551,6 +608,11 @@ export default {
     },
     watch: {
         'data.bus_id'(newVal) {
+            this.$nextTick(() => {
+                this.initSelect2();
+            });
+        },
+         'data.bus_id'(newVal) {
             this.$nextTick(() => {
                 this.initSelect2();
             });
@@ -596,21 +658,68 @@ export default {
             if ($.fn.DataTable.isDataTable("#fault_table")) {
                 $("#fault_table").DataTable().destroy();
             }
-            const res = await this.callApi('post', 'fleet/fault-claims');
+
+            const res = await this.callApi('post', 'fleet/fault-claims', this.filters);
+
             if (res.status === 200) {
                 this.faults = res.data.faults;
                 this.drivers = res.data.drivers;
                 this.buses = res.data.buses;
 
-                setTimeout(function () {
+                this.$nextTick(() => {
+                    // ✅ re-init DataTable
                     $("#fault_table").DataTable();
-                }, 300);
-                $('#faultModal').on('shown.bs.modal', () => {
-                    this.$nextTick(() => {
-                        this.initSelect2();
-                    });
+
+                    // ✅ re-init select2 after DOM updated
+                    this.initSelect2();
+                    this.initFilterSelect2();
                 });
             }
+        },
+       initFilterSelect2() {
+    const vm = this;
+
+    // ✅ Bus Filter with search
+    if (this.$refs.busFilterSelect) {
+        $(this.$refs.busFilterSelect).select2({
+            placeholder: "Select Bus",
+            allowClear: true,
+            width: '100%',
+            minimumResultsForSearch: 0
+        })
+        .off('change')
+        .on('change', function () {
+            vm.filters.bus_id = $(this).val();
+        });
+
+        // 🔥 Sync Vue → Select2 (so selected bus shows immediately)
+        $(this.$refs.busFilterSelect).val(this.filters.bus_id).trigger('change');
+    }
+
+    // ✅ Status Filter
+    if (this.$refs.statusFilterSelect) {
+        $(this.$refs.statusFilterSelect).select2({
+            placeholder: "Select Status",
+            allowClear: true,
+            width: '100%',
+            minimumResultsForSearch: 0
+        })
+        .off('change')
+        .on('change', function () {
+            vm.filters.status = $(this).val();
+        });
+
+        // 🔥 Sync Vue → Select2
+        $(this.$refs.statusFilterSelect).val(this.filters.status).trigger('change');
+    }
+},
+
+        applyFilters() {
+            this.fetchData();
+        },
+        resetFilters() {
+            this.filters = { from_date: '', to_date: '', status: '', bus_id: '' };
+            this.fetchData();
         },
         openDockModal(claim) {
             this.result = JSON.parse(JSON.stringify(this.resultDataReset));
