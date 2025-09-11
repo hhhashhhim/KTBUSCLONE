@@ -142,7 +142,7 @@ class FleetMaintenanceController extends Controller
 }
 
 
-    public function fleetPartLink(Request $request)
+   public function fleetPartLink(Request $request)
 {
     if (!checkPermissionButtons("link-maintenance")) {
         return response()->json(["Error" => ['You are not authorized to access this URL']], 403);
@@ -163,16 +163,20 @@ class FleetMaintenanceController extends Controller
         ];
         $this->validate($request, $rules);
 
-        // ✅ Update bus reading
-        Bus::where("id", $request->fleetId)->update([
-            "current_reading" => $request->currentReading
-        ]);
+        $companyId = Auth::user()->company_id;
+
+        // ✅ Update bus reading (restricted by company_id)
+        Bus::where("id", $request->fleetId)
+            ->where("company_id", $companyId)
+            ->update([
+                "current_reading" => $request->currentReading
+            ]);
 
         foreach ($request->fleetPart as $key => $partId) {
             $checkExist = MaintenancePartLink::where([
                 "bus_id"     => $request->fleetId,
                 "part_id"    => $partId,
-                "company_id" => Auth::user()->company_id
+                "company_id" => $companyId
             ])->first();
 
             if (!$checkExist) {
@@ -182,7 +186,7 @@ class FleetMaintenanceController extends Controller
                     "bus_id"     => $request->fleetId,
                     "part_id"    => $partId,
                     "added_by"   => Auth::user()->id,
-                    "company_id" => Auth::user()->company_id,
+                    "company_id" => $companyId,
                 ];
 
                 if ($useDays) {
@@ -208,7 +212,7 @@ class FleetMaintenanceController extends Controller
             "activity_by"    => Auth::user()->id,
             "message"        => Auth::user()->name . " | linked maintenance part at reading (" . $request->currentReading . ")",
             "requested_host" => $request->ip(),
-            "company_id"     => Auth::user()->company_id
+            "company_id"     => $companyId
         ]);
 
         DB::commit();
@@ -226,6 +230,7 @@ class FleetMaintenanceController extends Controller
         ], 422);
     }
 }
+
 
 
 
@@ -320,13 +325,14 @@ public function updateFleetPartLink(Request $request)
     }
 
     $today = \Carbon\Carbon::today();
+    $companyId = Auth::user()->company_id;
 
-    // Main table data
+    // Main table data (only user’s company buses)
     $due = Bus::with('maintenancePartLink')
+        ->where('company_id', $companyId)
         ->get()
         ->map(function ($bus) use ($today) {
             $dueParts = $bus->maintenancePartLink->filter(function ($part) use ($bus, $today) {
-
                 $isDue = false;
                 $plusDate = null;
 
@@ -342,7 +348,6 @@ public function updateFleetPartLink(Request $request)
                         $usedPercent = ($distanceTravelled / $totalDistance) * 100;
                         $part->percentage = max(0, min(100, 100 - intval($usedPercent)));
 
-                        // ✅ If health ≤ 20%, mark as due
                         if ($part->percentage <= 20) {
                             $isDue = true;
                         }
@@ -364,7 +369,6 @@ public function updateFleetPartLink(Request $request)
                         $usedPercent = ($daysPassed / $totalDays) * 100;
                         $part->percentage = max(0, min(100, 100 - intval($usedPercent)));
 
-                        // ✅ If health ≤ 20%, mark as due
                         if ($part->percentage <= 20) {
                             $isDue = true;
                         }
@@ -372,7 +376,6 @@ public function updateFleetPartLink(Request $request)
                 }
 
                 $part->maintenance_days_plus_date = $plusDate;
-
                 return $isDue;
             })->values();
 
@@ -404,15 +407,17 @@ public function updateFleetPartLink(Request $request)
         ->sortByDesc('due_parts')
         ->values();
 
-    // 🚍 Bus chart counts
-    $buses = Bus::with('maintenancePartLink')->get();
+    // 🚍 Bus chart counts (filter by company_id too)
+    $buses = Bus::with('maintenancePartLink')
+        ->where('company_id', $companyId)
+        ->get();
+
     $dueBusCount = 0;
     $updateBusCount = 0;
     foreach ($buses as $bus) {
         $hasDuePart = $bus->maintenancePartLink->contains(function ($part) use ($bus, $today) {
             $isDue = false;
 
-            // Same due check logic for chart
             if (!empty($part->maintenance_after) && !empty($part->maintenance_at)) {
                 $alertReading = $part->maintenance_after + $part->maintenance_at;
                 if ($bus->current_reading >= $alertReading) {
@@ -453,8 +458,13 @@ public function updateFleetPartLink(Request $request)
         'series' => [$dueBusCount, $updateBusCount]
     ];
 
-    // ⚙️ Part chart counts
-    $partLinks = MaintenancePartLink::with('bus')->get();
+    // ⚙️ Part chart counts (also filter by company_id)
+    $partLinks = MaintenancePartLink::with('bus')
+        ->whereHas('bus', function ($q) use ($companyId) {
+            $q->where('company_id', $companyId);
+        })
+        ->get();
+
     $duePartCount = 0;
     $updatePartCount = 0;
 
@@ -502,12 +512,13 @@ public function updateFleetPartLink(Request $request)
 
     return [
         "mainData"  => $due,
-        "busDrop"   => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id", "bus_number", "current_reading"]),
-        "partDrop"  => MaintenancePart::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id", "name"]),
+        "busDrop"   => Bus::orderBy('id')->where('company_id', $companyId)->get(["id", "bus_number", "current_reading"]),
+        "partDrop"  => MaintenancePart::orderBy('id')->where('company_id', $companyId)->get(["id", "name"]),
         "busChart"  => $busChart,
         "partChart" => $partChart,
     ];
 }
+
 public function dueMaintenanceAdd(Request $request)
 {
     if (!checkPermissionButtons("add-maintenance")) {

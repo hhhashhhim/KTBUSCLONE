@@ -23,19 +23,55 @@ use Illuminate\Support\Facades\Log;
 
 class FaultClaimController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
-        $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id,"hide"=>0])->get(["id", "user_id", "name", "cnic"]);
-        $faults =  FaultClaim::with('dock_requests', 'bus', 'driver')
-            ->where('company_id', Auth::user()->company_id)
+        $companyId = Auth::user()->company_id;
+
+        // 🚍 Buses
+        $buses = Bus::where('company_id', $companyId)
+            ->orderBy('id')
             ->get();
+
+        // 👨‍ Drivers
+        $drivers = Employee::where([
+            'employee_type' => 1,
+            'company_id'    => $companyId,
+            'hide'          => 0
+        ])
+            ->get(["id", "user_id", "name", "cnic"]);
+
+        // ⚙️ Faults with filters
+        $faults = FaultClaim::with('dock_requests', 'bus', 'driver')
+            ->where('company_id', $companyId)
+
+            // ✅ Date filter
+            ->when($request->from_date && $request->to_date, function ($q) use ($request) {
+                $q->whereBetween('created_at', [
+                    $request->from_date . " 00:00:00",
+                    $request->to_date   . " 23:59:59"
+                ]);
+            })
+
+            // ✅ Status filter
+            ->when($request->status, function ($q) use ($request) {
+                $q->where('status', $request->status);
+            })
+
+            // ✅ Bus filter
+            ->when($request->bus_id, function ($q) use ($request) {
+                $q->where('bus_id', $request->bus_id);
+            })
+
+
+            ->get();
+
         return [
-            "faults" => $faults,
+            "faults"  => $faults,
             "drivers" => $drivers,
-            "buses" => $buses,
+            "buses"   => $buses,
         ];
     }
+
 
     public function store(Request $request)
     {
@@ -74,13 +110,13 @@ class FaultClaimController extends Controller
             ], 422);
         }
     }
-    
+
     public function submitResult(Request $request)
     {
         DB::beginTransaction();
 
         try {
-            $fault = FaultClaim::where("id",$request->claim_id)->first();
+            $fault = FaultClaim::where("id", $request->claim_id)->first();
 
             // CASE: Dock Required — only create DockRequest
             if ($request->status === 'dock_required') {
@@ -173,14 +209,14 @@ class FaultClaimController extends Controller
                 $q->select('id', 'name');
             },
             'dockRequest'
-        ])->where("fault_claim_id",$request->id)->first();
+        ])->where("fault_claim_id", $request->id)->first();
 
-        return[
-            "fault"=> $fault,
-            "inspection"=> $inspection
+        return [
+            "fault" => $fault,
+            "inspection" => $inspection
         ];
     }
-    
+
     public function showRequest(Request $request)
     {
         $fault = FaultClaim::with(['bus', 'driver', 'dock_requests.approved'])
@@ -199,14 +235,14 @@ class FaultClaimController extends Controller
                 $q->select('id', 'name');
             },
             'dockRequest'
-        ])->where("fault_claim_id",$request->id)->first();
+        ])->where("fault_claim_id", $request->id)->first();
 
-        return[
-            "fault"=> $fault,
-            "inspection"=> $inspection
+        return [
+            "fault" => $fault,
+            "inspection" => $inspection
         ];
     }
-    
+
     public function helperData(Request $request)
     {
         $parts = MaintenancePart::with('addedBy', 'company')->where('company_id', Auth::user()->company_id)->get();
@@ -217,18 +253,40 @@ class FaultClaimController extends Controller
         ];
     }
 
-    public function requests()
-    {
-        $faults = FaultClaim::with([
-            'bus:id,bus_number',
-            'driver:id,name',
-            'dock_requests'
-        ])
-        ->orderByDesc('id')
-        ->get();
+    public function requests(Request $request)
+{
+    $query = FaultClaim::with([
+        'bus:id,bus_number',
+        'driver:id,name',
+        'dock_requests'
+    ]);
 
-        return response()->json(['faults' => $faults]);
+    // ✅ Filter by date
+    if ($request->filled('from_date') && $request->filled('to_date')) {
+        $query->whereBetween('created_at', [$request->from_date, $request->to_date]);
     }
+
+    // ✅ Filter by status
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    // ✅ Filter by bus
+    if ($request->filled('bus_id')) {
+        $query->where('bus_id', $request->bus_id);
+    }
+
+    $faults = $query->orderByDesc('id')->get();
+
+    // return also buses for filter dropdown
+    $buses = Bus::select('id', 'bus_number')->get();
+
+    return response()->json([
+        'faults' => $faults,
+        'buses'  => $buses
+    ]);
+}
+
 
     public function approveDockRequest(Request $request)
     {
