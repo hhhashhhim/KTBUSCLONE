@@ -109,12 +109,19 @@
                                                                     title="Edit Link Part">
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
-                                                                <button class="btn btn-info mx-1" data-toggle="modal"
-                                                                    data-target="#showDetails"
+                                                                <!-- Fleet Details Button -->
+                                                                <button class="btn btn-info mx-1"
                                                                     @click="fetchDueFleetDetail(data.bus_id)"
-                                                                    title="View Link Part">
+                                                                    title="View Bus Details">
                                                                     <i class="far fa-eye"></i>
                                                                 </button>
+
+                                                                <button class="btn btn-warning mx-1"
+                                                                    @click="openInspectionModal(data)"
+                                                                    title="View Inspection Results">
+                                                                    <i class="fas fa-search"></i>
+                                                                </button>
+
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -367,6 +374,166 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Inspection Result Modal -->
+            <div class="modal fade" id="inspectionModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-dark p-3 text-white">
+                            <h5 class="modal-title">
+                                <i class="fas fa-tools mr-2"></i> Fault Claim Details
+                            </h5>
+                            <button type="button" class="close text-white fa-2x" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+
+                            <!-- ✅ Date Filter Section -->
+                            <div class="row g-3 mb-3 align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label">From Date</label>
+                                    <input type="date" v-model="filter.from" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">To Date</label>
+                                    <input type="date" v-model="filter.to" class="form-control">
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-primary w-100" @click="applyInspectionFilter">
+                                        <i class="fas fa-filter"></i> Apply
+                                    </button>
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-danger w-100" @click="resetInspectionFilter">
+                                        <i class="fas fa-undo"></i> Reset
+                                    </button>
+                                </div>
+                            </div>
+
+
+                            <hr>
+
+                            <!-- ✅ Inspection Results -->
+                            <div class="card shadow border-0 mb-4" v-if="inspectionResults.length">
+                                <div v-for="res in inspectionResults" :key="res.id" class="mb-4">
+                                    <div class="card-header bg-success text-white">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-clipboard-check mr-2"></i> Inspection Result
+                                        </h5>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <!-- Bus and Driver Info -->
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <strong>Bus Number:</strong>
+                                                {{ res.bus && res.bus.bus_number ? res.bus.bus_number : res.bus_id }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Driver Name:</strong>
+                                                {{ res.driver && res.driver.name ? res.driver.name : 'N/A' }}
+                                            </div>
+                                        </div>
+
+                                        <!-- Info Box -->
+                                        <div class="bg-light rounded p-3 mb-3">
+                                            <div class="row mb-3">
+                                                <div class="col-md-4">
+                                                    <strong>Status:</strong>
+                                                    <span class="badge badge-info text-uppercase">{{ res.status ?? 'N/A'
+                                                    }}</span>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <strong>Repair Type:</strong> {{ res.repair_type ?? 'N/A' }}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <strong>Entry Date:</strong>
+                                                    {{ res.created_at ? new Date(res.created_at).toLocaleString() :
+                                                        'N/A' }}
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-md-4">
+                                                    <strong>Mechanic Name:</strong> {{ res.machanic_name ?? 'N/A' }}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <strong>Vendor:</strong> {{ res.vendor && res.vendor.name ?
+                                                        res.vendor.name :
+                                                        'N/A' }}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <strong>Bill Amount:</strong>
+                                                    {{ res.bill_amount ? parseFloat(res.bill_amount).toLocaleString() :
+                                                        'N/A' }}
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-0">
+                                                <div class="col-md-4">
+                                                    <strong>Current Reading:</strong> {{ res.current_reading ?
+                                                        res.current_reading +
+                                                        ' KM' : 'N/A' }}
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <strong>Maintenance Date:</strong> {{ res.maintenance_date ?? 'N/A'
+                                                    }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Parts -->
+                                        <div class="mb-3">
+                                            <strong>Parts Used:</strong>
+                                            <ul class="list-group list-group-sm mt-2">
+                                                <li v-for="p in res.parts" :key="p.id"
+                                                    class="list-group-item py-1 px-3">
+                                                    {{ p.part && p.part.name ? p.part.name : 'Unnamed Part' }}
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- Dock Info -->
+                                        <div class="px-3 py-2 mb-2 d-flex align-items-center">
+                                            <i class="fas fa-tools mr-2"></i>
+                                            <strong class="text-dark text-uppercase mb-0">Last Dock Request</strong>
+                                        </div>
+                                        <div class="row mb-3" v-if="res.dock_request">
+                                            <div class="col-md-4">
+                                                <strong>Dock Time:</strong> {{ res.dock_request.dock_time ?? 'N/A' }}
+                                            </div>
+                                            <div class="col-md-4">
+                                                <strong>Priority:</strong> {{ res.dock_request.periority ?? 'N/A' }}
+                                            </div>
+                                            <div class="col-md-4">
+                                                <strong>Dock Description:</strong> {{ res.dock_request.description ??
+                                                    'N/A' }}
+                                            </div>
+                                        </div>
+
+                                        <!-- Comments -->
+                                        <div class="mt-3">
+                                            <strong>Comments:</strong>
+                                            <div class="border rounded p-2 bg-light">
+                                                {{ res.comments || 'No comments provided.' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-else class="text-center text-muted">
+                                No inspection results available.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
 
             <div class="modal fade" id="maintenanceRecord" tabindex="-1" role="dialog"
                 aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -772,6 +939,12 @@ export default {
             maintenanceDateDays: [],
             useDaysPerRow: [],
             history: [],
+            inspectionResults: [],
+            currentBus: null,
+            filter: {
+                from: '',
+                to: ''
+            }
         };
     },
     created() {
@@ -842,13 +1015,71 @@ export default {
         },
 
         async fetchDueFleetDetail(id) {
-            const fleetDetailRes = await this.callApi("post", "fleet/single/due/detail", { id: id });
-            if (fleetDetailRes.status === 200) {
-                this.due_bus = fleetDetailRes.data.due_bus;
-                this.singleBusChart = fleetDetailRes.data.singleBusChart;
-                this.history = fleetDetailRes.data.maintenancesHistory;
-                this.renderModalPartChart();
+            try {
+                const fleetDetailRes = await this.callApi("post", "fleet/single/due/detail", { id });
+                console.log("Fleet Detail Response:", fleetDetailRes);
+
+                if (fleetDetailRes.status === 200) {
+                    this.due_bus = fleetDetailRes.data.due_bus;
+                    this.singleBusChart = fleetDetailRes.data.singleBusChart;
+                    this.history = fleetDetailRes.data.maintenancesHistory;
+                    this.renderModalPartChart();
+                    $('#showDetails').modal('show'); // Open Bus Details modal
+                }
+            } catch (error) {
+                console.error("Error fetching fleet detail:", error);
             }
+        },
+
+        async openInspectionModal(bus, fromDate = null, toDate = null) {
+            const busId = bus?.bus_id ?? bus?.id;
+            if (!busId) {
+                console.warn("⚠️ No bus_id found in data:", bus);
+                return;
+            }
+
+            this.currentBus = bus; // save current bus for filters
+
+            try {
+                const payload = { id: busId };
+                if (fromDate && toDate) {
+                    payload.from_date = fromDate;
+                    payload.to_date = toDate;
+                }
+
+                const res = await this.callApi("post", "fleet/inspection/results", payload);
+                if (res.status === 200) {
+                    this.inspectionResults = res.data.inspection_results || [];
+                    $('#inspectionModal').modal('show');
+                }
+            } catch (error) {
+                console.error("Error fetching inspection results:", error);
+            }
+        },
+
+        async applyInspectionFilter() {
+            if (!this.filter.from || !this.filter.to) {
+                return Swal.fire({
+                    title: "Error",
+                    text: "Please select both From and To dates",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
+            const fromDate = new Date(this.filter.from).toISOString().split("T")[0];
+            const toDate = new Date(this.filter.to).toISOString().split("T")[0];
+
+            await this.openInspectionModal(this.currentBus, fromDate, toDate);
+        },
+
+        async resetInspectionFilter() {
+            // Clear filter fields
+            this.filter.from = null;
+            this.filter.to = null;
+
+            // Reload latest 2
+            await this.openInspectionModal(this.currentBus);
         },
         getProgressColor(percentage) {
             if (percentage > 20) {
@@ -890,6 +1121,7 @@ export default {
                 });
             }
         },
+
         async updateMaintenanceFrom(data) {
             this.editData.maintenanceType = data.maintenance_type;
             this.editData.maintenanceId = data.id;
