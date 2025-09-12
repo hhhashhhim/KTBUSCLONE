@@ -18,59 +18,133 @@ use App\Models\Maintenance\FaultClaim;
 use App\Models\Maintenance\InspectionResult;
 use App\Models\Maintenance\InspectionResultPart;
 use App\Models\Maintenance\MaintenancePart;
+use App\Models\Maintenance\MaintenancePartLink;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class FaultClaimController extends Controller
 {
-    public function index(Request $request)
-    {
-        $companyId = Auth::user()->company_id;
+ public function index(Request $request)
+{
+    $companyId = Auth::user()->company_id;
 
-        // 🚍 Buses
-        $buses = Bus::where('company_id', $companyId)
-            ->orderBy('id')
-            ->get();
+    // 🚍 Buses
+    $buses = Bus::where('company_id', $companyId)
+        ->orderBy('id')
+        ->get();
 
-        // 👨‍ Drivers
-        $drivers = Employee::where([
-            'employee_type' => 1,
-            'company_id'    => $companyId,
-            'hide'          => 0
-        ])
-            ->get(["id", "user_id", "name", "cnic"]);
+    // 👨‍ Drivers
+    $drivers = Employee::where([
+        'employee_type' => 1,
+        'company_id'    => $companyId,
+        'hide'          => 0
+    ])->get(["id", "user_id", "name", "cnic"]);
 
-        // ⚙️ Faults with filters
-        $faults = FaultClaim::with('dock_requests', 'bus', 'driver')
-            ->where('company_id', $companyId)
+    // ⚙️ Faults with filters
+    $faults = FaultClaim::with('dock_requests', 'bus', 'driver')
+        ->where('company_id', $companyId)
+        ->when($request->from_date && $request->to_date, function ($q) use ($request) {
+            $q->whereBetween('created_at', [
+                $request->from_date . " 00:00:00",
+                $request->to_date   . " 23:59:59"
+            ]);
+        })
+        ->when($request->status, function ($q) use ($request) {
+            $q->where('status', $request->status);
+        })
+        ->when($request->bus_id, function ($q) use ($request) {
+            $q->where('bus_id', $request->bus_id);
+        })
+        ->get();
 
-            // ✅ Date filter
-            ->when($request->from_date && $request->to_date, function ($q) use ($request) {
-                $q->whereBetween('created_at', [
-                    $request->from_date . " 00:00:00",
-                    $request->to_date   . " 23:59:59"
-                ]);
-            })
+    // 🔧 Load all bus-part links
+    $links = MaintenancePartLink::with('maintenancePart')
+        ->whereIn('bus_id', $buses->pluck('id'))
+        ->get();
 
-            // ✅ Status filter
-            ->when($request->status, function ($q) use ($request) {
-                $q->where('status', $request->status);
-            })
+    // ✅ Same calculation function as fleetDueDetail (applied to link)
+    $calculateStatus = function ($link, $bus) {
+        if (!$link->maintenancePart) return null;
 
-            // ✅ Bus filter
-            ->when($request->bus_id, function ($q) use ($request) {
-                $q->where('bus_id', $request->bus_id);
-            })
+        $part = $link->maintenancePart;
+
+        // Merge link values into link (not only part)
+        $link->name                  = $part->name;
+        $link->maintenance_after     = $link->maintenance_after;
+        $link->maintenance_at        = $link->maintenance_at;
+        $link->maintenance_days      = $link->maintenance_days;
+        $link->maintenance_days_date = $link->maintenance_days_date;
+
+        // Defaults
+        $link->percentage            = 100;
+        $link->due                   = false;
+        $link->next_maintenance_date = null;
+
+        if ($link->maintenance_days && $link->maintenance_days_date) {
+            // 📅 Date-based
+            $startDate = Carbon::parse($link->maintenance_days_date);
+            $endDate   = $startDate->copy()->addDays($link->maintenance_days);
+            $now       = Carbon::now();
+
+            if ($now->greaterThanOrEqualTo($endDate)) {
+                $link->percentage = 0;
+                $link->due = true;
+            } else {
+                $totalDays   = max($startDate->diffInDays($endDate), 1);
+                $daysPassed  = $startDate->diffInDays($now);
+                $usedPercent = ($daysPassed / $totalDays) * 100;
+                $link->percentage = min(max(100 - intval($usedPercent), 0), 100);
+            }
+
+            $link->next_maintenance_date = $endDate->toDateString();
+
+        } else {
+            // 🚗 Km-based
+            $alertReading = $link->maintenance_after + $link->maintenance_at;
+            if ($bus->current_reading >= $alertReading) {
+                $link->percentage = 0;
+                $link->due = true;
+            } else {
+                $distanceTravelled = $bus->current_reading - $link->maintenance_at;
+                $totalDistance     = max($alertReading - $link->maintenance_at, 1);
+                $usedPercent       = ($distanceTravelled / $totalDistance) * 100;
+                $link->percentage  = min(max(100 - intval($usedPercent), 0), 100);
+            }
+
+            $link->next_maintenance_date = null;
+        }
+
+        // 🔴 Force due if <= 20%
+        if ($link->percentage <= 20) {
+            $link->due = true;
+        }
+
+        // Extra fields for table
+        $link->current_reading = $bus->current_reading;
+        $link->alert_reading   = $link->maintenance_after + $link->maintenance_at;
+
+        return $link;
+    };
+
+    // Attach parts with health to buses
+    $buses = $buses->map(function ($bus) use ($links, $calculateStatus) {
+        $busParts = $links->where('bus_id', $bus->id)->map(function ($link) use ($bus, $calculateStatus) {
+            return $calculateStatus($link, $bus);
+        })->filter()->values();
+
+        return array_merge($bus->toArray(), ['parts' => $busParts]);
+    });
+
+    return [
+        "faults"  => $faults,
+        "drivers" => $drivers,
+        "buses"   => $buses,
+        "links"   => $links,
+    ];
+}
 
 
-            ->get();
-
-        return [
-            "faults"  => $faults,
-            "drivers" => $drivers,
-            "buses"   => $buses,
-        ];
-    }
 
 
     public function store(Request $request)
@@ -254,38 +328,38 @@ class FaultClaimController extends Controller
     }
 
     public function requests(Request $request)
-{
-    $query = FaultClaim::with([
-        'bus:id,bus_number',
-        'driver:id,name',
-        'dock_requests'
-    ]);
+    {
+        $query = FaultClaim::with([
+            'bus:id,bus_number',
+            'driver:id,name',
+            'dock_requests'
+        ]);
 
-    // ✅ Filter by date
-    if ($request->filled('from_date') && $request->filled('to_date')) {
-        $query->whereBetween('created_at', [$request->from_date, $request->to_date]);
+        // ✅ Filter by date
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $query->whereBetween('created_at', [$request->from_date, $request->to_date]);
+        }
+
+        // ✅ Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // ✅ Filter by bus
+        if ($request->filled('bus_id')) {
+            $query->where('bus_id', $request->bus_id);
+        }
+
+        $faults = $query->orderByDesc('id')->get();
+
+        // return also buses for filter dropdown
+        $buses = Bus::select('id', 'bus_number')->get();
+
+        return response()->json([
+            'faults' => $faults,
+            'buses'  => $buses
+        ]);
     }
-
-    // ✅ Filter by status
-    if ($request->filled('status')) {
-        $query->where('status', $request->status);
-    }
-
-    // ✅ Filter by bus
-    if ($request->filled('bus_id')) {
-        $query->where('bus_id', $request->bus_id);
-    }
-
-    $faults = $query->orderByDesc('id')->get();
-
-    // return also buses for filter dropdown
-    $buses = Bus::select('id', 'bus_number')->get();
-
-    return response()->json([
-        'faults' => $faults,
-        'buses'  => $buses
-    ]);
-}
 
 
     public function approveDockRequest(Request $request)
