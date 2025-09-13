@@ -18,55 +18,52 @@
                     <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
                         <span>
                             Inventory
-                        </span>  
+                        </span>
                     </a>
                     <ul class="dropdown-menu">
                         <li class="dropdown">
-                        <router-link
-                            class="nav-link text-capitalize d-flex justify-content-between"
-                            :to="{ name: 'MR' }"
-                        >
-                            <span><i class="far fa-file"></i> MR</span>
-                          </router-link>
+                            <router-link class="nav-link text-capitalize d-flex justify-content-between"
+                                :to="{ name: 'MR' }">
+                                <span><i class="far fa-file"></i> MR</span>
+                            </router-link>
                         </li>
                         <li class="dropdown">
-                            <router-link
-                                class="nav-link text-capitalize d-flex justify-content-between"
-                                :to="{ name: 'PR' }"
-                            >
+                            <router-link class="nav-link text-capitalize d-flex justify-content-between"
+                                :to="{ name: 'PR' }">
                                 <span><i class="far fa-file"></i> PRN</span>
-                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ mrsQty || 0 }}</span>
+                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ mrsQty || 0
+                                    }}</span>
                             </router-link>
-                            </li>
-                            <li class="dropdown">
-                            <router-link
-                                class="nav-link text-capitalize d-flex justify-content-between"
-                                :to="{ name: 'BidSummary' }"
-                            >
+                        </li>
+                        <li class="dropdown">
+                            <router-link class="nav-link text-capitalize d-flex justify-content-between"
+                                :to="{ name: 'BidSummary' }">
                                 <span><i class="far fa-file"></i>Bid Summary</span>
-                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ prnsQty || 0 }}</span>
+                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ prnsQty || 0
+                                    }}</span>
                             </router-link>
-                            </li>
-                            <li class="dropdown">
-                            <router-link
-                                class="nav-link text-capitalize d-flex justify-content-between"
-                                :to="{ name: 'PO' }"
-                            >
+                        </li>
+                        <li class="dropdown">
+                            <router-link class="nav-link text-capitalize d-flex justify-content-between"
+                                :to="{ name: 'PO' }">
                                 <span><i class="far fa-file"></i> PO</span>
-                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ bidsQty || 0 }}</span>
+                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ bidsQty || 0
+                                    }}</span>
                             </router-link>
-                            </li>
+                        </li>
                         <li class="dropdown">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'stockInward' }">
-                                <span><i class="fa fa-warehouse"></i>  Stock Inward</span>
-                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ posQty || 0 }}</span>
+                                <span><i class="fa fa-warehouse"></i> Stock Inward</span>
+                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ posQty || 0
+                                    }}</span>
                             </router-link>
                         </li>
                         <li class="dropdown">
-                        <router-link class="nav-link text-capitalize" :to="{ name: 'stockOutward' }"> 
-                            <span><i class="fa fa-warehouse"></i>  Stock Outward</span>
-                            <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ mrsQty || 0 }}</span>
-                        </router-link>  
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'stockOutward' }">
+                                <span><i class="fa fa-warehouse"></i> Stock Outward</span>
+                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">{{ mrsQty || 0
+                                    }}</span>
+                            </router-link>
                         </li>
                         <!-- <li class="dropdown" v-if="checkForSubmenu('terminals')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'stock' }">
@@ -83,7 +80,7 @@
                                 <i class="fas fa-user-tag"></i> Suppliers
                             </router-link>
                         </li>
-                      
+
                         <!-- <li class="dropdown" v-if="checkForSubmenu('cities')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'gpo' }">
                                 <i class="fas fa-city"></i> GPO
@@ -95,7 +92,7 @@
                                 <i class="far fa-file"></i> Reports
                             </router-link>
                         </li>
-                        
+
                     </ul>
                 </li>
                 <li class="dropdown" v-if="checkPermission('admin')">
@@ -161,7 +158,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li class="dropdown" v-if="checkForSubmenu('report-header')">
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'report-header'}">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'report-header' }">
                                 <i class="fas fa-city"></i> Report Headers
                             </router-link>
                         </li>
@@ -206,7 +203,7 @@
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('close-trip')">
-                            <router-link class="nav-link text-capitalize" :to="{ name : 'summery-report'}">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'summery-report' }">
                                 <i class="fas fa-clock"></i> Closed Trip Report
                             </router-link>
                         </li>
@@ -257,13 +254,13 @@
                     <ul class="dropdown-menu">
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'roles' }"
-                                         v-if="checkForSubmenu('roles')">
+                                v-if="checkForSubmenu('roles')">
                                 <i class="fas fa-project-diagram"></i> roles
                             </router-link>
                         </li>
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'users' }"
-                                         v-if="checkForSubmenu('users')">
+                                v-if="checkForSubmenu('users')">
                                 <i class="fa fa-user"></i> Users
                             </router-link>
                         </li>
@@ -299,7 +296,8 @@
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('closing')">
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'booking-schedule-unclosing-spare' }">
+                            <router-link class="nav-link text-capitalize"
+                                :to="{ name: 'booking-schedule-unclosing-spare' }">
                                 <i class="fas fa-bookmark"></i> Spare Unclosing
                             </router-link>
                         </li>
@@ -364,25 +362,25 @@
                     <ul class="dropdown-menu">
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'employees' }"
-                                         v-if="checkForSubmenu('employees')">
+                                v-if="checkForSubmenu('employees')">
                                 <i class="fas fa-users"></i> Employees
                             </router-link>
                         </li>
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'leaves' }"
-                                         v-if="checkForSubmenu('leaves')">
+                                v-if="checkForSubmenu('leaves')">
                                 <i class="fas fa-street-view"></i> Leave Management
                             </router-link>
                         </li>
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'departments' }"
-                                         v-if="checkForSubmenu('departments')">
+                                v-if="checkForSubmenu('departments')">
                                 <i class="fas fa-street-view"></i> Departments
                             </router-link>
                         </li>
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'designations' }"
-                                         v-if="checkForSubmenu('designations')">
+                                v-if="checkForSubmenu('designations')">
                                 <i class="fas fa-street-view"></i> Designations
                             </router-link>
                         </li>
@@ -400,7 +398,7 @@
                     <ul class="dropdown-menu">
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-parts' }"
-                                         v-if="checkForSubmenu('part')">
+                                v-if="checkForSubmenu('part')">
                                 <i class="fas fa-users"></i> Parts Addition
                             </router-link>
                         </li>
@@ -412,24 +410,33 @@
                         </li> -->
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-due' }"
-                                         v-if="checkForSubmenu('dues')">
+                                v-if="checkForSubmenu('dues')">
                                 <i class="fas fa-users"></i> Maintenance
                             </router-link>
                         </li>
                         <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'fault-claim' }" v-if="checkForSubmenu('fault-claim')">
-                                <i class="fas fa-tools"></i> Fault Claim
-                            </router-link>
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'dock-request' }" v-if="checkForSubmenu('dock-request')">
-                                <i class="fas fa-warehouse"></i> Dock Requests
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-due-details' }"
+                                v-if="checkForSubmenu('dues')">
+                                <i class="fas fa-users"></i> Maintenance Details
                             </router-link>
                         </li>
-                        <!-- <li>
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-record' }"
-                                         v-if="checkForSubmenu('records')">
-                                <i class="fas fa-users"></i> Maintenance Record
+                        <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'fault-claim' }"
+                                v-if="checkForSubmenu('fault-claim')">
+                                <i class="fas fa-tools"></i> Fault Claim
                             </router-link>
-                        </li> -->
+
+
+                            <router-link class="nav-link text-capitalize d-flex justify-content-between"
+                                :to="{ name: 'dock-request' }" v-if="checkForSubmenu('dock-request')">
+                                <span> <i class="fas fa-warehouse"></i> Dock Requests</span>
+                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">
+                                    {{ pendingDockCount }}
+                                </span>
+                            </router-link>
+
+
+                        </li>
                     </ul>
                 </li>
                 <!-- Rereshment Panel -->
@@ -443,7 +450,7 @@
                     <ul class="dropdown-menu">
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'hotels' }"
-                                         v-if="checkForSubmenu('hotels')">
+                                v-if="checkForSubmenu('hotels')">
                                 <i class="fas fa-users"></i> Hotels
                             </router-link>
                         </li>
@@ -451,7 +458,7 @@
                     <ul class="dropdown-menu">
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'foodOrder' }"
-                                         v-if="checkForSubmenu('order')">
+                                v-if="checkForSubmenu('order')">
                                 <i class="fas fa-users"></i> Food Order
                             </router-link>
                         </li>
@@ -487,26 +494,31 @@
                             </ul>
                         </li>
                         <li class="dropdown">
-                            <a href="#" class="has-dropdown"><i class="far fa-money-bill-alt"></i><span>Transaction</span></a>
+                            <a href="#" class="has-dropdown"><i
+                                    class="far fa-money-bill-alt"></i><span>Transaction</span></a>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <router-link :to="{name:'account-transaction-bank-transactions'}" class="nav-link"><i class="far fa-dot-circle"></i><span>Bank Transaction</span></router-link
-                                        >
+                                    <router-link :to="{ name: 'account-transaction-bank-transactions' }"
+                                        class="nav-link"><i class="far fa-dot-circle"></i><span>Bank
+                                            Transaction</span></router-link>
                                 </li>
                                 <li>
-                                    <router-link :to="{name:'account-transaction-cash-transactions'}" class="nav-link"><i class="far fa-dot-circle"></i><span>Cash Transaction</span></router-link
-                                        >
+                                    <router-link :to="{ name: 'account-transaction-cash-transactions' }"
+                                        class="nav-link"><i class="far fa-dot-circle"></i><span>Cash
+                                            Transaction</span></router-link>
                                 </li>
                                 <li>
-                                    <router-link :to="{name:'account-transaction-journal-transactions'}" class="nav-link"><i class="far fa-dot-circle"></i><span>Journal Transaction</span></router-link
-                                        >
+                                    <router-link :to="{ name: 'account-transaction-journal-transactions' }"
+                                        class="nav-link"><i class="far fa-dot-circle"></i><span>Journal
+                                            Transaction</span></router-link>
                                 </li>
                             </ul>
                         </li>
                         <li class="dropdown">
                             <a href="#" class="has-dropdown"><i class="far fa-file-alt"></i><span>Reports</span></a>
                             <ul class="dropdown-menu">
-                                <li><router-link :to="{name:'account-report-finance'}" class="nav-link"><i class="far fa-dot-circle"></i><span>Finance</span></router-link>
+                                <li><router-link :to="{ name: 'account-report-finance' }" class="nav-link"><i
+                                            class="far fa-dot-circle"></i><span>Finance</span></router-link>
                                 </li>
                             </ul>
                         </li>
@@ -522,13 +534,13 @@
                     <ul class="dropdown-menu">
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'ticketSettings' }"
-                                         v-if="checkForSubmenu('tickets')">
+                                v-if="checkForSubmenu('tickets')">
                                 <i class="fas fa-users"></i> Ticket Format
                             </router-link>
                         </li>
                         <li>
                             <router-link class="nav-link text-capitalize" :to="{ name: 'activityLog' }"
-                                         v-if="checkForSubmenu('ActivityLog')">
+                                v-if="checkForSubmenu('ActivityLog')">
                                 <i class="fas fa-users"></i> Activity Log
                             </router-link>
                         </li>
@@ -549,39 +561,44 @@ export default {
                 company: "fa-building",
             },
             permissions: [],
+            pendingDockCount: 0, // 🚀 new
         }
     },
     created() {
-        this.permissions = this.$store.state.permissions
+        this.permissions = this.$store.state.permissions;
+        this.getPendingDockCount(); // 🚀 call on load
     },
     methods: {
         // main menu
         checkPermission(name) {
             let permissions = this.permissions;
             let module = permissions.find(obj => obj.name === name);
-            if (module) {
-                return module.allow;
-            } else {
-                return false;
-            }
-
+            return module ? module.allow : false;
         },
         // Sub menu
         checkForSubmenu(moduleName) {
-
             let permissions = this.permissions;
             let valid = false;
-            for (var i = 0; i < permissions.length; i++) {
+            for (let i = 0; i < permissions.length; i++) {
                 permissions[i].childs.forEach(subMenuItem => {
-                    if (subMenuItem.name == moduleName) {
+                    if (subMenuItem.name === moduleName) {
                         valid = subMenuItem.allow;
                         return;
                     }
                 });
             }
             return valid;
-
         },
+       
+       async getPendingDockCount() {
+    try {
+        const res = await this.callApi('get', 'fleet/dock-requests/pending-count'); // ✅ use GET not POST
+        this.pendingDockCount = res.data.pending_count;
+    } catch (err) {
+        console.error("Error fetching dock requests count:", err);
+    }
+}
+
     }
 };
 </script>

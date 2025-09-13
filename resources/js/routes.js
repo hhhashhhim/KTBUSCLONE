@@ -1,5 +1,5 @@
 import Profile from "./components/Profile.vue";
-import {createWebHistory, createRouter} from "vue-router";
+import { createWebHistory, createRouter } from "vue-router";
 import Users from "./pages/users/Users.vue";
 import Roles from "./pages/roles/Roles.vue";
 import Company from "./pages/company/Company.vue";
@@ -33,6 +33,7 @@ import TicketSettingPage from "./pages/settings/tickets/TicketSettingsPage.vue";
 import ActivityLogPage from "./pages/settings/ActivityLogPage.vue";
 import MaintenancePartPage from "./pages/maintenance/PartPage.vue";
 import MaintenanceLinkPage from "./pages/maintenance/LinkPage.vue";
+import MaintenanceDueDetailsPage from "./pages/maintenance/DueDetailsPage.vue";
 import MaintenanceDuePage from "./pages/maintenance/DuePage.vue";
 import FaultClaimPage from "./pages/maintenance/FaultClaimPage.vue";
 import DockRequest from "./pages/maintenance/DockRequestPage.vue";
@@ -49,13 +50,13 @@ import TerminalDiscountPage from "./pages/terminal/TerminalDiscountPage.vue";
 import TerminalTimePage from "./pages/terminal/TerminalTimePage.vue";
 import TerminalTimeDifferencePage from "./pages/terminal/TerminalTimeDifferencePage.vue";
 import AccountGroupPage from "./pages/account/ledger/AccountGroupPage.vue";
-import AccountHeadPage from './pages/account/ledger/AccountHeadPage.vue';
-import AccountHeadBankPage from './pages/account/ledger/AccountHeadBankPage.vue';
-import AccountHeadCashPage from './pages/account/ledger/AccountHeadCashPage.vue';
-import BankTransactionPage from './pages/account/transaction/BankTransactionPage.vue';
-import CashTransactionPage from './pages/account/transaction/CashTransactionPage.vue';
-import JournalTransactionPage from './pages/account/transaction/JournalTransactionPage.vue';
-import AccountReportFinancePage from './pages/account/report/AccountReportFinancePage.vue';
+import AccountHeadPage from "./pages/account/ledger/AccountHeadPage.vue";
+import AccountHeadBankPage from "./pages/account/ledger/AccountHeadBankPage.vue";
+import AccountHeadCashPage from "./pages/account/ledger/AccountHeadCashPage.vue";
+import BankTransactionPage from "./pages/account/transaction/BankTransactionPage.vue";
+import CashTransactionPage from "./pages/account/transaction/CashTransactionPage.vue";
+import JournalTransactionPage from "./pages/account/transaction/JournalTransactionPage.vue";
+import AccountReportFinancePage from "./pages/account/report/AccountReportFinancePage.vue";
 import loyaltyCardPage from "./pages/loyalityCard/CardCategoriesPage.vue";
 import loyaltyCardAssignPage from "./pages/loyalityCard/CardAssignPage.vue";
 import ReportsHeadersPage from "./pages/ReportsHeader/ReportsHeaderPage.vue";
@@ -83,10 +84,9 @@ import Reports from "./pages/inventory/products/reports.vue";
 import BidSummary from "./pages/inventory/products/BidSummary.vue";
 import PR from "./pages/inventory/products/PurchaseRequisitionNote.vue";
 
-// const url = '/kt-dev/'
+// const url = "/kt-dev/";
 const url = '/'
 
- 
 const routes = [
     {
         path: url + "",
@@ -106,409 +106,414 @@ const routes = [
     {
         path: url + "permissions/:id",
         component: Permissions,
-        name: "role.permission"
+        name: "role.permission",
     },
     {
         path: url + "profiles",
         component: Profile,
-        name: "profile"
+        name: "profile",
     },
     {
         path: url + "companies",
         component: Company,
-        name: "company"
+        name: "company",
     },
     {
         path: url + "update-password",
         component: Updatepassword,
-        name: "update-password"
+        name: "update-password",
     },
     {
         path: url + "terminals",
         component: Terminal,
-        name: "terminal"
+        name: "terminal",
     },
     {
         path: url + "admin/dashboard",
         component: Dashboard,
-        name: "admin-dashboard"
+        name: "admin-dashboard",
     },
     {
         path: url + "fare-table",
         component: FareTable,
-        name: "fare-table"
+        name: "fare-table",
     },
     {
         path: url + "sub-routes",
         component: SubRoute,
-        name: "sub-routes"
+        name: "sub-routes",
     },
     {
         path: url + "fare-class",
         component: FareClass,
-        name: "fare-class"
+        name: "fare-class",
     },
     {
         path: url + "routes",
         component: RoutePage,
-        name: "routes-page"
+        name: "routes-page",
     },
     {
         path: url + "discounts",
         component: DiscountPage,
-        name: "discount-page"
+        name: "discount-page",
     },
     {
         path: url + "surcharge",
         component: SurchargePage,
-        name: "surcharge-page"
+        name: "surcharge-page",
     },
     {
         path: url + "cities",
         component: CitiesPage,
-        name: "cities-page"
+        name: "cities-page",
     },
     {
         path: url + "schedule",
         component: SchedulePage,
-        name: "schedule-page"
+        name: "schedule-page",
     },
     {
         path: url + "buses",
         component: BusesPage,
-        name: "buses-page"
+        name: "buses-page",
     },
     {
         path: url + "bus-class",
         component: BusClassPage,
-        name: "bus-class-page"
+        name: "bus-class-page",
     },
     {
         path: url + "bookings",
         component: BookingPage,
-        name: "booking-page"
+        name: "booking-page",
     },
     {
         path: url + "booking/schedule/closing",
         component: ScheduleClosingPage,
-        name: "booking-schedule-closing"
+        name: "booking-schedule-closing",
     },
     {
         path: url + "booking/schedule/unclosing",
         component: ScheduleUnclosingPage,
-        name: "booking-schedule-unclosing"
+        name: "booking-schedule-unclosing",
     },
     {
         path: url + "booking/schedule/commission/unclosing",
         component: ScheduleCommissionClosingPage,
-        name: "booking-commission-closing"
+        name: "booking-commission-closing",
     },
     {
         path: url + "booking/schedule/unclosing/spare",
         component: ScheduleUnclosingSparePage,
-        name: "booking-schedule-unclosing-spare"
+        name: "booking-schedule-unclosing-spare",
     },
     {
         path: url + "booking/schedule/merges",
         component: ScheduleMergePage,
-        name: "booking-schedule-merges"
+        name: "booking-schedule-merges",
     },
     {
         path: url + "booking/all",
         component: AllBookingPage,
-        name: "all-booking-page"
+        name: "all-booking-page",
     },
     {
         path: url + "hrm/employees",
         component: EmployeesPage,
-        name: "employees"
+        name: "employees",
     },
     {
         path: url + "hrm/leaves",
         component: LeavePage,
-        name: "leaves"
+        name: "leaves",
     },
     {
         path: url + "hrm/departments",
         component: DepartmentPage,
-        name: "departments"
+        name: "departments",
     },
     {
         path: url + "hrm/designations",
         component: DesignationPage,
-        name: "designations"
+        name: "designations",
     },
     {
         path: url + "fleet/maintenance/part",
         component: MaintenancePartPage,
-        name: "maintenance-parts"
+        name: "maintenance-parts",
     },
     {
         path: url + "fleet/maintenance/link",
         component: MaintenanceLinkPage,
-        name: "maintenance-link"
+        name: "maintenance-link",
     },
     {
         path: url + "fleet/maintenance/due",
         component: MaintenanceDuePage,
-        name: "maintenance-due"
+        name: "maintenance-due",
+    },
+    {
+        path: url + "fleet/maintenance/due/details",
+        component: MaintenanceDueDetailsPage,
+        name: "maintenance-due-details",
     },
     {
         path: url + "fleet/fault/claim",
         component: FaultClaimPage,
-        name: "fault-claim"
+        name: "fault-claim",
     },
     {
         path: url + "fleet/dock/request",
         component: DockRequest,
-        name: "dock-request"
+        name: "dock-request",
     },
     {
         path: url + "fleet/maintenance/record",
         component: MaintenanceRecordPage,
-        name: "maintenance-record"
+        name: "maintenance-record",
     },
     {
         path: url + "refreshments/hotels",
         component: HotelPage,
-        name: "hotels"
+        name: "hotels",
     },
     {
         path: url + "refreshments/hotels/specific/foods",
         component: FoodPage,
-        name: "foods"
+        name: "foods",
     },
     {
         path: url + "refreshments/hotels/specific/foods/deals",
         component: FoodDealPage,
-        name: "foodDeals"
+        name: "foodDeals",
     },
     {
         path: url + "refreshments/hotels/food/order",
         component: FoodOrderPage,
-        name: "foodOrder"
+        name: "foodOrder",
     },
     {
         path: url + "settings/tickets",
         component: TicketSettingPage,
-        name: "ticketSettings"
+        name: "ticketSettings",
     },
     {
         path: url + "settings/activity/log",
         component: ActivityLogPage,
-        name: "activityLog"
+        name: "activityLog",
     },
     {
         path: url + "settings/profile",
         component: ProfilePage,
-        name: "profileSettings"
+        name: "profileSettings",
     },
     {
         path: url + "expense/categories",
         component: ExpenseCategoryPage,
-        name: "expense-category-page"
+        name: "expense-category-page",
     },
     {
         path: url + "expenses/:id",
         component: ExpensePage,
-        name: "expense-page"
+        name: "expense-page",
     },
     {
         path: url + "report/header/link/:id",
         component: HeaderLinkPage,
-        name: "header-link-page"
+        name: "header-link-page",
     },
     {
         path: url + "terminals/:id/commissions",
         component: TerminalCommissionPage,
-        name: "terminal-commission"
+        name: "terminal-commission",
     },
     {
         path: url + "terminals/:id/discounts",
         component: TerminalDiscountPage,
-        name: "terminal-discount"
+        name: "terminal-discount",
     },
     {
         path: url + "terminals/:id/times",
         component: TerminalTimePage,
-        name: "terminal-time"
+        name: "terminal-time",
     },
     {
         path: url + "terminal/time/difference",
         component: TerminalTimeDifferencePage,
-        name: "terminal-difference"
+        name: "terminal-difference",
     },
     {
         path: url + "accounts/groups",
         component: AccountGroupPage,
-        name: "account-groups"
+        name: "account-groups",
     },
     {
         path: url + "accounts/heads",
         component: AccountHeadPage,
-        name: "account-head"
+        name: "account-head",
     },
     {
         path: url + "accounts/heads/banks",
         component: AccountHeadBankPage,
-        name: "account-head-bank"
+        name: "account-head-bank",
     },
     {
         path: url + "accounts/heads/cash",
         component: AccountHeadCashPage,
-        name: "account-head-cash"
+        name: "account-head-cash",
     },
-    { 
-        path: url + 'accounts/transactions/bank-transactions',
+    {
+        path: url + "accounts/transactions/bank-transactions",
         component: BankTransactionPage,
         name: "account-transaction-bank-transactions",
     },
-    { 
-        path: url + 'accounts/transactions/cash-transactions',
+    {
+        path: url + "accounts/transactions/cash-transactions",
         component: CashTransactionPage,
         name: "account-transaction-cash-transactions",
     },
-    { 
-        path: url + 'accounts/transactions/journal-transactions',
+    {
+        path: url + "accounts/transactions/journal-transactions",
         component: JournalTransactionPage,
         name: "account-transaction-journal-transactions",
     },
-    { 
-        path: url + 'accounts/reports/finance',
+    {
+        path: url + "accounts/reports/finance",
         component: AccountReportFinancePage,
         name: "account-report-finance",
     },
     {
         path: url + "loyalty/card/categories",
         component: loyaltyCardPage,
-        name: "loyalty-card-categories"
+        name: "loyalty-card-categories",
     },
     {
         path: url + "loyalty/card/assign",
         component: loyaltyCardAssignPage,
-        name: "loyalty-card-assign"
+        name: "loyalty-card-assign",
     },
     {
         path: url + "reports/header",
         component: ReportsHeadersPage,
-        name: "report-header"
+        name: "report-header",
     },
     {
         path: url + "reports/summary/close/trip",
         component: CloseSummeryReportPage,
-        name: "summery-report"
+        name: "summery-report",
     },
     {
         path: url + "office/expenses",
         component: OfficeExpensesPage,
-        name: "office-expenses-page"
+        name: "office-expenses-page",
     },
     {
         path: url + "reports/advance/sale",
         component: AdvanceSaleReportsPage,
-        name: "advance-sale-report"
+        name: "advance-sale-report",
     },
     {
         path: url + "reports/terminal/commission",
         component: TerminalCommissionReportsPage,
-        name: "terminal-commission-report"
+        name: "terminal-commission-report",
     },
     {
         path: url + "reports/terminal/sale",
         component: TerminalSaleReportsPage,
-        name: "terminal-sale-report"
+        name: "terminal-sale-report",
     },
     {
         path: url + "reports/terminal/discount",
         component: TerminalDiscountReportsPage,
-        name: "terminal-discount-report"
+        name: "terminal-discount-report",
     },
     {
         path: url + "reports/schedules/drop",
         component: ScheduleDropReportPage,
-        name: "schedule-drop-report"
+        name: "schedule-drop-report",
     },
     {
         path: url + "reports/confirm/cancel",
         component: ConfirmCancellationPage,
-        name: "confirm-cancel-report"
+        name: "confirm-cancel-report",
     },
     {
         path: url + "reports/over/issue",
         component: OverIssuePage,
-        name: "over-issue-report"
+        name: "over-issue-report",
     },
     {
         path: url + "reports/reschedule",
         component: ReschedulePage,
-        name: "reschedule-report"
+        name: "reschedule-report",
     },
     {
         path: url + "counter/expenses",
         component: CounterExpensesPage,
-        name: "counter-expenses-page"
+        name: "counter-expenses-page",
     },
 
     {
         path: url + "inventory/products",
         component: InventoryProduct,
-        name: "products"
+        name: "products",
     },
     {
         path: url + "inventory/stock",
         component: Stock,
-        name: "stock"
+        name: "stock",
     },
     {
         path: url + "inventory/stock-inwards",
         component: StockInward,
-        name: "stockInward"
+        name: "stockInward",
     },
     {
         path: url + "inventory/stock-outwards",
         component: StockOutward,
-        name: "stockOutward"
+        name: "stockOutward",
     },
     {
         path: url + "inventory/suppliers",
         component: Suppliers,
-        name: "suppliers"
+        name: "suppliers",
     },
     {
         path: url + "inventory/gpo",
         component: GPO,
-        name: "gpo"
+        name: "gpo",
     },
     {
         path: url + "inventory/MR",
         component: MR,
-        name: "MR"
+        name: "MR",
     },
     {
         path: url + "inventory/PO",
         component: PO,
-        name: "PO"
+        name: "PO",
     },
     {
         path: url + "inventory/reports",
         component: Reports,
-        name: "reports"
+        name: "reports",
     },
     {
         path: url + "inventory/BidSummary",
         component: BidSummary,
-        name: "BidSummary"
+        name: "BidSummary",
     },
     {
         path: url + "inventory/PR",
         component: PR,
-        name: "PR"
+        name: "PR",
     },
-]
+];
 const router = createRouter({
     history: createWebHistory(),
     mode: history,
     routes,
-})
+});
 
-export default router
+export default router;

@@ -381,16 +381,14 @@
                     <div class="modal-content">
                         <div class="modal-header bg-dark p-3 text-white">
                             <h5 class="modal-title">
-                                <i class="fas fa-tools mr-2"></i> Fault Claim Details
+                                <i class="fas fa-tools mr-2"></i>Fault Claim Details
                             </h5>
-                            <button type="button" class="close text-white fa-2x" data-dismiss="modal">
+                            <button type="button" class="close text-white fa-2x"  @click="closeModal()" data-dismiss="modal">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
 
                         <div class="modal-body">
-
-                            <!-- ✅ Date Filter Section -->
                             <div class="row g-3 mb-3 align-items-end">
                                 <div class="col-md-4">
                                     <label class="form-label">From Date</label>
@@ -411,8 +409,6 @@
                                     </button>
                                 </div>
                             </div>
-
-
                             <hr>
 
                             <!-- ✅ Inspection Results -->
