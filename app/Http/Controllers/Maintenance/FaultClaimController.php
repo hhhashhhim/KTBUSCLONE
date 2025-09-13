@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use App\Models\ActivityLog;
 use App\Models\Bus\Bus;
+use App\Models\FaultClaimPart;
 use App\Models\Hrm\Employee\Employee;
 use App\Models\Inventory\Supplier;
 use App\Models\Maintenance\DockRequest;
@@ -146,44 +147,62 @@ class FaultClaimController extends Controller
 
 
 
+public function store(Request $request)
+{
+    DB::beginTransaction();
+    try {
+        // ✅ Create Fault Claim
+        $fault = FaultClaim::create([
+            'bus_id'     => $request->bus_id,
+            'driver_id'  => $request->driver_id,
+            'description'=> $request->description,
+            'status'     => 'pending',
+            'added_by'   => Auth::id(),
+            'company_id' => Auth::user()->company_id,
+        ]);
 
-    public function store(Request $request)
-    {
-        DB::beginTransaction();
-        try {
-            $fault = FaultClaim::create([
-                'bus_id' => $request->bus_id,
-                'driver_id' => $request->driver_id,
-                'description' => $request->description,
-                'status' => 'pending',
-                'added_by' => Auth::user()->id,
-                'company_id' => Auth::user()->company_id,
-            ]);
+        // ✅ Create Dock Request
+        $dock = DockRequest::create([
+            'fault_claim_id' => $fault->id,
+            'bus_id'         => $request->bus_id,
+            'dock_time'      => $request->dock_time,
+            'periority'      => $request->periority,
+            'description'    => $request->description,
+            'status'         => 'pending',
+            'request_type'   => $request->request_type ?? 'regular',
+            'added_by'       => Auth::id(),
+            'company_id'     => Auth::user()->company_id,
+        ]);
 
-            $dock = DockRequest::create([
-                'fault_claim_id' => $fault->id,
-                'bus_id' => $request->bus_id,
-                'dock_time' => $request->dock_time,
-                'periority' => $request->periority,
-                'description' => $request->description,
-                'status' => 'pending',
-                'added_by' => Auth::user()->id,
-                'company_id' => Auth::user()->company_id,
-            ]);
-
-            DB::commit();
-            return response()->json([
-                'message' => 'Fault & Dock Request Created Successfully',
-                'data' => null
-            ], 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'Error occurred during creation',
-                'error' => $e->getMessage()
-            ], 422);
+        // ✅ Save Selected Parts into fault_claim_parts
+        if ($request->has('parts') && is_array($request->parts)) {
+            foreach ($request->parts as $partId) {
+                FaultClaimPart::create([
+                    'part_id'        => $partId,
+                    'fault_claim_id' => $fault->id,
+                    'bus_id'         => $request->bus_id,
+                    'added_by'       => Auth::id(),
+                    'company_id'     => Auth::user()->company_id,
+                ]);
+            }
         }
+
+        DB::commit();
+        return response()->json([
+            'message' => 'Fault & Dock Request Created Successfully',
+            'data'    => null
+        ], 200);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'message' => 'Error occurred during creation',
+            'error'   => $e->getMessage()
+        ], 422);
     }
+}
+
+
 
     public function submitResult(Request $request)
     {
@@ -360,6 +379,14 @@ class FaultClaimController extends Controller
             'buses'  => $buses
         ]);
     }
+public function pendingDockCount()
+{
+    $count = DockRequest::where('status', 'pending')->count();
+
+    return response()->json([
+        'pending_count' => $count
+    ]);
+}
 
 
     public function approveDockRequest(Request $request)

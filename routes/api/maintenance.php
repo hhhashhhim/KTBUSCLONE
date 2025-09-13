@@ -30,6 +30,7 @@ Route::group(['prefix' => 'web/v1/fleet', 'middleware' => ['auth:sanctum']], fun
 
 Route::group(['prefix' => 'web/v1/fleet/maintenance', 'middleware' => ['auth:sanctum']], function () {
     Route::post('/due', [FleetMaintenanceController::class, 'dueMaintenance']);
+    Route::get('/due/details', [FleetMaintenanceController::class, 'dueMaintenanceDetails']);
     Route::post('/due/add', [FleetMaintenanceController::class, 'dueMaintenanceAdd']);
     Route::post('/record', [FleetMaintenanceController::class, 'maintenanceRecord']);
     Route::post('/due/update', [FleetMaintenanceController::class, 'dueMaintenanceUpdate']);
@@ -45,6 +46,8 @@ Route::middleware('auth:sanctum')->prefix('web/v1/fleet/dock-requests')->group(f
     Route::post('/', [FaultClaimController::class, 'requests']);
     Route::post('/show', [FaultClaimController::class, 'showRequest']);
     Route::post('/approve', [FaultClaimController::class, 'approveDockRequest']);
+    Route::get('/pending-count', [FaultClaimController::class, 'pendingDockCount']);
+
 });
 
 Route::middleware('auth:sanctum')->prefix('web/v1/fleet/inspection-result')->group(function () {
