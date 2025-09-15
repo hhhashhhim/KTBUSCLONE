@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Company;
 use App\Models\Maintenance\MaintenancePart;
 use App\Models\Bus\Bus;
+use App\Models\FaultClaimPart;
 use App\Models\Hrm\Employee\Employee;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -33,5 +34,14 @@ class FaultClaim extends Model
     {
         return $this->belongsTo(Employee::class, 'driver_id');
     }
+
+    public function claimParts() {
+    return $this->hasMany(FaultClaimPart::class, 'fault_claim_id');
+}
+
+public function inspectionResult() {
+    return $this->hasOne(InspectionResult::class, 'fault_claim_id');
+}
+
 
 }

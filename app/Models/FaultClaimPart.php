@@ -14,9 +14,11 @@ class FaultClaimPart extends Model
     protected $fillable = [
         'part_id',
         'fault_claim_id',
+        'dock_request_id',
         'bus_id',
         'added_by',
         'company_id',
+        'status',
     ];
 
     public function faultClaim()

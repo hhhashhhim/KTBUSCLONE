@@ -48,18 +48,26 @@ class UserController extends Controller
         ];
     }
 
-    public function getCities()
-    {
-        if(!checkForSubmenu("users"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
-        $cities = City::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
-        foreach ($cities as $single) {
-            $single->name = ucfirst($single->name);
-        }
-        return $cities;
+ public function getCities()
+{
+    if (!checkForSubmenu("users")) {
+        return response()->json(
+            ["Error" => ['You are not authorized to access this url']], 
+            403
+        );
     }
+
+    $cities = City::where('company_id', Auth::user()->company_id)
+                  ->where('hide', 0) 
+                  ->get(['id', 'name']);
+
+    foreach ($cities as $single) {
+        $single->name = ucfirst($single->name);
+    }
+
+    return $cities;
+}
+
 
     public function store(Request $request)
     {

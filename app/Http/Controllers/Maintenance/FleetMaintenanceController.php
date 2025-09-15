@@ -137,42 +137,42 @@ class FleetMaintenanceController extends Controller
         ];
     }
     // FleetMaintenanceController.php
-public function fleetInspectionResults(Request $request)
-{
-    $query = InspectionResult::with([
-        'bus:id,bus_number',
-        'driver:id,name',
-        'vendor:id,name',
-        'parts.part' => function ($q) {
-            $q->select('id', 'name');
-        },
-        'dockRequest'
-    ])->where('bus_id', $request->id);
+    public function fleetInspectionResults(Request $request)
+    {
+        $query = InspectionResult::with([
+            'bus:id,bus_number',
+            'driver:id,name',
+            'vendor:id,name',
+            'parts.part' => function ($q) {
+                $q->select('id', 'name');
+            },
+            'dockRequest'
+        ])->where('bus_id', $request->id);
 
-    // ✅ Apply date filter if provided
-    if ($request->filled('from_date') && $request->filled('to_date')) {
-        try {
-            $from = \Carbon\Carbon::parse($request->from_date)->startOfDay();
-            $to   = \Carbon\Carbon::parse($request->to_date)->endOfDay();
+        // ✅ Apply date filter if provided
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            try {
+                $from = \Carbon\Carbon::parse($request->from_date)->startOfDay();
+                $to   = \Carbon\Carbon::parse($request->to_date)->endOfDay();
 
-            $query->whereBetween('created_at', [$from, $to]);
-        } catch (\Exception $e) {
-            return response()->json([
-                "inspection_results" => [],
-                "error" => "Invalid date format"
-            ], 400);
+                $query->whereBetween('created_at', [$from, $to]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    "inspection_results" => [],
+                    "error" => "Invalid date format"
+                ], 400);
+            }
+        } else {
+            // ✅ No filter → only latest 2
+            $query->latest()->take(2);
         }
-    } else {
-        // ✅ No filter → only latest 2
-        $query->latest()->take(2);
+
+        $inspectionResults = $query->get();
+
+        return response()->json([
+            "inspection_results" => $inspectionResults
+        ]);
     }
-
-    $inspectionResults = $query->get();
-
-    return response()->json([
-        "inspection_results" => $inspectionResults
-    ]);
-}
 
 
 
@@ -553,80 +553,89 @@ public function fleetInspectionResults(Request $request)
             "partChart" => $partChart,
         ];
     }
-public function dueMaintenanceDetails()
-{
-    if (!checkForSubmenu("dues")) {
-        return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+    public function dueMaintenanceDetails()
+    {
+        if (!checkForSubmenu("dues")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $today = Carbon::today();
+        $companyId = Auth::user()->company_id;
+
+        $parts = MaintenancePartLink::with(['bus', 'maintenancePart'])
+            ->whereHas('bus', fn($q) => $q->where('company_id', $companyId))
+            ->get()
+            ->map(function ($part) use ($today) {
+                $bus = $part->bus;
+                $partName = $part->maintenancePart->name ?? '';
+                $isDue = false;
+                $plusDate = null;
+                $percentage = 100;
+
+                // Reading-based calculation
+                if (!empty($part->maintenance_after) && !empty($part->maintenance_at)) {
+                    $alertReading = $part->maintenance_after + $part->maintenance_at;
+                    $nextMaintenanceAt = $alertReading;
+                    if ($bus->current_reading >= $alertReading) {
+                        $isDue = true;
+                        $percentage = 0;
+                    } else {
+                        $distanceTravelled = $bus->current_reading - $part->maintenance_at;
+                        $totalDistance = max($alertReading - $part->maintenance_at, 1);
+                        $usedPercent = ($distanceTravelled / $totalDistance) * 100;
+                        $percentage = max(0, min(100, 100 - intval($usedPercent)));
+                        if ($percentage <= 20) $isDue = true;
+                    }
+                }
+
+                // ✅ Days-based calculation
+                if (!empty($part->maintenance_days) && !empty($part->maintenance_days_date)) {
+                    $startDate = \Carbon\Carbon::parse($part->maintenance_days_date);
+                    $endDate = $startDate->copy()->addDays($part->maintenance_days);
+                    $plusDate = $endDate->format('Y-m-d');
+
+                    if ($today->greaterThanOrEqualTo($endDate)) {
+                        $isDue = true;
+                        $percentage = 0;
+                    } else {
+                        $totalDays = max($startDate->diffInDays($endDate), 1);
+                        $daysPassed = $startDate->diffInDays($today);
+                        $usedPercent = ($daysPassed / $totalDays) * 100;
+                        $percentage = max(0, min(100, 100 - intval($usedPercent)));
+
+                        if ($percentage <= 20) $isDue = true;
+                    }
+                }
+
+                return [
+                    'bus_id'                     => $bus->id,
+                    'bus_number'                 => $bus->bus_number,
+                    'current_reading'            => $bus->current_reading,
+                    'part_id'                    => $part->id,
+                    'part_name'                  => $partName,
+                    'maintenance_days'           => $part->maintenance_days,
+                    'maintenance_days_date'      => $part->maintenance_days_date,
+                    'maintenance_days_plus_date' => $plusDate,
+                    'health_percentage'          => $percentage,
+                    'next_maintenance_at' => $nextMaintenanceAt ?? null, // 👈 added
+                    'status'                     => $isDue ? 'Due' : 'Up To Date',
+                ];
+            });
+
+        // ✅ Sort by worst health first
+        // $parts = $parts->sortBy('health_percentage')->values();
+
+        return response()->json([
+            "mainData" => $parts,
+            "busDrop"  => Bus::orderBy('id')
+                ->where('company_id', $companyId)
+                ->get(["id", "bus_number", "current_reading"]),
+            "partDrop" => MaintenancePart::orderBy('id')
+                ->where('company_id', $companyId)
+                ->get(["id", "name"]),
+        ]);
     }
 
-    $today = \Carbon\Carbon::today();
-    $companyId = Auth::user()->company_id;
-
-    $parts = MaintenancePartLink::with(['bus', 'maintenancePart'])
-        ->whereHas('bus', fn($q) => $q->where('company_id', $companyId))
-        ->get()
-        ->map(function ($part) use ($today) {
-            $bus = $part->bus;
-            $partName = $part->maintenancePart->name ?? '';
-            $isDue = false;
-            $plusDate = null;
-            $percentage = 100;
-
-            // Reading-based calculation
-            if (!empty($part->maintenance_after) && !empty($part->maintenance_at)) {
-                $alertReading = $part->maintenance_after + $part->maintenance_at;
-                if ($bus->current_reading >= $alertReading) {
-                    $isDue = true;
-                    $percentage = 0;
-                } else {
-                    $distanceTravelled = $bus->current_reading - $part->maintenance_at;
-                    $totalDistance = max($alertReading - $part->maintenance_at, 1);
-                    $usedPercent = ($distanceTravelled / $totalDistance) * 100;
-                    $percentage = max(0, min(100, 100 - intval($usedPercent)));
-                    if ($percentage <= 20) $isDue = true;
-                }
-            }
-
-            // Days-based calculation
-            if (!empty($part->maintenance_days) && !empty($part->maintenance_days_date)) {
-                $startDate = \Carbon\Carbon::parse($part->maintenance_days_date);
-                $endDate = $startDate->copy()->addDays($part->maintenance_days);
-                $plusDate = $endDate->format('Y-m-d');
-                if ($today->greaterThanOrEqualTo($endDate)) {
-                    $isDue = true;
-                    $percentage = 0;
-                } else {
-                    $totalDays = max($startDate->diffInDays($endDate), 1);
-                    $daysPassed = $startDate->diffInDays($today);
-                    $usedPercent = ($daysPassed / $totalDays) * 100;
-                    $percentage = max(0, min(100, 100 - intval($usedPercent)));
-                    if ($percentage <= 20) $isDue = true;
-                }
-            }
-
-            return [
-                'bus_id' => $bus->id,
-                'bus_number' => $bus->bus_number,
-                'current_reading' => $bus->current_reading,
-                'part_id' => $part->id,
-                'part_name' => $partName,
-                'maintenance_days' => $part->maintenance_days,
-                'maintenance_days_date' => $part->maintenance_days_date,
-                'maintenance_days_plus_date' => $plusDate,
-                'percentage' => $percentage,
-                'status' => $isDue ? 'Due' : 'Up To Date',
-            ];
-        });
-
-    // ✅ Sort by percentage ascending: 0% health first
-    $parts = $parts->sortBy('percentage')->values();
-
-    return response()->json([
-        "partsData" => $parts,
-        "busDrop"   => Bus::orderBy('id')->where('company_id', $companyId)->get(["id", "bus_number", "current_reading"]),
-        "partDrop"  => MaintenancePart::orderBy('id')->where('company_id', $companyId)->get(["id", "name"]),
-    ]);
-}
 
 
 

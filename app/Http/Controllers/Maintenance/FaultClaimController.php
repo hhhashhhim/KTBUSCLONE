@@ -43,21 +43,24 @@ class FaultClaimController extends Controller
     ])->get(["id", "user_id", "name", "cnic"]);
 
     // ⚙️ Faults with filters
-    $faults = FaultClaim::with('dock_requests', 'bus', 'driver')
-        ->where('company_id', $companyId)
-        ->when($request->from_date && $request->to_date, function ($q) use ($request) {
-            $q->whereBetween('created_at', [
-                $request->from_date . " 00:00:00",
-                $request->to_date   . " 23:59:59"
-            ]);
-        })
-        ->when($request->status, function ($q) use ($request) {
-            $q->where('status', $request->status);
-        })
-        ->when($request->bus_id, function ($q) use ($request) {
-            $q->where('bus_id', $request->bus_id);
-        })
-        ->get();
+   $faults = FaultClaim::with([
+    'bus',
+    'driver',
+    'dock_requests',
+    'claimParts.part:id,name', // ✅ parts added in fault claim
+    'inspectionResult.parts.part:id,name' // ✅ parts added in inspection
+])
+->where('company_id', $companyId)
+->when($request->from_date && $request->to_date, function ($q) use ($request) {
+    $q->whereBetween('created_at', [
+        $request->from_date . " 00:00:00",
+        $request->to_date   . " 23:59:59"
+    ]);
+})
+->when($request->status, fn($q) => $q->where('status', $request->status))
+->when($request->bus_id, fn($q) => $q->where('bus_id', $request->bus_id))
+->get();
+
 
     // 🔧 Load all bus-part links
     $links = MaintenancePartLink::with('maintenancePart')
@@ -180,7 +183,9 @@ public function store(Request $request)
                 FaultClaimPart::create([
                     'part_id'        => $partId,
                     'fault_claim_id' => $fault->id,
+                    'dock_request_id'=> $dock->id, // ✅ new column
                     'bus_id'         => $request->bus_id,
+                    'status'         => 'pending', // ✅ default
                     'added_by'       => Auth::id(),
                     'company_id'     => Auth::user()->company_id,
                 ]);
@@ -201,6 +206,7 @@ public function store(Request $request)
         ], 422);
     }
 }
+
 
 
 
@@ -310,32 +316,7 @@ public function store(Request $request)
         ];
     }
 
-    public function showRequest(Request $request)
-    {
-        $fault = FaultClaim::with(['bus', 'driver', 'dock_requests.approved'])
-            ->where('id', $request->id)
-            ->first();
-
-        if (!$fault) {
-            return response()->json(['message' => 'Not found'], 404);
-        }
-
-        $inspection = InspectionResult::with([
-            'bus:id,bus_number',
-            'driver:id,name',
-            'vendor:id,name',
-            'parts.part' => function ($q) {
-                $q->select('id', 'name');
-            },
-            'dockRequest'
-        ])->where("fault_claim_id", $request->id)->first();
-
-        return [
-            "fault" => $fault,
-            "inspection" => $inspection
-        ];
-    }
-
+   
     public function helperData(Request $request)
     {
         $parts = MaintenancePart::with('addedBy', 'company')->where('company_id', Auth::user()->company_id)->get();
@@ -379,6 +360,7 @@ public function store(Request $request)
             'buses'  => $buses
         ]);
     }
+
 public function pendingDockCount()
 {
     $count = DockRequest::where('status', 'pending')->count();
@@ -430,4 +412,31 @@ public function pendingDockCount()
             ], 500);
         }
     }
+
+     public function showRequest(Request $request)
+    {
+        $fault = FaultClaim::with(['bus', 'driver', 'dock_requests.approved'])
+            ->where('id', $request->id)
+            ->first();
+
+        if (!$fault) {
+            return response()->json(['message' => 'Not found'], 404);
+        }
+
+        $inspection = InspectionResult::with([
+            'bus:id,bus_number',
+            'driver:id,name',
+            'vendor:id,name',
+            'parts.part' => function ($q) {
+                $q->select('id', 'name');
+            },
+            'dockRequest'
+        ])->where("fault_claim_id", $request->id)->first();
+
+        return [
+            "fault" => $fault,
+            "inspection" => $inspection
+        ];
+    }
+
 }
