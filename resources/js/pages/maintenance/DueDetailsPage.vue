@@ -10,7 +10,6 @@
             <div class="card-body">
               <div class="row">
 
-
                 <!-- From Date -->
                 <div class="col-md-3">
                   <label for="from_date" class="form-label">From Date</label>
@@ -36,7 +35,7 @@
                 <!-- Bus -->
                 <div class="col-md-3">
                   <label for="bus_id" class="form-label">Bus</label>
-                  <select ref="busFilterSelect" v-model="filters.bus" id="bus_id" class="form-control">
+                  <select v-model="filters.bus" id="bus_id" class="form-control">
                     <option value="">All Buses</option>
                     <option v-for="bus in busDrop" :key="bus.id" :value="bus.id">
                       {{ bus.bus_number || 'Bus #' + bus.id }}
@@ -44,7 +43,7 @@
                   </select>
                 </div>
 
-
+                <!-- Filter & Reset -->
                 <div class="col-md-12 my-3">
                   <div class="row">
                     <div class="col-md-6">
@@ -56,11 +55,7 @@
                   </div>
                 </div>
 
-
               </div>
-
-
-              <!-- END Filters -->
 
               <!-- Table -->
               <div class="row">
@@ -68,14 +63,14 @@
                   <div class="card">
                     <div class="card-body">
                       <div class="table-responsive">
-                        <table class="table " id="parts_table">
+                        <table class="table" id="parts_table">
                           <thead>
                             <tr>
                               <th>Bus Number</th>
                               <th>Current Reading</th>
                               <th>Part Name</th>
-                              <th class="w-25">Health %</th>
-                              <th>Next Maintenance Date</th>
+                              <th class="w-25">Health Status</th>
+                              <th>Due Maintenance At</th>
                               <th>Status</th>
                             </tr>
                           </thead>
@@ -88,23 +83,28 @@
                               <td>
                                 <div class="progress" style="height: 20px;">
                                   <div class="progress-bar" role="progressbar"
-                                    :class="getProgressClass(part.percentage)"
-                                    :style="{ width: part.percentage + '%' }">
-                                    {{ part.percentage }}%
+                                    :class="getProgressClass(part.health_percentage)"
+                                    :style="{ width: part.health_percentage + '%' }">
+                                    {{ part.health_percentage }}%
                                   </div>
                                 </div>
                               </td>
-                              <td>{{ formatDate(part.maintenance_days_plus_date) }}</td>
                               <td>
-                                <span
-                                  :class="part.status === 'Due' ? 'badge bg-danger small-badge' : 'badge bg-success small-badge'">
+                                <p v-if="part.maintenance_days_plus_date">
+                                  {{ formatDate(part.maintenance_days_plus_date) }}
+                                </p>
+                                <p v-else>
+                                  {{ part.next_maintenance_at ? part.next_maintenance_at + ' (km)' : '-' }}
+                                </p>
+                              </td>
+                              <td>
+                                <span :class="part.status === 'Due'
+                                  ? 'badge bg-danger small-badge'
+                                  : 'badge bg-success small-badge'">
                                   {{ part.status }}
                                 </span>
                               </td>
                             </tr>
-
-
-
                           </tbody>
                         </table>
                       </div>
@@ -113,13 +113,13 @@
                 </div>
               </div>
               <!-- END TABLE -->
+
             </div>
           </div>
         </div>
       </div>
     </div>
   </section>
-
 </template>
 
 <script>
@@ -131,14 +131,13 @@ export default {
     return {
       partsData: [],
       busDrop: [],
-      dataTableInitialized: false,
+      filteredParts: [],
       filters: {
         from: "",
         to: "",
         status: "",
         bus: "",
       },
-      filteredParts: [], // filtered rows
     };
   },
   methods: {
@@ -154,158 +153,130 @@ export default {
       try {
         const res = await this.callApi("get", "fleet/maintenance/due/details");
         if (res.status === 200) {
-          this.partsData = res.data.partsData;
+          this.partsData = res.data.mainData;
           this.busDrop = res.data.busDrop;
 
-          // Apply initial filters
-          this.filteredParts = [...this.partsData];
+          // Initial sort by health %
+          this.filteredParts = [...this.partsData].sort(
+            (a, b) => Number(a.health_percentage) - Number(b.health_percentage)
+          );
 
-          // Destroy previous DataTable if exists
-          if ($.fn.DataTable.isDataTable("#parts_table")) {
-            $("#parts_table").DataTable().destroy();
-          }
-
-          this.$nextTick(() => {
-            // Re-init DataTable
-            $("#parts_table").DataTable({
-              ordering: false,
-              pageLength: 10,
-              responsive: true
-            });
-          });
+          this.reinitDataTable();
         }
       } catch (err) {
         console.error("Error fetching parts data:", err);
       }
     },
-
     applyFilters() {
-  this.filteredParts = this.partsData.filter((part) => {
-    // ✅ Convert to Date objects for correct filtering
-    const partDate = part.maintenance_days_plus_date
-      ? new Date(part.maintenance_days_plus_date)
-      : null;
-    const fromDate = this.filters.from ? new Date(this.filters.from) : null;
-    const toDate = this.filters.to ? new Date(this.filters.to) : null;
+      this.filteredParts = this.partsData.filter((part) => {
+        const partDate = part.maintenance_days_plus_date
+          ? new Date(part.maintenance_days_plus_date)
+          : null;
+        const fromDate = this.filters.from ? new Date(this.filters.from) : null;
+        const toDate = this.filters.to ? new Date(this.filters.to) : null;
 
-    const fromMatch = fromDate ? (partDate && partDate >= fromDate) : true;
-    const toMatch = toDate ? (partDate && partDate <= toDate) : true;
+        const fromMatch = fromDate ? (partDate && partDate >= fromDate) : true;
+        const toMatch = toDate ? (partDate && partDate <= toDate) : true;
+        const statusMatch = this.filters.status
+          ? part.status === this.filters.status
+          : true;
+        const busMatch = this.filters.bus
+          ? part.bus_id == this.filters.bus
+          : true;
 
-    const statusMatch = this.filters.status
-      ? part.status === this.filters.status
-      : true;
-    const busMatch = this.filters.bus
-      ? part.bus_id == this.filters.bus
-      : true;
+        return fromMatch && toMatch && statusMatch && busMatch;
+      });
 
-    return fromMatch && toMatch && statusMatch && busMatch;
-  });
+      // Always sort by health
+      this.filteredParts.sort(
+        (a, b) => Number(a.health_percentage) - Number(b.health_percentage)
+      );
 
-  // ✅ Always sort after filtering
-  this.filteredParts.sort((a, b) => a.percentage - b.percentage);
-
-  // ✅ Reinitialize DataTable
-  if ($.fn.DataTable.isDataTable("#parts_table")) {
-    $("#parts_table").DataTable().destroy();
-  }
-
-  this.$nextTick(() => {
-    $("#parts_table").DataTable({
-      ordering: false,
-      pageLength: 10,
-      responsive: true,
-    });
-  });
-},
-
-   resetFilters() {
-  this.filters = { from: "", to: "", status: "", bus: "" };
-
-  // ✅ Ensure sorting works numerically
-  this.filteredParts = [...this.partsData].sort(
-    (a, b) => Number(a.percentage) - Number(b.percentage)
-  );
-
-  // ✅ Reinitialize DataTable
-  if ($.fn.DataTable.isDataTable("#parts_table")) {
-    $("#parts_table").DataTable().destroy();
-  }
-  this.$nextTick(() => {
-    $("#parts_table").DataTable({
-      ordering: false,
-      pageLength: 10,
-      responsive: true,
-    });
-  });
-},
-
+      this.reinitDataTable();
+    },
+    resetFilters() {
+      this.filters = { from: "", to: "", status: "", bus: "" };
+      this.filteredParts = [...this.partsData].sort(
+        (a, b) => Number(a.health_percentage) - Number(b.health_percentage)
+      );
+      this.reinitDataTable();
+    },
+    reinitDataTable() {
+      if ($.fn.DataTable.isDataTable("#parts_table")) {
+        $("#parts_table").DataTable().destroy();
+      }
+      this.$nextTick(() => {
+        $("#parts_table").DataTable({
+          ordering: false,
+          pageLength: 10,
+          responsive: true,
+        });
+      });
+    },
     getProgressClass(percentage) {
       return percentage > 20 ? "bg-success" : "bg-danger";
-    }
+    },
   },
-
   mounted() {
     this.fetchPartsData();
   },
 };
-
 </script>
+<style
+  scoped>
 
-<style scoped>
-/* Table font and spacing */
-table,
-table * {
-  font-size: 14px !important;
+  /* Table font and spacing */
+  table,
+  table * {
+    font-size: 14px !important;
+  }
 
-}
+  /* Progress bar height and style */
+  .progress {
+    height: 20px;
+  }
 
-/* Progress bar height and style */
-.progress {
-  height: 20px;
-}
+  /* Badge styling */
+  .badge {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
 
-/* Badge styling */
-.badge {
-  padding: 5px 10px;
-  font-size: 12px;
-}
+  /* Card header spacing */
+  .card-header h4 {
+    margin: 0;
+  }
 
-/* Card header spacing */
-.card-header h4 {
-  margin: 0;
-}
-
-/* Optional: highlight due rows */
-tr.due-row td {
-  background-color: #ffe5e5;
-  /* light red for due parts */
-  border-color: #ff4d4d;
+  /* Optional: highlight due rows */
+  tr.due-row td {
+    background-color: #ffe5e5;
+    /* light red for due parts */
+    border-color: #ff4d4d;
     padding: 15px 5px !important;
-}
+  }
 
-.small-badge {
-  font-size: 10px !important;
-  /* smaller text */
-  color: #fff !important;
-  /* force white text */
-}
+  .small-badge {
+    font-size: 10px !important;
+    /* smaller text */
+    color: #fff !important;
+    /* force white text */
+  }
 
-/* Red border around all cells when status is Due */
-.due-row td {
-  border-top: 1px solid red !important;
-  border-bottom: 1px solid red !important;
-  background-color: transparent !important;
-  padding: 10px 5px !important;
-}
+  /* Red border around all cells when status is Due */
+  .due-row td {
+    border-top: 1px solid red !important;
+    border-bottom: 1px solid red !important;
+    background-color: transparent !important;
+    padding: 10px 5px !important;
+  }
 
-.due-row td:first-child {
-  border-left: 1px solid red !important;
-  background-color: transparent !important;
-}
+  .due-row td:first-child {
+    border-left: 1px solid red !important;
+    background-color: transparent !important;
+  }
 
-.due-row td:last-child {
-
-  background-color: transparent !important;
-  border-right: 1px solid red !important;
-}
+  .due-row td:last-child {
+    background-color: transparent !important;
+    border-right: 1px solid red !important;
+  }
 </style>

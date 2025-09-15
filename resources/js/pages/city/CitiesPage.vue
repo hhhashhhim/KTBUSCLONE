@@ -36,7 +36,7 @@
                                                     <tr v-for="(city,i) in cities" :key="i">
                                                         <td>{{ i + 1 }}</td>
                                                         <td>{{ city.name }}</td>
-                                                        <td>{{ city.added_by.name }}</td>
+                                                        <td>{{ city.added_by?.name }}</td>
                                                         <td v-if="checkForSubmenuButtons('edit-city')  || checkForSubmenuButtons('delete-city')">
                                                             <button v-if="checkForSubmenuButtons('edit-city')"
                                                                     title="Edit City" :data-target="'#' + editFormID"

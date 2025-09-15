@@ -34,6 +34,7 @@ import ActivityLogPage from "./pages/settings/ActivityLogPage.vue";
 import MaintenancePartPage from "./pages/maintenance/PartPage.vue";
 import MaintenanceLinkPage from "./pages/maintenance/LinkPage.vue";
 import MaintenanceDueDetailsPage from "./pages/maintenance/DueDetailsPage.vue";
+import MaintenanceDockRequestTimePage from "./pages/maintenance/DockRequestTimePage.vue";
 import MaintenanceDuePage from "./pages/maintenance/DuePage.vue";
 import FaultClaimPage from "./pages/maintenance/FaultClaimPage.vue";
 import DockRequest from "./pages/maintenance/DockRequestPage.vue";
@@ -258,6 +259,7 @@ const routes = [
         component: MaintenanceDueDetailsPage,
         name: "maintenance-due-details",
     },
+    
     {
         path: url + "fleet/fault/claim",
         component: FaultClaimPage,
@@ -267,6 +269,11 @@ const routes = [
         path: url + "fleet/dock/request",
         component: DockRequest,
         name: "dock-request",
+    },
+     {
+        path: url + "fleet/dock/request/time",
+        component: MaintenanceDockRequestTimePage,
+        name: "maintenance-due-details",
     },
     {
         path: url + "fleet/maintenance/record",

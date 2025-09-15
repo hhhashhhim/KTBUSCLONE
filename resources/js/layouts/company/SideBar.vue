@@ -434,8 +434,12 @@
                                     {{ pendingDockCount }}
                                 </span>
                             </router-link>
-
-
+                        </li>
+                         <li>
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'maintenance-due-details' }"
+                                v-if="checkForSubmenu('dues')">
+                                <i class="fas fa-users"></i> dock time
+                            </router-link>
                         </li>
                     </ul>
                 </li>
