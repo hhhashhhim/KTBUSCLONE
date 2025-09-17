@@ -149,7 +149,7 @@
                                                             <!-- Checkbox -->
                                                             <td class="text-center">
                                                                 <div class="custom-checkbox custom-control">
-                                                                    <input type="checkbox" :value="part.id"
+                                                                    <input type="checkbox" :value="part.part_id"
                                                                         v-model="data.parts" :id="'part-' + part.id"
                                                                         class="custom-control-input">
                                                                     <label :for="'part-' + part.id"
@@ -302,7 +302,7 @@
                                                                 formatDateTime(dock.dock_start_time) : 'Not Assigned' }}
                                                             </h6>
                                                             <span :class="getStatusClass(dock.status)">{{ dock.status
-                                                                }}</span>
+                                                            }}</span>
                                                         </div>
                                                         <div class="row">
                                                             <div class="col-md-6 mt-2">
@@ -330,7 +330,7 @@
                                                                     Comments:</strong><br>
                                                                 {{ dock.comments || 'N/A' }}
                                                             </div>
-                                                              <div class="col-md-12 mt-2">
+                                                            <div class="col-md-12 mt-2">
                                                                 <strong class="text-dark">Description:</strong><br>
                                                                 {{ dock.description || 'N/A' }}
                                                             </div>
@@ -512,13 +512,6 @@
                                     </div>
                                 </div>
 
-                                <!-- No Fault Fields -->
-                                <div class="col-md-6" v-if="result.status === 'no_fault'">
-                                    <div class="form-group">
-                                        <label>Mechanic Name <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" v-model="result.mechanic_name" />
-                                    </div>
-                                </div>
 
                                 <!-- Resolved Repair Type Selection -->
                                 <div class="col-md-12 mb-3" v-if="result.status === 'resolved'">
@@ -533,17 +526,75 @@
                                     </div>
                                 </div>
 
-                                <!-- Shared Fields (Resolved: all types) -->
-                                <div class="col-md-6" v-if="result.status === 'resolved' && result.repair_type">
+                                <!-- ✅ Parts Table Instead of Dropdown -->
+                              <div class="col-md-12" v-if="parts.length">
+    <div class="form-group">
+        <label><strong>Parts</strong></label>
+        <table class="table align-middle table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center" style="width: 80px;">Select</th>
+                    <th style="width: 250px;">Part Name</th>
+                    <th style="width: 350px;">Health Status</th>
+                    <th class="text-center" style="width: 120px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(part, index) in parts" :key="part.id">
+                    <!-- Checkbox -->
+                    <td class="text-center">
+                        <div class="custom-checkbox custom-control">
+                            <input type="checkbox" :value="part.id"
+                                   v-model="result.parts"
+                                   :id="'part-' + part.id"
+                                   class="custom-control-input">
+                            <label :for="'part-' + part.id" class="custom-control-label">&nbsp;</label>
+                        </div>
+                    </td>
+
+                    <!-- Part Name -->
+                    <td class="fw-semibold">
+                        {{ part.part?.name || part.maintenancePart?.name || 'N/A' }}
+                    </td>
+
+                    <!-- Health Progress -->
+                    <td>
+                        <div v-if="part.percentage !== undefined">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="fw-semibold">{{ part.percentage + '%' }}</small>
+                            </div>
+                            <div class="progress" style="height: 12px;">
+                                <div class="progress-bar"
+                                     :class="getProgressColor(part.percentage, part.due)"
+                                     :style="{ width: part.percentage + '%' }"></div>
+                            </div>
+                            <div v-if="part.next_maintenance_date" class="text-muted mt-2">
+                                Next Maintenance: {{ part.next_maintenance_date }}
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Status Badge -->
+                    <td class="text-center">
+                        <span v-if="part.due" class="badge text-white bg-danger">Due</span>
+                        <span v-else class="badge text-white bg-success">Up To Date</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+                                <!-- No Fault Fields -->
+                                <div class="col-md-6" v-if="result.status === 'no_fault'">
                                     <div class="form-group">
-                                        <label>Parts</label>
-                                        <select class="form-control" multiple v-model="result.parts" ref="partsSelect">
-                                            <option v-for="part in parts" :key="part.id" :value="part.id">{{ part.name
-                                            }}</option>
-                                        </select>
+                                        <label>Mechanic Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" v-model="result.mechanic_name" />
                                     </div>
                                 </div>
 
+                                <!-- Resolved Shared Fields -->
                                 <div class="col-md-6" v-if="result.status === 'resolved' && result.repair_type">
                                     <div class="form-group">
                                         <label>Current Reading <span class="text-danger">*</span></label>
@@ -575,7 +626,8 @@
                                         <select class="form-control" v-model="result.vendor_id" ref="vendorSelect">
                                             <option value="">Select Vendor</option>
                                             <option v-for="vendor in vendors" :key="vendor.id" :value="vendor.id">{{
-                                                vendor.name }}</option>
+                                                vendor.name }}
+                                            </option>
                                         </select>
                                     </div>
                                 </div>
@@ -622,11 +674,9 @@
                                     </div>
                                 </div>
 
-                                <!-- Comments Field Always At End (for all) -->
-                                <div class="col-md-12" v-if="
-                                    (result.status === 'no_fault') ||
-                                    (result.status === 'resolved' && result.repair_type)
-                                ">
+                                <!-- Comments Field Always At End -->
+                                <div class="col-md-12"
+                                    v-if="result.status === 'no_fault' || (result.status === 'resolved' && result.repair_type)">
                                     <div class="form-group">
                                         <label>Comments <span class="text-danger">*</span></label>
                                         <textarea class="form-control" v-model="result.comments" rows="2"></textarea>
@@ -643,6 +693,7 @@
                     </div>
                 </div>
             </div>
+
 
 
         </div>
@@ -743,111 +794,141 @@ export default {
         closeModal() {
             $(".modal").click();
         },
-       async fetchData() {
-    if ($.fn.DataTable.isDataTable("#fault_table")) {
-        $("#fault_table").DataTable().destroy();
-    }
+        async fetchData() {
+            if ($.fn.DataTable.isDataTable("#fault_table")) {
+                $("#fault_table").DataTable().destroy();
+            }
 
-    const res = await this.callApi('post', 'fleet/fault-claims', this.filters);
+            const res = await this.callApi('post', 'fleet/fault-claims', this.filters);
 
-    if (res.status === 200) {
-        this.faults = res.data.faults;
-        this.drivers = res.data.drivers;
-        this.buses = res.data.buses;
+            if (res.status === 200) {
+                this.faults = res.data.faults;
+                this.drivers = res.data.drivers;
+                this.buses = res.data.buses;
 
-        this.$nextTick(() => {
-            // ✅ re-init DataTable
-            $("#fault_table").DataTable();
+                this.$nextTick(() => {
+                    // ✅ re-init DataTable
+                    $("#fault_table").DataTable();
 
-            // ✅ re-init select2 after DOM updated
-            this.initSelect2();
-            this.initFilterSelect2();
-        });
-    }
-},
+                    // ✅ re-init select2 after DOM updated
+                    this.initSelect2();
+                    this.initFilterSelect2();
+                });
+            }
+        },
 
-initFilterSelect2() {
-    const vm = this;
+        initFilterSelect2() {
+            const vm = this;
 
-    // ✅ Bus Filter with search
-    if (this.$refs.busFilterSelect) {
-        $(this.$refs.busFilterSelect).select2({
-            placeholder: "Select Bus",
-            allowClear: true,
-            width: '100%',
-            minimumResultsForSearch: 0
-        })
-        .off('change')
-        .on('change', function () {
-            vm.filters.bus_id = $(this).val();   // 🔥 bas value update hogi
-        });
+            // ✅ Bus Filter with search
+            if (this.$refs.busFilterSelect) {
+                $(this.$refs.busFilterSelect).select2({
+                    placeholder: "Select Bus",
+                    allowClear: true,
+                    width: '100%',
+                    minimumResultsForSearch: 0
+                })
+                    .off('change')
+                    .on('change', function () {
+                        vm.filters.bus_id = $(this).val();   // 🔥 bas value update hogi
+                    });
 
-        // 🔥 Sync Vue → Select2
-        $(this.$refs.busFilterSelect).val(this.filters.bus_id).trigger('change.select2');
-    }
+                // 🔥 Sync Vue → Select2
+                $(this.$refs.busFilterSelect).val(this.filters.bus_id).trigger('change.select2');
+            }
 
-    // ✅ Status Filter
-    if (this.$refs.statusFilterSelect) {
-        $(this.$refs.statusFilterSelect).select2({
-            placeholder: "Select Status",
-            allowClear: true,
-            width: '100%',
-            minimumResultsForSearch: 0
-        })
-        .off('change')
-        .on('change', function () {
-            vm.filters.status = $(this).val();   // 🔥 bas value update hogi
-        });
+            // ✅ Status Filter
+            if (this.$refs.statusFilterSelect) {
+                $(this.$refs.statusFilterSelect).select2({
+                    placeholder: "Select Status",
+                    allowClear: true,
+                    width: '100%',
+                    minimumResultsForSearch: 0
+                })
+                    .off('change')
+                    .on('change', function () {
+                        vm.filters.status = $(this).val();   // 🔥 bas value update hogi
+                    });
 
-        // 🔥 Sync Vue → Select2
-        $(this.$refs.statusFilterSelect).val(this.filters.status).trigger('change.select2');
-    }
-},
+                // 🔥 Sync Vue → Select2
+                $(this.$refs.statusFilterSelect).val(this.filters.status).trigger('change.select2');
+            }
+        },
 
-getProgressColor(percentage, due) {
-    if (due) return 'bg-danger'; // red
-    return 'bg-success';         // green
-},
+        getProgressColor(percentage, due) {
+            if (due) return 'bg-danger'; // red
+            return 'bg-success';         // green
+        },
 
-applyFilters() {
-    this.fetchData();   // ✅ sirf button par chalega
-},
+        applyFilters() {
+            this.fetchData();   // ✅ sirf button par chalega
+        },
 
-resetFilters() {
-    this.filters = { from_date: '', to_date: '', status: '', bus_id: '' };
+        resetFilters() {
+            this.filters = { from_date: '', to_date: '', status: '', bus_id: '' };
 
-    this.$nextTick(() => {
-        // ✅ Reset Select2 visually
-        if (this.$refs.busFilterSelect) {
-            $(this.$refs.busFilterSelect).val("").trigger('change.select2');
-        }
-        if (this.$refs.statusFilterSelect) {
-            $(this.$refs.statusFilterSelect).val("").trigger('change.select2');
-        }
-    });
-
-    this.fetchData();   // ✅ reset hone ke baad data reload
-},
-
-        openDockModal(claim) {
-            this.result = JSON.parse(JSON.stringify(this.resultDataReset));
-            this.result.claim_id = claim.id;
-            this.result.bus_number = claim.bus?.bus_number || 'N/A';
-            this.result.driver_name = claim.driver?.name || 'N/A';
-            this.callApi('post', 'fleet/inspection-result/data', { claim_id: claim.id }).then(res => {
-                if (res.status === 200) {
-                    this.parts = res.data.parts || [];
-                    this.vendors = res.data.vendors || [];
-                } else {
-                    swal("Error", "Failed to fetch parts/vendors", "error");
+            this.$nextTick(() => {
+                // ✅ Reset Select2 visually
+                if (this.$refs.busFilterSelect) {
+                    $(this.$refs.busFilterSelect).val("").trigger('change.select2');
+                }
+                if (this.$refs.statusFilterSelect) {
+                    $(this.$refs.statusFilterSelect).val("").trigger('change.select2');
                 }
             });
 
-            this.$nextTick(() => {
-                $('#addDockModal').modal('show');
-                this.initInspectionSelect2();
-            });
+            this.fetchData();   // ✅ reset hone ke baad data reload
         },
+
+       openDockModal(item, type = 'fault') {
+    this.result = JSON.parse(JSON.stringify(this.resultDataReset));
+
+    if (type === 'fault') {
+        this.result.claim_id = item.id;
+        this.result.bus_number = item.bus?.bus_number || 'N/A';
+        this.result.driver_name = item.driver?.name || 'N/A';
+    } else if (type === 'dock') {
+        this.result.dock_request_id = item.id;
+        this.result.bus_number = item.bus?.bus_number || 'N/A';
+        this.result.driver_name = item.driver?.name || 'N/A';
+    }
+
+    const payload = type === 'fault'
+        ? { fault_claim_id: item.id }
+        : { dock_request_id: item.id };
+
+    this.callApi('post', 'fleet/inspection-result/data', payload).then(res => {
+        if (res.status === 200) {
+            this.parts = res.data.parts || [];
+            this.vendors = res.data.vendors || [];
+
+            // Pre-select all parts
+            this.result.parts = this.parts.map(p => p.id);
+
+            // ✅ Calculate health & due for each part
+            this.parts = this.parts.map(p => {
+                // Example: use percentage if provided by backend, otherwise calculate
+                if (p.percentage === undefined && p.maintenance_after !== undefined) {
+                    const total = p.maintenance_after || 1;
+                    const used = p.current_reading || 0;
+                    p.percentage = Math.max(100 - Math.floor((used / total) * 100), 0);
+                    p.due = p.percentage <= 20;
+                    p.next_maintenance_date = p.maintenance_days_date 
+                        ? moment(p.maintenance_days_date).add(p.maintenance_days, 'days').format('YYYY-MM-DD')
+                        : null;
+                }
+                return p;
+            });
+        } else {
+            swal("Error", "Failed to fetch parts/vendors", "error");
+        }
+    });
+
+    this.$nextTick(() => {
+        $('#addDockModal').modal('show');
+        this.initInspectionSelect2();
+    });
+},
         async viewDetails(item) {
             this.selectedFault = null;
 
@@ -870,79 +951,79 @@ resetFilters() {
             }
         },
         async add() {
-    if (!this.data.bus_id) {
-        return swal({ title: "Required", text: "Please select a Bus", icon: "error", timer: 2000 });
-    }
-    if (!this.data.driver_id) {
-        return swal({ title: "Required", text: "Please select a Driver", icon: "error", timer: 2000 });
-    }
-    if (!this.data.dock_hours && !this.data.dock_minutes) {
-        return swal({ title: "Required", text: "Please enter Dock Time (hours or minutes)", icon: "error", timer: 2000 });
-    }
-    if (this.data.dock_minutes < 0 || this.data.dock_minutes > 59) {
-        return swal({ title: "Invalid", text: "Minutes must be between 0 and 59", icon: "error", timer: 2000 });
-    }
-    if (!this.data.periority) {
-        return swal({ title: "Required", text: "Please select a Priority level", icon: "error", timer: 2000 });
-    }
-    if (!this.data.description) {
-        return swal({ title: "Required", text: "Please enter a Description", icon: "error", timer: 2000 });
-    }
-    if (!this.data.request_type) {
-        return swal({
-            title: "Required",
-            text: "Please select Request Type",
-            icon: "error",
-            timer: 2000
-        });
-    }
-    if (!this.data.parts || this.data.parts.length === 0) {
-        return swal({
-            title: "Required",
-            text: "Please select at least one Part",
-            icon: "error",
-            timer: 2000
-        });
-    }
+            if (!this.data.bus_id) {
+                return swal({ title: "Required", text: "Please select a Bus", icon: "error", timer: 2000 });
+            }
+            if (!this.data.driver_id) {
+                return swal({ title: "Required", text: "Please select a Driver", icon: "error", timer: 2000 });
+            }
+            if (!this.data.dock_hours && !this.data.dock_minutes) {
+                return swal({ title: "Required", text: "Please enter Dock Time (hours or minutes)", icon: "error", timer: 2000 });
+            }
+            if (this.data.dock_minutes < 0 || this.data.dock_minutes > 59) {
+                return swal({ title: "Invalid", text: "Minutes must be between 0 and 59", icon: "error", timer: 2000 });
+            }
+            if (!this.data.periority) {
+                return swal({ title: "Required", text: "Please select a Priority level", icon: "error", timer: 2000 });
+            }
+            if (!this.data.description) {
+                return swal({ title: "Required", text: "Please enter a Description", icon: "error", timer: 2000 });
+            }
+            if (!this.data.request_type) {
+                return swal({
+                    title: "Required",
+                    text: "Please select Request Type",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (!this.data.parts || this.data.parts.length === 0) {
+                return swal({
+                    title: "Required",
+                    text: "Please select at least one Part",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
 
-    this.loading = true;
+            this.loading = true;
 
-    try {
-        // Format dock_time from hours and minutes
-        const hours = this.data.dock_hours || 0;
-        const minutes = this.data.dock_minutes || 0;
-        const dock_time = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            try {
+                // Format dock_time from hours and minutes
+                const hours = this.data.dock_hours || 0;
+                const minutes = this.data.dock_minutes || 0;
+                const dock_time = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 
-        // ✅ Build payload
-        const payload = {
-            bus_id: this.data.bus_id,
-            driver_id: this.data.driver_id,
-            dock_time,
-            periority: this.data.periority,
-            request_type: this.data.request_type,
-            description: this.data.description,
-            parts: this.data.parts // array of selected part IDs
-        };
+                // ✅ Build payload
+                const payload = {
+                    bus_id: this.data.bus_id,
+                    driver_id: this.data.driver_id,
+                    dock_time,
+                    periority: this.data.periority,
+                    request_type: this.data.request_type,
+                    description: this.data.description,
+                    parts: this.data.parts // array of selected part IDs
+                };
 
-        const res = await this.callApi('post', 'fleet/fault-claims/store', payload);
+                const res = await this.callApi('post', 'fleet/fault-claims/store', payload);
 
-        if (res.status === 200) {
-            swal({ title: "Success", text: "Fault claim created successfully!", icon: "success", timer: 2000 });
+                if (res.status === 200) {
+                    swal({ title: "Success", text: "Fault claim created successfully!", icon: "success", timer: 2000 });
 
-            this.$nextTick(() => $('#faultModal').modal('hide'));
-            await this.fetchData();
+                    this.$nextTick(() => $('#faultModal').modal('hide'));
+                    await this.fetchData();
 
-            // ✅ Reset form
-            this.data = JSON.parse(JSON.stringify(this.addDataReset));
-            this.selectedBusParts = [];
-        }
-    } catch (err) {
-        console.error(err);
-        swal({ title: "Error", text: "Something went wrong while saving", icon: "error", timer: 2000 });
-    } finally {
-        this.loading = false;
-    }
-},
+                    // ✅ Reset form
+                    this.data = JSON.parse(JSON.stringify(this.addDataReset));
+                    this.selectedBusParts = [];
+                }
+            } catch (err) {
+                console.error(err);
+                swal({ title: "Error", text: "Something went wrong while saving", icon: "error", timer: 2000 });
+            } finally {
+                this.loading = false;
+            }
+        },
 
 
         async submitResult() {
@@ -1051,7 +1132,7 @@ resetFilters() {
                     .off('change').on('change', function () {
                         vm.data.driver_id = $(this).val();
                     });
-                    
+
             }, 100);
         },
         initInspectionSelect2() {
