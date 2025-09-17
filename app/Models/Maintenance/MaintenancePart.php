@@ -5,6 +5,7 @@ namespace App\Models\Maintenance;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\User;
 use App\Models\Company;
+use App\Models\FaultClaimPart;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -27,5 +28,9 @@ class MaintenancePart extends Model
     {
         return $this->hasMany(maintenancePartLink::class, 'part_id', 'id');
     }
+    public function parts()
+{
+    return $this->hasMany(FaultClaimPart::class, 'fault_claim_id');
+}
 
 }

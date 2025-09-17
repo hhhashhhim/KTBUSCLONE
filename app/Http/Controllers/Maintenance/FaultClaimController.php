@@ -290,42 +290,75 @@ public function store(Request $request)
     }
 
 
-    public function show(Request $request)
-    {
-        $fault = FaultClaim::with(['bus', 'driver', 'dock_requests.approved'])
-            ->where('id', $request->id)
-            ->first();
+   public function show(Request $request)
+{
+    $fault = FaultClaim::with([
+        'bus',
+        'driver',
+        'dock_requests.approved',
+        'claimParts.part:id,name' // ✅ add this
+    ])
+    ->where('id', $request->id)
+    ->first();
 
-        if (!$fault) {
-            return response()->json(['message' => 'Not found'], 404);
+    if (!$fault) {
+        return response()->json(['message' => 'Not found'], 404);
+    }
+
+    $inspection = InspectionResult::with([
+        'bus:id,bus_number',
+        'driver:id,name',
+        'vendor:id,name',
+        'parts.part:id,name',
+        'dockRequest'
+    ])->where("fault_claim_id", $request->id)->first();
+
+    return [
+        "fault" => $fault,
+        "inspection" => $inspection
+    ];
+}
+
+
+ public function helperData(Request $request)
+{
+    $companyId = Auth::user()->company_id;
+
+    $vendors = Supplier::all();
+
+    // Fault claim → existing behavior
+    if ($request->has('fault_claim_id')) {
+        $parts = FaultClaimPart::with('part', 'addedBy', 'company')
+            ->where('company_id', $companyId)
+            ->where('fault_claim_id', $request->fault_claim_id)
+            ->get();
+    }
+    // Dock request → get all maintenance parts for the bus
+    elseif ($request->has('dock_request_id')) {
+        $dockRequest = DockRequest::find($request->dock_request_id);
+        if ($dockRequest) {
+            $busId = $dockRequest->bus_id;
+
+            $parts = MaintenancePartLink::with('maintenancePart', 'addedBy', 'company')
+                ->where('company_id', $companyId)
+                ->where('bus_id', $busId)
+                ->get();
+        } else {
+            $parts = collect();
         }
-
-        $inspection = InspectionResult::with([
-            'bus:id,bus_number',
-            'driver:id,name',
-            'vendor:id,name',
-            'parts.part' => function ($q) {
-                $q->select('id', 'name');
-            },
-            'dockRequest'
-        ])->where("fault_claim_id", $request->id)->first();
-
-        return [
-            "fault" => $fault,
-            "inspection" => $inspection
-        ];
+    } else {
+        $parts = collect();
     }
 
-   
-    public function helperData(Request $request)
-    {
-        $parts = MaintenancePart::with('addedBy', 'company')->where('company_id', Auth::user()->company_id)->get();
-        $vendors = Supplier::all();
-        return [
-            "parts" => $parts,
-            "vendors" => $vendors,
-        ];
-    }
+    // Return as JSON
+    return response()->json([
+        'parts' => $parts,
+        'vendors' => $vendors,
+    ]);
+}
+
+
+
 
     public function requests(Request $request)
     {

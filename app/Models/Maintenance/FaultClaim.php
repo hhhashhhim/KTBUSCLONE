@@ -42,6 +42,9 @@ class FaultClaim extends Model
 public function inspectionResult() {
     return $this->hasOne(InspectionResult::class, 'fault_claim_id');
 }
-
+public function parts()
+{
+    return $this->hasMany(FaultClaimPart::class, 'fault_claim_id');
+}
 
 }
