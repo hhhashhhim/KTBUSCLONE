@@ -527,64 +527,33 @@
                                 </div>
 
                                 <!-- ✅ Parts Table Instead of Dropdown -->
-                              <div class="col-md-12" v-if="parts.length">
-    <div class="form-group">
-        <label><strong>Parts</strong></label>
-        <table class="table align-middle table-bordered table-striped">
-            <thead class="table-light">
-                <tr>
-                    <th class="text-center" style="width: 80px;">Select</th>
-                    <th style="width: 250px;">Part Name</th>
-                    <th style="width: 350px;">Health Status</th>
-                    <th class="text-center" style="width: 120px;">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(part, index) in parts" :key="part.id">
-                    <!-- Checkbox -->
-                    <td class="text-center">
-                        <div class="custom-checkbox custom-control">
-                            <input type="checkbox" :value="part.id"
-                                   v-model="result.parts"
-                                   :id="'part-' + part.id"
-                                   class="custom-control-input">
-                            <label :for="'part-' + part.id" class="custom-control-label">&nbsp;</label>
-                        </div>
-                    </td>
+                                <div class="col-md-12" v-if="(result.status === 'no_fault' && parts.length)
+                                    || (result.status === 'resolved' && result.repair_type && parts.length)
+                                    || (result.status === 'dock_required' && parts.length)">
+                                    <div class="form-group">
+                                        <label><strong>Parts</strong></label>
+                                        <table class="table table-bordered table-striped">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Part Name</th>
+                                                    <th>Select</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(part, index) in parts" :key="part.id">
+                                                    <td>{{ index + 1 }}</td>
+                                                    <td>{{ part.part?.name || part.maintenancePart?.name || 'N/A' }}
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" :value="part.id" v-model="result.parts">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
 
-                    <!-- Part Name -->
-                    <td class="fw-semibold">
-                        {{ part.part?.name || part.maintenancePart?.name || 'N/A' }}
-                    </td>
-
-                    <!-- Health Progress -->
-                    <td>
-                        <div v-if="part.percentage !== undefined">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <small class="fw-semibold">{{ part.percentage + '%' }}</small>
-                            </div>
-                            <div class="progress" style="height: 12px;">
-                                <div class="progress-bar"
-                                     :class="getProgressColor(part.percentage, part.due)"
-                                     :style="{ width: part.percentage + '%' }"></div>
-                            </div>
-                            <div v-if="part.next_maintenance_date" class="text-muted mt-2">
-                                Next Maintenance: {{ part.next_maintenance_date }}
-                            </div>
-                        </div>
-                    </td>
-
-                    <!-- Status Badge -->
-                    <td class="text-center">
-                        <span v-if="part.due" class="badge text-white bg-danger">Due</span>
-                        <span v-else class="badge text-white bg-success">Up To Date</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
+                                    </div>
+                                </div>
 
                                 <!-- No Fault Fields -->
                                 <div class="col-md-6" v-if="result.status === 'no_fault'">
@@ -880,55 +849,40 @@ export default {
             this.fetchData();   // ✅ reset hone ke baad data reload
         },
 
-       openDockModal(item, type = 'fault') {
-    this.result = JSON.parse(JSON.stringify(this.resultDataReset));
+        openDockModal(item, type = 'fault') {
+            this.result = JSON.parse(JSON.stringify(this.resultDataReset));
 
-    if (type === 'fault') {
-        this.result.claim_id = item.id;
-        this.result.bus_number = item.bus?.bus_number || 'N/A';
-        this.result.driver_name = item.driver?.name || 'N/A';
-    } else if (type === 'dock') {
-        this.result.dock_request_id = item.id;
-        this.result.bus_number = item.bus?.bus_number || 'N/A';
-        this.result.driver_name = item.driver?.name || 'N/A';
-    }
+            if (type === 'fault') {
+                this.result.claim_id = item.id;
+                this.result.bus_number = item.bus?.bus_number || 'N/A';
+                this.result.driver_name = item.driver?.name || 'N/A';
+            } else if (type === 'dock') {
+                this.result.dock_request_id = item.id;
+                this.result.bus_number = item.bus?.bus_number || 'N/A';
+                this.result.driver_name = item.driver?.name || 'N/A';
+            }
 
-    const payload = type === 'fault'
-        ? { fault_claim_id: item.id }
-        : { dock_request_id: item.id };
+            const payload = type === 'fault'
+                ? { fault_claim_id: item.id }
+                : { dock_request_id: item.id };
 
-    this.callApi('post', 'fleet/inspection-result/data', payload).then(res => {
-        if (res.status === 200) {
-            this.parts = res.data.parts || [];
-            this.vendors = res.data.vendors || [];
+            this.callApi('post', 'fleet/inspection-result/data', payload).then(res => {
+                if (res.status === 200) {
+                    this.parts = res.data.parts || [];
+                    this.vendors = res.data.vendors || [];
 
-            // Pre-select all parts
-            this.result.parts = this.parts.map(p => p.id);
-
-            // ✅ Calculate health & due for each part
-            this.parts = this.parts.map(p => {
-                // Example: use percentage if provided by backend, otherwise calculate
-                if (p.percentage === undefined && p.maintenance_after !== undefined) {
-                    const total = p.maintenance_after || 1;
-                    const used = p.current_reading || 0;
-                    p.percentage = Math.max(100 - Math.floor((used / total) * 100), 0);
-                    p.due = p.percentage <= 20;
-                    p.next_maintenance_date = p.maintenance_days_date 
-                        ? moment(p.maintenance_days_date).add(p.maintenance_days, 'days').format('YYYY-MM-DD')
-                        : null;
+                    // ✅ Pre-select all parts
+                    this.result.parts = this.parts.map(p => p.id);
+                } else {
+                    swal("Error", "Failed to fetch parts/vendors", "error");
                 }
-                return p;
             });
-        } else {
-            swal("Error", "Failed to fetch parts/vendors", "error");
-        }
-    });
 
-    this.$nextTick(() => {
-        $('#addDockModal').modal('show');
-        this.initInspectionSelect2();
-    });
-},
+            this.$nextTick(() => {
+                $('#addDockModal').modal('show');
+                this.initInspectionSelect2();
+            });
+        },
         async viewDetails(item) {
             this.selectedFault = null;
 
