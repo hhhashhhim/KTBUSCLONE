@@ -273,9 +273,9 @@
                             <h5 class="modal-title">
                                 <i class="fas fa-tools mr-2"></i> Fault Claim Details
                             </h5>
-                            <button type="button" class="btn btn-light btn-sm mr-2" @click=closeModal()>
+                            <!-- <button type="button" class="btn btn-light btn-sm mr-2" @click=closeModal()>
                                 <i class="fas fa-print"></i> Print
-                            </button>
+                            </button> -->
                             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
