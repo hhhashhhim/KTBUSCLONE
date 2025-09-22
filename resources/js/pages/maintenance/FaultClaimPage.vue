@@ -273,6 +273,9 @@
                             <h5 class="modal-title">
                                 <i class="fas fa-tools mr-2"></i> Fault Claim Details
                             </h5>
+                            <button type="button" class="btn btn-light btn-sm mr-2" @click=closeModal()>
+                                <i class="fas fa-print"></i> Print
+                            </button>
                             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -302,7 +305,7 @@
                                                                 formatDateTime(dock.dock_start_time) : 'Not Assigned' }}
                                                             </h6>
                                                             <span :class="getStatusClass(dock.status)">{{ dock.status
-                                                            }}</span>
+                                                                }}</span>
                                                         </div>
                                                         <div class="row">
                                                             <div class="col-md-6 mt-2">
@@ -551,7 +554,6 @@
                                                 </tr>
                                             </tbody>
                                         </table>
-
                                     </div>
                                 </div>
 
@@ -883,27 +885,47 @@ export default {
                 this.initInspectionSelect2();
             });
         },
-        async viewDetails(item) {
-            this.selectedFault = null;
+         async viewDetails(item) {
+        this.selectedFault = null;
+        const res = await this.callApi('post', `fleet/fault-claims/show`, { id: item.id });
 
-            // Make API call to get full fault with dock requests
-            const res = await this.callApi('post', `fleet/fault-claims/show`, { id: item.id });
+        if (res.status === 200 && res.data) {
+            this.selectedFault = res.data.fault;
+            this.inspection = res.data.inspection;
+            this.$nextTick(() => {
+                $('#viewDockModal').modal('show');
+            });
+        } else {
+            swal({
+                title: "Error",
+                text: "Failed to load fault details.",
+                icon: "error",
+                timer: 2000
+            });
+        }
+    },
 
-            if (res.status === 200 && res.data) {
-                this.selectedFault = res.data.fault;
-                this.inspection = res.data.inspection;
-                this.$nextTick(() => {
-                    $('#viewDockModal').modal('show');
-                });
-            } else {
-                swal({
-                    title: "Error",
-                    text: "Failed to load fault details.",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
-        },
+    printModal() {
+        let printContent = document.querySelector("#viewDockModal .modal-body").innerHTML;
+       let win = window.open("", "_blank");
+        win.document.write(`
+            <html>
+                <head>
+                    <title>Print Fault Claim</title>
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+                    <style>
+                        body { font-size: 14px; }
+                        .card { box-shadow: none !important; border: 1px solid #ddd; }
+                    </style>
+                </head>
+                <body onload="window.print(); window.close();">
+                    ${printContent}
+                </body>
+            </html>
+        `);
+        win.document.close();
+    },
         async add() {
             if (!this.data.bus_id) {
                 return swal({ title: "Required", text: "Please select a Bus", icon: "error", timer: 2000 });
