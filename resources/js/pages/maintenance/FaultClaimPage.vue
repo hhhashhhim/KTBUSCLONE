@@ -276,7 +276,8 @@
                             <!-- <button type="button" class="btn btn-light btn-sm mr-2" @click=closeModal()>
                                 <i class="fas fa-print"></i> Print
                             </button> -->
-                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"
+                                @click=closeModal()>
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>

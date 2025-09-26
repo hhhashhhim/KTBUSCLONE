@@ -93,7 +93,8 @@
                             <h5 class="modal-title">
                                 <i class="fas fa-tools mr-2"></i> Fault Claim Details
                             </h5>
-                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"
+                                @click=closeModal()>
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -410,6 +411,9 @@ export default {
                 default: return 'badge badge-dark';
             }
         },
+         closeModal(){
+            $('.modal').click();
+         },
 
         async approveDock(dock) {
             if (!this.dockTime) {
