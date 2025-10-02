@@ -41,8 +41,8 @@ class AccountController extends Controller
 
     public function groupStore(Request $request)
     {
-        try {
-            DB::beginTransaction();
+        // try {
+        //     DB::beginTransaction();
             
             $request->validate([
                 'groupName' => 'required|unique:account_groups,name',
@@ -68,11 +68,11 @@ class AccountController extends Controller
 
             DB::commit();
             return $group;
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error('Database transaction error: ' . $e->getMessage());
-            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-        }
+        // } catch (Exception $e) {
+        //     DB::rollBack();
+        //     Log::error('Database transaction error: ' . $e->getMessage());
+        //     return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        // }
 
     }
 

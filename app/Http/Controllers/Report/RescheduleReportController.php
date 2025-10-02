@@ -14,8 +14,7 @@ class RescheduleReportController extends Controller
 {
     public function getTerminals()
     {
-        if(!checkForSubmenu("confirm-cancel"))
-        {
+        if (!checkForSubmenu("confirm-cancel")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         return Terminal::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
@@ -23,16 +22,20 @@ class RescheduleReportController extends Controller
 
     public function filterData(Request $request)
     {
-        if(!checkForSubmenu("confirm-cancel"))
-        {
+        if (!checkForSubmenu("confirm-cancel")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $tickets = Ticket::with('reschedule_seat')
-            ->with("reschedule_seat.old_departure:id,name","reschedule_seat.old_destination:id,name")
-            ->with("reschedule_seat.new_departure:id,name","reschedule_seat.new_destination:id,name")
-            ->with(['reschedule_seat.new_ticket'=>function($q){
-                return $q->withTrashed();
-            }])
+        $tickets = Ticket::with([
+            'reschedule_seat',
+            'reschedule_seat.old_departure:id,name',
+            'reschedule_seat.old_destination:id,name',
+            'reschedule_seat.new_departure:id,name',
+            'reschedule_seat.new_destination:id,name',
+            'reschedule_seat.new_ticket' => function ($q) {
+                $q->withTrashed();
+            },
+            'terminal:id,name'  // <-- eager load terminal
+        ])
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'reschedule')
             ->onlyTrashed()
@@ -45,14 +48,26 @@ class RescheduleReportController extends Controller
             ->when($request->toDate != '', function ($query) use ($request) {
                 return $query->where('schedule_date', '<=', $request->toDate);
             })
-            ->orderBy('id','DESC')
+            ->orderBy('id', 'DESC')
             ->limit(($request->fromDate == '' && $request->toDate == '') ? 50 : 2000)
-            ->get(["id","terminal_name","schedule_id","schedule_date","customer_id","seat_fare","discount","seat_no","type"]);
+            ->get([
+                "id",
+                "terminal_id",
+                "schedule_id",
+                "schedule_date",
+                "customer_id",
+                "seat_fare",
+                "discount",
+                "seat_no",
+                "type"
+            ]);
+
 
         $tickets->map(function ($q) {
+            $q->terminal_name = $q->terminal->name ?? 'N/A'; // <-- from relation
             $q->reason = $q->reschedule_seat->reason;
-            $q->reschedule_by = User::find($q->reschedule_seat->added_by)->name??'N/A';
-            $q->reschedule_time = date("h:i A d-m-Y",strtotime($q->reschedule_seat->created_at));
+            $q->reschedule_by = User::find($q->reschedule_seat->added_by)->name ?? 'N/A';
+            $q->reschedule_time = date("h:i A d-m-Y", strtotime($q->reschedule_seat->created_at));
             $q->passenger_name = Customer::find($q->customer_id)->name;
             $q->passenger_contact = formatContact(Customer::find($q->customer_id)->contact);
             $q->type = $q->type;
@@ -67,24 +82,27 @@ class RescheduleReportController extends Controller
             $q->new_destination = $q->reschedule_seat->new_destination->name;
             $q->old_fare = (int)$q->seat_fare - (int)$q->discount;
             $q->new_fare = (int)$q->reschedule_seat->new_ticket->seat_fare - (int)$q->reschedule_seat->new_ticket->discount;
-            $q->badge = getRowBadgeColor(date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule_time_exact)), $q->reschedule_seat->created_at);
-            unset($q->reschedule_seat, $q->schedule);
+            $q->badge = getRowBadgeColor(
+                date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule_time_exact)),
+                $q->reschedule_seat->created_at
+            );
+            unset($q->reschedule_seat, $q->schedule, $q->terminal);
         });
-        
+
+
         return $tickets;
     }
 
     public
     function getPrintPdf(Request $request)
     {
-        if(!checkForSubmenu("confirm-cancel"))
-        {
+        if (!checkForSubmenu("confirm-cancel")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $tickets = Ticket::with('reschedule_seat')
-            ->with("reschedule_seat.old_departure:id,name","reschedule_seat.old_destination:id,name")
-            ->with("reschedule_seat.new_departure:id,name","reschedule_seat.new_destination:id,name")
-            ->with(['reschedule_seat.new_ticket'=>function($q){
+            ->with("reschedule_seat.old_departure:id,name", "reschedule_seat.old_destination:id,name")
+            ->with("reschedule_seat.new_departure:id,name", "reschedule_seat.new_destination:id,name")
+            ->with(['reschedule_seat.new_ticket' => function ($q) {
                 return $q->withTrashed();
             }])
             ->where('company_id', Auth::user()->company_id)
@@ -99,14 +117,14 @@ class RescheduleReportController extends Controller
             ->when($request->toDate != '', function ($query) use ($request) {
                 return $query->where('schedule_date', '<=', $request->toDate);
             })
-            ->orderBy('id','DESC')
+            ->orderBy('id', 'DESC')
             ->limit(($request->fromDate == '' && $request->toDate == '') ? 50 : 2000)
-            ->get(["id","terminal_name","schedule_id","schedule_date","customer_id","seat_fare","discount","seat_no","type"]);
+            ->get(["id", "terminal_name", "schedule_id", "schedule_date", "customer_id", "seat_fare", "discount", "seat_no", "type"]);
 
         $tickets->map(function ($q) {
             $q->reason = $q->reschedule_seat->reason;
-            $q->reschedule_by = User::find($q->reschedule_seat->added_by)->name??'N/A';
-            $q->reschedule_time = date("h:i A d-m-Y",strtotime($q->reschedule_seat->created_at));
+            $q->reschedule_by = User::find($q->reschedule_seat->added_by)->name ?? 'N/A';
+            $q->reschedule_time = date("h:i A d-m-Y", strtotime($q->reschedule_seat->created_at));
             $q->passenger_name = Customer::find($q->customer_id)->name;
             $q->passenger_contact = formatContact(Customer::find($q->customer_id)->contact);
             $q->type = $q->type;
