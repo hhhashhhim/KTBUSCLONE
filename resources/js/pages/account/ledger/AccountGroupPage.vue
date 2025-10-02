@@ -9,35 +9,46 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
+                                <!-- Tier 2 -->
                                 <div class="col-md-3">
-                                    <label for="terminalFilter">Tier 2</label>
-                                    <select id="terminalFilter" class="form-control" v-model="addData.secondLevel" @change="getThirdLevel($event.target.value)">
+                                    <label for="tier2">Tier 2</label>
+                                    <select id="tier2" class="form-control select2" v-model="addData.secondLevel"
+                                        @change="getThirdLevel(addData.secondLevel)">
                                         <option value="0">Select tier 2</option>
                                         <option v-for="(single, i) in secondLevelData" :key="i" :value="single.id">
                                             {{ single.name }}
                                         </option>
                                     </select>
                                 </div>
+
+                                <!-- Tier 3 -->
                                 <div class="col-md-3">
-                                    <label for="terminalFilter">Tier 3</label>
-                                    <select id="terminalFilter" class="form-control" v-model="addData.thirdLevel">
+                                    <label for="tier3">Tier 3</label>
+                                    <select id="tier3" class="form-control select2" v-model="addData.thirdLevel">
                                         <option value="0">Select tier 3</option>
                                         <option v-for="(single, i) in thirdLevelData" :key="i" :value="single.id">
                                             {{ single.name }}
                                         </option>
                                     </select>
                                 </div>
+
+                                <!-- New Group / Tier Input -->
                                 <div class="col-md-3">
-                                    <label for="terminalFilter">{{addData.thirdLevel == '0' ? 'New Tier 3' : 'New Tier 4'}}</label>
-                                    <input type="text" class="form-control" v-model="addData.groupName">
+                                    <label for="groupName">{{ addData.thirdLevel == '0' ? 'New Tier 3' : 'New Tier 4'
+                                    }}</label>
+                                    <input type="text" id="groupName" class="form-control"
+                                        v-model="addData.groupName" />
                                 </div>
+
+                                <!-- Add Button -->
                                 <div class="col-md-3">
                                     <button class="btn btn-primary mt-4 btn-block" type="button" @click="addGroup()"
-                                            :disabled="loading">
+                                        :disabled="loading">
                                         {{ loading ? 'Loading...' : 'Add' }}
                                     </button>
                                 </div>
                             </div>
+
                             <!-- Table -->
                             <div class="row mt-4">
                                 <div class="col-12">
@@ -45,31 +56,31 @@
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table class="table dataTables table-striped table-hover"
-                                                       id="group_table">
+                                                    id="group_table">
                                                     <thead>
-                                                    <tr>
-                                                        <th>Sr No.</th>
-                                                        <th>Tier 4</th>
-                                                        <th>Tier 3</th>
-                                                        <th>Tier 2</th>
-                                                        <th>Action</th>
-                                                    </tr>
+                                                        <tr>
+                                                            <th>Sr No.</th>
+                                                            <th>Tier 4</th>
+                                                            <th>Tier 3</th>
+                                                            <th>Tier 2</th>
+                                                            <th>Action</th>
+                                                        </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(single, i) in fourthLevelData" :key="i">
-                                                        <td>{{ i+1 }}</td>
-                                                        <td>{{ single.name }}</td>
-                                                        <td>{{ single.level_three.name }}</td>
-                                                        <td>{{ single.level_two.name }}</td>
-                                                        <td>
-                                                            <button
-                                                                    title="Edit Group" :data-target="'#' + editFormID"
-                                                                    data-toggle="modal" @click="edit(single)"
+                                                        <tr v-for="(single, i) in fourthLevelData" :key="i">
+                                                            <td>{{ i + 1 }}</td>
+                                                            <td>{{ single.name }}</td>
+                                                            <td>{{ single.level_three.name }}</td>
+                                                            <td>{{ single.level_two.name }}</td>
+                                                            <td>
+                                                                <button title="Edit Group"
+                                                                    :data-target="'#' + editFormID" data-toggle="modal"
+                                                                    @click="edit(single)"
                                                                     class=" text-light btn btn-primary mx-1">
-                                                                <i class="far fa-edit"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
+                                                                    <i class="far fa-edit"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -82,16 +93,12 @@
                     </div>
                 </div>
             </div>
-            <Edit
-                heading="Edit Name"
-                :errors="this.validationErrors"
-                :success="success"
-                :editForm="editFormID"
-            >
+            <Edit heading="Edit Name" :errors="this.validationErrors" :success="success" :editForm="editFormID">
                 <div class="row">
                     <div class="col-md-4">
                         <label for="">Tier 2</label>
-                        <select disabled id="" class="form-control" v-model="dataEdit.account_id" @change="getThirdLevel($event.target.value)">
+                        <select disabled id="" class="form-control" v-model="dataEdit.account_id"
+                            @change="getThirdLevel($event.target.value)">
                             <option value="0">Select tier 2</option>
                             <option v-for="(single, i) in secondLevelData" :key="i" :value="single.id">
                                 {{ single.name }}
@@ -163,7 +170,25 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
     },
+    mounted() {
+        // Initialize Select2
+        $('#tier2, #tier3').select2();
 
+        // Sync Select2 changes with Vue
+        $('#tier2').on('change', (e) => {
+            this.addData.secondLevel = e.target.value;
+            this.getThirdLevel(e.target.value);
+        });
+
+        $('#tier3').on('change', (e) => {
+            this.addData.thirdLevel = e.target.value;
+        });
+    },
+
+    updated() {
+        // Refresh Select2 when options change
+        $('#tier2, #tier3').trigger('change.select2');
+    },
     methods: {
         async fetchAccountGroups() {
 
@@ -179,10 +204,10 @@ export default {
                 $("#group_table").DataTable();
             }, 300);
         },
-        
+
         async getThirdLevel(id) {
 
-            const res = await this.callApi("post", 'accounts/groups/second', {id:id});
+            const res = await this.callApi("post", 'accounts/groups/second', { id: id });
             if (res.status == 200) {
                 this.thirdLevelData = res.data.thirdLevel
             } else {
@@ -195,13 +220,13 @@ export default {
         },
 
         clearForm: function () {
-            
+
             this.addData.secondLevel = "0",
-            this.addData.thirdLevel = "0",
-            this.addData.groupName = "",
-            this.thirdLevelData = [];
+                this.addData.thirdLevel = "0",
+                this.addData.groupName = "",
+                this.thirdLevelData = [];
         },
-        
+
         async addGroup() {
             this.validationErrors = [];
             if (this.addData.secondLevel == "0")
@@ -249,7 +274,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                    timer: 2000
+                            timer: 2000
                         });
                     }
                 }
@@ -261,15 +286,15 @@ export default {
         },
         async updateGroup() {
             this.validationErrors = [];
-            
+
             if (this.dataEdit.name == "")
                 return swal({
                     title: "Required!",
                     text: "Group name is required",
                     icon: "error",
                     timer: 2000
-            });
-            
+                });
+
             this.loading = true;
             const resCategory = await this.callApi("post", "accounts/groups/update", this.dataEdit);
             if (resCategory.status == 200) {
@@ -299,7 +324,7 @@ export default {
                             title: "Error",
                             text: errorContent,
                             icon: "error",
-                    timer: 2000
+                            timer: 2000
                         });
                     }
                 }
@@ -308,5 +333,4 @@ export default {
     },
 };
 </script>
-<style scoped>
-</style>
+<style scoped></style>

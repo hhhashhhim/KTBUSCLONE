@@ -13,86 +13,102 @@
                     <h5 class="modal-title" id="myLargeModalLabel">
                         Update Journal Transaction
                     </h5>
-                    <button
-                        type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                        @click="closeModal()"
-                    >
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal()">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+
                 <div class="modal-body">
+                    <!-- Terminal -->
                     <div class="row">
                         <div class="form-group col-md-12">
                             <label>Terminal</label>
-                            <select class="form-control" v-model="editData.terminal">
-                                <option value="0">Select From Following</option>
-                                <option
-                                    v-for="(terminal, i) in terminals"
-                                    :key="i"
-                                    :value="terminal.id"
-                                >
-                                    {{ terminal.name }}
-                                </option>
-                            </select>
+                            <select2
+                                v-model="editData.terminal_id"
+                                :options="terminalsMapped"
+                                :settings="{ width: '100%', dropdownParent: '#editTransaction', placeholder: 'Select From Following' }"
+                            />
                         </div>
                     </div>
+
+                    <!-- Transaction Table -->
                     <div class="border p-2 mb-2">
                         <div class="d-flex justify-content-between">
-                            <h5>Transaction <small :class="finalData.total_amount == 0 && (finalData.credits > 0 || finalData.debits > 0) ? 'text-success' : 'text-danger'">Credit({{finalData.credits}}) - Debit({{finalData.debits}}) = Difference({{finalData.total_amount}})</small></h5>
+                            <h5>
+                                Transaction
+                                <small :class="finalData.total_amount == 0 && (finalData.credits > 0 || finalData.debits > 0) ? 'text-success' : 'text-danger'">
+                                    Credit({{ finalData.credits }}) - Debit({{ finalData.debits }}) = Difference({{ finalData.total_amount }})
+                                </small>
+                            </h5>
                             <div>
                                 <button type="button" class="btn btn-outline-success" @click="addTransactionRow">Add Account</button>
                             </div>
                         </div>
+
+                        <!-- Table Head -->
                         <div class="row" v-if="transactionLoop > 0">
-                            <div class="form-group col-md-3">
-                                <label>Ledger <span class="text-danger">*</span></label>
-                            </div>
-                            <div class="form-group col-md-2">
-                                <label>Credits <span class="text-danger">*</span></label>
-                            </div>
-                            <div class="form-group col-md-2">
-                                <label>Debits <span class="text-danger">*</span></label>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label>Narration <span class="text-danger">*</span></label>
-                            </div>
-                            <div class="form-group col-md-2">
-                                <label>Remove</label>
-                            </div>
+                            <div class="form-group col-md-3"><label>Ledger <span class="text-danger">*</span></label></div>
+                            <div class="form-group col-md-2"><label>Credits <span class="text-danger">*</span></label></div>
+                            <div class="form-group col-md-2"><label>Debits <span class="text-danger">*</span></label></div>
+                            <div class="form-group col-md-3"><label>Narration <span class="text-danger">*</span></label></div>
+                            <div class="form-group col-md-2"><label>Remove</label></div>
                         </div>
+
+                        <!-- Rows -->
                         <div class="row" v-for="(i, index) in transactionLoop" :key="index">
                             <div class="form-group mb-2 col-md-3">
-                                <select class="form-control" v-model="editData.ledgers[index]">
-                                    <option value="0">Select From Following</option>
-                                    <option
-                                        v-for="(head, i) in heads"
-                                        :key="i"
-                                        :value="head.id"
-                                    >
-                                        {{ head.name }}
-                                    </option>
-                                </select>
+                                <select2
+                                    v-model="editData.ledgers[index]"
+                                    :options="headsMapped"
+                                    @select="saveTransactionRow($event, 'first', index)"
+                                    :settings="{ width: '100%', dropdownParent: '#editTransaction', placeholder: 'Select From Following' }"
+                                />
                             </div>
+
                             <div class="form-group mb-2 col-md-2">
-                                <input class="form-control" type="text" :value="editData.credits[index]" :disabled="editData.debits[index] > 0" @keyup="saveTransactionRow($event, 'second', index)" @keypress="$numberValidate($event,{dot:true})">
+                                <input
+                                    class="form-control"
+                                    type="text"
+                                    :value="editData.credits[index]"
+                                    :disabled="editData.debits[index] > 0"
+                                    @keyup="saveTransactionRow($event, 'second', index)"
+                                    @keypress="$numberValidate($event,{dot:true})"
+                                />
                             </div>
+
                             <div class="form-group mb-2 col-md-2">
-                                <input class="form-control" type="text" :value="editData.debits[index]" :disabled="editData.credits[index] > 0" @keyup="saveTransactionRow($event, 'third', index)" @keypress="$numberValidate($event,{dot:true})">
+                                <input
+                                    class="form-control"
+                                    type="text"
+                                    :value="editData.debits[index]"
+                                    :disabled="editData.credits[index] > 0"
+                                    @keyup="saveTransactionRow($event, 'third', index)"
+                                    @keypress="$numberValidate($event,{dot:true})"
+                                />
                             </div>
+
                             <div class="form-group mb-2 col-md-3">
-                                <input class="form-control" type="text" :value="editData.narrations[index]" @change="saveTransactionRow($event, 'fourth', index)" />
+                                <input
+                                    class="form-control"
+                                    type="text"
+                                    :value="editData.narrations[index]"
+                                    @change="saveTransactionRow($event, 'fourth', index)"
+                                    @keyup.enter="addTransactionRow"
+                                />
                             </div>
+
                             <div class="form-group mb-2 col-md-2">
-                                <button type="button" class="mt-1 btn-sm btn btn-outline-danger" @click="removeTransactionRow($event, index)"><i class="fas fa-trash"></i></button>
+                                <button type="button" class="mt-1 btn-sm btn btn-outline-danger" @click="removeTransactionRow($event, index)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Modal Footer -->
                 <div class="modal-footer bg-whitesmoke br">
-                    <button type="button" class="btn btn-primary" :class="{ 'disabled btn-progress': btnLoading }" @click=add()>Save</button>
+                    <button type="button" class="btn btn-primary" :class="{ 'disabled btn-progress': btnLoading }" @click="add()">Save</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">Close</button>
                 </div>
             </div>
@@ -102,30 +118,29 @@
 
 <script>
 export default {
-  props: ['btnLoading', 'editData', 'terminals', 'heads'],
-  data() {
-    return {
-        finalData: {
-            total_amount : 0,
-            credits : 0,
-            debits : 0,
+    props: ['btnLoading', 'editData', 'terminals', 'heads'],
+    data() {
+        return {
+            finalData: { total_amount: 0, credits: 0, debits: 0 },
+            transactionLoop: 0
+        }
+    },
+    computed: {
+        terminalsMapped() {
+            return this.terminals.map(t => ({ id: t.id, text: t.name }));
         },
-        transactionLoop: 0,
-    }
-  },
-  created(){
-        this.finalData.total_amount = 0;
-        this.transactionLoop = this.editData.ledgers.length;
-
-  },
+        headsMapped() {
+            return this.heads.map(h => ({ id: h.id, text: h.name }));
+        }
+    },
     watch: {
         editData: {
-            immediate: true, // This will also run the watcher when the component is created
+            immediate: true,
             handler(newVal) {
                 if (newVal && newVal.ledgers) {
-                    this.finalData.credits = this.editData.credits.reduce((acc, current) => acc + parseFloat(current), 0);
-                    this.finalData.debits = this.editData.debits.reduce((acc, current) => acc + parseFloat(current), 0);
-                    this.finalData.total_amount = (this.finalData.credits) - (this.finalData.debits);
+                    this.finalData.credits = newVal.credits.reduce((acc, val) => acc + parseFloat(val || 0), 0);
+                    this.finalData.debits = newVal.debits.reduce((acc, val) => acc + parseFloat(val || 0), 0);
+                    this.finalData.total_amount = this.finalData.credits - this.finalData.debits;
                     this.transactionLoop = newVal.ledgers.length;
                 }
             }
@@ -136,18 +151,10 @@ export default {
             this.$emit('update');
         },
         saveTransactionRow(event, fieldName, index) {
-            if (fieldName == "first") {
-                this.editData.ledgers[index] = event.id;
-            }
-            if (fieldName == "second") {
-                this.editData.credits[index] = event.target.value ? event.target.value : 0;
-            }
-            if (fieldName == "third") {
-                this.editData.debits[index] = event.target.value ? event.target.value : 0;
-            }
-            if (fieldName == "fourth") {
-                this.editData.narrations[index] = event.target.value;
-            }
+            if (fieldName === "first") this.editData.ledgers[index] = event.id;
+            if (fieldName === "second") this.editData.credits[index] = event.target.value || 0;
+            if (fieldName === "third") this.editData.debits[index] = event.target.value || 0;
+            if (fieldName === "fourth") this.editData.narrations[index] = event.target.value;
             this.totalAmount();
         },
         addTransactionRow() {
@@ -166,15 +173,14 @@ export default {
             this.transactionLoop--;
             this.totalAmount();
         },
-        totalAmount()
-        {
-            this.finalData.credits = this.editData.credits.reduce((acc, current) => acc + parseFloat(current), 0);
-            this.finalData.debits = this.editData.debits.reduce((acc, current) => acc + parseFloat(current), 0);
-            this.finalData.total_amount = (this.finalData.credits) - (this.finalData.debits);
+        totalAmount() {
+            this.finalData.credits = this.editData.credits.reduce((acc, val) => acc + parseFloat(val || 0), 0);
+            this.finalData.debits = this.editData.debits.reduce((acc, val) => acc + parseFloat(val || 0), 0);
+            this.finalData.total_amount = this.finalData.credits - this.finalData.debits;
         },
         closeModal() {
             $(".modal").click();
-        },
+        }
     }
 }
 </script>

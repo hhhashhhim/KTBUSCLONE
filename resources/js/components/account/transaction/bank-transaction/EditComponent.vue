@@ -18,59 +18,60 @@
                         class="close"
                         data-dismiss="modal"
                         aria-label="Close"
-                         @click="closeModal()"
+                        @click="closeModal()"
                     >
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
+                        <!-- Transaction Type -->
                         <div class="form-group col-md-6">
                             <label class="d-block">Transaction Type <span class="text-danger">*</span></label>
                             <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="bpEdit" value="BP" v-model="editData.type">
-                            <label class="form-check-label" for="bpEdit">Bank Payment</label>
+                                <input class="form-check-input" type="radio" id="bpEdit" value="BP" v-model="editData.type">
+                                <label class="form-check-label" for="bpEdit">Bank Payment</label>
                             </div>
                             <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="brEdit" value="BR" v-model="editData.type">
-                            <label class="form-check-label" for="brEdit">Bank Receipt</label>
+                                <input class="form-check-input" type="radio" id="brEdit" value="BR" v-model="editData.type">
+                                <label class="form-check-label" for="brEdit">Bank Receipt</label>
                             </div>
                         </div>
+
+                        <!-- Terminal -->
                         <div class="form-group col-md-12">
                             <label>Terminal</label>
-                            <select class="form-control" v-model="editData.terminal_id">
-                                <option value="0">Select From Following</option>
-                                <option
-                                    v-for="(terminal, i) in terminals"
-                                    :key="i"
-                                    :value="terminal.id"
-                                >
-                                    {{ terminal.name }}
-                                </option>
-                            </select>
+                            <select2 
+                                v-model="editData.terminal_id" 
+                                :options="terminalsMapped" 
+                                :settings="{ width: '100%', dropdownParent: '#editTransaction', placeholder: 'Select From Following' }" 
+                            />
                         </div>
+
+                        <!-- Bank Ledger -->
                         <div class="form-group col-md-4">
                             <label>Bank Ledger <span class="text-danger">*</span></label>
-                            <select class="form-control" v-model="editData.account_head_id">
-                                <option value="0">Select From Following</option>
-                                <option
-                                    v-for="(bank, i) in banks"
-                                    :key="i"
-                                    :value="bank.id"
-                                >
-                                    {{ bank.name }}
-                                </option>
-                            </select>
+                            <select2 
+                                v-model="editData.account_head_id" 
+                                :options="banksMapped" 
+                                :settings="{ width: '100%', dropdownParent: '#editTransaction', placeholder: 'Select From Following' }" 
+                            />
                         </div>
+
+                        <!-- Bank Narration -->
                         <div class="form-group col-md-4">
                             <label>Bank Narration <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" v-model="editData.narration"/>
                         </div>
+
+                        <!-- Cheque No -->
                         <div class="form-group col-md-4">
                             <label>Cheque No</label>
                             <input type="text" class="form-control" v-model="editData.cheque"/>
                         </div>
                     </div>
+
+                    <!-- Transaction Rows -->
                     <div class="border p-2 mb-2">
                         <div class="d-flex justify-content-between">
                             <h5>Transaction <small class="text-danger">(Amount  {{ finalData.total_amount }})</small></h5>
@@ -78,48 +79,50 @@
                                 <button type="button" class="btn btn-outline-success" @click="addTransactionRow">Add Account</button>
                             </div>
                         </div>
+
+                        <!-- Table Head -->
                         <div class="row" v-if="transactionLoop > 0">
-                            <div class="form-group col-md-4">
-                                <label>Ledger <span class="text-danger">*</span></label>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label>Amount <span class="text-danger">*</span></label>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label>Narration <span class="text-danger">*</span></label>
-                            </div>
-                            <div class="form-group col-md-2">
-                                <label>Remove</label>
-                            </div>
+                            <div class="form-group col-md-4"><label>Ledger <span class="text-danger">*</span></label></div>
+                            <div class="form-group col-md-3"><label>Amount <span class="text-danger">*</span></label></div>
+                            <div class="form-group col-md-3"><label>Narration <span class="text-danger">*</span></label></div>
+                            <div class="form-group col-md-2"><label>Remove</label></div>
                         </div>
+
+                        <!-- Transaction Row Items -->
                         <div class="row" v-for="(i, index) in transactionLoop" :key="index">
                             <div class="form-group mb-2 col-md-4">
-                                <select class="form-control" v-model="editData.ledgers[index]">
-                                    <option value="0">Select From Following</option>
-                                    <option
-                                        v-for="(head, i) in heads"
-                                        :key="i"
-                                        :value="head.id"
-                                    >
-                                        {{ head.name }}
-                                    </option>
-                                </select>
+                                <select2 
+                                    v-model="editData.ledgers[index]"
+                                    :options="headsMapped"
+                                    @select="saveTransactionRow($event, 'first', index)"
+                                    :settings="{ width: '100%', dropdownParent: '#editTransaction', placeholder: 'Select From Following' }"
+                                />
                             </div>
                             <div class="form-group mb-2 col-md-3">
-                                <input class="form-control" type="text" :value="editData.amounts[index]" @keyup="saveTransactionRow($event, 'second', index)" @keypress="$numberValidate($event,{dot:true})">
+                                <input class="form-control" type="text" 
+                                    :value="editData.amounts[index]" 
+                                    @keyup="saveTransactionRow($event, 'second', index)" 
+                                    @keypress="$numberValidate($event, {dot:true})"
+                                >
                             </div>
                             <div class="form-group mb-2 col-md-3">
-                                <input class="form-control" type="text" :value="editData.narrations[index]" @change="saveTransactionRow($event, 'third', index)" />
+                                <input class="form-control" type="text" 
+                                    :value="editData.narrations[index]" 
+                                    @change="saveTransactionRow($event, 'third', index)" 
+                                />
                             </div>
                             <div class="form-group mb-2 col-md-2">
-                                <button type="button" class="mt-1 btn-sm btn btn-outline-danger" @click="removeTransactionRow($event, index)"><i class="fas fa-trash"></i></button>
+                                <button type="button" class="mt-1 btn-sm btn btn-outline-danger" @click="removeTransactionRow($event, index)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="modal-footer bg-whitesmoke br">
-                    <button type="button" class="btn btn-primary" :class="{ 'disabled btn-progress': btnLoading }" @click=add()>Save</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"  @click="closeModal()">Close</button>
+                    <button type="button" class="btn btn-primary" :class="{ 'disabled btn-progress': btnLoading }" @click="add()">Save</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">Close</button>
                 </div>
             </div>
         </div>
@@ -131,62 +134,66 @@ export default {
   props: ['btnLoading', 'editData', 'terminals', 'banks', 'heads'],
   data() {
     return {
-        finalData: {
-            total_amount : 0,
-        },
+        finalData: { total_amount: 0 },
         transactionLoop: 0,
     }
   },
-  created(){
-        this.finalData.total_amount = this.editData.credit;
-        this.transactionLoop = this.editData.ledgers.length;
-
+  created() {
+      this.finalData.total_amount = this.editData.credit || 0;
+      this.transactionLoop = this.editData.ledgers.length || 0;
   },
-    watch: {
-        editData: {
-            immediate: true, // This will also run the watcher when the component is created
-            handler(newVal) {
-                if (newVal && newVal.ledgers) {
-                    this.finalData.total_amount = newVal.credit || 0;
-                    this.transactionLoop = newVal.ledgers.length;
-                }
-            }
-        }
-    },
-    methods: {
-        add() {
-            this.$emit('update');
-        },
-        saveTransactionRow(event, fieldName, index) {
-            if (fieldName == "first") {
-                this.editData.ledgers[index] = event.id;
-            }
-            if (fieldName == "second") {
-                this.editData.amounts[index] = event.target.value ? event.target.value : 0;
-            }
-            if (fieldName == "third") {
-                this.editData.narrations[index] = event.target.value;
-            }
-            this.totalAmount();
-        },
-        addTransactionRow() {
-            this.transactionLoop++;
-            this.totalAmount();
-        },
-        removeTransactionRow(event, index) {
-            this.editData.ledgers.splice(index, 1);
-            this.editData.amounts.splice(index, 1);
-            this.editData.narrations.splice(index, 1);
-            this.transactionLoop--;
-            this.totalAmount();
-        },
-        totalAmount()
-        {
-            this.finalData.total_amount = this.editData.amounts.reduce((acc, current) => acc + parseFloat(current), 0);
-        },
-        closeModal() {
-            $(".modal").click();
-        },
-    }
+  watch: {
+      editData: {
+          immediate: true,
+          handler(newVal) {
+              if (newVal && newVal.ledgers) {
+                  this.finalData.total_amount = newVal.credit || 0;
+                  this.transactionLoop = newVal.ledgers.length;
+              }
+          }
+      }
+  },
+  computed: {
+      banksMapped() {
+          return this.banks.map(b => ({ id: b.id, text: b.name }));
+      },
+      terminalsMapped() {
+          return this.terminals.map(t => ({ id: t.id, text: t.name }));
+      },
+      headsMapped() {
+          return this.heads.map(h => ({ id: h.id, text: h.name }));
+      }
+  },
+  methods: {
+      add() {
+          this.$emit('update');
+      },
+      saveTransactionRow(event, fieldName, index) {
+          if (fieldName === "first") this.editData.ledgers[index] = event.id;
+          if (fieldName === "second") this.editData.amounts[index] = event.target.value ? event.target.value : 0;
+          if (fieldName === "third") this.editData.narrations[index] = event.target.value;
+          this.totalAmount();
+      },
+      addTransactionRow() {
+          this.editData.ledgers.push(null);
+          this.editData.amounts.push(0);
+          this.editData.narrations.push('');
+          this.transactionLoop++;
+          this.totalAmount();
+      },
+      removeTransactionRow(event, index) {
+          this.editData.ledgers.splice(index, 1);
+          this.editData.amounts.splice(index, 1);
+          this.editData.narrations.splice(index, 1);
+          this.transactionLoop--;
+          this.totalAmount();
+      },
+      totalAmount() {
+          this.finalData.total_amount = this.editData.amounts.reduce((acc, val) => acc + parseFloat(val || 0), 0);
+      },
+      closeModal() {
+          $(".modal").click();
+      }
+  }
 }
 </script>

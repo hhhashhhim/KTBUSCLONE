@@ -1,6 +1,7 @@
 require('./bootstrap');
 // Window.Vue = require('vue');
 import { createApp } from 'vue';
+import Select2 from 'vue3-select2-component';
 import App from "./layouts/adminPanel/App.vue";
 import Test from "./layouts/adminPanel/Test.vue";
 import common from './common.js';
@@ -19,7 +20,7 @@ const app = createApp();
 Object.keys(globalFunctions).forEach((key) => {
     app.config.globalProperties[`$${key}`] = globalFunctions[key]
 })
-
+app.component('select2', Select2);
 app.component("main-app",App);
 app.component("test-app",Test);
 app.mixin(common);

@@ -50,7 +50,7 @@
             </div>
         </div>
 
-        <div class="card" v-if="abstep==1 && filter == true">
+        <div class="card" v-if="abstep == 1 && filter == true">
             <div class="card-header justify-content-between">
                 <h4>Receipt Filter</h4>
             </div>
@@ -59,7 +59,7 @@
                     <div class="row">
                         <div class="form-group col-md-3">
                             <label>Terminal</label>
-                            <select class="form-control" v-model="filterData.terminal">
+                            <!-- <select class="form-control" v-model="filterData.terminal">
                                 <option value="0">Select Bus Class</option>
                                 <option
                                     v-for="(terminal, i) in terminals"
@@ -68,27 +68,29 @@
                                 >
                                     {{ terminal.name }}
                                 </option>
-                            </select>
+                            </select> -->
+                            <select2 v-model="filterData.terminal" :options="terminalsMapped"
+                                :settings="{ width: '100%', placeholder: 'Select From Following' }" />
                         </div>
                         <div class="form-group col-md-3">
                             <label>From</label>
-                            <input type="date" class="form-control" v-model="filterData.from"/>
+                            <input type="date" class="form-control" v-model="filterData.from" />
                         </div>
                         <div class="form-group col-md-3">
                             <label>To</label>
-                            <input type="date" class="form-control" v-model="filterData.to"/>
+                            <input type="date" class="form-control" v-model="filterData.to" />
                         </div>
                         <div class="form-group col-md-3">
                             <button type="button" class="btn btn-block btn-primary"
-                            style="margin-top: 1.9rem !important"
-                            :class="{ 'disabled btn-progress': btnLoading }" @click=receiptReport()>Filter</button>
+                                style="margin-top: 1.9rem !important" :class="{ 'disabled btn-progress': btnLoading }"
+                                @click=receiptReport()>Filter</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="card" v-if="abstep==2 && filter == true">
+
+        <div class="card" v-if="abstep == 2 && filter == true">
             <div class="card-header justify-content-between">
                 <h4>General Ledger</h4>
             </div>
@@ -97,20 +99,12 @@
                     <div class="row">
                         <div class="form-group col-md-3">
                             <label>Terminal</label>
-                            <select class="form-control" v-model="filterData.terminal">
-                                <option value="0">Select Bus Class</option>
-                                <option
-                                    v-for="(terminal, i) in terminals"
-                                    :key="i"
-                                    :value="terminal.id"
-                                >
-                                    {{ terminal.name }}
-                                </option>
-                            </select>
+                            <select2 v-model="filterData.terminal" :options="terminalsMapped"
+                                :settings="{ width: '100%', placeholder: 'Select From Following' }" />
                         </div>
                         <div class="form-group col-md-3">
                             <label>General Ledger <span class="text-danger">*</span></label>
-                            <select class="form-control" v-model="filterData.level_four">
+                            <!-- <select class="form-control" v-model="filterData.level_four">
                                 <option value="0">Select Bus Class</option>
                                 <option
                                     v-for="(fourth, i) in fourth_level"
@@ -119,27 +113,29 @@
                                 >
                                     {{ fourth.name }}
                                 </option>
-                            </select>
+                            </select> -->
+                            <select2 v-model="filterData.level_four" :options="fourthMapped"
+                                :settings="{ width: '100%', placeholder: 'Select From Following' }" />
                         </div>
                         <div class="form-group col-md-2">
                             <label>From</label>
-                            <input type="date" class="form-control" v-model="filterData.from"/>
+                            <input type="date" class="form-control" v-model="filterData.from" />
                         </div>
                         <div class="form-group col-md-2">
                             <label>To</label>
-                            <input type="date" class="form-control" v-model="filterData.to"/>
+                            <input type="date" class="form-control" v-model="filterData.to" />
                         </div>
                         <div class="form-group col-md-2">
                             <button type="button" class="btn btn-block btn-primary"
-                            style="margin-top: 1.9rem !important"
-                            :class="{ 'disabled btn-progress': btnLoading }" @click=generalLedgerReport()>Filter</button>
+                                style="margin-top: 1.9rem !important" :class="{ 'disabled btn-progress': btnLoading }"
+                                @click=generalLedgerReport()>Filter</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="card" v-if="abstep==3 && filter == true">
+
+        <div class="card" v-if="abstep == 3 && filter == true">
             <div class="card-header justify-content-between">
                 <h4>Ledger</h4>
             </div>
@@ -148,49 +144,42 @@
                     <div class="row">
                         <div class="form-group col-md-3">
                             <label>Terminal</label>
-                            <select class="form-control" v-model="filterData.terminal">
-                                <option value="0">Select Bus Class</option>
-                                <option
-                                    v-for="(terminal, i) in terminals"
-                                    :key="i"
-                                    :value="terminal.id"
-                                >
-                                    {{ terminal.name }}
-                                </option>
-                            </select>
+                             <select2 v-model="filterData.terminal" :options="terminalsMapped"
+                                :settings="{ width: '100%', placeholder: 'Select From Following' }" />
                         </div>
                         <div class="form-group col-md-3">
                             <label>Ledger <span class="text-danger">*</span></label>
-                            <select class="form-control" v-model="filterData.head">
+                            <!-- <select class="form-control" v-model="filterData.head">
                                 <option value="0">Select Bus Class</option>
-                                <option
-                                    v-for="(head, i) in heads"
-                                    :key="i"
-                                    :value="head.id"
-                                >
+                                <option v-for="(head, i) in heads" :key="i" :value="head.id">
                                     {{ head.name }}
                                 </option>
-                            </select>
+                            </select> -->
+                              <select2 
+                                    v-model="filterData.head"
+                                    :options="headsMapped"
+                                    :settings="{ width: '100%', placeholder: 'Select From Following' }"
+                                />
                         </div>
                         <div class="form-group col-md-2">
                             <label>From</label>
-                            <input type="date" class="form-control" v-model="filterData.from"/>
+                            <input type="date" class="form-control" v-model="filterData.from" />
                         </div>
                         <div class="form-group col-md-2">
                             <label>To</label>
-                            <input type="date" class="form-control" v-model="filterData.to"/>
+                            <input type="date" class="form-control" v-model="filterData.to" />
                         </div>
                         <div class="form-group col-md-2">
                             <button type="button" class="btn btn-block btn-primary"
-                            style="margin-top: 1.9rem !important"
-                            :class="{ 'disabled btn-progress': btnLoading }" @click=ledgerReport()>Filter</button>
+                                style="margin-top: 1.9rem !important" :class="{ 'disabled btn-progress': btnLoading }"
+                                @click=ledgerReport()>Filter</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="card" v-if="abstep==4 && filter == true">
+        <div class="card" v-if="abstep == 4 && filter == true">
             <div class="card-header justify-content-between">
                 <h4>General Journal</h4>
             </div>
@@ -199,36 +188,28 @@
                     <div class="row">
                         <div class="form-group col-md-3">
                             <label>Terminal</label>
-                            <select class="form-control" v-model="filterData.terminal">
-                                <option value="0">Select Bus Class</option>
-                                <option
-                                    v-for="(terminal, i) in terminals"
-                                    :key="i"
-                                    :value="terminal.id"
-                                >
-                                    {{ terminal.name }}
-                                </option>
-                            </select>
+                              <select2 v-model="filterData.terminal" :options="terminalsMapped"
+                                :settings="{ width: '100%', placeholder: 'Select From Following' }" />
                         </div>
                         <div class="form-group col-md-3">
                             <label>From</label>
-                            <input type="date" class="form-control" v-model="filterData.from"/>
+                            <input type="date" class="form-control" v-model="filterData.from" />
                         </div>
                         <div class="form-group col-md-3">
                             <label>To</label>
-                            <input type="date" class="form-control" v-model="filterData.to"/>
+                            <input type="date" class="form-control" v-model="filterData.to" />
                         </div>
                         <div class="form-group col-md-3">
                             <button type="button" class="btn btn-block btn-primary"
-                            style="margin-top: 1.9rem !important"
-                            :class="{ 'disabled btn-progress': btnLoading }" @click=journalReport()>Filter</button>
+                                style="margin-top: 1.9rem !important" :class="{ 'disabled btn-progress': btnLoading }"
+                                @click=journalReport()>Filter</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="card" v-if="abstep==5 && filter == true">
+
+        <div class="card" v-if="abstep == 5 && filter == true">
             <div class="card-header justify-content-between">
                 <h4>Trial Sheet</h4>
             </div>
@@ -237,36 +218,28 @@
                     <div class="row">
                         <div class="form-group col-md-3">
                             <label>Terminal</label>
-                            <select class="form-control" v-model="filterData.terminal">
-                                <option value="0">Select Bus Class</option>
-                                <option
-                                    v-for="(terminal, i) in terminals"
-                                    :key="i"
-                                    :value="terminal.id"
-                                >
-                                    {{ terminal.name }}
-                                </option>
-                            </select>
+                              <select2 v-model="filterData.terminal" :options="terminalsMapped"
+                                :settings="{ width: '100%', placeholder: 'Select From Following' }" />
                         </div>
                         <div class="form-group col-md-3">
                             <label>From</label>
-                            <input type="date" class="form-control" v-model="filterData.from"/>
+                            <input type="date" class="form-control" v-model="filterData.from" />
                         </div>
                         <div class="form-group col-md-3">
                             <label>To</label>
-                            <input type="date" class="form-control" v-model="filterData.to"/>
+                            <input type="date" class="form-control" v-model="filterData.to" />
                         </div>
                         <div class="form-group col-md-3">
                             <button type="button" class="btn btn-block btn-primary"
-                            style="margin-top: 1.9rem !important"
-                            :class="{ 'disabled btn-progress': btnLoading }" @click=trialSheetReport()>Filter</button>
+                                style="margin-top: 1.9rem !important" :class="{ 'disabled btn-progress': btnLoading }"
+                                @click=trialSheetReport()>Filter</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="card" v-if="abstep==6 && filter == true">
+        <div class="card" v-if="abstep == 6 && filter == true">
             <div class="card-header justify-content-between">
                 <h4>Daily Report</h4>
             </div>
@@ -275,109 +248,64 @@
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label>Terminal</label>
-                            <select class="form-control" v-model="filterData.terminal">
-                                <option value="0">Select Bus Class</option>
-                                <option
-                                    v-for="(terminal, i) in terminals"
-                                    :key="i"
-                                    :value="terminal.id"
-                                >
-                                    {{ terminal.name }}
-                                </option>
-                            </select>
+                              <select2 v-model="filterData.terminal" :options="terminalsMapped"
+                                :settings="{ width: '100%', placeholder: 'Select From Following' }" />
                         </div>
                         <div class="form-group col-md-4">
                             <label>Date</label>
-                            <input type="date" class="form-control" v-model="filterData.current"/>
+                            <input type="date" class="form-control" v-model="filterData.current" />
                         </div>
                         <div class="form-group col-md-4">
                             <button type="button" class="btn btn-block btn-primary"
-                            style="margin-top: 1.9rem !important"
-                            :class="{ 'disabled btn-progress': btnLoading }" @click=dailyReport()>Filter</button>
+                                style="margin-top: 1.9rem !important" :class="{ 'disabled btn-progress': btnLoading }"
+                                @click=dailyReport()>Filter</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <!-- Receipt -->
-        <Receipt
-            v-if="abstep==1 && filter == false"
-            :btnLoading="btnLoading"
-            :voucher="voucher"
-            :receipts="receipts"
-            ref="childComponentRef"
-            @print-voucher="printVoucher"
-            @print="printReceiptSlip"
-        />
+        <Receipt v-if="abstep == 1 && filter == false" :btnLoading="btnLoading" :voucher="voucher" :receipts="receipts"
+            ref="childComponentRef" @print-voucher="printVoucher" @print="printReceiptSlip" />
         <!-- General Ledger -->
-        <GeneralLedger
-            v-if="abstep==2 && filter == false"
-            :btnLoading="btnLoading"
-            :voucher="voucher"
-            :general_ledgers="general_ledgers"
-            ref="childComponentRef"
-            @print-voucher="printVoucher"
-            @print="printAccountLedgerReport"
-        />
+        <GeneralLedger v-if="abstep == 2 && filter == false" :btnLoading="btnLoading" :voucher="voucher"
+            :general_ledgers="general_ledgers" ref="childComponentRef" @print-voucher="printVoucher"
+            @print="printAccountLedgerReport" />
         <!-- Ledger -->
-        <Ledger
-            v-if="abstep==3 && filter == false"
-            :btnLoading="btnLoading"
-            :voucher="voucher"
-            :ledgers="ledgers"
-            ref="childComponentRef"
-            @print-voucher="printVoucher"
-            @print="printLedgerReport"
-        />
+        <Ledger v-if="abstep == 3 && filter == false" :btnLoading="btnLoading" :voucher="voucher" :ledgers="ledgers"
+            ref="childComponentRef" @print-voucher="printVoucher" @print="printLedgerReport" />
         <!-- General Journal -->
-        <Journal
-            v-if="abstep==4 && filter == false"
-            :btnLoading="btnLoading"
-            :voucher="voucher"
-            :journals="journals"
-            ref="childComponentRef"
-            @print-voucher="printVoucher"
-            @print="printJournalReport"
-        />
+        <Journal v-if="abstep == 4 && filter == false" :btnLoading="btnLoading" :voucher="voucher" :journals="journals"
+            ref="childComponentRef" @print-voucher="printVoucher" @print="printJournalReport" />
         <!-- Trial Sheet -->
-        <TrialSheet
-            v-if="abstep==5 && filter == false"
-            :btnLoading="btnLoading"
-            :voucher="voucher"
-            :data="data"
-            ref="childComponentRef"
-            @print="printGeneralTrialSheetReport"
-        />
+        <TrialSheet v-if="abstep == 5 && filter == false" :btnLoading="btnLoading" :voucher="voucher" :data="data"
+            ref="childComponentRef" @print="printGeneralTrialSheetReport" />
         <!-- Daily Report -->
-        <DailyReport
-            v-if="abstep==6 && filter == false"
-            :btnLoading="btnLoading"
-            :voucher="voucher"
-            :daily_data="daily_data"
-            ref="childComponentRef"
-            @print-voucher="printVoucher"
-            @print="printDailyReport"
-        />
+        <DailyReport v-if="abstep == 6 && filter == false" :btnLoading="btnLoading" :voucher="voucher"
+            :daily_data="daily_data" ref="childComponentRef" @print-voucher="printVoucher" @print="printDailyReport" />
         <!-- External Form Submission -->
-        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/receipts/pdf`" method="post" ref="printReceiptPdf" target="_blank">
+        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/receipts/pdf`" method="post"
+            ref="printReceiptPdf" target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="terminal" :value="this.filterData.terminal">
             <input type="hidden" name="id" :value="this.voucher.id">
             <input type="hidden" name="type" :value="this.voucher.type">
             <input type="hidden" name="posting_id" :value="this.voucher.posting_id">
         </form>
-        
+
         <!-- External General Ledger -->
-        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/general/ledger/pdf`" method="post" ref="printAccountLedgerReportPdf" target="_blank">
+        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/general/ledger/pdf`"
+            method="post" ref="printAccountLedgerReportPdf" target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="terminal" :value="this.filterData.terminal">
             <input type="hidden" name="level_four" :value="this.filterData.level_four">
             <input type="hidden" name="from" :value="this.filterData.from">
             <input type="hidden" name="to" :value="this.filterData.to">
         </form>
-        
+
         <!-- External Ledger -->
-        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/ledger/pdf`" method="post" ref="printLedgerReportPdf" target="_blank">
+        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/ledger/pdf`" method="post"
+            ref="printLedgerReportPdf" target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="terminal" :value="this.filterData.terminal">
             <input type="hidden" name="head" :value="this.filterData.head">
@@ -386,29 +314,33 @@
         </form>
 
         <!-- External General Journal -->
-        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/general/journal/pdf`" method="post" ref="printJournalReportPdf" target="_blank">
+        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/general/journal/pdf`"
+            method="post" ref="printJournalReportPdf" target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="terminal" :value="this.filterData.terminal">
             <input type="hidden" name="from" :value="this.filterData.from">
             <input type="hidden" name="to" :value="this.filterData.to">
         </form>
-        
+
         <!-- External Trial Report -->
-        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/general/trial/pdf`" method="post" ref="printGeneralTrialReportPdf" target="_blank">
+        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/general/trial/pdf`"
+            method="post" ref="printGeneralTrialReportPdf" target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="terminal" :value="this.filterData.terminal">
             <input type="hidden" name="from" :value="this.filterData.from">
             <input type="hidden" name="to" :value="this.filterData.to">
         </form>
-        
+
         <!-- External Daily Report -->
-        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/daily/report/pdf`" method="post" ref="printDailyReportPdf" target="_blank">
+        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/daily/report/pdf`"
+            method="post" ref="printDailyReportPdf" target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="terminal" :value="this.filterData.terminal">
             <input type="hidden" name="current" :value="this.filterData.current">
         </form>
         <!-- Voucher Pdf -->
-        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/pdf`" method="post" ref="transactionFormPdf" target="_blank">
+        <form :action="`${this.$store.state.api_url}api/web/v1/accounts/transactions/data/pdf`" method="post"
+            ref="transactionFormPdf" target="_blank">
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="id" :value="this.voucher.id">
             <input type="hidden" name="type" :value="this.voucher.type">
@@ -475,13 +407,21 @@ export default {
     mounted() {
     },
     computed: {
+        terminalsMapped() {
+            return this.terminals.map(t => ({ id: t.id, text: t.name }));
+        },
+        fourthMapped() {
+            return this.fourth_level.map(f => ({ id: f.id, text: f.name }));
+        },
+        headsMapped() {
+            return this.heads.map(h => ({ id: h.id, text: h.name }));
+        }
     },
     methods: {
         async helperData() {
             this.tableLoading = true;
             const res = await this.callApi("get", "accounts/reports/helper/data");
-            if(res.status == 200)
-            {
+            if (res.status == 200) {
                 this.fourth_level = res.data.fourth_level;
                 this.heads = res.data.heads;
                 this.terminals = res.data.terminals;
@@ -490,16 +430,14 @@ export default {
             this.tableLoading = false;
         },
         async receiptReport() {
-            if(!this.filterData.from)
-            {
+            if (!this.filterData.from) {
                 return swal({
                     icon: 'error',
                     title: 'Error',
                     text: 'Please select from date',
                 });
             }
-            if(!this.filterData.to)
-            {
+            if (!this.filterData.to) {
                 return swal({
                     icon: 'error',
                     title: 'Error',
@@ -507,9 +445,8 @@ export default {
                 });
             }
             this.tableLoading = true;
-            const res = await this.callApi("post", "accounts/reports/finance/receipts",this.filterData);
-            if(res.status == 200)
-            {
+            const res = await this.callApi("post", "accounts/reports/finance/receipts", this.filterData);
+            if (res.status == 200) {
                 this.filter = false;
                 this.abstep = 1;
                 this.receipts = res.data.receipts;
@@ -523,24 +460,21 @@ export default {
             this.tableLoading = false;
         },
         async generalLedgerReport() {
-            if(this.filterData.level_four == 0)
-            {
+            if (this.filterData.level_four == 0) {
                 return swal({
                     icon: 'error',
                     title: 'Error',
                     text: 'Please select general ledger',
                 });
             }
-            if(!this.filterData.from)
-            {
+            if (!this.filterData.from) {
                 return swal({
                     icon: 'error',
                     title: 'Error',
                     text: 'Please select from date',
                 });
             }
-            if(!this.filterData.to)
-            {
+            if (!this.filterData.to) {
                 return swal({
                     icon: 'error',
                     title: 'Error',
@@ -548,9 +482,8 @@ export default {
                 });
             }
             this.tableLoading = true;
-            const res = await this.callApi("post", "accounts/reports/finance/general/ledger",this.filterData);
-            if(res.status == 200)
-            {
+            const res = await this.callApi("post", "accounts/reports/finance/general/ledger", this.filterData);
+            if (res.status == 200) {
                 this.filter = false;
                 this.abstep = 2;
                 this.general_ledgers = res.data.general_ledgers;
@@ -568,24 +501,21 @@ export default {
             this.tableLoading = false;
         },
         async ledgerReport() {
-            if(this.filterData.head == 0)
-            {
+            if (this.filterData.head == 0) {
                 return swal({
                     icon: 'error',
                     title: 'Error',
                     text: 'Please select ledger',
                 });
             }
-            if(!this.filterData.from)
-            {
+            if (!this.filterData.from) {
                 return swal({
                     icon: 'error',
                     title: 'Error',
                     text: 'Please select from date',
                 });
             }
-            if(!this.filterData.to)
-            {
+            if (!this.filterData.to) {
                 return swal({
                     icon: 'error',
                     title: 'Error',
@@ -593,9 +523,8 @@ export default {
                 });
             }
             this.tableLoading = true;
-            const res = await this.callApi("post", "accounts/reports/finance/ledger",this.filterData);
-            if(res.status == 200)
-            {
+            const res = await this.callApi("post", "accounts/reports/finance/ledger", this.filterData);
+            if (res.status == 200) {
                 this.filter = false;
                 this.abstep = 3;
                 this.ledgers = res.data.ledgers;
@@ -613,16 +542,14 @@ export default {
             this.tableLoading = false;
         },
         async journalReport() {
-            if(!this.filterData.from)
-            {
+            if (!this.filterData.from) {
                 return swal({
                     icon: 'error',
                     title: 'Error',
                     text: 'Please select from date',
                 });
             }
-            if(!this.filterData.to)
-            {
+            if (!this.filterData.to) {
                 return swal({
                     icon: 'error',
                     title: 'Error',
@@ -630,9 +557,8 @@ export default {
                 });
             }
             this.tableLoading = true;
-            const res = await this.callApi("post", "accounts/reports/finance/general/journal",this.filterData);
-            if(res.status == 200)
-            {
+            const res = await this.callApi("post", "accounts/reports/finance/general/journal", this.filterData);
+            if (res.status == 200) {
                 this.filter = false;
                 this.abstep = 4;
                 this.journals = res.data.journals;
@@ -650,16 +576,14 @@ export default {
             this.tableLoading = false;
         },
         async trialSheetReport() {
-            if(!this.filterData.from)
-            {
+            if (!this.filterData.from) {
                 return swal({
                     icon: 'error',
                     title: 'Error',
                     text: 'Please select from date',
                 });
             }
-            if(!this.filterData.to)
-            {
+            if (!this.filterData.to) {
                 return swal({
                     icon: 'error',
                     title: 'Error',
@@ -667,9 +591,8 @@ export default {
                 });
             }
             this.tableLoading = true;
-            const res = await this.callApi("post", "accounts/reports/finance/trial/sheet",this.filterData);
-            if(res.status == 200)
-            {
+            const res = await this.callApi("post", "accounts/reports/finance/trial/sheet", this.filterData);
+            if (res.status == 200) {
                 this.filter = false;
                 this.abstep = 5;
                 this.data = res.data.data;
@@ -688,8 +611,7 @@ export default {
             this.tableLoading = false;
         },
         async dailyReport() {
-            if(!this.filterData.current)
-            {
+            if (!this.filterData.current) {
                 return swal({
                     icon: 'error',
                     title: 'Error',
@@ -697,9 +619,8 @@ export default {
                 });
             }
             this.tableLoading = true;
-            const res = await this.callApi("post", "accounts/reports/finance/daily/report",this.filterData);
-            if(res.status == 200)
-            {
+            const res = await this.callApi("post", "accounts/reports/finance/daily/report", this.filterData);
+            if (res.status == 200) {
                 this.filter = false;
                 this.abstep = 6;
                 this.daily_data = res.data.daily_data;
@@ -747,16 +668,16 @@ export default {
                 this.$refs.printDailyReportPdf.submit();
             }, 500);
         },
-        printVoucher(id,type) {
-        this.voucher.id = id;
-        this.voucher.type = type;
-        setTimeout(() => {
-            this.$refs.transactionFormPdf.submit();
-        }, 500);
-    },
-    showAlert() {
-      alert('In process'); // Custom alert message
-    }
+        printVoucher(id, type) {
+            this.voucher.id = id;
+            this.voucher.type = type;
+            setTimeout(() => {
+                this.$refs.transactionFormPdf.submit();
+            }, 500);
+        },
+        showAlert() {
+            alert('In process'); // Custom alert message
+        }
     }
 };
 </script>
