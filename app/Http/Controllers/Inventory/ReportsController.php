@@ -61,34 +61,61 @@ class ReportsController extends Controller
         return response()->json(['inward' => $inwards]);
     }
 
-    public function filter_issued(Request $request)
-    {
-        $query = StoreIssuanceNote::with(['details.product']);
-           // Filter by date range
-           if ($request->filled('from_date') && $request->filled('to_date')) {
-            $query->whereBetween('created_at', [
-                $request->from_date . ' 00:00:00',
-                $request->to_date . ' 23:59:59'
-            ]);
-        }
-        // Filter by MR and SIN (on parent)
-        if ($request->filled('mr')) {
-            $query->where('mr_id', $request->mr);
-        }
-        if ($request->filled('sin')) {
-            $query->where('id', $request->sin);
-        }
-        // Filter by product (on child)
+  public function filter_issued(Request $request)
+{
+    $query = StoreIssuanceNote::query();
+
+    // ✅ Base relations, conditionally filter details
+    $query->with(['details' => function ($q) use ($request) {
+        $q->with(['product', 'bus']);
+
         if ($request->filled('product_id')) {
-            $query->whereHas('details', function ($q) use ($request) {
-                $q->where('product_id', $request->product_id);
-            });
+            $q->where('product_id', $request->product_id);
         }
-        $outwards = $query->latest()->get();
-        return response()->json([
-            'outward' => $outwards
+
+        if ($request->filled('bus_id')) {
+            $q->where('bus_id', $request->bus_id);
+        }
+    }]);
+
+    // ✅ Date range filter
+    if ($request->filled('from_date') && $request->filled('to_date')) {
+        $query->whereBetween('created_at', [
+            $request->from_date . ' 00:00:00',
+            $request->to_date . ' 23:59:59'
         ]);
-    }     
+    }
+
+    // ✅ MR and SIN filters
+    if ($request->filled('mr')) {
+        $query->where('mr_id', $request->mr);
+    }
+
+    if ($request->filled('sin')) {
+        $query->where('id', $request->sin);
+    }
+
+    // ✅ Parent-level filters (only include notes having such details)
+    if ($request->filled('product_id')) {
+        $query->whereHas('details', function ($q) use ($request) {
+            $q->where('product_id', $request->product_id);
+        });
+    }
+
+    if ($request->filled('bus_id')) {
+        $query->whereHas('details', function ($q) use ($request) {
+            $q->where('bus_id', $request->bus_id);
+        });
+    }
+
+    // ✅ Final data
+    $outwards = $query->latest()->get();
+
+    return response()->json([
+        'outward' => $outwards
+    ]);
+}
+
      
    public function product_control(Request $request)
     {

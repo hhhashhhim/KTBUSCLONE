@@ -26,14 +26,14 @@ class StockOutwardController extends Controller
         $issuedQtyMap = StoreIssuanceNoteDetail::with('storeIssuanceNote')
             ->get()
             ->groupBy(function ($detail) {
-                return $detail->storeIssuanceNote->mr_id . '-' . $detail->product_id;
+                return $detail->storeIssuanceNote->mr_id . '-' . $detail->product_id . '-' . $detail->bus_id;;
             })
             ->map(function ($group) {
                 return $group->sum('qty');
             });
 
         // Fetch MRs where at least one detail has qty != store_issued_qty
-        $mrs = MaterialRequest::with(['details.product', 'requestedByUser'])
+        $mrs = MaterialRequest::with(['details.product', 'details.bus', 'requestedByUser'])
             ->whereHas('details', function ($query) {
                 $query->whereColumn('qty', '!=', 'store_issued_qty');
             })
@@ -43,13 +43,13 @@ class StockOutwardController extends Controller
         // Inject issued_qty into each MR detail
         foreach ($mrs as $mr) {
             foreach ($mr->details as $detail) {
-                $key = $mr->id . '-' . $detail->product_id;
+                $key = $mr->id . '-' . $detail->product_id . '-' . $detail->bus_id;
                 $detail->issued_qty = $issuedQtyMap[$key] ?? 0;
             }
         }
 
         // Fetch all Store Issuance Notes with related product details
-        $outwards = StoreIssuanceNote::with(['details.product'])->latest()->get();
+        $outwards = StoreIssuanceNote::with(['details.product', 'details.bus'])->latest()->get();
 
         return response()->json([
             'success'  => true,
@@ -65,6 +65,7 @@ class StockOutwardController extends Controller
             'requested_by' => 'required|string',
             'details'      => 'required|array|min:1',
             'details.*.product_id' => 'required|exists:products,id',
+            'details.*.bus_id' => 'required|exists:buses,id',
             'details.*.qty'   => 'required|numeric|min:1',
             'details.*.rate'  => 'required|numeric',
             'details.*.total' => 'required|numeric',
@@ -110,6 +111,7 @@ class StockOutwardController extends Controller
                     'store_issuance_note_id' => $storeIssuance->id,
                     'product_id' => $detail['product_id'],
                     'qty'        => $detail['qty'],
+                    'bus_id'     => $detail['bus_id'],
                     'rate'       => $product->avg_price,
                     'total'      => $sub_total,
                     'company_id' => Auth::user()->company_id,
@@ -117,6 +119,7 @@ class StockOutwardController extends Controller
                 // Update issued qty in MR details
                 MaterialRequestDetail::where('mr_id', $request->mr_id)
                     ->where('product_id', $detail['product_id'])
+                    ->where('bus_id', $detail['bus_id'])
                     ->increment('store_issued_qty', $detail['qty']);
                 $issuedNow += $detail['qty'];
                 if ($product->product_head_id) {
@@ -236,70 +239,73 @@ class StockOutwardController extends Controller
     {
         // Load outward note with product details
         $outward = StoreIssuanceNote::with(['details.product'])->findOrFail($request->outward_id);
-    
+
         // Get the related MR with user and products
         $mr = MaterialRequest::with(['details.product', 'requestedByUser'])
             ->find($outward->mr_id);
-    
+
         // Use TCPDF directly
         $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(true);
         $pdf->AddPage();
-    
+
         // Logo
         $logoPath = public_path('assets/img/kt-logo.jpg');
         if (file_exists($logoPath)) {
             $pdf->Image($logoPath, 10, 12, 25);
         }
-    
+
         // Title
         $pdf->SetFont('helvetica', 'B', 14);
         $pdf->Cell(0, 10, 'Stock Outward Details', 0, 1, 'C');
         $pdf->Ln(10);
-    
+
         // Meta Info
         $pdf->SetFont('helvetica', '', 11);
         $pdf->MultiCell(0, 6, "Invoice #: {$outward->id}", 0, 'L');
         $pdf->MultiCell(0, 6, "Date: " . date('d-M-Y h:i A', strtotime($outward->created_at)), 0, 'L');
         $pdf->MultiCell(0, 6, "Requested By: " . ($mr?->requestedByUser?->name ?? '-'), 0, 'L');
-    
+
         // Table Title
         $pdf->Ln(5);
         $pdf->SetFont('helvetica', 'B', 11);
         $pdf->Cell(0, 8, "Product Details", 0, 1);
         $pdf->SetFont('helvetica', '', 10);
-    
+
         // HTML Table
         $outwardTable = <<<EOD
             <table border="1" cellpadding="4">
                 <thead>
                     <tr style="background-color:#f9f9f9;">
                         <th>#</th>
+                        <th>Bus Number</th>
                         <th>Product</th>
                         <th>Qty</th>
                     </tr>
                 </thead>
                 <tbody>
         EOD;
-    
+
         foreach ($outward->details as $i => $detail) {
             $productName = $detail->product->name ?? 'N/A';
+            $busNumber = $detail->bus->bus_number ?? 'N/A';
             $qty = $detail->qty ?? 0;
             $outwardTable .= "<tr align='center'>
                 <td>" . ($i + 1) . "</td>
+                <td>{$busNumber}</td>
                 <td>{$productName}</td>
                 <td>{$qty}</td>
             </tr>";
         }
-    
+
         $outwardTable .= <<<EOD
                 </tbody>
             </table>
         EOD;
-    
+
         $pdf->writeHTML($outwardTable, true, false, false, false, '');
-    
+
         // Watermark
         $pdf->SetAlpha(0.1);
         $pdf->StartTransform();
@@ -308,22 +314,22 @@ class StockOutwardController extends Controller
         $pdf->Text(20, 150, 'Kainat Travels');
         $pdf->StopTransform();
         $pdf->SetAlpha(1);
-    
+
         // Output the PDF
         return $pdf->Output("Outward_Invoice_{$outward->id}.pdf", 'I');
     }
-    }
-    require_once(public_path() . '/assets/tcpdf/tcpdf.php');
-    class MYPDF extends TCPDF
+}
+require_once(public_path() . '/assets/tcpdf/tcpdf.php');
+class MYPDF extends TCPDF
+{
+    public function Header() {}
+    public function Footer()
     {
-        public function Header() {}
-        public function Footer()
-        {
-            $this->SetY(-12); // Distance from bottom
-            $this->SetFont('helvetica', 'UB', 10);
-            $printDate = date('d-m-Y h:i A');
-            $printedBy = auth()->check() ? auth()->user()->name : 'System';
-            $footerText = "Printed by: $printedBy | Printed on: $printDate | Developed by SARZONE";
-            $this->Cell(0, 10, $footerText, 0, false, 'C');
-        }
+        $this->SetY(-12); // Distance from bottom
+        $this->SetFont('helvetica', 'UB', 10);
+        $printDate = date('d-m-Y h:i A');
+        $printedBy = auth()->check() ? auth()->user()->name : 'System';
+        $footerText = "Printed by: $printedBy | Printed on: $printDate | Developed by SARZONE";
+        $this->Cell(0, 10, $footerText, 0, false, 'C');
     }
+}

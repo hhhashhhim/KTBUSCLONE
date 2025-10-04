@@ -2,13 +2,14 @@
 
 namespace App\Models\Inventory;
 
+use App\Models\Bus\Bus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class StoreIssuanceNoteDetail extends Model
 {
     use HasFactory;
-    protected $fillable = ['store_issuance_note_id', 'product_id', 'qty', 'rate', 'total','company_id'];
+    protected $fillable = ['store_issuance_note_id', 'product_id', 'qty', 'rate', 'total','company_id','bus_id'];
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id');
@@ -16,6 +17,10 @@ class StoreIssuanceNoteDetail extends Model
     public function storeIssuanceNote()
     {
         return $this->belongsTo(StoreIssuanceNote::class, 'store_issuance_note_id');
+    }
+        public function bus()
+    {
+        return $this->belongsTo(Bus::class, 'bus_id');
     }
     
    
