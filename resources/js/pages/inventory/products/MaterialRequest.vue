@@ -33,46 +33,40 @@
                       <td>{{ new Date(mr.created_at).toLocaleString() }}</td>
                       <td><span>{{ mr.requested_by_user?.name }}</span></td>
                       <td>
-                        <span
-                          class="badge text-white"
-                          :class="{
-                            'badge-danger': mr.status == 0,
-                            'badge-warning': mr.status == 1,
-                            'badge-success': mr.status == 2 || mr.status == 7, // shared badge color
-                            'badge-primary': mr.status == 3,
-                            'badge-secondary': mr.status == 4,
-                            'badge-info': mr.status == 5,
-                            'badge-dark': mr.status == 6,
-                          }"
-                        >
+                        <span class="badge text-white" :class="{
+                          'badge-danger': mr.status == 0,
+                          'badge-warning': mr.status == 1,
+                          'badge-success': mr.status == 2 || mr.status == 7, // shared badge color
+                          'badge-primary': mr.status == 3,
+                          'badge-secondary': mr.status == 4,
+                          'badge-info': mr.status == 5,
+                          'badge-dark': mr.status == 6,
+                        }">
                           {{
                             mr.status == 0 ? 'Rejected' :
-                            mr.status == 1 ? 'Processing' :
-                            mr.status == 2 ? 'Store Issued' :
-                            mr.status == 3 ? 'PRN Generated' :
-                            mr.status == 4 ? 'BID Generated' :
-                            mr.status == 5 ? 'PO Generated' :
-                            mr.status == 6 ? 'Inward Generated' :
-                            mr.status == 7 ? 'Store Partial Issued' :
-                            'Unknown'
+                              mr.status == 1 ? 'Processing' :
+                                mr.status == 2 ? 'Store Issued' :
+                                  mr.status == 3 ? 'PRN Generated' :
+                                    mr.status == 4 ? 'BID Generated' :
+                                      mr.status == 5 ? 'PO Generated' :
+                                        mr.status == 6 ? 'Inward Generated' :
+                                          mr.status == 7 ? 'Store Partial Issued' :
+                                            'Unknown'
                           }}
                         </span>
                       </td>
                       <td>
-                        <button
-                          v-if="mr.status == 1"
-                          class="btn btn-danger btn-sm mx-1"
-                          @click="confirmDelete(mr.id)"
-                        >
+                        <button v-if="mr.status == 1" class="btn btn-danger btn-sm mx-1" @click="confirmDelete(mr.id)">
                           <i class="fas fa-trash"></i>
                         </button>
-                          <button class="btn btn-info btn-sm mx-1" @click="viewMR(mr)" data-toggle="modal" data-target="#viewMRModal">
-                            <i class="fas fa-eye"></i>
-                          </button>
-                            <!-- Pass mr.id instead of full mr object -->
-                            <button class="btn btn-dark btn-sm mx-1" @click="printMR(mr.id)">
-                              <i class="fas fa-print"></i>
-                            </button>
+                        <button class="btn btn-info btn-sm mx-1" @click="viewMR(mr)" data-toggle="modal"
+                          data-target="#viewMRModal">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <!-- Pass mr.id instead of full mr object -->
+                        <button class="btn btn-dark btn-sm mx-1" @click="printMR(mr.id)">
+                          <i class="fas fa-print"></i>
+                        </button>
                       </td>
                     </tr>
                   </tbody>
@@ -93,13 +87,25 @@
             </div>
             <div class="modal-body">
               <div class="row">
-                <!-- Product select --> 
+                <!-- Bus Select -->
+                <div class="form-group col-md-4">
+                  <label>Select Bus</label>
+                  <select v-model="bus_id" class="form-control">
+                    <option value="">Select Bus</option>
+                    <option v-for="bus in buses" :key="bus.id" :value="bus.id">
+                      {{ bus.bus_number }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Product select -->
                 <div class="form-group col-md-4">
                   <div class="d-flex justify-content-between">
                     <label>Select Product</label>
                     <!-- <button class="btn btn-primary p-0 m-0 px-2" data-toggle="modal" data-target="#addProducts">Add New</button> -->
                   </div>
-                  <select v-model="singleProduct.product_id" @change="singleProduct.product_id = $event.target.value" class="form-control ">
+                  <select v-model="singleProduct.product_id" @change="singleProduct.product_id = $event.target.value"
+                    class="form-control ">
                     <option value="">Select</option>
                     <option v-for="prod in products" :key="prod.id" :value="prod.id">{{ prod.name }}</option>
                   </select>
@@ -130,6 +136,7 @@
                   <thead>
                     <tr>
                       <th>#</th>
+                      <th>Bus Number</th>
                       <th>Product</th>
                       <th>Qty</th>
                       <th>Reason</th>
@@ -139,6 +146,7 @@
                   <tbody>
                     <tr v-for="(item, index) in productsList" :key="index">
                       <td>{{ index + 1 }}</td>
+                      <td>{{ getBusName(item.bus_id) }}</td>
                       <td>{{ getProductName(item.product_id) }}</td>
                       <td>{{ item.qty }}</td>
                       <td>{{ item.reason }}</td>
@@ -182,6 +190,7 @@
                     <tr>
                       <th class="text-center">#</th>
                       <th>Product Name</th>
+                      <th>Bus Nnumber</th>
                       <th>Qty</th>
                       <th>Store Issued Qty</th>
                       <th>Reason</th>
@@ -191,6 +200,8 @@
                   <tbody>
                     <tr v-for="(detail, index) in selectedMR.details" :key="index">
                       <td class="text-center">{{ index + 1 }}</td>
+
+                      <!-- Product -->
                       <td v-if="editingIndex === index">
                         <select v-model="editDetailData.product_id" class="form-control form-control-sm select2">
                           <option v-for="prod in products" :key="prod.id" :value="prod.id">{{ prod.name }}</option>
@@ -199,27 +210,42 @@
                       <td v-else>
                         {{ detail.product.name }}
                       </td>
+                      <!-- Bus Number -->
+                      <td v-if="editingIndex === index">
+                        <select v-model="editDetailData.bus_id" class="form-control form-control-sm">
+                          <option v-for="bus in buses" :key="bus.id" :value="bus.id">{{ bus.bus_number }}</option>
+                        </select>
+                      </td>
+
+                      <td v-else>
+                        {{ getBusName(detail.bus_id) }}
+                      </td>
+
+                      <!-- Qty -->
                       <td v-if="editingIndex === index">
                         <input type="number" v-model="editDetailData.qty" class="form-control form-control-sm" />
                       </td>
                       <td v-else>
                         {{ detail.qty }}
                       </td>
-                      <td> {{ detail.store_issued_qty ?? 0 }}</td> 
+
+                      <!-- Store Issued Qty -->
+                      <td>{{ detail.store_issued_qty ?? 0 }}</td>
+
+                      <!-- Reason -->
                       <td v-if="editingIndex === index">
                         <input type="text" v-model="editDetailData.reason" class="form-control form-control-sm" />
                       </td>
                       <td v-else>
                         {{ detail.reason }}
                       </td>
+
+                      <!-- Actions -->
                       <td v-if="selectedMR.status == 1">
-                        <!-- If editing, show Save/Cancel -->
                         <template v-if="editingIndex === index">
                           <button class="btn btn-success btn-sm mx-1" @click="saveDetail(index)">Save</button>
                           <button class="btn btn-secondary btn-sm" @click="cancelEdit()">Cancel</button>
                         </template>
-
-                        <!-- Otherwise, show Edit/Delete -->
                         <template v-else>
                           <button class="btn btn-primary btn-sm mx-1" @click="editDetail(detail, index)">Edit</button>
                           <button class="btn btn-danger btn-sm" @click="deleteDetail(detail.id, index)">Delete</button>
@@ -228,6 +254,7 @@
                       <td v-else></td>
                     </tr>
                   </tbody>
+
                 </table>
               </div>
             </div>
@@ -240,64 +267,78 @@
       <AddProductModal></AddProductModal>
     </div>
     <form :action="`${this.$store.state.api_url}api/web/v1/mr/pdf`" method="post" ref="printmrPdf" target="_blank">
-      <input type="hidden" name="token" :value="$store.state.token"> 
+      <input type="hidden" name="token" :value="$store.state.token">
       <input type="hidden" name="mr_id" :value="selectedMR"> <!-- new hidden input -->
     </form>
   </section>
 </template>
 
 <script>
-import AddProductModal from '../modal/addProductsModal.vue'; 
+import AddProductModal from '../modal/addProductsModal.vue';
 
-  export default {
-    components: { 
-      AddProductModal,
-    },
-    data() {
-      return {
-        printMrId: null,
-        activeTab:'mr',
-        formID: 'addMRForm',
-        products: [],
-        mrs: [],
-        singleProduct: { product_id: '', qty: '', reason: '' },
-        productsList: [],
-        selectedMR: null,
-        loading: false,
-        deleteId: null,
-        editingIndex: null,
-        editDetailData: {}
-      };
-    },
-    mounted() { 
-      this.fetchMRs();
-      // Attach modal close listener for Bootstrap 4
-      const modalEl = document.getElementById('viewMRModal');
-      if (modalEl) {
-        $(modalEl).on('hidden.bs.modal', this.cancelEdit);
-      }
-      this.$nextTick(function () {
-        $('.select2').select2().on('change', (e) => {
-          this.singleProduct.product_id = e.target.value;
-        });
-      })
-    },
-    beforeUnmount() {
-      const modalEl = document.getElementById('viewMRModal');
-      if (modalEl) {
-        $(modalEl).off('hidden.bs.modal', this.cancelEdit);
-      }
-    }, 
+export default {
+  components: {
+    AddProductModal,
+  },
+  data() {
+    return {
+      printMrId: null,
+      activeTab: 'mr',
+      formID: 'addMRForm',
+      products: [],
+      mrs: [],
+      buses: [],
+      bus_id: '',
+      singleProduct: { product_id: '', qty: '', reason: '' },
+      productsList: [],
+      selectedMR: null,
+      loading: false,
+      deleteId: null,
+      editingIndex: null,
+      editDetailData: {}
+    };
+  },
+  mounted() {
+    this.fetchMRs();
+    this.fetchBuses();
+    // Attach modal close listener for Bootstrap 4
+    const modalEl = document.getElementById('viewMRModal');
+    if (modalEl) {
+      $(modalEl).on('hidden.bs.modal', this.cancelEdit);
+    }
+    this.$nextTick(function () {
+      $('.select2').select2().on('change', (e) => {
+        this.singleProduct.product_id = e.target.value;
+      });
+    })
+  },
+  beforeUnmount() {
+    const modalEl = document.getElementById('viewMRModal');
+    if (modalEl) {
+      $(modalEl).off('hidden.bs.modal', this.cancelEdit);
+    }
+  },
   methods: {
-    async fetchMRs() { 
-        const response = await this.callApi('post', 'mr');  // Correct your API endpoint here
-        this.mrs      = response.data.data;
-        this.products = response.data.products;
-        this.users    = response.data.users;
-        this.$nextTick(() => {
-          $(".dataTable").DataTable(); // Initial setup after data load
-        }); 
-    }, 
+    async fetchMRs() {
+      const response = await this.callApi('post', 'mr');  // Correct your API endpoint here
+      this.mrs = response.data.data;
+      this.products = response.data.products;
+      this.users = response.data.users;
+      this.buses = response.data.buses;
+      this.$nextTick(() => {
+        $(".dataTable").DataTable(); // Initial setup after data load
+      });
+    },
+    async fetchBuses() {
+      const response = await this.callApi('post', 'buses'); // or 'get' depending on your API
+      this.buses = response.data;
+    },
+
+    getBusName(id) {
+      const bus = this.buses.find(p => p.id == id); // ✅ fixed
+      return bus ? bus.bus_number : 'Unknown';
+    },
+
     getProductName(id) {
       const product = this.products.find(p => p.id == id);
       return product ? product.name : 'Unknown';
@@ -307,8 +348,8 @@ import AddProductModal from '../modal/addProductsModal.vue';
         Swal.fire('Error', 'Please select product and quantity.', 'error');
         return;
       }
-      this.productsList.push({...this.singleProduct});
-      this.singleProduct = { product_id: '', qty: '', reason: '' };
+      this.productsList.push({ ...this.singleProduct, bus_id: this.bus_id });
+      this.singleProduct = { product_id: '', qty: '', reason: '', bus_id: '' };
     },
     removeProduct(index) {
       this.productsList.splice(index, 1);
@@ -317,30 +358,31 @@ import AddProductModal from '../modal/addProductsModal.vue';
       if (this.productsList.length === 0) {
         Swal.fire('Error', 'Add products before submitting.', 'error');
         return;
-      } 
-        const payload = { details: this.productsList };
-        const response = await this.callApi('post', 'mr/store', payload);
-        if (response.status === 200 || response.status === 201) { 
-            this.loading = false;
-            this.productsList = [];
-            this.fetchMRs();
-            return Swal.fire({
-              icon: 'success',
-              title: 'Created',
-              text: 'MR Created successfully!',
-            });
-        } 
-        if(response.status == 422){ 
-            this.loading = false;
-             Swal.fire({
-              icon: 'error',
-              title: 'Validation Error',
-              text: 'Please fill all field',
-            });
-        }
-        else{
-            Swal.fire('Error', err.response?.data , 'error');
-        } 
+      }
+      const payload = { bus_id: this.bus_id, details: this.productsList };
+      const response = await this.callApi('post', 'mr/store', payload);
+      if (response.status === 200 || response.status === 201) {
+        this.loading = false;
+        this.productsList = [];
+        this.bus_id = '';
+        this.fetchMRs();
+        return Swal.fire({
+          icon: 'success',
+          title: 'Created',
+          text: 'MR Created successfully!',
+        });
+      }
+      if (response.status == 422) {
+        this.loading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Validation Error',
+          text: 'Please fill all field',
+        });
+      }
+      else {
+        Swal.fire('Error', err.response?.data, 'error');
+      }
     },
     viewMR(mr) {
       this.selectedMR = JSON.parse(JSON.stringify(mr)); // Deep clone to avoid direct mutation
@@ -353,42 +395,43 @@ import AddProductModal from '../modal/addProductsModal.vue';
       this.editDetailData.product_id = detail.product.id; // Ensure product_id is set
     },
     cancelEdit() {
-        this.editingIndex = null;
-        this.editDetailData = {};
+      this.editingIndex = null;
+      this.editDetailData = {};
     },
     async saveDetail(index) {
-        
-          if (!this.editDetailData || !this.editDetailData.id) {
-            throw new Error('No detail selected for update.');
-          }
-          const payload = {
-            id: this.editDetailData.id,
-            qty: this.editDetailData.qty,
-            reason: this.editDetailData.reason,
-          };
-          const response = await this.callApi('post', 'mr/detail-update', payload);
-          if (response.status === 200 || response.status === 201) { 
-            this.loading = false;
-            $("#viewMRModal").click();
-            this.fetchMRs();
-            this.clearForm();
-            return Swal.fire({
-              icon: 'success',
-              title: 'Updated',
-              text: 'MR Updated successfully!',
-            });
-        } 
-        if(response.status == 422){ 
-            this.loading = false;
-             Swal.fire({
-              icon: 'error',
-              title: 'Validation Error',
-              text: 'Please fill all field',
-            });
-        }
-        else{
-            Swal.fire('Error', err.response?.data , 'error');
-        } 
+
+      if (!this.editDetailData || !this.editDetailData.id) {
+        throw new Error('No detail selected for update.');
+      }
+      const payload = {
+        id: this.editDetailData.id,
+        qty: this.editDetailData.qty,
+        reason: this.editDetailData.reason,
+         bus_id: this.editDetailData.bus_id,
+      };
+      const response = await this.callApi('post', 'mr/detail-update', payload);
+      if (response.status === 200 || response.status === 201) {
+        this.loading = false;
+        $("#viewMRModal").click();
+        this.fetchMRs();
+        this.clearForm();
+        return Swal.fire({
+          icon: 'success',
+          title: 'Updated',
+          text: 'MR Updated successfully!',
+        });
+      }
+      if (response.status == 422) {
+        this.loading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Validation Error',
+          text: 'Please fill all field',
+        });
+      }
+      else {
+        Swal.fire('Error', err.response?.data, 'error');
+      }
     },
     async deleteDetail(id, index) {
       try {
@@ -412,55 +455,55 @@ import AddProductModal from '../modal/addProductsModal.vue';
             Swal.fire('Error', error.response?.data?.message || 'Something went wrong!', 'error');
           }
         }
-      } catch (error) { 
+      } catch (error) {
         Swal.fire('Error', error.response?.data?.message || 'Failed to delete!', 'error');
       }
     },
     async confirmDelete(id) {
-    
-        const confirm = await Swal.fire({
-          title: 'Delete Material Request',
-          text: 'Are you sure you want to permanently delete this Material Request?',
-          icon: 'error',
-          showCancelButton: true,
-          confirmButtonColor: '#dc3545',
-          cancelButtonColor: '#6c757d',
-          confirmButtonText: 'Delete',
-          cancelButtonText: 'Cancel',
-          reverseButtons: true,
-          focusConfirm: false,
-          customClass: {
-            confirmButton: 'btn btn-danger',
-            cancelButton: 'btn btn-secondary'
-          }
-        });
 
-        if (confirm.isConfirmed) {
-          // User clicked "Yes, delete it!"
-          const response = await this.callApi('post', 'mr/mr-delete', { id });
-          if (response.status === 200 || response.status === 201) { 
-            this.loading = false;
-            this.fetchMRs();
-            this.clearForm();
-            return Swal.fire({
-              icon: 'success',
-              title: 'Deleted',
-              text: 'Bid Summary Deleted successfully!',
-            });
-        } 
-        if(response.status == 422){ 
-            this.loading = false;
-             Swal.fire({
-              icon: 'error',
-              title: 'Validation Error',
-              text: 'Please fill all field',
-            });
+      const confirm = await Swal.fire({
+        title: 'Delete Material Request',
+        text: 'Are you sure you want to permanently delete this Material Request?',
+        icon: 'error',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        focusConfirm: false,
+        customClass: {
+          confirmButton: 'btn btn-danger',
+          cancelButton: 'btn btn-secondary'
         }
-        else{
-            Swal.fire('Error', err.response?.data , 'error');
-        } 
-        } 
-      
+      });
+
+      if (confirm.isConfirmed) {
+        // User clicked "Yes, delete it!"
+        const response = await this.callApi('post', 'mr/mr-delete', { id });
+        if (response.status === 200 || response.status === 201) {
+          this.loading = false;
+          this.fetchMRs();
+          this.clearForm();
+          return Swal.fire({
+            icon: 'success',
+            title: 'Deleted',
+            text: 'Bid Summary Deleted successfully!',
+          });
+        }
+        if (response.status == 422) {
+          this.loading = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Please fill all field',
+          });
+        }
+        else {
+          Swal.fire('Error', err.response?.data, 'error');
+        }
+      }
+
     },
     async printMR(id) {
       this.selectedMR = id;
@@ -475,9 +518,10 @@ import AddProductModal from '../modal/addProductsModal.vue';
         modalEl.removeEventListener('hidden.bs.modal', this.cancelEdit);
       }
     },
-     clearForm() {
+    clearForm() {
       this.productsList = [];
       this.singleProduct = { product_id: '', qty: '', reason: '' };
+      this.bus_id = '';
     },
   }
 }
