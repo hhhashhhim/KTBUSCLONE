@@ -24,61 +24,61 @@ class BusController extends Controller
 {
     public function index()
     {
-          $auth_key = "@+_VbdTWAYv4c1kkuIO!NQQupcb@yNw%_I^qNWJ1cp+owvKF35";
+        $auth_key = "@+_VbdTWAYv4c1kkuIO!NQQupcb@yNw%_I^qNWJ1cp+owvKF35";
 
         $today = now()->subDays(1)->format("Y-m-d");
 
         // confirm | reserve | over issue | today | lastday tickets
         $ticketData = Ticket::withTrashed()
-        ->where("date", $today)
-        ->get();
-        
+            ->where("date", $today)
+            ->get();
+
         // today new customer
         $newCustomer = Ticket::where("date", $today)
-        ->whereNotIn('customer_id', function ($query) use ($today) {
-            $query->select('customer_id')
-                  ->from('tickets')
-                  ->whereDate('date', '<', $today);
-        })
-        ->select('customer_id','date')
-        ->distinct() 
-        ->get();
-        
+            ->whereNotIn('customer_id', function ($query) use ($today) {
+                $query->select('customer_id')
+                    ->from('tickets')
+                    ->whereDate('date', '<', $today);
+            })
+            ->select('customer_id', 'date')
+            ->distinct()
+            ->get();
+
         // today customer repeat
         $oldCustomer = Ticket::where("date", $today)
-        ->whereIn('customer_id', function ($query) use ($today) {
-            $query->select('customer_id')
-                  ->from('tickets')
-                  ->whereDate('date', '<', $today);
-        })
-        ->select('customer_id','date')
-        ->distinct() 
-        ->get();
+            ->whereIn('customer_id', function ($query) use ($today) {
+                $query->select('customer_id')
+                    ->from('tickets')
+                    ->whereDate('date', '<', $today);
+            })
+            ->select('customer_id', 'date')
+            ->distinct()
+            ->get();
 
-        $cancel_ids = $ticketData->where("date",$today)->where("type","canceled")->pluck('id');
-       $pending_merges = TicketClosing::where('company_id', Auth::user()->company_id)
-        ->where("hide",1)
-        ->get()
-        ->groupBy('ticket_merge_id')
-        ->filter(function ($group){
-            return $group->count() == 1;
-        })
-        ->count();
+        $cancel_ids = $ticketData->where("date", $today)->where("type", "canceled")->pluck('id');
+        $pending_merges = TicketClosing::where('company_id', Auth::user()->company_id)
+           ->where(["hide"=>0,"commission_route"=>0])
+            ->get()
+            ->groupBy('ticket_merge_id')
+            ->filter(function ($group) {
+                return $group->count() == 1;
+            })
+            ->count();
 
-        $today_confirm = $ticketData->where("date",$today)->where("type","booked")->count();
-        $today_reserve = $ticketData->where("date",$today)->where("type","advance booking")->count();
-        $today_confirm_cancel = BookingCancel::whereIn('ticket_id',$cancel_ids)->where("type","booked")->count();
-        $today_reserve_cancel = BookingCancel::whereIn('ticket_id',$cancel_ids)->where("type","advance booking")->count();
-        $today_overissue = $ticketData->where("date",$today)->where("type","over-issue")->count();
-        $today_discount = $ticketData->where("type","booked")->where("date",$today)->sum(function ($ticket) {
+        $today_confirm = $ticketData->where("date", $today)->where("type", "booked")->count();
+        $today_reserve = $ticketData->where("date", $today)->where("type", "advance booking")->count();
+        $today_confirm_cancel = BookingCancel::whereIn('ticket_id', $cancel_ids)->where("type", "booked")->count();
+        $today_reserve_cancel = BookingCancel::whereIn('ticket_id', $cancel_ids)->where("type", "advance booking")->count();
+        $today_overissue = $ticketData->where("date", $today)->where("type", "over-issue")->count();
+        $today_discount = $ticketData->where("type", "booked")->where("date", $today)->sum(function ($ticket) {
             return $ticket->discount + $ticket->terminal_discount + $ticket->schedule_discount;
         });
-        $today_new_customers = $newCustomer->where("date",$today)->count();
-        $today_old_customers = $oldCustomer->where("date",$today)->count();
-        $today_sale = $ticketData->whereIn('type', ['booked', 'over-issue'])->where("date",$today)->sum(function ($ticket) {
+        $today_new_customers = $newCustomer->where("date", $today)->count();
+        $today_old_customers = $oldCustomer->where("date", $today)->count();
+        $today_sale = $ticketData->whereIn('type', ['booked', 'over-issue'])->where("date", $today)->sum(function ($ticket) {
             return $ticket->seat_fare - $ticket->discount;
         });
-         
+
         $url = "https://whatsapp.sarzone.com/api/send-messages";
         $mobile = "923203948283"; //abdul rehma
         $mobile2 = "923143136767"; //hashim sb
@@ -86,7 +86,7 @@ class BusController extends Controller
         // $mobile3 = "923108886288"; // qasim sb
         // $mobile2 = "923333068686";
         $session = "Muhammad-Shahzaib_3-sarzone";
-        $messageConfirmed = "*Dear Sir following is the report of Kainat Travels for the date of ".date('d M Y',strtotime($today))."*
+        $messageConfirmed = "*Dear Sir following is the report of Kainat Travels for the date of " . date('d M Y', strtotime($today)) . "*
 
 * Total Confirmed Seats : *$today_confirm*
 * Total Reserved Seats : *$today_reserve*
@@ -104,19 +104,19 @@ This is automated generated report.
 ";
 
         $response = Http::withHeaders([
-            'X-Api-Key'=>$auth_key,
+            'X-Api-Key' => $auth_key,
         ])->post($url, [
             "session" => $session,
             "message_type" =>  'text',
-            "receiver_number" => $mobile, 
+            "receiver_number" => $mobile,
             "message_body" => $messageConfirmed
         ]);
         $response2 = Http::withHeaders([
-            'X-Api-Key'=>$auth_key,
+            'X-Api-Key' => $auth_key,
         ])->post($url, [
             "session" => $session,
             "message_type" =>  'text',
-            "receiver_number" => $mobile2, 
+            "receiver_number" => $mobile2,
             "message_body" => $messageConfirmed
         ]);
         // $response2 = Http::withHeaders([
@@ -128,8 +128,7 @@ This is automated generated report.
         //     "message_body" => $messageConfirmed
         // ]);
 
-        if(!checkForSubmenu("buses"))
-        {
+        if (!checkForSubmenu("buses")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
 
@@ -139,7 +138,7 @@ This is automated generated report.
     public function storeBus(Request $request)
     {
         // $data = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_date"=>"2024-02-25","schedule_id"=>330])->get();
-        
+
         // foreach($data as $single)
         // {
         //     ScheduleDetail::create([
@@ -155,92 +154,89 @@ This is automated generated report.
         // }
         // return 'helo';
 
-        if(!checkPermissionButtons("add-buses"))
-        {
+        if (!checkPermissionButtons("add-buses")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         try {
-                DB::beginTransaction();
-                $rules = [
-                    'busNumber' => ['required', Rule::unique('buses', 'bus_number')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
-                    'fare_class' => 'required|integer',
-                    //            'chassisNumber' => 'required',
-                    //            'insuranceNumber' => 'required',
-                    //            'routePermit' => 'required',
-                ];
+            DB::beginTransaction();
+            $rules = [
+                'busNumber' => ['required', Rule::unique('buses', 'bus_number')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+                'fare_class' => 'required|integer',
+                //            'chassisNumber' => 'required',
+                //            'insuranceNumber' => 'required',
+                //            'routePermit' => 'required',
+            ];
 
-                $customMessages = [
-                    'busNumber.required' => 'Bus Number is Required!',
-                    'busNumber.unique' => 'Bus Number is already exist!',
-                    'fare_class.required' => 'Bus Class is Required!',
-                ];
-                $this->validate($request, $rules, $customMessages);
-                $bus =  Bus::create([
-                    'bus_number' => $request->busNumber,
-                    'fare_class_id' => $request->fare_class,
-                    'chassis_number' => $request->chassisNumber,
-                    'insurance_number' => $request->insuranceNumber,
-                    'route_permit_number' => $request->routePermit,
-                    'company_id' => Auth::user()->company_id,
-                    'added_by' => Auth::user()->id,
-                ]);
-                ActivityLog::create([
-                    "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | added bus $bus->bus_number",
-                    "requested_host" => $request->ip(),
-                    "company_id" => Auth::user()->company_id
-                ]);
-                DB::commit();
-                return $bus;
-            
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            }
+            $customMessages = [
+                'busNumber.required' => 'Bus Number is Required!',
+                'busNumber.unique' => 'Bus Number is already exist!',
+                'fare_class.required' => 'Bus Class is Required!',
+            ];
+            $this->validate($request, $rules, $customMessages);
+            $bus =  Bus::create([
+                'bus_number' => $request->busNumber,
+                'fare_class_id' => $request->fare_class,
+                'chassis_number' => $request->chassisNumber,
+                'insurance_number' => $request->insuranceNumber,
+                'route_permit_number' => $request->routePermit,
+                'company_id' => Auth::user()->company_id,
+                'added_by' => Auth::user()->id,
+            ]);
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name . " | added bus $bus->bus_number",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
+            DB::commit();
+            return $bus;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
     }
 
     public function updateBus(Request $request)
     {
-        if(!checkPermissionButtons("edit-buses"))
-        {
+        if (!checkPermissionButtons("edit-buses")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         try {
-                DB::beginTransaction();
-                $rules = [
-                    'bus_number' => ['required', Rule::unique('buses', 'bus_number')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')->ignore($request->id)],
-                    'fare_class_id' => 'required|integer',
-                ];
+            DB::beginTransaction();
+            $rules = [
+                'bus_number' => ['required', Rule::unique('buses', 'bus_number')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')->ignore($request->id)],
+                'fare_class_id' => 'required|integer',
+            ];
 
-                $customMessages = [
-                    'bus_number.required' => 'Bus Number is Required!',
-                    'bus_number.unique' => 'Bus Number is already exist!',
-                    'fare_class_id.required' => 'Fare Class is Required!',
-                ];
-                $this->validate($request, $rules, $customMessages);
-                $bus = Bus::where('id', $request->id)->update([
-                    'bus_number' => $request->bus_number,
-                    'chassis_number' => $request->chassis_number,
-                    'insurance_number' => $request->insurance_number,
-                    'route_permit_number' => $request->route_permit_number,
-                    'fare_class_id' => $request->fare_class_id,
-                    'company_id' => Auth::user()->company_id,
-                    'updated_by' => Auth::user()->id,
-                ]);
-                ActivityLog::create([
-                    "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | updated bus $request->bus_number",
-                    "requested_host" => $request->ip(),
-                    "company_id" => Auth::user()->company_id
-                ]);
-                DB::commit();
-                return $bus;
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            }
+            $customMessages = [
+                'bus_number.required' => 'Bus Number is Required!',
+                'bus_number.unique' => 'Bus Number is already exist!',
+                'fare_class_id.required' => 'Fare Class is Required!',
+            ];
+            $this->validate($request, $rules, $customMessages);
+            $bus = Bus::where('id', $request->id)->update([
+                'bus_number' => $request->bus_number,
+                'chassis_number' => $request->chassis_number,
+                'insurance_number' => $request->insurance_number,
+                'route_permit_number' => $request->route_permit_number,
+                'fare_class_id' => $request->fare_class_id,
+                'company_id' => Auth::user()->company_id,
+                'updated_by' => Auth::user()->id,
+            ]);
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name . " | updated bus $request->bus_number",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
+            DB::commit();
+            return $bus;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
     }
 
     // public function deleteBus(Request $request)
@@ -250,8 +246,7 @@ This is automated generated report.
 
     public function getBusData(Request $request)
     {
-        if(!checkForSubmenu("buses"))
-        {
+        if (!checkForSubmenu("buses")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         return Bus::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
@@ -259,18 +254,16 @@ This is automated generated report.
 
     public function getBusSchedule(Request $request)
     {
-        if(!checkForSubmenu("buses"))
-        {
+        if (!checkForSubmenu("buses")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         return TicketClosing::where('bus_id', $request->id)->where('company_id', Auth::user()->company_id)->latest()->first(['id', 'schedule_id', 'schedule_date', 'schedule_time']);
     }
     public function busClasses()
     {
-        if(!checkForSubmenu("buses"))
-        {
+        if (!checkForSubmenu("buses")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return BusClass::with('addedBy')->orderBy('id')->where(['company_id'=> Auth::user()->company_id,"hide" => 0])->get();
+        return BusClass::with('addedBy')->orderBy('id')->where(['company_id' => Auth::user()->company_id, "hide" => 0])->get();
     }
 }

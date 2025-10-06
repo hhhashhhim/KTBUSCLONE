@@ -66,7 +66,7 @@ class ScheduleClosingController extends Controller
         ->with("bus:id,bus_number", "schedule:id,name,route_id", "schedule.route:id,name")
         ->where(["hide"=>0,"commission_route"=>0])
         ->get()
-        ->groupBy('ticket_merge_id')
+        ->groupBy('ticket_merge_id') 
         ->filter(function ($group){
             return $group->count() == 1;
         });
