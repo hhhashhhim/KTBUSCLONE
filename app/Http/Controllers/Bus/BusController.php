@@ -57,7 +57,7 @@ class BusController extends Controller
 
         $cancel_ids = $ticketData->where("date",$today)->where("type","canceled")->pluck('id');
        $pending_merges = TicketClosing::where('company_id', Auth::user()->company_id)
-        ->where("hide",0)
+        ->where("hide",1)
         ->get()
         ->groupBy('ticket_merge_id')
         ->filter(function ($group){
