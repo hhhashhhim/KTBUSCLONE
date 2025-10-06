@@ -93,8 +93,9 @@ class DailyReport extends Command
          
         $url = "https://whatsapp.sarzone.com/api/send-messages";
         $mobile = "923203948283"; //abdul rehma
-        $mobile2 = "923360111140"; //hashim sb
-        $mobile3 = "923108886288"; // qasim sb
+        $mobile2 = "923143136767"; //hashim sb
+        // $mobile2 = "923360111140"; //hashim sb
+        // $mobile3 = "923108886288"; // qasim sb
         // $mobile2 = "923333068686";
         $session = "Muhammad-Shahzaib_3-sarzone";
         $messageConfirmed = "*Dear Sir following is the report of Kainat Travels for the date of ".date('d M Y',strtotime($today))."*
@@ -130,13 +131,13 @@ This is automated generated report.
             "receiver_number" => $mobile2, 
             "message_body" => $messageConfirmed
         ]);
-        $response2 = Http::withHeaders([
-            'X-Api-Key'=>$auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile3, 
-            "message_body" => $messageConfirmed
-        ]);
+        // $response2 = Http::withHeaders([
+        //     'X-Api-Key'=>$auth_key,
+        // ])->post($url, [
+        //     "session" => $session,
+        //     "message_type" =>  'text',
+        //     "receiver_number" => $mobile3, 
+        //     "message_body" => $messageConfirmed
+        // ]);
     }
 }
