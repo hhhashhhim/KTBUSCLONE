@@ -273,9 +273,6 @@
                             <h5 class="modal-title">
                                 <i class="fas fa-tools mr-2"></i> Fault Claim Details
                             </h5>
-                            <!-- <button type="button" class="btn btn-light btn-sm mr-2" @click=closeModal()>
-                                <i class="fas fa-print"></i> Print
-                            </button> -->
                             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"
                                 @click=closeModal()>
                                 <span aria-hidden="true">&times;</span>
@@ -285,12 +282,22 @@
                         <div class="modal-body">
                             <div class="card shadow-sm border-0">
                                 <div class="card-body">
-                                    <h5 class="card-title mb-4">
-                                        <span class="text-dark">Bus:</span> <strong>{{ selectedFault?.bus?.bus_number ||
-                                            'N/A' }}</strong> |
-                                        <span class="text-dark">Driver:</span> <strong>{{ selectedFault?.driver?.name ||
-                                            'N/A' }}</strong>
-                                    </h5>
+                                    <div class="d-flex mb-4 justify-content-between align-items-center">
+                                        <h5 class="card-title ">
+                                            <span class="text-dark">Bus:</span> <strong>{{
+                                                selectedFault?.bus?.bus_number ||
+                                                'N/A' }}</strong> |
+                                            <span class="text-dark">Driver:</span> <strong>{{
+                                                selectedFault?.driver?.name ||
+                                                'N/A' }}</strong>
+                                        </h5>
+                                        <div class="">
+                                            <button type="button" @click="printFaultClaim()"
+                                                class="btn btn-primary p-2 mr-2">
+                                                <i class="fas fa-print"></i> Print Fault Claim
+                                            </button>
+                                        </div>
+                                    </div>
 
                                     <div v-if="selectedFault?.dock_requests?.length > 0">
                                         <div class="row">
@@ -667,15 +674,19 @@
             </div>
 
 
-
+            <div id="print-area" style="display: none">
+                <FaultClaimPrint :fault="selectedFault" :inspection="inspection" />
+            </div>
         </div>
     </section>
 </template>
 
 <script>
+import FaultClaimPrint from "../../components/FaultClaimPrint.vue";
 import moment from 'moment';
 export default {
     name: "fault-claims",
+    components: { FaultClaimPrint },
     data() {
         return {
             faults: [],
@@ -886,47 +897,89 @@ export default {
                 this.initInspectionSelect2();
             });
         },
-         async viewDetails(item) {
-        this.selectedFault = null;
-        const res = await this.callApi('post', `fleet/fault-claims/show`, { id: item.id });
+        async viewDetails(item) {
+            this.selectedFault = null;
+            const res = await this.callApi('post', `fleet/fault-claims/show`, { id: item.id });
 
-        if (res.status === 200 && res.data) {
-            this.selectedFault = res.data.fault;
-            this.inspection = res.data.inspection;
+            if (res.status === 200 && res.data) {
+                this.selectedFault = res.data.fault;
+                this.inspection = res.data.inspection;
+                this.$nextTick(() => {
+                    $('#viewDockModal').modal('show');
+                });
+            } else {
+                swal({
+                    title: "Error",
+                    text: "Failed to load fault details.",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+        },
+
+        printFaultClaim() {
+            // ✅ Use selectedFault since that's your actual data
+            if (!this.selectedFault || Object.keys(this.selectedFault).length === 0) {
+                alert("No fault data to display.");
+                return;
+            }
+
+            // ✅ Find the print component area
+            const printArea = this.$el.querySelector("#print-area");
+
+            if (!printArea) {
+                alert("Print area not found.");
+                return;
+            }
+
+            // ✅ Wait briefly to ensure Vue has rendered <FaultClaimPrint> content
             this.$nextTick(() => {
-                $('#viewDockModal').modal('show');
-            });
-        } else {
-            swal({
-                title: "Error",
-                text: "Failed to load fault details.",
-                icon: "error",
-                timer: 2000
-            });
-        }
-    },
+                const printContent = printArea.innerHTML.trim();
+                if (!printContent) {
+                    alert("No fault data to display.");
+                    return;
+                }
 
-    printModal() {
-        let printContent = document.querySelector("#viewDockModal .modal-body").innerHTML;
-       let win = window.open("", "_blank");
-        win.document.write(`
-            <html>
-                <head>
-                    <title>Print Fault Claim</title>
-                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-                    <style>
-                        body { font-size: 14px; }
-                        .card { box-shadow: none !important; border: 1px solid #ddd; }
-                    </style>
-                </head>
-                <body onload="window.print(); window.close();">
-                    ${printContent}
-                </body>
-            </html>
-        `);
-        win.document.close();
-    },
+                // ✅ Open print in same tab (not popup)
+                const win = window.open("", "_blank");
+
+                win.document.write(`
+  <html>
+    <head>
+      <title>Fault Claim Report</title>
+      <!-- Bootstrap CSS -->
+      <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+      <!-- Font Awesome CSS (for icons) -->
+     
+
+
+      <style>
+        body { font-size: 14px; margin: 20px; color: #000; }
+        h4 { font-weight: bold; text-align: center; margin-bottom: 20px; }
+        .border, .rounded { border-color: #ccc !important; }
+
+        @media print {
+          .no-print { display: none; }
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+        }
+      </style>
+    </head>
+    <body onload="window.print();">
+      ${printContent}
+    </body>
+     
+  </html>
+`);
+
+
+                win.document.close();
+            });
+        },
         async add() {
             if (!this.data.bus_id) {
                 return swal({ title: "Required", text: "Please select a Bus", icon: "error", timer: 2000 });
