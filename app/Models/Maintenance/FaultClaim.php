@@ -15,11 +15,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class FaultClaim extends Model
 {
     use HasFactory, softDeletes;
-    
+
     protected $guarded = [];
 
     // status = pending / dock time / resolved
-
+    protected $casts = [
+        'images' => 'array', // automatically cast JSON to array
+    ];
     public function dock_requests()
     {
         return $this->hasMany(DockRequest::class);
@@ -35,16 +37,17 @@ class FaultClaim extends Model
         return $this->belongsTo(Employee::class, 'driver_id');
     }
 
-    public function claimParts() {
-    return $this->hasMany(FaultClaimPart::class, 'fault_claim_id');
-}
+    public function claimParts()
+    {
+        return $this->hasMany(FaultClaimPart::class, 'fault_claim_id');
+    }
 
-public function inspectionResult() {
-    return $this->hasOne(InspectionResult::class, 'fault_claim_id');
-}
-public function parts()
-{
-    return $this->hasMany(FaultClaimPart::class, 'fault_claim_id');
-}
-
+    public function inspectionResult()
+    {
+        return $this->hasOne(InspectionResult::class, 'fault_claim_id');
+    }
+    public function parts()
+    {
+        return $this->hasMany(FaultClaimPart::class, 'fault_claim_id');
+    }
 }

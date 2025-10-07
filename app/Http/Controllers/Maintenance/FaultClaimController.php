@@ -26,187 +26,191 @@ use Illuminate\Support\Facades\Log;
 
 class FaultClaimController extends Controller
 {
- public function index(Request $request)
-{
-    $companyId = Auth::user()->company_id;
+    public function index(Request $request)
+    {
+        $companyId = Auth::user()->company_id;
 
-    // 🚍 Buses
-    $buses = Bus::where('company_id', $companyId)
-        ->orderBy('id')
-        ->get();
+        // 🚍 Buses
+        $buses = Bus::where('company_id', $companyId)
+            ->orderBy('id')
+            ->get();
 
-    // 👨‍ Drivers
-    $drivers = Employee::where([
-        'employee_type' => 1,
-        'company_id'    => $companyId,
-        'hide'          => 0
-    ])->get(["id", "user_id", "name", "cnic"]);
+        // 👨‍ Drivers
+        $drivers = Employee::where([
+            'employee_type' => 1,
+            'company_id'    => $companyId,
+            'hide'          => 0
+        ])->get(["id", "user_id", "name", "cnic"]);
 
-    // ⚙️ Faults with filters
-   $faults = FaultClaim::with([
-    'bus',
-    'driver',
-    'dock_requests',
-    'claimParts.part:id,name', // ✅ parts added in fault claim
-    'inspectionResult.parts.part:id,name' // ✅ parts added in inspection
-])
-->where('company_id', $companyId)
-->when($request->from_date && $request->to_date, function ($q) use ($request) {
-    $q->whereBetween('created_at', [
-        $request->from_date . " 00:00:00",
-        $request->to_date   . " 23:59:59"
-    ]);
-})
-->when($request->status, fn($q) => $q->where('status', $request->status))
-->when($request->bus_id, fn($q) => $q->where('bus_id', $request->bus_id))
-->get();
-
-
-    // 🔧 Load all bus-part links
-    $links = MaintenancePartLink::with('maintenancePart')
-        ->whereIn('bus_id', $buses->pluck('id'))
-        ->get();
-
-    // ✅ Same calculation function as fleetDueDetail (applied to link)
-    $calculateStatus = function ($link, $bus) {
-        if (!$link->maintenancePart) return null;
-
-        $part = $link->maintenancePart;
-
-        // Merge link values into link (not only part)
-        $link->name                  = $part->name;
-        $link->maintenance_after     = $link->maintenance_after;
-        $link->maintenance_at        = $link->maintenance_at;
-        $link->maintenance_days      = $link->maintenance_days;
-        $link->maintenance_days_date = $link->maintenance_days_date;
-
-        // Defaults
-        $link->percentage            = 100;
-        $link->due                   = false;
-        $link->next_maintenance_date = null;
-
-        if ($link->maintenance_days && $link->maintenance_days_date) {
-            // 📅 Date-based
-            $startDate = Carbon::parse($link->maintenance_days_date);
-            $endDate   = $startDate->copy()->addDays($link->maintenance_days);
-            $now       = Carbon::now();
-
-            if ($now->greaterThanOrEqualTo($endDate)) {
-                $link->percentage = 0;
-                $link->due = true;
-            } else {
-                $totalDays   = max($startDate->diffInDays($endDate), 1);
-                $daysPassed  = $startDate->diffInDays($now);
-                $usedPercent = ($daysPassed / $totalDays) * 100;
-                $link->percentage = min(max(100 - intval($usedPercent), 0), 100);
-            }
-
-            $link->next_maintenance_date = $endDate->toDateString();
-
-        } else {
-            // 🚗 Km-based
-            $alertReading = $link->maintenance_after + $link->maintenance_at;
-            if ($bus->current_reading >= $alertReading) {
-                $link->percentage = 0;
-                $link->due = true;
-            } else {
-                $distanceTravelled = $bus->current_reading - $link->maintenance_at;
-                $totalDistance     = max($alertReading - $link->maintenance_at, 1);
-                $usedPercent       = ($distanceTravelled / $totalDistance) * 100;
-                $link->percentage  = min(max(100 - intval($usedPercent), 0), 100);
-            }
-
-            $link->next_maintenance_date = null;
-        }
-
-        // 🔴 Force due if <= 20%
-        if ($link->percentage <= 20) {
-            $link->due = true;
-        }
-
-        // Extra fields for table
-        $link->current_reading = $bus->current_reading;
-        $link->alert_reading   = $link->maintenance_after + $link->maintenance_at;
-
-        return $link;
-    };
-
-    // Attach parts with health to buses
-    $buses = $buses->map(function ($bus) use ($links, $calculateStatus) {
-        $busParts = $links->where('bus_id', $bus->id)->map(function ($link) use ($bus, $calculateStatus) {
-            return $calculateStatus($link, $bus);
-        })->filter()->values();
-
-        return array_merge($bus->toArray(), ['parts' => $busParts]);
-    });
-
-    return [
-        "faults"  => $faults,
-        "drivers" => $drivers,
-        "buses"   => $buses,
-        "links"   => $links,
-    ];
-}
-
-
-
-public function store(Request $request)
-{
-    DB::beginTransaction();
-    try {
-        // ✅ Create Fault Claim
-        $fault = FaultClaim::create([
-            'bus_id'     => $request->bus_id,
-            'driver_id'  => $request->driver_id,
-            'description'=> $request->description,
-            'status'     => 'pending',
-            'added_by'   => Auth::id(),
-            'company_id' => Auth::user()->company_id,
-        ]);
-
-        // ✅ Create Dock Request
-        $dock = DockRequest::create([
-            'fault_claim_id' => $fault->id,
-            'bus_id'         => $request->bus_id,
-            'dock_time'      => $request->dock_time,
-            'periority'      => $request->periority,
-            'description'    => $request->description,
-            'status'         => 'pending',
-            'request_type'   => $request->request_type ?? 'regular',
-            'added_by'       => Auth::id(),
-            'company_id'     => Auth::user()->company_id,
-        ]);
-
-        // ✅ Save Selected Parts into fault_claim_parts
-        if ($request->has('parts') && is_array($request->parts)) {
-            foreach ($request->parts as $partId) {
-                FaultClaimPart::create([
-                    'part_id'        => $partId,
-                    'fault_claim_id' => $fault->id,
-                    'dock_request_id'=> $dock->id, // ✅ new column
-                    'bus_id'         => $request->bus_id,
-                    'status'         => 'pending', // ✅ default
-                    'added_by'       => Auth::id(),
-                    'company_id'     => Auth::user()->company_id,
+        // ⚙️ Faults with filters
+        $faults = FaultClaim::with([
+            'bus',
+            'driver',
+            'dock_requests',
+            'claimParts.part:id,name', // ✅ parts added in fault claim
+            'inspectionResult.parts.part:id,name' // ✅ parts added in inspection
+        ])
+            ->where('company_id', $companyId)
+            ->when($request->from_date && $request->to_date, function ($q) use ($request) {
+                $q->whereBetween('created_at', [
+                    $request->from_date . " 00:00:00",
+                    $request->to_date   . " 23:59:59"
                 ]);
+            })
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->when($request->bus_id, fn($q) => $q->where('bus_id', $request->bus_id))
+            ->get();
+
+
+        // 🔧 Load all bus-part links
+        $links = MaintenancePartLink::with('maintenancePart')
+            ->whereIn('bus_id', $buses->pluck('id'))
+            ->get();
+
+        // ✅ Same calculation function as fleetDueDetail (applied to link)
+        $calculateStatus = function ($link, $bus) {
+            if (!$link->maintenancePart) return null;
+
+            $part = $link->maintenancePart;
+
+            // Merge link values into link (not only part)
+            $link->name                  = $part->name;
+            $link->maintenance_after     = $link->maintenance_after;
+            $link->maintenance_at        = $link->maintenance_at;
+            $link->maintenance_days      = $link->maintenance_days;
+            $link->maintenance_days_date = $link->maintenance_days_date;
+
+            // Defaults
+            $link->percentage            = 100;
+            $link->due                   = false;
+            $link->next_maintenance_date = null;
+
+            if ($link->maintenance_days && $link->maintenance_days_date) {
+                // 📅 Date-based
+                $startDate = Carbon::parse($link->maintenance_days_date);
+                $endDate   = $startDate->copy()->addDays($link->maintenance_days);
+                $now       = Carbon::now();
+
+                if ($now->greaterThanOrEqualTo($endDate)) {
+                    $link->percentage = 0;
+                    $link->due = true;
+                } else {
+                    $totalDays   = max($startDate->diffInDays($endDate), 1);
+                    $daysPassed  = $startDate->diffInDays($now);
+                    $usedPercent = ($daysPassed / $totalDays) * 100;
+                    $link->percentage = min(max(100 - intval($usedPercent), 0), 100);
+                }
+
+                $link->next_maintenance_date = $endDate->toDateString();
+            } else {
+                // 🚗 Km-based
+                $alertReading = $link->maintenance_after + $link->maintenance_at;
+                if ($bus->current_reading >= $alertReading) {
+                    $link->percentage = 0;
+                    $link->due = true;
+                } else {
+                    $distanceTravelled = $bus->current_reading - $link->maintenance_at;
+                    $totalDistance     = max($alertReading - $link->maintenance_at, 1);
+                    $usedPercent       = ($distanceTravelled / $totalDistance) * 100;
+                    $link->percentage  = min(max(100 - intval($usedPercent), 0), 100);
+                }
+
+                $link->next_maintenance_date = null;
             }
-        }
 
-        DB::commit();
-        return response()->json([
-            'message' => 'Fault & Dock Request Created Successfully',
-            'data'    => null
-        ], 200);
+            // 🔴 Force due if <= 20%
+            if ($link->percentage <= 20) {
+                $link->due = true;
+            }
 
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'message' => 'Error occurred during creation',
-            'error'   => $e->getMessage()
-        ], 422);
+            // Extra fields for table
+            $link->current_reading = $bus->current_reading;
+            $link->alert_reading   = $link->maintenance_after + $link->maintenance_at;
+
+            return $link;
+        };
+
+        // Attach parts with health to buses
+        $buses = $buses->map(function ($bus) use ($links, $calculateStatus) {
+            $busParts = $links->where('bus_id', $bus->id)->map(function ($link) use ($bus, $calculateStatus) {
+                return $calculateStatus($link, $bus);
+            })->filter()->values();
+
+            return array_merge($bus->toArray(), ['parts' => $busParts]);
+        });
+
+        return [
+            "faults"  => $faults,
+            "drivers" => $drivers,
+            "buses"   => $buses,
+            "links"   => $links,
+        ];
     }
-}
 
+
+    public function store(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $storedImages = [];
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $file) {
+                    $storedImages[] = $this->image($file);
+                }
+            }
+
+            // ✅ Create Fault Claim
+            $fault = FaultClaim::create([
+                'bus_id'     => $request->bus_id,
+                'driver_id'  => $request->driver_id,
+                'description' => $request->description,
+                'status'     => 'pending',
+                'images' => implode(',', $storedImages), 
+                'added_by'   => Auth::id(),
+                'company_id' => Auth::user()->company_id,
+            ]);
+
+            // ✅ Create Dock Request
+            $dock = DockRequest::create([
+                'fault_claim_id' => $fault->id,
+                'bus_id'         => $request->bus_id,
+                'dock_time'      => $request->dock_time,
+                'periority'      => $request->periority,
+                'description'    => $request->description,
+                'status'         => 'pending',
+                'request_type'   => $request->request_type ?? 'regular',
+                'added_by'       => Auth::id(),
+                'company_id'     => Auth::user()->company_id,
+            ]);
+
+            // ✅ Save Selected Parts into fault_claim_parts
+            if ($request->has('parts') && is_array($request->parts)) {
+                foreach ($request->parts as $partId) {
+                    FaultClaimPart::create([
+                        'part_id'        => $partId,
+                        'fault_claim_id' => $fault->id,
+                        'dock_request_id' => $dock->id,
+                        'bus_id'         => $request->bus_id,
+                        'status'         => 'pending',
+                        'added_by'       => Auth::id(),
+                        'company_id'     => Auth::user()->company_id,
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => 'Fault & Dock Request Created Successfully',
+                'data'    => null
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Error occurred during creation',
+                'error'   => $e->getMessage()
+            ], 422);
+        }
+    }
 
 
 
@@ -290,72 +294,86 @@ public function store(Request $request)
     }
 
 
-   public function show(Request $request)
-{
-    $fault = FaultClaim::with([
-        'bus',
-        'driver',
-        'dock_requests.approved',
-        'claimParts.part:id,name' // ✅ add this
-    ])
-    ->where('id', $request->id)
-    ->first();
+    public function show(Request $request)
+    {
+        $fault = FaultClaim::with([
+            'bus:id,bus_number',
+            'driver:id,name',
+            'dock_requests.approved',
+            'claimParts.part:id,name'
+        ])
+            ->where('id', $request->id)
+            ->first();
 
-    if (!$fault) {
-        return response()->json(['message' => 'Not found'], 404);
+        if (!$fault) {
+            return response()->json(['message' => 'Not found'], 404);
+        }
+
+        // 🔹 Ensure images is always an array
+        if ($fault->images) {
+            // if stored as comma-separated filenames
+            $fault->images = explode(',', $fault->images);
+
+            // OR if stored as JSON in DB, uncomment this instead:
+            // $fault->images = json_decode($fault->images, true) ?? [];
+        } else {
+            $fault->images = [];
+        }
+
+        $inspection = InspectionResult::with([
+            'bus:id,bus_number',
+            'driver:id,name',
+            'vendor:id,name',
+            'parts.part:id,name',
+            'dockRequest'
+        ])
+            ->where("fault_claim_id", $request->id)
+            ->first();
+
+        return response()->json([
+            "fault" => $fault,
+            "inspection" => $inspection
+        ]);
     }
 
-    $inspection = InspectionResult::with([
-        'bus:id,bus_number',
-        'driver:id,name',
-        'vendor:id,name',
-        'parts.part:id,name',
-        'dockRequest'
-    ])->where("fault_claim_id", $request->id)->first();
-
-    return [
-        "fault" => $fault,
-        "inspection" => $inspection
-    ];
-}
 
 
- public function helperData(Request $request)
-{
-    $companyId = Auth::user()->company_id;
+    public function helperData(Request $request)
+    {
+        $companyId = Auth::user()->company_id;
 
-    $vendors = Supplier::all();
+        $vendors = Supplier::all();
 
-    // Fault claim → existing behavior
-    if ($request->has('fault_claim_id')) {
-        $parts = FaultClaimPart::with('part', 'addedBy', 'company')
-            ->where('company_id', $companyId)
-            ->where('fault_claim_id', $request->fault_claim_id)
-            ->get();
-    }
-    // Dock request → get all maintenance parts for the bus
-    elseif ($request->has('dock_request_id')) {
-        $dockRequest = DockRequest::find($request->dock_request_id);
-        if ($dockRequest) {
-            $busId = $dockRequest->bus_id;
-
-            $parts = MaintenancePartLink::with('maintenancePart', 'addedBy', 'company')
+        // Fault claim → existing behavior
+        if ($request->has('fault_claim_id')) {
+            $parts = FaultClaimPart::with('part', 'addedBy', 'company')
                 ->where('company_id', $companyId)
-                ->where('bus_id', $busId)
+                ->where('fault_claim_id', $request->fault_claim_id)
                 ->get();
+        }
+        // Dock request → get all maintenance parts for the bus
+        elseif ($request->has('dock_request_id')) {
+            $dockRequest = DockRequest::find($request->dock_request_id);
+            if ($dockRequest) {
+                $busId = $dockRequest->bus_id;
+
+                $parts = MaintenancePartLink::with('maintenancePart', 'addedBy', 'company')
+                    ->where('company_id', $companyId)
+                    ->where('bus_id', $busId)
+                    ->get();
+            } else {
+                $parts = collect();
+            }
         } else {
             $parts = collect();
         }
-    } else {
-        $parts = collect();
-    }
 
-    // Return as JSON
-    return response()->json([
-        'parts' => $parts,
-        'vendors' => $vendors,
-    ]);
-}
+        // Return as JSON
+        return response()->json([
+            'parts' => $parts,
+            'vendors' => $vendors,
+        ]);
+    }
 
 
 
@@ -394,14 +412,14 @@ public function store(Request $request)
         ]);
     }
 
-public function pendingDockCount()
-{
-    $count = DockRequest::where('status', 'pending')->count();
+    public function pendingDockCount()
+    {
+        $count = DockRequest::where('status', 'pending')->count();
 
-    return response()->json([
-        'pending_count' => $count
-    ]);
-}
+        return response()->json([
+            'pending_count' => $count
+        ]);
+    }
 
 
     public function approveDockRequest(Request $request)
@@ -446,7 +464,7 @@ public function pendingDockCount()
         }
     }
 
-     public function showRequest(Request $request)
+    public function showRequest(Request $request)
     {
         $fault = FaultClaim::with(['bus', 'driver', 'dock_requests.approved'])
             ->where('id', $request->id)
@@ -472,4 +490,14 @@ public function pendingDockCount()
         ];
     }
 
+
+    public function image($image)
+    {
+        $filenameWithExt = $image->getClientOriginalName();
+        $filename = pathinfo($filenameWithExt);
+        $extension = $image->extension();
+        $nameToStore = $filename['filename'] . "_" . time() . "." . $extension;
+        $image->move(public_path('uploads/fault/claim/proof/'), $nameToStore);
+        return $nameToStore;
+    }
 }
