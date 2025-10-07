@@ -85,8 +85,8 @@ import Reports from "./pages/inventory/products/reports.vue";
 import BidSummary from "./pages/inventory/products/BidSummary.vue";
 import PR from "./pages/inventory/products/PurchaseRequisitionNote.vue";
 
-const url = "/kt-dev/";
-// const url = '/'
+// const url = "/kt-dev/";
+const url = '/'
 
 const routes = [
     {
