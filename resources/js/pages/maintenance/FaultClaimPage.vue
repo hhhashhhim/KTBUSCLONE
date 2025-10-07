@@ -244,6 +244,10 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="form-group col-md-12">
+                                    <label>Upload Images (optional)</label>
+                                    <input type="file" class="form-control" multiple @change="handleImageUpload" />
+                                </div>
 
 
                                 <div class="form-group col-md-12">
@@ -274,7 +278,7 @@
                                 <i class="fas fa-tools mr-2"></i> Fault Claim Details
                             </h5>
                             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"
-                                @click=closeModal()>
+                                @click=closeDockModal()>
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -298,6 +302,21 @@
                                             </button>
                                         </div>
                                     </div>
+                                    <div class="mb-4" v-if="selectedFault?.images">
+                                        <h6 class="text-dark mb-2">
+                                            <i class="fas fa-image mr-2"></i> Uploaded Image
+                                        </h6>
+                                        <a :href="$store.state.api_url + 'uploads/fault/claim/proof/' + selectedFault.images"
+                                            target="_blank">
+                                            <img :src="$store.state.api_url + 'uploads/fault/claim/proof/' + selectedFault.images"
+                                                style="width:90px; height:100px; object-fit:cover;"
+                                                class="img-thumbnail shadow-sm" alt="Fault Image" />
+                                        </a>
+                                    </div>
+
+                                    <div v-else class="text-muted mb-4">
+                                        <i class="fas fa-info-circle"></i> No image uploaded.
+                                    </div>
 
                                     <div v-if="selectedFault?.dock_requests?.length > 0">
                                         <div class="row">
@@ -313,7 +332,7 @@
                                                                 formatDateTime(dock.dock_start_time) : 'Not Assigned' }}
                                                             </h6>
                                                             <span :class="getStatusClass(dock.status)">{{ dock.status
-                                                                }}</span>
+                                                            }}</span>
                                                         </div>
                                                         <div class="row">
                                                             <div class="col-md-6 mt-2">
@@ -777,6 +796,9 @@ export default {
         closeModal() {
             $(".modal").click();
         },
+        closeDockModal() {
+            $("#closeDockModal").click();
+        },
         async fetchData() {
             if ($.fn.DataTable.isDataTable("#fault_table")) {
                 $("#fault_table").DataTable().destroy();
@@ -980,6 +1002,10 @@ export default {
                 win.document.close();
             });
         },
+
+        handleImageUpload(event) {
+            this.data.images = Array.from(event.target.files);
+        },
         async add() {
             if (!this.data.bus_id) {
                 return swal({ title: "Required", text: "Please select a Bus", icon: "error", timer: 2000 });
@@ -1000,50 +1026,52 @@ export default {
                 return swal({ title: "Required", text: "Please enter a Description", icon: "error", timer: 2000 });
             }
             if (!this.data.request_type) {
-                return swal({
-                    title: "Required",
-                    text: "Please select Request Type",
-                    icon: "error",
-                    timer: 2000
-                });
+                return swal({ title: "Required", text: "Please select Request Type", icon: "error", timer: 2000 });
             }
             if (!this.data.parts || this.data.parts.length === 0) {
-                return swal({
-                    title: "Required",
-                    text: "Please select at least one Part",
-                    icon: "error",
-                    timer: 2000
-                });
+                return swal({ title: "Required", text: "Please select at least one Part", icon: "error", timer: 2000 });
             }
 
             this.loading = true;
 
             try {
-                // Format dock_time from hours and minutes
+                // ✅ Format dock_time
                 const hours = this.data.dock_hours || 0;
                 const minutes = this.data.dock_minutes || 0;
                 const dock_time = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 
-                // ✅ Build payload
-                const payload = {
-                    bus_id: this.data.bus_id,
-                    driver_id: this.data.driver_id,
-                    dock_time,
-                    periority: this.data.periority,
-                    request_type: this.data.request_type,
-                    description: this.data.description,
-                    parts: this.data.parts // array of selected part IDs
-                };
+                // ✅ Build FormData for text + files
+                const formData = new FormData();
+                formData.append('bus_id', this.data.bus_id);
+                formData.append('driver_id', this.data.driver_id);
+                formData.append('dock_time', dock_time);
+                formData.append('periority', this.data.periority);
+                formData.append('request_type', this.data.request_type);
+                formData.append('description', this.data.description);
 
-                const res = await this.callApi('post', 'fleet/fault-claims/store', payload);
+                // Parts (array)
+                this.data.parts.forEach((p, i) => {
+                    formData.append(`parts[${i}]`, p);
+                });
+
+                // Images (optional)
+                if (this.data.images && this.data.images.length > 0) {
+                    this.data.images.forEach((file, i) => {
+                        formData.append(`images[${i}]`, file);
+                    });
+                }
+
+                // ✅ Post with multipart/form-data
+                const res = await this.callApi('post', 'fleet/fault-claims/store', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
 
                 if (res.status === 200) {
                     swal({ title: "Success", text: "Fault claim created successfully!", icon: "success", timer: 2000 });
-
                     this.$nextTick(() => $('#faultModal').modal('hide'));
                     await this.fetchData();
 
-                    // ✅ Reset form
+                    // Reset form
                     this.data = JSON.parse(JSON.stringify(this.addDataReset));
                     this.selectedBusParts = [];
                 }

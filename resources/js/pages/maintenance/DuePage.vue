@@ -383,7 +383,7 @@
                             <h5 class="modal-title">
                                 <i class="fas fa-tools mr-2"></i>Fault Claim Details
                             </h5>
-                            <button type="button" class="close text-white fa-2x"  @click="closeModal()" data-dismiss="modal">
+                            <button type="button" class="close text-white fa-2x"  @click="closeinspectionModal()" data-dismiss="modal">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -965,6 +965,9 @@ export default {
         },
         closeModal() {
             $(".modal").click();
+        },
+        closeinspectionModal() {
+            $("#inspectionModal").click();
         },
         async fetchData() {
             const fleetRes = await this.callApi("post", "fleet/maintenance/due");

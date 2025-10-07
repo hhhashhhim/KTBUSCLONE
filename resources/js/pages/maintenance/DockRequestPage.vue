@@ -21,9 +21,9 @@
                             <label for="status" class="form-label">Status</label>
                             <select ref="statusFilterSelect" v-model="filters.status" id="status" class="form-control">
                                 <option value="">All</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="dock time">dock time</option>
-                                    <option value="resolved">Resolved</option>
+                                <option value="pending">Pending</option>
+                                <option value="dock time">dock time</option>
+                                <option value="resolved">Resolved</option>
                             </select>
                         </div>
 
@@ -37,18 +37,19 @@
                             </select>
                         </div>
 
-                        
-                           <div class="col-md-12 my-3">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <button type="submit" @click="applyFilters" class="btn btn-primary w-100">Filter</button>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <button type="button" @click="resetFilters"
-                                            class="btn btn-danger w-100">Reset</button>
-                                    </div>
+
+                        <div class="col-md-12 my-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button type="submit" @click="applyFilters"
+                                        class="btn btn-primary w-100">Filter</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="button" @click="resetFilters"
+                                        class="btn btn-danger w-100">Reset</button>
                                 </div>
                             </div>
+                        </div>
                     </div>
 
 
@@ -71,7 +72,8 @@
                                 <td>
                                     <span :class="getStatusClass(item.status)">{{ item.status }}</span>
                                 </td>
-                                <td>{{ item.dock_requests ? item.dock_requests[item.dock_requests.length - 1].dock_time :
+                                <td>{{ item.dock_requests ? item.dock_requests[item.dock_requests.length - 1].dock_time
+                                    :
                                     'N/A' }}</td>
                                 <td>
                                     <button class="btn btn-info btn-sm" @click="viewDetails(item)"
@@ -108,6 +110,22 @@
                                         <span class="text-dark">Driver:</span>
                                         <strong>{{ selectedFault?.driver?.name || 'N/A' }}</strong>
                                     </h5>
+                                    <div class="mb-4" v-if="selectedFault?.images">
+                                        <h6 class="text-dark mb-2">
+                                            <i class="fas fa-image mr-2"></i> Uploaded Image
+                                        </h6>
+                                        <a :href="$store.state.api_url + 'uploads/fault/claim/proof/' + selectedFault.images"
+                                            target="_blank">
+                                            <img :src="$store.state.api_url + 'uploads/fault/claim/proof/' + selectedFault.images"
+                                                style="width:90px; height:100px; object-fit:cover;"
+                                                class="img-thumbnail shadow-sm" alt="Fault Image" />
+                                        </a>
+                                    </div>
+
+                                    <div v-else class="text-muted mb-4">
+                                        <i class="fas fa-info-circle"></i> No image uploaded.
+                                    </div>
+
 
                                     <div v-if="selectedFault?.dock_requests?.length > 0">
                                         <div class="row">
@@ -371,11 +389,11 @@ export default {
             const res = await this.callApi('post', 'fleet/dock-requests', this.filters);
             if (res.status === 200) {
                 this.faults = res.data.faults;
-                this.buses  = res.data.buses;
+                this.buses = res.data.buses;
 
                 this.$nextTick(() => {
                     $("#fault_table").DataTable();
-                    this.initFilterSelect2(); 
+                    this.initFilterSelect2();
                 });
             }
         },
@@ -411,9 +429,9 @@ export default {
                 default: return 'badge badge-dark';
             }
         },
-         closeModal(){
+        closeModal() {
             $('.modal').click();
-         },
+        },
 
         async approveDock(dock) {
             if (!this.dockTime) {
