@@ -87,8 +87,33 @@
             </div>
             <div class="modal-body">
               <div class="row">
+                <!-- Add Direct Store Toggle -->
+                <div class="form-group col-md-12">
+                  <label class="font-weight-bold mb-2 d-block">Request Type</label>
+                  <div class="d-flex flex-wrap align-items-center gap-3">
+                    <div class="custom-radio-box" :class="{ active: isDirectStore === 'false' }"
+                      @click="isDirectStore = 'false'">
+                      <input class="form-check-input d-none" type="radio" id="regularRequest" value="false"
+                        v-model="isDirectStore" />
+                      <label class="form-check-label mb-0" for="regularRequest">
+                        <i class="fas fa-clipboard-list mr-2"></i> Regular
+                      </label>
+                    </div>
+
+                    <div class="custom-radio-box mx-3" :class="{ active: isDirectStore === 'true' }"
+                      @click="isDirectStore = 'true'">
+                      <input class="form-check-input d-none" type="radio" id="directStoreRequest" value="true"
+                        v-model="isDirectStore" />
+                      <label class="form-check-label mb-0" for="directStoreRequest">
+                        <i class="fas fa-store mr-2"></i> Direct Store
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+
                 <!-- Bus Select -->
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-4" v-if="isDirectStore === 'false'">
                   <label>Select Bus</label>
                   <select v-model="bus_id" class="form-control">
                     <option value="">Select Bus</option>
@@ -111,23 +136,26 @@
                   </select>
                 </div>
                 <!-- Qty -->
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-4">
                   <label>Quantity</label>
                   <input type="number" class="form-control" v-model="singleProduct.qty">
                 </div>
                 <!-- Reason -->
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-12">
                   <label>Reason</label>
                   <textarea class="form-control" v-model="singleProduct.reason"></textarea>
                 </div>
                 <!-- Add Button -->
-                <div class="form-group col-md-1">
-                  <label>Action</label>
-                  <button class="btn btn-success btn-sm" @click="addProduct">
-                    <i class="fa fa-plus"></i> Add
-                  </button>
-                </div>
               </div>
+
+              <div class="form-group col-md-12 d-flex justify-content-end">
+                <button class="btn btn-success d-flex align-items-center shadow-sm px-4" @click="addProduct"
+                  style="border-radius: 8px; font-weight: 600; transition: all 0.3s ease;">
+                  <i class="fa fa-plus mx-2"></i> Add
+                </button>
+              </div>
+
+
 
               <!-- Products Added Table -->
               <div class="table-responsive mt-3">
@@ -136,7 +164,7 @@
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Bus Number</th>
+                      <th v-if="isDirectStore === 'false'">Bus Number</th>
                       <th>Product</th>
                       <th>Qty</th>
                       <th>Reason</th>
@@ -146,7 +174,7 @@
                   <tbody>
                     <tr v-for="(item, index) in productsList" :key="index">
                       <td>{{ index + 1 }}</td>
-                      <td>{{ getBusName(item.bus_id) }}</td>
+                      <td v-if="isDirectStore === 'false'">{{ getBusName(item.bus_id) }}</td>
                       <td>{{ getProductName(item.product_id) }}</td>
                       <td>{{ item.qty }}</td>
                       <td>{{ item.reason }}</td>
@@ -156,9 +184,12 @@
                         </button>
                       </td>
                     </tr>
-                    <tr class="text-center w-100" v-if="productsList.length == 0">
-                      <p><i>No Product Added</i></p>
+                    <tr v-if="productsList.length == 0">
+                      <td colspan="8" class="text-center py-3">
+                        <i style="color: #6c757d; font-weight: 500;">No Product Added</i>
+                      </td>
                     </tr>
+
                   </tbody>
                 </table>
               </div>
@@ -287,6 +318,7 @@ export default {
       formID: 'addMRForm',
       products: [],
       mrs: [],
+      isDirectStore: 'false',
       buses: [],
       bus_id: '',
       singleProduct: { product_id: '', qty: '', reason: '' },
@@ -338,7 +370,9 @@ export default {
       const bus = this.buses.find(p => p.id == id); // ✅ fixed
       return bus ? bus.bus_number : 'Unknown';
     },
-
+    AddMrModal() {
+      $('#AddMrModal').click();
+    },
     getProductName(id) {
       const product = this.products.find(p => p.id == id);
       return product ? product.name : 'Unknown';
@@ -359,31 +393,60 @@ export default {
         Swal.fire('Error', 'Add products before submitting.', 'error');
         return;
       }
-      const payload = { bus_id: this.bus_id, details: this.productsList };
-      const response = await this.callApi('post', 'mr/store', payload);
-      if (response.status === 200 || response.status === 201) {
+
+      this.loading = true;
+
+      // Build payload
+      const isDirect = this.isDirectStore === 'true';
+      const payload = {
+        direct_store: isDirect,
+        bus_id: isDirect ? null : this.bus_id,
+        details: this.productsList.map(item => ({
+          product_id: item.product_id,
+          qty: item.qty,
+          reason: isDirect ? null : item.reason,
+        })),
+      };
+
+      try {
+        const response = await this.callApi('post', 'mr/store', payload);
+
+        if (response.status === 200 || response.status === 201) {
+          this.loading = false;
+          this.productsList = [];
+          this.bus_id = '';
+          this.isDirectStore = 'false'; // reset to default
+          this.fetchMRs();
+
+          // ✅ Dynamic success message based on request type
+          const successTitle = isDirect
+            ? 'Direct Store Entry Created'
+            : 'MR Created successfully!';
+          const successText = isDirect
+            ? 'Good Receive Note has been successfully created.'
+            : 'Material Request has been successfully created.';
+
+          return Swal.fire({
+            icon: 'success',
+            title: successTitle,
+            text: successText,
+          });
+        }
+
+        if (response.status === 422) {
+          this.loading = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Please fill all fields correctly.',
+          });
+        }
+      } catch (err) {
         this.loading = false;
-        this.productsList = [];
-        this.bus_id = '';
-        this.fetchMRs();
-        return Swal.fire({
-          icon: 'success',
-          title: 'Created',
-          text: 'MR Created successfully!',
-        });
-      }
-      if (response.status == 422) {
-        this.loading = false;
-        Swal.fire({
-          icon: 'error',
-          title: 'Validation Error',
-          text: 'Please fill all field',
-        });
-      }
-      else {
-        Swal.fire('Error', err.response?.data, 'error');
+        Swal.fire('Error', err.response?.data || err.message, 'error');
       }
     },
+
     viewMR(mr) {
       this.selectedMR = JSON.parse(JSON.stringify(mr)); // Deep clone to avoid direct mutation
       this.editingIndex = null;
@@ -407,7 +470,7 @@ export default {
         id: this.editDetailData.id,
         qty: this.editDetailData.qty,
         reason: this.editDetailData.reason,
-         bus_id: this.editDetailData.bus_id,
+        bus_id: this.editDetailData.bus_id,
       };
       const response = await this.callApi('post', 'mr/detail-update', payload);
       if (response.status === 200 || response.status === 201) {
@@ -526,3 +589,51 @@ export default {
   }
 }
 </script>
+<style scoped>
+.custom-radio-box {
+  border: 2px solid #dee2e6;
+  border-radius: 10px;
+  padding: 10px 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: #6c757d;
+  background-color: #fff;
+  font-weight: 600;
+  min-width: 160px;
+  text-align: center;
+}
+
+.custom-radio-box:hover {
+  border-color: #007bff;
+  color: #007bff;
+  box-shadow: 0 3px 8px rgba(0, 123, 255, 0.1);
+}
+
+.custom-radio-box.active {
+  border-color: #007bff;
+  background-color: #007bff;
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+}
+
+.custom-radio-box i {
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+@media (max-width: 576px) {
+  .custom-radio-box {
+    flex: 1 1 100%;
+    margin-bottom: 10px;
+  }
+}
+
+.btn-success:hover {
+  background-color: #218838 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+</style>

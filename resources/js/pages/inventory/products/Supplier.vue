@@ -21,7 +21,7 @@
                       <th>Sr No.</th>
                       <th>Supplier Name</th>
                       <th>Contact Number</th>
-                      <th>CNIC Number</th>
+                      <th>POC Number</th>
                       <th>Address</th>
                       <th>Action</th>
                     </tr>
@@ -50,17 +50,15 @@
                       <td v-else>{{ supplier.address }}</td>
 
                       <td>
-                        <button v-if="editId === supplier.id" required class="btn btn-success btn-sm" @click="updateSupplier(supplier)">
+                        <button v-if="editId === supplier.id" required class="btn btn-success btn-sm"
+                          @click="updateSupplier(supplier)">
                           Save
                         </button>
                         <button v-else class="btn btn-primary btn-sm mx-1" @click="editSupplier(supplier)">
                           <i class="far fa-edit"></i>
                         </button>
-                        <button 
-                          v-if="supplier.is_deletable && editId !== supplier.id" 
-                          class="btn btn-danger btn-sm" 
-                          @click="confirmDelete(supplier.id)"
-                        >
+                        <button v-if="supplier.is_deletable && editId !== supplier.id" class="btn btn-danger btn-sm"
+                          @click="confirmDelete(supplier.id)">
                           <i class="fas fa-trash"></i>
                         </button>
 
@@ -84,10 +82,11 @@
           </div>
           <div class="form-group col-md-4">
             <label>Contact Number <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" required placeholder="Enter Contact Number" v-model="data.contact" />
+            <input type="text" class="form-control" required placeholder="Enter Contact Number"
+              v-model="data.contact" />
           </div>
           <div class="form-group col-md-4">
-            <label>CNIC Number <span class="text-danger">*</span></label>
+            <label>POC Number <span class="text-danger">*</span></label>
             <input type="text" class="form-control" required placeholder="Enter CNIC Number" v-model="data.cnic" />
           </div>
           <div class="form-group col-md-12">
@@ -97,69 +96,67 @@
           <div class="col-md-12 text-right">
             <button type="button" class="btn btn-primary px-3" :disabled="loading" @click="addSupplier">
               {{ loading ? 'Loading...' : 'Add' }}
-            </button> 
+            </button>
           </div>
         </div>
-       
+
 
         <div class="card-body">
-              <div class="table-responsive">
-                <h4>Suppliers</h4>
-                <table class="table table-striped table-hover dataTable1">
-                  <thead>
-                    <tr>
-                      <th>Sr No.</th>
-                      <th>Supplier Name</th>
-                      <th>Contact Number</th>
-                      <th>CNIC Number</th>
-                      <th>Address</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(supplier, index) in suppliers" :key="supplier.id">
-                      <td>{{ index + 1 }}</td>
-                      <td v-if="editId === supplier.id">
-                        <input v-model="supplier.name" required class="form-control form-control-sm" />
-                      </td>
-                      <td v-else>{{ supplier.name }}</td>
+          <div class="table-responsive">
+            <h4>Suppliers</h4>
+            <table class="table table-striped table-hover dataTable1">
+              <thead>
+                <tr>
+                  <th>Sr No.</th>
+                  <th>Supplier Name</th>
+                  <th>Contact Number</th>
+                  <th>POC Number</th>
+                  <th>Address</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(supplier, index) in suppliers" :key="supplier.id">
+                  <td>{{ index + 1 }}</td>
+                  <td v-if="editId === supplier.id">
+                    <input v-model="supplier.name" required class="form-control form-control-sm" />
+                  </td>
+                  <td v-else>{{ supplier.name }}</td>
 
-                      <td v-if="editId === supplier.id">
-                        <input v-model="supplier.contact" required class="form-control form-control-sm" />
-                      </td>
-                      <td v-else>{{ supplier.contact }}</td>
+                  <td v-if="editId === supplier.id">
+                    <input v-model="supplier.contact" required class="form-control form-control-sm" />
+                  </td>
+                  <td v-else>{{ supplier.contact }}</td>
 
-                      <td v-if="editId === supplier.id">
-                        <input v-model="supplier.cnic" required class="form-control form-control-sm" />
-                      </td>
-                      <td v-else>{{ supplier.cnic }}</td>
+                  <td v-if="editId === supplier.id">
+                    <input v-model="supplier.cnic" required class="form-control form-control-sm" />
+                  </td>
+                  <td v-else>{{ supplier.cnic }}</td>
 
-                      <td v-if="editId === supplier.id">
-                        <input v-model="supplier.address" required class="form-control form-control-sm" />
-                      </td>
-                      <td v-else>{{ supplier.address }}</td>
+                  <td v-if="editId === supplier.id">
+                    <input v-model="supplier.address" required class="form-control form-control-sm" />
+                  </td>
+                  <td v-else>{{ supplier.address }}</td>
 
-                      <td>
-                        <button v-if="editId === supplier.id" required class="btn btn-success btn-sm" @click="updateSupplier(supplier)">
-                          Save
-                        </button>
-                        <button v-else class="btn btn-primary btn-sm mx-1" @click="editSupplier(supplier)">
-                          <i class="far fa-edit"></i>
-                        </button>
-                        <button 
-                          v-if="supplier.is_deletable && editId !== supplier.id" 
-                          class="btn btn-danger btn-sm" 
-                          @click="confirmDelete(supplier.id)"
-                        >
-                          <i class="fas fa-trash"></i>
-                        </button>
+                  <td>
+                    <button v-if="editId === supplier.id" required class="btn btn-success btn-sm"
+                      @click="updateSupplier(supplier)">
+                      Save
+                    </button>
+                    <button v-else class="btn btn-primary btn-sm mx-1" @click="editSupplier(supplier)">
+                      <i class="far fa-edit"></i>
+                    </button>
+                    <button v-if="supplier.is_deletable && editId !== supplier.id" class="btn btn-danger btn-sm"
+                      @click="confirmDelete(supplier.id)">
+                      <i class="fas fa-trash"></i>
+                    </button>
 
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </Add>
 
       <!-- Delete Confirm Modal -->
@@ -187,7 +184,7 @@
   </section>
 </template>
 
- 
+
 <script>
 import Add from '../../../components/Add.vue';
 
@@ -215,13 +212,13 @@ export default {
     this.fetchSuppliers();
   },
   watch: {
-  activeTab(newTab) {
-    this.$nextTick(() => {
-      // Destroy any existing DataTable instance before re-initializing
-      $('.dataTable1').DataTable().destroy();
-      $('.dataTable1').DataTable();
-    });
-  },
+    activeTab(newTab) {
+      this.$nextTick(() => {
+        // Destroy any existing DataTable instance before re-initializing
+        $('.dataTable1').DataTable().destroy();
+        $('.dataTable1').DataTable();
+      });
+    },
   },
   methods: {
 
@@ -231,16 +228,16 @@ export default {
       this.success = '';
     },
     async fetchSuppliers() {
-  try {
-    const response = await this.callApi('post', 'supplier');
-    this.suppliers = response.data.suppliers; // ✅ Correct field
-    this.$nextTick(() => {
-        $('.dataTable1').DataTable(); // Initial setup after data load
-      });
-  } catch (error) {
-    console.error(error);
-  }
-},
+      try {
+        const response = await this.callApi('post', 'supplier');
+        this.suppliers = response.data.suppliers; // ✅ Correct field
+        this.$nextTick(() => {
+          $('.dataTable1').DataTable(); // Initial setup after data load
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    },
 
     async addSupplier() {
       try {
@@ -252,31 +249,31 @@ export default {
           cnic: this.data.cnic
         };
         const response = await this.callApi('post', 'supplier/store', payload);
-      
+
 
         if (response.status === 200 || response.status === 201) {
-          
+
           $(".dataTable1").DataTable().destroy();
-            this.loading = false;
-            this.clearForm();
-            this.fetchSuppliers(); 
-            return Swal.fire({
-              icon: 'success',
-              title: 'Created',
-              text: 'Supplier Created successfully!',
-            });
-        } 
-        if(response.status == 422){ 
-            this.loading = false;
-             Swal.fire({
-              icon: 'error',
-              title: 'Validation Error',
-              text: 'Please fill all field',
-            });
+          this.loading = false;
+          this.clearForm();
+          this.fetchSuppliers();
+          return Swal.fire({
+            icon: 'success',
+            title: 'Created',
+            text: 'Supplier Created successfully!',
+          });
         }
-        else{
-            Swal.fire('Error', err.response?.data , 'error');
-        } 
+        if (response.status == 422) {
+          this.loading = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Please fill all field',
+          });
+        }
+        else {
+          Swal.fire('Error', err.response?.data, 'error');
+        }
       } finally {
         this.loading = false;
       }
@@ -287,39 +284,39 @@ export default {
     },
 
     async updateSupplier(supplier) {
-    const payload = {
-      id: supplier.id, // 👈 must include id
-      name: supplier.name,
-      contact: supplier.contact_number, // you need to change your model later maybe
-      address: supplier.address,
-      cnic: supplier.cnic_number
-    };
-    const response = await this.callApi('post', 'supplier/update', payload);
-    $(".dataTable1").DataTable().destroy();
-    if (response.status === 200 || response.status === 201) {
-          $(".dataTable1").DataTable().destroy();
-            this.loading = false;
-            this.fetchSuppliers();
-            this.clearForm();
-            this.editId = null;
-            return Swal.fire({
-              icon: 'success',
-              title: 'Updated',
-              text: 'Supplier Updated successfully!',
-            });
-        } 
-        if(response.status == 422){ 
-            this.loading = false;
-             Swal.fire({
-              icon: 'error',
-              title: 'Validation Error',
-              text: 'Please fill all field',
-            });
-        }
-        else{
-            Swal.fire('Error', err.response?.data , 'error');
-        } 
-},
+      const payload = {
+        id: supplier.id, // 👈 must include id
+        name: supplier.name,
+        contact: supplier.contact_number, // you need to change your model later maybe
+        address: supplier.address,
+        cnic: supplier.cnic_number
+      };
+      const response = await this.callApi('post', 'supplier/update', payload);
+      $(".dataTable1").DataTable().destroy();
+      if (response.status === 200 || response.status === 201) {
+        $(".dataTable1").DataTable().destroy();
+        this.loading = false;
+        this.fetchSuppliers();
+        this.clearForm();
+        this.editId = null;
+        return Swal.fire({
+          icon: 'success',
+          title: 'Updated',
+          text: 'Supplier Updated successfully!',
+        });
+      }
+      if (response.status == 422) {
+        this.loading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Validation Error',
+          text: 'Please fill all field',
+        });
+      }
+      else {
+        Swal.fire('Error', err.response?.data, 'error');
+      }
+    },
     confirmDelete(id) {
       this.deleteId = id;
       $('#deleteConfirmModal').modal('show');
@@ -327,35 +324,35 @@ export default {
 
     async deleteSupplier() {
       try {
-        const response = await this.callApi('post', `supplier/delete`,{ id: this.deleteId }); 
-        
+        const response = await this.callApi('post', `supplier/delete`, { id: this.deleteId });
+
         if (response.status === 200 || response.status === 201) {
           $(".dataTable1").DataTable().destroy();
-            this.loading = false;
-            
-            this.fetchSuppliers();
-            return Swal.fire({
-              icon: 'success',
-              title: 'Deleted',
-              text: 'Supplier Deleted successfully!',
-            });
-        } 
-        if(response.status == 422){ 
-            this.loading = false;
-             Swal.fire({
-              icon: 'error',
-              title: 'Validation Error',
-              text: 'Please fill all field',
-            });
+          this.loading = false;
+
+          this.fetchSuppliers();
+          return Swal.fire({
+            icon: 'success',
+            title: 'Deleted',
+            text: 'Supplier Deleted successfully!',
+          });
         }
-        else{
-            Swal.fire('Error', err.response?.data , 'error');
-        } 
+        if (response.status == 422) {
+          this.loading = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Please fill all field',
+          });
+        }
+        else {
+          Swal.fire('Error', err.response?.data, 'error');
+        }
       } catch (error) {
         console.error('Error deleting product:', error);
       }
     }
-    
+
   }
 };
 </script>

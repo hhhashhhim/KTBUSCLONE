@@ -304,7 +304,7 @@
                     <div class="row">
                       <div class="col-md-4 mb-1"><strong>Name:</strong> {{ po.supplier?.name || 'N/A' }}</div>
                       <div class="col-md-4 mb-1"><strong>Contact:</strong> {{ po.supplier?.contact || 'N/A' }}</div>
-                      <div class="col-md-4 mb-1"><strong>CNIC:</strong> {{ po.supplier?.cnic || 'N/A' }}</div>
+                      <div class="col-md-4 mb-1"><strong>POC Number:</strong> {{ po.supplier?.cnic || 'N/A' }}</div>
                       <div class="col-md-12 mb-1"><strong>Address:</strong> {{ po.supplier?.address || 'N/A' }}</div>
                     </div>
                   </div>
