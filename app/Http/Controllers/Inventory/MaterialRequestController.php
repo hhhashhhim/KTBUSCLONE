@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Bus\Bus;;
 
 use App\Models\Company;
+use App\Models\Inventory\GoodReceiveNote;
 use App\Models\Inventory\MaterialRequest;
 use App\Models\Inventory\MaterialRequestDetail;
 use App\Models\Inventory\Product;
+use App\Models\Inventory\PurchaseRequisitionNote;
 use App\Models\Inventory\StoreIssuanceNote;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -21,7 +23,7 @@ class MaterialRequestController extends Controller
 
     public function index()
     {
-        $mrs = MaterialRequest::with(['details.product','details.bus', 'requestedByUser', 'storeIssuance.details'])->latest()->get();
+        $mrs = MaterialRequest::with(['details.product', 'details.bus', 'requestedByUser', 'storeIssuance.details'])->latest()->get();
         $products = Product::latest()->get();
         $buses = Bus::latest()->get();
         return response()->json([
@@ -34,32 +36,92 @@ class MaterialRequestController extends Controller
     }
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'bus_id'               => 'nullable',
-            'details'              => 'required',
-            'details.*.product_id' => 'required',
-            'details.*.qty'        => 'required',
-            'details.*.reason'     => 'required',
+            'details'              => 'required|array|min:1',
+            'details.*.product_id' => 'required|exists:products,id',
+            'details.*.qty'        => 'required|numeric|min:1',
+            'details.*.reason'     => 'nullable|string',
+            'direct_store'         => 'nullable|boolean',
         ]);
 
         DB::beginTransaction();
+
         try {
+            // ✅ Case 1: Direct Store Selected
+            if ($request->direct_store) {
+                // 1️⃣ Create Good Receive Note (GRN)
+                $grn = GoodReceiveNote::create([
+                    'po_id'       => null,
+                    'supplier_id' => null,
+                    'received_by' => auth()->id(),
+                    'added_by'    => auth()->id(),
+                    'company_id'  => auth()->user()->company_id,
+                ]);
+
+                foreach ($request->details as $detail) {
+                    $grn->details()->create([
+                        'product_id'        => $detail['product_id'],
+                        'qty'               => $detail['qty'],
+                        'rate'              => 0,
+                        'total'             => 0,
+                        'tax'               => 0,
+                        'delivery_charges'  => 0,
+                        'discount'          => 0,
+                        'net_amount'        => 0,
+                        'company_id'        => auth()->user()->company_id,
+                        'created_at'        => now(),
+                        'updated_at'        => now(),
+                    ]);
+                }
+
+                // 2️⃣ Create Purchase Requisition Note (PRN)
+                $prn = PurchaseRequisitionNote::create([
+                    'mr_id'      => null,
+                    'status'     => 2,
+                    'added_by'   => auth()->id(),
+                    'company_id' => auth()->user()->company_id,
+                ]);
+
+                foreach ($request->details as $detail) {
+                    $prn->details()->create([
+                        'product_id' => $detail['product_id'],
+                        'qty'        => $detail['qty'],
+                        'company_id' => auth()->user()->company_id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    // ✅ Update product stock
+                    $product = Product::find($detail['product_id']);
+                    if ($product) {
+                        $product->qty = $product->qty + $detail['qty'];
+                        $product->save();
+                    }
+                }
+
+                DB::commit();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Good Receive Note & Purchase Requisition Note created successfully (Direct Store).',
+                ]);
+            }
+
+            // ✅ Case 2: Regular MR Flow
             $mr = MaterialRequest::create([
                 'requested_by' => auth()->id(),
                 'status'       => 1,
-                'company_id'   => Auth::user()->company_id,
+                'company_id'   => auth()->user()->company_id,
                 'added_by'     => auth()->id(),
-
             ]);
 
             foreach ($request->details as $detail) {
                 $mr->details()->create([
                     'product_id'       => $detail['product_id'],
-                    'bus_id'           => $detail['bus_id'],
+                    'bus_id'           => $request->bus_id,
                     'qty'              => $detail['qty'],
                     'store_Issued_qty' => 0,
-                    'reason'           => $detail['reason'],
-                    'company_id'       => Auth::user()->company_id,
+                    'reason'           => $detail['reason'] ?? null,
+                    'company_id'       => auth()->user()->company_id,
                 ]);
             }
 
@@ -77,6 +139,7 @@ class MaterialRequestController extends Controller
             ], 500);
         }
     }
+
 
     public function update(Request $request)
     {
