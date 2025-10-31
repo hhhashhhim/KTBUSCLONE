@@ -84,13 +84,14 @@ import MR from "./pages/inventory/products/MaterialRequest.vue";
 import Reports from "./pages/inventory/products/reports.vue";
 import BidSummary from "./pages/inventory/products/BidSummary.vue";
 import PR from "./pages/inventory/products/PurchaseRequisitionNote.vue";
+import JazzCashRefund from "./pages/booking/JazzCashRefund.vue";
 
 // const url = "/kt-dev/";
-const url = '/'
+const url = '/' 
 
 const routes = [
     {
-        path: url + "",
+        path: url + "", 
         component: Users,
         name: "home",
     },
@@ -188,6 +189,11 @@ const routes = [
         path: url + "bookings",
         component: BookingPage,
         name: "booking-page",
+    },
+    {
+        path: url + "booking/jazzcashrefund",
+        component: JazzCashRefund,
+        name: "jazz-cash-refund-page",
     },
     {
         path: url + "booking/schedule/closing",
