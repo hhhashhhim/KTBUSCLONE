@@ -32,6 +32,9 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
       Route::post('/schedules/available',[BookingApiController::class,'availableSchedules']);
       Route::post('/schedule/preview',[BookingApiController::class,'previewSchedule']);
       Route::post('/new',[BookingApiController::class,'bookSeat']);
+      //To save jazzcash reference number to be used for refund
+      Route::post('/update-transaction-reference',[BookingApiController::class,'updateTransactionReference']);
+
       Route::post('/update/terminal/data',[BookingApiController::class,'updateSeatTerminalData']);
    });
    

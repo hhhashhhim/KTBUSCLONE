@@ -807,6 +807,7 @@ class TicketingApiController extends Controller
                             'updated_by' => Auth::user()->id,
                             'discount' => 0,
                             'points_usage' => 0,
+                             'transaction_id' => $request->pp_TxnRefNo ?? null,
                         ]);
                         if ($isPartial == 1) {
 

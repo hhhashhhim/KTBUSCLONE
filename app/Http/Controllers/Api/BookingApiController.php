@@ -34,12 +34,22 @@ use App\Models\Schedule\ScheduleTerminalVisibility;
 use App\Models\City;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\BreakResource;
+use App\Models\Booking\Booking;
 use App\Models\LimitedSeat;
 use Illuminate\Support\Facades\Cache;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class BookingApiController extends Controller
 {
+
+    public function updateTransactionReference( Request $request ){
+       Log::info('=============>', [$request->all()]);
+        Ticket::where('invoice_id', $request->invoice)->update([
+            'transaction_id' => $request->reference
+        ]);
+        return ['message' => 'Hello'];
+    }
     public function departureCities(Request $request)
     {
         try {
@@ -650,6 +660,7 @@ class BookingApiController extends Controller
     public function bookSeat(Request $request)
     {
 
+
         $scheduleId = $request->schedule_id;
         $lockName = "stayLock:" . $scheduleId;  // Dynamic lock based on schedule ID
         try {
@@ -688,6 +699,7 @@ class BookingApiController extends Controller
                             Ticket::where("invoice_id",$request->invoice_id)->update([
                                 'type' => 'booked',
                                 'updated_by' => Auth::user()->id,
+                                'transaction_id' => $request->transaction_id,
                                 'booked_time' => date("Y-m-d H:i:s"),
                             ]);
                             ticketConfirmedMessage($request->invoice_id);
@@ -927,6 +939,7 @@ class BookingApiController extends Controller
                                 'schedule_discount'   => $checkDiscount->schedule_discount,
                                 'terminal_discount'   => $checkDiscount->terminal_discount,
                                 'points_usage' => 0,
+                                'transaction_id' => $request->pp_TxnRefNo ?? null,
                             ]);
                             if ($isPartial == 1) {
 
@@ -962,6 +975,7 @@ class BookingApiController extends Controller
                                     'gender' => $request->gender[$i],
                                     'type' => $ticket->type,
                                     'added_by' => Auth::user()->id,
+                                    
                                 ]);
                             }
                             $allTicket[] = $ticket->id;
@@ -975,7 +989,7 @@ class BookingApiController extends Controller
                     ]);
                     DB::commit();
 
-                    return new CreatedResource(["invoice_id"=>$invoice->id]);
+                    return new CreatedResource(["invoice_id" => $invoice->id]);
                 } finally {
                     // Always release the lock, regardless of success or failure in the inner try block
                     optional($lock)->release();
