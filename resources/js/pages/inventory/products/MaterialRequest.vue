@@ -362,7 +362,7 @@ export default {
       });
     },
     async fetchBuses() {
-      const response = await this.callApi('post', 'buses'); // or 'get' depending on your API
+      const response = await this.callApi('post', 'mr/buses',); // or 'get' depending on your API
       this.buses = response.data;
     },
 

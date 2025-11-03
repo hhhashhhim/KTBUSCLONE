@@ -180,8 +180,8 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <template v-for="(grn, index) in inward" :key="grn.id">
-                        <tr v-for="(detail, idx) in grn.details" :key="detail.id">
+                      <template v-for="(grn) in inward" :key="grn.id">
+                        <tr v-for="(detail, index) in grn.details" :key="detail.id">
                           <td>{{ index + 1 }}</td>
                           <td>{{ new Date(grn.created_at).toLocaleDateString() }}</td>
                           <td>GRN - {{ grn.id }}</td>

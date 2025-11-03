@@ -311,11 +311,11 @@
                                 <i class="fas fa-bookmark"></i> Counter Expenses
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('closing')">
+                        <!-- <li class="dropdown" v-if="checkForSubmenu('closing')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'jazz-cash-refund-page' }">
                                 <i class="fas fa-bookmark"></i>JazzCash Refund
                             </router-link>
-                        </li>
+                        </li> -->
                     </ul>
                 </li>
                 <!-- loyalityCard Panel -->
