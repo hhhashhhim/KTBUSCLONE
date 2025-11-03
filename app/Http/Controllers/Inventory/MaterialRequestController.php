@@ -305,6 +305,12 @@ class MaterialRequestController extends Controller
 
         $pdf->Output('PRN_' . $mr->id . '.pdf', 'I');
     }
+
+    public function bus()
+    {
+        $buses = Bus::all();
+        return response()->json($buses);
+    }
 }
 require_once(public_path() . '/assets/tcpdf/tcpdf.php');
 class MYPDF extends TCPDF
