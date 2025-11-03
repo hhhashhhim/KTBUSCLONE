@@ -352,7 +352,7 @@ export default {
       this.dataTableInstances = [];
     },
     async fetchBuses() {
-      const response = await this.callApi('post', 'buses');
+      const response = await this.callApi('post', 'mr/buses',);
       this.buses = response.data || [];
     },
     initDataTables() {
@@ -486,5 +486,4 @@ export default {
   color: #0d6efd;
   border-color: #0d6efd;
 }
-
 </style>

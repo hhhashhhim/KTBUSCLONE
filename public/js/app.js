@@ -53497,7 +53497,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return _this2.callApi('post', 'buses');
+                return _this2.callApi('post', 'mr/buses');
 
               case 2:
                 response = _context.sent;
@@ -137994,7 +137994,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.cursor-pointer[data-v-3bf50110] {\r\n  cursor: pointer;\r\n  color: #6777ef;\r\n  font-size: 16px;\n}\n.tab-option[data-v-3bf50110] {\r\n  cursor: pointer;\r\n  font-weight: 600;\r\n  color: #555;\r\n  border-bottom: 3px solid transparent;\r\n  transition: all 0.3s ease;\n}\n.tab-option[data-v-3bf50110]:hover {\r\n  color: #007bff;\r\n  border-color: #007bff;\n}\n.tab-option.active[data-v-3bf50110] {\r\n  color: #0d6efd;\r\n  border-color: #0d6efd;\n}\r\n\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.cursor-pointer[data-v-3bf50110] {\r\n  cursor: pointer;\r\n  color: #6777ef;\r\n  font-size: 16px;\n}\n.tab-option[data-v-3bf50110] {\r\n  cursor: pointer;\r\n  font-weight: 600;\r\n  color: #555;\r\n  border-bottom: 3px solid transparent;\r\n  transition: all 0.3s ease;\n}\n.tab-option[data-v-3bf50110]:hover {\r\n  color: #007bff;\r\n  border-color: #007bff;\n}\n.tab-option.active[data-v-3bf50110] {\r\n  color: #0d6efd;\r\n  border-color: #0d6efd;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
