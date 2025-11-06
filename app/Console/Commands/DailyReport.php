@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\Booking\BookingCancel;
 use App\Models\Schedule\TicketClosing;
+use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Auth;
 
@@ -45,69 +46,77 @@ class DailyReport extends Command
      * @return int
      */
     public function handle()
-    {
-        $auth_key = "@+_VbdTWAYv4c1kkuIO!NQQupcb@yNw%_I^qNWJ1cp+owvKF35";
+{
+    $auth_key = "@+_VbdTWAYv4c1kkuIO!NQQupcb@yNw%_I^qNWJ1cp+owvKF35";
 
-        $today = now()->subDays(1)->format("Y-m-d");
+    // ✅ ensure Auth user exists (for CLI/schedule)
+    if (!Auth::check()) {
+        $user = User::first();
+        Auth::setUser($user);
+    }
 
-        // confirm | reserve | over issue | today | lastday tickets
-        $ticketData = Ticket::withTrashed()
-            ->where("date", $today)
-            ->get();
+    $company_id = Auth::user()->company_id; // <-- new variable
 
-        // today new customer
-        $newCustomer = Ticket::where("date", $today)
-            ->whereNotIn('customer_id', function ($query) use ($today) {
-                $query->select('customer_id')
-                    ->from('tickets')
-                    ->whereDate('date', '<', $today);
-            })
-            ->select('customer_id', 'date')
-            ->distinct()
-            ->get();
+    $today = now()->subDays(1)->format("Y-m-d");
 
-        // today customer repeat
-        $oldCustomer = Ticket::where("date", $today)
-            ->whereIn('customer_id', function ($query) use ($today) {
-                $query->select('customer_id')
-                    ->from('tickets')
-                    ->whereDate('date', '<', $today);
-            })
-            ->select('customer_id', 'date')
-            ->distinct()
-            ->get();
+    // confirm | reserve | over issue | today | lastday tickets
+    $ticketData = Ticket::withTrashed()
+        ->where("date", $today)
+        ->get();
 
-        $cancel_ids = $ticketData->where("date", $today)->where("type", "canceled")->pluck('id');
-        $pending_merges = TicketClosing::where('company_id', Auth::user()->company_id)
-            ->where(["hide" => 0, "commission_route" => 0])
-            ->get()
-            ->groupBy('ticket_merge_id')
-            ->filter(function ($group) {
-                return $group->count() == 1;
-            })
-            ->count();
+    // today new customer
+    $newCustomer = Ticket::where("date", $today)
+        ->whereNotIn('customer_id', function ($query) use ($today) {
+            $query->select('customer_id')
+                ->from('tickets')
+                ->whereDate('date', '<', $today);
+        })
+        ->select('customer_id', 'date')
+        ->distinct()
+        ->get();
 
-        $today_confirm = $ticketData->where("date", $today)->where("type", "booked")->count();
-        $today_reserve = $ticketData->where("date", $today)->where("type", "advance booking")->count();
-        $today_confirm_cancel = BookingCancel::whereIn('ticket_id', $cancel_ids)->where("type", "booked")->count();
-        $today_reserve_cancel = BookingCancel::whereIn('ticket_id', $cancel_ids)->where("type", "advance booking")->count();
-        $today_overissue = $ticketData->where("date", $today)->where("type", "over-issue")->count();
-        $today_discount = $ticketData->where("type", "booked")->where("date", $today)->sum(function ($ticket) {
-            return $ticket->discount + $ticket->terminal_discount + $ticket->schedule_discount;
-        });
-        $today_new_customers = $newCustomer->where("date", $today)->count();
-        $today_old_customers = $oldCustomer->where("date", $today)->count();
-        $today_sale = $ticketData->whereIn('type', ['booked', 'over-issue'])->where("date", $today)->sum(function ($ticket) {
-            return $ticket->seat_fare - $ticket->discount;
-        });
+    // today customer repeat
+    $oldCustomer = Ticket::where("date", $today)
+        ->whereIn('customer_id', function ($query) use ($today) {
+            $query->select('customer_id')
+                ->from('tickets')
+                ->whereDate('date', '<', $today);
+        })
+        ->select('customer_id', 'date')
+        ->distinct()
+        ->get();
 
-        $url = "https://whatsapp.sarzone.com/api/send-messages";
-        $mobile = "923203948283"; //abdul rehma
-        $mobile2 = "923360111140"; //hashim sb
-        $mobile3 = "923108886288"; // qasim sb
-        $mobile4 = "923143136767"; // farhan ali
-        $session = "Muhammad-Shahzaib_3-sarzone";
-        $messageConfirmed = "*Dear Sir following is the report of Kainat Travels for the date of " . date('d M Y', strtotime($today)) . "*
+    $cancel_ids = $ticketData->where("date", $today)->where("type", "canceled")->pluck('id');
+    $pending_merges = TicketClosing::where('company_id', $company_id)
+        ->where(["hide" => 0, "commission_route" => 0])
+        ->get()
+        ->groupBy('ticket_merge_id')
+        ->filter(function ($group) {
+            return $group->count() == 1;
+        })
+        ->count();
+
+    $today_confirm = $ticketData->where("date", $today)->where("type", "booked")->count();
+    $today_reserve = $ticketData->where("date", $today)->where("type", "advance booking")->count();
+    $today_confirm_cancel = BookingCancel::whereIn('ticket_id', $cancel_ids)->where("type", "booked")->count();
+    $today_reserve_cancel = BookingCancel::whereIn('ticket_id', $cancel_ids)->where("type", "advance booking")->count();
+    $today_overissue = $ticketData->where("date", $today)->where("type", "over-issue")->count();
+    $today_discount = $ticketData->where("type", "booked")->where("date", $today)->sum(function ($ticket) {
+        return $ticket->discount + $ticket->terminal_discount + $ticket->schedule_discount;
+    });
+    $today_new_customers = $newCustomer->where("date", $today)->count();
+    $today_old_customers = $oldCustomer->where("date", $today)->count();
+    $today_sale = $ticketData->whereIn('type', ['booked', 'over-issue'])->where("date", $today)->sum(function ($ticket) {
+        return $ticket->seat_fare - $ticket->discount;
+    });
+
+    $url = "https://whatsapp.sarzone.com/api/send-messages";
+    // $mobile = "923203948283"; //abdul rehma
+    // $mobile2 = "923360111140"; //hashim sb
+    // $mobile3 = "923108886288"; // qasim sb
+    $mobile4 = "923143136767"; // farhan ali
+    $session = "Muhammad-Shahzaib_3-sarzone";
+    $messageConfirmed = "*Dear Sir following is the report of Kainat Travels for the date of " . date('d M Y', strtotime($today)) . "*
 
 * Total Confirmed Seats : *$today_confirm*
 * Total Reserved Seats : *$today_reserve*
@@ -124,37 +133,14 @@ This is automated generated report.
 (E&EO)
 ";
 
-        $response = Http::withHeaders([
-            'X-Api-Key' => $auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile,
-            "message_body" => $messageConfirmed
-        ]);
-        $response2 = Http::withHeaders([
-            'X-Api-Key' => $auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile2,
-            "message_body" => $messageConfirmed
-        ]);
-        $response2 = Http::withHeaders([
-            'X-Api-Key' => $auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile3,
-            "message_body" => $messageConfirmed
-        ]);
-        $response2 = Http::withHeaders([
-            'X-Api-Key' => $auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile4,
-            "message_body" => $messageConfirmed
-        ]);
-    }
+    $response2 = Http::withHeaders([
+        'X-Api-Key' => $auth_key,
+    ])->post($url, [
+        "session" => $session,
+        "message_type" =>  'text',
+        "receiver_number" => $mobile4,
+        "message_body" => $messageConfirmed
+    ]);
+}
+
 }

@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Inventory;
 
-use App\Http\Controllers\Controller;;
+use App\Http\Controllers\Controller;
+use App\Models\Bus\Bus;
+
+;
 
 use App\Models\Inventory\GoodReceiveNote;
 use App\Models\Inventory\GoodReceiveNoteDetail;
@@ -30,7 +33,7 @@ class ReportsController extends Controller
             // Still need product relation inside each detail
             'details.product'
         ]);
-    
+
         // Filter by date range
         if ($request->filled('from_date') && $request->filled('to_date')) {
             $query->whereBetween('created_at', [
@@ -38,93 +41,93 @@ class ReportsController extends Controller
                 $request->to_date . ' 23:59:59'
             ]);
         }
-    
+
         // Filter by GRN number
         if ($request->filled('grn')) {
             $query->where('id', $request->grn);
         }
-    
+
         // Filter by PO number
         if ($request->filled('po')) {
             $query->where('po_id', $request->po);
         }
-    
+
         // Ensure only GRNs that actually have the selected product in their details
         if ($request->filled('product_id')) {
             $query->whereHas('details', function ($q) use ($request) {
                 $q->where('product_id', $request->product_id);
             });
         }
-    
+
         $inwards = $query->latest()->get();
-    
+
         return response()->json(['inward' => $inwards]);
     }
 
-  public function filter_issued(Request $request)
-{
-    $query = StoreIssuanceNote::query();
+    public function filter_issued(Request $request)
+    {
+        $query = StoreIssuanceNote::query();
 
-    // ✅ Base relations, conditionally filter details
-    $query->with(['details' => function ($q) use ($request) {
-        $q->with(['product', 'bus']);
+        // ✅ Base relations, conditionally filter details
+        $query->with(['details' => function ($q) use ($request) {
+            $q->with(['product', 'bus']);
 
+            if ($request->filled('product_id')) {
+                $q->where('product_id', $request->product_id);
+            }
+
+            if ($request->filled('bus_id')) {
+                $q->where('bus_id', $request->bus_id);
+            }
+        }]);
+
+        // ✅ Date range filter
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $query->whereBetween('created_at', [
+                $request->from_date . ' 00:00:00',
+                $request->to_date . ' 23:59:59'
+            ]);
+        }
+
+        // ✅ MR and SIN filters
+        if ($request->filled('mr')) {
+            $query->where('mr_id', $request->mr);
+        }
+
+        if ($request->filled('sin')) {
+            $query->where('id', $request->sin);
+        }
+
+        // ✅ Parent-level filters (only include notes having such details)
         if ($request->filled('product_id')) {
-            $q->where('product_id', $request->product_id);
+            $query->whereHas('details', function ($q) use ($request) {
+                $q->where('product_id', $request->product_id);
+            });
         }
 
         if ($request->filled('bus_id')) {
-            $q->where('bus_id', $request->bus_id);
+            $query->whereHas('details', function ($q) use ($request) {
+                $q->where('bus_id', $request->bus_id);
+            });
         }
-    }]);
 
-    // ✅ Date range filter
-    if ($request->filled('from_date') && $request->filled('to_date')) {
-        $query->whereBetween('created_at', [
-            $request->from_date . ' 00:00:00',
-            $request->to_date . ' 23:59:59'
+        // ✅ Final data
+        $outwards = $query->latest()->get();
+
+        return response()->json([
+            'outward' => $outwards
         ]);
     }
 
-    // ✅ MR and SIN filters
-    if ($request->filled('mr')) {
-        $query->where('mr_id', $request->mr);
-    }
 
-    if ($request->filled('sin')) {
-        $query->where('id', $request->sin);
-    }
-
-    // ✅ Parent-level filters (only include notes having such details)
-    if ($request->filled('product_id')) {
-        $query->whereHas('details', function ($q) use ($request) {
-            $q->where('product_id', $request->product_id);
-        });
-    }
-
-    if ($request->filled('bus_id')) {
-        $query->whereHas('details', function ($q) use ($request) {
-            $q->where('bus_id', $request->bus_id);
-        });
-    }
-
-    // ✅ Final data
-    $outwards = $query->latest()->get();
-
-    return response()->json([
-        'outward' => $outwards
-    ]);
-}
-
-     
-   public function product_control(Request $request)
+    public function product_control(Request $request)
     {
-        $fromDate = $request->filled('from_date') 
-            ? Carbon::parse($request->from_date)->startOfDay() 
+        $fromDate = $request->filled('from_date')
+            ? Carbon::parse($request->from_date)->startOfDay()
             : Carbon::today()->startOfDay();
 
-        $toDate = $request->filled('to_date') 
-            ? Carbon::parse($request->to_date)->endOfDay() 
+        $toDate = $request->filled('to_date')
+            ? Carbon::parse($request->to_date)->endOfDay()
             : Carbon::today()->endOfDay();
 
         $products = Product::all();
@@ -171,7 +174,7 @@ class ReportsController extends Controller
                 $netTotal = $record->net_amount ?? 0;
                 $purchase_qty += $qty;
                 $purchase_value += $netTotal;
-            } 
+            }
             $avg_purchase_price = $purchase_qty > 0 ? intval($purchase_value / $purchase_qty) : 0;
             // Issuances during selected date range
             $currentIssuances = StoreIssuanceNoteDetail::where('product_id', $product->id)
@@ -213,4 +216,9 @@ class ReportsController extends Controller
         return response()->json(['data' => $data]);
     }
 
+    public function bus()
+    {
+        $buses = Bus::all();
+        return response()->json($buses);
+    }
 }
