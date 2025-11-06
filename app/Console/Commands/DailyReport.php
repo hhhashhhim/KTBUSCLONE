@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\Booking\BookingCancel;
 use App\Models\Schedule\TicketClosing;
+use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Auth;
 
