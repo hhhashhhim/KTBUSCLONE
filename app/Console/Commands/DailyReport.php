@@ -95,6 +95,7 @@ class DailyReport extends Command
     ->whereNotNull('ticket_merge_id')
     ->groupBy('ticket_merge_id')
     ->having('total', '=', 1)
+    ->distinct("schedule_id")
     ->count();
 
 
