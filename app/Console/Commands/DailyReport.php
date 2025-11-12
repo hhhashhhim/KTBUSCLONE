@@ -117,7 +117,7 @@ $pending_merges = Ticket::leftJoin('ticket_closings', 'tickets.ticket_closing_id
         $q->where('ticket_closings.commission_route', 0)
           ->orWhereNull('ticket_closings.commission_route');
     })
-    ->distinct('schedule_id') // keep distinct schedule_id
+    ->distinct('tickets.schedule_id') // keep distinct schedule_id
     ->count();
 
 Log::info('Pending Merge Result', [
