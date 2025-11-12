@@ -87,7 +87,7 @@ class DailyReport extends Command
             ->get();
             
             $cancel_ids = $ticketData->where("date", $today)->where("type", "canceled")->pluck('id');
-            $pending_merges = Ticket::where("ticket_closing_id",'=',null, $company_id)->where('hide', 0)->where('commission_route', 0)->distinct("schedule_id")->count();
+            $pending_merges = Ticket::where("ticket_closing_id",'=',null, )->where($company_id)->where('hide', 0)->where('commission_route', 0)->distinct("schedule_id")->count();
         // $pending_merges = TicketClosing::where('company_id', $company_id)
         //     ->where('hide', 0)
         //     ->where('commission_route', 0)
