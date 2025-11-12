@@ -88,12 +88,17 @@ class DailyReport extends Command
         $cancel_ids = $ticketData->where("date", $today)->where("type", "canceled")->pluck('id');
         $pending_merges = TicketClosing::where('company_id', Auth::user()->company_id)
             ->where("hide", 0)
+            ->orWhere('commission_route', 0)
             ->get()
             ->groupBy('ticket_merge_id')
             ->filter(function ($group) {
                 return $group->count() == 1;
             })
             ->count();
+        Log::info('Pending Merge Result', [
+            'company_id' => $company_id,
+            'pending_merges' => $pending_merges,
+        ]);
 
         $today_confirm = $ticketData->where("date", $today)->where("type", "booked")->count();
         $today_reserve = $ticketData->where("date", $today)->where("type", "advance booking")->count();
@@ -110,10 +115,10 @@ class DailyReport extends Command
         });
 
         $url = "https://whatsapp.sarzone.com/api/send-messages";
-        $mobile = "923203948283"; //abdul rehma
-        $mobile2 = "923360111140"; //hashim sb
-        $mobile3 = "923108886288"; // qasim sb
-        $mobile4 = "923143136767"; // farhan ali
+        // $mobile = "923203948283"; //abdul rehma
+        // $mobile2 = "923360111140"; //hashim sb
+        // $mobile3 = "923108886288"; // qasim sb
+        // $mobile4 = "923143136767"; // farhan ali
         $session = "Muhammad-Shahzaib_3-sarzone";
         $messageConfirmed = "*Dear Sir following is the report of Kainat Travels for the date of " . date('d M Y', strtotime($today)) . "*
 
@@ -132,37 +137,37 @@ This is automated generated report.
 (E&EO)
 ";
 
-        $response = Http::withHeaders([
-            'X-Api-Key' => $auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile,
-            "message_body" => $messageConfirmed
-        ]);
-        $response2 = Http::withHeaders([
-            'X-Api-Key' => $auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile2,
-            "message_body" => $messageConfirmed
-        ]);
-        $response2 = Http::withHeaders([
-            'X-Api-Key' => $auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile3,
-            "message_body" => $messageConfirmed
-        ]);
-        $response2 = Http::withHeaders([
-            'X-Api-Key' => $auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile4,
-            "message_body" => $messageConfirmed
-        ]);
+        // $response = Http::withHeaders([
+        //     'X-Api-Key' => $auth_key,
+        // ])->post($url, [
+        //     "session" => $session,
+        //     "message_type" =>  'text',
+        //     "receiver_number" => $mobile,
+        //     "message_body" => $messageConfirmed
+        // ]);
+        // $response2 = Http::withHeaders([
+        //     'X-Api-Key' => $auth_key,
+        // ])->post($url, [
+        //     "session" => $session,
+        //     "message_type" =>  'text',
+        //     "receiver_number" => $mobile2,
+        //     "message_body" => $messageConfirmed
+        // ]);
+        // $response2 = Http::withHeaders([
+        //     'X-Api-Key' => $auth_key,
+        // ])->post($url, [
+        //     "session" => $session,
+        //     "message_type" =>  'text',
+        //     "receiver_number" => $mobile3,
+        //     "message_body" => $messageConfirmed
+        // ]);
+        // $response2 = Http::withHeaders([
+        //     'X-Api-Key' => $auth_key,
+        // ])->post($url, [
+        //     "session" => $session,
+        //     "message_type" =>  'text',
+        //     "receiver_number" => $mobile4,
+        //     "message_body" => $messageConfirmed
+        // ]);
     }
 }
