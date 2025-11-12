@@ -107,18 +107,16 @@ class DailyReport extends Command
             'company_id' => $company_id,
         ]);
         $pending_merges = Ticket::where('company_id', $company_id)
-            ->whereNull('ticket_closing_id')        // only tickets not yet closed
-            ->where(function ($q) {
-                $q->whereNull('ticket_merge_id')    // tickets not yet merged
-                    ->orWhere('ticket_merge_id', 0); // in case 0 is used instead of null
-            })
-            ->distinct('ticket_merge_id')           // count unique merges
-            ->count();
+    ->whereNull('ticket_closing_id') // tickets not yet closed
+    ->whereNotNull('ticket_merge_id') // only tickets already assigned to a merge batch
+    ->distinct('ticket_merge_id')     // count each merge once
+    ->count();
 
-        Log::info('Pending Merge Result', [
-            'company_id' => $company_id,
-            'pending_merges' => $pending_merges,
-        ]);
+Log::info('Pending Merge Result', [
+    'company_id' => $company_id,
+    'pending_merges' => $pending_merges,
+]);
+
 
 
 
