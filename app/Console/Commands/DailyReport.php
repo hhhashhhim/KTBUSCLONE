@@ -106,24 +106,25 @@ class DailyReport extends Command
         Log::info('Pending Merge Check', [
             'company_id' => $company_id,
         ]);
-$pending_merges = Ticket::leftJoin('ticket_closings', 'tickets.ticket_closing_id', '=', 'ticket_closings.id')
-    ->where('tickets.company_id', $company_id)
-    ->whereNull('tickets.ticket_closing_id') // tickets not yet closed
-    ->where(function ($q) {
-        $q->where('ticket_closings.hide', 0)
-          ->orWhereNull('ticket_closings.hide');
-    })
-    ->where(function ($q) {
-        $q->where('ticket_closings.commission_route', 0)
-          ->orWhereNull('ticket_closings.commission_route');
-    })
-    ->distinct('tickets.schedule_id') // keep distinct schedule_id
-    ->count();
+        $pending_merges = Ticket::leftJoin('ticket_closings', 'tickets.ticket_closing_id', '=', 'ticket_closings.id')
+            ->where('tickets.company_id', $company_id)
+            ->whereNull('tickets.ticket_closing_id')
+            ->where(function ($q) {
+                $q->where('ticket_closings.hide', 0)
+                    ->orWhereNull('ticket_closings.hide');
+            })
+            ->where(function ($q) {
+                $q->where('ticket_closings.commission_route', 0)
+                    ->orWhereNull('ticket_closings.commission_route');
+            })
+            ->distinct('tickets.schedule_id')
+            ->where("date", $today)
+            ->count();
 
-Log::info('Pending Merge Result', [
-    'company_id' => $company_id,
-    'pending_merges' => $pending_merges,
-]);
+        Log::info('Pending Merge Result', [
+            'company_id' => $company_id,
+            'pending_merges' => $pending_merges,
+        ]);
 
 
 
