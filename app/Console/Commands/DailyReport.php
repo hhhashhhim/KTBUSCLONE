@@ -107,22 +107,14 @@ class DailyReport extends Command
             'company_id' => $company_id,
         ]);
 
-        $pending_merges = TicketClosing::where('company_id', $company_id)
-            ->where(function ($q) {
-                $q->whereIn('hide', [0, '0'])
-                    ->orWhereNull('hide');
-            })
-            ->where(function ($q) {
-                $q->whereIn('commission_route', [0, '0'])
-                    ->orWhereNull('commission_route');
-            })
-            ->whereNull('ticket_merge_id')
-            ->count();
+       $pending_merges = Ticket::whereNull('ticket_closing_id')
+    ->distinct('schedule_id')
+    ->count();
 
-        Log::info('Pending Merge Result', [
-            'company_id' => $company_id,
-            'pending_merges' => $pending_merges,
-        ]);
+\Log::info('Pending Merge Result', [
+    'pending_merges' => $pending_merges,
+]);
+
 
 
 
@@ -145,7 +137,7 @@ class DailyReport extends Command
         // $mobile = "923203948283"; //abdul rehma
         // $mobile2 = "923360111140"; //hashim sb
         // $mobile3 = "923108886288"; // qasim sb
-        $mobile4 = "923143136767"; // farhan ali
+        // $mobile4 = "923143136767"; // farhan ali
         $session = "Muhammad-Shahzaib_3-sarzone";
         $messageConfirmed = "*Dear Sir following is the report of Kainat Travels for the date of " . date('d M Y', strtotime($today)) . "*
 
@@ -188,13 +180,13 @@ This is automated generated report.
         //     "receiver_number" => $mobile3,
         //     "message_body" => $messageConfirmed
         // ]);
-        $response2 = Http::withHeaders([
-            'X-Api-Key' => $auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile4,
-            "message_body" => $messageConfirmed
-        ]);
+        // $response2 = Http::withHeaders([
+        //     'X-Api-Key' => $auth_key,
+        // ])->post($url, [
+        //     "session" => $session,
+        //     "message_type" =>  'text',
+        //     "receiver_number" => $mobile4,
+        //     "message_body" => $messageConfirmed
+        // ]);
     }
 }
