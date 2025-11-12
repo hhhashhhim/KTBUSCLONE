@@ -90,9 +90,6 @@ class DailyReport extends Command
         $cancel_ids = $ticketData->where("date", $today)->where("type", "canceled")->pluck('id');
        $pending_merges = DB::table('ticket_closings')
     ->select('ticket_merge_id', DB::raw('COUNT(*) as total'))
-    ->where('company_id', $company_id)
-    ->where('hide', 0)
-    ->where('commission_route', 0)
     ->whereNotNull('ticket_merge_id')
     ->groupBy('ticket_merge_id')
     ->having('total', '=', 1)
