@@ -86,15 +86,24 @@ class DailyReport extends Command
             ->distinct()
             ->get();
 
-        // $pending_merges = Ticket::where("ticket_closing_id",'=',null)->distinct("schedule_id")->count();
         $cancel_ids = $ticketData->where("date", $today)->where("type", "canceled")->pluck('id');
-   $pending_merges = Ticket::where('company_id', Auth::user()->company_id)
-    ->whereNull('ticket_closing_id')
-    ->whereNotNull('ticket_merge_id')
-    ->distinct('ticket_merge_id')
-    ->count('ticket_merge_id');
-
-
+        // $pending_merges = TicketClosing::where('company_id', $company_id)
+        //     ->where(["hide" => 0, "commission_route" => 0])
+        //     ->get()
+        //     ->groupBy('ticket_merge_id')
+        //     ->filter(function ($group) {
+        //         return $group->count() == 1;
+        //     })
+        //     ->count();
+   $pending_merges = DB::table('tickets')
+    ->join('ticket_closings', 'tickets.ticket_merge_id', '=', 'ticket_closings.ticket_merge_id')
+    ->where('tickets.company_id', Auth::user()->company_id)
+    ->whereNull('tickets.ticket_closing_id')            // ticket not yet closed
+    ->whereNotNull('tickets.ticket_merge_id')           // must have merge id
+    ->where('ticket_closings.hide', 0)                  // hide = 0
+    ->where('ticket_closings.commission_route', 0)      // commission_route = 0
+    ->distinct('tickets.ticket_merge_id')
+    ->count('tickets.ticket_merge_id');
 
 
         $today_confirm = $ticketData->where("date", $today)->where("type", "booked")->count();
