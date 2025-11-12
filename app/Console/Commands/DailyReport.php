@@ -106,16 +106,16 @@ class DailyReport extends Command
         Log::info('Pending Merge Check', [
             'company_id' => $company_id,
         ]);
-        $pending_merges = Ticket::where('company_id', $company_id)
+ $pending_merges = Ticket::where('company_id', $company_id)
     ->whereNull('ticket_closing_id') // tickets not yet closed
-    ->whereNotNull('ticket_merge_id') // only tickets already assigned to a merge batch
-    ->distinct('ticket_merge_id')     // count each merge once
+    ->distinct('schedule_id')     // count each merge batch once
     ->count();
 
 Log::info('Pending Merge Result', [
     'company_id' => $company_id,
     'pending_merges' => $pending_merges,
 ]);
+
 
 
 
