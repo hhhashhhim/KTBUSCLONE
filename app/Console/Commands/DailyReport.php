@@ -109,19 +109,21 @@ class DailyReport extends Command
 
         $pending_merges = TicketClosing::where('company_id', $company_id)
             ->where(function ($q) {
-                $q->where('hide', 0)
+                $q->whereIn('hide', [0, '0'])
                     ->orWhereNull('hide');
             })
             ->where(function ($q) {
-                $q->where('commission_route', 0)
+                $q->whereIn('commission_route', [0, '0'])
                     ->orWhereNull('commission_route');
             })
             ->whereNull('ticket_merge_id')
             ->count();
 
         Log::info('Pending Merge Result', [
+            'company_id' => $company_id,
             'pending_merges' => $pending_merges,
         ]);
+
 
 
 
