@@ -51,11 +51,23 @@ class DailyReport extends Command
 
         // ✅ ensure Auth user exists (for CLI/schedule)
         if (!Auth::check()) {
-            $user = User::first();
+            // Pick a valid user who belongs to a real company
+            $user = User::where('company_id', '>', 0)->first();
+
+            if (!$user) {
+              
+                return; // Stop execution if no valid user
+            }
+
             Auth::setUser($user);
+           
         }
 
-        $company_id = Auth::user()->company_id; // <-- new variable
+        // Now safely get the company_id
+        $company_id = Auth::user()->company_id;
+
+       
+
 
         $today = now()->subDays(1)->format("Y-m-d");
 
@@ -87,10 +99,22 @@ class DailyReport extends Command
             ->get();
 
         $cancel_ids = $ticketData->where("date", $today)->where("type", "canceled")->pluck('id');
+       
+
         $pending_merges = TicketClosing::where('company_id', $company_id)
-            ->where(["hide" => 0, "commission_route" => 0])
+            ->where(function ($q) {
+                $q->where('hide', 0)
+                    ->orWhereNull('hide');
+            })
+            ->where(function ($q) {
+                $q->where('commission_route', 0)
+                    ->orWhereNull('commission_route');
+            })
             ->whereNull('ticket_merge_id')
             ->count();
+
+      
+
 
 
         $today_confirm = $ticketData->where("date", $today)->where("type", "booked")->count();
