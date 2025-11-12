@@ -55,18 +55,22 @@ class DailyReport extends Command
             $user = User::where('company_id', '>', 0)->first();
 
             if (!$user) {
-              
+                Log::error('No valid user found with a company_id > 0');
                 return; // Stop execution if no valid user
             }
 
             Auth::setUser($user);
-           
+            Log::info('User set for scheduled job', [
+                'user_id' => $user->id,
+                'company_id' => $user->company_id,
+                'user_name' => $user->name,
+            ]);
         }
 
         // Now safely get the company_id
         $company_id = Auth::user()->company_id;
 
-       
+        Log::info('Company ID resolved for report', ['company_id' => $company_id]);
 
 
         $today = now()->subDays(1)->format("Y-m-d");
@@ -99,7 +103,9 @@ class DailyReport extends Command
             ->get();
 
         $cancel_ids = $ticketData->where("date", $today)->where("type", "canceled")->pluck('id');
-       
+        Log::info('Pending Merge Check', [
+            'company_id' => $company_id,
+        ]);
 
         $pending_merges = TicketClosing::where('company_id', $company_id)
             ->where(function ($q) {
@@ -113,7 +119,9 @@ class DailyReport extends Command
             ->whereNull('ticket_merge_id')
             ->count();
 
-      
+        Log::info('Pending Merge Result', [
+            'pending_merges' => $pending_merges,
+        ]);
 
 
 
