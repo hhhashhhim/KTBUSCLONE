@@ -15,5 +15,8 @@ class StoreIssuanceNote extends Model
     {
         return $this->hasMany(StoreIssuanceNoteDetail::class, 'store_issuance_note_id');
     }
-    
+     public function materialRequestDetail()
+    {
+        return $this->hasMany(MaterialRequestDetail::class, 'mr_id');
+    }
 }

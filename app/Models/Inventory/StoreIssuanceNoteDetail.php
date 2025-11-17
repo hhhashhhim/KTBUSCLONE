@@ -26,6 +26,13 @@ class StoreIssuanceNoteDetail extends Model
     {
         return $this->hasMany(MaterialRequest::class);
     }
+public function materialRequestDetail()
+{
+    return $this->hasOne(MaterialRequestDetail::class, 'product_id', 'product_id')
+                ->whereColumn('material_request_details.bus_id', 'store_issuance_note_details.bus_id')
+                ->latest(); // pick latest if multiple
+}
+
    
     
 }

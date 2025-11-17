@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;;
 
 use App\Models\Inventory\BidSummary;
 use App\Models\Inventory\MaterialRequest;
+use App\Models\Inventory\MaterialRequestDetail;
 use App\Models\Inventory\Product;
 use App\Models\Inventory\ProductCategory;
 use App\Models\Inventory\ProductUnit;
@@ -123,17 +124,21 @@ class ProductController extends Controller
         ], 200);
     }
 
-    public function issuanceHistory($id)
-    {
-        $details = StoreIssuanceNoteDetail::with([
-            'storeIssuanceNote',
-            'bus'
-        ])
-            ->where('product_id', $id)
-            ->orderBy('id', 'DESC')
-            ->get();
+ public function issuanceHistory($id)
+{
+    // Fetch issuance details
+    $details = StoreIssuanceNoteDetail::with([
+        'storeIssuanceNote',
+        'storeIssuanceNote.materialRequestDetail',
+        'bus',
+    ])
+    ->where('product_id', $id)
+    ->orderBy('id', 'DESC')
+    ->get();
 
-        return response()->json($details);
-    }
+
+    return response()->json($details);
+}
+
     
 }

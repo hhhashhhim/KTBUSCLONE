@@ -267,7 +267,7 @@ class MaterialRequestController extends Controller
 
         foreach ($details as $i => $item) {
             $productName  = $item->product->name ?? 'N/A';
-            $productName  = $item->bus->bus_number ?? 'N/A';
+            $busNumber    = $item->bus->bus_number ?? 'N/A';
             $askedQty     = $item->qty ?? 0;
             $issuedQty    = $item->store_Issued_qty ?? 0;
             $reason = $item->reason ?? 'For mess';
@@ -275,6 +275,7 @@ class MaterialRequestController extends Controller
             $table .= <<<EOD
                 <tr>
                     <td align="center">{$srNo}</td> 
+                    <td>{$busNumber}</td>
                     <td>{$productName}</td>
                     <td align="center">{$askedQty}</td>
                     <td align="center">{$issuedQty}</td> 
