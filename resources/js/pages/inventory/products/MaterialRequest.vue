@@ -171,7 +171,7 @@
                       <th v-if="isDirectStore === 'false'">Bus Number</th>
                       <th>Product</th>
                       <th>Qty</th>
-                      <th>price</th>
+                      <th v-if="isDirectStore === 'true'">price</th>
                       <th>Reason</th>
                       <th>Action</th>
                     </tr>
@@ -182,7 +182,7 @@
                       <td v-if="isDirectStore === 'false'">{{ getBusName(item.bus_id) }}</td>
                       <td>{{ getProductName(item.product_id) }}</td>
                       <td>{{ item.qty }}</td>
-                      <td>{{ item.avg_price }}</td>
+                      <td v-if="isDirectStore === 'true'">{{ item.avg_price }}</td>
                       <td>{{ item.reason }}</td>
                       <td>
                         <button class="btn btn-danger btn-sm" @click="removeProduct(index)">
