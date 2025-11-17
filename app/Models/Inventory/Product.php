@@ -27,6 +27,10 @@ class Product extends Model
     {
         return $this->hasMany(MaterialRequestDetail::class);
     }
+    public function materialRequest()
+    {
+        return $this->hasMany(MaterialRequest::class);
+    }
     public function prnDetails()
     {
         return $this->hasMany(PurchaseRequisitionNoteDetail::class);
@@ -39,7 +43,17 @@ class Product extends Model
         public function issuanceDetails() {
             return $this->hasMany(StoreIssuanceNoteDetail::class);
         } 
-
+public function materialRequests()
+{
+    return $this->hasManyThrough(
+        MaterialRequest::class,        // final model
+        MaterialRequestDetail::class,  // intermediate model
+        'product_id',                  // FK on intermediate table
+        'id',                          // PK on final model
+        'id',                          // local key on Product
+        'mr_id'                        // FK on intermediate table pointing to final
+    );
+}
 }
 
 

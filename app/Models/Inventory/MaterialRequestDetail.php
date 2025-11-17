@@ -22,5 +22,9 @@ class MaterialRequestDetail extends Model
         return $this->belongsTo(Bus::class, 'bus_id');
     }
 
+public function materialRequest()
+{
+    return $this->belongsTo(MaterialRequest::class, 'mr_id', 'id');
+}
 
 }

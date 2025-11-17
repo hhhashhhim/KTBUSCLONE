@@ -95,6 +95,7 @@ class MaterialRequestController extends Controller
                     $product = Product::find($detail['product_id']);
                     if ($product) {
                         $product->qty = $product->qty + $detail['qty'];
+                        $product->avg_price = $detail['avg_price'];
                         $product->save();
                     }
                 }
@@ -311,6 +312,149 @@ class MaterialRequestController extends Controller
         $buses = Bus::all();
         return response()->json($buses);
     }
+   public function productPDF(Request $request)
+{
+   $product = Product::with([
+    'category',
+    'unit',
+    'issuanceDetails.storeIssuanceNote',
+    'issuanceDetails.bus',
+    'materialRequestDetails'
+])->find($request->product_id);
+
+
+    $company = Company::first(); // Or relevant company info
+
+  $pdf = new MYPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+        $pdf->setPrintHeader(false); // Optional, if you’re not using a header
+        $pdf->setPrintFooter(true);  // ✅ This is necessary
+
+        $pdf->setPrintFooter(true);
+    $pdf->AddPage();
+
+    // Logo
+    $logoPath = public_path('assets/img/kt-logo.jpg');
+    if (file_exists($logoPath)) {
+        $pdf->Image($logoPath, 10, 12, 30);
+    }
+
+    // Title & Company Info
+    $pdf->Ln(10);
+    $pdf->SetFont('helvetica', 'B', 16);
+    $pdf->Cell(0, 10, 'Product Issuance Report', 0, 1, 'C');
+    $pdf->SetFont('helvetica', '', 12);
+     $pdf->Cell(0, 8, 'Company : ' . ($company->name ?? 'Kainat Travels'), 0, 1);
+
+    $pdf->Ln(5);
+    $pdf->Line(10, $pdf->GetY(), 200, $pdf->GetY());
+    $pdf->Ln(5);
+
+    // Product Info Table
+    $categoryName = $product->category ? $product->category->name : '-';
+    $unitName     = $product->unit ? $product->unit->name : '-';
+
+    $tbl = <<<EOD
+<style>
+table {
+    border-collapse: collapse; width: 100%;
+}
+th {
+   background-color: #f7f7f7; border: 1px solid #000; padding: 5px; font-weight: bold; text-align: center;
+}
+td {
+    text-align: center;
+    padding: 6px;
+    border: 1px solid #000;
+}
+</style>
+<table>
+    <tr>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Unit</th>
+        <th>Available Quantity</th>
+        <th>Price</th>
+    </tr>
+    <tr>
+        <td>{$product->name}</td>
+        <td>{$categoryName}</td>
+        <td>{$unitName}</td>
+        <td>{$product->qty}</td>
+        <td>{$product->avg_price}</td>
+    </tr>
+</table>
+EOD;
+
+    $pdf->writeHTML($tbl, true, false, false, false, '');
+
+    // Issuance History Table
+  // Issuance History Table
+$pdf->Ln(8);
+$pdf->SetFont('helvetica', 'B', 14);
+$pdf->Cell(0, 8, 'Issuance History', 0, 1);
+$pdf->SetFont('helvetica', '', 11);
+
+$tbl2 = '<style>
+table.history { border-collapse: collapse; width: 100%; }
+table.history th { background-color: #f7f7f7; border: 1px solid #000; padding: 5px; font-weight: bold; text-align: center; }
+table.history td { border: 1px solid #000; padding: 5px; text-align: center; }
+</style>
+<table class="history">
+    <tr>
+        <th>#</th>
+        <th>Requested By</th>
+        <th>Reason</th>
+        <th>Bus</th>
+        <th>Issuance Quantity</th>
+        <th>Date</th>
+    </tr>';
+
+if($product->issuanceDetails->count() > 0) {
+    foreach ($product->issuanceDetails->sortByDesc('created_at') as $i => $row) {
+
+        // Find the MR detail corresponding to this issuance
+        $mrDetail = $product->materialRequestDetails
+            ->where('bus_id', $row->bus_id)
+            ->where('product_id', $row->product_id) // optional but safer
+            ->where('store_Issued_qty', $row->qty) // optional if qty matches
+            ->sortByDesc('created_at')
+            ->first();
+
+        $reason = $mrDetail->reason ?? '-';
+
+        $tbl2 .= '<tr>
+            <td>' . ($i + 1) . '</td>
+            <td>' . ($row->storeIssuanceNote->requested_by ?? '-') . '</td>
+            <td>' . $reason . '</td>
+            <td>' . ($row->bus->bus_number ?? '-') . '</td>
+            <td>' . $row->qty . '</td>
+            <td>' . date('d-M-Y', strtotime($row->created_at)) . '</td>
+        </tr>';
+    }
+} else {
+    $tbl2 .= '<tr><td colspan="6" style="text-align:center;">No issuance history found</td></tr>';
+}
+
+
+$tbl2 .= '</table>';
+
+$pdf->writeHTML($tbl2, true, false, false, false, '');
+
+
+    // Output
+    $pdf->SetPDFVersion('1.4'); // Enable transparency support
+       $pdf->StartTransform();
+       $pdf->SetAlpha(0.15); // Increase opacity to 30% (less transparent)
+       $pdf->Rotate(45, 105, 148);
+       $pdf->SetFont('helvetica', 'B', 50);
+       $pdf->SetTextColor(0, 0, 0); // Black color
+       $pdf->Text(20, 150, 'Kainat Travels');
+       $pdf->StopTransform();
+       $pdf->SetAlpha(1); // Reset transparency
+
+    $pdf->Output('Product_' . $product->id . '.pdf', 'I');
+}
+
 }
 require_once(public_path() . '/assets/tcpdf/tcpdf.php');
 class MYPDF extends TCPDF

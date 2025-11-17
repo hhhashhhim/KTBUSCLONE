@@ -22,7 +22,10 @@ class StoreIssuanceNoteDetail extends Model
     {
         return $this->belongsTo(Bus::class, 'bus_id');
     }
-    
+      public function materialRequest()
+    {
+        return $this->hasMany(MaterialRequest::class);
+    }
    
     
 }

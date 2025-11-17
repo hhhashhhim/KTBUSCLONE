@@ -26,6 +26,7 @@ Route::middleware(['auth:sanctum'])->prefix('web/v1/reports')->group(function ()
 //PDFs
 Route::middleware(['custom.sanctum.token.verify'])->prefix('web/v1/')->group(function () {
     Route::post('mr/pdf/', [MaterialRequestController::class, 'mrPDF']);
+    Route::post('product/pdf/', [MaterialRequestController::class, 'productPDF']);
     Route::post('prn/pdf/', [PurchaseRequisitionNoteController::class, 'prnPDF']);
     Route::post('bid/pdf/', [BidSummariesController::class, 'bidPDF']);
     Route::post('po/pdf/', [PurchaseOrderController::class, 'poPDF']);
@@ -76,6 +77,8 @@ Route::middleware(['auth:sanctum'])->prefix('web/v1/mr')->group(function () {
     Route::post('mr-delete', [MaterialRequestController::class, 'mr_destroy']);
     Route::post('detail-delete', [MaterialRequestController::class, 'destroy']); 
     Route::post('buses', [MaterialRequestController::class, 'bus']); 
+    Route::get('products/{id}/issuance-history', [ProductController::class, 'issuanceHistory']);
+
 });
 // Products
 Route::middleware(['auth:sanctum'])->prefix('web/v1/inventory-product')->group(function () {
