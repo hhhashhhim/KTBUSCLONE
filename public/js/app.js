@@ -106223,13 +106223,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["badge text-white", (_ref = {
-        'badge-secondary': !prn.mr,
-
-        /* fallback */
+        'badge-dark': !prn.mr,
         'badge-danger': prn.mr && prn.mr.status == 0,
         'badge-warning': prn.mr && prn.mr.status == 1,
         'badge-success': prn.mr && (prn.mr.status == 2 || prn.mr.status == 7)
-      }, _defineProperty(_ref, "badge-warning", prn.mr && prn.mr.status == 3), _defineProperty(_ref, "badge-secondary", prn.mr && prn.mr.status == 4), _defineProperty(_ref, 'badge-info', prn.mr && prn.mr.status == 5), _defineProperty(_ref, 'badge-dark', prn.mr && prn.mr.status == 6), _ref)])
+      }, _defineProperty(_ref, "badge-warning", prn.mr && prn.mr.status == 3), _defineProperty(_ref, 'badge-secondary', prn.mr && prn.mr.status == 4), _defineProperty(_ref, 'badge-info', prn.mr && prn.mr.status == 5), _defineProperty(_ref, "badge-dark", prn.mr && prn.mr.status == 6), _ref)])
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(!prn.mr ? 'No MR Found' : prn.mr.status == 0 ? 'Rejected' : prn.mr.status == 2 ? 'Store Issued' : prn.mr.status == 3 ? 'Processing' : prn.mr.status == 4 ? 'BID Generated' : prn.mr.status == 5 ? 'PO Generated' : prn.mr.status == 6 ? 'InWard Generated' : prn.mr.status == 7 ? 'Partial Store Issued' : 'Unknown'), 3
     /* TEXT, CLASS */
     )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {

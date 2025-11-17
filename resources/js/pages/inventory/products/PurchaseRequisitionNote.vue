@@ -95,7 +95,7 @@
                         <span
                           class="badge text-white"
                           :class="{
-  'badge-secondary': !prn.mr, /* fallback */
+  'badge-dark': !prn.mr,
   'badge-danger': prn.mr && prn.mr.status == 0,
   'badge-warning': prn.mr && prn.mr.status == 1,
   'badge-success': prn.mr && (prn.mr.status == 2 || prn.mr.status == 7),
