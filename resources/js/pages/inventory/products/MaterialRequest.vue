@@ -91,25 +91,28 @@
                 <div class="form-group col-md-12">
                   <label class="font-weight-bold mb-2 d-block">Request Type</label>
                   <div class="d-flex flex-wrap align-items-center gap-3">
+
+                    <!-- Regular -->
                     <div class="custom-radio-box" :class="{ active: isDirectStore === 'false' }"
-                      @click="isDirectStore = 'false'">
-                      <input class="form-check-input d-none" type="radio" id="regularRequest" value="false"
-                        v-model="isDirectStore" />
+                      @click="switchRequestType('false')">
+                      <input class="form-check-input d-none" type="radio" id="regularRequest" value="false" />
                       <label class="form-check-label mb-0" for="regularRequest">
                         <i class="fas fa-clipboard-list mr-2"></i> Regular
                       </label>
                     </div>
 
+                    <!-- Direct Store -->
                     <div class="custom-radio-box mx-3" :class="{ active: isDirectStore === 'true' }"
-                      @click="isDirectStore = 'true'">
-                      <input class="form-check-input d-none" type="radio" id="directStoreRequest" value="true"
-                        v-model="isDirectStore" />
+                      @click="switchRequestType('true')">
+                      <input class="form-check-input d-none" type="radio" id="directStoreRequest" value="true" />
                       <label class="form-check-label mb-0" for="directStoreRequest">
                         <i class="fas fa-store mr-2"></i> Direct Store
                       </label>
                     </div>
+
                   </div>
                 </div>
+
 
 
                 <!-- Bus Select -->
@@ -327,7 +330,7 @@ export default {
       isDirectStore: 'false',
       buses: [],
       bus_id: '',
-      singleProduct: { product_id: '', qty: '', reason: '' , avg_price: ''},
+      singleProduct: { product_id: '', qty: '', reason: '', avg_price: '' },
       productsList: [],
       selectedMR: null,
       loading: false,
@@ -383,14 +386,78 @@ export default {
       const product = this.products.find(p => p.id == id);
       return product ? product.name : 'Unknown';
     },
-    addProduct() {
-      if (!this.singleProduct.product_id || !this.singleProduct.qty) {
-        Swal.fire('Error', 'Please select product and quantity.', 'error');
-        return;
+    switchRequestType(type) {
+      if (type === 'true' && this.productsList.length > 0 && this.isDirectStore === 'false') {
+        return Swal.fire({
+          icon: 'error',
+          title: 'REGULAR',
+          html: 'You already added products for <b>REGULAR</b> request. Please clear the list before switching to Direct Store.',
+        });
       }
-      this.productsList.push({ ...this.singleProduct, bus_id: this.bus_id });
+
+      if (type === 'false' && this.productsList.length > 0 && this.isDirectStore === 'true') {
+        return Swal.fire({
+          icon: 'error',
+          title: 'DIRECT STORE',
+          html: 'You already added products for <b>DIRECT STORE</b> request. Please clear the list before switching to Regular.'
+        });
+      }
+
+
+      this.isDirectStore = type;
+    },
+    addProduct() {
+      // DIRECT STORE
+      if (this.isDirectStore === 'true') {
+
+        if (!this.singleProduct.product_id) {
+          return Swal.fire('Error', 'Please select a product to continue.', 'error');
+        }
+
+        if (!this.singleProduct.qty) {
+          return Swal.fire('Error', 'Please enter the quantity you want to add.', 'error');
+        }
+
+        if (!this.singleProduct.avg_price) {
+          return Swal.fire('Error', 'Please enter the price for this product.', 'error');
+        }
+
+        if (!this.singleProduct.reason) {
+          return Swal.fire('Error', 'Please provide a reason for this direct store entry.', 'error');
+        }
+      }
+
+      // REGULAR
+      if (this.isDirectStore === 'false') {
+
+        if (!this.bus_id) {
+          return Swal.fire('Error', 'Please select a bus for this request.', 'error');
+        }
+
+        if (!this.singleProduct.product_id) {
+          return Swal.fire('Error', 'Please select a product before adding.', 'error');
+        }
+
+        if (!this.singleProduct.qty) {
+          return Swal.fire('Error', 'Please enter the required quantity.', 'error');
+        }
+
+        if (!this.singleProduct.reason) {
+          return Swal.fire('Error', 'Please add a reason for this request.', 'error');
+        }
+
+        // assign bus_id into the product row
+        this.singleProduct.bus_id = this.bus_id;
+      }
+
+
+      // ADD TO LIST
+      this.productsList.push({ ...this.singleProduct });
+
+      // RESET FORM
       this.singleProduct = { product_id: '', qty: '', reason: '', bus_id: '', avg_price: '' };
     },
+
     removeProduct(index) {
       this.productsList.splice(index, 1);
     },
@@ -411,7 +478,7 @@ export default {
           product_id: item.product_id,
           qty: item.qty,
           reason: isDirect ? null : item.reason,
-           avg_price: isDirect ? item.avg_price : null,
+          avg_price: isDirect ? item.avg_price : null,
         })),
       };
 
