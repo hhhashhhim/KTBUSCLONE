@@ -131,6 +131,7 @@
                       <th>Requested By</th>
                       <th>Bus</th>
                       <th>Issuance Quantity</th>
+                      <!-- <th>Reason</th> -->
                       <!-- <th>Rate</th>
                       <th>Total</th> -->
                       <th>Date</th>
@@ -140,15 +141,14 @@
                   <tbody>
                     <tr v-for="(row, index) in issuanceHistory" :key="index">
                       <td>{{ index + 1 }}</td>
-                      <!-- <td>{{ row.store_issuance_note_id }}</td> -->
                       <td>{{ row.store_issuance_note.requested_by }}</td>
                       <td>{{ row.bus?.bus_number || '-' }}</td>
                       <td>{{ row.qty }}</td>
-                      <!-- <td>{{ row.rate }}</td>
-                      <td>{{ row.total }}</td> -->
+                      <!-- <td>{{ row.store_issuance_note.material_request_detail[0]?.reason || '-' }}</td> -->
                       <td>{{ new Date(row.created_at).toLocaleDateString() }}</td>
                     </tr>
                   </tbody>
+
                 </table>
               </div>
 

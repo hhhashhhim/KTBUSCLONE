@@ -101390,7 +101390,7 @@ var _hoisted_49 = {
   "class": "table table-bordered"
 };
 
-var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "#"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th>Issuance ID</th> "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Requested By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Issuance Quantity"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th>Rate</th>\r\n                      <th>Total</th> "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Date")])], -1
+var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "#"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th>Issuance ID</th> "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Requested By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Issuance Quantity"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th>Reason</th> "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th>Rate</th>\r\n                      <th>Total</th> "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Date")])], -1
 /* HOISTED */
 );
 
@@ -101803,13 +101803,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       key: index
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(index + 1), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td>{{ row.store_issuance_note_id }}</td> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(row.store_issuance_note.requested_by), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(row.store_issuance_note.requested_by), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(((_row$bus = row.bus) === null || _row$bus === void 0 ? void 0 : _row$bus.bus_number) || '-'), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(row.qty), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td>{{ row.rate }}</td>\r\n                      <td>{{ row.total }}</td> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(new Date(row.created_at).toLocaleDateString()), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td>{{ row.store_issuance_note.material_request_detail[0]?.reason || '-' }}</td> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(new Date(row.created_at).toLocaleDateString()), 1
     /* TEXT */
     )]);
   }), 128
@@ -106223,11 +106223,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["badge text-white", (_ref = {
-        'badge-danger': prn.mr.status == 0,
-        'badge-warning': prn.mr.status == 1,
-        'badge-success': prn.mr.status == 2 || prn.mr.status == 7
-      }, _defineProperty(_ref, "badge-warning", prn.mr.status == 3), _defineProperty(_ref, 'badge-secondary', prn.mr.status == 4), _defineProperty(_ref, 'badge-info', prn.mr.status == 5), _defineProperty(_ref, 'badge-dark', prn.mr.status == 6), _ref)])
-    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(prn.mr.status == 0 ? 'Rejected' : prn.mr.status == 2 ? 'Store Issued' : prn.mr.status == 3 ? 'Processing' : prn.mr.status == 4 ? 'BID Generated' : prn.mr.status == 5 ? 'PO Generated' : prn.mr.status == 6 ? 'InWard Generated' : prn.mr.status == 7 ? 'Partial Store Issued' : 'Unknown'), 3
+        'badge-secondary': !prn.mr,
+
+        /* fallback */
+        'badge-danger': prn.mr && prn.mr.status == 0,
+        'badge-warning': prn.mr && prn.mr.status == 1,
+        'badge-success': prn.mr && (prn.mr.status == 2 || prn.mr.status == 7)
+      }, _defineProperty(_ref, "badge-warning", prn.mr && prn.mr.status == 3), _defineProperty(_ref, "badge-secondary", prn.mr && prn.mr.status == 4), _defineProperty(_ref, 'badge-info', prn.mr && prn.mr.status == 5), _defineProperty(_ref, 'badge-dark', prn.mr && prn.mr.status == 6), _ref)])
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(!prn.mr ? 'No MR Found' : prn.mr.status == 0 ? 'Rejected' : prn.mr.status == 2 ? 'Store Issued' : prn.mr.status == 3 ? 'Processing' : prn.mr.status == 4 ? 'BID Generated' : prn.mr.status == 5 ? 'PO Generated' : prn.mr.status == 6 ? 'InWard Generated' : prn.mr.status == 7 ? 'Partial Store Issued' : 'Unknown'), 3
     /* TEXT, CLASS */
     )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
       "class": "btn btn-info btn-sm",

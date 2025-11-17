@@ -72,7 +72,7 @@
               <h4>Purchase Requisition Note - PRNs </h4>
             </div>
             <div class="card-body">
-              <div class="table-responsive">
+              <div class="table-responsive"> 
                 <table class="table table-striped table-hover dataTable1">
                   <thead>
                     <tr>
@@ -95,25 +95,29 @@
                         <span
                           class="badge text-white"
                           :class="{
-                            'badge-danger': prn.mr.status == 0,
-                            'badge-warning': prn.mr.status == 1,
-                            'badge-success': prn.mr.status == 2 || prn.mr.status == 7,
-                            'badge-warning': prn.mr.status == 3, 
-                            'badge-secondary': prn.mr.status == 4, 
-                            'badge-info': prn.mr.status == 5, 
-                            'badge-dark': prn.mr.status == 6, 
-                          }"
+  'badge-secondary': !prn.mr, /* fallback */
+  'badge-danger': prn.mr && prn.mr.status == 0,
+  'badge-warning': prn.mr && prn.mr.status == 1,
+  'badge-success': prn.mr && (prn.mr.status == 2 || prn.mr.status == 7),
+  'badge-warning': prn.mr && prn.mr.status == 3,
+  'badge-secondary': prn.mr && prn.mr.status == 4,
+  'badge-info': prn.mr && prn.mr.status == 5,
+  'badge-dark': prn.mr && prn.mr.status == 6
+}"
+
                         >
-                          {{
-                            prn.mr.status == 0 ? 'Rejected' : 
-                            prn.mr.status == 2 ? 'Store Issued' :
-                            prn.mr.status == 3 ? 'Processing' :
-                            prn.mr.status == 4 ? 'BID Generated' :
-                            prn.mr.status == 5 ? 'PO Generated' :
-                            prn.mr.status == 6 ? 'InWard Generated' :
-                            prn.mr.status  == 7 ? 'Partial Store Issued' :
-                            'Unknown'
-                          }}
+                          {{ 
+  !prn.mr ? 'No MR Found' :
+  prn.mr.status == 0 ? 'Rejected' : 
+  prn.mr.status == 2 ? 'Store Issued' :
+  prn.mr.status == 3 ? 'Processing' :
+  prn.mr.status == 4 ? 'BID Generated' :
+  prn.mr.status == 5 ? 'PO Generated' :
+  prn.mr.status == 6 ? 'InWard Generated' :
+  prn.mr.status == 7 ? 'Partial Store Issued' :
+  'Unknown'
+}}
+
                         </span>
                       </td>
                       <td>
