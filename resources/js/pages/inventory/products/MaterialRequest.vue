@@ -140,6 +140,10 @@
                   <label>Quantity</label>
                   <input type="number" class="form-control" v-model="singleProduct.qty">
                 </div>
+                <div class="form-group col-md-4" v-if="isDirectStore === 'true'">
+                  <label>Price</label>
+                  <input type="number" class="form-control" v-model="singleProduct.avg_price">
+                </div>
                 <!-- Reason -->
                 <div class="form-group col-md-12">
                   <label>Reason</label>
@@ -167,6 +171,7 @@
                       <th v-if="isDirectStore === 'false'">Bus Number</th>
                       <th>Product</th>
                       <th>Qty</th>
+                      <th>price</th>
                       <th>Reason</th>
                       <th>Action</th>
                     </tr>
@@ -177,6 +182,7 @@
                       <td v-if="isDirectStore === 'false'">{{ getBusName(item.bus_id) }}</td>
                       <td>{{ getProductName(item.product_id) }}</td>
                       <td>{{ item.qty }}</td>
+                      <td>{{ item.avg_price }}</td>
                       <td>{{ item.reason }}</td>
                       <td>
                         <button class="btn btn-danger btn-sm" @click="removeProduct(index)">
@@ -321,7 +327,7 @@ export default {
       isDirectStore: 'false',
       buses: [],
       bus_id: '',
-      singleProduct: { product_id: '', qty: '', reason: '' },
+      singleProduct: { product_id: '', qty: '', reason: '' , avg_price: ''},
       productsList: [],
       selectedMR: null,
       loading: false,
@@ -383,7 +389,7 @@ export default {
         return;
       }
       this.productsList.push({ ...this.singleProduct, bus_id: this.bus_id });
-      this.singleProduct = { product_id: '', qty: '', reason: '', bus_id: '' };
+      this.singleProduct = { product_id: '', qty: '', reason: '', bus_id: '', avg_price: '' };
     },
     removeProduct(index) {
       this.productsList.splice(index, 1);
@@ -405,6 +411,7 @@ export default {
           product_id: item.product_id,
           qty: item.qty,
           reason: isDirect ? null : item.reason,
+           avg_price: isDirect ? item.avg_price : null,
         })),
       };
 
