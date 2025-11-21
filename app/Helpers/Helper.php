@@ -948,7 +948,7 @@ if (!function_exists('sendMessageToAllBus')) {
                 4 => 'Hamza_4-Device4',
                 5 => 'Hamza_4-Device-5'
             ];
-            $randomNumber = rand(1, 5);
+            $randomNumber = rand(1, 4);
 
 
 
@@ -1010,7 +1010,7 @@ if (!function_exists('sendOtpForTicket')) {
             $session = $names[5];
             
             $response = Http::withHeaders([
-                'X-Api-Key'    => '@+_VbdTWAYv4c1kkuIO!NQQupcb@yNw%_I^qNWJ1cp+owvKF35',
+                'X-Api-Key'    => '(fC3dUv&PtG$%TeMgdE1TegI#1(tP&CgmDSb)No+jkV#c7l*qh',
             ])->post($url, [
                 "session" => $session,
                 "message_type" =>  'text',
