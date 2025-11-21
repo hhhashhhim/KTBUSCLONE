@@ -85,9 +85,11 @@ import Reports from "./pages/inventory/products/reports.vue";
 import BidSummary from "./pages/inventory/products/BidSummary.vue";
 import PR from "./pages/inventory/products/PurchaseRequisitionNote.vue";
 import JazzCashRefund from "./pages/booking/JazzCashRefund.vue";
+import DiscountCardAssignPage from "./pages/discountType/DiscountCardAssignPage.vue";
+import DiscountType from "./pages/discountType/DiscountCardTypePage.vue";
 
-// const url = "/kt-dev/";
-const url = '/' 
+const url = "/kt-dev/";
+// const url = '/' 
 
 const routes = [
     {
@@ -405,6 +407,16 @@ const routes = [
         path: url + "loyalty/card/assign",
         component: loyaltyCardAssignPage,
         name: "loyalty-card-assign",
+    },
+    {
+        path: url + "discount/card/type",
+        component: DiscountType,
+        name: "discount-card-type",
+    },
+    {
+        path: url + "discount/card/assign",
+        component: DiscountCardAssignPage,
+        name: "discount-card-assign",
     },
     {
         path: url + "reports/header",

@@ -339,6 +339,26 @@
                         </li>
                     </ul>
                 </li>
+                <li class="dropdown" v-if="checkPermission('discountCard')">
+                    <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
+                        <span>
+                            Discount Card
+                        </span>
+                    </a>
+                    <!--                    Permission just about terminals-->
+                    <ul class="dropdown-menu">
+                        <li class="dropdown" v-if="checkForSubmenu('discountCardtype')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'discount-card-type' }">
+                                <i class="fas fa-bookmark"></i>Discount Card Type
+                            </router-link>
+                        </li>
+                        <li class="dropdown" v-if="checkForSubmenu('discountCardAssign')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'discount-card-assign' }">
+                                <i class="fas fa-bookmark"></i> Assign Discount Card
+                            </router-link>
+                        </li>
+                    </ul>
+                </li>
                 <!-- Expenses panel -->
                 <li class="dropdown" v-if="checkPermission('expenses')">
                     <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>

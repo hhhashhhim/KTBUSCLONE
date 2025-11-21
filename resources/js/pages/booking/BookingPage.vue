@@ -76,11 +76,11 @@
                                                 <div class="form-group mb-0">
                                                     <label>CNIC <span class="text-danger"
                                                             v-if="this.addForm.type != 'advance booking'">*</span></label>
-                                                    <vue-mask
-                                                        v-on:blur="getCustomer('addFormCNIC'), getPoints('addFormCNIC')"
-                                                        class="form-control" v-model="addForm.customerCNIC"
-                                                        mask="00000-0000000-0" :raw="false" :options="options">
+                                                    <vue-mask @blur="handleBlur" class="form-control"
+                                                        v-model="addForm.customerCNIC" mask="00000-0000000-0"
+                                                        :raw="false" :options="options">
                                                     </vue-mask>
+
 
                                                 </div>
                                             </div>
@@ -113,22 +113,41 @@
                                             <div class="col-md-6">
                                                 <label class="py-2 text-danger" v-if="this.haveLabel">{{
                                                     this.label
-                                                    }}</label>
+                                                }}</label>
+                                                <label class="py-2 text-danger" v-if="this.haveLabel">{{
+                                                    this.discountLabel
+                                                }}</label>
                                             </div>
-                                            <div class="col-md-6" v-if="this.hideCheckBox">
-                                                <div class="custom-control custom-checkbox">
+                                            <div class="col-md-6">
+
+                                                <!-- POINTS CHECKBOX -->
+                                                <!-- POINTS -->
+                                                <div class="custom-control custom-checkbox" v-if="showPointsCheckbox">
                                                     <input type="checkbox" class="custom-control-input"
-                                                        id="pointsCheckBox" @click="usePoints($event)"
-                                                        :value="this.pointsCardId" name="pointsUsage">
-                                                    <label class="custom-control-label" for="pointsCheckBox">Points
-                                                        Usage</label>
+                                                        id="pointsCheckBox" name="pointsUsage" value="points"
+                                                        :checked="selectedOption === 'points'"
+                                                        @change="onRadioChange('points')">
+                                                    <label class="custom-control-label" for="pointsCheckBox">
+                                                        Points Usage
+                                                    </label>
                                                 </div>
-                                                <label class="text-danger">{{
-                                                    this.pointsUsage ? this.pointsUsage : ''
-                                                    }}</label>
+
+                                                <!-- DISCOUNT -->
+                                                <div class="custom-control custom-checkbox" v-if="showDiscountCheckbox">
+                                                    <input type="checkbox" class="custom-control-input"
+                                                        id="discountCheckBox" name="pointsUsage" value="discount"
+                                                        :checked="selectedOption === 'discount'"
+                                                        @change="onRadioChange('discount')">
+                                                    <label class="custom-control-label" for="discountCheckBox">
+                                                        Discount Usage
+                                                    </label>
+                                                </div>
+
+
                                             </div>
+
                                         </div>
-                                        <div class="row bg-light-green pt-2" v-if="this.pointsUsage">
+                                        <div class="row bg-light-green pt-2" v-if="selectedOption === 'points'">
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label for="points_use">How Many Points you want to utilize</label>
@@ -164,6 +183,61 @@
                                                     OTP</button>
                                             </div>
                                         </div>
+                                        <!-- DISCOUNT SECTION (Same style as Points) -->
+                                        <div class="row bg-light-green pt-2" v-if="selectedOption === 'discount'">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-0">
+                                                    <label for="discount_use">Discount Amount</label>
+
+                                                    <!-- Flat Discount -->
+                                                    <input v-if="discountType === 'flat'" type="text"
+                                                        class="form-control"
+                                                        placeholder="Flat discount will be applied automatically"
+                                                        :value="flatDiscount" disabled />
+
+                                                    <!-- Percentage Discount -->
+                                                    <input v-if="discountType === 'percentage'" type="text"
+                                                        class="form-control"
+                                                        placeholder="Percentage discount will be applied"
+                                                        :value="percentageDiscount + '%'" disabled />
+                                                </div>
+                                            </div>
+
+                                            <!-- OTP input (visible only when not verified) -->
+                                            <div class="col-md-6"
+                                                v-if="this.discountUsage && this.addForm.discount_otp_valid == false">
+                                                <div class="form-group mb-0">
+                                                    <label for="discount_otp">OTP</label>
+                                                    <input type="text" class="form-control" id="discount_otp"
+                                                        placeholder="Enter 6 digit OTP" v-model="addForm.discountOtp" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- OTP Verified Message -->
+                                        <div v-if="this.addForm.discount_otp_valid" class="bg-light-green pb-3 row">
+                                            <div class="col-md-12 text-center text-dark">
+                                                OTP verified successfully
+                                            </div>
+                                        </div>
+
+                                        <!-- SEND + VERIFY OTP Buttons -->
+                                        <div class="row pt-3 bg-light-green pb-3"
+                                            v-if="this.discountUsage && this.addForm.discount_otp_valid == false">
+                                            <div class="col-md-6">
+                                                <button class="btn btn-block btn-sm btn-dark"
+                                                    :class="{ 'btn-progress': otpLoader }" @click="sendDiscountOtp()">
+                                                    Send OTP
+                                                </button>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button class="btn btn-block btn-primary btn-sm ml-1"
+                                                    :class="{ 'btn-progress': otpLoader }" @click="verifyDiscountOtp()">
+                                                    Verify OTP
+                                                </button>
+                                            </div>
+                                        </div>
+
                                         <div class="row mt-2">
                                             <div v-if="checkForSubmenuButtons('terminal-id')" class="col-md-6">
                                                 <div class="form-group mb-0">
@@ -179,10 +253,9 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="form-group mb-0" v-if="showDropdown"
-                                                       >
+                                                <div class="form-group mb-0" v-if="showDropdown">
                                                     <label for="Terminals" class="mb-0">Select Bank</label>
-                                                    <select class="form-control"  v-model="selectedOption">
+                                                    <select class="form-control" v-model="selectedOption">
                                                         <option disabled value="">Select an option</option>
                                                         <option value="option1">Option 1</option>
                                                         <option value="option2">Option 2</option>
@@ -253,11 +326,16 @@
                                             <div class="col-md-2 pl-0">
                                                 <div class="form-group mb-0">
                                                     <label>Discount <span class="ml-2 text-muted"></span></label>
-                                                    <input type="text" @keypress="isNumberDiscount($event)"
+                                                    <input type="text" class="form-control" id="fareDiscount"
+                                                        v-model.number="addForm.discount" :readonly="true" />
+                                                    <!-- always readonly since discount is applied via OTP -->
+
+
+                                                    <!-- <input type="text" @keypress="isNumberDiscount($event)"
                                                         @keyup="calculateTotal()"
                                                         :readonly="!checkForSubmenuButtons('discount-field')"
                                                         class="form-control" id="fareDiscount"
-                                                        v-model="addForm.discount" />
+                                                        v-model="addForm.discount" /> -->
                                                 </div>
                                             </div>
                                             <div class="col-md-2 pl-0">
@@ -684,7 +762,7 @@
                                                     <h4 class="mb-0 font-weight-bold mr-3">Type:</h4>
                                                     <h4 class="mb-0 text-muted text-capitalize">{{
                                                         singleSeat.type
-                                                        }}</h4>
+                                                    }}</h4>
                                                 </div>
                                             </div>
                                             <div class="row my-3 pl-3">
@@ -1581,6 +1659,10 @@ export default {
             reScheduleDate: '',
             loading: false,
             otpLoader: false,
+            discountType: "",             // flat or percentage
+            flatDiscount: 0,
+            percentageDiscount: 0,
+            discountUsage: false,
             editAble: true,
             editAbleELT: true,
             getSchedule: false,
@@ -1664,6 +1746,9 @@ export default {
                 alreadyBookedId: [],
                 reservedFare: [],
                 advanceSeatClass: [],
+                discountOtp: "",
+                discount_otp_valid: false,
+                discountOtpCnic: "",
             },
             advanceCash: {
                 sale: 0,
@@ -1697,8 +1782,11 @@ export default {
 
             messageData: {
                 title: '',
-                body: ''
+                body: '',
             },
+            selectedOption: null,
+            showPointsCheckbox: false,
+            showDiscountCheckbox: false,
 
         };
     },
@@ -1767,6 +1855,51 @@ export default {
         }, 2000);
     },
     methods: {
+        onRadioChange(type) {
+
+            // --- If clicking the same radio again → unselect it ---
+            if (this.selectedOption === type) {
+                this.selectedOption = null;
+                this.pointsUsage = false;
+                this.discountUsage = false;
+
+                // Reset both fields
+                this.addForm.discountOtp = "";
+                this.addForm.discount_otp_valid = false;
+                this.addForm.pointsUseInput = "";
+                this.addForm.otp = "";
+                this.addForm.otp_valid = false;
+                return;
+            }
+
+            // --- If switching to POINTS ---
+            if (type === "points") {
+                this.selectedOption = "points";
+                this.pointsUsage = true;
+                this.discountUsage = false;
+
+                // Reset discount fields
+                this.addForm.discountOtp = "";
+                this.addForm.discount_otp_valid = false;
+            }
+
+            // --- If switching to DISCOUNT ---
+            else if (type === "discount") {
+                this.selectedOption = "discount";
+                this.discountUsage = true;
+                this.pointsUsage = false;
+
+                // Reset points fields
+                this.addForm.pointsUseInput = "";
+                this.addForm.otp = "";
+                this.addForm.otp_valid = false;
+            }
+        },
+        handleBlur() {
+            this.getCustomer('addFormCNIC');
+            this.getPoints('addFormCNIC');
+            this.getDiscountCard('addFormCNIC');
+        },
         // modal close
         closeModal() {
             $(".modal").modal('hide');
@@ -2546,36 +2679,58 @@ export default {
             return string.replace(/(\d{4})(\d{7})/, "$1-$2");
         },
         async getPoints(value) {
-            if (this.addForm.customerCNIC) {
-                const resCnicPoints = await this.callApi("post", "booking/getPoints", {
-                    cnicNumber: this.addForm.customerCNIC,
-                    status: value,
-                });
+            if (!this.addForm.customerCNIC) return;
 
-                this.pointsUsage = false;
-                if (resCnicPoints.data != "" && resCnicPoints.status == 200) {
-                    this.label = "This Customer Have a loyalty Card with " + resCnicPoints.data.starting_points + " Points";
-                    this.pointsValidation = resCnicPoints.data.starting_points;
-                    this.hideCheckBox = resCnicPoints.data.starting_points == 0 ? false : true;
-                    this.pointsCardId = resCnicPoints.data.id;
-                    this.haveLabel = true;
+            const res = await this.callApi("post", "booking/getPoints", {
+                cnicNumber: this.addForm.customerCNIC,
+                status: value,
+            });
+
+            this.showPointsCheckbox = false;  // reset
+
+            if (res.status === 200 && res.data !== "") {
+                this.label = "This Customer Has a Loyalty Card with " + res.data.starting_points + " Points";
+                this.pointsCardId = res.data.id;
+                this.pointsValidation = res.data.starting_points;
+                this.showPointsCheckbox = res.data.starting_points > 0;
+                this.haveLabel = true;
+            } else {
+                this.label = "";
+                this.showPointsCheckbox = false;
+            }
+        },
+        async getDiscountCard(value) {
+            if (!this.addForm.customerCNIC) return;
+
+            const res = await this.callApi("post", "booking/getDiscountCard", {
+                cnicNumber: this.addForm.customerCNIC,
+                status: value,
+            });
+
+            this.showDiscountCheckbox = false; // reset
+
+            if (res.status === 200 && res.data !== "") {
+                const card = res.data.discount_card_type;
+
+                // Detect whether discount is flat or percentage
+                let discountText = "";
+                if (card.discount_type === "flat") {
+                    discountText = `Flat Discount: Rs ${card.flat_discount}`;
+                } else if (card.discount_type === "percentage") {
+                    discountText = `Discount: ${card.percentage_discount}%`;
                 }
-                if (resCnicPoints.data == "" && resCnicPoints.status == 200) {
-                    this.label = "";
-                    this.pointsValidation = "";
-                    this.hideCheckBox = false;
-                    this.haveLabel = false;
-                }
-                if (resCnicPoints.status == 201) {
-                    this.label = resCnicPoints.data.expiredData;
-                    this.pointsValidation = "";
-                    this.hideCheckBox = false;
-                    this.haveLabel = true;
-                }
-                if (resCnicPoints.status == 404) {
-                    this.label = "";
-                    this.pointsValidation = "";
-                    this.hideCheckBox = false;
+
+                // Show label with discount amount
+                this.discountLabel = `This Customer Has a Discount Card (${discountText})`;
+
+                this.discountCardId = res.data.id;
+                this.showDiscountCheckbox = true;
+                this.haveLabel = true;
+            } else {
+                this.discountLabel = "";
+                this.showDiscountCheckbox = false;
+
+                if (!this.showPointsCheckbox) {
                     this.haveLabel = false;
                 }
             }
@@ -2675,19 +2830,23 @@ export default {
             }
         },
 
-        calculateTotal: function () {
-            if (this.addForm.discount > this.addForm.totalFare) {
+        calculateTotal() {
+            const fare = Number(this.addForm.totalFare);
+            const discount = Number(this.addForm.discount || 0);
+
+            if (discount > fare) {
                 this.addForm.discount = 0;
-                this.addForm.totalAmount = parseFloat(this.addForm.totalFare);
+                this.addForm.totalAmount = fare;
+
                 return swal({
                     title: "Ops",
                     text: "Discount Cannot be more than Amount Receivable",
                     icon: "error",
                     timer: 2000
                 });
-            } else {
-                this.addForm.totalAmount = parseFloat(this.addForm.totalFare) - (this.addForm.discount ? (this.addForm.discount) : this.addForm.totalFare)
             }
+
+            this.addForm.totalAmount = fare - discount;
         },
 
         isNumber: function (evt) {
@@ -3644,7 +3803,140 @@ export default {
             }
             this.otpLoader = false;
         },
+        async sendDiscountOtp() {
 
+            if (!this.addForm.customerCNIC) {
+                return swal({
+                    title: "OOPS!",
+                    text: "Please enter valid CNIC",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
+            this.otpLoader = true;
+
+            const resMessage = await this.callApi("post", "booking/send-discount-otp", this.addForm);
+
+            if (resMessage.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "OTP Sent Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+            }
+
+            if (resMessage.status == 409) {
+                swal({
+                    title: "OOPS!",
+                    text: resMessage.data.error.join("\n"),
+                    icon: "error",
+                    timer: 2000
+                });
+                console.log(resMessage.data.error);
+            }
+
+            this.otpLoader = false;
+        },
+
+
+        async verifyDiscountOtp() {
+            if (!this.addForm.discountOtp || this.addForm.discountOtp.length !== 6) {
+                return swal({
+                    title: "OOPS!",
+                    text: "Please enter a valid 6-digit OTP",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
+            this.otpLoader = true;
+
+            const resMessage = await this.callApi("post", "booking/verify-discount-otp", this.addForm);
+
+            if (resMessage.status == 200) {
+                this.addForm.discount_otp_valid = true;
+                this.addForm.discountOtpCnic = this.addForm.customerCNIC;
+
+                // Apply discount automatically
+                await this.applyDiscountCardAuto();
+
+                swal({
+                    title: "Success",
+                    text: "Discount OTP Verified Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+            }
+
+            if (resMessage.status === 409) {
+                this.addForm.discount_otp_valid = false;
+
+                swal({
+                    title: "OOPS!",
+                    text: resMessage.data.error.join("\n"),
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
+            this.otpLoader = false;
+        },
+        async applyDiscountCardAuto() {
+            if (!this.addForm.customerCNIC) return;
+
+            const cleanCNIC = this.addForm.customerCNIC.replace(/\D/g, "");
+
+            try {
+                const res = await this.callApi("post", "booking/getDiscountCard", {
+                    cnicNumber: this.addForm.customerCNIC,
+                    status: 'addFormCNIC'
+                });
+
+                if (res.status === 200 && res.data && res.data.discount_card_type) {
+                    const card = res.data.discount_card_type;
+                    let discountAmount = 0;
+                    let discountText = "";
+
+                    if (card.discount_type === "flat") {
+                        discountAmount = Number(card.flat_discount || 0);
+                        discountText = `Flat Discount: Rs ${discountAmount}`;
+                    } else if (card.discount_type === "percentage") {
+                        discountAmount = (Number(this.addForm.totalFare) * Number(card.percentage_discount || 0)) / 100;
+                        discountText = `Discount: ${card.percentage_discount}%`;
+                    }
+
+                    // Apply discount
+                    this.addForm.discount = discountAmount;
+
+                    // Recalculate total
+                    this.$nextTick(() => this.calculateTotal());
+
+                    // Update UI
+                    this.discountLabel = `This Customer Has a Discount Card (${discountText})`;
+                    this.discountCardId = res.data.id;
+                    this.showDiscountCheckbox = true;
+                    this.haveLabel = true;
+
+                } else {
+                    // No discount
+                    this.addForm.discount = 0;
+                    this.$nextTick(() => this.calculateTotal());
+                    this.discountLabel = "";
+                    this.showDiscountCheckbox = false;
+                    if (!this.showPointsCheckbox) this.haveLabel = false;
+                }
+
+            } catch (error) {
+                console.error("Error fetching discount card:", error);
+                this.addForm.discount = 0;
+                this.$nextTick(() => this.calculateTotal());
+                this.discountLabel = "";
+                this.showDiscountCheckbox = false;
+                if (!this.showPointsCheckbox) this.haveLabel = false;
+            }
+        },
         async resetArrays() {
             this.selectedSeats = [];
             this.schedule = [];

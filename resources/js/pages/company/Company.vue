@@ -652,6 +652,40 @@ export default {
                         }
                     ]
                 },
+                {
+                    name: "discountCard",
+                    allow: true,
+                    childs: [
+                        {
+                            name: "discountCardtype",
+                            allow: true,
+                            buttons: [
+                                {
+                                    name: "add-card-discount",
+                                    allow: true,
+                                },
+                                {
+                                    name: "edit-card-discount",
+                                    allow: true,
+                                }
+                            ]
+                        },
+                        {
+                            name: "discountCardAssign",
+                            allow: true,
+                            buttons: [
+                                {
+                                    name: "add-assign-discount",
+                                    allow: true,
+                                },
+                                {
+                                    name: "edit-assign-discount",
+                                    allow: true,
+                                }
+                            ]
+                        }
+                    ]
+                },
 
                 // Expenses Panel
                 {
