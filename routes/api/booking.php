@@ -16,11 +16,14 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
     Route::post('/cities', [BookingController::class, 'cities']);
     Route::post('/store', [BookingController::class, 'store']);
     Route::post('/send-otp', [BookingController::class, 'sendOtp']);
+    Route::post('/send-discount-otp', [BookingController::class, 'sendDiscountOtp']);
     Route::post('/verify-otp', [BookingController::class, 'verifyOtp']);
+    Route::post('/verify-discount-otp', [BookingController::class, 'verifyDiscountOtp']);
     Route::post('/terminals', [BookingController::class, 'getTerminals']);
     // Route::post('/delete', [BookingController::class, 'deleteBooking']);
     Route::post('/getCNIC', [BookingController::class, 'getCnic']);
     Route::post('/getPoints', [BookingController::class, 'getPoints']);
+    Route::post('/getDiscountCard', [BookingController::class, 'getDiscountCard']);
     Route::post('/usagePoints', [BookingController::class, 'usagePoints']);
     // Route::post('/details', [BookingController::class, 'detailTicket']);
     Route::post('/reschedule', [BookingController::class, 'singleReschedule']);

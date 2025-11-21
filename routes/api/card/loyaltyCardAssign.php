@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Card\CardAssignController;
+use App\Http\Controllers\DiscountType\DiscountCardAssignController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -10,5 +11,13 @@ Route::group(['prefix' => 'web/v1/loyaltyCardAssign','middleware' => ['auth:sanc
     Route::post('/categories', [CardAssignController::class, 'cardCategories']);
     Route::post('/update', [CardAssignController::class, 'update']);
     Route::post('/getCNIC', [CardAssignController::class, 'getCNIC']);
+
+});
+Route::group(['prefix' => 'web/v1/discountCardAssign','middleware' => ['auth:sanctum']], function () {
+    Route::post('/', [DiscountCardAssignController::class, 'index']);
+    Route::post('/store', [DiscountCardAssignController::class, 'store']);
+    Route::post('/categories', [DiscountCardAssignController::class, 'cardCategories']);
+    Route::post('/update', [DiscountCardAssignController::class, 'update']);
+    Route::post('/getCNIC', [DiscountCardAssignController::class, 'getCNIC']);
 
 });

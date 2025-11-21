@@ -38,10 +38,11 @@ use Rawilk\Printing\Receipts\ReceiptPrinter;
 
 
 if (!function_exists('checkForSubmenu')) {
-    function checkForSubmenu($moduleName) {
+    function checkForSubmenu($moduleName)
+    {
         $permissions = Role::find(Auth::user()->role_id)->permissions;
         $valid = false;
-    
+
         // Loop through each permission item
         foreach ($permissions as $permission) {
             // Check if 'childs' key exists and is an array
@@ -58,19 +59,20 @@ if (!function_exists('checkForSubmenu')) {
                 }
             }
         }
-    
+
         return $valid;
     }
 }
 if (!function_exists('countSeatFromMap')) {
-    function countSeatFromMap($seatMap) {
-        
+    function countSeatFromMap($seatMap)
+    {
+
         $flattenedSeatMap = array_merge(...$seatMap);
-        $reservedSeatsOfType0 = array_filter($flattenedSeatMap, function($seat) {
+        $reservedSeatsOfType0 = array_filter($flattenedSeatMap, function ($seat) {
             return isset($seat['reserved']) && $seat['reserved'] === true &&
                 isset($seat['type']) && $seat['type'] === 0;
         });
-        $count = array_reduce($reservedSeatsOfType0, function($carry, $seat) {
+        $count = array_reduce($reservedSeatsOfType0, function ($carry, $seat) {
             return $carry + 1;
         }, 0);
 
@@ -81,16 +83,11 @@ if (!function_exists('checkPermissionButtons')) {
     function checkPermissionButtons($name)
     {
         $permissions = Role::find(Auth::user()->role_id)->permissions;
-        foreach($permissions as $menu)
-        {
-            foreach($menu['childs'] as $submenu)
-            {
-                if(isset($submenu['buttons']))
-                {
-                    foreach($submenu['buttons'] as $button)
-                    {
-                        if($button['name'] == $name)
-                        {
+        foreach ($permissions as $menu) {
+            foreach ($menu['childs'] as $submenu) {
+                if (isset($submenu['buttons'])) {
+                    foreach ($submenu['buttons'] as $button) {
+                        if ($button['name'] == $name) {
                             return $button['allow'];
                         }
                     }
@@ -203,7 +200,8 @@ if (!function_exists('priceDiff')) {
             ];
         }
         if ($new < $old) {
-            return ['diff' => $new - $old,
+            return [
+                'diff' => $new - $old,
                 'type' => 'refund to customer',
             ];
         }
@@ -211,19 +209,19 @@ if (!function_exists('priceDiff')) {
 }
 
 if (!function_exists('checkDiscountAmount')) {
-    function checkDiscountAmount($detail,$terminalId,$fare_class)
+    function checkDiscountAmount($detail, $terminalId, $fare_class)
     {
 
         $scheduleDiscount = Discount::where('id', $detail->schedule->discount_id)
-        ->where('is_active', 1)
-        ->whereHas("discount_terminals", function ($q) use ($terminalId) {
-            $q->where("terminal_id", $terminalId ?? Auth::user()->terminal_id);
-        })
-        ->first();
+            ->where('is_active', 1)
+            ->whereHas("discount_terminals", function ($q) use ($terminalId) {
+                $q->where("terminal_id", $terminalId ?? Auth::user()->terminal_id);
+            })
+            ->first();
 
         $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $detail->schedule->route_id])
-        ->where('start_date', '<=', $detail->departure_date)
-        ->where('end_date', '>=', $detail->departure_date)->first();
+            ->where('start_date', '<=', $detail->departure_date)
+            ->where('end_date', '>=', $detail->departure_date)->first();
 
         $fare = FareTable::where('from_city_id', $detail->departure_id)
             ->where('to_city_id', $detail->destination_id)
@@ -250,41 +248,35 @@ if (!function_exists('checkDiscountAmount')) {
             $discounted_fare = $discounted_fare - $tdiscount;
         }
         // check if any discount/surcharge apply then it should apply custom round other wise show fix fare
-        if($fare == $discounted_fare)
-        {
+        if ($fare == $discounted_fare) {
             return (object)[
                 "schedule_discount" => 0,
                 "terminal_discount" => 0,
             ];
         }
-        
+
         $appliedFare = customRound($discounted_fare);
 
         $roundAmount = $discounted_fare - $appliedFare;
-        
-        if($sdiscount > 0 && $tdiscount > 0)
-        {
+
+        if ($sdiscount > 0 && $tdiscount > 0) {
             return (object)[
-                "schedule_discount" => round($sdiscount + ($roundAmount/2)),
-                "terminal_discount" => intVal($tdiscount + ($roundAmount/2)),
+                "schedule_discount" => round($sdiscount + ($roundAmount / 2)),
+                "terminal_discount" => intVal($tdiscount + ($roundAmount / 2)),
             ];
-        }
-        elseif($sdiscount > 0)
-        {
+        } elseif ($sdiscount > 0) {
             return (object)[
                 "schedule_discount" => $sdiscount + $roundAmount,
                 "terminal_discount" => 0,
             ];
-        }
-        elseif($tdiscount > 0)
-        {
+        } elseif ($tdiscount > 0) {
             return (object)[
                 "schedule_discount" => 0,
                 "terminal_discount" => $tdiscount + $roundAmount,
             ];
         }
-       
-        
+
+
         // $result = $discount % 100;
         // if($result == 0)
         // {
@@ -295,29 +287,28 @@ if (!function_exists('checkDiscountAmount')) {
         //     return $discount - $result;
         // }
 
-        
+
     }
 }
 
 if (!function_exists('seatFareIsWrong')) {
     function seatFareIsWrong($request)
     {
-        foreach($request->selected_seats_fare as $i => $value)
-        {
+        foreach ($request->selected_seats_fare as $i => $value) {
             $fareForAllClasses = FareTable::where('from_city_id', $request->departure_city_id)->where('to_city_id', $request->destination_city_id)
-            ->where('company_id', Auth::user()->company_id)
-            ->get()->unique('fare_class');
+                ->where('company_id', Auth::user()->company_id)
+                ->get()->unique('fare_class');
             $schedule = Schedule::where('id', $request->schedule_id)
-            ->where('company_id', Auth::user()->company_id)
-            ->first();
+                ->where('company_id', Auth::user()->company_id)
+                ->first();
             $scheduleDiscount = Discount::where('id', $schedule->discount_id)
-            ->where('is_active', 1)
-            ->whereHas("discount_terminals", function ($q){
-                $q->where("terminal_id", Auth::user()->terminal_id);
-            })
-            ->first();
+                ->where('is_active', 1)
+                ->whereHas("discount_terminals", function ($q) {
+                    $q->where("terminal_id", Auth::user()->terminal_id);
+                })
+                ->first();
             $terminalDiscount = TerminalDiscount::where(["terminal_id" => Auth::user()->terminal_id, "route_id" => $schedule->route_id])->where('start_date', '<=', $request->date)
-            ->where('end_date', '>=', $request->date)->first();
+                ->where('end_date', '>=', $request->date)->first();
             $scheduleSurcharge = Surcharge::where('id', $schedule->surcharge_id)->where('is_active', 1)->first();
 
             $data = $fareForAllClasses->where('fare_class', $request->selected_seats_class[$i])->first();
@@ -345,13 +336,11 @@ if (!function_exists('seatFareIsWrong')) {
                     $fare = (int)$data->fare + $scheduleSurcharge->flat;
                 }
             }
-            if($fare != $startFare)
-            {
-                $fare = customRound($fare??0);
+            if ($fare != $startFare) {
+                $fare = customRound($fare ?? 0);
             }
-            
-            if($fare != $request->selected_seats_fare[$i])
-            {
+
+            if ($fare != $request->selected_seats_fare[$i]) {
                 return true;
             }
         }
@@ -371,8 +360,10 @@ if (!function_exists('updateFare')) {
             'distance_in_km' => $request->distance_in_km,
             'updated_by' => Auth::user()->id,
         ]);
-        FareTable::where('from_city_id', $request->to)->where('to_city_id', $request->from)->where('fare_class',
-            $request->fare_class)->update([
+        FareTable::where('from_city_id', $request->to)->where('to_city_id', $request->from)->where(
+            'fare_class',
+            $request->fare_class
+        )->update([
             'fare' => $request->fare,
             'from_city_id' => $request->to,
             'to_city_id' => $request->from,
@@ -398,21 +389,18 @@ if (!function_exists('updateFare')) {
 
 //Updated Already advanced Booked Seat
 if (!function_exists('updateAdvancedSeat')) {
-    function updateAdvancedSeat($request, $invoice,$finalAmountDiscount)
+    function updateAdvancedSeat($request, $invoice, $finalAmountDiscount)
     {
         // $customerData =  Customer::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request->customerCNIC))->orWhere("contact",plainContactAndCnic($request->contact))->first();
         $customerData =  Customer::where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request->customerCNIC))->first();
         // $customerAll = [];
-        if($customerData)
-        {
+        if ($customerData) {
             $customerData->update([
                 'name' => $request->customerName,
                 'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
                 'contact' => plainContactAndCnic($request->contact),
             ]);
-        }
-        else
-        {
+        } else {
             $customerData = Customer::create([
                 'company_id' => Auth::user()->company_id,
                 'added_by' => Auth::user()->id,
@@ -427,12 +415,12 @@ if (!function_exists('updateAdvancedSeat')) {
             ->where('schedule_id', $request->schedule)
             ->where('departure_date', $request->date)
             ->where('company_id', Auth::user()->company_id)
-            ->where('departure_time', date("H:i:s",strtotime($request->departure_time)))
+            ->where('departure_time', date("H:i:s", strtotime($request->departure_time)))
             ->first();
 
         foreach ($request->alreadyBookedId as $key => $single) {
             $customer_id = Ticket::where('company_id', Auth::user()->company_id)->where('id', $single)->first();
-            $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->advanceSeatClass[$key]);
+            $checkDiscount =  checkDiscountAmount($detail, $request->terminalId, $request->advanceSeatClass[$key]);
             $customer_id->update([
                 'type' => 'booked',
                 'schedule_time' => $request->departure_time,
@@ -450,9 +438,8 @@ if (!function_exists('updateAdvancedSeat')) {
             ]);
 
             // online terminal request will be differrent so it is in if condition
-            if($request->destinationCity)
-            {
-            // checking partial
+            if ($request->destinationCity) {
+                // checking partial
                 $schedule = Schedule::where('id', $customer_id->schedule_id)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                 $departure_city_id = $schedule->route->fares->first()->departure_city_id;
                 $destination_city_id = $schedule->route->fares->last()->destination_city_id;
@@ -460,7 +447,7 @@ if (!function_exists('updateAdvancedSeat')) {
                 if ($request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id) {
                     $isPartial = 1;
                 }
-                
+
                 $customer_id->update([
                     'terminal_id' => $request->terminalId,
                     'departure_city_id' => $request->departureCity,
@@ -469,7 +456,7 @@ if (!function_exists('updateAdvancedSeat')) {
                     'is_partial' => $isPartial,
                     'destination_city_id' => $request->destinationCity,
                 ]);
-                
+
 
                 if ($isPartial == 1) {
                     TicketIsPartial::create([
@@ -487,9 +474,7 @@ if (!function_exists('updateAdvancedSeat')) {
                         'type' => $customer_id->type,
                         'added_by' => Auth::user()->id,
                     ]);
-                }
-                else
-                {
+                } else {
                     TicketIsPartial::where([
                         'ticket_id' => $customer_id->id,
                     ])->delete();
@@ -509,14 +494,12 @@ if (!function_exists('updateAdvancedSeat')) {
 }
 
 if (!function_exists('terminalTimes')) {
-    function terminalTimes($detail,$route)
+    function terminalTimes($detail, $route)
     {
         $departure_times = [];
-        $terminalTime = TerminalTimeDifference::where(['company_id' => Auth::user()->company_id, 'city_id' => $detail->departure_id, 'route_id' => $route,'show'=>1])->with("terminal:id,name")->get();
-        if($terminalTime->count() > 0)
-        {
-            foreach($terminalTime as $single)
-            {
+        $terminalTime = TerminalTimeDifference::where(['company_id' => Auth::user()->company_id, 'city_id' => $detail->departure_id, 'route_id' => $route, 'show' => 1])->with("terminal:id,name")->get();
+        if ($terminalTime->count() > 0) {
+            foreach ($terminalTime as $single) {
                 $time = (object)[];
                 $sub = 0;
                 $sub = $single->time_difference * 60;
@@ -524,9 +507,7 @@ if (!function_exists('terminalTimes')) {
                 $time->terminal_time = date("h:i A", strtotime($detail->departure_date . " " . $detail->departure_time) + $sub);
                 $departure_times[] = $time;
             }
-        }
-        else
-        {
+        } else {
             $time = (object)[];
             $time->terminal_name = 'time';
             $time->terminal_time = date("h:i A", strtotime($detail->departure_time));
@@ -547,60 +528,60 @@ if (!function_exists('superDataWhatsappMessage')) {
 
         // confirm | reserve | over issue | today | lastday tickets
         $ticketData = Ticket::withTrashed()
-        ->where("date", $today)
-        ->get();
-        
+            ->where("date", $today)
+            ->get();
+
         // today new customer
         $newCustomer = Ticket::where("date", $today)
-        ->whereNotIn('customer_id', function ($query) use ($today) {
-            $query->select('customer_id')
-                  ->from('tickets')
-                  ->whereDate('date', '<', $today);
-        })
-        ->select('customer_id','date')
-        ->distinct() 
-        ->get();
-        
+            ->whereNotIn('customer_id', function ($query) use ($today) {
+                $query->select('customer_id')
+                    ->from('tickets')
+                    ->whereDate('date', '<', $today);
+            })
+            ->select('customer_id', 'date')
+            ->distinct()
+            ->get();
+
         // today customer repeat
         $oldCustomer = Ticket::where("date", $today)
-        ->whereIn('customer_id', function ($query) use ($today) {
-            $query->select('customer_id')
-                  ->from('tickets')
-                  ->whereDate('date', '<', $today);
-        })
-        ->select('customer_id','date')
-        ->distinct() 
-        ->get();
+            ->whereIn('customer_id', function ($query) use ($today) {
+                $query->select('customer_id')
+                    ->from('tickets')
+                    ->whereDate('date', '<', $today);
+            })
+            ->select('customer_id', 'date')
+            ->distinct()
+            ->get();
 
         $pending_merges = TicketClosing::where('company_id', Auth::user()->company_id)
-        ->where("hide",0)
-        ->get()
-        ->groupBy('ticket_merge_id')
-        ->filter(function ($group){
-            return $group->count() == 1;
-        })
-        ->count();
+            ->where("hide", 0)
+            ->get()
+            ->groupBy('ticket_merge_id')
+            ->filter(function ($group) {
+                return $group->count() == 1;
+            })
+            ->count();
 
-        $today_confirm = $ticketData->where("date",$today)->where("type","booked")->count();
-        $today_reserve = $ticketData->where("date",$today)->where("type","advance booking")->count();
-        $today_cancel = $ticketData->where("date",$today)->where("type","canceled")->count();
-        $today_overissue = $ticketData->where("date",$today)->where("type","over-issue")->count();
-        $today_discount = $ticketData->where("type","booked")->where("date",$today)->sum(function ($ticket) {
+        $today_confirm = $ticketData->where("date", $today)->where("type", "booked")->count();
+        $today_reserve = $ticketData->where("date", $today)->where("type", "advance booking")->count();
+        $today_cancel = $ticketData->where("date", $today)->where("type", "canceled")->count();
+        $today_overissue = $ticketData->where("date", $today)->where("type", "over-issue")->count();
+        $today_discount = $ticketData->where("type", "booked")->where("date", $today)->sum(function ($ticket) {
             return $ticket->discount + $ticket->terminal_discount + $ticket->schedule_discount;
         });
-        $today_new_customers = $newCustomer->where("date",$today)->count();
-        $today_old_customers = $oldCustomer->where("date",$today)->count();
-        $today_sale = $ticketData->whereIn('type', ['booked', 'over-issue'])->where("date",$today)->sum(function ($ticket) {
+        $today_new_customers = $newCustomer->where("date", $today)->count();
+        $today_old_customers = $oldCustomer->where("date", $today)->count();
+        $today_sale = $ticketData->whereIn('type', ['booked', 'over-issue'])->where("date", $today)->sum(function ($ticket) {
             return $ticket->seat_fare - $ticket->discount;
         });
-         
+
         $url = "https://whatsapp.sarzone.com/api/send-messages";
         $mobile = "923203948283";
         $mobile2 = "923167347272";
         $mobile3 = "923056198121";
         // $mobile2 = "923333068686";
         $session = "Muhammad-Shahzaib_3-sarzone";
-        $messageConfirmed = "*Dear Sir following is the report of Kainat Travels for the date of ".date('d M Y',strtotime($today))."*
+        $messageConfirmed = "*Dear Sir following is the report of Kainat Travels for the date of " . date('d M Y', strtotime($today)) . "*
 
 * Total Confirmed Seats : *$today_confirm*
 * Total Reserved Seats : *$today_reserve*
@@ -613,100 +594,93 @@ if (!function_exists('superDataWhatsappMessage')) {
 * Pending Merges : *$pending_merges*";
 
         $response = Http::withHeaders([
-            'X-Api-Key'=>$auth_key,
+            'X-Api-Key' => $auth_key,
         ])->post($url, [
             "session" => $session,
             "message_type" =>  'text',
-            "receiver_number" => $mobile, 
+            "receiver_number" => $mobile,
             "message_body" => $messageConfirmed
         ]);
         $response2 = Http::withHeaders([
-            'X-Api-Key'=>$auth_key,
+            'X-Api-Key' => $auth_key,
         ])->post($url, [
             "session" => $session,
             "message_type" =>  'text',
-            "receiver_number" => $mobile2, 
+            "receiver_number" => $mobile2,
             "message_body" => $messageConfirmed
         ]);
         $response2 = Http::withHeaders([
-            'X-Api-Key'=>$auth_key,
+            'X-Api-Key' => $auth_key,
         ])->post($url, [
             "session" => $session,
             "message_type" =>  'text',
-            "receiver_number" => $mobile3, 
+            "receiver_number" => $mobile3,
             "message_body" => $messageConfirmed
         ]);
-        
     }
 }
 if (!function_exists('ticketConfirmedMessage')) {
     function ticketConfirmedMessage($invoice_id)
     {
-        $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
-        $message_allow = Terminal::where("id",Auth::user()->terminal_id)->first()->send_message;
-        if($auth_key && $message_allow)
-        {
-            $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->withTrashed()->where("invoice_id",$invoice_id)->get();
+        $auth_key = Company::where("id", Auth::user()->company_id)->first()->whatsapp_auth_key;
+        $message_allow = Terminal::where("id", Auth::user()->terminal_id)->first()->send_message;
+        if ($auth_key && $message_allow) {
+            $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->withTrashed()->where("invoice_id", $invoice_id)->get();
             $tickets->map(function ($item) {
                 $item->acutal_time = $item->date . " " . $item->schedule_time; //if ticket booked from another terminal
 
                 $sub = 0;
                 $terminalTime = TerminalTimeDifference::where(['company_id' => $item->company_id, 'terminal_id' => $item->terminal_id, 'route_id' => $item->route_id])->first();
-                if($terminalTime)
-                {
+                if ($terminalTime) {
                     $sub = $terminalTime->time_difference * 60;
                 }
 
                 $item->acutal_time = date("Y-m-d H:i:00", strtotime($item->date . " " . $item->schedule_time) + $sub);
             });
             $format = TicketsTemplate::with("terminal")
-                    ->join("ticket_template_terminals","ticket_template_terminals.ticket_template_id","tickets_templates.id")
-                    ->whereNull('tickets_templates.deleted_at')
-                    ->whereNull('ticket_template_terminals.deleted_at')
-                    ->where(['tickets_templates.company_id'=> Auth::user()->company_id,"ticket_template_terminals.terminal_id"=>Auth::user()->terminal_id])->where('tickets_templates.status', 1)
-                    ->first();
+                ->join("ticket_template_terminals", "ticket_template_terminals.ticket_template_id", "tickets_templates.id")
+                ->whereNull('tickets_templates.deleted_at')
+                ->whereNull('ticket_template_terminals.deleted_at')
+                ->where(['tickets_templates.company_id' => Auth::user()->company_id, "ticket_template_terminals.terminal_id" => Auth::user()->terminal_id])->where('tickets_templates.status', 1)
+                ->first();
 
             $type = $tickets[0]->type;
-            $cancelMessage = SubRoute::where(["from_city"=>$tickets[0]->departure_city_id,"to_city"=>$tickets[0]->destination_city_id])->first()->cancel_message??'';
+            $cancelMessage = SubRoute::where(["from_city" => $tickets[0]->departure_city_id, "to_city" => $tickets[0]->destination_city_id])->first()->cancel_message ?? '';
             // this is for timing from different terminal
             $html = "";
-            $terminalTime = TerminalTimeDifference::where(['company_id' => $tickets[0]->company_id, 'city_id' => $tickets[0]->departure_city_id, 'route_id' => $tickets[0]->route_id,'show'=>1])->with("terminal:id,name")->get();
-            if($terminalTime->count() > 0)
-            {
-                foreach($terminalTime as $single)
-                {
+            $terminalTime = TerminalTimeDifference::where(['company_id' => $tickets[0]->company_id, 'city_id' => $tickets[0]->departure_city_id, 'route_id' => $tickets[0]->route_id, 'show' => 1])->with("terminal:id,name")->get();
+            if ($terminalTime->count() > 0) {
+                foreach ($terminalTime as $single) {
                     $sub = 0;
                     $sub = $single->time_difference * 60;
-                    $html .= "*".($single->display_name ? $single->display_name : 'Time').":* ".date("h:i A", strtotime($tickets[0]->date . " " . $tickets[0]->schedule_time) + $sub)."\n";
+                    $html .= "*" . ($single->display_name ? $single->display_name : 'Time') . ":* " . date("h:i A", strtotime($tickets[0]->date . " " . $tickets[0]->schedule_time) + $sub) . "\n";
                 }
-            }
-            else
-            {
-                $html .= "*Time:* ".date("h:i A", strtotime($tickets[0]->schedule_time))."\n";
+            } else {
+                $html .= "*Time:* " . date("h:i A", strtotime($tickets[0]->schedule_time)) . "\n";
             }
 
-        
-        // to choose random device
-        // Define an array of names
-        $names = [
-            1 => 'Hamza_4-Device1',
-            2 => 'Hamza_4-Device2-201-samsung-a20',
-            3 => 'Hamza_4-Device3-204-samsung-a20',
-            4 => 'Hamza_4-Device4',
-            5 => 'Hamza_4-Device-5'
-        ];
-        $randomNumber = rand(1, 5);
+
+            // to choose random device
+            // Define an array of names
+            $names = [
+                1 => 'Hamza_4-Device1',
+                2 => 'Hamza_4-Device2-201-samsung-a20',
+                3 => 'Hamza_4-Device3-204-samsung-a20',
+                4 => 'Hamza_4-Device4',
+                5 => 'Hamza_4-Device-5'
+            ];
+            $randomNumber = rand(1, 5);
 
 
-        
-         
-        $url = "https://whatsapp.sarzone.com/api/send-messages";
-        $mobile = "92".substr($tickets[0]->customer->contact, -10);
-        $session = $names[$randomNumber];
-        $messageConfirmed = "Dear ".$tickets[0]->customer->name.",
-Seat# ".implode(',',$tickets->pluck('seat_no')->toArray()).",
-".$tickets[0]->departure_city->name." to ".$tickets[0]->destination_city->name."
-Date ".$tickets[0]->date."
+
+
+            $url = "https://whatsapp.sarzone.com/api/send-messages";
+            $mobile = "92" . substr($tickets[0]->customer->contact, -10);
+            $session = $names[$randomNumber];
+            $messageConfirmed = "Dear " . $tickets[0]->customer->name . ",
+Seat# " . implode(',', $tickets->pluck('seat_no')->toArray()) . ",
+" . $tickets[0]->departure_city->name . " to " . $tickets[0]->destination_city->name . "
+Date " . $tickets[0]->date . "
 has been Confirmed
 Departure at:
 $html
@@ -721,126 +695,116 @@ Terms & conditions applied
 4:For passenger safety Bus will not pick/drop passengers from Roadside or outside Company Terminal
 5: Keep your personal belongings Safe Company is not responsible for any loss or damage.";
 
-        $messageReserved = "Dear ".$tickets[0]->customer->name.",
-Seat# ".implode(',',$tickets->pluck('seat_no')->toArray()).",
-".$tickets[0]->departure_city->name." to ".$tickets[0]->destination_city->name."
-Date ".$tickets[0]->date."
+            $messageReserved = "Dear " . $tickets[0]->customer->name . ",
+Seat# " . implode(',', $tickets->pluck('seat_no')->toArray()) . ",
+" . $tickets[0]->departure_city->name . " to " . $tickets[0]->destination_city->name . "
+Date " . $tickets[0]->date . "
 Is Reserved
 Departure at:
 $html
-".$cancelMessage."
+" . $cancelMessage . "
 
 Terms & conditions applied.";
 
-        $finalData = [
-            'tickets' => $tickets,
-            'format' => $format,
-        ];
+            $finalData = [
+                'tickets' => $tickets,
+                'format' => $format,
+            ];
 
-        $pdf = Pdf::loadView('pdf/singleTicket', ['data' => $finalData]);
+            $pdf = Pdf::loadView('pdf/singleTicket', ['data' => $finalData]);
 
-        // Render the PDF and get the output as a string
-        $pdfOutput = $pdf->output();
+            // Render the PDF and get the output as a string
+            $pdfOutput = $pdf->output();
 
-        // Convert the PDF output to a Base64 string
-        $base64Pdf = base64_encode($pdfOutput);
-        try{
+            // Convert the PDF output to a Base64 string
+            $base64Pdf = base64_encode($pdfOutput);
+            try {
                 $response = Http::withHeaders([
-                    'X-Api-Key'=>$auth_key,
+                    'X-Api-Key' => $auth_key,
                 ])
-                ->timeout(1)
-                ->post($url, [
-                    "session" => $session,
-                    "receiver_number" => $mobile, 
-                    "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed,
-                    "message_type" =>  $type == "advance booking" ? 'text' : 'media',
-                    "file_type" => $type == "advance booking" ? null : "base64",
-                    "file" => $type == "advance booking" ? null : $base64Pdf,
-                    "file_name" => $type == "advance booking" ? null : $tickets[0]->customer->name
-                ]);
+                    ->timeout(1)
+                    ->post($url, [
+                        "session" => $session,
+                        "receiver_number" => $mobile,
+                        "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed,
+                        "message_type" =>  $type == "advance booking" ? 'text' : 'media',
+                        "file_type" => $type == "advance booking" ? null : "base64",
+                        "file" => $type == "advance booking" ? null : $base64Pdf,
+                        "file_name" => $type == "advance booking" ? null : $tickets[0]->customer->name
+                    ]);
                 return $response;
             } catch (\Exception $e) {
-
             }
         }
     }
 }
 
 if (!function_exists('ticketRescheduledMessage')) {
-    function ticketRescheduledMessage($old_tickets,$new_tickets)
+    function ticketRescheduledMessage($old_tickets, $new_tickets)
     {
-        $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
-        $message_allow = Terminal::where("id",Auth::user()->terminal_id)->first()->send_message;
-        if($auth_key && $message_allow)
-        {
-        $old_seats = implode(",",Ticket::withTrashed()->whereIn("id",$old_tickets)->pluck("seat_no")->toArray());
-        $new_seats = implode(",",Ticket::whereIn("id",$new_tickets)->pluck("seat_no")->toArray());
-        $old_detail = Ticket::withTrashed()->where("id",$old_tickets[0])->with("departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
-        $new_detail = Ticket::where("id",$new_tickets[0])->with("departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
-        $cancelMessage = SubRoute::where(["from_city"=>$old_detail->departure_city_id,"to_city"=>$old_detail->destination_city_id])->first()->cancel_message??'';
-        $type = $new_detail->type;
-        // this is for timing from different terminal
-        $old_html = "";
-        $oldTerminalTime = TerminalTimeDifference::where(['company_id' => $old_detail->company_id, 'city_id' => $old_detail->departure_city_id, 'route_id' => $old_detail->route_id,'show'=>1])->with("terminal:id,name")->get();
-        if($oldTerminalTime->count() > 0)
-        {
-            foreach($oldTerminalTime as $single)
-            {
-                $sub = 0;
-                $sub = $single->time_difference * 60;
-                $old_html .= "*".($single->display_name ? $single->display_name : 'Time').":* ".date("h:i A", strtotime($old_detail->date . " " . $old_detail->schedule_time) + $sub)."\n";
+        $auth_key = Company::where("id", Auth::user()->company_id)->first()->whatsapp_auth_key;
+        $message_allow = Terminal::where("id", Auth::user()->terminal_id)->first()->send_message;
+        if ($auth_key && $message_allow) {
+            $old_seats = implode(",", Ticket::withTrashed()->whereIn("id", $old_tickets)->pluck("seat_no")->toArray());
+            $new_seats = implode(",", Ticket::whereIn("id", $new_tickets)->pluck("seat_no")->toArray());
+            $old_detail = Ticket::withTrashed()->where("id", $old_tickets[0])->with("departure_city:id,name", "destination_city:id,name", "customer:id,name,contact", "terminal:id,name")->first();
+            $new_detail = Ticket::where("id", $new_tickets[0])->with("departure_city:id,name", "destination_city:id,name", "customer:id,name,contact", "terminal:id,name")->first();
+            $cancelMessage = SubRoute::where(["from_city" => $old_detail->departure_city_id, "to_city" => $old_detail->destination_city_id])->first()->cancel_message ?? '';
+            $type = $new_detail->type;
+            // this is for timing from different terminal
+            $old_html = "";
+            $oldTerminalTime = TerminalTimeDifference::where(['company_id' => $old_detail->company_id, 'city_id' => $old_detail->departure_city_id, 'route_id' => $old_detail->route_id, 'show' => 1])->with("terminal:id,name")->get();
+            if ($oldTerminalTime->count() > 0) {
+                foreach ($oldTerminalTime as $single) {
+                    $sub = 0;
+                    $sub = $single->time_difference * 60;
+                    $old_html .= "*" . ($single->display_name ? $single->display_name : 'Time') . ":* " . date("h:i A", strtotime($old_detail->date . " " . $old_detail->schedule_time) + $sub) . "\n";
+                }
+            } else {
+                $old_html .= "*Time:* " . date("h:i A", strtotime($old_detail->schedule_time)) . "\n";
             }
-        }
-        else
-        {
-            $old_html .= "*Time:* ".date("h:i A", strtotime($old_detail->schedule_time))."\n";
-        }
 
-        $new_html = "";
-        $newTerminalTime = TerminalTimeDifference::where(['company_id' => $new_detail->company_id, 'city_id' => $new_detail->departure_city_id, 'route_id' => $new_detail->route_id,'show'=>1])->with("terminal:id,name")->get();
-        if($newTerminalTime->count() > 0)
-        {
-            foreach($newTerminalTime as $new)
-            {
-                $sub = 0;
-                $sub = $new->time_difference * 60;
-                $new_html .= "*".($new->display_name ? $new->display_name : 'Time').":* ".date("h:i A", strtotime($new_detail->date . " " . $new_detail->schedule_time) + $sub)."\n";
+            $new_html = "";
+            $newTerminalTime = TerminalTimeDifference::where(['company_id' => $new_detail->company_id, 'city_id' => $new_detail->departure_city_id, 'route_id' => $new_detail->route_id, 'show' => 1])->with("terminal:id,name")->get();
+            if ($newTerminalTime->count() > 0) {
+                foreach ($newTerminalTime as $new) {
+                    $sub = 0;
+                    $sub = $new->time_difference * 60;
+                    $new_html .= "*" . ($new->display_name ? $new->display_name : 'Time') . ":* " . date("h:i A", strtotime($new_detail->date . " " . $new_detail->schedule_time) + $sub) . "\n";
+                }
+            } else {
+                $new_html .= "*Time:* " . date("h:i A", strtotime($new_detail->schedule_time)) . "\n";
             }
-        }
-        else
-        {
-            $new_html .= "*Time:* ".date("h:i A", strtotime($new_detail->schedule_time))."\n";
-        }
-
-        
-        // to choose random device
-        // Define an array of names
-        $names = [
-            1 => 'Hamza_4-Device1',
-            2 => 'Hamza_4-Device2-201-samsung-a20',
-            3 => 'Hamza_4-Device3-204-samsung-a20',
-            4 => 'Hamza_4-Device4',
-            5 => 'Hamza_4-Device-5'
-        ];
-        $randomNumber = rand(1, 5);
 
 
-        
-         
-        $url = "https://whatsapp.sarzone.com/api/send-messages";
-        $mobile = "92".substr($old_detail->customer->contact, -10);
-        $session = $names[$randomNumber];
-        $messageConfirmed = "Dear ".$old_detail->customer->name.",
+            // to choose random device
+            // Define an array of names
+            $names = [
+                1 => 'Hamza_4-Device1',
+                2 => 'Hamza_4-Device2-201-samsung-a20',
+                3 => 'Hamza_4-Device3-204-samsung-a20',
+                4 => 'Hamza_4-Device4',
+                5 => 'Hamza_4-Device-5'
+            ];
+            $randomNumber = rand(1, 5);
+
+
+
+
+            $url = "https://whatsapp.sarzone.com/api/send-messages";
+            $mobile = "92" . substr($old_detail->customer->contact, -10);
+            $session = $names[$randomNumber];
+            $messageConfirmed = "Dear " . $old_detail->customer->name . ",
 Seat# $old_seats,
-".$old_detail->departure_city->name." to ".$old_detail->destination_city->name."
-Date ".$old_detail->date."
+" . $old_detail->departure_city->name . " to " . $old_detail->destination_city->name . "
+Date " . $old_detail->date . "
 Departure at:
 $old_html
 Is shifted to
 
 Seat# $new_seats,
-".$new_detail->departure_city->name." to ".$new_detail->destination_city->name."
-Date ".$new_detail->date."
+" . $new_detail->departure_city->name . " to " . $new_detail->destination_city->name . "
+Date " . $new_detail->date . "
 Departure at:
 $new_html
 For any inquiries/Complains Dial UAN 03111777333
@@ -852,38 +816,35 @@ Terms & conditions applied
 4:For passenger safety Bus will not pick/drop passengers from Roadside or outside Company Terminal
 5: Keep your personal belongings Safe Company is not responsible for any loss or damage.";
 
-        $messageReserved = "Dear ".$old_detail->customer->name.",
+            $messageReserved = "Dear " . $old_detail->customer->name . ",
 Seat# $old_seats,
-".$old_detail->departure_city->name." to ".$old_detail->destination_city->name."
-Date ".$old_detail->date."
+" . $old_detail->departure_city->name . " to " . $old_detail->destination_city->name . "
+Date " . $old_detail->date . "
 $old_html
 Is shifted to
 
 Seat# $new_seats,
-".$new_detail->departure_city->name." to ".$new_detail->destination_city->name."
-Date ".$new_detail->date." 
+" . $new_detail->departure_city->name . " to " . $new_detail->destination_city->name . "
+Date " . $new_detail->date . " 
 $new_html
-".$cancelMessage."
+" . $cancelMessage . "
 
 Terms & conditions applied.";
 
-        try{
-            $response = Http::withHeaders([
-                'X-Api-Key'=>$auth_key,
-            ])
-            ->timeout(1)
-            ->post($url, [
-                "session" => $session,
-                "message_type" =>  'text',
-                "receiver_number" => $mobile, 
-                "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed
-            ]);
-            return $response;
-        } 
-        catch (\Exception $e) {
-
-        }
-        
+            try {
+                $response = Http::withHeaders([
+                    'X-Api-Key' => $auth_key,
+                ])
+                    ->timeout(1)
+                    ->post($url, [
+                        "session" => $session,
+                        "message_type" =>  'text',
+                        "receiver_number" => $mobile,
+                        "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed
+                    ]);
+                return $response;
+            } catch (\Exception $e) {
+            }
         }
     }
 }
@@ -891,55 +852,50 @@ Terms & conditions applied.";
 if (!function_exists('ticketcanceledMessage')) {
     function ticketCanceledMessage($tickets)
     {
-        $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
-        $message_allow = Terminal::where("id",Auth::user()->terminal_id)->first()->send_message;
-        if($auth_key && $message_allow)
-        {
-        $seats = implode(",",Ticket::withTrashed()->whereIn("id",$tickets)->pluck("seat_no")->toArray());
-        $detail = Ticket::withTrashed()->where("id",$tickets[0])->with("cancel_ticket:id,ticket_id,percentage","departure_city:id,name","destination_city:id,name","customer:id,name,contact","terminal:id,name")->first();
-        $cancelMessage = SubRoute::where(["from_city"=>$detail->departure_city_id,"to_city"=>$detail->destination_city_id])->first()->cancel_message??'';
-        // this is for timing from different terminal
-        $html = "";
-        $terminalTime = TerminalTimeDifference::where(['company_id' => $detail->company_id, 'city_id' => $detail->departure_city_id, 'route_id' => $detail->route_id,'show'=>1])->with("terminal:id,name")->get();
-        if($terminalTime->count() > 0)
-        {
-            foreach($terminalTime as $single)
-            {
-                $sub = 0;
-                $sub = $single->time_difference * 60;
-                $html .= "*".($single->display_name ? $single->display_name : 'Time').":* ".date("h:i A", strtotime($detail->date . " " . $detail->schedule_time) + $sub)."\n";
+        $auth_key = Company::where("id", Auth::user()->company_id)->first()->whatsapp_auth_key;
+        $message_allow = Terminal::where("id", Auth::user()->terminal_id)->first()->send_message;
+        if ($auth_key && $message_allow) {
+            $seats = implode(",", Ticket::withTrashed()->whereIn("id", $tickets)->pluck("seat_no")->toArray());
+            $detail = Ticket::withTrashed()->where("id", $tickets[0])->with("cancel_ticket:id,ticket_id,percentage", "departure_city:id,name", "destination_city:id,name", "customer:id,name,contact", "terminal:id,name")->first();
+            $cancelMessage = SubRoute::where(["from_city" => $detail->departure_city_id, "to_city" => $detail->destination_city_id])->first()->cancel_message ?? '';
+            // this is for timing from different terminal
+            $html = "";
+            $terminalTime = TerminalTimeDifference::where(['company_id' => $detail->company_id, 'city_id' => $detail->departure_city_id, 'route_id' => $detail->route_id, 'show' => 1])->with("terminal:id,name")->get();
+            if ($terminalTime->count() > 0) {
+                foreach ($terminalTime as $single) {
+                    $sub = 0;
+                    $sub = $single->time_difference * 60;
+                    $html .= "*" . ($single->display_name ? $single->display_name : 'Time') . ":* " . date("h:i A", strtotime($detail->date . " " . $detail->schedule_time) + $sub) . "\n";
+                }
+            } else {
+                $html .= "*Time:* " . date("h:i A", strtotime($detail->schedule_time));
             }
-        }
-        else
-        {
-            $html .= "*Time:* ".date("h:i A", strtotime($detail->schedule_time));
-        }
-
-        
-        // to choose random device
-        // Define an array of names
-        $names = [
-            1 => 'Hamza_4-Device1',
-            2 => 'Hamza_4-Device2-201-samsung-a20',
-            3 => 'Hamza_4-Device3-204-samsung-a20',
-            4 => 'Hamza_4-Device4',
-            5 => 'Hamza_4-Device-5'
-        ];
-        $randomNumber = rand(1, 5);
 
 
-        
-         
-        $url = "https://whatsapp.sarzone.com/api/send-messages";
-        $mobile = "92".substr($detail->customer->contact, -10);
-        $session = $names[$randomNumber];
-        $canceledMessage = "Dear ".$detail->customer->name.",
+            // to choose random device
+            // Define an array of names
+            $names = [
+                1 => 'Hamza_4-Device1',
+                2 => 'Hamza_4-Device2-201-samsung-a20',
+                3 => 'Hamza_4-Device3-204-samsung-a20',
+                4 => 'Hamza_4-Device4',
+                5 => 'Hamza_4-Device-5'
+            ];
+            $randomNumber = rand(1, 5);
+
+
+
+
+            $url = "https://whatsapp.sarzone.com/api/send-messages";
+            $mobile = "92" . substr($detail->customer->contact, -10);
+            $session = $names[$randomNumber];
+            $canceledMessage = "Dear " . $detail->customer->name . ",
 Seat# $seats,
-*".$detail->departure_city->name."* to *".$detail->destination_city->name."*
+*" . $detail->departure_city->name . "* to *" . $detail->destination_city->name . "*
 $html
 
-Date ".$detail->date." Is cancelled
-at ".$detail->cancel_ticket->percentage."% deduction charges
+Date " . $detail->date . " Is cancelled
+at " . $detail->cancel_ticket->percentage . "% deduction charges
 
 Please visit  counter from where ticket purchased or relevant online platform for claim
 
@@ -950,15 +906,15 @@ UAN 03111777333
 
 Terms & conditions applied.";
 
-        $response = Http::withHeaders([
-            'X-Api-Key'=>$auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile, 
-            "message_body" => $canceledMessage
-        ]);
-        return $response;
+            $response = Http::withHeaders([
+                'X-Api-Key' => $auth_key,
+            ])->post($url, [
+                "session" => $session,
+                "message_type" =>  'text',
+                "receiver_number" => $mobile,
+                "message_body" => $canceledMessage
+            ]);
+            return $response;
         }
     }
 }
@@ -972,18 +928,17 @@ if (!function_exists('sendMessageToAllBus')) {
             'departure_date' => $request->date,
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
-            'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
+            'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
         ])->first();
 
-        $customerIds =  Ticket::where(["schedule_id"=>$scheduleDetail->schedule_id,"schedule_date"=>$scheduleDetail->schedule_date])
-        ->distinct("invoice_no")->pluck("customer_id")->toArray();
+        $customerIds =  Ticket::where(["schedule_id" => $scheduleDetail->schedule_id, "schedule_date" => $scheduleDetail->schedule_date])
+            ->distinct("invoice_no")->pluck("customer_id")->toArray();
 
-        $customers = Customer::whereIn("id",$customerIds)->get();
+        $customers = Customer::whereIn("id", $customerIds)->get();
 
-        $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
-        
-        foreach($customers as $key=>$customer)
-        {
+        $auth_key = Company::where("id", Auth::user()->company_id)->first()->whatsapp_auth_key;
+
+        foreach ($customers as $key => $customer) {
             // to choose random device
             // Define an array of names
             $names = [
@@ -996,32 +951,30 @@ if (!function_exists('sendMessageToAllBus')) {
             $randomNumber = rand(1, 5);
 
 
-            
-            
+
+
             $url = "https://whatsapp.sarzone.com/api/send-messages";
-            $mobile = "92".substr($customer->contact, -10);
+            $mobile = "92" . substr($customer->contact, -10);
             $session = $names[$randomNumber];
             $messageConfirmed = "*$request->title*
             
 $request->body";
 
 
-            try{
-                    $response = Http::withHeaders([
-                        'X-Api-Key'=>$auth_key,
-                    ])
+            try {
+                $response = Http::withHeaders([
+                    'X-Api-Key' => $auth_key,
+                ])
                     ->timeout(1)
                     ->post($url, [
                         "session" => $session,
-                        "receiver_number" => $mobile, 
+                        "receiver_number" => $mobile,
                         "message_body" => $messageConfirmed,
                         "message_type" => 'text'
                     ]);
-                    return $response;
+                return $response;
             } catch (\Exception $e) {
-
             }
-            
         }
     }
 }
@@ -1029,67 +982,111 @@ $request->body";
 if (!function_exists('sendOtpForTicket')) {
     function sendOtpForTicket($request)
     {
-        $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
-        
-        $customer = Customer::where("cnic",plainContactAndCnic($request->customerCNIC))->first();
+        $auth_key = Company::where("id", Auth::user()->company_id)->first()->whatsapp_auth_key;
+
+        $customer = Customer::where("cnic", plainContactAndCnic($request->customerCNIC))->first();
 
         $otp = rand(100000, 999999); // Generate a 6-digit OTP
-    
-       $customer->update([
+
+        $customer->update([
             "loyalty_otp" => $otp,
             "loyalty_otp_expiration" => Carbon::now()->addMinutes(5),
-       ]);
+        ]);
 
-        
-        if($customer)
-        {
+
+        if ($customer) {
             $names = [
                 1 => 'Hamza_4-Device1',
                 2 => 'Hamza_4-Device2-201-samsung-a20',
                 3 => 'Hamza_4-Device3-204-samsung-a20',
                 4 => 'Hamza_4-Device4',
                 5 => 'Hamza_4-Device-5'
+                // 5 => 'Muhammad-Shahzaib_3-sarzone'
             ];
-            $randomNumber = rand(1, 5);
-    
+            
             $url = "https://whatsapp.sarzone.com/api/send-messages";
-            $mobile = "92".substr($customer->contact, -10);
-            $session = $names[$randomNumber];
+            $mobile = "92" . substr($customer->contact, -10);
             $message = "Your OTP for verification is $otp";
-    
+            $session = $names[5];
+            
             $response = Http::withHeaders([
-                'X-Api-Key'=>$auth_key,
+                'X-Api-Key'    => '@+_VbdTWAYv4c1kkuIO!NQQupcb@yNw%_I^qNWJ1cp+owvKF35',
             ])->post($url, [
                 "session" => $session,
                 "message_type" =>  'text',
-                "receiver_number" => $mobile, 
+                "receiver_number" => $mobile,
                 "message_body" => $message
             ]);
             return $response;
-        }
-        else
-        {
+        } else {
             return response()->json(["error" => ['Customer not found']], 409);
         }
-        
+    }
+}
+if (!function_exists('sendDiscountOtpForTicket')) {
+    function sendDiscountOtpForTicket($request)
+    {
+        // Get WhatsApp auth key for the company (optional, if needed)
+        $auth_key = Company::where("id", Auth::user()->company_id)->first()->whatsapp_auth_key;
+
+        // Find customer by CNIC (after cleaning)
+        $customer = Customer::where("cnic", plainContactAndCnic($request->customerCNIC))->first();
+
+        if (!$customer) {
+            return response()->json(["error" => ['Customer not found']], 409);
+        }
+
+        // Generate 6-digit OTP
+        $otp = rand(100000, 999999);
+
+        // Save OTP & expiration in DB
+        $customer->update([
+            "discount_otp" => $otp,
+            "discount_otp_expiration" => Carbon::now()->addMinutes(5),
+        ]);
+
+       if ($customer) {
+            $names = [
+                // 1 => 'Hamza_4-Device1',
+                // 2 => 'Hamza_4-Device2-201-samsung-a20',
+                // 3 => 'Hamza_4-Device3-204-samsung-a20',
+                // 4 => 'Hamza_4-Device4',
+                // 5 => 'Hamza_4-Device-5'
+                5 => 'Muhammad-Shahzaib_3-sarzone'
+            ];
+            
+            $url = "https://whatsapp.sarzone.com/api/send-messages";
+            $mobile = "92" . substr($customer->contact, -10);
+            $message = "Your OTP for verification is $otp";
+            $session = $names[5];
+            
+            $response = Http::withHeaders([
+                'X-Api-Key'    => '@+_VbdTWAYv4c1kkuIO!NQQupcb@yNw%_I^qNWJ1cp+owvKF35',
+            ])->post($url, [
+                "session" => $session,
+                "message_type" =>  'text',
+                "receiver_number" => $mobile,
+                "message_body" => $message
+            ]);
+            return $response;
+        } else {
+            return response()->json(["error" => ['Customer not found']], 409);
+        }
     }
 }
 //Updated Already advanced Booked Seat Api
 if (!function_exists('updateAdvancedSeatApi')) {
     function updateAdvancedSeatApi($request, $company_id)
     {
-        $customerData =  Customer::where('company_id', $company_id)->where('cnic', plainContactAndCnic($request->customer_cnic))->orWhere("contact",plainContactAndCnic($request->contact))->first();
+        $customerData =  Customer::where('company_id', $company_id)->where('cnic', plainContactAndCnic($request->customer_cnic))->orWhere("contact", plainContactAndCnic($request->contact))->first();
         // $customerAll = [];
-        if($customerData)
-        {
+        if ($customerData) {
             $customerData->update([
                 'name' => $request->customerName,
                 'cnic' => is_null($request->customerCNIC) ? 0 : plainContactAndCnic($request->customerCNIC),
                 'contact' => plainContactAndCnic($request->contact),
             ]);
-        }
-        else
-        {
+        } else {
             $customerData = Customer::create([
                 'company_id' => Auth::user()->company_id,
                 'added_by' => Auth::user()->id,
@@ -1107,9 +1104,8 @@ if (!function_exists('updateAdvancedSeatApi')) {
             ]);
 
             // online terminal request will be differrent so it is in if condition
-            if($request->destinationCity)
-            {
-            // checking partial
+            if ($request->destinationCity) {
+                // checking partial
                 $schedule = Schedule::where('id', $customer_id->schedule_id)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                 $departure_city_id = $schedule->route->fares->first()->departure_city_id;
                 $destination_city_id = $schedule->route->fares->last()->destination_city_id;
@@ -1117,14 +1113,14 @@ if (!function_exists('updateAdvancedSeatApi')) {
                 if ($request->departureCity != $departure_city_id || $request->destinationCity != $destination_city_id) {
                     $isPartial = 1;
                 }
-                
+
                 $customer_id->update([
                     'terminal_id' => $request->terminalId,
                     'departure_city_id' => $request->departureCity,
                     'is_partial' => $isPartial,
                     'destination_city_id' => $request->destinationCity,
                 ]);
-                
+
 
                 if ($isPartial == 1) {
                     TicketIsPartial::create([
@@ -1142,9 +1138,7 @@ if (!function_exists('updateAdvancedSeatApi')) {
                         'type' => $customer_id->type,
                         'added_by' => Auth::user()->id,
                     ]);
-                }
-                else
-                {
+                } else {
                     TicketIsPartial::where([
                         'ticket_id' => $customer_id->id,
                     ])->delete();
@@ -1169,7 +1163,7 @@ if (!function_exists('updateFareTable')) {
     {
         // these method create record in fare table with combination of fare class|city from|city to
 
-        
+
         $fareClasses = FareClass::where('company_id', $company_id)->get();
         $cities = City::where('company_id', $company_id)->get();
         $cityIds = $cities->pluck('id')->all();
@@ -1368,10 +1362,17 @@ if (!function_exists('printEltTicket')) {
     function printEltTicket($eltId, $company_id)
     {
         $format = TicketsTemplate::where(['company_id' => 1, 'status' => 1, 'terminal_id' =>
-            Auth::user()->terminal_id])->first();
-        $eltTicket = TicketELT::with('departure:id,name', 'destination:id,name', 'company', 'ticket.seatClass',
-            'customer', 'schedule', 'schedule.bus_class:id,name')->where(['company_id' => $company_id, 'id' =>
-            $eltId])->first();
+        Auth::user()->terminal_id])->first();
+        $eltTicket = TicketELT::with(
+            'departure:id,name',
+            'destination:id,name',
+            'company',
+            'ticket.seatClass',
+            'customer',
+            'schedule',
+            'schedule.bus_class:id,name'
+        )->where(['company_id' => $company_id, 'id' =>
+        $eltId])->first();
 
         $receipt = (string)(new ReceiptPrinter)
             ->centerAlign()
@@ -1457,20 +1458,15 @@ if (!function_exists('customRound')) {
         $value = round($value);
         // round 50 multiple
         $result = $value % 100;
-        if($result < 25)
-        {
+        if ($result < 25) {
             $round = 0;
-        }
-        elseif($result >= 25 && $result < 75)
-        {
+        } elseif ($result >= 25 && $result < 75) {
             $round = 50;
-        }
-        elseif($result >= 75 )
-        {
+        } elseif ($result >= 75) {
             $round = 100;
         }
         $result = $value - $result + $round;
-        
+
         return $result;
 
 
@@ -1484,7 +1480,7 @@ if (!function_exists('customRound')) {
         // {
         //     return $value - $result + 10;
         // }
-        
+
     }
 }
 
@@ -1508,14 +1504,14 @@ if (!function_exists('codeImageElt')) {
 if (!function_exists('getMembers')) {
     function getMembers($data, $company_id, $type)
     {
-//        dd($data, $company_id, $type);
+        //        dd($data, $company_id, $type);
         if ($data && $company_id && $type) {
             $dataMember = TicketClosingMember::where([
                 'company_id' => $company_id,
                 'ticket_closing_id' => $data->ticket_closing_id,
                 'type' => $type,
             ])->pluck('user_id');
-//            for drivers
+            //            for drivers
             if ($type == 1) {
                 return Employee::where('company_id', $company_id)->whereIn('id', $dataMember)->get(['name', 'contact']) ?? [];
             } else {
@@ -1595,7 +1591,8 @@ if (!function_exists('updateCloseSchedule')) {
         // this is for get schedule end city
         $destination = RouteFare::where("route_id", $route)->orderBy('id', 'DESC')->first();
         // this is for get schedule departure time
-        $depTime = ScheduleDetail::where(["schedule_id" => $request->schedule,
+        $depTime = ScheduleDetail::where([
+            "schedule_id" => $request->schedule,
             "departure_id" => $departure->departure_city_id,
             "destination_id" => $departure->destination_city_id,
             "departure_date" => $request->date,
@@ -1638,9 +1635,10 @@ if (!function_exists('updateCloseSchedule')) {
 
     //  this function for creation of account head / Tier 5
     if (!function_exists('accountHeadCreate')) {
-        function accountHeadCreate($name, $first, $second, $third, $fourth) {
+        function accountHeadCreate($name, $first, $second, $third, $fourth)
+        {
 
-            $code = AccountHead::latest('id')->where('group_id', $fourth )->limit(1)->value('code') + 1;
+            $code = AccountHead::latest('id')->where('group_id', $fourth)->limit(1)->value('code') + 1;
             $code = str_pad($code, 4, '0', STR_PAD_LEFT);
 
             $head = AccountHead::create([

@@ -27,6 +27,7 @@ use App\Models\Terminal\TerminalTimeDifference;
 use App\Models\TerminalCommission;
 use App\Models\ActivityLog;
 use App\Models\Customer;
+use App\Models\DiscountType\DiscountAssign;
 use App\Models\FareClass;
 use App\Models\Terminal\TerminalVisibility;
 use App\Models\FareTable;
@@ -55,8 +56,7 @@ class BookingController extends Controller
 {
     public function index(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $bookings = Ticket::select('schedule_id', 'date', 'schedule_details_id', 'bus_class_id')->with('schedule:id,name', 'scheduleDetail', 'seatClass')->whereDate('date', isset($request->date) ? $request->date : date("Y-m-d"))
@@ -75,8 +75,7 @@ class BookingController extends Controller
 
     public function cities()
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         if (Auth::user()->departure_city_ids == "all") {
@@ -84,14 +83,13 @@ class BookingController extends Controller
         } else {
             $ids = json_decode(Auth::user()->departure_city_ids);
         }
-        return City::with('addedBy')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->whereIn('id', $ids)->get();
+        return City::with('addedBy')->where(['company_id' => Auth::user()->company_id, "hide" => 0])->whereIn('id', $ids)->get();
     }
 
     public function store(Request $request)
     {
-       
-        if(!checkForSubmenu("bookings"))
-        {
+
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         /*
@@ -108,12 +106,11 @@ class BookingController extends Controller
         $scheduleId = $request->schedule;
         $lockName = "stayLock:" . $scheduleId;  // Dynamic lock based on schedule ID
         try {
-                $lock = Cache::lock($lockName, 7);  // 7-second timeout
+            $lock = Cache::lock($lockName, 7);  // 7-second timeout
 
-                if ($lock->get()) {
+            if ($lock->get()) {
                 // this is for cache lock accuracy so i am calling reschedule method from there.
-                if(isset($request->rc_flag))
-                {
+                if (isset($request->rc_flag)) {
                     return $this->singleReschedule($request);
                 }
                 DB::beginTransaction();
@@ -127,16 +124,16 @@ class BookingController extends Controller
                     ->where('schedule_id', $request->schedule)
                     ->where('departure_date', $request->date)
                     ->where('company_id', Auth::user()->company_id)
-                    ->where('departure_time', date("H:i:s",strtotime($request->departure_time)))
+                    ->where('departure_time', date("H:i:s", strtotime($request->departure_time)))
                     ->first();
 
                 //  $schedule_time_exact ( Date At which bus will leave from first terminal ) 
-                $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$detail->schedule_id,"schedule_date"=>$detail->schedule_date])->first();
+                $schedule_time_exact = ScheduleDetail::where(["schedule_id" => $detail->schedule_id, "schedule_date" => $detail->schedule_date])->first();
                 // $schedule To get Route Details ( Example Child City for example Karachi to RWP contains Karachi to Moro and more ) 
                 $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                 // $existingTicket Tickets which are already booked or reserved
-                $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->orderBy('id', 'desc')->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
-                
+                $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->orderBy('id', 'desc')->first(['bus_id', 'ticket_closing_id', 'ticket_merge_id']);
+
                 //To create Invoice Number
                 $invoice = Invoice::create([
                     "schedule_id"   => $schedule->id,
@@ -149,13 +146,12 @@ class BookingController extends Controller
                 ]);
 
                 $finalAmountDiscount = 0;
-                if((isset($request->flag) && $request->flag == 1) || $request->type == 'booked')
-                {
+                if ((isset($request->flag) && $request->flag == 1) || $request->type == 'booked') {
                     if ($request->usagePoints == true && $request->otp_valid == true) {
-    //                  Get Customer's Loyalty Card
+                        //                  Get Customer's Loyalty Card
                         $cardAssign = CardAssign::where(['id' => $request->pointsCardId, 'company_id' => Auth::user()->company_id])->first();
                         $card = CardCategory::where(['id' => $cardAssign->card_category_id, 'company_id' => Auth::user()->company_id])->first();
-                        
+
                         if ($card->discount_type == 'percentage') {
                             $amountInPercent = (int)$card->percentage_discount * $request->pointsUseInput;
                             $finalAmountDiscount = (int)(($request->totalFare * $amountInPercent) / 100);
@@ -170,24 +166,105 @@ class BookingController extends Controller
                             ]);
                         }
                     }
-                    // loyalty card point addition
                     if (!is_null($request->customerCNIC)) {
-                        $checkCard = CardAssign::where(['cnic' => plainContactAndCnic($request->customerCNIC), 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
-                        if ($checkCard) {
+
+                        $checkCard = CardAssign::where([
+                            'cnic' => plainContactAndCnic($request->customerCNIC),
+                            'company_id' => Auth::user()->company_id
+                        ])->with("cardCategory")->first();
+
+                        if ($checkCard && $checkCard->cardCategory) {
+
+                            $addPoint = 0; // default for safety
+
                             if ($checkCard->cardCategory->point_type == "flatPoints") {
-                                $addPoint = $request->totalAmount / $checkCard->cardCategory->point_flat;
+
+                                $pointFlat = $checkCard->cardCategory->point_flat;
+
+                                // If zero/null → skip adding points but no error
+                                if ($pointFlat > 0) {
+                                    $addPoint = $request->totalAmount / $pointFlat;
+                                }
                             } else {
-                                $distance = FareTable::where(['from_city_id' => $request->departureCity, 'to_city_id' => $request->destinationCity, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
-                                if ($distance) {
-                                    $addPoint = $distance / $checkCard->cardCategory->point_distance;
-                                } else {
-                                    return response()->json(["errors" => ["Error" => ["Please Fill The Distance In Kilometer Field In fare Table"]]], 422);
+
+                                $fare = FareTable::where([
+                                    'from_city_id'    => $request->departureCity,
+                                    'to_city_id'      => $request->destinationCity,
+                                    'company_id'      => Auth::user()->company_id
+                                ])->first();
+
+                                if ($fare && $fare->distance_in_km > 0) {
+
+                                    $pointDistance = $checkCard->cardCategory->point_distance;
+
+                                    if ($pointDistance > 0) {
+                                        $addPoint = $fare->distance_in_km / $pointDistance;
+                                    }
                                 }
                             }
-                            $checkCard->increment("starting_points", $addPoint);
+
+                            // Only increment if points calculated
+                            if ($addPoint > 0) {
+                                $checkCard->increment("starting_points", $addPoint);
+                            }
                         }
                     }
                 }
+                // -----------------------------
+// Discount Card application (after OTP verification)
+// -----------------------------
+if (!empty($request->usageDiscount) && !empty($request->discount_otp_valid) && $request->discount_otp_valid == true) {
+    // Find assigned card (you must pass discountCardId from frontend)
+    $discountAssign = CardAssign::where([
+        'id' => $request->discountCardId ?? 0,
+        'company_id' => Auth::user()->company_id
+    ])->first();
+
+    if (!$discountAssign) {
+        return response()->json(["errors" => ["Error" => ["Discount card not found"]]], 422);
+    }
+
+    $discountCard = CardCategory::where([
+        'id' => $discountAssign->card_category_id,
+        'company_id' => Auth::user()->company_id
+    ])->first();
+
+    if (!$discountCard) {
+        return response()->json(["errors" => ["Error" => ["Discount card category not found"]]], 422);
+    }
+
+    // Apply discount according to card type
+    if ($discountCard->discount_type === 'flat') {
+        // flat_discount is amount per ticket (assumption)
+        $perSeatFlat = (float)$discountCard->flat_discount;
+        $seatCount = max(1, count($request->selectedSeats ?? []));
+        $discountFromCard = $perSeatFlat * $seatCount;
+
+        // If discount exceeds total fare -> error (prevents "booking more discount")
+        if ($discountFromCard > (float)$request->totalFare) {
+            return response()->json(["errors" => ["Error" => ["Flat discount (Rs {$discountFromCard}) exceeds total fare. Cannot apply."]]], 422);
+        }
+
+        // add to finalAmountDiscount (combine with any points discount)
+        $finalAmountDiscount += $discountFromCard;
+
+        // Optionally: mark this assignment as used or decrement usage if you track counts
+        // $discountAssign->decrement('starting_points', $someValue); // if needed
+
+    } elseif ($discountCard->discount_type === 'percentage') {
+        // percentage_discount is percentage to apply on totalFare
+        $percent = (float)$discountCard->percentage_discount;
+        // Apply percentage on total fare (if you want percentage on fare-after-points you can change source)
+        $discountFromCard = (($percent / 100) * (float)$request->totalFare);
+
+        // add to finalAmountDiscount (combine with any points discount)
+        $finalAmountDiscount += $discountFromCard;
+    } else {
+        // Unknown discount type - fail safe
+        return response()->json(["errors" => ["Error" => ["Unknown discount type on card"]]], 422);
+    }
+}
+
                 /*
                 *   Validation
                 *   Only Purpose to Seat Avoid Duplication 
@@ -203,40 +280,38 @@ class BookingController extends Controller
                 //RWP MORO KARACHI are now single Array
                 array_push($allFaresOfRoute, $lastDestination->destination_city_id);
                 //Example MORO departure will have 1 index  
-                $scheduleDepIndex = array_search( $request->departureCity, $allFaresOfRoute );
+                $scheduleDepIndex = array_search($request->departureCity, $allFaresOfRoute);
                 //Example Karachi destination will have 2 index  
-                $scheduleDesIndex = array_search( $request->destinationCity, $allFaresOfRoute );
+                $scheduleDesIndex = array_search($request->destinationCity, $allFaresOfRoute);
 
                 // if seat are going to update then case will be different from newly created
                 if (isset($request->flag) && $request->flag == 1) {
                     //Seat 35
-                    $checkAlreadyBooked = Ticket::whereIn( "seat_no", $request->selectedSeats )
-                    ->where([
-                        'company_id'    => Auth::user()->company_id, 
-                        'schedule_date' => date('Y-m-d', strtotime($detail->schedule_date) ), 
-                        'schedule_id'   => $request->schedule,
-                        "type"          => "booked"
-                    ])
-                    ->get();
-                }
-                else {
+                    $checkAlreadyBooked = Ticket::whereIn("seat_no", $request->selectedSeats)
+                        ->where([
+                            'company_id'    => Auth::user()->company_id,
+                            'schedule_date' => date('Y-m-d', strtotime($detail->schedule_date)),
+                            'schedule_id'   => $request->schedule,
+                            "type"          => "booked"
+                        ])
+                        ->get();
+                } else {
                     //Seat 35
-                    $checkAlreadyBooked = Ticket::whereIn( "seat_no", $request->selectedSeats )
-                    ->where([
-                        'company_id'    => Auth::user()->company_id, 
-                        'schedule_date' => date('Y-m-d', strtotime($detail->schedule_date) ), 
-                        'schedule_id'   => $request->schedule
-                    ])
-                    ->get();
+                    $checkAlreadyBooked = Ticket::whereIn("seat_no", $request->selectedSeats)
+                        ->where([
+                            'company_id'    => Auth::user()->company_id,
+                            'schedule_date' => date('Y-m-d', strtotime($detail->schedule_date)),
+                            'schedule_id'   => $request->schedule
+                        ])
+                        ->get();
                 }
 
-                foreach($checkAlreadyBooked as $tkt)
-                {
+                foreach ($checkAlreadyBooked as $tkt) {
                     //Check if Ticket is Booked for RWP to MORO Target is to book MORO to Karachi
                     // $ticketDepIndex will have 0 as Karachi is at index 0
-                    $ticketDepIndex = array_search( $tkt->departure_city_id, $allFaresOfRoute );
+                    $ticketDepIndex = array_search($tkt->departure_city_id, $allFaresOfRoute);
                     // $ticketDesIndex will have 1 as MORO is at index 1 
-                    $ticketDesIndex = array_search( $tkt->destination_city_id, $allFaresOfRoute );
+                    $ticketDesIndex = array_search($tkt->destination_city_id, $allFaresOfRoute);
 
                     /*
                     *   $ticketDepIndex for RWP will have 0 and $scheduleDepIndex will have 1 for MORO $scheduleDesIndex will have 2 For Karachi
@@ -245,25 +320,25 @@ class BookingController extends Controller
                     *   Condition 2 )($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
                     *   Output 1 > 1 > 1 && 1 <= 2 Result False
                     */
-                    if( ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
-                        || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
-                    {
+                    if (($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
+                        || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
+                    ) {
                         return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
                     }
-                    if( ($scheduleDepIndex >= $ticketDepIndex && $scheduleDepIndex < $ticketDesIndex) // Will Check Partial Seat 
-                        || ($scheduleDesIndex > $ticketDepIndex && $scheduleDesIndex <= $ticketDesIndex))
-                    {
+                    if (($scheduleDepIndex >= $ticketDepIndex && $scheduleDepIndex < $ticketDesIndex) // Will Check Partial Seat 
+                        || ($scheduleDesIndex > $ticketDepIndex && $scheduleDesIndex <= $ticketDesIndex)
+                    ) {
                         return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
                     }
                 }
                 //Reservation To Booking
                 if (isset($request->flag) && $request->flag == 1) {
                     //If Reserved seat is converted into Issued/Booked
-                    $allTicket = updateAdvancedSeat($request, $invoice,$finalAmountDiscount);
-                    
+                    $allTicket = updateAdvancedSeat($request, $invoice, $finalAmountDiscount);
+
                     ActivityLog::create([
                         "activity_by"    => Auth::user()->id,
-                        "message"        => Auth::user()->name." | update ticket from advance to confirm | time : $detail->schedule_date $detail->departure_time | ".json_encode($request->alreadyBookedId)." --- ".$request->totalFare,
+                        "message"        => Auth::user()->name . " | update ticket from advance to confirm | time : $detail->schedule_date $detail->departure_time | " . json_encode($request->alreadyBookedId) . " --- " . $request->totalFare,
                         "requested_host" => $request->ip(),
                         "company_id"     => Auth::user()->company_id
                     ]);
@@ -273,7 +348,7 @@ class BookingController extends Controller
                         //Check If Seat is already Booked
                         return response()->json(["errors" => ["Error" => ["Please refresh your seat map you entered some wrong/duplicate entry"]]], 422);
                     }
-                    
+
                     $departure_city_id   = $schedule->route->fares->first()->departure_city_id;
                     $destination_city_id = $schedule->route->fares->last()->destination_city_id;
                     $isPartial = 0;
@@ -310,10 +385,10 @@ class BookingController extends Controller
                         $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
                         ++$bookingNo;
                     }
-                    
+
                     $allTicket = [];
                     foreach ($request->selectedSeats as $i => $seat) {
-                        $checkDiscount =  checkDiscountAmount($detail,$request->terminalId,$request->selectedSeatsClass[$i]);
+                        $checkDiscount =  checkDiscountAmount($detail, $request->terminalId, $request->selectedSeatsClass[$i]);
                         $ticket = Ticket::create([
                             'company_id'          => Auth::user()->company_id,
                             'departure_city_id'   => $request->departureCity,
@@ -389,13 +464,13 @@ class BookingController extends Controller
                     }
                     ActivityLog::create([
                         "activity_by"    => Auth::user()->id,
-                        "message"        => Auth::user()->name." | stored ticket ($request->type) | time : $detail->schedule_date $detail->departure_time | seat no :".json_encode($request->selectedSeats)." --- ".json_encode($request->selectedSeatsFare),
+                        "message"        => Auth::user()->name . " | stored ticket ($request->type) | time : $detail->schedule_date $detail->departure_time | seat no :" . json_encode($request->selectedSeats) . " --- " . json_encode($request->selectedSeatsFare),
                         "requested_host" => $request->ip(),
                         "company_id"     => Auth::user()->company_id
                     ]);
                 }
 
-                
+
                 DB::commit();
                 return [
                     'ids' => implode('-', $allTicket),
@@ -421,39 +496,81 @@ class BookingController extends Controller
     {
         return ticketCanceledMessage($request->tickets);
     }
-    
+
     public function sendMessageToBus(Request $request)
     {
         return sendMessageToAllBus($request);
     }
-    
+
     public function sendOtp(Request $request)
     {
         return sendOtpForTicket($request);
     }
-    
+    public function sendDiscountOtp(Request $request)
+    {
+        return sendDiscountOtpForTicket($request);
+    }
+
     public function verifyOtp(Request $request)
     {
-        $customer = Customer::where("cnic",plainContactAndCnic($request->customerCNIC))->first();
-        
-        if($customer && $customer->loyalty_otp == $request->otp && $customer->loyalty_otp_expiration > now())
-        {
-            return response()->json(["error" => ["Verified Successfully"]], 200);
+        $customer = Customer::where("cnic", plainContactAndCnic($request->customerCNIC))->first();
+
+        if (!$customer) {
+            return response()->json(["error" => ["Customer not found"]], 409);
         }
-        else
-        {
-            return response()->json(["error" => ["An error occurred during verification. Please check your data."]], 409);
+
+        if ((string)$customer->loyalty_otp !== (string)$request->otp) {
+            return response()->json(["error" => ["OTP does not match"]], 409);
         }
+
+        if ($customer->loyalty_otp_expiration <= now()) {
+            return response()->json(["error" => ["OTP expired"]], 409);
+        }
+
+        // Mark OTP as verified (optional)
+        $customer->update([
+            'loyalty_otp' => null,
+            'loyalty_otp_expiration' => null,
+        ]);
+
+        return response()->json(["success" => ["OTP verified successfully"]], 200);
     }
+
+    public function verifyDiscountOtp(Request $request)
+    {
+        // Clean CNIC and get customer
+        $customer = Customer::where("cnic", plainContactAndCnic($request->customerCNIC))->first();
+
+        if (!$customer) {
+            return response()->json(["error" => ["Customer not found"]], 409);
+        }
+
+        // Make sure frontend field matches backend check
+        if ((string)$customer->discount_otp !== (string)$request->discountOtp) {
+            return response()->json(["error" => ["OTP does not match"]], 409);
+        }
+
+        if ($customer->discount_otp_expiration <= now()) {
+            return response()->json(["error" => ["OTP expired"]], 409);
+        }
+
+        // Mark OTP as verified (optional)
+        $customer->update([
+            'discount_otp' => null,
+            'discount_otp_expiration' => null,
+        ]);
+
+        return response()->json(["success" => ["Discount OTP verified successfully"]], 200);
+    }
+
 
 
     private function singleReschedule($request)
     {
-        if(!checkPermissionButtons("reschedule-seats"))
-        {
+        if (!checkPermissionButtons("reschedule-seats")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-  
+
         try {
             DB::beginTransaction();
             $scheduleDetail = ScheduleDetail::where([
@@ -462,9 +579,9 @@ class BookingController extends Controller
                 'departure_id' => $request->data[0]['dataDepartureCity'],
                 'destination_id' => $request->data[0]['dataDestination'],
                 'schedule_id' => $request->data[0]['rescheduleSchedule'],
-                'departure_time' =>  date("H:i:s",strtotime($request->data[0]['departure_time'])),
+                'departure_time' =>  date("H:i:s", strtotime($request->data[0]['departure_time'])),
             ])->first();
-            $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$scheduleDetail->schedule_id,"schedule_date"=>$scheduleDetail->schedule_date])->first();
+            $schedule_time_exact = ScheduleDetail::where(["schedule_id" => $scheduleDetail->schedule_id, "schedule_date" => $scheduleDetail->schedule_date])->first();
             $schedule = Schedule::where('id', $scheduleDetail->schedule_id)->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             /*
             *   Validation
@@ -481,32 +598,30 @@ class BookingController extends Controller
             //RWP MORO KARACHI are now single Array
             array_push($allFaresOfRoute, $lastDestination->destination_city_id);
             //Example MORO departure will have 1 index  
-            $scheduleDepIndex = array_search( $scheduleDetail->departure_id, $allFaresOfRoute );
+            $scheduleDepIndex = array_search($scheduleDetail->departure_id, $allFaresOfRoute);
             //Example Karachi destination will have 2 index  
-            $scheduleDesIndex = array_search( $scheduleDetail->destination_id, $allFaresOfRoute );
+            $scheduleDesIndex = array_search($scheduleDetail->destination_id, $allFaresOfRoute);
 
-         
-            
-            
-           
 
-            foreach($request->data as $key => $item)
-            {
+
+
+
+
+            foreach ($request->data as $key => $item) {
                 //Seat 35
-                $tkt = Ticket::where( "seat_no", $item['selected_seatNo'] )
-                ->where([
-                    'company_id'    => Auth::user()->company_id, 
-                    'schedule_date' => date('Y-m-d', strtotime($scheduleDetail->schedule_date) ), 
-                    'schedule_id'   => $schedule->id
-                ])
-                ->first();
-                if($tkt)
-                {
+                $tkt = Ticket::where("seat_no", $item['selected_seatNo'])
+                    ->where([
+                        'company_id'    => Auth::user()->company_id,
+                        'schedule_date' => date('Y-m-d', strtotime($scheduleDetail->schedule_date)),
+                        'schedule_id'   => $schedule->id
+                    ])
+                    ->first();
+                if ($tkt) {
                     //Check if Ticket is Booked for RWP to MORO Target is to book MORO to Karachi
                     // $ticketDepIndex will have 0 as Karachi is at index 0
-                    $ticketDepIndex = array_search( $tkt->departure_city_id, $allFaresOfRoute );
+                    $ticketDepIndex = array_search($tkt->departure_city_id, $allFaresOfRoute);
                     // $ticketDesIndex will have 1 as MORO is at index 1 
-                    $ticketDesIndex = array_search( $tkt->destination_city_id, $allFaresOfRoute );
+                    $ticketDesIndex = array_search($tkt->destination_city_id, $allFaresOfRoute);
 
                     /*
                     *   $ticketDepIndex for RWP will have 0 and $scheduleDepIndex will have 1 for MORO $scheduleDesIndex will have 2 For Karachi
@@ -515,9 +630,9 @@ class BookingController extends Controller
                     *   Condition 2 )($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
                     *   Output 1 > 1 > 1 && 1 <= 2 Result False
                     */
-                    if( ($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
-                        || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex))
-                    {
+                    if (($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
+                        || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
+                    ) {
                         return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
                     }
                 }
@@ -533,19 +648,19 @@ class BookingController extends Controller
                     $bookingNo = Ticket::where('date', $item['rescheduleDate'])->latest()->first()->booking_no ?? 0;
                     ++$bookingNo;
                 }
-                
-             
-                $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$scheduleDetail->schedule_id,"schedule_date"=>$scheduleDetail->schedule_date])->first();
+
+
+                $schedule_time_exact = ScheduleDetail::where(["schedule_id" => $scheduleDetail->schedule_id, "schedule_date" => $scheduleDetail->schedule_date])->first();
                 $schedule = Schedule::where('id', $item['newDepartureTime'])->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
-                
-                
+
+
                 $departure_city_id = $schedule->route->fares->first()->departure_city_id;
                 $destination_city_id = $schedule->route->fares->last()->destination_city_id;
                 $isPartial = 0;
                 if ($item['dataDepartureCity'] != $departure_city_id || $item['dataDestination'] != $destination_city_id) {
                     $isPartial = 1;
                 }
-                $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $scheduleDetail->schedule_date, 'schedule_id' => $scheduleDetail->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id','schedule_id']);
+                $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $scheduleDetail->schedule_date, 'schedule_id' => $scheduleDetail->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id', 'ticket_merge_id', 'schedule_id']);
                 if ($item['selected_seatFare'] != $item['dataAll']['seat_fare']) {
                     RescheduleExtraAmount::create([
                         'company_id' => Auth::user()->company_id,
@@ -592,7 +707,7 @@ class BookingController extends Controller
                     'online_terminal' => Terminal::find($ticket['terminal_id'])->is_online_terminal,
                     'schedule_id' => $item['newDepartureTime'],
                     'route_id' => $schedule->route_id,
-                    'remarks' => $item['reason']??"",
+                    'remarks' => $item['reason'] ?? "",
                     'gender' => $ticket['gender'],
                     'type' => $ticket['type'],
                     'reschedule_type' => $item['overIssueReschedule'],
@@ -639,14 +754,13 @@ class BookingController extends Controller
             }
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
-                "message" => Auth::user()->name." | rescheduled ticket seat no : ".$ticket['seat_no']." to  ".$item['selected_seatNo']." | to time : $scheduleDetail->schedule_date $scheduleDetail->departure_time",
+                "message" => Auth::user()->name . " | rescheduled ticket seat no : " . $ticket['seat_no'] . " to  " . $item['selected_seatNo'] . " | to time : $scheduleDetail->schedule_date $scheduleDetail->departure_time",
                 "requested_host" => $request->ip(),
                 "company_id" => Auth::user()->company_id
             ]);
             DB::commit();
-            ticketRescheduledMessage($old_tickets,$new_tickets);
+            ticketRescheduledMessage($old_tickets, $new_tickets);
             return response()->json(['success' => 'Success'], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Database transaction error: ' . $e->getMessage());
@@ -661,44 +775,43 @@ class BookingController extends Controller
 
     public function fetchSpecificSchedule(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         if (!$request->date) {
             return "Date is Required";
         }
-        $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id"=>Auth::user()->company_id,"terminal_id"=>$request->terminal??Auth::user()->terminal_id,"visibility"=>1])->pluck("schedule_id");
-        $advanceBookingDays = Terminal::where("id",Auth::user()->terminal_id)->first()->advance_booking;
+        $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id" => Auth::user()->company_id, "terminal_id" => $request->terminal ?? Auth::user()->terminal_id, "visibility" => 1])->pluck("schedule_id");
+        $advanceBookingDays = Terminal::where("id", Auth::user()->terminal_id)->first()->advance_booking;
 
-        $allSchedules = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
-        ->with('schedule')
-        ->whereHas('schedule', function($q){$q->where("hide",0);})
-        ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => Auth::user()->company_id])
-        ->oldest("departure_time")
-        ->when($advanceBookingDays!=null,function($q)use($advanceBookingDays){
-            $q->where("departure_date",'<',now()->addDays($advanceBookingDays)->format("Y-m-d"));
-        })
-        ->get();
-        
+        $allSchedules = ScheduleDetail::whereIn("schedule_id", $visibleScheduleIds)
+            ->with('schedule')
+            ->whereHas('schedule', function ($q) {
+                $q->where("hide", 0);
+            })
+            ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date, 'company_id' => Auth::user()->company_id])
+            ->oldest("departure_time")
+            ->when($advanceBookingDays != null, function ($q) use ($advanceBookingDays) {
+                $q->where("departure_date", '<', now()->addDays($advanceBookingDays)->format("Y-m-d"));
+            })
+            ->get();
+
         foreach ($allSchedules as $key => $single) {
             $sub = 0;
             $terminalTime = TerminalTimeDifference::where(['company_id' => Auth::user()->company_id, 'terminal_id' => Auth::user()->terminal_id, 'route_id' => $single->schedule->route_id])->first();
-            if($terminalTime)
-            {
+            if ($terminalTime) {
                 $sub = $terminalTime->time_difference * 60;
             }
 
             $single->departure_city_time = $single->departure_time;
             $exactDate = date("Y-m-d h:i A", strtotime($single->departure_date . ' ' . $single->departure_time) + $sub);
-            $single->departure_date_time = date("Y-m-d H:i:s",strtotime($exactDate));
+            $single->departure_date_time = date("Y-m-d H:i:s", strtotime($exactDate));
             $single->departure_date = date("m/d/Y", strtotime($exactDate));
             $single->departure_time = date("h:i A", strtotime($exactDate));
-           
-            $visibilty = TerminalVisibility::where(["route_id"=>$single->schedule->route_id,"departure_city_id"=>$single->departure_id,"destination_city_id"=>$single->destination_id])->first();
-            if(Auth::user()->check_booking_minutes && isset($visibilty->booking_minutes) && $visibilty->booking_minutes >= 0)
-            {
-                
+
+            $visibilty = TerminalVisibility::where(["route_id" => $single->schedule->route_id, "departure_city_id" => $single->departure_id, "destination_city_id" => $single->destination_id])->first();
+            if (Auth::user()->check_booking_minutes && isset($visibilty->booking_minutes) && $visibilty->booking_minutes >= 0) {
+
                 $bookingTime = strtotime($single->departure_date . ' ' . $single->departure_time) - ($visibilty->booking_minutes * 60);
                 $currentTime = strtotime(date("Y-m-d H:i:s"));
 
@@ -706,11 +819,9 @@ class BookingController extends Controller
                     unset($allSchedules[$key]);
                 }
             }
-            
         }
         // return $allSchedules;
-        if(checkPermissionButtons("time-lock"))
-        {
+        if (checkPermissionButtons("time-lock")) {
             $filteredSchedules = $allSchedules->where("departure_date_time", '>', date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s")) - 7200));
             return array_values($filteredSchedules->toArray());
         }
@@ -720,8 +831,7 @@ class BookingController extends Controller
     public
     function fetchSpecificDestination(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $depart_city = RouteFare::where('departure_city_id', $request->id)->where('company_id', Auth::user()->company_id)->pluck('destination_city_id')->toArray();
@@ -731,13 +841,12 @@ class BookingController extends Controller
             $ids = json_decode(Auth::user()->destination_city_ids);
             $finalArray = array_intersect(array_unique($depart_city), $ids);
         }
-        return City::whereIn('id', $finalArray)->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
+        return City::whereIn('id', $finalArray)->where(['company_id' => Auth::user()->company_id, "hide" => 0])->get(['id', 'name']);
     }
 
     public function fetchSpecificOverIssueSeat(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $ticket = Ticket::where(["company_id" => Auth::user()->company_id, "date" => $request->date, "seat_no" => $request->seat_no, "schedule_id" => $request->schedule_id, "destination_city_id" => $request->destination_id, "departure_city_id" => $request->departure_id])->select('booking_no', 'customer_id', 'gender', 'is_partial', 'type', 'remarks')->first();
@@ -754,8 +863,7 @@ class BookingController extends Controller
 
     public function overIssueAddNew(Request $request)
     {
-        if(!checkPermissionButtons("overissue-seat"))
-        {
+        if (!checkPermissionButtons("overissue-seat")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         try {
@@ -783,7 +891,7 @@ class BookingController extends Controller
             $ticket->delete();
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
-                "message" => Auth::user()->name." | added seat ($ticket->seat_no) to over issue | time : $ticket->schedule_date $ticket->schedule_time",
+                "message" => Auth::user()->name . " | added seat ($ticket->seat_no) to over issue | time : $ticket->schedule_date $ticket->schedule_time",
                 "requested_host" => $request->ip(),
                 "company_id" => Auth::user()->company_id
             ]);
@@ -799,8 +907,7 @@ class BookingController extends Controller
     public
     function getCnic(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         if ($request->status == 'addFormCNIC') {
@@ -827,6 +934,20 @@ class BookingController extends Controller
             return response()->json(["not_found" => "This Customer Dont have loyalty card"], 404);
         }
     }
+    function getDiscountCard(Request $request)
+    {
+        if ($request->status == 'addFormCNIC' && $request['cnicNumber']) {
+            $discountCardAssign = DiscountAssign::with('discountCardType')->where('company_id', Auth::user()->company_id)->where('cnic', plainContactAndCnic($request['cnicNumber']))->first();
+            if (!is_null($discountCardAssign)) {
+                if ($discountCardAssign->expiry_date >= date('Y-m-d')) {
+                    return $discountCardAssign;
+                } else {
+                    return response()->json(["expiredData" => "Loyalty Card is Expired Please Renew It"], 201);
+                }
+            }
+            return response()->json(["not_found" => "This Customer Dont have loyalty card"], 404);
+        }
+    }
 
     public
     function usagePoints(Request $request)
@@ -844,12 +965,11 @@ class BookingController extends Controller
     public
     function getTerminals()
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         return [
-            'terminals' => Terminal::with('city')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(),
+            'terminals' => Terminal::with('city')->where(['company_id' => Auth::user()->company_id, "hide" => 0])->get(),
             'authTerminalId' => Auth::user()->terminal_id ?? 0,
         ];
     }
@@ -870,8 +990,7 @@ class BookingController extends Controller
     public
     function advanceData(Request $request)
     {
-        if(!checkPermissionButtons("seat-details"))
-        {
+        if (!checkPermissionButtons("seat-details")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $uniqueDate = ScheduleDetail::where([
@@ -880,9 +999,9 @@ class BookingController extends Controller
             'departure_date' => $request->date,
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
-            'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
+            'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
         ])->first(['schedule_date']);
-        $tickets = Ticket::with('scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'busClass','added_name')->where('company_id', Auth::user()->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('schedule_date', $uniqueDate->schedule_date)->get()->groupBy('seat_no');
+        $tickets = Ticket::with('scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'busClass', 'added_name')->where('company_id', Auth::user()->company_id)->whereIn('seat_no', $request->seatNO)->where('schedule_id', $request->scheduleId)->where('schedule_date', $uniqueDate->schedule_date)->get()->groupBy('seat_no');
         $checkCustomers = [];
         foreach ($tickets as $key => $single) {
             foreach ($single as $key => $item) {
@@ -907,8 +1026,7 @@ class BookingController extends Controller
     public
     function getFareClass()
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         return FareClass::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
@@ -917,8 +1035,7 @@ class BookingController extends Controller
     public
     function dropCheck(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $uniqueDate = ScheduleDetail::where([
@@ -927,7 +1044,7 @@ class BookingController extends Controller
             'departure_date' => $request->date,
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
-            'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
+            'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
         ])->first()->schedule_date;
         $found = DropSchedule::with("drop_by")->where([
             'company_id' => Auth::user()->company_id,
@@ -945,7 +1062,8 @@ class BookingController extends Controller
     public
     function checkAssignedBus(Request $request)
     {
-        $departureTime = ScheduleDetail::where(["schedule_id" => $request->scheduleId,
+        $departureTime = ScheduleDetail::where([
+            "schedule_id" => $request->scheduleId,
             "departure_id" => $request->departureCity,
             "destination_id" => $request->destinationCity,
             "departure_date" => $request->date,
@@ -962,8 +1080,7 @@ class BookingController extends Controller
     public
     function fetchELTDetails(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $uniqueDate = ScheduleDetail::where("departure_id", $request->departureCity)
@@ -984,8 +1101,7 @@ class BookingController extends Controller
     public
     function terminalSeats(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $seats = Terminal::where('id', $request->terminal_id)->value('available_seats');
@@ -1016,8 +1132,7 @@ class BookingController extends Controller
     public
     function selected(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         if (!$request->departureCity || !$request->destinationCity || !$request->date) {
@@ -1030,10 +1145,10 @@ class BookingController extends Controller
             'departure_date' => $request->date,
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
-            'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
+            'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
         ])->first();
         // Getting Already Booked Tickets
-        $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy' ,'updated_name')
+        $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy', 'updated_name')
             ->where('company_id', Auth::user()->company_id)->where('schedule_id', $request->id)
             ->whereDate('schedule_date', $scheduleDetail->schedule_date)->get();
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
@@ -1043,11 +1158,11 @@ class BookingController extends Controller
             ->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')
             ->first();
         $scheduleDiscount = Discount::where('id', $schedule->discount_id)
-        ->where('is_active', 1)
-        ->whereHas("discount_terminals", function ($q) use ($request) {
-            $q->where("terminal_id", $request->dropTerminal);
-        })
-        ->first();
+            ->where('is_active', 1)
+            ->whereHas("discount_terminals", function ($q) use ($request) {
+                $q->where("terminal_id", $request->dropTerminal);
+            })
+            ->first();
         $scheduleSurcharge = Surcharge::where('id', $schedule->surcharge_id)->where('is_active', 1)->first();
         $fareForAllClasses = FareTable::where('from_city_id', $request->departureCity)->where('to_city_id', $request->destinationCity)
             ->where('company_id', Auth::user()->company_id)
@@ -1064,9 +1179,9 @@ class BookingController extends Controller
                 ]
             ], 422);
         }
-//        //Apply terminal discount
+        //        //Apply terminal discount
         $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->dropTerminal ?? 0, "route_id" => $schedule->route_id])->where('start_date', '<=', $request->date)
-        ->where('end_date', '>=', $request->date)->first();
+            ->where('end_date', '>=', $request->date)->first();
 
         // Looping Through the seat of the bus
         $seatMap = $scheduleDetail->bus_class->seat_map;
@@ -1112,7 +1227,7 @@ class BookingController extends Controller
                     $seatMap[$i][$j]['seat_fare'] = $tickets[$result]['seat_fare'] - $tickets[$result]['discount'];
                     $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
                     $seatMap[$i][$j]['online_terminal'] = $tickets[$result]['online_terminal'];
-                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['updated_name']['name']??"N/A";
+                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['updated_name']['name'] ?? "N/A";
                     $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
                     $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
                     $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
@@ -1131,7 +1246,7 @@ class BookingController extends Controller
                             $seatMap[$i][$j]['seat_fare'] = $tickets[$result]['seat_fare'] - $tickets[$result]['discount'];
                             $seatMap[$i][$j]['customer_phone'] = $tickets[$singlePartial]['customer']['contact'];
                             $seatMap[$i][$j]['online_terminal'] = $tickets[$singlePartial]['online_terminal'];
-                            $seatMap[$i][$j]['booked_by'] = $tickets[$singlePartial]['updated_name']['name']??'N/A';
+                            $seatMap[$i][$j]['booked_by'] = $tickets[$singlePartial]['updated_name']['name'] ?? 'N/A';
                             $seatMap[$i][$j]['departure_city_name'] = $tickets[$singlePartial]['departure_city']['name'];
                             $seatMap[$i][$j]['destination_city_name'] = $tickets[$singlePartial]['destination_city']['name'];
                             $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
@@ -1197,13 +1312,11 @@ class BookingController extends Controller
                             }
                         }
                         // check if any discount/surcharge apply then it should apply custom round other wise show fix fare
-                        if($fare != $seatMap[$i][$j]['fare'])
-                        {
-                            $seatMap[$i][$j]['fare'] = customRound($seatMap[$i][$j]['fare']??0);
+                        if ($fare != $seatMap[$i][$j]['fare']) {
+                            $seatMap[$i][$j]['fare'] = customRound($seatMap[$i][$j]['fare'] ?? 0);
                         }
                     }
                 }
-                
             }
         }
         $schedule->bus_class->seat_map = $seatMap;
@@ -1215,134 +1328,129 @@ class BookingController extends Controller
 
     public function dropSchedule(Request $request)
     {
-        if(!checkPermissionButtons("drop-schedule"))
-        {
+        if (!checkPermissionButtons("drop-schedule")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         try {
-                DB::beginTransaction();
-                $scheduleDetail = ScheduleDetail::where([
+            DB::beginTransaction();
+            $scheduleDetail = ScheduleDetail::where([
+                'company_id' => Auth::user()->company_id,
+                'schedule_id' => $request->schedule_id,
+                'departure_date' => $request->date,
+                'departure_id' => $request->departure_city_id,
+                'destination_id' => $request->destination_city_id,
+            ])->first();
+
+            $tickets = Ticket::where([
+                'company_id' => Auth::user()->company_id,
+                'schedule_id' => $request->schedule_id,
+                'schedule_date' => $scheduleDetail->schedule_date,
+            ])->first();
+            $old = DropSchedule::where([
+                'company_id' => Auth::user()->company_id,
+                'date' => $request->date,
+                'schedule_date' => $scheduleDetail->schedule_date,
+                'schedule_id' => $request->schedule_id,
+            ])->first();
+
+            if (isset($tickets) && $tickets->ticket_closing_id != null) {
+                TicketClosingMember::where([
                     'company_id' => Auth::user()->company_id,
-                    'schedule_id' => $request->schedule_id,
-                    'departure_date' => $request->date,
-                    'departure_id' => $request->departure_city_id,
-                    'destination_id' => $request->destination_city_id,
+                    'ticket_closing_id' => $tickets->ticket_closing_id,
+                ])->delete();
+
+
+                $merge = TicketClosing::where([
+                    'company_id' => Auth::user()->company_id,
+                    'id' => $tickets->ticket_closing_id,
                 ])->first();
 
-                $tickets = Ticket::where([
+                if ($merge) {
+                    TicketClosing::where([
+                        'company_id' => Auth::user()->company_id,
+                        'id' => $tickets->ticket_closing_id,
+                    ])->delete();
+
+                    $mergeRecord = TicketClosingMerge::find($merge->ticket_merge_id);
+                    if ($mergeRecord->schedule_complete == 1) {
+                        TicketClosingMerge::where([
+                            'company_id' => Auth::user()->company_id,
+                            'id' => $merge->ticket_merge_id,
+                        ])->update([
+                            "schedule_complete" => 0,
+                            "schedule_return_date" => null,
+                        ]);
+                    } else {
+                        $mergeRecord->delete();
+                    }
+                }
+            }
+            if (!$old) {
+                DropSchedule::create([
                     'company_id' => Auth::user()->company_id,
-                    'schedule_id' => $request->schedule_id,
-                    'schedule_date' => $scheduleDetail->schedule_date,
-                ])->first();
-                $old = DropSchedule::where([
-                    'company_id' => Auth::user()->company_id,
+                    'terminal_id' => Auth::user()->terminal_id,
                     'date' => $request->date,
                     'schedule_date' => $scheduleDetail->schedule_date,
                     'schedule_id' => $request->schedule_id,
-                ])->first();
-                
-                if (isset($tickets) && $tickets->ticket_closing_id != null) {
-                    TicketClosingMember::where([
-                        'company_id' => Auth::user()->company_id,
-                        'ticket_closing_id' => $tickets->ticket_closing_id,
-                    ])->delete();
-
-                    
-                    $merge = TicketClosing::where([
-                        'company_id' => Auth::user()->company_id,
-                        'id' => $tickets->ticket_closing_id,
-                    ])->first();
-
-                    if($merge)
-                    {
-                        TicketClosing::where([
-                            'company_id' => Auth::user()->company_id,
-                            'id' => $tickets->ticket_closing_id,
-                        ])->delete();
-    
-                        $mergeRecord = TicketClosingMerge::find($merge->ticket_merge_id);
-                        if ($mergeRecord->schedule_complete == 1) {
-                            TicketClosingMerge::where([
-                                'company_id' => Auth::user()->company_id,
-                                'id' => $merge->ticket_merge_id,
-                            ])->update([
-                                "schedule_complete" => 0,
-                                "schedule_return_date" => null,
-                            ]);
-                        } else {
-                            $mergeRecord->delete();
-                        }
-                    }
-                }
-                if (!$old) {
-                    DropSchedule::create([
-                        'company_id' => Auth::user()->company_id,
-                        'terminal_id' => Auth::user()->terminal_id,
-                        'date' => $request->date,
-                        'schedule_date' => $scheduleDetail->schedule_date,
-                        'schedule_id' => $request->schedule_id,
-                        'added_by' => Auth::user()->id,
-                        'is_drop' => 1,
-                        'reason' => $request->reason,
-                    ]);
-                    ActivityLog::create([
-                        "activity_by" => Auth::user()->id,
-                        "message" => Auth::user()->name." | dropped schedule | time : $scheduleDetail->schedule_date $scheduleDetail->departure_time",
-                        "requested_host" => $request->ip(),
-                        "company_id" => Auth::user()->company_id
-                    ]);
-                    DB::commit();
-                    return response()->json(['success' => 'Success'], 200);
-                }
-                DB::commit();
-                return response()->json(["errors" => ["Error" => ["This Schedule is already Closed"]]], 422);
-            
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            }
-    }
-    public function revertDropSchedule(Request $request)
-    {
-        if(!checkPermissionButtons("drop-schedule"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
-        try {
-                DB::beginTransaction();
-                $scheduleDetail = ScheduleDetail::where([
-                    'company_id' => Auth::user()->company_id,
-                    'schedule_id' => $request->schedule_id,
-                    'departure_date' => $request->date,
-                    'departure_id' => $request->departure_city_id,
-                    'destination_id' => $request->destination_city_id,
-                ])->first();
-                DropSchedule::where([
-                    'company_id' => Auth::user()->company_id,
-                    'schedule_date' => $scheduleDetail->schedule_date,
-                    'schedule_id' => $request->schedule_id,
+                    'added_by' => Auth::user()->id,
                     'is_drop' => 1,
-                ])->delete();
+                    'reason' => $request->reason,
+                ]);
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | revert schedule | time : $scheduleDetail->schedule_date $scheduleDetail->departure_time",
+                    "message" => Auth::user()->name . " | dropped schedule | time : $scheduleDetail->schedule_date $scheduleDetail->departure_time",
                     "requested_host" => $request->ip(),
                     "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+                return response()->json(['success' => 'Success'], 200);
             }
+            DB::commit();
+            return response()->json(["errors" => ["Error" => ["This Schedule is already Closed"]]], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
+    }
+    public function revertDropSchedule(Request $request)
+    {
+        if (!checkPermissionButtons("drop-schedule")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        try {
+            DB::beginTransaction();
+            $scheduleDetail = ScheduleDetail::where([
+                'company_id' => Auth::user()->company_id,
+                'schedule_id' => $request->schedule_id,
+                'departure_date' => $request->date,
+                'departure_id' => $request->departure_city_id,
+                'destination_id' => $request->destination_city_id,
+            ])->first();
+            DropSchedule::where([
+                'company_id' => Auth::user()->company_id,
+                'schedule_date' => $scheduleDetail->schedule_date,
+                'schedule_id' => $request->schedule_id,
+                'is_drop' => 1,
+            ])->delete();
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name . " | revert schedule | time : $scheduleDetail->schedule_date $scheduleDetail->departure_time",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
     }
 
     public
     function getClosingData(Request $request)
     {
-        if(!checkPermissionButtons("assign-bus"))
-        {
+        if (!checkPermissionButtons("assign-bus")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $uniqueDate = ScheduleDetail::where([
@@ -1351,7 +1459,7 @@ class BookingController extends Controller
             'departure_date' => $request->date,
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
-            'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
+            'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
         ])->first()->schedule_date;
 
         $schedule = ScheduleDetail::where([
@@ -1385,9 +1493,9 @@ class BookingController extends Controller
         $infoData->drivers = $checkAssign ? $checkAssign->members->where("type", 1)->pluck('user_id') : [];
         $infoData->hosts = $checkAssign ? $checkAssign->members->where("type", 2)->pluck('user_id') : [];
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
-        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id,"hide"=>0 ,"status" => "w"])->orderBy('id')->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
-        $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id,"hide"=>0 ,"status" => "w"])->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
-        
+        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id, "hide" => 0, "status" => "w"])->orderBy('id')->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
+        $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id, "hide" => 0, "status" => "w"])->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
+
         $data = [
             "buses" => $buses,
             "hosts" => $hosts,
@@ -1396,145 +1504,213 @@ class BookingController extends Controller
         ];
         return $data;
     }
-    
+
     public
     function getBusClasses(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $bus_classes =  BusClass::with('addedBy')->orderBy('id')->where(['company_id'=> Auth::user()->company_id,"hide" => 0])->get();
-    
+        $bus_classes =  BusClass::with('addedBy')->orderBy('id')->where(['company_id' => Auth::user()->company_id, "hide" => 0])->get();
+
         $data = [
             "bus_classes" => $bus_classes,
         ];
         return $data;
     }
-    
+
     function updateBusClass(Request $request)
     {
-        if(!checkPermissionButtons("bus-class"))
-        {
+        if (!checkPermissionButtons("bus-class")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         try {
-                $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
-                    'company_id' => Auth::user()->company_id,
-                    'schedule_id' => $request->id,
-                    'departure_date' => $request->date,
-                    'departure_id' => $request->departureCity,
-                    'destination_id' => $request->destinationCity,
-                    'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
-                ])->first();
-                
-                ScheduleDetail::where(['company_id'=> Auth::user()->company_id,"schedule_id" => $scheduleDetail->schedule_id,"schedule_date"=>$scheduleDetail->schedule_date])->update([
-                    "bus_class_id" => $request->bus_class
-                ]);
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            }
+            $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
+                'company_id' => Auth::user()->company_id,
+                'schedule_id' => $request->id,
+                'departure_date' => $request->date,
+                'departure_id' => $request->departureCity,
+                'destination_id' => $request->destinationCity,
+                'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
+            ])->first();
+
+            ScheduleDetail::where(['company_id' => Auth::user()->company_id, "schedule_id" => $scheduleDetail->schedule_id, "schedule_date" => $scheduleDetail->schedule_date])->update([
+                "bus_class_id" => $request->bus_class
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
     }
 
     public
     function bookingElt(Request $request)
     {
-        if(!checkPermissionButtons("add-elt"))
-        {
+        if (!checkPermissionButtons("add-elt")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         try {
-                DB::beginTransaction();
-                if (is_null(Auth::user()->terminal_id)) {
-                    return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
-                }
-                $ticket = Ticket::where([
-                    'company_id' => Auth::user()->company_id,
-                    'date' => $request->date,
-                    'schedule_id' => $request->schedule_id,
-                    'customer_id' => $request->customer_id,
-                    'departure_city_id' => $request->departure_id,
-                    'destination_city_id' => $request->destination_id,
-                    'seat_no' => $request->seat_no,
-                ])->first();
-                $old = TicketELT::where([
+            DB::beginTransaction();
+            if (is_null(Auth::user()->terminal_id)) {
+                return response()->json(["errors" => ["Booking Error" => ["Some Error Occur, Please Refresh The page, If Error Still Occurs Please Contact to Your IT-Team"]]], 422);
+            }
+            $ticket = Ticket::where([
+                'company_id' => Auth::user()->company_id,
+                'date' => $request->date,
+                'schedule_id' => $request->schedule_id,
+                'customer_id' => $request->customer_id,
+                'departure_city_id' => $request->departure_id,
+                'destination_city_id' => $request->destination_id,
+                'seat_no' => $request->seat_no,
+            ])->first();
+            $old = TicketELT::where([
+                'company_id' => Auth::user()->company_id,
+                'ticket_id' => $ticket->id,
+                'customer_id' => $request->customer_id,
+                'schedule_id' => $request->schedule_id,
+                'date' => $request->date,
+            ])->first();
+
+            if (!$old && $request->alreadyExist !== 0) {
+                $ticketElt = TicketELT::create([
                     'company_id' => Auth::user()->company_id,
                     'ticket_id' => $ticket->id,
                     'customer_id' => $request->customer_id,
+                    'departure_city' => $request->departure_id,
+                    'destination_city' => $request->destination_id,
                     'schedule_id' => $request->schedule_id,
+                    'seat_no' => $request->seat_no,
                     'date' => $request->date,
-                ])->first();
+                    'elt_price' => $request->totalPrice,
+                    'seat_fare' => $request->singleFare,
+                    'elt_weight' => $request->eltWeight,
+                    'elt_description' => $request->eltDescription,
+                    'added_by' => Auth::user()->id,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name . " | stored elt against seat no ($request->seat_no) | time : $ticket->schedule_date $ticket->schedule_time",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
 
-                if (!$old && $request->alreadyExist !== 0) {
-                    $ticketElt = TicketELT::create([
-                        'company_id' => Auth::user()->company_id,
-                        'ticket_id' => $ticket->id,
-                        'customer_id' => $request->customer_id,
-                        'departure_city' => $request->departure_id,
-                        'destination_city' => $request->destination_id,
-                        'schedule_id' => $request->schedule_id,
-                        'seat_no' => $request->seat_no,
-                        'date' => $request->date,
-                        'elt_price' => $request->totalPrice,
-                        'seat_fare' => $request->singleFare,
-                        'elt_weight' => $request->eltWeight,
-                        'elt_description' => $request->eltDescription,
-                        'added_by' => Auth::user()->id,
-                    ]);
-                    ActivityLog::create([
-                        "activity_by" => Auth::user()->id,
-                        "message" => Auth::user()->name." | stored elt against seat no ($request->seat_no) | time : $ticket->schedule_date $ticket->schedule_time",
-                        "requested_host" => $request->ip(),
-                        "company_id" => Auth::user()->company_id
-                    ]);
-                    
-                    DB::commit();
-                    return $ticketElt;
-                } else {
-                    $old->update([
-                        'elt_price' => $request->totalPrice,
-                        'elt_weight' => $request->eltWeight,
-                        'elt_description' => $request->eltDescription,
-                        'updated_by' => Auth::user()->company_id,
-                    ]);
-                    ActivityLog::create([
-                        "activity_by" => Auth::user()->id,
-                        "message" => Auth::user()->name." | update elt against seat no ($request->seat_no) | time : $ticket->schedule_date $ticket->schedule_time",
-                        "requested_host" => $request->ip(),
-                        "company_id" => Auth::user()->company_id
-                    ]);
-                    DB::commit();
-                    return $old;
-                }
-                // return response()->json(["errors" => ["Error" => ["Elt Already Exist Against This Seat! Please Select any Other Seat"]]], 422);
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+                DB::commit();
+                return $ticketElt;
+            } else {
+                $old->update([
+                    'elt_price' => $request->totalPrice,
+                    'elt_weight' => $request->eltWeight,
+                    'elt_description' => $request->eltDescription,
+                    'updated_by' => Auth::user()->company_id,
+                ]);
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name . " | update elt against seat no ($request->seat_no) | time : $ticket->schedule_date $ticket->schedule_time",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
+                DB::commit();
+                return $old;
             }
+            // return response()->json(["errors" => ["Error" => ["Elt Already Exist Against This Seat! Please Select any Other Seat"]]], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
     }
 
     public
     function cancelingBooking(Request $request)
     {
-        if(!checkPermissionButtons("cancel-ticket") && !checkPermissionButtons("reserved-cancel"))
-        {
+        if (!checkPermissionButtons("cancel-ticket") && !checkPermissionButtons("reserved-cancel")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         try {
-                DB::beginTransaction();
-                $ticket = Ticket::where([
-                    'company_id' => Auth::user()->company_id,
-                    'date' => $request->date,
-                    'schedule_id' => $request->schedule_id,
-                    'customer_id' => $request->customer_id,
-                    'departure_city_id' => $request->departure_id,
-                    'destination_city_id' => $request->destination_id,
-                    'seat_no' => $request->seat_no,
+            DB::beginTransaction();
+            $ticket = Ticket::where([
+                'company_id' => Auth::user()->company_id,
+                'date' => $request->date,
+                'schedule_id' => $request->schedule_id,
+                'customer_id' => $request->customer_id,
+                'departure_city_id' => $request->departure_id,
+                'destination_city_id' => $request->destination_id,
+                'seat_no' => $request->seat_no,
 
-                ])->first();
+            ])->first();
+
+            //Deduct points reverse in case of cancellation
+            $customer = Customer::where('id', $ticket->customer_id)->first();
+            $checkCard = CardAssign::where(['cnic' => $customer->cnic, 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
+            if ($checkCard) {
+                if ($checkCard->cardCategory->point_type == "flatPoints") {
+                    $subPoint = $ticket->seat_fare / $checkCard->cardCategory->point_flat;
+                } else {
+                    $distance = FareTable::where(['from_city_id' => $ticket->departure_city_id, 'to_city_id' => $ticket->destination_city_id, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
+                    $subPoint = $distance / $checkCard->cardCategory->point_distance;
+                }
+                if ($ticket->type == "booked") {
+                    $checkCard->decrement("starting_points", $subPoint);
+                }
+
+                $checkCard->increment("starting_points", $ticket->points_usage);
+            }
+
+            $delElt = TicketELT::where('ticket_id', $ticket->id)->first();
+            if ($delElt) {
+                $delElt->delete();
+            }
+            $type = $ticket->type;
+            $ticket->update([
+                'type' => 'canceled',
+            ]);
+            BookingCancel::create([
+                'company_id' => Auth::user()->company_id,
+                'ticket_id' => $ticket->id,
+                'percentage' => $request->percentage,
+                'reason' => $request->remarks,
+                'type' => $type,
+                'added_by' => Auth::user()->id,
+            ]);
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name . " | canceled booking. seat no ($request->seat_no) | time : $ticket->schedule_date $ticket->schedule_time",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
+
+            $tkts = [];
+            if ($type == "booked") {
+                $tkts[] = $ticket->id;
+            }
+            $ticket->delete();
+            DB::commit();
+            return [
+                "tickets" => $tkts
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
+    }
+    public
+    function cancelingAllBooking(Request $request)
+    {
+        if (!checkPermissionButtons("cancel-ticket") && !checkPermissionButtons("reserved-cancel")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        try {
+            DB::beginTransaction();
+            $tickets = Ticket::whereIn("id", $request->cancelAllSeat)->where(['company_id' => Auth::user()->company_id])->get();
+            $status = $tickets[0]->type;
+            foreach ($tickets as $ticket) {
+                $delElt = TicketELT::where('ticket_id', $ticket->id)->first();
+                if ($delElt) {
+                    $delElt->delete();
+                }
+
 
                 //Deduct points reverse in case of cancellation
                 $customer = Customer::where('id', $ticket->customer_id)->first();
@@ -1546,18 +1722,13 @@ class BookingController extends Controller
                         $distance = FareTable::where(['from_city_id' => $ticket->departure_city_id, 'to_city_id' => $ticket->destination_city_id, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
                         $subPoint = $distance / $checkCard->cardCategory->point_distance;
                     }
-                    if($ticket->type == "booked")
-                    {
+                    if ($ticket->type == "booked") {
                         $checkCard->decrement("starting_points", $subPoint);
                     }
 
                     $checkCard->increment("starting_points", $ticket->points_usage);
                 }
 
-                $delElt = TicketELT::where('ticket_id', $ticket->id)->first();
-                if ($delElt) {
-                    $delElt->delete();
-                }
                 $type = $ticket->type;
                 $ticket->update([
                     'type' => 'canceled',
@@ -1566,113 +1737,39 @@ class BookingController extends Controller
                     'company_id' => Auth::user()->company_id,
                     'ticket_id' => $ticket->id,
                     'percentage' => $request->percentage,
-                    'reason' => $request->remarks,
+                    'reason' => $request->reason,
                     'type' => $type,
                     'added_by' => Auth::user()->id,
                 ]);
-                ActivityLog::create([
-                    "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | canceled booking. seat no ($request->seat_no) | time : $ticket->schedule_date $ticket->schedule_time",
-                    "requested_host" => $request->ip(),
-                    "company_id" => Auth::user()->company_id
-                ]);
-                
-                $tkts = [];
-                if($type == "booked")
-                {
-                    $tkts[] = $ticket->id;
-                }
                 $ticket->delete();
-                DB::commit();
-                return [
-                    "tickets" => $tkts
-                ];
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
-    }
-    public
-    function cancelingAllBooking(Request $request)
-    {
-        if(!checkPermissionButtons("cancel-ticket") && !checkPermissionButtons("reserved-cancel"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name . " | canceled booking. seat no " . (implode(',', $tickets->pluck('seat_no')->toArray())) . " | time : " . $tickets[0]->schedule_date . " " . $tickets[0]->schedule_time,
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
+
+            $tkts = [];
+            if ($type == "booked") {
+                $tkts = $tickets->pluck('id');
+            }
+
+            DB::commit();
+            return [
+                "tickets" => $tkts
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
         }
-        try {
-                DB::beginTransaction();
-                $tickets = Ticket::whereIn("id",$request->cancelAllSeat)->where(['company_id' => Auth::user()->company_id])->get();
-                $status = $tickets[0]->type;
-                foreach($tickets as $ticket)
-                {
-                    $delElt = TicketELT::where('ticket_id', $ticket->id)->first();
-                    if ($delElt) {
-                        $delElt->delete();
-                    }
-
-
-                    //Deduct points reverse in case of cancellation
-                    $customer = Customer::where('id', $ticket->customer_id)->first();
-                    $checkCard = CardAssign::where(['cnic' => $customer->cnic, 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
-                    if ($checkCard) {
-                        if ($checkCard->cardCategory->point_type == "flatPoints") {
-                            $subPoint = $ticket->seat_fare / $checkCard->cardCategory->point_flat;
-                        } else {
-                            $distance = FareTable::where(['from_city_id' => $ticket->departure_city_id, 'to_city_id' => $ticket->destination_city_id, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
-                            $subPoint = $distance / $checkCard->cardCategory->point_distance;
-                        }
-                        if($ticket->type == "booked")
-                        {
-                            $checkCard->decrement("starting_points", $subPoint);
-                        }
-
-                        $checkCard->increment("starting_points", $ticket->points_usage);
-                    }
-
-                    $type = $ticket->type;
-                    $ticket->update([
-                        'type' => 'canceled',
-                    ]);
-                    BookingCancel::create([
-                        'company_id' => Auth::user()->company_id,
-                        'ticket_id' => $ticket->id,
-                        'percentage' => $request->percentage,
-                        'reason' => $request->reason,
-                        'type' => $type,
-                        'added_by' => Auth::user()->id,
-                    ]);
-                    $ticket->delete();
-                }
-                ActivityLog::create([
-                    "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | canceled booking. seat no ".(implode(',',$tickets->pluck('seat_no')->toArray()))." | time : ".$tickets[0]->schedule_date." ".$tickets[0]->schedule_time,
-                    "requested_host" => $request->ip(),
-                    "company_id" => Auth::user()->company_id
-                ]);
-                
-                $tkts = [];
-                if($type == "booked")
-                {
-                    $tkts = $tickets->pluck('id');
-                }
-                
-                DB::commit();
-                return [
-                    "tickets" => $tkts
-                ];
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            }
     }
 
     public
     function terminalInvoice(Request $request)
     {
-        if(!checkPermissionButtons("terminal-invoice"))
-        {
+        if (!checkPermissionButtons("terminal-invoice")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $scheduleDetail = ScheduleDetail::where([
@@ -1681,20 +1778,20 @@ class BookingController extends Controller
             'departure_date' => $request->date,
             'departure_id' => $request->departure_city_id,
             'destination_id' => $request->destination_city_id,
-            'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
+            'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
         ])->first();
 
-        $passengerData = Ticket::withTrashed()->with('customer:id,name,cnic,contact', 'addedBy:id,name','updated_name:id,name', 'terminal:id,name', 'elt:id,elt_price,ticket_id', 'destination_city:id,name', 'departure_city:id,name')->where([
+        $passengerData = Ticket::withTrashed()->with('customer:id,name,cnic,contact', 'addedBy:id,name', 'updated_name:id,name', 'terminal:id,name', 'elt:id,elt_price,ticket_id', 'destination_city:id,name', 'departure_city:id,name')->where([
             'company_id' => Auth::user()->company_id,
             'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id,
             'schedule_id' => $request->schedule_id,
             'schedule_date' => $scheduleDetail->schedule_date,
         ])->where(function ($query) {
             $query->where("type", "booked")
-                  ->orWhere("type", "over-issue");
+                ->orWhere("type", "over-issue");
         })
-        ->get();
-       
+            ->get();
+
         $routeId = Schedule::where(["id" => $request->schedule_id, 'company_id' => Auth::user()->company_id])->first()->route_id;
         $commission = TerminalCommission::where(["company_id" => Auth::user()->company_id, 'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id, "route_id" => $routeId])->first();
 
@@ -1702,9 +1799,9 @@ class BookingController extends Controller
         $hostInfo = getMembers($passengerData->first(), Auth::user()->company_id, 2) ?? [];
         $routeName = routeName($request->schedule_id);
         $bus = (object)[];
-        $bus->bus_class = BusClass::find($scheduleDetail->bus_class_id)->name??'N/A';
-        $bus->bus_no = $passengerData->count() > 0 ? Bus::find($passengerData[0]->bus_id)->bus_number??'N/A' : "N/A";
-        
+        $bus->bus_class = BusClass::find($scheduleDetail->bus_class_id)->name ?? 'N/A';
+        $bus->bus_no = $passengerData->count() > 0 ? Bus::find($passengerData[0]->bus_id)->bus_number ?? 'N/A' : "N/A";
+
         $date = date_format(date_create($scheduleDetail->schedule_date . ' ' . $scheduleDetail->departure_time), "l") . ' , ' . date_format(date_create($scheduleDetail->schedule_date . ' ' . $scheduleDetail->departure_time), "d F Y H:i:s A");
         $eltAmount = 0;
         foreach ($passengerData as $passenger) {
@@ -1713,11 +1810,11 @@ class BookingController extends Controller
         $passengerData = $passengerData->sortBy(function ($item) {
             // Extract the integer part of the 'age' values using a regular expression
             preg_match('/\d+/', $item['seat_no'], $matches);
-            
+
             // Use the extracted integer part for sorting
             return $matches[0] ?? 0;
         })->values();
-        
+
         $refunds = Ticket::with('cancel_ticket:ticket_id,percentage')->where([
             'company_id' => Auth::user()->company_id,
             'terminal_id' => $request->terminal_id ?? Auth::user()->terminal_id,
@@ -1729,24 +1826,22 @@ class BookingController extends Controller
             $percentageValue = ((int)$single->seat_fare - ((int)$single->discount)) * (is_null($single->cancel_ticket) ? 0 : $single->cancel_ticket->percentage);
             $final = $percentageValue / 100;
             $refundData += $final;
-        }
-        ;
+        };
         $passengerData = ['record' => $passengerData, 'driverInfo' => $driverInfo, 'hostInfo' => $hostInfo, 'routeName' => $routeName, 'bus' => $bus, 'date' => $date, 'terminalGross' => $passengerData->sum('seat_fare'), 'totalElt' => $eltAmount, 'commission' => $commission, 'refund' => round($refundData)];
         $terminal = Terminal::find(Auth::user()->terminal_id);
         $format = TicketsTemplate::with("terminal")
-        ->join("ticket_template_terminals","ticket_template_terminals.ticket_template_id","tickets_templates.id")
-        ->whereNull('tickets_templates.deleted_at')
-        ->whereNull('ticket_template_terminals.deleted_at')
-        ->where(['tickets_templates.company_id'=> Auth::user()->company_id,"ticket_template_terminals.terminal_id"=>Auth::user()->terminal_id])->where('tickets_templates.status', 1)
-        ->first();
-        return view('pdf/TerminalPaxDetails', ['data' => $passengerData, 'terminal' => $terminal,"format"=>$format]);
+            ->join("ticket_template_terminals", "ticket_template_terminals.ticket_template_id", "tickets_templates.id")
+            ->whereNull('tickets_templates.deleted_at')
+            ->whereNull('ticket_template_terminals.deleted_at')
+            ->where(['tickets_templates.company_id' => Auth::user()->company_id, "ticket_template_terminals.terminal_id" => Auth::user()->terminal_id])->where('tickets_templates.status', 1)
+            ->first();
+        return view('pdf/TerminalPaxDetails', ['data' => $passengerData, 'terminal' => $terminal, "format" => $format]);
     }
 
     public
     function busInvoice(Request $request)
     {
-        if(!checkPermissionButtons("bus-invoice"))
-        {
+        if (!checkPermissionButtons("bus-invoice")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $uniqueDate = ScheduleDetail::where([
@@ -1755,7 +1850,7 @@ class BookingController extends Controller
             'departure_date' => $request->date,
             'departure_id' => $request->departure_city_id,
             'destination_id' => $request->destination_city_id,
-            'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
+            'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
         ])->first()->schedule_date;
         $route = Schedule::where([
             'company_id' => Auth::user()->company_id,
@@ -1794,31 +1889,29 @@ class BookingController extends Controller
             ->get()->groupBy(["terminal_id", "destination_city_id"]);
 
         // for add cancelation charges into the bus invoice paid by customer
-        $cancelTicket = Ticket::
-            onlyTrashed()
+        $cancelTicket = Ticket::onlyTrashed()
             ->where([
                 'company_id' => Auth::user()->company_id,
                 'schedule_id' => $request->schedule_id,
                 'schedule_date' => $uniqueDate,
             ])
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->where("type", "canceled")
                     ->whereHas('cancel_ticket', function ($query) {
                         $query->where('percentage', '>', 0);
                     });
             })
-            ->with("cancel_ticket:id,ticket_id,percentage","terminal:id,name")
-            ->get(["id","seat_fare","discount","terminal_id","seat_no"])->groupBy("terminal_id");
+            ->with("cancel_ticket:id,ticket_id,percentage", "terminal:id,name")
+            ->get(["id", "seat_fare", "discount", "terminal_id", "seat_no"])->groupBy("terminal_id");
 
         $refundTerminal = [];
-        $cancelTicket->map(function($single) use (&$refundTerminal){
-            
+        $cancelTicket->map(function ($single) use (&$refundTerminal) {
+
             $refundAmount = 0;
             $refundSeats = [];
-            $single->map(function($ticket) use (&$refundAmount,&$refundSeats){
-            
-                if($ticket->cancel_ticket)
-                {
+            $single->map(function ($ticket) use (&$refundAmount, &$refundSeats) {
+
+                if ($ticket->cancel_ticket) {
                     $refundAmount += (($ticket->seat_fare - $ticket->discount) / 100) * $ticket->cancel_ticket->percentage;
                     $refundSeats[] = $ticket->seat_no;
                 }
@@ -1826,7 +1919,7 @@ class BookingController extends Controller
             $singleTerminal = [];
             $singleTerminal["terminal"] = $single[0]->terminal->name;
             $singleTerminal["amount"] = $refundAmount;
-            $singleTerminal["seats"] = implode(",",$refundSeats);
+            $singleTerminal["seats"] = implode(",", $refundSeats);
 
             $refundTerminal[] = $singleTerminal;
         });
@@ -1837,7 +1930,7 @@ class BookingController extends Controller
         //         $refundAmount += (($single->seat_fare - $single->discount) / 100) * $single->cancel_ticket->percentage;
         //     }
         // });
-        
+
         $busData = TicketClosing::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
@@ -1848,21 +1941,20 @@ class BookingController extends Controller
 
         $infoData->bus_data = $busData;
 
-       
+
         $format = TicketsTemplate::with("terminal")
-        ->join("ticket_template_terminals","ticket_template_terminals.ticket_template_id","tickets_templates.id")
-        ->whereNull('tickets_templates.deleted_at')
-        ->whereNull('ticket_template_terminals.deleted_at')
-        ->where(['tickets_templates.company_id'=> Auth::user()->company_id,"ticket_template_terminals.terminal_id"=>Auth::user()->terminal_id])->where('tickets_templates.status', 1)
-        ->first();;
-        return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData,"refundTerminal" => $refundTerminal,"format"=>$format]);
+            ->join("ticket_template_terminals", "ticket_template_terminals.ticket_template_id", "tickets_templates.id")
+            ->whereNull('tickets_templates.deleted_at')
+            ->whereNull('ticket_template_terminals.deleted_at')
+            ->where(['tickets_templates.company_id' => Auth::user()->company_id, "ticket_template_terminals.terminal_id" => Auth::user()->terminal_id])->where('tickets_templates.status', 1)
+            ->first();;
+        return view('pdf/PrintBusInvoice', ["infoData" => $infoData, "mainData" => $mainData, "refundTerminal" => $refundTerminal, "format" => $format]);
     }
 
     public
     function ticketPdf(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         if ((int)$request->duplicate == 0) {
@@ -1871,50 +1963,48 @@ class BookingController extends Controller
             $ids = [$request->ticket_id];
         }
         // return $ids;
-       $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city','terminal')->where('company_id', Auth::user()->company_id)->withTrashed()->whereIn('id', $ids)->get();
+        $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city', 'terminal')->where('company_id', Auth::user()->company_id)->withTrashed()->whereIn('id', $ids)->get();
         $tickets->map(function ($item) {
-          
+
 
             $item->acutal_time = $item->date . " " . $item->schedule_time; //if ticket booked from another terminal
 
             $sub = 0;
             $terminalTime = TerminalTimeDifference::where(['company_id' => $item->company_id, 'terminal_id' => $item->terminal_id, 'route_id' => $item->route_id])->first();
-            if($terminalTime)
-            {
+            if ($terminalTime) {
                 $sub = $terminalTime->time_difference * 60;
             }
 
             $item->acutal_time = date("Y-m-d H:i:00", strtotime($item->date . " " . $item->schedule_time) + $sub);
         });
         $format = TicketsTemplate::with("terminal")
-                ->join("ticket_template_terminals","ticket_template_terminals.ticket_template_id","tickets_templates.id")
-                ->whereNull('tickets_templates.deleted_at')
-                ->whereNull('ticket_template_terminals.deleted_at')
-                ->where(['tickets_templates.company_id'=> Auth::user()->company_id,"ticket_template_terminals.terminal_id"=>Auth::user()->terminal_id])->where('tickets_templates.status', 1)
-                ->first();
+            ->join("ticket_template_terminals", "ticket_template_terminals.ticket_template_id", "tickets_templates.id")
+            ->whereNull('tickets_templates.deleted_at')
+            ->whereNull('ticket_template_terminals.deleted_at')
+            ->where(['tickets_templates.company_id' => Auth::user()->company_id, "ticket_template_terminals.terminal_id" => Auth::user()->terminal_id])->where('tickets_templates.status', 1)
+            ->first();
         $finalData = [
             'tickets' => $tickets,
             'format' => $format,
             'duplicate' => (int)$request->duplicate,
         ];
-        
+
         return view('pdf/pdf', ['data' => $finalData]);
     }
 
     public
     function eltPdf(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $ticketsElt = TicketELT::with('schedule', 'customer', 'ticket.seatClass:id,name', 'destination', 'departure')->where(['company_id' => Auth::user()->company_id, 'id' => $request->elt_ids])->first();
         $format = TicketsTemplate::with("terminal")
-        ->join("ticket_template_terminals","ticket_template_terminals.ticket_template_id","tickets_templates.id")
-        ->whereNull('tickets_templates.deleted_at')
-        ->whereNull('ticket_template_terminals.deleted_at')
-        ->where(['tickets_templates.company_id'=> Auth::user()->company_id,"ticket_template_terminals.terminal_id"=>Auth::user()->terminal_id])->where('tickets_templates.status', 1)
-        ->first();
+            ->join("ticket_template_terminals", "ticket_template_terminals.ticket_template_id", "tickets_templates.id")
+            ->whereNull('tickets_templates.deleted_at')
+            ->whereNull('ticket_template_terminals.deleted_at')
+            ->where(['tickets_templates.company_id' => Auth::user()->company_id, "ticket_template_terminals.terminal_id" => Auth::user()->terminal_id])->where('tickets_templates.status', 1)
+            ->first();
         $finalData = [
             'elt' => $ticketsElt,
             'format' => $format,
@@ -1942,8 +2032,7 @@ class BookingController extends Controller
     public
     function passengerListPdf(Request $request)
     {
-        if(!checkPermissionButtons("pax-list"))
-        {
+        if (!checkPermissionButtons("pax-list")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $uniqueDate = ScheduleDetail::where([
@@ -1952,7 +2041,7 @@ class BookingController extends Controller
             'departure_date' => $request->date,
             'departure_id' => $request->departure_city_id,
             'destination_id' => $request->destination_city_id,
-            'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
+            'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
         ])->first()->schedule_date;
         $scheduleTime = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
@@ -1983,11 +2072,11 @@ class BookingController extends Controller
             'type' => 'booked',
         ])->groupBy('destination_city_id')->selectRaw('destination_city_id,count(*) as destinationPassengerCount')->get();
         $format = TicketsTemplate::with("terminal")
-        ->join("ticket_template_terminals","ticket_template_terminals.ticket_template_id","tickets_templates.id")
-        ->whereNull('tickets_templates.deleted_at')
-        ->whereNull('ticket_template_terminals.deleted_at')
-        ->where(['tickets_templates.company_id'=> Auth::user()->company_id,"ticket_template_terminals.terminal_id"=>Auth::user()->terminal_id])->where('tickets_templates.status', 1)
-        ->first();
+            ->join("ticket_template_terminals", "ticket_template_terminals.ticket_template_id", "tickets_templates.id")
+            ->whereNull('tickets_templates.deleted_at')
+            ->whereNull('ticket_template_terminals.deleted_at')
+            ->where(['tickets_templates.company_id' => Auth::user()->company_id, "ticket_template_terminals.terminal_id" => Auth::user()->terminal_id])->where('tickets_templates.status', 1)
+            ->first();
         $countPassenger = count($passengerData);
         $actualDeparture = date('m/d/Y h:i A', strtotime($uniqueDate . ' ' . $scheduleTime));
         $driverInfo = getMembers($passengerData->first(), Auth::user()->company_id, 1) ?? [];
@@ -1998,7 +2087,7 @@ class BookingController extends Controller
         $passengerData = $passengerData->sortBy(function ($item) {
             // Extract the integer part of the 'age' values using a regular expression
             preg_match('/\d+/', $item['seat_no'], $matches);
-            
+
             // Use the extracted integer part for sorting
             return $matches[0] ?? 0;
         });
@@ -2008,8 +2097,7 @@ class BookingController extends Controller
     public
     function fetchScheduleSurchargeDiscount(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         return Schedule::with(['surcharge' => function ($q) {
@@ -2022,20 +2110,18 @@ class BookingController extends Controller
     public
     function fetchTerminalDiscount(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $schedule = Schedule::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
         return $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->dropTerminal ?? 0, "route_id" => $schedule->route_id])->where('start_date', '<=', $request->date)
-        ->where('end_date', '>=', $request->date)->first();
+            ->where('end_date', '>=', $request->date)->first();
     }
 
     public
     function fetchOverIssueSeat(Request $request)
     {
-        if(!checkForSubmenu("bookings"))
-        {
+        if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $uniqueDate = ScheduleDetail::where("departure_id", $request->departureCity)
@@ -2044,11 +2130,11 @@ class BookingController extends Controller
             ->where('departure_date', $request->date)
             ->where('company_id', Auth::user()->company_id)
             ->first();
-        $tickets = Ticket::withTrashed()->with('overIssueSeats','overIssueSeats.overissue_by', 'scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'busClass')->where(["schedule_date" => $uniqueDate->schedule_date, "schedule_id" => $uniqueDate->schedule_id, 'type' => 'over-issue'])->get();
+        $tickets = Ticket::withTrashed()->with('overIssueSeats', 'overIssueSeats.overissue_by', 'scheduleDetail', 'schedule', 'customer', 'company', 'destination_city', 'departure_city', 'busClass')->where(["schedule_date" => $uniqueDate->schedule_date, "schedule_id" => $uniqueDate->schedule_id, 'type' => 'over-issue'])->get();
         foreach ($tickets as $key => $single) {
             $single->bookingDate = date('d/m/Y H:i A', strtotime($single->booked_time));
             $single->OverIssueDate = date('d/m/Y H:i A', strtotime($single->overIssueSeats->created_at));
-            $single->overIssueBy = $single->overIssueSeats->overissue_by->name??"N/A";
+            $single->overIssueBy = $single->overIssueSeats->overissue_by->name ?? "N/A";
         }
         return $tickets;
     }
@@ -2056,8 +2142,7 @@ class BookingController extends Controller
     public
     function revertOverIssueSeat(Request $request)
     {
-        if(!checkPermissionButtons("overissue-seat"))
-        {
+        if (!checkPermissionButtons("overissue-seat")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $ticket = Ticket::where([
@@ -2079,8 +2164,7 @@ class BookingController extends Controller
     public
     function getFetchOldELT(Request $request)
     {
-        if(!checkPermissionButtons("add-elt"))
-        {
+        if (!checkPermissionButtons("add-elt")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $foundELT = TicketELT::where([
@@ -2100,5 +2184,4 @@ class BookingController extends Controller
             return response()->json([], 204);
         }
     }
-
 }
