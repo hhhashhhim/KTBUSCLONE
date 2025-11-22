@@ -669,7 +669,7 @@ if (!function_exists('ticketConfirmedMessage')) {
                 4 => 'Hamza_4-Device4',
                 5 => 'Hamza_4-Device-5'
             ];
-            $randomNumber = rand(1, 5);
+            $randomNumber = rand(1, 4);
 
 
 
@@ -1001,7 +1001,7 @@ if (!function_exists('sendOtpForTicket')) {
                 3 => 'Hamza_4-Device3-204-samsung-a20',
                 4 => 'Hamza_4-Device4',
                 5 => 'Hamza_4-Device-5'
-                // 5 => 'Muhammad-Shahzaib_3-sarzone'
+               
             ];
             
             $url = "https://whatsapp.sarzone.com/api/send-messages";
@@ -1047,12 +1047,12 @@ if (!function_exists('sendDiscountOtpForTicket')) {
 
        if ($customer) {
             $names = [
-                // 1 => 'Hamza_4-Device1',
-                // 2 => 'Hamza_4-Device2-201-samsung-a20',
-                // 3 => 'Hamza_4-Device3-204-samsung-a20',
-                // 4 => 'Hamza_4-Device4',
-                // 5 => 'Hamza_4-Device-5'
-                5 => 'Muhammad-Shahzaib_3-sarzone'
+                1 => 'Hamza_4-Device1',
+                2 => 'Hamza_4-Device2-201-samsung-a20',
+                3 => 'Hamza_4-Device3-204-samsung-a20',
+                4 => 'Hamza_4-Device4',
+                5 => 'Hamza_4-Device-5'
+                
             ];
             
             $url = "https://whatsapp.sarzone.com/api/send-messages";
@@ -1061,7 +1061,8 @@ if (!function_exists('sendDiscountOtpForTicket')) {
             $session = $names[5];
             
             $response = Http::withHeaders([
-                'X-Api-Key'    => '@+_VbdTWAYv4c1kkuIO!NQQupcb@yNw%_I^qNWJ1cp+owvKF35',
+                'X-Api-Key'    => '
+                ',
             ])->post($url, [
                 "session" => $session,
                 "message_type" =>  'text',
