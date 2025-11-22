@@ -489,6 +489,7 @@ if (!empty($request->usageDiscount) && !empty($request->discount_otp_valid) && $
 
     public function whatsappMessage(Request $request)
     {
+      
         return ticketConfirmedMessage($request->invoice_id);
     }
 

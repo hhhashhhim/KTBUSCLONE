@@ -622,7 +622,8 @@ if (!function_exists('superDataWhatsappMessage')) {
 if (!function_exists('ticketConfirmedMessage')) {
     function ticketConfirmedMessage($invoice_id)
     {
-        $auth_key = Company::where("id", Auth::user()->company_id)->first()->whatsapp_auth_key;
+        
+       $auth_key = Company::where("id", Auth::user()->company_id)->first()->whatsapp_auth_key;
         $message_allow = Terminal::where("id", Auth::user()->terminal_id)->first()->send_message;
         if ($auth_key && $message_allow) {
             $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->withTrashed()->where("invoice_id", $invoice_id)->get();
@@ -667,16 +668,13 @@ if (!function_exists('ticketConfirmedMessage')) {
                 2 => 'Hamza_4-Device2-201-samsung-a20',
                 3 => 'Hamza_4-Device3-204-samsung-a20',
                 4 => 'Hamza_4-Device4',
-                5 => 'Hamza_4-Device-5'
             ];
             $randomNumber = rand(1, 4);
 
 
-
-
             $url = "https://whatsapp.sarzone.com/api/send-messages";
             $mobile = "92" . substr($tickets[0]->customer->contact, -10);
-            $session = $names[$randomNumber];
+             $session = $names[$randomNumber];
             $messageConfirmed = "Dear " . $tickets[0]->customer->name . ",
 Seat# " . implode(',', $tickets->pluck('seat_no')->toArray()) . ",
 " . $tickets[0]->departure_city->name . " to " . $tickets[0]->destination_city->name . "
@@ -786,7 +784,7 @@ if (!function_exists('ticketRescheduledMessage')) {
                 4 => 'Hamza_4-Device4',
                 5 => 'Hamza_4-Device-5'
             ];
-            $randomNumber = rand(1, 5);
+            $randomNumber = rand(1, 4);
 
 
 
@@ -881,9 +879,7 @@ if (!function_exists('ticketcanceledMessage')) {
                 4 => 'Hamza_4-Device4',
                 5 => 'Hamza_4-Device-5'
             ];
-            $randomNumber = rand(1, 5);
-
-
+            $randomNumber = rand(1, 4);
 
 
             $url = "https://whatsapp.sarzone.com/api/send-messages";
@@ -1010,7 +1006,7 @@ if (!function_exists('sendOtpForTicket')) {
             $session = $names[5];
             
             $response = Http::withHeaders([
-                'X-Api-Key'    => '(fC3dUv&PtG$%TeMgdE1TegI#1(tP&CgmDSb)No+jkV#c7l*qh',
+               'X-Api-Key' => $auth_key,
             ])->post($url, [
                 "session" => $session,
                 "message_type" =>  'text',
@@ -1061,8 +1057,7 @@ if (!function_exists('sendDiscountOtpForTicket')) {
             $session = $names[5];
             
             $response = Http::withHeaders([
-                'X-Api-Key'    => '
-                ',
+               'X-Api-Key' => $auth_key,
             ])->post($url, [
                 "session" => $session,
                 "message_type" =>  'text',
