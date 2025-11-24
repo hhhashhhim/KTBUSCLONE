@@ -327,7 +327,9 @@
                                                 <div class="form-group mb-0">
                                                     <label>Discount <span class="ml-2 text-muted"></span></label>
                                                     <input type="text" class="form-control" id="fareDiscount"
-                                                        v-model.number="addForm.discount" :readonly="addForm.discount_otp_valid" />
+                                                        v-model.number="addForm.discount" 
+                                                        @keyup="calculateTotal()"
+                                                        :readonly="addForm.discount_otp_valid" />
                                                     <!-- always readonly since discount is applied via OTP -->
 
 

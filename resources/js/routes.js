@@ -89,7 +89,7 @@ import DiscountCardAssignPage from "./pages/discountType/DiscountCardAssignPage.
 import DiscountType from "./pages/discountType/DiscountCardTypePage.vue";
 
 // const url = "/kt-dev/";
-const url = '/' 
+ const url = '/' 
 
 const routes = [
     {
