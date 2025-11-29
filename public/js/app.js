@@ -89288,7 +89288,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onKeyup: _cache[31] || (_cache[31] = function ($event) {
       return $options.calculateTotal();
     }),
-    readonly: $data.addForm.discount_otp_valid
+    readonly: $data.addForm.discount_otp_valid || !_ctx.checkForSubmenuButtons('discount-field')
   }, null, 40
   /* PROPS, HYDRATE_EVENTS */
   , _hoisted_125), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addForm.discount, void 0, {
