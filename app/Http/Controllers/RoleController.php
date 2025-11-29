@@ -25,7 +25,7 @@ class RoleController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $role = Role::with('company:id,name')->find($request->id);
+       return $role = Role::with('company:id,name')->find($request->id);
         $company = Company::find($role->company_id);
         if ($company) {
 

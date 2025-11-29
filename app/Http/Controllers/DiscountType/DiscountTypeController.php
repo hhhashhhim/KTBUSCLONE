@@ -28,7 +28,7 @@ class DiscountTypeController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        // try {
+        try {
                 DB::beginTransaction();
                 $rules = [
                     'name' => ['required', 'alpha', Rule::unique('discount_types', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
@@ -46,9 +46,6 @@ class DiscountTypeController extends Controller
                     'discount_type' => $request->discountType,
                     'flat_discount' => $request->discountFlat ?? 0,
                     'percentage_discount' => $request->discountPercentage ?? 0,
-                    // 'point_type' => $request->pointsType,
-                    // 'point_flat' => $request->pointsFlat ?? 0,
-                    // 'point_distance' => $request->pointsDistance ?? 0,
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
                 ]);
@@ -61,11 +58,11 @@ class DiscountTypeController extends Controller
                 DB::commit();
                 return $category;
             
-            // } catch (\Exception $e) {
-            //     DB::rollBack();
-            //     Log::error('Database transaction error: ' . $e->getMessage());
-            //     return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            // }
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
     }
 
     public function update(Request $request)
@@ -81,9 +78,6 @@ class DiscountTypeController extends Controller
                     'discount_type' => $request->discount_type,
                     'flat_discount' => $request->discount_type == "flat" ? $request->flat_discount : 0,
                     'percentage_discount' => $request->discount_type == "flat" ? 0 : $request->percentage_discount,
-                    // 'point_type' => $request->point_type,
-                    // 'point_flat' => $request->point_type == "flatPoints" ? $request->point_flat : 0,
-                    // 'point_distance' => $request->point_type == "flatPoints" ? 0 : $request->point_distance,
                     'updated_by' => Auth::user()->id,
                 ]);
                 ActivityLog::create([
