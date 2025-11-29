@@ -29,10 +29,10 @@ class RoleController extends Controller
         $company = Company::find($role->company_id);
         if ($company) {
 
-            // if ($role->permissions) {
-            //     $modules = $role->permissions;
-            // }
-            // else{
+            if ($role->permissions) {
+                $modules = $role->permissions;
+            }
+            else{
                 $modules = [];
                 foreach ($company->modules as $i => $module) {
 
@@ -57,7 +57,7 @@ class RoleController extends Controller
 
                 }
 
-            // }
+            }
 
             return response()->json([
                 'role' => $role,
