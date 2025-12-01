@@ -91,7 +91,7 @@
                                                 </div>
                                             </div>
                                             <div class="row">
-                                                <!-- <div class="col-md-4">
+                                                <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label for="statusFilter">Status</label>
                                                         <select id="statusFilter" class="form-control"
@@ -107,7 +107,7 @@
                                                             <option value="over-issue">Over Issue Ticket</option>
                                                         </select>
                                                     </div>
-                                                </div> --> 
+                                                </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label for="dateFilter">Departure Date From</label>
