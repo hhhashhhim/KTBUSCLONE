@@ -139,10 +139,10 @@ class AllBookingController extends Controller
         "customers.contact"
     ];
 
-    if (Schema::hasColumn('tickets', 'transaction_id')) {
-        $columns[] = "tickets.transaction_id";
-        $data->whereNotNull('tickets.transaction_id');
-    }
+    // if (Schema::hasColumn('tickets', 'transaction_id')) {
+    //     $columns[] = "tickets.transaction_id";
+    //     $data->whereNotNull('tickets.transaction_id');
+    // }
 
     return [
         "data" => $data->with(
