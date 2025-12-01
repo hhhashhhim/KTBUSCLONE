@@ -607,6 +607,7 @@ export default {
                             ]
                         },
                         {name: "all-booking", allow: true},
+                        {name: "jazz-cash-refund", allow: true},
                         {
                             name: "counter-expenses",
                             allow: true,
