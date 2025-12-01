@@ -39064,7 +39064,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         terminalFilter: "",
         routeFilter: "",
         busFilter: "",
-        statusFilter: ""
+        statusFilter: "canceled"
       },
       selectedRecord: null,
       refundReason: "",
@@ -90752,7 +90752,7 @@ var _hoisted_41 = {
   "class": "row"
 };
 var _hoisted_42 = {
-  "class": "col-md-4"
+  "class": "col-md-4 d-none"
 };
 var _hoisted_43 = {
   "class": "form-group"

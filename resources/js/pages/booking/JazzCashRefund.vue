@@ -91,7 +91,7 @@
                                                 </div>
                                             </div>
                                             <div class="row">
-                                                <div class="col-md-4">
+                                                <div class="col-md-4 d-none">
                                                     <div class="form-group">
                                                         <label for="statusFilter">Status</label>
                                                         <select id="statusFilter" class="form-control"
@@ -395,7 +395,7 @@ export default {
                 terminalFilter: "",
                 routeFilter: "",
                 busFilter: "",
-                statusFilter: "",
+                statusFilter: "canceled",
             },
             selectedRecord: null,
             refundReason: "",
