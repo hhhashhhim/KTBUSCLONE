@@ -101,7 +101,7 @@ class AllBookingController extends Controller
 
         $data = Ticket::where(["tickets.company_id" => Auth::user()->company_id])
             ->where("tickets.terminal_id", 14)
-            ->where("tickets.type" == "canceled")
+             ->where("tickets.type", "canceled")
             ->join("customers", "customers.id", "tickets.customer_id")
             ->where("customers.cnic", 'like', '%' . str_replace("-", "", $request->cnicFilter) . '%')
             ->where("customers.contact", 'like', '%' . str_replace("-", "", $request->phoneFilter) . '%')
