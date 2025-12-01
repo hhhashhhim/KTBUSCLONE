@@ -102,8 +102,6 @@ class AllBookingController extends Controller
     $data = Ticket::where("tickets.company_id", Auth::user()->company_id)
         ->where("tickets.terminal_id", 14)
         ->where("tickets.type", "canceled")
-        ->whereYear('tickets.date', now()->subMonth()->year)   // Previous month
-        ->whereMonth('tickets.date', now()->subMonth()->month)
         ->join("customers", "customers.id", "tickets.customer_id")
         ->where("customers.cnic", 'like', '%' . str_replace("-", "", $request->cnicFilter) . '%')
         ->where("customers.contact", 'like', '%' . str_replace("-", "", $request->phoneFilter) . '%')
@@ -111,10 +109,16 @@ class AllBookingController extends Controller
         ->where(function ($q) use ($request) {
             if ($request->invoiceFilter) $q->where("invoice_id", 'like', '%' . $request->invoiceFilter . '%');
             if ($request->busFilter) $q->where("bus_id", $request->busFilter);
-            if ($request->fromDateFilter) $q->where("date", '>=', $request->fromDateFilter);
-            if ($request->toDateFilter) $q->where("date", '<=', $request->toDateFilter);
             if ($request->routeFilter) $q->where("route_id", $request->routeFilter);
         });
+
+    // Apply date filter: use from/to if given, else default previous month
+    if ($request->fromDateFilter && $request->toDateFilter) {
+        $data->whereBetween('tickets.date', [$request->fromDateFilter, $request->toDateFilter]);
+    } else {
+        $data->whereYear('tickets.date', now()->subMonth()->year)
+             ->whereMonth('tickets.date', now()->subMonth()->month);
+    }
 
     return [
         "data" => $data->with(
@@ -140,6 +144,7 @@ class AllBookingController extends Controller
         "total_fare" => $data->sum("seat_fare")
     ];
 }
+
 
     public function refund(Request $request)
     {
