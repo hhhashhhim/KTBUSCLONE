@@ -39056,15 +39056,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       totalFare: "",
       filterForm: {
         cnicFilter: "",
-        fromDateFilter: "",
-        toDateFilter: "",
+        fromDateFilter: new Date().toISOString().substr(0, 10),
+        toDateFilter: new Date().toISOString().substr(0, 10),
         nameFilter: "",
         invoiceFilter: "",
         phoneFilter: "",
-        terminalFilter: "",
+        terminalFilter: 14,
+        // Force terminal 14
         routeFilter: "",
         busFilter: "",
-        statusFilter: ""
+        statusFilter: "canceled" // Force canceled tickets
+
       },
       selectedRecord: null,
       refundReason: "",
@@ -39089,11 +39091,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               _this.fetchBus();
 
-              _this.filterForm.fromDateFilter = new Date().toISOString().substr(0, 10);
-              _this.filterForm.toDateFilter = new Date().toISOString().substr(0, 10);
               currentRouteName = _this.$route.name;
 
-              if (currentRouteName == 'booking-page') {
+              if (currentRouteName === 'booking-page') {
                 window.addEventListener('keydown', _this.enterKey);
                 window.addEventListener('keydown', _this.altM);
               } else {
@@ -39101,7 +39101,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 8:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -39124,10 +39124,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 2:
                 resRoute = _context2.sent;
-
-                if (resRoute.status == 200) {
-                  _this2.routes = resRoute.data;
-                }
+                if (resRoute.status == 200) _this2.routes = resRoute.data;
 
               case 4:
               case "end":
@@ -39153,9 +39150,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resTerminal = _context3.sent;
 
                 if (resTerminal.status === 200) {
-                  // Filter only the terminal with ID 14
-                  _this3.terminals = resTerminal.data.filter(function (terminal) {
-                    return terminal.id === 14;
+                  // Only terminal 14
+                  _this3.terminals = resTerminal.data.filter(function (t) {
+                    return t.id === 14;
                   });
                 }
 
@@ -39181,10 +39178,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 2:
                 resBuses = _context4.sent;
-
-                if (resBuses.status == 200) {
-                  _this4.buses = resBuses.data;
-                }
+                if (resBuses.status == 200) _this4.buses = resBuses.data;
 
               case 4:
               case "end":
@@ -39203,11 +39197,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _this5.tableLoading = true;
-                _context5.next = 3;
+                _this5.tableLoading = true; // Force canceled and terminal 14 in filter payload
+
+                _this5.filterForm.statusFilter = "canceled";
+                _this5.filterForm.terminalFilter = 14;
+                _context5.next = 5;
                 return _this5.callApi("post", "allBooking/jazzcashfilter", _this5.filterForm);
 
-              case 3:
+              case 5:
                 resFilter = _context5.sent;
 
                 if (resFilter.status === 200) {
@@ -39217,7 +39214,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 _this5.tableLoading = false;
 
-              case 6:
+              case 8:
               case "end":
                 return _context5.stop();
             }
@@ -39227,23 +39224,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     formatDate: function formatDate(timestamp) {
       var date = new Date(timestamp);
-      var hours = date.getHours() % 12 || 12; // Get hours in 12-hour format
-
-      var minutes = ('0' + date.getMinutes()).slice(-2); // Ensure minutes are always two digits
-
-      var ampm = date.getHours() < 12 ? 'AM' : 'PM'; // Get AM/PM
-      // Format date as DD-MM-YYYY
-
-      var formattedDate = ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear(); // Combine time and date
-
+      var hours = date.getHours() % 12 || 12;
+      var minutes = ('0' + date.getMinutes()).slice(-2);
+      var ampm = date.getHours() < 12 ? 'AM' : 'PM';
+      var formattedDate = ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear();
       return "".concat(hours, ":").concat(minutes, " ").concat(ampm, " | ").concat(formattedDate);
     },
     openRefundModal: function openRefundModal(record) {
       this.selectedRecord = record;
       this.refundReason = "";
       this.refundPercentage = "";
-      this.calculatedRefundAmount = ""; // optional reset
-
       var modal = new bootstrap.Modal(document.getElementById("refundModal"));
       modal.show();
     },
@@ -39251,13 +39241,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this6 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        var payload, _data$response, res, data, ppMessage, genericMsg, combinedMsg, isSuccess;
+        var payload, _data$response, res, data, ppMsg, msg, combinedMsg, isSuccess;
 
         return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                if (_this6.refundPercentage) {
+                if (!(!_this6.refundPercentage || !_this6.refundReason.trim())) {
                   _context6.next = 3;
                   break;
                 }
@@ -39265,61 +39255,42 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 Swal.fire({
                   icon: "warning",
                   title: "Missing Information",
-                  text: "Please select a refund percentage."
+                  text: "Please fill refund percentage and reason."
                 });
                 return _context6.abrupt("return");
 
               case 3:
-                if (_this6.refundReason.trim()) {
-                  _context6.next = 6;
-                  break;
-                }
-
-                Swal.fire({
-                  icon: "warning",
-                  title: "Missing Information",
-                  text: "Please enter a refund reason."
-                });
-                return _context6.abrupt("return");
-
-              case 6:
                 payload = {
                   ticket_id: _this6.selectedRecord.id,
                   refund_reason: _this6.refundReason,
                   refund_percentage: _this6.refundPercentage,
                   refund_amount: _this6.calculatedRefundAmount
                 };
-                console.log("📦 Refund Payload:", payload); // 🌀 Loader while processing
-
                 Swal.fire({
                   title: "Processing Refund...",
-                  text: "Please wait while we process your request.",
                   allowOutsideClick: false,
                   didOpen: function didOpen() {
-                    Swal.showLoading();
+                    return Swal.showLoading();
                   }
                 });
-                _context6.prev = 9;
-                _context6.next = 12;
+                _context6.prev = 5;
+                _context6.next = 8;
                 return _this6.callApi("post", "allBooking/refund", payload);
 
-              case 12:
+              case 8:
                 res = _context6.sent;
-                console.log("📥 Refund API Response:", res);
                 data = res === null || res === void 0 ? void 0 : res.data;
-                ppMessage = (data === null || data === void 0 ? void 0 : (_data$response = data.response) === null || _data$response === void 0 ? void 0 : _data$response.pp_ResponseMessage) || "";
-                genericMsg = (data === null || data === void 0 ? void 0 : data.message) || "";
-                combinedMsg = ppMessage || genericMsg || "Refund response received."; // 🧩 Detect success or failure by pp_ResponseMessage
-
-                isSuccess = ppMessage.toLowerCase().includes("successful") || genericMsg.toLowerCase().includes("successful");
+                ppMsg = (data === null || data === void 0 ? void 0 : (_data$response = data.response) === null || _data$response === void 0 ? void 0 : _data$response.pp_ResponseMessage) || "";
+                msg = (data === null || data === void 0 ? void 0 : data.message) || "";
+                combinedMsg = ppMsg || msg || "Refund response received.";
+                isSuccess = ppMsg.toLowerCase().includes("successful") || msg.toLowerCase().includes("successful");
 
                 if (isSuccess) {
                   Swal.fire({
                     icon: "success",
                     title: "Refund Successful",
                     text: combinedMsg,
-                    timer: 2500,
-                    showConfirmButton: true
+                    timer: 2500
                   });
                   _this6.selectedRecord.refunded = true;
 
@@ -39334,25 +39305,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   });
                 }
 
-                _context6.next = 26;
+                _context6.next = 21;
                 break;
 
-              case 22:
-                _context6.prev = 22;
-                _context6.t0 = _context6["catch"](9);
-                console.error("Refund Error:", _context6.t0);
+              case 17:
+                _context6.prev = 17;
+                _context6.t0 = _context6["catch"](5);
+                console.error(_context6.t0);
                 Swal.fire({
                   icon: "error",
-                  title: "Server or Network Error",
-                  text: "Refund failed due to a network or server issue."
+                  title: "Server Error",
+                  text: "Refund failed due to network or server issue."
                 });
 
-              case 26:
+              case 21:
               case "end":
                 return _context6.stop();
             }
           }
-        }, _callee6, null, [[9, 22]]);
+        }, _callee6, null, [[5, 17]]);
       }))();
     },
     closeRefundModal: function closeRefundModal() {
@@ -39374,8 +39345,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(['getDeletingObj'])), {}, {
     calculatedRefundAmount: function calculatedRefundAmount() {
       if (!this.selectedRecord || !this.refundPercentage) return 0;
-      var fare = parseFloat(this.selectedRecord.seat_fare || 0);
-      return (fare * this.refundPercentage / 100).toFixed(2);
+      return (parseFloat(this.selectedRecord.seat_fare || 0) * this.refundPercentage / 100).toFixed(2);
     }
   }),
   watch: {

@@ -370,12 +370,8 @@ export default {
     },
     data() {
         return {
-            options: {
-                placeholder: "xxxxx-xxxxxxx-x",
-            },
-            optionsContact: {
-                placeholder: "03xx-xxxxxxx",
-            },
+            options: { placeholder: "xxxxx-xxxxxxx-x" },
+            optionsContact: { placeholder: "03xx-xxxxxxx" },
             loading: false,
             showAllBooking: false,
             tableLoading: true,
@@ -387,15 +383,15 @@ export default {
             totalFare: "",
             filterForm: {
                 cnicFilter: "",
-                fromDateFilter: "",
-                toDateFilter: "",
+                fromDateFilter: new Date().toISOString().substr(0, 10),
+                toDateFilter: new Date().toISOString().substr(0, 10),
                 nameFilter: "",
                 invoiceFilter: "",
                 phoneFilter: "",
-                terminalFilter: "",
+                terminalFilter: 14, // Force terminal 14
                 routeFilter: "",
                 busFilter: "",
-                statusFilter: "",
+                statusFilter: "canceled", // Force canceled tickets
             },
             selectedRecord: null,
             refundReason: "",
@@ -408,10 +404,9 @@ export default {
         this.fetchRoutes();
         this.fetchTerminals();
         this.fetchBus();
-        this.filterForm.fromDateFilter = new Date().toISOString().substr(0, 10);
-        this.filterForm.toDateFilter = new Date().toISOString().substr(0, 10);
+
         const currentRouteName = this.$route.name;
-        if (currentRouteName == 'booking-page') {
+        if (currentRouteName === 'booking-page') {
             window.addEventListener('keydown', this.enterKey);
             window.addEventListener('keydown', this.altM);
         } else {
@@ -419,31 +414,28 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
     },
-
     methods: {
         async fetchRoutes() {
             const resRoute = await this.callApi("post", "allBooking/routes");
-            if (resRoute.status == 200) {
-                this.routes = resRoute.data;
-            }
+            if (resRoute.status == 200) this.routes = resRoute.data;
         },
         async fetchTerminals() {
             const resTerminal = await this.callApi("post", "allBooking/terminals");
             if (resTerminal.status === 200) {
-                // Filter only the terminal with ID 14
-                this.terminals = resTerminal.data.filter(terminal => terminal.id === 14);
+                // Only terminal 14
+                this.terminals = resTerminal.data.filter(t => t.id === 14);
             }
         },
         async fetchBus() {
             const resBuses = await this.callApi("post", "allBooking/buses");
-            if (resBuses.status == 200) {
-                this.buses = resBuses.data;
-            }
-
+            if (resBuses.status == 200) this.buses = resBuses.data;
         },
-
         async filterFunction() {
             this.tableLoading = true;
+            // Force canceled and terminal 14 in filter payload
+            this.filterForm.statusFilter = "canceled";
+            this.filterForm.terminalFilter = 14;
+
             const resFilter = await this.callApi("post", "allBooking/jazzcashfilter", this.filterForm);
             if (resFilter.status === 200) {
                 this.allRecords = resFilter.data.data;
@@ -453,42 +445,22 @@ export default {
         },
         formatDate(timestamp) {
             const date = new Date(timestamp);
-            const hours = date.getHours() % 12 || 12; // Get hours in 12-hour format
-            const minutes = ('0' + date.getMinutes()).slice(-2); // Ensure minutes are always two digits
-            const ampm = date.getHours() < 12 ? 'AM' : 'PM'; // Get AM/PM
-
-            // Format date as DD-MM-YYYY
+            const hours = date.getHours() % 12 || 12;
+            const minutes = ('0' + date.getMinutes()).slice(-2);
+            const ampm = date.getHours() < 12 ? 'AM' : 'PM';
             const formattedDate = ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear();
-
-            // Combine time and date
             return `${hours}:${minutes} ${ampm} | ${formattedDate}`;
         },
         openRefundModal(record) {
             this.selectedRecord = record;
             this.refundReason = "";
             this.refundPercentage = "";
-            this.calculatedRefundAmount = ""; // optional reset
-
             const modal = new bootstrap.Modal(document.getElementById("refundModal"));
             modal.show();
         },
-
         async confirmRefund() {
-            if (!this.refundPercentage) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Missing Information",
-                    text: "Please select a refund percentage.",
-                });
-                return;
-            }
-
-            if (!this.refundReason.trim()) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Missing Information",
-                    text: "Please enter a refund reason.",
-                });
+            if (!this.refundPercentage || !this.refundReason.trim()) {
+                Swal.fire({ icon: "warning", title: "Missing Information", text: "Please fill refund percentage and reason." });
                 return;
             }
 
@@ -499,61 +471,29 @@ export default {
                 refund_amount: this.calculatedRefundAmount,
             };
 
-            console.log("📦 Refund Payload:", payload);
-
-            // 🌀 Loader while processing
-            Swal.fire({
-                title: "Processing Refund...",
-                text: "Please wait while we process your request.",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-            });
+            Swal.fire({ title: "Processing Refund...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             try {
                 const res = await this.callApi("post", "allBooking/refund", payload);
-                console.log("📥 Refund API Response:", res);
-
                 const data = res?.data;
-                const ppMessage = data?.response?.pp_ResponseMessage || "";
-                const genericMsg = data?.message || "";
-                const combinedMsg = ppMessage || genericMsg || "Refund response received.";
-
-                // 🧩 Detect success or failure by pp_ResponseMessage
-                const isSuccess =
-                    ppMessage.toLowerCase().includes("successful") ||
-                    genericMsg.toLowerCase().includes("successful");
+                const ppMsg = data?.response?.pp_ResponseMessage || "";
+                const msg = data?.message || "";
+                const combinedMsg = ppMsg || msg || "Refund response received.";
+                const isSuccess = ppMsg.toLowerCase().includes("successful") || msg.toLowerCase().includes("successful");
 
                 if (isSuccess) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Refund Successful",
-                        text: combinedMsg,
-                        timer: 2500,
-                        showConfirmButton: true,
-                    });
+                    Swal.fire({ icon: "success", title: "Refund Successful", text: combinedMsg, timer: 2500 });
                     this.selectedRecord.refunded = true;
                     this.closeRefundModal();
                     this.filterFunction();
                 } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Refund Failed",
-                        text: combinedMsg,
-                    });
+                    Swal.fire({ icon: "error", title: "Refund Failed", text: combinedMsg });
                 }
             } catch (err) {
-                console.error("Refund Error:", err);
-                Swal.fire({
-                    icon: "error",
-                    title: "Server or Network Error",
-                    text: "Refund failed due to a network or server issue.",
-                });
+                console.error(err);
+                Swal.fire({ icon: "error", title: "Server Error", text: "Refund failed due to network or server issue." });
             }
         },
-
-
         closeRefundModal() {
             $("#refundModal").click();
         },
@@ -569,27 +509,24 @@ export default {
             const modal = new bootstrap.Modal(document.getElementById('refundDetailsModal'));
             modal.show();
         },
-
-
-
     },
     computed: {
         ...mapGetters(['getDeletingObj']),
         calculatedRefundAmount() {
             if (!this.selectedRecord || !this.refundPercentage) return 0;
-            const fare = parseFloat(this.selectedRecord.seat_fare || 0);
-            return ((fare * this.refundPercentage) / 100).toFixed(2);
+            return ((parseFloat(this.selectedRecord.seat_fare || 0) * this.refundPercentage) / 100).toFixed(2);
         },
     },
     watch: {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
-                this.discounts.splice(obj.index, 1)
+                this.discounts.splice(obj.index, 1);
             }
         }
     }
 };
 </script>
+
 <style scoped>
 .loading-spinner {
     display: block;
