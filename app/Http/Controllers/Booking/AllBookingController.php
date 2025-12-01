@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Models\RefundLog;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
 use Throwable;
 
 class AllBookingController extends Controller
@@ -94,68 +93,72 @@ class AllBookingController extends Controller
             "total_fare" => $data->with("schedule:id,route_id", "schedule.route:id,name", "bus:id,bus_number", "terminal:id,name", "addedBy:id,name", "scheduleDetail:id,departure_time", "cancel_ticket:id,ticket_id,added_by,created_at", "cancel_ticket.addedBy:id,name")->select("tickets.*", "customers.name", "customers.cnic", "customers.contact")->sum("seat_fare")
         ];
     }
-  public function jazzcashfilter(Request $request)
-{
-    if (!checkForSubmenu("all-booking")) {
-        return response()->json([
-            "Error" => ['You are not authorized to access this url']
-        ], 403);
+    public function jazzcashfilter(Request $request)
+    {
+        if (!checkForSubmenu("all-booking")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $data = Ticket::where(["tickets.company_id" => Auth::user()->company_id])
+            ->where("tickets.terminal_id", 14)
+            ->where("tickets.type" == "canceled")
+            ->join("customers", "customers.id", "tickets.customer_id")
+            ->where("customers.cnic", 'like', '%' . str_replace("-", "", $request->cnicFilter) . '%')
+            ->where("customers.contact", 'like', '%' . str_replace("-", "", $request->phoneFilter) . '%')
+            ->where("customers.name", 'like', '%' . $request->nameFilter . '%')
+
+            ->where(function ($q) use ($request) {
+                // Ticket table filters
+                if ($request->invoiceFilter) {
+                    $q->where("invoice_id", 'like', '%' . $request->invoiceFilter . '%');
+                }
+                if ($request->busFilter) {
+                    $q->where("bus_id", $request->busFilter);
+                }
+                if ($request->fromDateFilter) {
+                    $q->where("date", '>=', $request->fromDateFilter);
+                }
+                if ($request->toDateFilter) {
+                    $q->where("date", '<=', $request->toDateFilter);
+                }
+                if ($request->routeFilter) {
+                    $q->where("route_id", $request->routeFilter);
+                }
+                if ($request->statusFilter == "reschedule") {
+                    $q->where("reschedule_type", '!=', $request->statusFilter);
+                } elseif ($request->statusFilter) {
+                    $q->where("type", $request->statusFilter);
+                }
+                return $q;
+            });
+
+        // Include canceled or over-issue with trashed
+        if ($request->statusFilter == "canceled" || $request->statusFilter == "over-issue") {
+            $data->where("type", $request->statusFilter)->withTrashed();
+        }
+
+        return [
+            "data" => $data->with(
+                "schedule:id,route_id",
+                "schedule.route:id,name",
+                "bus:id,bus_number",
+                "terminal:id,name",
+                "addedBy:id,name",
+                "scheduleDetail:id,departure_time",
+                "cancel_ticket:id,ticket_id,added_by,created_at",
+                "cancel_ticket.added_by_name:id,name",
+                "overIssueSeats:id,ticket_id,added_by,created_at",
+                "overIssueSeats.overissue_by:id,name"
+            )->select(
+                "tickets.*",
+                "customers.name",
+                "customers.cnic",
+                "customers.contact"
+            )->get(),
+
+            "total_fare" => $data->sum("seat_fare")
+        ];
     }
-
-    // Base query: canceled tickets at terminal 14
-    $data = Ticket::where("tickets.company_id", Auth::user()->company_id)
-        ->where("tickets.terminal_id", 14)
-        ->where("tickets.type", "canceled")
-        ->join("customers", "customers.id", "tickets.customer_id")
-        ->where("customers.cnic", 'like', '%' . str_replace("-", "", $request->cnicFilter) . '%')
-        ->where("customers.contact", 'like', '%' . str_replace("-", "", $request->phoneFilter) . '%')
-        ->where("customers.name", 'like', '%' . $request->nameFilter . '%')
-        ->when($request->invoiceFilter, function ($q) use ($request) {
-            $q->where("tickets.invoice_id", 'like', '%' . $request->invoiceFilter . '%');
-        })
-        ->when($request->busFilter, function ($q) use ($request) {
-            $q->where("tickets.bus_id", $request->busFilter);
-        })
-        ->when($request->fromDateFilter, function ($q) use ($request) {
-            $q->where("tickets.date", '>=', $request->fromDateFilter);
-        })
-        ->when($request->toDateFilter, function ($q) use ($request) {
-            $q->where("tickets.date", '<=', $request->toDateFilter);
-        })
-        ->when($request->routeFilter, function ($q) use ($request) {
-            $q->where("tickets.route_id", $request->routeFilter);
-        });
-
-    // Columns to select
-    $columns = [
-        "tickets.*",
-        "customers.name",
-        "customers.cnic",
-        "customers.contact"
-    ];
-
-    // Return results with relations
-    return [
-        "data" => $data->with(
-            "schedule:id,route_id",
-            "schedule.route:id,name",
-            "bus:id,bus_number",
-            "terminal:id,name",
-            "addedBy:id,name",
-            "scheduleDetail:id,departure_time",
-            "cancel_ticket:id,ticket_id,added_by,created_at",
-            "cancel_ticket.added_by_name:id,name",
-            "overIssueSeats:id,ticket_id,added_by,created_at",
-            "overIssueSeats.overissue_by:id,name"
-        )->select($columns)->get(),
-
-        "total_fare" => $data->sum("seat_fare")
-    ];
-}
-
-
-
-
     public function refund(Request $request)
     {
         $validated = $request->validate([
@@ -165,7 +168,7 @@ class AllBookingController extends Controller
             'refund_amount'     => 'required|numeric|min:1',
         ]);
 
-        $ticket = Ticket::withTrashed()->find($request->ticket_id);
+         $ticket = Ticket::withTrashed()->find($request->ticket_id);
 
         if (!$ticket || empty($ticket->transaction_id)) {
             return response()->json([
@@ -179,13 +182,6 @@ class AllBookingController extends Controller
         $password      = 'vs8z12syy0';
         $merchantMPIN  = '1234';
         $integritySalt = '8335zz8zuu';
-
-
-        // $merchantID    = 'MC32084';
-        // $password      = 'yy41w5f10e';
-        // $merchantMPIN  = '1234';
-        // $integritySalt = '9208s6wx05';
-
 
         // 🧾 Refund data (dynamically generated)
         $refundAmount = (float)$request->refund_amount * 100; // Convert to paisa
@@ -266,7 +262,7 @@ class AllBookingController extends Controller
 
 
 
-
+ 
 
 
     public function jazzcash2()
