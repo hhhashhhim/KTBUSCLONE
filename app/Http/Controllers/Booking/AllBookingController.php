@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Models\RefundLog;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Throwable;
 
 class AllBookingController extends Controller
@@ -100,19 +101,12 @@ class AllBookingController extends Controller
         }
 
         $data = Ticket::where(["tickets.company_id" => Auth::user()->company_id])
-            // ✅ Always show only terminal ID = 14
             ->where("tickets.terminal_id", 14)
-
-            // Join customer table
             ->join("customers", "customers.id", "tickets.customer_id")
-
-            // Customer filters
             ->where("customers.cnic", 'like', '%' . str_replace("-", "", $request->cnicFilter) . '%')
             ->where("customers.contact", 'like', '%' . str_replace("-", "", $request->phoneFilter) . '%')
             ->where("customers.name", 'like', '%' . $request->nameFilter . '%')
-
             ->where(function ($q) use ($request) {
-                // Ticket table filters
                 if ($request->invoiceFilter) {
                     $q->where("invoice_id", 'like', '%' . $request->invoiceFilter . '%');
                 }
@@ -136,9 +130,22 @@ class AllBookingController extends Controller
                 return $q;
             });
 
-        // Include canceled or over-issue with trashed
         if ($request->statusFilter == "canceled" || $request->statusFilter == "over-issue") {
             $data->where("type", $request->statusFilter)->withTrashed();
+        }
+
+        // ✅ Prepare columns dynamically
+        $columns = [
+            "tickets.*",
+            "customers.name",
+            "customers.cnic",
+            "customers.contact"
+        ];
+
+        // Only add transaction_id if column exists and filter tickets where it's not null
+        if (Schema::hasColumn('tickets', 'transaction_id')) {
+            $columns[] = "tickets.transaction_id";
+            $data->whereNotNull('tickets.transaction_id');
         }
 
         return [
@@ -153,16 +160,13 @@ class AllBookingController extends Controller
                 "cancel_ticket.added_by_name:id,name",
                 "overIssueSeats:id,ticket_id,added_by,created_at",
                 "overIssueSeats.overissue_by:id,name"
-            )->select(
-                "tickets.*",
-                "customers.name",
-                "customers.cnic",
-                "customers.contact"
-            )->get(),
+            )->select($columns)->get(),
 
             "total_fare" => $data->sum("seat_fare")
         ];
     }
+
+
     public function refund(Request $request)
     {
         $validated = $request->validate([
@@ -172,7 +176,7 @@ class AllBookingController extends Controller
             'refund_amount'     => 'required|numeric|min:1',
         ]);
 
-         $ticket = Ticket::withTrashed()->find($request->ticket_id);
+        $ticket = Ticket::withTrashed()->find($request->ticket_id);
 
         if (!$ticket || empty($ticket->transaction_id)) {
             return response()->json([
@@ -186,6 +190,13 @@ class AllBookingController extends Controller
         $password      = 'vs8z12syy0';
         $merchantMPIN  = '1234';
         $integritySalt = '8335zz8zuu';
+
+
+        // $merchantID    = 'MC32084';
+        // $password      = 'yy41w5f10e';
+        // $merchantMPIN  = '1234';
+        // $integritySalt = '9208s6wx05';
+
 
         // 🧾 Refund data (dynamically generated)
         $refundAmount = (float)$request->refund_amount * 100; // Convert to paisa
@@ -266,7 +277,7 @@ class AllBookingController extends Controller
 
 
 
- 
+
 
 
     public function jazzcash2()
