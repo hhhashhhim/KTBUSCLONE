@@ -94,44 +94,39 @@ class AllBookingController extends Controller
             "total_fare" => $data->with("schedule:id,route_id", "schedule.route:id,name", "bus:id,bus_number", "terminal:id,name", "addedBy:id,name", "scheduleDetail:id,departure_time", "cancel_ticket:id,ticket_id,added_by,created_at", "cancel_ticket.addedBy:id,name")->select("tickets.*", "customers.name", "customers.cnic", "customers.contact")->sum("seat_fare")
         ];
     }
-   public function jazzcashfilter(Request $request)
+  public function jazzcashfilter(Request $request)
 {
     if (!checkForSubmenu("all-booking")) {
-        return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        return response()->json([
+            "Error" => ['You are not authorized to access this url']
+        ], 403);
     }
 
+    // Base query: canceled tickets at terminal 14
     $data = Ticket::where("tickets.company_id", Auth::user()->company_id)
         ->where("tickets.terminal_id", 14)
-        ->where("tickets.type", "canceled") // ✅ FORCE ONLY CANCELED
+        ->where("tickets.type", "canceled")
         ->join("customers", "customers.id", "tickets.customer_id")
         ->where("customers.cnic", 'like', '%' . str_replace("-", "", $request->cnicFilter) . '%')
         ->where("customers.contact", 'like', '%' . str_replace("-", "", $request->phoneFilter) . '%')
         ->where("customers.name", 'like', '%' . $request->nameFilter . '%')
-        ->where(function ($q) use ($request) {
-
-            if ($request->invoiceFilter) {
-                $q->where("invoice_id", 'like', '%' . $request->invoiceFilter . '%');
-            }
-            if ($request->busFilter) {
-                $q->where("bus_id", $request->busFilter);
-            }
-            if ($request->fromDateFilter) {
-                $q->where("date", '>=', $request->fromDateFilter);
-            }
-            if ($request->toDateFilter) {
-                $q->where("date", '<=', $request->toDateFilter);
-            }
-            if ($request->routeFilter) {
-                $q->where("route_id", $request->routeFilter);
-            }
-
-            return $q;
+        ->when($request->invoiceFilter, function ($q) use ($request) {
+            $q->where("tickets.invoice_id", 'like', '%' . $request->invoiceFilter . '%');
+        })
+        ->when($request->busFilter, function ($q) use ($request) {
+            $q->where("tickets.bus_id", $request->busFilter);
+        })
+        ->when($request->fromDateFilter, function ($q) use ($request) {
+            $q->where("tickets.date", '>=', $request->fromDateFilter);
+        })
+        ->when($request->toDateFilter, function ($q) use ($request) {
+            $q->where("tickets.date", '<=', $request->toDateFilter);
+        })
+        ->when($request->routeFilter, function ($q) use ($request) {
+            $q->where("tickets.route_id", $request->routeFilter);
         });
 
-    // ❌ REMOVE the old messy status logic completely
-    // if ($request->statusFilter == "canceled" || ... ) { ... }
-
-    // Dynamic columns
+    // Columns to select
     $columns = [
         "tickets.*",
         "customers.name",
@@ -139,11 +134,7 @@ class AllBookingController extends Controller
         "customers.contact"
     ];
 
-    // if (Schema::hasColumn('tickets', 'transaction_id')) {
-    //     $columns[] = "tickets.transaction_id";
-    //     $data->whereNotNull('tickets.transaction_id');
-    // }
-
+    // Return results with relations
     return [
         "data" => $data->with(
             "schedule:id,route_id",
@@ -161,6 +152,7 @@ class AllBookingController extends Controller
         "total_fare" => $data->sum("seat_fare")
     ];
 }
+
 
 
 
