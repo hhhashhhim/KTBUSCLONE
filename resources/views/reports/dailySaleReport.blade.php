@@ -9,7 +9,7 @@
             margin: 10px;
         }
 
-        body {
+        body { 
             height: 10%;
             overflow: scroll;
             margin: 40px 30px 40px 30px;

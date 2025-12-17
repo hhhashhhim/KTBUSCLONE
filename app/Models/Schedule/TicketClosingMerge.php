@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class TicketClosingMerge extends Model
 {
     use HasFactory, SoftDeletes;
-
+    //This will generate on assigning bus and on merge two records will be deleted and one record for both created
     protected $guarded = [];
 
     public function addedBy()

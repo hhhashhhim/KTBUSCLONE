@@ -68,6 +68,7 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
             Route::post('/hide', [ScheduleClosingController::class, 'hideUnclosing']);
             Route::post('/spare', [ScheduleClosingController::class, 'spareUnclosing']);
             Route::post('/revert', [ScheduleClosingController::class, 'revertUnclosing']);
+            Route::post('/data', [ScheduleClosingController::class, 'unclosingData']);
         });
         
         

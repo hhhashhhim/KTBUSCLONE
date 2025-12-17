@@ -102,7 +102,7 @@ class AllBookingController extends Controller
         $data = Ticket::where(["tickets.company_id" => Auth::user()->company_id])
             // ✅ Always show only terminal ID = 14
             ->where("tickets.terminal_id", 14)
-
+            ->whereNotNull("tickets.transaction_id")
             // Join customer table
             ->join("customers", "customers.id", "tickets.customer_id")
 
@@ -172,7 +172,7 @@ class AllBookingController extends Controller
             'refund_amount'     => 'required|numeric|min:1',
         ]);
 
-         $ticket = Ticket::withTrashed()->find($request->ticket_id);
+        $ticket = Ticket::withTrashed()->find($request->ticket_id);
 
         if (!$ticket || empty($ticket->transaction_id)) {
             return response()->json([
@@ -184,7 +184,7 @@ class AllBookingController extends Controller
         // 🏦 JazzCash credentials
         $merchantID    = '00151726';
         $password      = 'vs8z12syy0';
-        $merchantMPIN  = '1234';
+        $merchantMPIN  = '7863';
         $integritySalt = '8335zz8zuu';
 
         // 🧾 Refund data (dynamically generated)
@@ -266,7 +266,7 @@ class AllBookingController extends Controller
 
 
 
- 
+
 
 
     public function jazzcash2()

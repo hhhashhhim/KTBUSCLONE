@@ -171,6 +171,7 @@ class ExpenseController extends Controller
 
     public function dailySummery(Request $request)
     {
+        
         if(!checkPermissionButtons("add-expense"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
