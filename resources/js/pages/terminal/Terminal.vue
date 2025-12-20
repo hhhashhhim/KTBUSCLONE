@@ -148,7 +148,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-9">
+                    <div class="form-group col-md-12">
                         <label for="address">Address <span class="text-danger ml-2">*</span></label>
                         <textarea class="form-control" spellcheck="false" v-model="data.address" maxlength="140"
                                   placeholder="Address Must be less then 140 characters or 21 words"></textarea>
@@ -163,6 +163,41 @@
                             </span>
                         </label>
                     </div>
+                <div class="form-group col-md-3">
+    <label class="fw-bold mb-2 d-block">Payment Recovery Method</label>
+
+    <div class="d-flex gap-3">
+        <div class="form-check">
+            <input
+                class="form-check-input"
+                type="radio"
+                name="valueType1"
+                id="cash"
+                value="cash"
+                v-model="data.recovery_method"
+            />
+            <label class="form-check-label" for="cash">
+                Cash
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input
+                class="form-check-input"
+                type="radio"
+                name="valueType1"
+                id="bank"
+                value="bank"
+                v-model="data.recovery_method"
+            />
+            <label class="form-check-label" for="bank">
+                Bank
+            </label>
+        </div>
+    </div>
+</div>
+
+
                 </div>
                 <div class="row">
                     <div class="form-group col-md-3">
@@ -312,7 +347,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-9">
+                    <div class="form-group col-md-12">
                         <label for="address">Address <span class="text-danger ml-2">*</span></label>
                         <textarea class="form-control" spellcheck="false" v-model="dataEdit.address" maxlength="140"
                                   placeholder="Address Must be less then 140 characters or 21 words"></textarea>
@@ -328,6 +363,42 @@
                             </span>
                         </label>
                     </div>
+                                    <div class="form-group col-md-3">
+  
+    <label class="fw-bold mb-2 d-block">Payment Recovery Method</label>
+
+   
+    <div class="d-flex gap-3">
+        <div class="form-check">
+            <input
+                class="form-check-input"
+                type="radio"
+                name="valueType2"
+                id="cash1"
+                value="cash"
+                v-model="dataEdit.recovery_method"
+                
+            />
+            <label class="form-check-label" for="cash1">
+                Cash
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input
+                class="form-check-input"
+                type="radio"
+                name="valueType2"
+                id="bank1"
+                value="bank"
+                 v-model="dataEdit.recovery_method"
+            />
+            <label class="form-check-label" for="bank1">
+               Bank
+            </label>
+        </div>
+    </div>
+</div>
                 </div>
                 <div class="row">
                     <div class="form-group col-md-3">
@@ -427,6 +498,7 @@
                                             <tr>
                                                 <th>Sr No.</th>
                                                 <th>Terminal Name</th>
+                                                <th>Payment Recovery Method</th>
                                                 <th>Address</th>
                                                 <th>Contact Number</th>
                                                 <th>Added By</th>
@@ -439,6 +511,8 @@
                                             <tr v-for="(single, i) in terminalsDetails" :key="i">
                                                 <td>{{ i + 1 }}</td>
                                                 <td v-if="single.name">{{ single.name }}</td>
+                                                <td v-else>N/A</td>
+                                                <td v-if="single.recovery_method">{{ single.recovery_method }}</td>
                                                 <td v-else>N/A</td>
                                                 <td v-if="single.address">{{ single.address }}</td>
                                                 <td v-else>N/A</td>
@@ -592,6 +666,7 @@ export default {
                 flatCommission: "",
                 percentageCommission: "",
                 seatNumberType: "all",
+                recovery_method: 'cash'
             },
             dataEdit: {},
             delId: "",

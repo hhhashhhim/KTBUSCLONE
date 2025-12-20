@@ -95,7 +95,7 @@ const routes = [
     {
         path: url + "", 
         component: Users,
-        name: "home",
+        name: "home", 
     },
     {
         path: url + "users",
