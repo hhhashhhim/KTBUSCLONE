@@ -186,6 +186,7 @@ class AllBookingController extends Controller
         $password      = 'vs8z12syy0';
         $merchantMPIN  = '7863';
         $integritySalt = '8335zz8zuu';
+        $pp_Version = '1.1';
 
         // 🧾 Refund data (dynamically generated)
         $refundAmount = (float)$request->refund_amount * 100; // Convert to paisa
@@ -197,6 +198,7 @@ class AllBookingController extends Controller
             'pp_TxnCurrency'     => 'PKR',
             'pp_TxnRefNo'        => $ticket->transaction_id,
             'pp_Amount'          => (string)$refundAmount,
+            'pp_Version'          => $pp_Version,
         ];
 
         // 🔐 Generate Secure Hash
