@@ -204,7 +204,10 @@
                                                                     formatDate(record.over_issue_seats.created_at) :
                                                                     'N/A' }}
                                                                 </td>
-                                                                <td>{{ record.type }}</td>
+                                                               <td>
+  {{ record.refund_amount ? 'Refunded' : record.type }}
+</td>
+
                                                                 <td>
                                                                     <span v-if="record.refund_amount">
                                                                         {{ record.refund_amount }} → ({{
