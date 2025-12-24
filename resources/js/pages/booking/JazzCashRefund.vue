@@ -218,12 +218,14 @@
 
                                                                 <td>
                                                                     <div class="d-flex gap-1">
-                                                                        <button class="btn btn-sm btn-warning"
-                                                                            :disabled="record.refund_amount !== null"
-                                                                            @click="openRefundModal(record)">
-                                                                            {{ record.refund_amount ? 'Refunded' :
-                                                                                'Refund' }}
-                                                                        </button>
+                                                                      <button
+  v-if="record.refund_amount === null"
+  class="btn btn-sm btn-warning"
+  @click="openRefundModal(record)"
+>
+  Refund
+</button>
+
 
                                                                         <button v-if="record.refund_amount"
                                                                             class="btn btn-sm btn-info mx-2"

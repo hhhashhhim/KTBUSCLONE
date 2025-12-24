@@ -92100,7 +92100,7 @@ var _hoisted_70 = {
 var _hoisted_71 = {
   "class": "d-flex gap-1"
 };
-var _hoisted_72 = ["disabled", "onClick"];
+var _hoisted_72 = ["onClick"];
 var _hoisted_73 = ["onClick"];
 
 var _hoisted_74 = /*#__PURE__*/_withScopeId(function () {
@@ -92625,16 +92625,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [record.refund_amount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_69, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(record.refund_amount) + " → (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(record.refund_percentage) + "%) ", 1
     /* TEXT */
-    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_70, "-"))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_70, "-"))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [record.refund_amount === null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      key: 0,
       "class": "btn btn-sm btn-warning",
-      disabled: record.refund_amount !== null,
       onClick: function onClick($event) {
         return $options.openRefundModal(record);
       }
-    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(record.refund_amount ? 'Refunded' : 'Refund'), 9
-    /* TEXT, PROPS */
-    , _hoisted_72), record.refund_amount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-      key: 0,
+    }, " Refund ", 8
+    /* PROPS */
+    , _hoisted_72)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), record.refund_amount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      key: 1,
       "class": "btn btn-sm btn-info mx-2",
       onClick: function onClick($event) {
         return $options.viewRefundDetails(record);
