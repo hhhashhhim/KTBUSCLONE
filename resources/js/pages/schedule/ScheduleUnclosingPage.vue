@@ -16,17 +16,17 @@
                                             <div
                                                 class="d-flex justify-content-end"
                                             >
-                                                <button
+                                                <!-- <button
                                                     class="btn btn-primary"
                                                     data-toggle="modal"
                                                     data-target="#exampleModal"
                                                     @click="fetchMergedData()"
                                                 >
                                                     Merge Schedule
-                                                </button>
-                                                <!-- <button class="btn btn-primary" :disabled="loading" @click="mergeSchedule()">
-                                                    Merge Schedule
                                                 </button> -->
+                                                <button class="btn btn-primary" :disabled="loading" @click="mergeSchedule()">
+                                                    Merge Schedule
+                                                </button>
                                             </div>
                                             <div class="table-responsive">
                                                 <table

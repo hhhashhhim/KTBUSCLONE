@@ -51,6 +51,7 @@
                         <th>Terminal Name</th>
                         <th>Passenger Count</th>
                         <th>KT Commission</th>
+                        <th>Other Commission</th>
                         <th>Total Receivable</th>
                         <!-- <th>Receivable Cash</th>
                         <th>Receivable Bank</th> -->
@@ -69,6 +70,7 @@
                         <td>{{ tickets[0].terminal.name }}</td>
                         <td>{{ tickets.length }}</td>
                         <td>{{ totalCommission(tickets) }}</td>
+                        <td>{{ totalOtherCommission(tickets) }}</td>
                         <td>{{ totalFare(tickets) }}</td>
 <!-- <td>
   <span v-if="tickets[0].terminal.recovery_method === 'cash'">
@@ -85,13 +87,16 @@
 
 
                         <td>
-                          <input
-                            type="number"
-                            min="0"
-                            class="form-control"
-                            v-model.number="cashBankStart[terminalId].cash"
-                            @input="editingField = 'cash'"
-                          />
+   <input
+  type="number"
+  min="0"
+  class="form-control"
+  :value="Math.max(0, cashBankStart[terminalId].cash)"
+  @input="updateCash($event.target.value, terminalId, tickets)"
+  @focus="editingField = 'cash'"
+/>
+
+
                         </td>
                         <td>
                           <select
@@ -111,13 +116,16 @@
                           </select>
                         </td>
                         <td>
-                          <input
-                            type="number"
-                            min="0"
-                            class="form-control"
-                            v-model.number="cashBankStart[terminalId].bank"
-                            @input="editingField = 'bank'"
-                          />
+  <input
+  type="number"
+  min="0"
+  class="form-control"
+  :value="Math.max(0, receivable(terminalId, tickets) - totalOtherCommission(tickets))"
+  @focus="editingField = 'bank'"
+
+/>
+
+
                         </td>
 
                         <td>
@@ -184,6 +192,7 @@
                         <th>Terminal Name</th>
                         <th>Passenger Count</th>
                         <th>KT Commission</th>
+                        <th>Other Commission</th>
                         <th>Total Receivable</th>
                         <th>Total Received in Cash</th>
                         <th>Select Bank</th>
@@ -200,6 +209,7 @@
                         <td>{{ tickets[0].terminal.name }}</td>
                         <td>{{ tickets.length }}</td>
                         <td>{{ totalCommission(tickets) }}</td>
+                         <td>{{ totalOtherCommission(tickets) }}</td>
                         <td>{{ totalFare(tickets) }}</td>
 
                         <td>
@@ -784,6 +794,18 @@ export default {
 
   },
   methods: {
+   updateCash(value, terminalId, tickets) {
+  const otherCommission = this.totalOtherCommission(tickets);
+
+  this.cashBankStart[terminalId].cash =
+    Number(value || 0) - otherCommission;
+},
+updateBank(value, terminalId, tickets) {
+  const otherCommission = this.totalOtherCommission(tickets);
+
+  this.cashBankStart[terminalId].bank =
+    Number(value || 0) - otherCommission;
+},
       syncPaid(index) {
       // Auto-fill Paid when Amount changes
       this.postData.paid[index] = this.postData.amount[index];
@@ -829,9 +851,6 @@ export default {
       return tickets.reduce((s, t) => s + Number(t.fare || 0), 0);
     },
 
-    totalCommission(tickets) {
-      return tickets.reduce((s, t) => s + Number(t.commission || 0), 0);
-    },
 
     sumByRecovery(schedule, method) {
       if (!schedule) return 0;
@@ -1005,6 +1024,24 @@ export default {
         return sum + adjustment;
       }, 0);
     },
+      receivable(terminalId, tickets) {
+    // Example: sum of fares for this terminal
+    return tickets.reduce((sum, t) => sum + Number(t.seat_fare || 0), 0);
+  },
+     totalOtherCommission(list) {
+  return list.reduce((sum, t) => {
+    const fare = Number(t.seat_fare || 0);
+    const fix = Number(t.commission?.fix_commission || 0);
+    const flat = Number(t.commission?.flat_commission || 0);
+    const percent = Number(t.commission?.percentage_commission || 0);
+
+    // Use flat if available, otherwise percentage of seat fare
+    const flatOrPercentage =
+      flat > 0 ? flat : (percent / 100) * fare;
+
+    return sum + fix + flatOrPercentage;
+  }, 0);
+},
     saveRow(event, fieldName, index) {
       // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
       if (fieldName == "first") {
