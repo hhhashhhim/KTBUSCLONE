@@ -208,7 +208,6 @@ class AllBookingController extends Controller
         }
 
         $data['pp_SecureHash'] = hash_hmac('sha256', $hashString, $integritySalt);
-        return $data;
         // Log::info('🎯 JazzCash Refund Payload', $data);
 
         // 🌐 Send refund request
