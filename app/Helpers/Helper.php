@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Rawilk\Printing\Facades\Printing;
 use Rawilk\Printing\Receipts\ReceiptPrinter;
 
@@ -621,64 +622,75 @@ if (!function_exists('superDataWhatsappMessage')) {
 }
 if (!function_exists('ticketConfirmedMessage')) {
     function ticketConfirmedMessage($invoice_id)
-    {
-        
-       $auth_key = Company::where("id", Auth::user()->company_id)->first()->whatsapp_auth_key;
-        $message_allow = Terminal::where("id", Auth::user()->terminal_id)->first()->send_message;
-        if ($auth_key && $message_allow) {
-            $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city')->where('company_id', Auth::user()->company_id)->withTrashed()->where("invoice_id", $invoice_id)->get();
-            $tickets->map(function ($item) {
-                $item->acutal_time = $item->date . " " . $item->schedule_time; //if ticket booked from another terminal
+{
+    $auth_key = Company::where("id", Auth::user()->company_id)->value('whatsapp_auth_key');
+    $message_allow = Terminal::where("id", Auth::user()->terminal_id)->value('send_message');
 
-                $sub = 0;
-                $terminalTime = TerminalTimeDifference::where(['company_id' => $item->company_id, 'terminal_id' => $item->terminal_id, 'route_id' => $item->route_id])->first();
-                if ($terminalTime) {
-                    $sub = $terminalTime->time_difference * 60;
-                }
+    if (!$auth_key || !$message_allow) {
+        return ['status' => 'skipped', 'reason' => 'No auth key or messaging disabled'];
+    }
 
-                $item->acutal_time = date("Y-m-d H:i:00", strtotime($item->date . " " . $item->schedule_time) + $sub);
-            });
-            $format = TicketsTemplate::with("terminal")
-                ->join("ticket_template_terminals", "ticket_template_terminals.ticket_template_id", "tickets_templates.id")
-                ->whereNull('tickets_templates.deleted_at')
-                ->whereNull('ticket_template_terminals.deleted_at')
-                ->where(['tickets_templates.company_id' => Auth::user()->company_id, "ticket_template_terminals.terminal_id" => Auth::user()->terminal_id])->where('tickets_templates.status', 1)
-                ->first();
+    $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city')
+        ->where('company_id', Auth::user()->company_id)
+        ->withTrashed()
+        ->where("invoice_id", $invoice_id)
+        ->get();
 
-            $type = $tickets[0]->type;
-            $cancelMessage = SubRoute::where(["from_city" => $tickets[0]->departure_city_id, "to_city" => $tickets[0]->destination_city_id])->first()->cancel_message ?? '';
-            // this is for timing from different terminal
-            $html = "";
-            $terminalTime = TerminalTimeDifference::where(['company_id' => $tickets[0]->company_id, 'city_id' => $tickets[0]->departure_city_id, 'route_id' => $tickets[0]->route_id, 'show' => 1])->with("terminal:id,name")->get();
-            if ($terminalTime->count() > 0) {
-                foreach ($terminalTime as $single) {
-                    $sub = 0;
-                    $sub = $single->time_difference * 60;
-                    $html .= "*" . ($single->display_name ? $single->display_name : 'Time') . ":* " . date("h:i A", strtotime($tickets[0]->date . " " . $tickets[0]->schedule_time) + $sub) . "\n";
-                }
-            } else {
-                $html .= "*Time:* " . date("h:i A", strtotime($tickets[0]->schedule_time)) . "\n";
-            }
+    if ($tickets->isEmpty()) {
+        return ['status' => 'skipped', 'reason' => 'No tickets found'];
+    }
 
+    $ticket = $tickets[0];
+    $type = $ticket->type; // booked / advance booking
+    $cancelMessage = SubRoute::where([
+        "from_city" => $ticket->departure_city_id,
+        "to_city" => $ticket->destination_city_id
+    ])->value('cancel_message') ?? '';
 
-            // to choose random device
-            // Define an array of names
-            $names = [
-                1 => 'Hamza_4-Device1',
-                2 => 'Hamza_4-Device2-201-samsung-a20',
-                3 => 'Hamza_4-Device3-204-samsung-a20',
-                4 => 'Hamza_4-Device4',
-            ];
-            $randomNumber = rand(1, 4);
+    // Terminal timing display
+    $html = "";
+    $terminalTimes = TerminalTimeDifference::where([
+        'company_id' => $ticket->company_id,
+        'city_id' => $ticket->departure_city_id,
+        'route_id' => $ticket->route_id,
+        'show' => 1
+    ])->with("terminal:id,name")->get();
 
+    if ($terminalTimes->isNotEmpty()) {
+        foreach ($terminalTimes as $tt) {
+            $sub = $tt->time_difference * 60;
+            $html .= "*" . ($tt->display_name ?: 'Time') . ":* " . date("h:i A", strtotime($ticket->date . " " . $ticket->schedule_time) + $sub) . "\n";
+        }
+    } else {
+        $html .= "*Time:* " . date("h:i A", strtotime($ticket->schedule_time)) . "\n";
+    }
 
-            $url = "https://whatsapp.sarzone.com/api/send-messages";
-            $mobile = "92" . substr($tickets[0]->customer->contact, -10);
-             $session = $names[$randomNumber];
-            $messageConfirmed = "Dear " . $tickets[0]->customer->name . ",
+    // Random device/session
+    $devices = [
+        1 => 'Hamza_4-Device1',
+        2 => 'Hamza_4-Device2-201-samsung-a20',
+        3 => 'Hamza_4-Device3-204-samsung-a20',
+        4 => 'Hamza_4-Device4',
+    ];
+    $session = $devices[rand(1, 4)];
+    $mobile = "92" . substr($ticket->customer->contact, -10);
+
+    $format = TicketsTemplate::with("terminal")
+        ->join("ticket_template_terminals", "ticket_template_terminals.ticket_template_id", "tickets_templates.id")
+        ->whereNull('tickets_templates.deleted_at')
+        ->whereNull('ticket_template_terminals.deleted_at')
+        ->where(['tickets_templates.company_id' => Auth::user()->company_id, "ticket_template_terminals.terminal_id" => Auth::user()->terminal_id])
+        ->where('tickets_templates.status', 1)
+        ->first();
+
+    $finalData = ['tickets' => $tickets, 'format' => $format];
+    $base64Pdf = base64_encode(Pdf::loadView('pdf/singleTicket', ['data' => $finalData])->output());
+
+    // ✅ Define messages here
+    $messageConfirmed = "Dear " . $ticket->customer->name . ",
 Seat# " . implode(',', $tickets->pluck('seat_no')->toArray()) . ",
-" . $tickets[0]->departure_city->name . " to " . $tickets[0]->destination_city->name . "
-Date " . $tickets[0]->date . "
+" . $ticket->departure_city->name . " to " . $ticket->destination_city->name . "
+Date " . $ticket->date . "
 has been Confirmed
 Departure at:
 $html
@@ -693,10 +705,10 @@ Terms & conditions applied
 4:For passenger safety Bus will not pick/drop passengers from Roadside or outside Company Terminal
 5: Keep your personal belongings Safe Company is not responsible for any loss or damage.";
 
-            $messageReserved = "Dear " . $tickets[0]->customer->name . ",
+    $messageReserved = "Dear " . $ticket->customer->name . ",
 Seat# " . implode(',', $tickets->pluck('seat_no')->toArray()) . ",
-" . $tickets[0]->departure_city->name . " to " . $tickets[0]->destination_city->name . "
-Date " . $tickets[0]->date . "
+" . $ticket->departure_city->name . " to " . $ticket->destination_city->name . "
+Date " . $ticket->date . "
 Is Reserved
 Departure at:
 $html
@@ -704,37 +716,55 @@ $html
 
 Terms & conditions applied.";
 
-            $finalData = [
-                'tickets' => $tickets,
-                'format' => $format,
-            ];
+    // Decide which messages to send
+    $sendTypes = match($message_allow) {
+    1 => ['confirm'],
+    2 => ['reserved'],
+    3 => ['confirm', 'reserved'],
+};
 
-            $pdf = Pdf::loadView('pdf/singleTicket', ['data' => $finalData]);
+// Filter $sendTypes based on ticket type
+if ($type == 'booked') {
+    $sendTypes = array_filter($sendTypes, fn($s) => $s == 'confirm');
+} elseif ($type == 'advance booking') {
+    $sendTypes = array_filter($sendTypes, fn($s) => $s == 'reserved');
+}
 
-            // Render the PDF and get the output as a string
-            $pdfOutput = $pdf->output();
 
-            // Convert the PDF output to a Base64 string
-            $base64Pdf = base64_encode($pdfOutput);
-            try {
-                $response = Http::withHeaders([
-                    'X-Api-Key' => $auth_key,
-                ])
-                    ->timeout(1)
-                    ->post($url, [
-                        "session" => $session,
-                        "receiver_number" => $mobile,
-                        "message_body" => $type == "advance booking" ? $messageReserved : $messageConfirmed,
-                        "message_type" =>  $type == "advance booking" ? 'text' : 'media',
-                        "file_type" => $type == "advance booking" ? null : "base64",
-                        "file" => $type == "advance booking" ? null : $base64Pdf,
-                        "file_name" => $type == "advance booking" ? null : $tickets[0]->customer->name
-                    ]);
-                return $response;
-            } catch (\Exception $e) {
-            }
-        }
+    $messagesSent = [];
+    $session_response = [];
+
+    try {
+       foreach ($sendTypes as $sendType) {
+    $response = Http::withHeaders(['X-Api-Key' => $auth_key])
+        ->timeout(3)
+        ->post("https://whatsapp.sarzone.com/api/send-messages", [
+            "session" => $session,
+            "receiver_number" => $mobile,
+            "message_body" => $sendType == 'confirm' ? $messageConfirmed : $messageReserved,
+            "message_type" => $sendType == 'confirm' ? 'media' : 'text',
+            "file_type" => $sendType == 'confirm' ? 'base64' : null,
+            "file" => $sendType == 'confirm' ? $base64Pdf : null,
+            "file_name" => $sendType == 'confirm' ? $ticket->customer->name : null
+        ]);
+
+    $messagesSent[] = $sendType;
+    $session_response[$sendType] = $response->json();
+}
+
+    } catch (\Exception $e) {
+        Log::error("WhatsApp send error: " . $e->getMessage());
+        return ['status' => 'error', 'message' => $e->getMessage()];
     }
+
+    return [
+        'status' => 'success',
+        'messages_sent' => $messagesSent,
+        'session_used' => $session,
+        'session_response' => $session_response
+    ];
+}
+
 }
 
 if (!function_exists('ticketRescheduledMessage')) {

@@ -480,6 +480,10 @@
                 "allow": true
             },
             {
+                "name": "jazz-cash-refund", 
+                "allow": true
+            },
+            {
                 "name": "jazz-cash-refund",
                 "allow": true
             },

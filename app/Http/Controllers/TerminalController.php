@@ -100,6 +100,7 @@ class TerminalController extends Controller
             ];
             $this->validate($request, $rules, $customMessages);
 
+
             Terminal::create([
                 'name' => $request->name,
                 'urdu_name' => $request->urdu_name,
@@ -123,6 +124,7 @@ class TerminalController extends Controller
                 'ticket_flat_commission' => $request->flatCommission ?? 0,
                 'ticket_percentage_commission' => $request->percentageCommission ?? 0,
                 'added_by' => Auth::user()->id,
+                'send_message' => (int) $request->send_message,
                 'company_id' => Auth::user()->is_super_admin == 0 ? Auth::user()->company_id : $request->company_id,
             ]);
             ActivityLog::create([
@@ -173,6 +175,20 @@ class TerminalController extends Controller
                 'contact' => 'required',
             ]);
             Terminal::where("city_id", $request->city_id)->update(["is_main" => 0]);
+$sendMessage = 0;
+
+if (is_array($request->send_message)) {
+    if (in_array('confirm', $request->send_message) && in_array('reserved', $request->send_message)) {
+        $sendMessage = 3;
+    } elseif (in_array('confirm', $request->send_message)) {
+        $sendMessage = 1;
+    } elseif (in_array('reserved', $request->send_message)) {
+        $sendMessage = 2;
+    }
+}
+
+
+
             Terminal::find($request->id)->update([
                 'name' => $request->name,
                 'urdu_name' => $request->urdu_name,
@@ -196,7 +212,7 @@ class TerminalController extends Controller
                 'active_sms' => $request->active_sms ? 1 : 0,
                 'status' => (int)$request->status,
                 'other_terminal_passenger_detail' => $request->other_terminal_passenger_detail,
-                'send_message' => $request->send_message,
+                'send_message' => $sendMessage,
             ]);
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
