@@ -642,6 +642,7 @@ if (!function_exists('ticketConfirmedMessage')) {
 
     $ticket = $tickets[0];
     $type = $ticket->type; // booked / advance booking
+
     $cancelMessage = SubRoute::where([
         "from_city" => $ticket->departure_city_id,
         "to_city" => $ticket->destination_city_id
@@ -686,7 +687,7 @@ if (!function_exists('ticketConfirmedMessage')) {
     $finalData = ['tickets' => $tickets, 'format' => $format];
     $base64Pdf = base64_encode(Pdf::loadView('pdf/singleTicket', ['data' => $finalData])->output());
 
-    // ✅ Define messages here
+    // Messages
     $messageConfirmed = "Dear " . $ticket->customer->name . ",
 Seat# " . implode(',', $tickets->pluck('seat_no')->toArray()) . ",
 " . $ticket->departure_city->name . " to " . $ticket->destination_city->name . "
@@ -717,41 +718,48 @@ $html
 Terms & conditions applied.";
 
     // Decide which messages to send
-    $sendTypes = match($message_allow) {
-    1 => ['confirm'],
-    2 => ['reserved'],
-    3 => ['confirm', 'reserved'],
-};
+    $sendTypes = match((int)$message_allow) {
+        1 => ['confirm'],
+        2 => ['reserved'],
+        3 => ['confirm', 'reserved'],
+        default => null,
+    };
 
-// Filter $sendTypes based on ticket type
-if ($type == 'booked') {
-    $sendTypes = array_filter($sendTypes, fn($s) => $s == 'confirm');
-} elseif ($type == 'advance booking') {
-    $sendTypes = array_filter($sendTypes, fn($s) => $s == 'reserved');
-}
+    // Skip if no messages to send
+    if (empty($sendTypes)) {
+        return [
+            'status' => 'skipped',
+            'reason' => 'No messages to send for this terminal/message_allow value'
+        ];
+    }
 
+    // Filter $sendTypes based on ticket type
+    if ($type == 'booked') {
+        $sendTypes = array_filter($sendTypes, fn($s) => $s == 'confirm');
+    } elseif ($type == 'advance booking') {
+        $sendTypes = array_filter($sendTypes, fn($s) => $s == 'reserved');
+    }
 
     $messagesSent = [];
     $session_response = [];
 
     try {
-       foreach ($sendTypes as $sendType) {
-    $response = Http::withHeaders(['X-Api-Key' => $auth_key])
-        ->timeout(3)
-        ->post("https://whatsapp.sarzone.com/api/send-messages", [
-            "session" => $session,
-            "receiver_number" => $mobile,
-            "message_body" => $sendType == 'confirm' ? $messageConfirmed : $messageReserved,
-            "message_type" => $sendType == 'confirm' ? 'media' : 'text',
-            "file_type" => $sendType == 'confirm' ? 'base64' : null,
-            "file" => $sendType == 'confirm' ? $base64Pdf : null,
-            "file_name" => $sendType == 'confirm' ? $ticket->customer->name : null
-        ]);
+        foreach ($sendTypes as $sendType) {
+            $response = Http::withHeaders(['X-Api-Key' => $auth_key])
+                ->timeout(3)
+                ->post("https://whatsapp.sarzone.com/api/send-messages", [
+                    "session" => $session,
+                    "receiver_number" => $mobile,
+                    "message_body" => $sendType == 'confirm' ? $messageConfirmed : $messageReserved,
+                    "message_type" => $sendType == 'confirm' ? 'media' : 'text',
+                    "file_type" => $sendType == 'confirm' ? 'base64' : null,
+                    "file" => $sendType == 'confirm' ? $base64Pdf : null,
+                    "file_name" => $sendType == 'confirm' ? $ticket->customer->name : null
+                ]);
 
-    $messagesSent[] = $sendType;
-    $session_response[$sendType] = $response->json();
-}
-
+            $messagesSent[] = $sendType;
+            $session_response[$sendType] = $response->json();
+        }
     } catch (\Exception $e) {
         Log::error("WhatsApp send error: " . $e->getMessage());
         return ['status' => 'error', 'message' => $e->getMessage()];
