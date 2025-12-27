@@ -46757,36 +46757,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       });
     },
     totalCash: function totalCash() {
-      if (this.shortages.length == 0) {
-        return 0;
-      }
-
-      ;
-      return this.shortages.reduce(function (sum, item) {
+      var shortages = this.shortages || [];
+      if (shortages.length === 0) return 0;
+      return shortages.reduce(function (sum, item) {
         var _item$total_received_;
 
         return sum + Number((_item$total_received_ = item.total_received_cash) !== null && _item$total_received_ !== void 0 ? _item$total_received_ : 0);
       }, 0);
     },
     totalBank: function totalBank() {
-      if (this.shortages.length == 0) {
-        return 0;
-      }
-
-      ;
-      return this.shortages.reduce(function (sum, item) {
+      var shortages = this.shortages || [];
+      if (shortages.length === 0) return 0;
+      return shortages.reduce(function (sum, item) {
         var _item$total_received_2;
 
         return sum + Number((_item$total_received_2 = item.total_received_bank) !== null && _item$total_received_2 !== void 0 ? _item$total_received_2 : 0);
       }, 0);
     },
     totalShortage: function totalShortage() {
-      if (this.shortages.length == 0) {
-        return 0;
-      }
-
-      ;
-      return this.shortages.reduce(function (sum, item) {
+      var shortages = this.shortages || [];
+      if (shortages.length === 0) return 0;
+      return shortages.reduce(function (sum, item) {
         var _item$shortage;
 
         return sum + Number((_item$shortage = item.shortage) !== null && _item$shortage !== void 0 ? _item$shortage : 0);

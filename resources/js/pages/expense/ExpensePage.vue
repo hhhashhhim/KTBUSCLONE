@@ -855,35 +855,36 @@ export default {
         return this.shortages.filter(item => item.type === 'return');
     },
 
-    totalCash() {
-         if(this.shortages.length == 0){
-            return 0;
-        };
-        return this.shortages.reduce(
-            (sum, item) => sum + Number(item.total_received_cash ?? 0),
-            0
-        );
-    },
+   totalCash() {
+    const shortages = this.shortages || [];
+    if (shortages.length === 0) return 0;
 
-    totalBank() {
-         if(this.shortages.length == 0){
-            return 0;
-        };
-        return this.shortages.reduce(
-            (sum, item) => sum + Number(item.total_received_bank ?? 0),
-            0
-        );
-    },
+    return shortages.reduce(
+        (sum, item) => sum + Number(item.total_received_cash ?? 0),
+        0
+    );
+},
 
-    totalShortage() {
-        if(this.shortages.length == 0){
-            return 0;
-        };
-        return this.shortages.reduce(
-            (sum, item) => sum + Number(item.shortage ?? 0),
-            0
-        );
-    },
+totalBank() {
+    const shortages = this.shortages || [];
+    if (shortages.length === 0) return 0;
+
+    return shortages.reduce(
+        (sum, item) => sum + Number(item.total_received_bank ?? 0),
+        0
+    );
+},
+
+totalShortage() {
+    const shortages = this.shortages || [];
+    if (shortages.length === 0) return 0;
+
+    return shortages.reduce(
+        (sum, item) => sum + Number(item.shortage ?? 0),
+        0
+    );
+},
+
 
     profitLoss() {
     // Ensure shortages and expenses are arrays
