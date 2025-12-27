@@ -358,7 +358,7 @@ class ScheduleClosingController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        // try {
+        try {
             DB::beginTransaction();
                 $mergeOne = TicketClosingMerge::where("id",$request->mergeIds[0])->first();
                 $mergeTwo = TicketClosingMerge::where("id",$request->mergeIds[1])->first();
@@ -393,7 +393,7 @@ class ScheduleClosingController extends Controller
                         'ticket_merge_id' => $merge->id,
 
                         'expense_category_id' => $expenses['category'][$key],
-                        'description' => $expenses['description'][$key],
+                        'description' => $expenses['description'][$key] ?? '-',
                         'amount' => $expenses['amount'][$key],
                         'paid' => isset($expenses['paid'][$key]) ? $expenses['paid'][$key] : $expenses['amount'][$key],
                         'ledger' => 1,
@@ -404,13 +404,13 @@ class ScheduleClosingController extends Controller
 
                 }
                 
-            //     DB::commit();
-            //     return $merge;
-            // } catch (\Exception $e) {
-            //     DB::rollBack();
-            //     Log::error('Database transaction error: ' . $e->getMessage());
-            //     return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            // }
+                DB::commit();
+                return $merge;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
             
                
     }
