@@ -14,9 +14,45 @@
                             </div> -->
                         </div>
                         <div class="card-body">
+
                             <!-- Table -->
                             <div class="row">
                                 <div class="col-12">
+                                        <form @submit.prevent="fetchData">
+    <div class="row px-2 mb-4 align-items-end">
+        <div class="col-md-3">
+            <label for="terminalFilter">Select Bus</label>
+            <select id="terminalFilter" class="form-control"
+                    v-model="filterData.bus_number">
+                <option value="">Select Bus</option>
+                <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
+                    {{ bus.bus_number }}
+                </option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="fromDate">Departure Date</label>
+            <input id="fromDate" type="date" class="form-control"
+                   v-model="filterData.from_date">
+        </div>
+
+        <div class="col-md-3">
+            <label for="toDate">Return Date</label>
+            <input id="toDate" type="date" class="form-control"
+                   v-model="filterData.to_date">
+        </div>
+
+        <div class="col-md-3 d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary mr-2">
+                Filter
+            </button>
+            <button type="button" class="btn btn-danger" @click="resetFilters">
+                Reset
+            </button>
+        </div>
+    </div>
+</form>
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="table-responsive">
@@ -348,6 +384,12 @@ export default {
             },
             success: false,
             errors: false,
+             filterData: {
+                bus_number: "",
+                from_date: new Date().toISOString().split('T')[0],
+                to_date: new Date().toISOString().split('T')[0],
+            },
+            tableLoading: false,
         };
     },
     async created() {
@@ -361,7 +403,7 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
 
-        this.fetchData();
+        // this.fetchData();
         this.permissions = this.$store.state.permissions;
     },
     mounted() {
@@ -399,7 +441,9 @@ export default {
             this.data = {};
         },
         async fetchData() {
-            const res = await this.callApi("post", "booking/close/schedule/closing");
+             try {
+            this.tableLoading = true;
+            const res = await this.callApi("post", "booking/close/schedule/closing", this.filterData);
             if (res.status == 200) {
                 this.closings = res.data.closings;
                 this.buses = res.data.buses;
@@ -414,7 +458,20 @@ export default {
                 });
             }, 300);
             $(".select2").select2();
+             } catch (error) {
+        console.error("Error fetching merges:", error);
+    } finally {
+        this.tableLoading = false; // ensures loader stops even on error
+    }
         },
+        resetFilters() {
+    this.filterData = {
+        bus_number: '',
+        from_date: new Date().toISOString().split('T')[0],
+        to_date: new Date().toISOString().split('T')[0],
+    };
+    this.fetchData(); // optional: refresh table after reset
+},
         async getSchedule() {
             const data = {
                 date: this.addData.date

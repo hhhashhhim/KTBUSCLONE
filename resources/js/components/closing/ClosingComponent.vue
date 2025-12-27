@@ -40,6 +40,7 @@
                 Bus No: {{ data?.singleData?.bus_number || "" }}
               </h5>
               <div class="row">
+            
                 <!-- Rawalpindi Table -->
                 <div class="col-md-12 mb-3">
                   <h5 class="text-center">
@@ -51,8 +52,8 @@
                         <th>Terminal Name</th>
                         <th>Passenger Count</th>
                         <th>KT Commission</th>
-                        <th>Other Commission</th>
                         <th>Total Receivable</th>
+                        <th>Other Commission</th>
                         <!-- <th>Receivable Cash</th>
                         <th>Receivable Bank</th> -->
                         <th>Total Received in Cash</th>
@@ -70,38 +71,20 @@
                         <td>{{ tickets[0].terminal.name }}</td>
                         <td>{{ tickets.length }}</td>
                         <td>{{ totalCommission(tickets) }}</td>
-                        <td>{{ totalOtherCommission(tickets) }}</td>
                         <td>{{ totalFare(tickets) }}</td>
-<!-- <td>
-  <span v-if="tickets[0].terminal.recovery_method === 'cash'">
-    {{ totalFare(tickets) }}
-  </span>
-  <span v-else>0</span>
-</td>
-<td>
-  <span v-if="tickets[0].terminal.recovery_method === 'bank'">
-    {{ totalFare(tickets) }}
-  </span>
-  <span v-else>0</span>
-</td> -->
-
-
+                        <td>{{ totalOtherCommission(tickets) }}</td>
                         <td>
-   <input
-  type="number"
-  min="0"
-  class="form-control"
-  :value="Math.max(0, cashBankStart[terminalId].cash)"
-  @input="updateCash($event.target.value, terminalId, tickets)"
-  @focus="editingField = 'cash'"
-/>
-
-
+                          <input
+                            type="number"
+                            class="form-control"
+                            v-model="cashBankStart[terminalId].cash"
+                            @input="updateCash(terminalId, tickets)"
+                          />
                         </td>
                         <td>
                           <select
                             class="form-control rounded-0"
-                            v-model="selectedBank"
+                            v-model="cashBankStart[terminalId].selectedBankId"
                           >
                             <option value="" selected disabled>
                               Select Bank
@@ -116,16 +99,13 @@
                           </select>
                         </td>
                         <td>
-  <input
-  type="number"
-  min="0"
-  class="form-control"
-  :value="Math.max(0, receivable(terminalId, tickets) - totalOtherCommission(tickets))"
-  @focus="editingField = 'bank'"
-
-/>
-
-
+                          <input
+                            type="number"
+                            min="0"
+                            class="form-control"
+                            v-model.number="cashBankStart[terminalId].bank"
+                            @input="updateBank(terminalId, tickets)"
+                          />
                         </td>
 
                         <td>
@@ -155,7 +135,10 @@
                         <th>
                           {{ sumReceivable() }}
                         </th>
-<!-- <th></th>
+                        <th>
+                          {{ sumOtherCommissions(data.schedule_start) }}
+                        </th>
+                        <!-- <th></th>
 <th></th> -->
 
                         <th>
@@ -192,8 +175,8 @@
                         <th>Terminal Name</th>
                         <th>Passenger Count</th>
                         <th>KT Commission</th>
-                        <th>Other Commission</th>
                         <th>Total Receivable</th>
+                        <th>Other Commission</th>
                         <th>Total Received in Cash</th>
                         <th>Select Bank</th>
                         <th>Total Received in Bank</th>
@@ -209,8 +192,8 @@
                         <td>{{ tickets[0].terminal.name }}</td>
                         <td>{{ tickets.length }}</td>
                         <td>{{ totalCommission(tickets) }}</td>
-                         <td>{{ totalOtherCommission(tickets) }}</td>
                         <td>{{ totalFare(tickets) }}</td>
+                        <td>{{ totalOtherCommission(tickets) }}</td>
 
                         <td>
                           <input
@@ -221,7 +204,7 @@
                             @input="editingField = 'cash'"
                           />
                         </td>
-<td>
+                        <td>
                           <select
                             class="form-control rounded-0"
                             v-model="selectedBank"
@@ -271,11 +254,12 @@
                         <th>
                           {{ totalCommissions(data.schedule_return) }}
                         </th>
-
                         <th>
                           {{ sumReceivableReturn() }}
                         </th>
-
+                        <th>
+                          {{ sumOtherCommissions(data.schedule_return) }}
+                        </th>
                         <th>
                           {{ sumCashReturn() }}
                         </th>
@@ -342,36 +326,35 @@
                           />
                         </td>
                         <td>
-  <!-- Total Expense -->
-  <input
-    type="number"
-    min="0"
-    class="form-control rounded-0"
-    v-model.number="postData.amount[index]"
-    @input="syncPaid(index)"
-  />
-</td>
+                          <!-- Total Expense -->
+                          <input
+                            type="number"
+                            min="0"
+                            class="form-control rounded-0"
+                            v-model.number="postData.amount[index]"
+                            @input="syncPaid(index)"
+                          />
+                        </td>
 
-<td>
-  <!-- Total Expense Paid -->
-  <input
-    type="number"
-    min="0"
-    class="form-control rounded-0"
-    v-model.number="postData.paid[index]"
-  />
-</td>
+                        <td>
+                          <!-- Total Expense Paid -->
+                          <input
+                            type="number"
+                            min="0"
+                            class="form-control rounded-0"
+                            v-model.number="postData.paid[index]"
+                          />
+                        </td>
 
-<td>
-  <!-- Balance -->
-  <input
-    type="number"
-    class="form-control rounded-0"
-    :value="balances[index]"
-    readonly
-  />
-</td>
-
+                        <td>
+                          <!-- Balance -->
+                          <input
+                            type="number"
+                            class="form-control rounded-0"
+                            :value="balances[index]"
+                            readonly
+                          />
+                        </td>
 
                         <!-- <td>
                           <input
@@ -412,7 +395,7 @@
                               :value="totalSale"
                             />
                           </div>
-                        </td>
+                        </td> 
                         <td>
                           <div class="form-group">
                             <label for="totalNums">Total Amount</label>
@@ -455,16 +438,16 @@
                     <tbody>
                       <tr>
                         <th>Total Receivable in Cash</th>
-                        <td>{{ sumStartCash() + sumReturnCash() }}</td>
+                        <td>
+                          {{ $insertComma(sumStartCash() + sumReturnCash()) }}
+                        </td>
                       </tr>
                       <tr>
                         <th>Total Receivable in Bank</th>
-                        <td>{{ sumStartBank() + sumReturnBank() }}</td>
+                        <td>
+                          {{ $insertComma(sumStartBank() + sumReturnBank()) }}
+                        </td>
                       </tr>
-                      <!-- <tr class="border-r">
-                        <th>Total Receivable</th>
-                        <td>{{ sumReceivable() + sumReceivableReturn() }}</td>
-                      </tr> -->
                     </tbody>
                   </table>
 
@@ -478,16 +461,12 @@
                     <tbody>
                       <tr>
                         <th>Total Received in Cash</th>
-                        <td>{{ sumCash() + sumCashReturn() }}</td>
+                        <td>{{ $insertComma(sumCash() + sumCashReturn()) }}</td>
                       </tr>
                       <tr>
                         <th>Total Received in Bank</th>
-                        <td>{{ sumBank() + sumBankReturn() }}</td>
+                        <td>{{ $insertComma(sumBank() + sumBankReturn()) }}</td>
                       </tr>
-                      <!-- <tr class="border-r">
-                        <th>Total</th>
-                        <td>{{ grandTotal }}</td>
-                      </tr> -->
                     </tbody>
                   </table>
                   <table class="table table-sm table-hover mt-3">
@@ -498,24 +477,39 @@
                     </thead>
                     <tbody>
                       <tr>
-                        <th>Total receivable</th>
-                        <td>{{ sumReceivable() + sumReceivableReturn() }}</td>
+                        <th>Total Receivable</th>
+                        <td>
+                          {{
+                            $insertComma(
+                              sumReceivable() + sumReceivableReturn()
+                            )
+                          }}
+                        </td>
                       </tr>
                       <tr>
-                        <th>Total received</th>
-                        <td>{{ grandTotal }}</td>
+                        <th>Total Other Commission</th>
+                        <td>
+                          {{
+                            $insertComma(
+                              sumOtherCommissions(data.schedule_return) +
+                                sumOtherCommissions(data.schedule_start)
+                            )
+                          }}
+                        </td>
                       </tr>
                       <tr>
                         <th>Total Shortage</th>
-                        <td>{{ sumShortage() + sumShortageReturn() }}</td>
-                      </tr>
-                      <!-- <tr class=" border-r">
-                        <th>Total
-                        </th>
                         <td>
-                          {{ total }}
+                          {{
+                            $insertComma(sumShortage() + sumShortageReturn())
+                          }}
                         </td>
-                      </tr> -->
+                      </tr>
+
+                      <tr class="border-r">
+                        <th>Total Received</th>
+                        <td>{{ $insertComma(grandTotal) }}</td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -533,22 +527,41 @@
                         <th>Total KT Commission</th>
                         <td>
                           {{
-                            totalCommissions(data.schedule_return) +
-                            totalCommissions(data.schedule_start)
+                            $insertComma(
+                              totalCommissions(data.schedule_return) +
+                                totalCommissions(data.schedule_start)
+                            )
+                          }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Total Other Commission</th>
+                        <td>
+                          {{
+                            $insertComma(
+                              sumOtherCommissions(data.schedule_return) +
+                                sumOtherCommissions(data.schedule_start)
+                            )
                           }}
                         </td>
                       </tr>
                       <tr>
                         <th>Total Paid Expenses</th>
-                        <td>{{ totalAmount - totalExpenses }}</td>
+                        <td>
+                          {{
+                            $insertComma(
+                              Math.round(totalAmount - totalExpenses)
+                            )
+                          }}
+                        </td>
                       </tr>
                       <tr>
                         <th>Total Credit Expenses</th>
-                        <td>{{ totalExpenses }}</td>
+                        <td>{{ $insertComma(totalExpenses) }}</td>
                       </tr>
                       <tr class="border-r">
                         <th>Total Expense</th>
-                        <td>{{ grandTotalexpense }}</td>
+                        <td>{{ $insertComma(grandTotalexpense) }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -563,19 +576,27 @@
                     <tbody>
                       <tr>
                         <th>Total Receivable</th>
-                        <td>{{ sumReceivable() + sumReceivableReturn() }}</td>
+                        <td>
+                          {{
+                            $insertComma(
+                              sumReceivable() + sumReceivableReturn()
+                            )
+                          }}
+                        </td>
                       </tr>
                       <tr>
                         <th>Total Expenses</th>
-                        <td>{{ grandTotalexpense }}</td>
+                        <td>{{ $insertComma(grandTotalexpense) }}</td>
                       </tr>
                       <tr class="border-r">
                         <th>Total</th>
                         <td>
                           {{
-                            sumReceivable() +
-                            sumReceivableReturn() -
-                            grandTotalexpense
+                            $insertComma(
+                              sumReceivable() +
+                                sumReceivableReturn() -
+                                grandTotalexpense
+                            )
                           }}
                         </td>
                       </tr>
@@ -594,16 +615,20 @@
                     <tbody>
                       <tr>
                         <th>Total Received in Cash</th>
-                        <td>{{ sumCash() + sumCashReturn() }}</td>
+                        <td>{{ $insertComma(sumCash() + sumCashReturn()) }}</td>
                       </tr>
                       <tr>
                         <th>Total Paid Expenses</th>
-                        <td>{{ totalPaid }}</td>
+                        <td>{{ $insertComma(totalPaid) }}</td>
                       </tr>
                       <tr class="border-r">
                         <th>Total Cash in Hand</th>
                         <td>
-                          {{ sumCash() + sumCashReturn() - totalPaid }}
+                          {{
+                            $insertComma(
+                              sumCash() + sumCashReturn() - totalPaid
+                            )
+                          }}
                         </td>
                       </tr>
                     </tbody>
@@ -620,7 +645,25 @@
             >
               Close
             </button>
-            <button type="button" class="btn btn-primary">Save changes</button>
+            <button
+              type="button"
+              class="btn btn-primary d-flex align-items-center"
+              @click="saveTicketClosingShortage"
+              :disabled="loading"
+            >
+              <!-- Loader -->
+              <span
+                v-if="loading"
+                class="spinner-border spinner-border-sm mr-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+
+              <!-- Text -->
+              <span>
+                {{ loading ? "Saving..." : "Save changes" }}
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -630,7 +673,7 @@
 
 <script>
 export default {
-  props: ["data", "banks"],
+  props: ["data", "banks", "busIds", "mergeIds"],
   data() {
     return {
       categories: [],
@@ -643,12 +686,17 @@ export default {
         ledger: [],
         invoice: [],
       },
+      addData: {
+      busIds: [],
+      mergeIds: [],
+    },
       loop: 1,
       loading: false,
       cashBank: {},
       editingField: null, // 'cash' | 'bank'
       cashBankStart: {},
       cashBankReturn: {},
+      mergedData: {}
     };
   },
   watch: {
@@ -675,11 +723,15 @@ export default {
         Object.entries(val).forEach(([terminalId, tickets]) => {
           if (this.cashBankStart[terminalId]) return;
 
-          const total = this.totalFare(tickets);
+          const rawTotal =
+            this.totalFare(tickets) - this.totalOtherCommission(tickets);
+          const commission = this.totalOtherCommission(tickets);
+          const total = Math.round(rawTotal);
           const method = tickets[0].terminal.recovery_method;
 
           this.cashBankStart[terminalId] = {
             total,
+            commission,
             cash: method === "cash" ? total : 0,
             bank: method === "bank" ? total : 0,
             shortage: 0,
@@ -696,11 +748,15 @@ export default {
         Object.entries(val).forEach(([terminalId, tickets]) => {
           if (this.cashBankReturn[terminalId]) return;
 
-          const total = this.totalFare(tickets);
+          const rawTotal =
+            this.totalFare(tickets) - this.totalOtherCommission(tickets);
+          const total = Math.round(rawTotal);
+          const commission = this.totalOtherCommission(tickets);
           const method = tickets[0].terminal.recovery_method;
 
           this.cashBankReturn[terminalId] = {
             total,
+            commission,
             cash: method === "cash" ? total : 0,
             bank: method === "bank" ? total : 0,
             shortage: 0,
@@ -755,7 +811,9 @@ export default {
       return (
         (Number(this.totalAmount) || 0) +
         this.totalCommissions(this.data.schedule_return || {}) +
-        this.totalCommissions(this.data.schedule_start || {})
+        this.totalCommissions(this.data.schedule_start || {}) +
+        this.sumOtherCommissions(this.data.schedule_return || {}) +
+        this.sumOtherCommissions(this.data.schedule_start || {})
       );
     },
 
@@ -767,9 +825,14 @@ export default {
     },
 
     totalPaid() {
-      return this.postData.paid.reduce(
+      const paid = this.postData.paid.reduce(
         (sum, val) => sum + (Number(val) || 0),
         0
+      );
+      return (
+        paid +
+        this.sumOtherCommissions(this.data.schedule_return) +
+        this.sumOtherCommissions(this.data.schedule_start)
       );
     },
     totalExpenses() {
@@ -778,7 +841,7 @@ export default {
         return sum + (Number(val) - paid);
       }, 0);
     },
-     balances() {
+    balances() {
       return this.postData.amount.map((amt, index) => {
         let paid = this.postData.paid[index] || 0;
 
@@ -791,22 +854,24 @@ export default {
         return amt - paid;
       });
     },
-
   },
   methods: {
-   updateCash(value, terminalId, tickets) {
-  const otherCommission = this.totalOtherCommission(tickets);
+    updateCash(terminalId, tickets) {
+      const row = this.cashBankStart[terminalId];
+      const receivable = this.receivable(terminalId, tickets);
 
-  this.cashBankStart[terminalId].cash =
-    Number(value || 0) - otherCommission;
-},
-updateBank(value, terminalId, tickets) {
-  const otherCommission = this.totalOtherCommission(tickets);
+      row.cash = Math.max(0, Number(row.cash) || 0);
+      row.bank = Math.max(0, Number(row.bank) || 0);
 
-  this.cashBankStart[terminalId].bank =
-    Number(value || 0) - otherCommission;
-},
-      syncPaid(index) {
+      row.shortage = Math.max(0, receivable - (row.cash + row.bank));
+    },
+    updateBank(value, terminalId, tickets) {
+      const otherCommission = this.totalOtherCommission(tickets);
+
+      this.cashBankStart[terminalId].bank =
+        Number(value || 0) - otherCommission;
+    },
+    syncPaid(index) {
       // Auto-fill Paid when Amount changes
       this.postData.paid[index] = this.postData.amount[index];
     },
@@ -851,7 +916,6 @@ updateBank(value, terminalId, tickets) {
       return tickets.reduce((s, t) => s + Number(t.fare || 0), 0);
     },
 
-
     sumByRecovery(schedule, method) {
       if (!schedule) return 0;
 
@@ -859,7 +923,8 @@ updateBank(value, terminalId, tickets) {
         const filtered = tickets.filter(
           (t) => t.terminal?.recovery_method === method
         );
-        return sum + this.totalFare(filtered);
+
+        return sum + parseFloat(this.totalFare(filtered));
       }, 0);
     },
     sumStartCash() {
@@ -877,41 +942,40 @@ updateBank(value, terminalId, tickets) {
     sumReturnBank() {
       return this.sumByRecovery(this.data?.schedule_return, "bank");
     },
-     sumReceivable() {
-    return Object.values(this.cashBankStart).reduce(
-      (sum, row) => sum + (Number(row.total) || 0),
-      0
-    );
-  },
+    sumReceivable() {
+      return Object.values(this.cashBankStart).reduce(
+        (sum, row) => sum + (Number(row.total) + Number(row.commission) || 0),
+        0
+      );
+    },
 
     sumCash() {
-    return Object.values(this.cashBankStart).reduce(
-      (sum, row) => sum + (Number(row.cash) || 0),
-      0
-    );
-  },
+      return Object.values(this.cashBankStart).reduce(
+        (sum, row) => sum + (Number(row.cash) || 0),
+        0
+      );
+    },
 
     sumBank() {
-    return Object.values(this.cashBankStart).reduce(
-      (sum, row) => sum + (Number(row.bank) || 0),
-      0
-    );
-  },
+      return Object.values(this.cashBankStart).reduce(
+        (sum, row) => sum + (Number(row.bank) || 0),
+        0
+      );
+    },
 
     sumShortage() {
-    return Object.values(this.cashBankStart).reduce(
-      (sum, row) => sum + (Number(row.shortage) || 0),
-      0
-    );
-  },
+      return Object.values(this.cashBankStart).reduce(
+        (sum, row) => sum + (Number(row.shortage) || 0),
+        0
+      );
+    },
 
-   sumReceived() {
-    return Object.values(this.cashBankStart).reduce(
-      (sum, row) =>
-        sum + (Number(row.cash) || 0) + (Number(row.bank) || 0),
-      0
-    );
-  },
+    sumReceived() {
+      return Object.values(this.cashBankStart).reduce(
+        (sum, row) => sum + (Number(row.cash) || 0) + (Number(row.bank) || 0),
+        0
+      );
+    },
 
     netAmount(id) {
       const row = this.cashBank[id];
@@ -926,41 +990,40 @@ updateBank(value, terminalId, tickets) {
 
       return received;
     },
-   sumReceivableReturn() {
-    return Object.values(this.cashBankReturn).reduce(
-      (sum, row) => sum + (Number(row.total) || 0),
-      0
-    );
-  },
+    sumReceivableReturn() {
+      return Object.values(this.cashBankReturn).reduce(
+        (sum, row) => sum + (Number(row.total) + Number(row.commission) || 0),
+        0
+      );
+    },
 
-  sumCashReturn() {
-    return Object.values(this.cashBankReturn).reduce(
-      (sum, row) => sum + (Number(row.cash) || 0),
-      0
-    );
-  },
+    sumCashReturn() {
+      return Object.values(this.cashBankReturn).reduce(
+        (sum, row) => sum + (Number(row.cash) || 0),
+        0
+      );
+    },
 
-  sumBankReturn() {
-    return Object.values(this.cashBankReturn).reduce(
-      (sum, row) => sum + (Number(row.bank) || 0),
-      0
-    );
-  },
+    sumBankReturn() {
+      return Object.values(this.cashBankReturn).reduce(
+        (sum, row) => sum + (Number(row.bank) || 0),
+        0
+      );
+    },
 
-  sumShortageReturn() {
-    return Object.values(this.cashBankReturn).reduce(
-      (sum, row) => sum + (Number(row.shortage) || 0),
-      0
-    );
-  },
+    sumShortageReturn() {
+      return Object.values(this.cashBankReturn).reduce(
+        (sum, row) => sum + (Number(row.shortage) || 0),
+        0
+      );
+    },
 
-  sumReceivedReturn() {
-    return Object.values(this.cashBankReturn).reduce(
-      (sum, row) =>
-        sum + (Number(row.cash) || 0) + (Number(row.bank) || 0),
-      0
-    );
-  },
+    sumReceivedReturn() {
+      return Object.values(this.cashBankReturn).reduce(
+        (sum, row) => sum + (Number(row.cash) || 0) + (Number(row.bank) || 0),
+        0
+      );
+    },
 
     totalPassengers(data) {
       const groups = data || {};
@@ -981,6 +1044,13 @@ updateBank(value, terminalId, tickets) {
       const groups = data || {};
       return Object.values(groups).reduce(
         (sum, tickets) => sum + this.totalCommission(tickets),
+        0
+      );
+    },
+    sumOtherCommissions(data) {
+      const groups = data || {};
+      return Object.values(groups).reduce(
+        (sum, tickets) => sum + this.totalOtherCommission(tickets),
         0
       );
     },
@@ -1024,24 +1094,25 @@ updateBank(value, terminalId, tickets) {
         return sum + adjustment;
       }, 0);
     },
-      receivable(terminalId, tickets) {
-    // Example: sum of fares for this terminal
-    return tickets.reduce((sum, t) => sum + Number(t.seat_fare || 0), 0);
-  },
-     totalOtherCommission(list) {
-  return list.reduce((sum, t) => {
-    const fare = Number(t.seat_fare || 0);
-    const fix = Number(t.commission?.fix_commission || 0);
-    const flat = Number(t.commission?.flat_commission || 0);
-    const percent = Number(t.commission?.percentage_commission || 0);
+    receivable(terminalId, tickets) {
+      return this.totalFare(tickets) - this.totalOtherCommission(tickets);
+    },
+    totalOtherCommission(list) {
+      let fixCommission = 0;
 
-    // Use flat if available, otherwise percentage of seat fare
-    const flatOrPercentage =
-      flat > 0 ? flat : (percent / 100) * fare;
+      const value = list.reduce((sum, t) => {
+        const fare = parseFloat(t.seat_fare || 0);
+        fixCommission = parseFloat(t.commission?.fix_commission || 0);
+        const flat = parseFloat(t.commission?.flat_commission || 0);
+        const percent = parseFloat(t.commission?.percentage_commission || 0);
+        const flatOrPercentage = flat > 0 ? flat : (percent / 100) * fare;
 
-    return sum + fix + flatOrPercentage;
-  }, 0);
-},
+        return sum + flatOrPercentage;
+      }, 0);
+
+      // Round the final result to the nearest whole number
+      return Math.round(value + fixCommission);
+    },
     saveRow(event, fieldName, index) {
       // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
       if (fieldName == "first") {
@@ -1087,6 +1158,129 @@ updateBank(value, terminalId, tickets) {
         0
       );
       this.netProfit = this.totalSale - this.totalAmount;
+    },
+
+ // ===== Merge Schedule API =====
+async mergeScheduleApi(addData = {}) {
+  const payload = {
+    ...addData,
+    expenses:this.postData,
+    busIds: addData.busIds?.length ? addData.busIds : this.busIds || [],
+    mergeIds: addData.mergeIds?.length ? addData.mergeIds : this.mergeIds || [],
+  };
+
+  if (!payload.busIds.length || !payload.mergeIds.length) {
+    Swal.fire({
+      icon: "error",
+      title: "Cannot merge",
+      text: "Bus IDs or Merge IDs are empty. Fetch unclosing data first.",
+    });
+    return null;
+  }
+
+  try {
+    const res = await this.callApi(
+      "post",
+      "booking/close/schedule/closing/merge",
+      payload
+    );
+
+    if (res.status === 200 || res.status === 201) {
+      const mergedData = res.data || {};
+      this.mergedData = mergedData;
+
+      // Update stored IDs if returned
+      if (mergedData.busIds?.length) this.busIds = mergedData.busIds;
+      if (mergedData.mergeIds?.length) this.mergeIds = mergedData.mergeIds;
+
+      return mergedData;
+    } else {
+      throw new Error(`Merge failed with status ${res.status}`);
+    }
+  } catch (error) {
+    const errMsg =
+      error?.response?.data?.Error?.join("\n") || error.message || "Merge failed";
+    Swal.fire({ icon: "error", title: "Merge Error", text: errMsg });
+    throw new Error(errMsg);
+  }
+},
+
+// ===== Save Ticket Closing Shortage =====
+async saveTicketClosingShortage() {
+  this.loading = true;
+
+  try {
+    // Step 1: Merge schedules
+    const mergedResult = await this.mergeScheduleApi(this.addData);
+
+ 
+    // Step 2: Store merged data for the component
+    this.closingData = mergedResult;
+
+    // Step 3: Ticket closing logic
+    const calcKtCommission = (tickets) =>
+      tickets?.length
+        ? tickets.reduce(
+            (sum, t) =>
+              sum + ((t.commission?.adjustment_commission || 0) / 100) * (t.seat_fare - t.discount),
+            0
+          )
+        : 0;
+
+    const mapRows = (cashBank, schedule) =>
+      Object.entries(cashBank).map(([terminalId, row]) => {
+        const tickets = schedule[terminalId] || [];
+        return {
+          terminal_id: Number(terminalId),
+          passenger_count: tickets.length,
+          kt_commission: calcKtCommission(tickets),
+          other_commission: row.commission || 0,
+          total_receivable: row.total + row.commission,
+          total_received_cash: row.cash,
+          bank_id: row.selectedBankId || null,
+          total_received_bank: row.bank,
+          shortage: row.shortage,
+          received: row.cash + row.bank,
+          mergeId: mergedResult.id
+        };
+      });
+
+    // Step 4: Save Start
+
+    await this.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
+      ticket_closing_id: mergedResult.id,
+      type: "start",
+      rows: mapRows(this.cashBankStart, this.data.schedule_start),
+    });
+
+    
+    await this.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
+      ticket_closing_id: mergedResult.id,
+      type: "return",
+      rows: mapRows(this.cashBankReturn, this.data.schedule_return),
+    });
+
+    Swal.fire({
+      icon: "success",
+      title: "Saved!",
+      text: "Ticket closing saved successfully",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+
+    this.$emit('fetchData');
+
+    this.closeexampleModal();
+  } catch (error) {
+    console.error(error);
+    Swal.fire({ icon: "error", title: "Error", text: error.message || "Failed to save ticket closing" });
+  } finally {
+    this.loading = false;
+  }
+},
+
+    closeexampleModal() {
+      $("#exampleModal").click();
     },
   },
 };

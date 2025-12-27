@@ -16,17 +16,17 @@
                                             <div
                                                 class="d-flex justify-content-end"
                                             >
-                                                <!-- <button
+                                                <button
                                                     class="btn btn-primary"
                                                     data-toggle="modal"
                                                     data-target="#exampleModal"
                                                     @click="fetchMergedData()"
                                                 >
                                                     Merge Schedule
-                                                </button> -->
-                                                <button class="btn btn-primary" :disabled="loading" @click="mergeSchedule()">
-                                                    Merge Schedule
                                                 </button>
+                                                <!-- <button class="btn btn-primary" :disabled="loading" @click="mergeSchedule()">
+                                                    Merge Schedule
+                                                </button> -->
                                             </div>
                                             <div class="table-responsive">
                                                 <table
@@ -261,7 +261,7 @@
             </Hide>
         </div>
     </section>
-    <Closing :data="closingData" :banks="banks"/>
+    <Closing :data="closingData" :banks="banks" :busIds="busIds" :mergeIds="mergeIds" :addData="addData" @fetchData="fetchData($event)"/>
 </template>
 
 <script>
@@ -309,17 +309,21 @@ export default {
     },
     methods: {
         async fetchMergedData() {
-            const res = await this.callApi(
-                "post",
-                "booking/close/schedule/unclosing/data", this.addData
-            );
-            if (res.status == 200) {
-                this.closingData = res.data.data;
-                this.banks = res.data.banks;
-            } else {
-                console.log(res);
-            }
-        },
+  const res = await this.callApi(
+    "post",
+    "booking/close/schedule/unclosing/data",
+    this.addData
+  );
+
+ if (res.status === 200) {
+    this.closingData = res.data.data;
+    this.banks = res.data.banks;
+    this.busIds = res.data.busIds;
+    this.mergeIds = res.data.mergeIds;
+  } else {
+    console.log(res);
+  }
+},
         clearForm: function () {
             this.data = {};
         },

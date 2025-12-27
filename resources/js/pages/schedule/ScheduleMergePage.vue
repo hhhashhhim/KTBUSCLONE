@@ -14,35 +14,43 @@
                             </div> -->
                         </div>
                         <div class="card-body">
-                            <div class="row px-2 mb-4">
-                                    <div class="col-md-4">
-                                        <label for="terminalFilter">Select Bus</label>
-                                        <select id="terminalFilter" class="form-control"
-                                                v-model="filterData.bus_number"
-                                                @change="fetchMerges()"
-                                                >
-                                            <option value="">Select Bus</option>
-                                            <option v-for="(bus, i) in buses" :key="i"
-                                                    :value="bus.id">
-                                                {{ bus.bus_number }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="fromDate">From Date</label>
-                                        <input id="fromDate" type="date" class="form-control"
-                                                v-model="filterData.from_date"
-                                                @change="fetchMerges()"
-                                                >
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="fromDate">To Date</label>
-                                        <input id="fromDate" type="date" class="form-control"
-                                                v-model="filterData.to_date"
-                                                @change="fetchMerges()"
-                                                >
-                                    </div>
-                                </div>
+                         <form @submit.prevent="fetchMerges">
+    <div class="row px-2 mb-4 align-items-end">
+        <div class="col-md-3">
+            <label for="terminalFilter">Select Bus</label>
+            <select id="terminalFilter" class="form-control"
+                    v-model="filterData.bus_number">
+                <option value="">Select Bus</option>
+                <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
+                    {{ bus.bus_number }}
+                </option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="fromDate">Departure Date</label>
+            <input id="fromDate" type="date" class="form-control"
+                   v-model="filterData.from_date">
+        </div>
+
+        <div class="col-md-3">
+            <label for="toDate">Return Date</label>
+            <input id="toDate" type="date" class="form-control"
+                   v-model="filterData.to_date">
+        </div>
+
+        <div class="col-md-3 d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary mr-2">
+                Filter
+            </button>
+            <button type="button" class="btn btn-danger" @click="resetFilters">
+                Reset
+            </button>
+        </div>
+    </div>
+</form>
+
+
                             <!-- Table -->
                             <div class="row">
                                 <div class="col-12">
@@ -81,66 +89,110 @@
                                                             <th width="200px" v-if="checkForSubmenuButtons('add-expense')">Action</th>
                                                         </tr>
                                                         </thead>
-                                                        <tbody>
-                                                        <tr v-for="(merge, i) in merges" :key="i">
-                                                            <td>
-                                                                {{ merge.bus.bus_number }}
-                                                            </td>
-                                                            <td class="bg-blue-grey">
-                                                                {{ merge.closing[0].schedule.name }}
-                                                            </td>
-                                                            <td class="bg-blue-grey">
-                                                                {{ merge.schedule_departure_date }}
-                                                            </td>
-                                                            <td class="bg-dark-gray">
-                                                                {{ merge.closing[1].schedule.name }}
-                                                            </td>
-                                                            <td class="bg-dark-gray">
-                                                                {{ merge.schedule_return_date }}
-                                                            </td>
-                                                            <td>
-                                                                {{ merge.closing_date??"N/A" }}
-                                                            </td>
-                                                            <td>
-                                                                {{ (merge.seat_fare) + (merge.elt) + (merge.refund) - (merge.discount) - (merge.commission) }}
-                                                            </td>
-                                                            <td>
-                                                                {{ parseInt(merge.expenses_sum_amount) }}
-                                                            </td>
-                                                            <td class="bg-danger">
-                                                                {{ (merge.seat_fare) + (merge.elt) + (merge.refund) - (merge.discount) - (merge.commission) - (merge.expenses_sum_amount) }}
-                                                            </td>
-                                                            <td v-if="checkForSubmenuButtons('add-expense')">
-                                                                <router-link target="_blank" v-if="checkForSubmenuButtons('add-expense')"
-                                                                             class="btn btn-success mx-1"
-                                                                             :to="{ name:'expense-page', params: { id:merge.id }}"
-                                                                             title="Add Expense">
-                                                                    <i class="fas fa-plus"></i>
-                                                                </router-link>
-                                                                <router-link target="_blank"
-                                                                             v-if="checkForSubmenuButtons('add-expense')"
-                                                                             class="btn btn-success mx-1"
-                                                                             :to="{ name:'header-link-page', params: { id:merge.id }}"
-                                                                             title="header link">
-                                                                    Link
-                                                                </router-link>
-                                                                <button title="Closing Date"
-                                                                    data-target="#date-modal"
-                                                                    data-toggle="modal"
-                                                                    @click="closingData.mergeId = merge.id; closingData.closingDate = merge.closing_date"
-                                                                    class="btn btn-info mx-1"
-                                                                >
-                                                                    <i class="far fa-clock"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td colspan="6"></td>
-                                                            <td><b>{{ totalSale }}</b></td>
-                                                            <td><b>{{ totalExpense }}</b></td>
-                                                            <td><b>{{ totalSale - totalExpense }}</b></td>
-                                                        </tr>
-                                                        </tbody>
+                                                       <tbody>
+  <tr v-for="(merge, i) in merges" :key="i">
+    <td>
+      {{ merge.bus?.bus_number || "-" }}
+    </td>
+
+    <!-- Departure Schedule -->
+    <td class="bg-blue-grey">
+      {{
+        merge.closing && merge.closing.length > 0
+          ? merge.closing[0]?.schedule?.name
+          : "-"
+      }}
+    </td>
+
+    <td class="bg-blue-grey">
+      {{ merge.schedule_departure_date || "-" }}
+    </td>
+
+    <!-- Return Schedule -->
+    <td class="bg-dark-gray">
+      {{
+        merge.closing && merge.closing.length > 1
+          ? merge.closing[1]?.schedule?.name
+          : "-"
+      }}
+    </td>
+
+    <td class="bg-dark-gray">
+      {{ merge.schedule_return_date || "-" }}
+    </td>
+
+    <td>
+      {{ merge.closing_date ?? "N/A" }}
+    </td>
+
+    <td>
+      {{
+        (merge.seat_fare || 0) +
+        (merge.elt || 0) +
+        (merge.refund || 0) -
+        (merge.discount || 0) -
+        (merge.commission || 0)
+      }}
+    </td>
+
+    <td>
+      {{ parseInt(merge.expenses_sum_amount || 0) }}
+    </td>
+
+    <td class="bg-danger">
+      {{
+        (merge.seat_fare || 0) +
+        (merge.elt || 0) +
+        (merge.refund || 0) -
+        (merge.discount || 0) -
+        (merge.commission || 0) -
+        (merge.expenses_sum_amount || 0)
+      }}
+    </td>
+
+    <td v-if="checkForSubmenuButtons('add-expense')">
+      <router-link
+        target="_blank"
+        class="btn btn-success mx-1"
+        :to="{ name:'expense-page', params: { id: merge.id }}"
+        title="Add Expense"
+      >
+        <i class="fas fa-plus"></i>
+      </router-link>
+
+      <router-link
+        target="_blank"
+        class="btn btn-success mx-1"
+        :to="{ name:'header-link-page', params: { id: merge.id }}"
+        title="Header Link"
+      >
+        Link
+      </router-link>
+
+      <button
+        title="Closing Date"
+        data-target="#date-modal"
+        data-toggle="modal"
+        @click="
+          closingData.mergeId = merge.id;
+          closingData.closingDate = merge.closing_date
+        "
+        class="btn btn-info mx-1"
+      >
+        <i class="far fa-clock"></i>
+      </button>
+    </td>
+  </tr>
+
+  <!-- Totals -->
+  <tr>
+    <td colspan="6"></td>
+    <td><b>{{ totalSale }}</b></td>
+    <td><b>{{ totalExpense }}</b></td>
+    <td><b>{{ totalSale - totalExpense }}</b></td>
+  </tr>
+</tbody>
+
                                                     </table>
                                                 </div>
                                             </div>
@@ -210,7 +262,7 @@ export default {
     data() {
         return {
             loading: false,
-            tableLoading: true,
+            tableLoading: false,
             validationErrors: "",
             totalSale: 0,
             totalExpense: 0,
@@ -222,8 +274,8 @@ export default {
             },
             filterData: {
                 bus_number: "",
-                from_date: "",
-                to_date: "",
+                from_date: new Date().toISOString().split('T')[0],
+                to_date: new Date().toISOString().split('T')[0],
             },
             // formID: "schedule_closing_form",
             // editFormID: "edit_schedule_closing_form",
@@ -243,7 +295,7 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
 
-        this.fetchData();
+        // this.fetchData();
         this.permissions = this.$store.state.permissions;
     },
 
@@ -271,15 +323,34 @@ export default {
             // }, 300);
         },
         async fetchMerges() {
-            this.tableLoading = true;
-            const res = await this.callApi("post", "booking/close/schedule/merges",this.filterData);
-            if (res.status == 200) {
-                this.merges = res.data.merges;
-                this.tableLoading = false;
-            } else {
-                console.log(res);
-            }
-        },
+    try {
+        this.tableLoading = true;
+        const res = await this.callApi(
+            "post",
+            "booking/close/schedule/merges",
+            this.filterData
+        );
+
+        if (res.status === 200) {
+            this.merges = res.data.merges;
+        } else {
+            console.error("API returned error:", res);
+        }
+    } catch (error) {
+        console.error("Error fetching merges:", error);
+    } finally {
+        this.tableLoading = false; // ensures loader stops even on error
+    }
+},
+
+resetFilters() {
+    this.filterData = {
+        bus_number: '',
+        from_date: new Date().toISOString().split('T')[0],
+                to_date: new Date().toISOString().split('T')[0],
+    };
+    this.fetchMerges(); // optional: refresh table after reset
+},
         async updateClosingDate() {
             if (this.closingData.closingDate == "") {
                 return swal({

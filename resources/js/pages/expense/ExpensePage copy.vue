@@ -1,306 +1,6 @@
 <template>
     <section class="section">
-                <div
-              v-if="isLoading"
-              class="d-flex flex-column align-items-center justify-content-center my-3"
-            >
-              <img
-                class="loading-spinner"
-                :src="$store.state.main_url + 'assets/img/loading-spinner.gif'"
-                alt="Loading..."
-                style="width: 20px; height: 20px"
-              />
-              <small class="text-muted mt-1">Loading bus data...</small>
-            </div>
-        <div class="section-body" v-else>
-           <div class="row text-white">
-  <!-- Total Shortage -->
-  <div class="col-md-3 mb-3">
-    <div class="card bg-danger shadow-sm">
-      <div class="card-body">
-        <h6 class="card-title">Total Shortage</h6>
-        <h4 class="card-text">{{ $insertComma(totalShortage) }}</h4>
-      </div>
-    </div>
-  </div>
-
-  <!-- Total Cash -->
-  <div class="col-md-3 mb-3">
-    <div class="card bg-success shadow-sm">
-      <div class="card-body">
-        <h6 class="card-title">Total Cash</h6>
-        <h4 class="card-text">{{ $insertComma(totalCash) }}</h4>
-      </div>
-    </div>
-  </div>
-
-  <!-- Total Bank -->
-  <div class="col-md-3 mb-3">
-    <div class="card bg-primary shadow-sm">
-      <div class="card-body">
-        <h6 class="card-title">Total Bank</h6>
-        <h4 class="card-text">{{ $insertComma(totalBank) }}</h4>
-      </div>
-    </div>
-  </div>
-
-  <!-- Profit & Loss -->
-  <div class="col-md-3 mb-3">
-    <div class="card bg-warning shadow-sm">
-      <div class="card-body">
-        <h6 class="card-title">Profit & Loss</h6>
-        <h4 class="card-text">{{ $insertComma(profitLoss) }}</h4>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5>Terminal Details</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                     <h5 class="mt-3">Start</h5>
-
-<table class="table table-bordered table-sm">
-  <thead>
-    <tr>
-      <th>Terminal Name</th>
-      <th>Passenger Count</th>
-      <th>KT Commission</th>
-      <th>Total Receivable</th>
-      <th>Other Commission</th>
-      <th>Total Received in Cash</th>
-      <th>Select Bank</th>
-      <th>Total Received in Bank</th>
-      <th>Shortage</th>
-      <th>Received</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <tr v-for="(item, index) in startShortages" :key="'start-'+index">
-      <td>{{ item?.terminal?.name }}</td>
-      <td>{{ item.passenger_count }}</td>
-      <td>{{ item.kt_commission }}</td>
-      <td>{{ item.total_receivable }}</td>
-      <td>{{ item.other_commission }}</td>
-      <td>
-  <input
-    v-if="isEditing(item)"
-    type="number"
-    class="form-control form-control-sm"
-    v-model.number="item.total_received_cash"
-  />
-  <span v-else>
-    {{ item.total_received_cash }}
-  </span>
-</td>
-
-     <td>
-  <select
-    v-if="isEditing(item)"
-    v-model="item.bank_id"
-    class="form-control form-control-sm"
-  >
-    <option value="">Select Bank</option>
-    <option v-for="bank in banks" :key="bank.id" :value="bank.id">
-      {{ bank.name }}
-    </option>
-  </select>
-
-  <span v-else>
-    {{ item?.bank?.name || '-' }}
-  </span>
-</td>
-
-     <td>
-  <input
-    v-if="isEditing(item)"
-    type="number"
-    class="form-control form-control-sm"
-    v-model.number="item.total_received_bank"
-  />
-  <span v-else>
-    {{ item.total_received_bank }}
-  </span>
-</td>
-
-
-      <td :class="{'text-danger': Number(item.shortage) > 0}">
-        {{ item.shortage }}
-      </td>
-
-      <td>{{ item.received }}</td>
-      <td class="text-nowrap">
-  <button
-    v-if="!isEditing(item)"
-    class="btn btn-sm btn-primary"
-    @click="startEdit(item)"
-  >
-    Edit
-  </button>
-
-  <template v-else>
-    <button
-      class="btn btn-sm btn-success mr-1"
-      @click="saveEdit(item)"
-    >
-      Save
-    </button>
-
-    <button
-      class="btn btn-sm btn-secondary"
-      @click="cancelEdit(item)"
-    >
-      Cancel
-    </button>
-  </template>
-</td>
-
-    </tr>
-  </tbody>
-  <tfoot>
-  <tr class="font-weight-bold bg-light">
-    <td colspan="5" class="text-right">Total</td>
-    <td>{{ $insertComma(startTotals.totalReceivedCash) }}</td>
-    <td></td> <!-- bank select column -->
-    <td>{{ $insertComma(startTotals.totalReceivedBank) }}</td>
-    <td>{{ $insertComma(startTotals.totalShortage) }}</td>
-    <td>{{ $insertComma(startTotals.totalReceived) }}</td>
-    <td></td> <!-- Action column -->
-  </tr>
-</tfoot>
-
-</table>
-<h5 class="mt-4">Return</h5>
-
-<table class="table table-bordered table-sm">
-  <thead>
-    <tr>
-      <th>Terminal Name</th>
-      <th>Passenger Count</th>
-      <th>KT Commission</th>
-      <th>Total Receivable</th>
-      <th>Other Commission</th>
-      <th>Total Received in Cash</th>
-      <th>Select Bank</th>
-      <th>Total Received in Bank</th>
-      <th>Shortage</th>
-      <th>Received</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <tr v-for="(item, index) in returnShortages" :key="'return-'+index">
-      <td>{{ item?.terminal?.name }}</td>
-      <td>{{ item.passenger_count }}</td>
-      <td>{{ item.kt_commission }}</td>
-      <td>{{ item.total_receivable }}</td>
-      <td>{{ item.other_commission }}</td>
-      <td>
-  <input
-    v-if="isEditing(item)"
-    type="number"
-    class="form-control form-control-sm"
-    v-model.number="item.total_received_cash"
-  />
-  <span v-else>
-    {{ item.total_received_cash }}
-  </span>
-</td>
-
-     <td>
-  <select
-    v-if="isEditing(item)"
-    v-model="item.bank_id"
-    class="form-control form-control-sm"
-  >
-    <option value="">Select Bank</option>
-    <option v-for="bank in banks" :key="bank.id" :value="bank.id">
-      {{ bank.name }}
-    </option>
-  </select>
-
-  <span v-else>
-    {{ item?.bank?.name || '-' }}
-  </span>
-</td>
-
-     <td>
-  <input
-    v-if="isEditing(item)"
-    type="number"
-    class="form-control form-control-sm"
-    v-model.number="item.total_received_bank"
-  />
-  <span v-else>
-    {{ item.total_received_bank }}
-  </span>
-</td>
-
-
-      <td :class="{'text-danger': Number(item.shortage) > 0}">
-        {{ item.shortage }}
-      </td>
-
-      <td>{{ item.received }}</td>
-      <td class="text-nowrap">
-  <button
-    v-if="!isEditing(item)"
-    class="btn btn-sm btn-primary"
-    @click="startEdit(item)"
-  >
-    Edit
-  </button>
-
-  <template v-else>
-    <button
-      class="btn btn-sm btn-success mr-1"
-      @click="saveEdit(item)"
-    >
-      Save
-    </button>
-
-    <button
-      class="btn btn-sm btn-secondary"
-      @click="cancelEdit(item)"
-    >
-      Cancel
-    </button>
-  </template>
-</td>
-
-    </tr>
-  </tbody>
-  <tfoot>
-  <tr class="font-weight-bold bg-light">
-    <td colspan="5" class="text-right">Total</td>
-    <td>{{ $insertComma(returnTotals.totalReceivedCash) }}</td>
-    <td></td> <!-- bank select column -->
-    <td>{{ $insertComma(returnTotals.totalReceivedBank) }}</td>
-    <td>{{ $insertComma(returnTotals.totalShortage) }}</td>
-    <td>{{ $insertComma(returnTotals.totalReceived) }}</td>
-    <td></td> <!-- Action column -->
-  </tr>
-</tfoot>
-
-</table>
-
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="section-body">
             <div class="row">
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary ">
@@ -543,7 +243,7 @@ export default {
             validationErrors: [],
             editAble: true,
             categories: [],
-            isLoading: true,
+            loading: false,
             formID: 'expense_form',
             editFormID: 'edit_expense_form',
             // deleteFormID:'delete_city_form',
@@ -561,13 +261,14 @@ export default {
                 ledger: [],
                 invoice: [],
             },
+            // dataEdit:{
+            //     id:"",
+            //     name:"",
+            // },
+            // delId:"",
             success: false,
             errors: false,
             loop: 1,
-            shortages : [],
-            editingRowId: null,
-            editCache: {},
-            expenses: [],
         }
     },
     async created() {
@@ -592,48 +293,6 @@ export default {
     },
 
     methods: {
-          startEdit(item) {
-    this.editingRowId = item.id;
-
-    // clone row values (so cancel works)
-    this.editCache[item.id] = {
-      total_received_cash: item.total_received_cash,
-      bank_id: item.bank_id,
-      total_received_bank: item.total_received_bank
-    };
-  },
-
-  cancelEdit(item) {
-    const cache = this.editCache[item.id];
-
-    item.total_received_cash = cache.total_received_cash;
-    item.bank_id = cache.bank_id;
-    item.total_received_bank = cache.total_received_bank;
-
-    this.editingRowId = null;
-    delete this.editCache[item.id];
-  },
-
-  async saveEdit(item) {
-    // 👉 API call here
-    // axios.post('/save-shortage', item)
-    const res = await this.callApi("post", 'booking/close/schedule/closing/ticket-closing-shortage/update', item)
-    if (res.status == 200) {
-        this.existingExpenses();
-              swal({
-                    title: "Success",
-                    text: "Data Updated Successfully",
-                    icon: "success",
-                    timer: 2000
-                });
-    }
-    this.editingRowId = null;
-    delete this.editCache[item.id];
-  },
-
-  isEditing(item) {
-    return this.editingRowId === item.id;
-  },
         closeModal() {
             $("#accountModal").click();
         },
@@ -648,14 +307,12 @@ export default {
         },
         async existingExpenses() {
            
-            this.isLoading = true;
+            
             const res = await this.callApi("post", 'expenses', {ticket_merge_id: this.postData.ticket_merge_id});
             if (res.status == 200) {
                 const expenses = res.data.expenses;
-                this.expenses = expenses;
                 this.totalSale = res.data.sale;
                 this.checkClosing = res.data.closing;
-                this.shortages = res.data.shortage;
           
                 if (expenses != "") {
                     this.loop = expenses.length;
@@ -675,7 +332,6 @@ export default {
                     this.editAble = false;
                 }
             }
-             this.isLoading = false;
         },
         saveRow(event, fieldName, index) {
             // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
@@ -844,71 +500,7 @@ export default {
         },
     },
     computed: {
-        ...mapGetters(['getDeletingObj']),
-            startShortages() {
-                return this.shortages.filter(item => item.type === 'start');
-            },
-            returnShortages() {
-                return this.shortages.filter(item => item.type === 'return');
-            },
-             totalCash() {
-    return this.shortages.reduce(
-      (sum, item) => sum + Number(item.total_received_cash || 0),
-      0
-    );
-  },
-  totalBank() {
-    return this.shortages.reduce(
-      (sum, item) => sum + Number(item.total_received_bank || 0),
-      0
-    );
-  },
-  totalShortage() {
-    return this.shortages.reduce(
-      (sum, item) => sum + Number(item.shortage || 0),
-      0
-    );
-  },
-  profitLoss() {
-    // Assuming profitLoss = total received - total receivable
-   
-    const totalReceivable = this.shortages.reduce(
-      (sum, item) => sum + Number(item.total_receivable || 0),
-      0
-    );
-     const totalKtCommission = this.shortages.reduce(
-      (sum, item) => sum + Number(item.kt_commission || 0),
-      0
-    );
-     const totalOtherCommission = this.shortages.reduce(
-      (sum, item) => sum + Number(item.other_commission || 0),
-      0
-    );
-     const totalExpenses = this.expenses.reduce(
-      (sum, item) => sum + Number(item.amount || 0),
-      0
-    );
-    return totalReceivable - (totalOtherCommission + totalKtCommission + totalExpenses);
-  },
-   startTotals() {
-    return {
-      totalReceivedCash: this.startShortages.reduce((sum, i) => sum + Number(i.total_received_cash || 0), 0),
-      totalReceivedBank: this.startShortages.reduce((sum, i) => sum + Number(i.total_received_bank || 0), 0),
-      totalReceived: this.startShortages.reduce((sum, i) => sum + Number(i.received || 0), 0),
-      totalShortage: this.startShortages.reduce((sum, i) => sum + Number(i.shortage || 0), 0),
-    }
-  },
-  // Return Table Totals
-  returnTotals() {
-    return {
-      totalReceivedCash: this.returnShortages.reduce((sum, i) => sum + Number(i.total_received_cash || 0), 0),
-      totalReceivedBank: this.returnShortages.reduce((sum, i) => sum + Number(i.total_received_bank || 0), 0),
-      totalReceived: this.returnShortages.reduce((sum, i) => sum + Number(i.received || 0), 0),
-      totalShortage: this.returnShortages.reduce((sum, i) => sum + Number(i.shortage || 0), 0),
-    }
-  }
-            
-
+        ...mapGetters(['getDeletingObj'])
     },
     watch: {
         getDeletingObj(obj) {
