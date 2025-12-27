@@ -1177,6 +1177,7 @@ async mergeScheduleApi(addData = {}) {
   }
 
   try {
+    console.log(payload);
     
     const res = await this.callApi(
       "post",
@@ -1211,6 +1212,7 @@ async saveTicketClosingShortage() {
   try {
     // Step 1: Merge schedules
     const mergedResult = await this.mergeScheduleApi(this.addData); 
+    return
     // Step 2: Store merged data for the component
     this.closingData = mergedResult;
 
