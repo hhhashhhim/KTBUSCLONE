@@ -290,7 +290,9 @@ export default {
             },
             success: false,
             errors: false,
-            closingData : {}
+            closingData : {},
+            mergeIds: [],
+            busIds: [],
         };
     },
     async created() {

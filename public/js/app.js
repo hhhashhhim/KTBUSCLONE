@@ -67375,7 +67375,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       },
       success: false,
       errors: false,
-      closingData: {}
+      closingData: {},
+      mergeIds: [],
+      busIds: []
     };
   },
   created: function created() {
@@ -130812,8 +130814,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , ["hideForm"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Closing, {
     data: $data.closingData,
     banks: _ctx.banks,
-    busIds: _ctx.busIds,
-    mergeIds: _ctx.mergeIds,
+    busIds: $data.busIds,
+    mergeIds: $data.mergeIds,
     addData: $data.addData,
     onFetchData: _cache[2] || (_cache[2] = function ($event) {
       return $options.fetchData($event);
