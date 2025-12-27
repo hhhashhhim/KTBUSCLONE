@@ -1179,7 +1179,6 @@ async mergeScheduleApi(addData = {}) {
   }
 
   try {
-    console.log("test merge", payload);
     
     const res = await this.callApi(
       "post",
@@ -1210,12 +1209,12 @@ async mergeScheduleApi(addData = {}) {
 // ===== Save Ticket Closing Shortage =====
 async saveTicketClosingShortage() {
   this.loading = true;
-
+  
   try {
     // Step 1: Merge schedules
     const mergedResult = await this.mergeScheduleApi(this.addData);
     console.log("addData before mergeScheduleApi", this.addData);
-
+    return
     
  
     // Step 2: Store merged data for the component

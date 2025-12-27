@@ -27910,15 +27910,14 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
             case 5:
               _context3.prev = 5;
-              console.log("test merge", payload);
-              _context3.next = 9;
+              _context3.next = 8;
               return _this13.callApi("post", "booking/close/schedule/closing/merge", payload);
 
-            case 9:
+            case 8:
               res = _context3.sent;
 
               if (!(res.status === 200 || res.status === 201)) {
-                _context3.next = 18;
+                _context3.next = 17;
                 break;
               }
 
@@ -27929,15 +27928,15 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
               if ((_mergedData$mergeIds = mergedData.mergeIds) !== null && _mergedData$mergeIds !== void 0 && _mergedData$mergeIds.length) _this13.mergeIds = mergedData.mergeIds;
               return _context3.abrupt("return", mergedData);
 
-            case 18:
+            case 17:
               throw new Error("Merge failed with status ".concat(res.status));
 
-            case 19:
-              _context3.next = 26;
+            case 18:
+              _context3.next = 25;
               break;
 
-            case 21:
-              _context3.prev = 21;
+            case 20:
+              _context3.prev = 20;
               _context3.t0 = _context3["catch"](5);
               errMsg = (_context3.t0 === null || _context3.t0 === void 0 ? void 0 : (_error$response = _context3.t0.response) === null || _error$response === void 0 ? void 0 : (_error$response$data = _error$response.data) === null || _error$response$data === void 0 ? void 0 : (_error$response$data$ = _error$response$data.Error) === null || _error$response$data$ === void 0 ? void 0 : _error$response$data$.join("\n")) || _context3.t0.message || "Merge failed";
               Swal.fire({
@@ -27947,12 +27946,12 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
               });
               throw new Error(errMsg);
 
-            case 26:
+            case 25:
             case "end":
               return _context3.stop();
           }
         }
-      }, _callee3, null, [[5, 21]]);
+      }, _callee3, null, [[5, 20]]);
     }))();
   }), _defineProperty(_methods, "saveTicketClosingShortage", function saveTicketClosingShortage() {
     var _this14 = this;
@@ -27970,58 +27969,18 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
             case 4:
               mergedResult = _context4.sent;
-              console.log("addData before mergeScheduleApi", _this14.addData); // Step 2: Store merged data for the component
+              console.log("addData before mergeScheduleApi", _this14.addData);
+              return _context4.abrupt("return");
 
-              _this14.closingData = mergedResult; // Step 3: Ticket closing logic
-
-              calcKtCommission = function calcKtCommission(tickets) {
-                return tickets !== null && tickets !== void 0 && tickets.length ? tickets.reduce(function (sum, t) {
-                  var _t$commission5;
-
-                  return sum + (((_t$commission5 = t.commission) === null || _t$commission5 === void 0 ? void 0 : _t$commission5.adjustment_commission) || 0) / 100 * (t.seat_fare - t.discount);
-                }, 0) : 0;
-              };
-
-              mapRows = function mapRows(cashBank, schedule) {
-                return Object.entries(cashBank).map(function (_ref5) {
-                  var _ref6 = _slicedToArray(_ref5, 2),
-                      terminalId = _ref6[0],
-                      row = _ref6[1];
-
-                  var tickets = schedule[terminalId] || [];
-                  return {
-                    terminal_id: Number(terminalId),
-                    passenger_count: tickets.length,
-                    kt_commission: calcKtCommission(tickets),
-                    other_commission: row.commission || 0,
-                    total_receivable: row.total + row.commission,
-                    total_received_cash: row.cash,
-                    bank_id: row.selectedBankId || null,
-                    total_received_bank: row.bank,
-                    shortage: row.shortage,
-                    received: row.cash + row.bank,
-                    mergeId: mergedResult.id
-                  };
-                });
-              }; // Step 4: Save Start
-
-
-              _context4.next = 11;
-              return _this14.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
-                ticket_closing_id: mergedResult.id,
-                type: "start",
-                rows: mapRows(_this14.cashBankStart, _this14.data.schedule_start)
-              });
-
-            case 11:
-              _context4.next = 13;
+            case 12:
+              _context4.next = 14;
               return _this14.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
                 ticket_closing_id: mergedResult.id,
                 type: "return",
                 rows: mapRows(_this14.cashBankReturn, _this14.data.schedule_return)
               });
 
-            case 13:
+            case 14:
               Swal.fire({
                 icon: "success",
                 title: "Saved!",
@@ -28034,11 +27993,11 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
               _this14.closeexampleModal();
 
-              _context4.next = 22;
+              _context4.next = 23;
               break;
 
-            case 18:
-              _context4.prev = 18;
+            case 19:
+              _context4.prev = 19;
               _context4.t0 = _context4["catch"](1);
               console.error(_context4.t0);
               Swal.fire({
@@ -28047,17 +28006,17 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                 text: _context4.t0.message || "Failed to save ticket closing"
               });
 
-            case 22:
-              _context4.prev = 22;
+            case 23:
+              _context4.prev = 23;
               _this14.loading = false;
-              return _context4.finish(22);
+              return _context4.finish(23);
 
-            case 25:
+            case 26:
             case "end":
               return _context4.stop();
           }
         }
-      }, _callee4, null, [[1, 18, 22, 25]]);
+      }, _callee4, null, [[1, 19, 23, 26]]);
     }))();
   }), _defineProperty(_methods, "closeexampleModal", function closeexampleModal() {
     $("#exampleModal").click();
