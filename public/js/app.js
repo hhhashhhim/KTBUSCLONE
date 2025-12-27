@@ -46758,65 +46758,93 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     totalCash: function totalCash() {
       return this.shortages.reduce(function (sum, item) {
-        return sum + Number(item.total_received_cash || 0);
+        var _item$total_received_;
+
+        return sum + Number((_item$total_received_ = item.total_received_cash) !== null && _item$total_received_ !== void 0 ? _item$total_received_ : 0);
       }, 0);
     },
     totalBank: function totalBank() {
       return this.shortages.reduce(function (sum, item) {
-        return sum + Number(item.total_received_bank || 0);
+        var _item$total_received_2;
+
+        return sum + Number((_item$total_received_2 = item.total_received_bank) !== null && _item$total_received_2 !== void 0 ? _item$total_received_2 : 0);
       }, 0);
     },
     totalShortage: function totalShortage() {
       return this.shortages.reduce(function (sum, item) {
-        return sum + Number(item.shortage || 0);
+        var _item$shortage;
+
+        return sum + Number((_item$shortage = item.shortage) !== null && _item$shortage !== void 0 ? _item$shortage : 0);
       }, 0);
     },
     profitLoss: function profitLoss() {
-      // Assuming profitLoss = total received - total receivable
       var totalReceivable = this.shortages.reduce(function (sum, item) {
-        return sum + Number(item.total_receivable || 0);
+        var _item$total_receivabl;
+
+        return sum + Number((_item$total_receivabl = item.total_receivable) !== null && _item$total_receivabl !== void 0 ? _item$total_receivabl : 0);
       }, 0);
       var totalKtCommission = this.shortages.reduce(function (sum, item) {
-        return sum + Number(item.kt_commission || 0);
+        var _item$kt_commission;
+
+        return sum + Number((_item$kt_commission = item.kt_commission) !== null && _item$kt_commission !== void 0 ? _item$kt_commission : 0);
       }, 0);
       var totalOtherCommission = this.shortages.reduce(function (sum, item) {
-        return sum + Number(item.other_commission || 0);
+        var _item$other_commissio;
+
+        return sum + Number((_item$other_commissio = item.other_commission) !== null && _item$other_commissio !== void 0 ? _item$other_commissio : 0);
       }, 0);
       var totalExpenses = this.expenses.reduce(function (sum, item) {
-        return sum + Number(item.amount || 0);
+        var _item$amount;
+
+        return sum + Number((_item$amount = item.amount) !== null && _item$amount !== void 0 ? _item$amount : 0);
       }, 0);
       return totalReceivable - (totalOtherCommission + totalKtCommission + totalExpenses);
     },
     startTotals: function startTotals() {
       return {
         totalReceivedCash: this.startShortages.reduce(function (sum, i) {
-          return sum + Number(i.total_received_cash || 0);
+          var _i$total_received_cas;
+
+          return sum + Number((_i$total_received_cas = i.total_received_cash) !== null && _i$total_received_cas !== void 0 ? _i$total_received_cas : 0);
         }, 0),
         totalReceivedBank: this.startShortages.reduce(function (sum, i) {
-          return sum + Number(i.total_received_bank || 0);
+          var _i$total_received_ban;
+
+          return sum + Number((_i$total_received_ban = i.total_received_bank) !== null && _i$total_received_ban !== void 0 ? _i$total_received_ban : 0);
         }, 0),
         totalReceived: this.startShortages.reduce(function (sum, i) {
-          return sum + Number(i.received || 0);
+          var _i$received;
+
+          return sum + Number((_i$received = i.received) !== null && _i$received !== void 0 ? _i$received : 0);
         }, 0),
         totalShortage: this.startShortages.reduce(function (sum, i) {
-          return sum + Number(i.shortage || 0);
+          var _i$shortage;
+
+          return sum + Number((_i$shortage = i.shortage) !== null && _i$shortage !== void 0 ? _i$shortage : 0);
         }, 0)
       };
     },
-    // Return Table Totals
     returnTotals: function returnTotals() {
       return {
         totalReceivedCash: this.returnShortages.reduce(function (sum, i) {
-          return sum + Number(i.total_received_cash || 0);
+          var _i$total_received_cas2;
+
+          return sum + Number((_i$total_received_cas2 = i.total_received_cash) !== null && _i$total_received_cas2 !== void 0 ? _i$total_received_cas2 : 0);
         }, 0),
         totalReceivedBank: this.returnShortages.reduce(function (sum, i) {
-          return sum + Number(i.total_received_bank || 0);
+          var _i$total_received_ban2;
+
+          return sum + Number((_i$total_received_ban2 = i.total_received_bank) !== null && _i$total_received_ban2 !== void 0 ? _i$total_received_ban2 : 0);
         }, 0),
         totalReceived: this.returnShortages.reduce(function (sum, i) {
-          return sum + Number(i.received || 0);
+          var _i$received2;
+
+          return sum + Number((_i$received2 = i.received) !== null && _i$received2 !== void 0 ? _i$received2 : 0);
         }, 0),
         totalShortage: this.returnShortages.reduce(function (sum, i) {
-          return sum + Number(i.shortage || 0);
+          var _i$shortage2;
+
+          return sum + Number((_i$shortage2 = i.shortage) !== null && _i$shortage2 !== void 0 ? _i$shortage2 : 0);
         }, 0)
       };
     }

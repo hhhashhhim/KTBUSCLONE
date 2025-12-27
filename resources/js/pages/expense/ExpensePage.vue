@@ -843,73 +843,77 @@ export default {
             }
         },
     },
-    computed: {
-        ...mapGetters(['getDeletingObj']),
-            startShortages() {
-                return this.shortages.filter(item => item.type === 'start');
-            },
-            returnShortages() {
-                return this.shortages.filter(item => item.type === 'return');
-            },
-             totalCash() {
-    return this.shortages.reduce(
-      (sum, item) => sum + Number(item.total_received_cash || 0),
-      0
-    );
-  },
-  totalBank() {
-    return this.shortages.reduce(
-      (sum, item) => sum + Number(item.total_received_bank || 0),
-      0
-    );
-  },
-  totalShortage() {
-    return this.shortages.reduce(
-      (sum, item) => sum + Number(item.shortage || 0),
-      0
-    );
-  },
-  profitLoss() {
-    // Assuming profitLoss = total received - total receivable
-   
-    const totalReceivable = this.shortages.reduce(
-      (sum, item) => sum + Number(item.total_receivable || 0),
-      0
-    );
-     const totalKtCommission = this.shortages.reduce(
-      (sum, item) => sum + Number(item.kt_commission || 0),
-      0
-    );
-     const totalOtherCommission = this.shortages.reduce(
-      (sum, item) => sum + Number(item.other_commission || 0),
-      0
-    );
-     const totalExpenses = this.expenses.reduce(
-      (sum, item) => sum + Number(item.amount || 0),
-      0
-    );
-    return totalReceivable - (totalOtherCommission + totalKtCommission + totalExpenses);
-  },
-   startTotals() {
-    return {
-      totalReceivedCash: this.startShortages.reduce((sum, i) => sum + Number(i.total_received_cash || 0), 0),
-      totalReceivedBank: this.startShortages.reduce((sum, i) => sum + Number(i.total_received_bank || 0), 0),
-      totalReceived: this.startShortages.reduce((sum, i) => sum + Number(i.received || 0), 0),
-      totalShortage: this.startShortages.reduce((sum, i) => sum + Number(i.shortage || 0), 0),
-    }
-  },
-  // Return Table Totals
-  returnTotals() {
-    return {
-      totalReceivedCash: this.returnShortages.reduce((sum, i) => sum + Number(i.total_received_cash || 0), 0),
-      totalReceivedBank: this.returnShortages.reduce((sum, i) => sum + Number(i.total_received_bank || 0), 0),
-      totalReceived: this.returnShortages.reduce((sum, i) => sum + Number(i.received || 0), 0),
-      totalShortage: this.returnShortages.reduce((sum, i) => sum + Number(i.shortage || 0), 0),
-    }
-  }
-            
+   computed: {
+    ...mapGetters(['getDeletingObj']),
 
+    startShortages() {
+        return this.shortages.filter(item => item.type === 'start');
     },
+
+    returnShortages() {
+        return this.shortages.filter(item => item.type === 'return');
+    },
+
+    totalCash() {
+        return this.shortages.reduce(
+            (sum, item) => sum + Number(item.total_received_cash ?? 0),
+            0
+        );
+    },
+
+    totalBank() {
+        return this.shortages.reduce(
+            (sum, item) => sum + Number(item.total_received_bank ?? 0),
+            0
+        );
+    },
+
+    totalShortage() {
+        return this.shortages.reduce(
+            (sum, item) => sum + Number(item.shortage ?? 0),
+            0
+        );
+    },
+
+    profitLoss() {
+        const totalReceivable = this.shortages.reduce(
+            (sum, item) => sum + Number(item.total_receivable ?? 0),
+            0
+        );
+        const totalKtCommission = this.shortages.reduce(
+            (sum, item) => sum + Number(item.kt_commission ?? 0),
+            0
+        );
+        const totalOtherCommission = this.shortages.reduce(
+            (sum, item) => sum + Number(item.other_commission ?? 0),
+            0
+        );
+        const totalExpenses = this.expenses.reduce(
+            (sum, item) => sum + Number(item.amount ?? 0),
+            0
+        );
+        return totalReceivable - (totalOtherCommission + totalKtCommission + totalExpenses);
+    },
+
+    startTotals() {
+        return {
+            totalReceivedCash: this.startShortages.reduce((sum, i) => sum + Number(i.total_received_cash ?? 0), 0),
+            totalReceivedBank: this.startShortages.reduce((sum, i) => sum + Number(i.total_received_bank ?? 0), 0),
+            totalReceived: this.startShortages.reduce((sum, i) => sum + Number(i.received ?? 0), 0),
+            totalShortage: this.startShortages.reduce((sum, i) => sum + Number(i.shortage ?? 0), 0),
+        };
+    },
+
+    returnTotals() {
+        return {
+            totalReceivedCash: this.returnShortages.reduce((sum, i) => sum + Number(i.total_received_cash ?? 0), 0),
+            totalReceivedBank: this.returnShortages.reduce((sum, i) => sum + Number(i.total_received_bank ?? 0), 0),
+            totalReceived: this.returnShortages.reduce((sum, i) => sum + Number(i.received ?? 0), 0),
+            totalShortage: this.returnShortages.reduce((sum, i) => sum + Number(i.shortage ?? 0), 0),
+        };
+    }
+},
+
     watch: {
         getDeletingObj(obj) {
             if (obj.isDeleted) {
