@@ -13,6 +13,7 @@ use App\Models\ActivityLog;
 use App\Models\OfficeExpense;
 use App\Models\TerminalCommission;
 use App\Models\Expense\TicketMergeExpense;
+use App\Models\TicketClosingShortage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -111,12 +112,13 @@ class ExpenseController extends Controller
         });
 
         $merge->refund += $refundAmount;
-        
+        $shortage = TicketClosingShortage::with('terminal', 'bank')->where('ticket_closing_id', $request->ticket_merge_id)->get();
         $checkClosing = AccountTransaction::where(["company_id"=>Auth::user()->company_id,"posting_id"=>$request->ticket_merge_id])->first();
         return [
             "expenses" => $expenses,
-            "sale" => $merge->seat_fare - $merge->discount - $merge->commission + $merge->elt + $merge->refund,
-            "closing" => $checkClosing ? true : false,
+            "sale"     => $merge->seat_fare - $merge->discount - $merge->commission + $merge->elt + $merge->refund,
+            "closing"  => $checkClosing ? true : false,
+            'shortage' => $shortage,
         ];
     }
 

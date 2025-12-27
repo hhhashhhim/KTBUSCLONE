@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Schedule;
 use App\Http\Controllers\Controller;
 use App\Models\Account\AccountHead;
 use App\Models\Account\AccountTransaction;
-use App\Models\account\Bank;
+use App\Models\Account\Bank;
 use App\Models\Bus\Bus;
 use App\Models\Bus\BusClass;
 use App\Models\City;
@@ -33,30 +33,66 @@ use Illuminate\Support\Facades\Auth;
 
 class ScheduleClosingController extends Controller
 {
-    public function closing()
-    {
-        if(!checkForSubmenu("closing"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
-        $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
-        $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id,"hide"=>0])->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
-        $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id,"hide"=>0])->get(["id", "user_id", "name", "cnic"]);
-        $closings = TicketClosing::where('company_id', Auth::user()->company_id)
-        ->with("bus:id,bus_number", "schedule:id,name,route_id", "schedule.route:id,name")
+    public function closing(Request $request)
+{
+    if (!checkForSubmenu("closing")) {
+        return response()->json([
+            "Error" => ['You are not authorized to access this url']
+        ], 403);
+    }
+
+    $user = Auth::user();
+
+    // 🔹 Static data
+    $buses = Bus::where('company_id', $user->company_id)
+        ->orderBy('id')
+        ->get();
+
+    $hosts = Employee::where([
+        'employee_type' => 2,
+        'company_id' => $user->company_id,
+        'hide' => 0
+    ])
+    ->where('user_id', '!=', 0)
+    ->get(['user_id', 'name', 'cnic']);
+
+    $drivers = Employee::where([
+        'employee_type' => 1,
+        'company_id' => $user->company_id,
+        'hide' => 0
+    ])->get(['id', 'user_id', 'name', 'cnic']);
+
+    // 🔹 Closings query with filters
+    $closingsQuery = TicketClosing::where('company_id', $user->company_id)
+        ->with(
+            'bus:id,bus_number',
+            'schedule:id,name,route_id',
+            'schedule.route:id,name'
+        );
+
+    // 🔸 Bus filter
+     if ($request->from_date) {
+        $closingsQuery->whereDate('schedule_date', '>=', $request->from_date);
+    }
+
+    if ($request->to_date) {
+        $closingsQuery->whereDate('schedule_date', '<=', $request->to_date);
+    }
+
+
+    $closings = $closingsQuery
         ->get()
         ->groupBy('ticket_merge_id')
-        ->filter(function ($group){
-            return $group->count() == 2;
-        });
-        $data = [
-            "buses" => $buses,
-            "hosts" => $hosts,
-            "drivers" => $drivers,
-            "closings" => $closings,
-        ];
-        return $data;
-    }
+        ->filter(fn ($group) => $group->count() == 2);
+
+    return [
+        "buses" => $buses,
+        "hosts" => $hosts,
+        "drivers" => $drivers,
+        "closings" => $closings
+    ];
+}
+
     
     public function unclosing()
     {
@@ -67,11 +103,13 @@ class ScheduleClosingController extends Controller
         $closings = TicketClosing::where('company_id', Auth::user()->company_id)
         ->with("bus:id,bus_number", "schedule:id,name,route_id", "schedule.route:id,name")
         ->where(["hide"=>0,"commission_route"=>0])
+        ->orderBy('bus_id')
         ->get()
         ->groupBy('ticket_merge_id') 
         ->filter(function ($group){
             return $group->count() == 1;
         });
+        
         $data = [
             "closings" => $closings,
         ];
@@ -197,107 +235,104 @@ class ScheduleClosingController extends Controller
     }
 
     public function unclosingData(Request $request)
-    {
-        $companyId = Auth::user()->company_id;
-        $mergeIds = $request->mergeIds;
+{
+    $companyId = Auth::user()->company_id;
+    $mergeIds = $request->mergeIds;
 
-        // Get closing pairs with schedule in a single query
-        $closingPairs = TicketClosing::with('schedule:id,route_id')
-            ->where('company_id', $companyId)
-            ->whereIn('ticket_merge_id', $mergeIds)
-            ->get();
+    // Get closing pairs with schedule in a single query
+    $closingPairs = TicketClosing::with('schedule:id,route_id')
+        ->where('company_id', $companyId)
+        ->whereIn('ticket_merge_id', $mergeIds)
+        ->get();
 
-        if ($closingPairs->count() < 2) {
-            return response()->json(['error' => 'Invalid merge pair data'], 400);
-        }
+    if ($closingPairs->count() < 2) {
+        return response()->json(['error' => 'Invalid merge pair data'], 400);
+    }
 
-        // Preload both route IDs
-        $routeIdStart  = $closingPairs[0]->schedule->route_id;
-        $routeIdReturn = $closingPairs[1]->schedule->route_id;
+    // Preload route IDs
+    $routeIdStart  = $closingPairs[0]->schedule->route_id;
+    $routeIdReturn = $closingPairs[1]->schedule->route_id;
 
-        // Fetch all terminals once
-        $terminals = Terminal::pluck('name', 'id');
+    // Fetch tickets
+    $tickets = Ticket::withTrashed()
+        ->where('company_id', $companyId)
+        ->whereIn('ticket_closing_id', [$closingPairs[0]->id, $closingPairs[1]->id])
+        ->whereIn('type', ['booked', 'over-issue'])
+        ->with([
+            'elt',
+            'terminal:id,name,recovery_method',
+            'commission' => function ($q) use ($routeIdStart, $routeIdReturn) {
+                $q->whereIn('route_id', [$routeIdStart, $routeIdReturn]);
+            },
+        ])
+        ->get();
 
-        // Fetch tickets for start & return schedule in one combined query (much faster)
-        $tickets = Ticket::withTrashed()
-            ->where('company_id', $companyId)
-            ->whereIn('ticket_closing_id', [$closingPairs[0]->id, $closingPairs[1]->id])
-            ->whereIn('type', ['booked', 'over-issue'])
-            ->with([
-                'elt',
-                'terminal:id,name,recovery_method',
-                'commission' => function ($q) use ($routeIdStart, $routeIdReturn) {
-                    $q->whereIn('route_id', [$routeIdStart, $routeIdReturn]);
-                },
-            ])
-            ->get();
+    // Group tickets by schedule
+    $data = (object)[];
+    $data->schedule_start  = $tickets->where('ticket_closing_id', $closingPairs[0]->id)->groupBy('terminal_id');
+    $data->schedule_return = $tickets->where('ticket_closing_id', $closingPairs[1]->id)->groupBy('terminal_id');
 
-        // Group tickets by schedule
-        $data = (object)[];
-        $data->schedule_start  = $tickets->where('ticket_closing_id', $closingPairs[0]->id)->groupBy('terminal_id');
-        $data->schedule_return = $tickets->where('ticket_closing_id', $closingPairs[1]->id)->groupBy('terminal_id');
+    // Expenses
+    $data->expense = TicketMergeExpense::where('company_id', $companyId)
+        ->where('ticket_merge_id', $request->ticket_merge_id)
+        ->with('expense_category:id,name')
+        ->get();
 
-        // Expenses
-        $data->expense = TicketMergeExpense::where('company_id', $companyId)
-            ->where('ticket_merge_id', $request->ticket_merge_id)
-            ->with('expense_category:id,name')
-            ->get();
+    // Bus number
+    $busId = $closingPairs->first()->bus_id;
+    $singleData = (object)[
+        'bus_number' => Bus::where('id', $busId)->where('company_id', $companyId)->value('bus_number')
+    ];
 
-        // Bus number (single optimized query)
-        $busId = TicketClosingMerge::where('id', $mergeIds[0])->value('bus_id');
-        $singleData = (object)[];
-        $singleData->bus_number = Bus::where('company_id', $companyId)
-            ->where('id', $busId)
-            ->value('bus_number');
+    // Schedule routes
+    $scheduleIds = $closingPairs->pluck('schedule_id');
+    $routes = Schedule::with('route:id,name')->where('company_id', $companyId)->whereIn('id', $scheduleIds)->get();
 
-        // Get schedule routes in one optimized query
-        $scheduleIds = $closingPairs->pluck('schedule_id');
-        $routes = Schedule::with('route:id,name')
-            ->where('company_id', $companyId)
-            ->whereIn('id', $scheduleIds)
-            ->get();
+    $singleData->city_one = explode("-", $routes[0]->route->name)[0];
+    $singleData->city_two = explode("-", $routes[1]->route->name ?? $routes[0]->route->name)[0];
 
-        // Extract city names only once
-        $singleData->city_one = explode("-", $routes[0]->route->name)[0];
-        $singleData->city_two = explode("-", $routes[1]->route->name ?? $routes[0]->route->name)[0];
+    // Refund calculations
+    $cancelTickets = Ticket::onlyTrashed()
+        ->where('company_id', $companyId)
+        ->whereIn('ticket_merge_id', $mergeIds)
+        ->where('type', 'canceled')
+        ->with(['cancel_ticket:id,ticket_id,percentage', 'terminal:id,name'])
+        ->get(['id','seat_fare','discount','terminal_id'])
+        ->groupBy('terminal_id');
 
-        // Refund calculations
-        $cancelTickets = Ticket::onlyTrashed()
-            ->where('company_id', $companyId)
-            ->whereIn('ticket_merge_id', $mergeIds)
-            ->where('type', 'canceled')
-            ->with([
-                'cancel_ticket:id,ticket_id,percentage',
-                'terminal:id,name'
-            ])
-            ->get(['id','seat_fare','discount','terminal_id'])
-            ->groupBy('terminal_id');
+    $refundTerminal = [];
+    foreach ($cancelTickets as $terminalId => $ticketsGroup) {
+        $refundAmount = $ticketsGroup->sum(function ($ticket) {
+            return $ticket->cancel_ticket
+                ? (($ticket->seat_fare - $ticket->discount) * $ticket->cancel_ticket->percentage) / 100
+                : 0;
+        });
 
-        $refundTerminal = [];
-        foreach ($cancelTickets as $terminalId => $ticketsGroup) {
-            $refundAmount = $ticketsGroup->sum(function ($ticket) {
-                return $ticket->cancel_ticket
-                    ? (($ticket->seat_fare - $ticket->discount) * $ticket->cancel_ticket->percentage) / 100
-                    : 0;
-            });
-
-            $refundTerminal[] = [
-                'terminal' => $ticketsGroup[0]->terminal->name,
-                'amount'   => $refundAmount,
-            ];
-        }
-$banks = Bank::where('banks.company_id', Auth::user()->company_id)
-            ->join('account_heads', 'banks.account_head_id', 'account_heads.id')
-            ->select('account_heads.*', 'account_heads.name as text')
-            ->get();
-        $data->refund = $refundTerminal;
-        $data->singleData = $singleData;
-
-        return [
-            'banks' => $banks,
-            'data' => $data,
+        $refundTerminal[] = [
+            'terminal' => $ticketsGroup[0]->terminal->name,
+            'amount'   => $refundAmount,
         ];
     }
+
+    $banks = Bank::where('banks.company_id', $companyId)
+        ->join('account_heads', 'banks.account_head_id', 'account_heads.id')
+        ->select('account_heads.*', 'account_heads.name as text')
+        ->get();
+
+    $data->refund = $refundTerminal;
+    $data->singleData = $singleData;
+
+    // ✅ Add mergeIds and busIds to the response
+    $response = [
+        'banks'    => $banks,
+        'data'     => $data,
+        'mergeIds' => $mergeIds,
+        'busIds'   => $closingPairs->pluck('bus_id')->unique()->values(), // return unique bus IDs
+    ];
+
+    return $response;
+}
+
 
 
     public function spareUnclosing(Request $request)
@@ -318,6 +353,7 @@ $banks = Bank::where('banks.company_id', Auth::user()->company_id)
     
     public function mergeClosing(Request $request)
     {
+
         if(!checkForSubmenu("closing"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
@@ -350,12 +386,33 @@ $banks = Bank::where('banks.company_id', Auth::user()->company_id)
                     "requested_host" => $request->ip(),
                     "company_id" => Auth::user()->company_id
                 ]);
-            DB::commit();
+                 $i = 0;
+                 $expenses = $request->expenses;
+                foreach ($expenses['category'] as $key => $value) {
+                    TicketMergeExpense::create([
+                        'ticket_merge_id' => $merge->id,
+
+                        'expense_category_id' => $expenses['category'][$key],
+                        'description' => $expenses['description'][$key],
+                        'amount' => $expenses['amount'][$key],
+                        'paid' => isset($expenses['paid'][$key]) ? $expenses['paid'][$key] : $expenses['amount'][$key],
+                        'ledger' => 1,
+                        'invoice' => "exp-".++$i.'-'.$merge->id,
+                        'company_id' => Auth::user()->company_id,
+                        'added_by' => Auth::user()->id,
+                    ]);
+
+                }
+                
+                DB::commit();
+                return $merge;
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Database transaction error: ' . $e->getMessage());
                 return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
             }
+            
+               
     }
     
     public function releaseClosing(Request $request)
@@ -407,127 +464,155 @@ $banks = Bank::where('banks.company_id', Auth::user()->company_id)
             }
     }
 
-    public function merges(Request $request)
-    {
-        if(!checkForSubmenu("merges"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+   public function merges(Request $request)
+{
+    if (!checkForSubmenu("merges")) {
+        return response()->json([
+            "Error" => ['You are not authorized to access this url']
+        ], 403);
+    }
+
+    $user = Auth::user();
+
+    // Base query
+    $query = TicketClosingMerge::where([
+        'company_id' => $user->company_id,
+        'schedule_complete' => 1
+    ])
+    ->withSum('expenses', 'amount')
+    ->with([
+        'bus:id,bus_number',
+        'closing:id,ticket_merge_id,schedule_id',
+        'closing.schedule:id,name',
+        'tickets' => function ($q) {
+            $q->withTrashed()
+              ->whereIn('type', ['booked', 'over-issue'])
+              ->with([
+                  'elt:id,ticket_id,elt_price',
+                  'schedule:id,route_id'
+              ])
+              ->select(
+                  'id',
+                  'ticket_merge_id',
+                  'seat_fare',
+                  'discount',
+                  'schedule_id',
+                  'terminal_id',
+                  'ticket_closing_id'
+              );
         }
-        $merges = TicketClosingMerge::where(['company_id' => Auth::user()->company_id, 'schedule_complete' => 1])
-            ->withSum("expenses",'amount')
-            ->with("bus:id,bus_number")
-            ->with("closing:id,ticket_merge_id,schedule_id", "closing.schedule:id,name")
-            ->with("tickets.elt:id,ticket_id,elt_price","tickets.schedule:id,route_id")
-            ->with(["tickets"=>function($q){
-                $q->withTrashed();
-                $q->where(function ($query) {
-                    $query->where("type", "booked")
-                          ->orWhere("type", "over-issue");
-                });
-                $q->select("id","ticket_merge_id","seat_fare","discount","schedule_id","terminal_id","ticket_closing_id");
-            }])
-            ->where(function($q) use ($request){
-                if($request->bus_number)
-                {
-                    $q->where("bus_id",$request->bus_number);
-                }
-                if($request->from_date)
-                {
-                    $q->where("schedule_departure_date",'>=',$request->from_date);
-                }
-                if($request->to_date)
-                {
-                    $q->where("schedule_departure_date",'<=',$request->to_date);
-                }
-            })
-            ->limit(($request->from_date == '' && $request->to_date == '') ? 20 : 2000)
-            ->orderBy("schedule_departure_date","DESC")
-            ->get(["id","schedule_departure_date","schedule_return_date","bus_id","closing_date"]);
+    ]);
 
-            
-        // this is for show sale at front
-        $merges->map(function($single){
-            
-            $single->seat_fare = $single->tickets->sum("seat_fare");
-            $single->discount = $single->tickets->sum("discount");
+    // Filters
+    if ($request->bus_number) {
+        $query->where('bus_id', $request->bus_number);
+    }
 
-            // elt amount | commission
-            $eltAmount = 0;
-            $commission = 0;
-            $closingOne = [];
-            $closingTwo = [];
-            foreach($single->tickets as $ticket)
-            {
-                // elt
-                if($ticket->elt)
-                {
-                    $eltAmount += $ticket->elt->elt_price;
-                }
-                // commission
-                $terminalCommission = TerminalCommission::where(["terminal_id"=>$ticket->terminal_id,"route_id"=>$ticket->schedule->route_id,"company_id"=>Auth::user()->terminal_id])->first();
-                if($terminalCommission)
-                {    
-                    if($single->closing[0]->id == $ticket->ticket_closing_id)
-                    {
-                        $closingOne[] = $terminalCommission->id;
-                    }
-                    else
-                    {
-                        $closingTwo[] = $terminalCommission->id;
-                    }
-                    
-                    if($terminalCommission->flat_commission == 0)
-                        $commission += (($ticket->seat_fare - ($ticket->discount))/100)*$terminalCommission->percentage_commission;
-                    else
-                    {
-                        $commission += $terminalCommission->flat_commission;
-                    }
-                    // kt adjustment commission
-                    $commission += (($ticket->seat_fare - $ticket->discount)/100)*$terminalCommission->adjustment_commission;
-                }
-                else
-                {
-                    $commission += 0;
-                }
-                 
+    if ($request->from_date) {
+        $query->whereDate('schedule_departure_date', '>=', $request->from_date);
+    }
+
+    if ($request->to_date) {
+        $query->whereDate('schedule_departure_date', '<=', $request->to_date);
+    }
+
+    $limit = (!$request->from_date && !$request->to_date) ? 20 : 2000;
+
+    $merges = $query
+        ->orderByDesc('schedule_departure_date')
+        ->limit($limit)
+        ->get([
+            'id',
+            'schedule_departure_date',
+            'schedule_return_date',
+            'bus_id',
+            'closing_date'
+        ]);
+
+    // 🔹 Preload commissions once (IMPORTANT)
+    $terminalCommissions = TerminalCommission::where('company_id', $user->terminal_id)
+        ->get()
+        ->groupBy(fn ($c) => $c->terminal_id . '_' . $c->route_id);
+
+    // 🔹 Process merges
+    foreach ($merges as $merge) {
+
+        $merge->seat_fare = $merge->tickets->sum('seat_fare');
+        $merge->discount  = $merge->tickets->sum('discount');
+
+        $eltAmount = 0;
+        $commission = 0;
+        $closingOne = [];
+        $closingTwo = [];
+
+        foreach ($merge->tickets as $ticket) {
+
+            // ELT
+            if ($ticket->elt) {
+                $eltAmount += $ticket->elt->elt_price;
             }
-            
-            $commission += TerminalCommission::whereIn("id",array_unique($closingOne))->get()->sum("fix_commission");
-            $commission += TerminalCommission::whereIn("id",array_unique($closingTwo))->get()->sum("fix_commission");
-            
-            $single->elt += $eltAmount;
-            $single->commission += (int)$commission;
 
-            // for add cancelation charges into the sale
-            $cancelTicket = Ticket::
-                onlyTrashed()
-                ->where([
-                    'company_id' => Auth::user()->company_id,
-                    'ticket_merge_id' => $single->id,
-                    'type' => "canceled",
-                ])
-                ->with("cancel_ticket:id,ticket_id,percentage")
-                ->get(["id","seat_fare","discount"]);
+            $key = $ticket->terminal_id . '_' . $ticket->schedule->route_id;
+            $terminalCommission = $terminalCommissions[$key][0] ?? null;
 
-        
-            $refundAmount = 0;
-            $cancelTicket->map(function($item) use (&$refundAmount){
-                if($item->cancel_ticket)
-                {
-                    $refundAmount += (($item->seat_fare - $item->discount) / 100) * $item->cancel_ticket->percentage;
+            if ($terminalCommission) {
+
+                if ($merge->closing[0]->id == $ticket->ticket_closing_id) {
+                    $closingOne[] = $terminalCommission->id;
+                } else {
+                    $closingTwo[] = $terminalCommission->id;
                 }
+
+                $netFare = $ticket->seat_fare - $ticket->discount;
+
+                // Percentage / flat commission
+                if ($terminalCommission->flat_commission == 0) {
+                    $commission += ($netFare / 100) * $terminalCommission->percentage_commission;
+                } else {
+                    $commission += $terminalCommission->flat_commission;
+                }
+
+                // Adjustment commission
+                $commission += ($netFare / 100) * $terminalCommission->adjustment_commission;
+            }
+        }
+
+        // Fix commission (batch)
+        $commission += TerminalCommission::whereIn('id', array_unique($closingOne))
+            ->sum('fix_commission');
+
+        $commission += TerminalCommission::whereIn('id', array_unique($closingTwo))
+            ->sum('fix_commission');
+
+        $merge->elt        = $eltAmount;
+        $merge->commission = (int) $commission;
+
+        // 🔹 Cancel tickets refund
+        $refundAmount = Ticket::onlyTrashed()
+            ->where([
+                'company_id' => $user->company_id,
+                'ticket_merge_id' => $merge->id,
+                'type' => 'canceled'
+            ])
+            ->with('cancel_ticket:id,ticket_id,percentage')
+            ->get()
+            ->sum(function ($ticket) {
+                if (!$ticket->cancel_ticket) return 0;
+                return (($ticket->seat_fare - $ticket->discount) / 100)
+                        * $ticket->cancel_ticket->percentage;
             });
 
-            $single->refund += $refundAmount;
-            
-        });
-        
-        $data = [
-            "merges" => $merges,
-            "buses" => Bus::orderBy('id')->where('company_id', Auth::user()->company_id)->get(["id","bus_number"]),
-        ];
-        return $data;
+        $merge->refund = $refundAmount;
     }
+
+    return [
+        'merges' => $merges,
+        'buses'  => Bus::where('company_id', $user->company_id)
+                        ->orderBy('id')
+                        ->get(['id', 'bus_number'])
+    ];
+}
+
     
     public function mergesPdf(Request $request)
     {

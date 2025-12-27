@@ -3,6 +3,7 @@
 use App\Http\Controllers\Booking\BookingController;
 use App\Http\Controllers\Booking\CounterExpensesController;
 use App\Http\Controllers\Schedule\ScheduleClosingController;
+use App\Http\Controllers\TicketClosingShortageController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -82,6 +83,9 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
             Route::post('/update', [ScheduleClosingController::class, 'update']);
             Route::post('/date/update', [ScheduleClosingController::class, 'updateClosingDate']);
             Route::post('/members', [ScheduleClosingController::class, 'getMembers']);
+            Route::post('/ticket-closing-shortage', [TicketClosingShortageController::class, 'store']);
+            Route::post('/ticket-closing-shortage/update', [TicketClosingShortageController::class, 'update']);
+
         });
 
         Route::group(['prefix' => '/merges', [CustomMiddleware::class]], function () {
