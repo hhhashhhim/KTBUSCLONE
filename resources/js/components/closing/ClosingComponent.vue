@@ -687,8 +687,6 @@ export default {
         invoice: [],
       },
       addData: {
-      busIds: [],
-      mergeIds: [],
     },
       loop: 1,
       loading: false,
@@ -1165,8 +1163,8 @@ async mergeScheduleApi(addData = {}) {
   const payload = {
     ...addData,
     expenses:this.postData,
-    busIds: addData.busIds?.length ? addData.busIds : this.busIds || [],
-    mergeIds: addData.mergeIds?.length ? addData.mergeIds : this.mergeIds || [],
+    busIds: this.busIds || [],
+    mergeIds: this.mergeIds || [],
   };
 
   if (!payload.busIds.length || !payload.mergeIds.length) {
@@ -1212,11 +1210,7 @@ async saveTicketClosingShortage() {
   
   try {
     // Step 1: Merge schedules
-    const mergedResult = await this.mergeScheduleApi(this.addData);
-    console.log("addData before mergeScheduleApi", this.addData);
-    return
-    
- 
+    const mergedResult = await this.mergeScheduleApi(this.addData); 
     // Step 2: Store merged data for the component
     this.closingData = mergedResult;
 

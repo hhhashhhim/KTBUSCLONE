@@ -27417,10 +27417,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         ledger: [],
         invoice: []
       },
-      addData: {
-        busIds: [],
-        mergeIds: []
-      },
+      addData: {},
       loop: 1,
       loading: false,
       cashBank: {},
@@ -27881,8 +27878,6 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         _this13 = this;
 
     return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-      var _addData$busIds, _addData$mergeIds;
-
       var addData, payload, res, _mergedData$busIds, _mergedData$mergeIds, mergedData, _error$response, _error$response$data, _error$response$data$, errMsg;
 
       return _regeneratorRuntime().wrap(function _callee3$(_context3) {
@@ -27892,8 +27887,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
               addData = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : {};
               payload = _objectSpread(_objectSpread({}, addData), {}, {
                 expenses: _this13.postData,
-                busIds: (_addData$busIds = addData.busIds) !== null && _addData$busIds !== void 0 && _addData$busIds.length ? addData.busIds : _this13.busIds || [],
-                mergeIds: (_addData$mergeIds = addData.mergeIds) !== null && _addData$mergeIds !== void 0 && _addData$mergeIds.length ? addData.mergeIds : _this13.mergeIds || []
+                busIds: _this13.busIds || [],
+                mergeIds: _this13.mergeIds || []
               });
 
               if (!(!payload.busIds.length || !payload.mergeIds.length)) {
@@ -27969,18 +27964,57 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
             case 4:
               mergedResult = _context4.sent;
-              console.log("addData before mergeScheduleApi", _this14.addData);
-              return _context4.abrupt("return");
+              // Step 2: Store merged data for the component
+              _this14.closingData = mergedResult; // Step 3: Ticket closing logic
 
-            case 12:
-              _context4.next = 14;
+              calcKtCommission = function calcKtCommission(tickets) {
+                return tickets !== null && tickets !== void 0 && tickets.length ? tickets.reduce(function (sum, t) {
+                  var _t$commission5;
+
+                  return sum + (((_t$commission5 = t.commission) === null || _t$commission5 === void 0 ? void 0 : _t$commission5.adjustment_commission) || 0) / 100 * (t.seat_fare - t.discount);
+                }, 0) : 0;
+              };
+
+              mapRows = function mapRows(cashBank, schedule) {
+                return Object.entries(cashBank).map(function (_ref5) {
+                  var _ref6 = _slicedToArray(_ref5, 2),
+                      terminalId = _ref6[0],
+                      row = _ref6[1];
+
+                  var tickets = schedule[terminalId] || [];
+                  return {
+                    terminal_id: Number(terminalId),
+                    passenger_count: tickets.length,
+                    kt_commission: calcKtCommission(tickets),
+                    other_commission: row.commission || 0,
+                    total_receivable: row.total + row.commission,
+                    total_received_cash: row.cash,
+                    bank_id: row.selectedBankId || null,
+                    total_received_bank: row.bank,
+                    shortage: row.shortage,
+                    received: row.cash + row.bank,
+                    mergeId: mergedResult.id
+                  };
+                });
+              }; // Step 4: Save Start
+
+
+              _context4.next = 10;
+              return _this14.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
+                ticket_closing_id: mergedResult.id,
+                type: "start",
+                rows: mapRows(_this14.cashBankStart, _this14.data.schedule_start)
+              });
+
+            case 10:
+              _context4.next = 12;
               return _this14.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
                 ticket_closing_id: mergedResult.id,
                 type: "return",
                 rows: mapRows(_this14.cashBankReturn, _this14.data.schedule_return)
               });
 
-            case 14:
+            case 12:
               Swal.fire({
                 icon: "success",
                 title: "Saved!",
@@ -27993,11 +28027,11 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
               _this14.closeexampleModal();
 
-              _context4.next = 23;
+              _context4.next = 21;
               break;
 
-            case 19:
-              _context4.prev = 19;
+            case 17:
+              _context4.prev = 17;
               _context4.t0 = _context4["catch"](1);
               console.error(_context4.t0);
               Swal.fire({
@@ -28006,17 +28040,17 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                 text: _context4.t0.message || "Failed to save ticket closing"
               });
 
-            case 23:
-              _context4.prev = 23;
+            case 21:
+              _context4.prev = 21;
               _this14.loading = false;
-              return _context4.finish(23);
+              return _context4.finish(21);
 
-            case 26:
+            case 24:
             case "end":
               return _context4.stop();
           }
         }
-      }, _callee4, null, [[1, 19, 23, 26]]);
+      }, _callee4, null, [[1, 17, 21, 24]]);
     }))();
   }), _defineProperty(_methods, "closeexampleModal", function closeexampleModal() {
     $("#exampleModal").click();
