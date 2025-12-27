@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\account\Bank;
+use App\Models\Account\Bank;
 use App\Models\Schedule\TicketClosing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
