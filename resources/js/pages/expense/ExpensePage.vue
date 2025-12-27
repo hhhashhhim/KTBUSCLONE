@@ -851,10 +851,14 @@ export default {
     },
 
     returnShortages() {
+        
         return this.shortages.filter(item => item.type === 'return');
     },
 
     totalCash() {
+         if(this.shortages.length == 0){
+            return 0;
+        };
         return this.shortages.reduce(
             (sum, item) => sum + Number(item.total_received_cash ?? 0),
             0
@@ -862,6 +866,9 @@ export default {
     },
 
     totalBank() {
+         if(this.shortages.length == 0){
+            return 0;
+        };
         return this.shortages.reduce(
             (sum, item) => sum + Number(item.total_received_bank ?? 0),
             0
@@ -869,6 +876,9 @@ export default {
     },
 
     totalShortage() {
+        if(this.shortages.length == 0){
+            return 0;
+        };
         return this.shortages.reduce(
             (sum, item) => sum + Number(item.shortage ?? 0),
             0
@@ -876,24 +886,34 @@ export default {
     },
 
     profitLoss() {
-        const totalReceivable = this.shortages.reduce(
-            (sum, item) => sum + Number(item.total_receivable ?? 0),
-            0
-        );
-        const totalKtCommission = this.shortages.reduce(
-            (sum, item) => sum + Number(item.kt_commission ?? 0),
-            0
-        );
-        const totalOtherCommission = this.shortages.reduce(
-            (sum, item) => sum + Number(item.other_commission ?? 0),
-            0
-        );
-        const totalExpenses = this.expenses.reduce(
-            (sum, item) => sum + Number(item.amount ?? 0),
-            0
-        );
-        return totalReceivable - (totalOtherCommission + totalKtCommission + totalExpenses);
-    },
+    // Ensure shortages and expenses are arrays
+    const shortages = this.shortages || [];
+    const expenses = this.expenses || [];
+
+    // If no shortages, return 0
+
+    const totalReceivable = shortages.reduce(
+        (sum, item) => sum + Number(item.total_receivable ?? 0),
+        0
+    );
+
+    const totalKtCommission = shortages.reduce(
+        (sum, item) => sum + Number(item.kt_commission ?? 0),
+        0
+    );
+
+    const totalOtherCommission = shortages.reduce(
+        (sum, item) => sum + Number(item.other_commission ?? 0),
+        0
+    );
+
+    const totalExpenses = expenses.reduce(
+        (sum, item) => sum + Number(item.amount ?? 0),
+        0
+    );
+
+    return totalReceivable - (totalKtCommission + totalOtherCommission + totalExpenses);
+},
 
     startTotals() {
         return {

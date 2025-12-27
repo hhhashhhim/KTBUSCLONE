@@ -46757,6 +46757,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       });
     },
     totalCash: function totalCash() {
+      if (this.shortages.length == 0) {
+        return 0;
+      }
+
+      ;
       return this.shortages.reduce(function (sum, item) {
         var _item$total_received_;
 
@@ -46764,6 +46769,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, 0);
     },
     totalBank: function totalBank() {
+      if (this.shortages.length == 0) {
+        return 0;
+      }
+
+      ;
       return this.shortages.reduce(function (sum, item) {
         var _item$total_received_2;
 
@@ -46771,6 +46781,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, 0);
     },
     totalShortage: function totalShortage() {
+      if (this.shortages.length == 0) {
+        return 0;
+      }
+
+      ;
       return this.shortages.reduce(function (sum, item) {
         var _item$shortage;
 
@@ -46778,27 +46793,31 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, 0);
     },
     profitLoss: function profitLoss() {
-      var totalReceivable = this.shortages.reduce(function (sum, item) {
+      // Ensure shortages and expenses are arrays
+      var shortages = this.shortages || [];
+      var expenses = this.expenses || []; // If no shortages, return 0
+
+      var totalReceivable = shortages.reduce(function (sum, item) {
         var _item$total_receivabl;
 
         return sum + Number((_item$total_receivabl = item.total_receivable) !== null && _item$total_receivabl !== void 0 ? _item$total_receivabl : 0);
       }, 0);
-      var totalKtCommission = this.shortages.reduce(function (sum, item) {
+      var totalKtCommission = shortages.reduce(function (sum, item) {
         var _item$kt_commission;
 
         return sum + Number((_item$kt_commission = item.kt_commission) !== null && _item$kt_commission !== void 0 ? _item$kt_commission : 0);
       }, 0);
-      var totalOtherCommission = this.shortages.reduce(function (sum, item) {
+      var totalOtherCommission = shortages.reduce(function (sum, item) {
         var _item$other_commissio;
 
         return sum + Number((_item$other_commissio = item.other_commission) !== null && _item$other_commissio !== void 0 ? _item$other_commissio : 0);
       }, 0);
-      var totalExpenses = this.expenses.reduce(function (sum, item) {
+      var totalExpenses = expenses.reduce(function (sum, item) {
         var _item$amount;
 
         return sum + Number((_item$amount = item.amount) !== null && _item$amount !== void 0 ? _item$amount : 0);
       }, 0);
-      return totalReceivable - (totalOtherCommission + totalKtCommission + totalExpenses);
+      return totalReceivable - (totalKtCommission + totalOtherCommission + totalExpenses);
     },
     startTotals: function startTotals() {
       return {
