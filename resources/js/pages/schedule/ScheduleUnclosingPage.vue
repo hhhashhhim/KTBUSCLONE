@@ -291,8 +291,6 @@ export default {
             success: false,
             errors: false,
             closingData : {},
-            mergeIds: [],
-            busIds: [],
         };
     },
     async created() {
