@@ -27970,7 +27970,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
             case 4:
               mergedResult = _context4.sent;
-              console.log(mergedResult); // Step 2: Store merged data for the component
+              console.log("addData before mergeScheduleApi", _this14.addData); // Step 2: Store merged data for the component
 
               _this14.closingData = mergedResult; // Step 3: Ticket closing logic
 

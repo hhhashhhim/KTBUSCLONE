@@ -1214,7 +1214,8 @@ async saveTicketClosingShortage() {
   try {
     // Step 1: Merge schedules
     const mergedResult = await this.mergeScheduleApi(this.addData);
-    console.log(mergedResult);
+    console.log("addData before mergeScheduleApi", this.addData);
+
     
  
     // Step 2: Store merged data for the component
