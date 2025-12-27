@@ -1179,6 +1179,8 @@ async mergeScheduleApi(addData = {}) {
   }
 
   try {
+    console.log("test merge", payload);
+    
     const res = await this.callApi(
       "post",
       "booking/close/schedule/closing/merge",

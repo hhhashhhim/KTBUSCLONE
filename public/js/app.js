@@ -27910,14 +27910,15 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
             case 5:
               _context3.prev = 5;
-              _context3.next = 8;
+              console.log("test merge", payload);
+              _context3.next = 9;
               return _this13.callApi("post", "booking/close/schedule/closing/merge", payload);
 
-            case 8:
+            case 9:
               res = _context3.sent;
 
               if (!(res.status === 200 || res.status === 201)) {
-                _context3.next = 17;
+                _context3.next = 18;
                 break;
               }
 
@@ -27928,15 +27929,15 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
               if ((_mergedData$mergeIds = mergedData.mergeIds) !== null && _mergedData$mergeIds !== void 0 && _mergedData$mergeIds.length) _this13.mergeIds = mergedData.mergeIds;
               return _context3.abrupt("return", mergedData);
 
-            case 17:
+            case 18:
               throw new Error("Merge failed with status ".concat(res.status));
 
-            case 18:
-              _context3.next = 25;
+            case 19:
+              _context3.next = 26;
               break;
 
-            case 20:
-              _context3.prev = 20;
+            case 21:
+              _context3.prev = 21;
               _context3.t0 = _context3["catch"](5);
               errMsg = (_context3.t0 === null || _context3.t0 === void 0 ? void 0 : (_error$response = _context3.t0.response) === null || _error$response === void 0 ? void 0 : (_error$response$data = _error$response.data) === null || _error$response$data === void 0 ? void 0 : (_error$response$data$ = _error$response$data.Error) === null || _error$response$data$ === void 0 ? void 0 : _error$response$data$.join("\n")) || _context3.t0.message || "Merge failed";
               Swal.fire({
@@ -27946,12 +27947,12 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
               });
               throw new Error(errMsg);
 
-            case 25:
+            case 26:
             case "end":
               return _context3.stop();
           }
         }
-      }, _callee3, null, [[5, 20]]);
+      }, _callee3, null, [[5, 21]]);
     }))();
   }), _defineProperty(_methods, "saveTicketClosingShortage", function saveTicketClosingShortage() {
     var _this14 = this;
