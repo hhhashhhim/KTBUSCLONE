@@ -27969,7 +27969,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
             case 4:
               mergedResult = _context4.sent;
-              // Step 2: Store merged data for the component
+              console.log(mergedResult); // Step 2: Store merged data for the component
+
               _this14.closingData = mergedResult; // Step 3: Ticket closing logic
 
               calcKtCommission = function calcKtCommission(tickets) {
@@ -28004,22 +28005,22 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
               }; // Step 4: Save Start
 
 
-              _context4.next = 10;
+              _context4.next = 11;
               return _this14.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
                 ticket_closing_id: mergedResult.id,
                 type: "start",
                 rows: mapRows(_this14.cashBankStart, _this14.data.schedule_start)
               });
 
-            case 10:
-              _context4.next = 12;
+            case 11:
+              _context4.next = 13;
               return _this14.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
                 ticket_closing_id: mergedResult.id,
                 type: "return",
                 rows: mapRows(_this14.cashBankReturn, _this14.data.schedule_return)
               });
 
-            case 12:
+            case 13:
               Swal.fire({
                 icon: "success",
                 title: "Saved!",
@@ -28032,11 +28033,11 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
               _this14.closeexampleModal();
 
-              _context4.next = 21;
+              _context4.next = 22;
               break;
 
-            case 17:
-              _context4.prev = 17;
+            case 18:
+              _context4.prev = 18;
               _context4.t0 = _context4["catch"](1);
               console.error(_context4.t0);
               Swal.fire({
@@ -28045,17 +28046,17 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                 text: _context4.t0.message || "Failed to save ticket closing"
               });
 
-            case 21:
-              _context4.prev = 21;
+            case 22:
+              _context4.prev = 22;
               _this14.loading = false;
-              return _context4.finish(21);
+              return _context4.finish(22);
 
-            case 24:
+            case 25:
             case "end":
               return _context4.stop();
           }
         }
-      }, _callee4, null, [[1, 17, 21, 24]]);
+      }, _callee4, null, [[1, 18, 22, 25]]);
     }))();
   }), _defineProperty(_methods, "closeexampleModal", function closeexampleModal() {
     $("#exampleModal").click();
