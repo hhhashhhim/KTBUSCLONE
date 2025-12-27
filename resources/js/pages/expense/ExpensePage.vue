@@ -846,14 +846,16 @@ export default {
    computed: {
     ...mapGetters(['getDeletingObj']),
 
-    startShortages() {
-        return this.shortages.filter(item => item.type === 'start');
-    },
+ startShortages() {
+    const shortages = this.shortages || [];
+    return shortages.filter(item => item.type === 'start');
+},
 
-    returnShortages() {
-        
-        return this.shortages.filter(item => item.type === 'return');
-    },
+returnShortages() {
+    const shortages = this.shortages || [];
+    return shortages.filter(item => item.type === 'return');
+},
+
 
    totalCash() {
     const shortages = this.shortages || [];

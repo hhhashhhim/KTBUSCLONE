@@ -46747,12 +46747,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   },
   computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['getDeletingObj'])), {}, {
     startShortages: function startShortages() {
-      return this.shortages.filter(function (item) {
+      var shortages = this.shortages || [];
+      return shortages.filter(function (item) {
         return item.type === 'start';
       });
     },
     returnShortages: function returnShortages() {
-      return this.shortages.filter(function (item) {
+      var shortages = this.shortages || [];
+      return shortages.filter(function (item) {
         return item.type === 'return';
       });
     },
