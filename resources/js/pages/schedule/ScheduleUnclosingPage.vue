@@ -13,17 +13,69 @@
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-body">
+                                            <form @submit.prevent="fetchData">
+    <div class="row px-2 mb-4 align-items-end">
+        <div class="col-md-3">
+            <label for="terminalFilter">Select Bus</label>
+            <select id="terminalFilter" class="form-control"
+                    v-model="filterData.bus_number">
+                <option value="">Select Bus</option>
+                <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
+                    {{ bus.bus_number }}
+                </option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="fromDate">Schedule Date</label>
+            <input id="fromDate" type="date" class="form-control"
+                   v-model="filterData.from_date">
+        </div>
+
+        <div class="col-md-3">
+            <label for="toDate">Return Date</label>
+            <input id="toDate" type="date" class="form-control"
+                   v-model="filterData.to_date">
+        </div>
+
+       <div class="col-md-3">
+  <div class="row">
+    <div class="col-6 pr-1">
+      <button type="submit" class="btn btn-primary w-100">
+        Filter
+      </button>
+    </div>
+    <div class="col-6 pl-1">
+      <button type="button" class="btn btn-danger w-100" @click="resetFilters">
+        Reset
+      </button>
+    </div>
+  </div>
+</div>
+
+    </div>
+</form>
                                             <div
                                                 class="d-flex justify-content-end"
                                             >
-                                                <button
-                                                    class="btn btn-primary"
-                                                    data-toggle="modal"
-                                                    data-target="#exampleModal"
-                                                    @click="fetchMergedData()"
-                                                >
-                                                    Merge Schedule
-                                                </button>
+                                              <button
+  class="btn btn-primary d-flex align-items-center"
+  :disabled="loading"
+  @click="fetchMergedData"
+>
+  <span
+    v-if="loading"
+    class="spinner-border spinner-border-sm mr-2"
+    role="status"
+    aria-hidden="true"
+  ></span>
+
+  <span>
+    {{ loading ? 'Merging...' : 'Merge Schedule' }}
+  </span>
+</button>
+
+
                                                 <!-- <button class="btn btn-primary" :disabled="loading" @click="mergeSchedule()">
                                                     Merge Schedule
                                                 </button> -->
@@ -277,6 +329,11 @@ export default {
     data() {
         return {
             loading: false,
+             filterData: {
+      bus_number: "",
+      from_date: "",
+      to_date: ""
+    },
             closings: [],
             permissions: [],
             validationErrors: "",
@@ -291,6 +348,7 @@ export default {
             success: false,
             errors: false,
             closingData : {},
+             buses: [],
         };
     },
     async created() {
@@ -309,19 +367,58 @@ export default {
     },
     methods: {
         async fetchMergedData() {
-  const res = await this.callApi(
-    "post",
-    "booking/close/schedule/unclosing/data",
-    this.addData
-  );
+  if (this.loading) return;
 
- if (res.status === 200) {
-    this.closingData = res.data.data;
-    this.banks = res.data.banks;
-    this.busIds = res.data.busIds;
-    this.mergeIds = res.data.mergeIds;
-  } else {
-    console.log(res);
+  this.loading = true;
+  this.validationErrors = [];
+
+  // ❌ Validation: same buses
+  if (this.addData.busIds[0] !== this.addData.busIds[1]) {
+    swal({
+      title: "Required",
+      text: "Please select same buses",
+      icon: "error",
+      timer: 2000,
+    });
+    this.loading = false;
+    return;
+  }
+
+  // ❌ Validation: two schedules
+  if (this.addData.mergeIds.length !== 2) {
+    swal({
+      title: "Required",
+      text: "Please select two schedules",
+      icon: "error",
+      timer: 2000,
+    });
+    this.loading = false;
+    return;
+  }
+
+  try {
+    const res = await this.callApi(
+      "post",
+      "booking/close/schedule/unclosing/data",
+      this.addData
+    );
+
+    if (res.status === 200) {
+      this.closingData = res.data.data;
+      this.banks = res.data.banks;
+      this.busIds = res.data.busIds;
+      this.mergeIds = res.data.mergeIds;
+
+      // ✅ Open modal after success
+      $("#exampleModal").modal("show");
+    } else {
+      console.log(res);
+    }
+  } catch (err) {
+    console.error(err);
+  } finally {
+    // ✅ Always stop loader
+    this.loading = false;
   }
 },
         clearForm: function () {
@@ -354,16 +451,31 @@ export default {
             console.log(this.addData);
         },
         async fetchData() {
-            const res = await this.callApi(
-                "post",
-                "booking/close/schedule/unclosing"
-            );
-            if (res.status == 200) {
-                this.closings = res.data.closings;
-            } else {
-                console.log(res);
-            }
-        },
+  try {
+    const res = await this.callApi(
+      "post",
+      "booking/close/schedule/unclosing",
+      this.filterData // ✅ send filters
+    );
+
+    if (res.status === 200) {
+      this.closings = res.data.closings;
+      this.buses = res.data.buses;
+    } else {
+      console.log(res);
+    }
+  } catch (e) {
+    console.error(e);
+  }
+},
+resetFilters() {
+  this.filterData = {
+    bus_number: "",
+    from_date: "",
+    to_date: ""
+  };
+  this.fetchData();
+},
 
         async hideUnclosing() {
             this.loading = true;

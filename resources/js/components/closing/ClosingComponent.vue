@@ -14,12 +14,9 @@
             <h5 class="text-center" id="busModalLabel">
               Merge Schedule Details
             </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
           </div>
           <div class="modal-body">
             <div
@@ -642,6 +639,7 @@
               type="button"
               class="btn btn-secondary"
               data-bs-dismiss="modal"
+              @click="close()"
             >
               Close
             </button>
@@ -913,8 +911,15 @@ export default {
     },
 
     totalFare(tickets) {
-      return tickets.reduce((s, t) => s + Number(t.fare || 0), 0);
-    },
+  return tickets.reduce((sum, t) => {
+    const fare = parseFloat(t.seat_fare) || 0;
+    const discount = parseFloat(t.discount) || 0;
+    // console.log("test", t.discount);
+    
+    return sum + (fare - discount);
+  }, 0);
+
+},
 
     sumByRecovery(schedule, method) {
       if (!schedule) return 0;
@@ -969,7 +974,9 @@ export default {
         0
       );
     },
-
+ close(){
+            $('#exampleModal').click();
+        },
     sumReceived() {
       return Object.values(this.cashBankStart).reduce(
         (sum, row) => sum + (Number(row.cash) || 0) + (Number(row.bank) || 0),
@@ -1068,12 +1075,7 @@ export default {
         this.categories = res.data;
       }
     },
-    // ===== TOTALS =====
-    totalFare(group) {
-      if (!Array.isArray(group)) return 0;
-
-      return group.reduce((sum, item) => sum + Number(item.seat_fare || 0), 0);
-    },
+   
     totalCommission(list) {
       return list.reduce((sum, t) => {
         // const fix = Number(t.commission?.fix_commission || 0);
