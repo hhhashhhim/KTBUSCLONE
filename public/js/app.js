@@ -27559,7 +27559,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       var paid = this.postData.paid.reduce(function (sum, val) {
         return sum + (Number(val) || 0);
       }, 0);
-      return paid + this.sumOtherCommissions(this.data.schedule_return) + this.sumOtherCommissions(this.data.schedule_start);
+      return paid;
     },
     totalExpenses: function totalExpenses() {
       var _this4 = this;

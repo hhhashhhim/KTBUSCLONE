@@ -823,15 +823,11 @@ export default {
     },
 
     totalPaid() {
-      const paid = this.postData.paid.reduce(
-        (sum, val) => sum + (Number(val) || 0),
-        0
-      );
-      return (
-        paid +
-        this.sumOtherCommissions(this.data.schedule_return) +
-        this.sumOtherCommissions(this.data.schedule_start)
-      );
+       const paid = this.postData.paid.reduce(
+    (sum, val) => sum + (Number(val) || 0),
+    0
+  );
+  return paid;
     },
     totalExpenses() {
       return this.postData.amount.reduce((sum, val, index) => {
