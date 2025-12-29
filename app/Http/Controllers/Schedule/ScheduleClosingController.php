@@ -94,27 +94,60 @@ class ScheduleClosingController extends Controller
 }
 
     
-    public function unclosing()
-    {
-        if(!checkForSubmenu("closing"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
-        $closings = TicketClosing::where('company_id', Auth::user()->company_id)
-        ->with("bus:id,bus_number", "schedule:id,name,route_id", "schedule.route:id,name")
-        ->where(["hide"=>0,"commission_route"=>0])
+    public function unclosing(Request $request)
+{
+    if (!checkForSubmenu("closing")) {
+        return response()->json([
+            "Error" => ['You are not authorized to access this url']
+        ], 403);
+    }
+
+    $query = TicketClosing::where('company_id', Auth::user()->company_id)
+        ->with(
+            "bus:id,bus_number",
+            "schedule:id,name,route_id",
+            "schedule.route:id,name"
+        )
+        ->where([
+            "hide" => 0,
+            "commission_route" => 0
+        ]);
+ $buses = Bus::where('company_id', Auth::user()->company_id)
+        ->select('id', 'bus_number')
+        ->orderBy('bus_number')
+        ->get();
+ $buses = Bus::where('company_id', Auth::user()->company_id)
+        ->select('id', 'bus_number')
+        ->orderBy('bus_number')
+        ->get();
+    // ✅ Bus filter
+    if ($request->bus_number) {
+        $query->where('bus_id', $request->bus_number);
+    }
+
+    // ✅ Date range filter
+    if ($request->from_date) {
+        $query->whereDate('schedule_date', '>=', $request->from_date);
+    }
+
+    if ($request->to_date) {
+        $query->whereDate('schedule_date', '<=', $request->to_date);
+    }
+
+    $closings = $query
         ->orderBy('bus_id')
         ->get()
-        ->groupBy('ticket_merge_id') 
-        ->filter(function ($group){
+        ->groupBy('ticket_merge_id')
+        ->filter(function ($group) {
             return $group->count() == 1;
         });
-        
-        $data = [
-            "closings" => $closings,
-        ];
-        return $data;
-    }
+
+    return response()->json([
+        "closings" => $closings,
+        "buses" => $buses
+    ]);
+}
+
     
     public function commissionClosing()
     {
