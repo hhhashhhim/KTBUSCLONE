@@ -27824,10 +27824,12 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       var _t$commission2, _t$commission3, _t$commission4;
 
       var fare = parseFloat(t.seat_fare || 0);
+      var discount = parseFloat(t.discount) || 0;
+      var afterDiscount = fare - discount;
       fixCommission = parseFloat(((_t$commission2 = t.commission) === null || _t$commission2 === void 0 ? void 0 : _t$commission2.fix_commission) || 0);
       var flat = parseFloat(((_t$commission3 = t.commission) === null || _t$commission3 === void 0 ? void 0 : _t$commission3.flat_commission) || 0);
       var percent = parseFloat(((_t$commission4 = t.commission) === null || _t$commission4 === void 0 ? void 0 : _t$commission4.percentage_commission) || 0);
-      var flatOrPercentage = flat > 0 ? flat : percent / 100 * fare;
+      var flatOrPercentage = flat > 0 ? flat : percent / 100 * afterDiscount;
       return sum + flatOrPercentage;
     }, 0); // Round the final result to the nearest whole number
 

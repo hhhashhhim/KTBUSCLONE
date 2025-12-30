@@ -1100,10 +1100,12 @@ export default {
 
       const value = list.reduce((sum, t) => {
         const fare = parseFloat(t.seat_fare || 0);
+        const discount = parseFloat(t.discount) || 0;
+        const afterDiscount = fare - discount;
         fixCommission = parseFloat(t.commission?.fix_commission || 0);
         const flat = parseFloat(t.commission?.flat_commission || 0);
         const percent = parseFloat(t.commission?.percentage_commission || 0);
-        const flatOrPercentage = flat > 0 ? flat : (percent / 100) * fare;
+        const flatOrPercentage = flat > 0 ? flat : (percent / 100) * afterDiscount;
 
         return sum + flatOrPercentage;
       }, 0);
