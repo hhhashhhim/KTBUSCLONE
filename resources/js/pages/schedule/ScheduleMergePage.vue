@@ -80,8 +80,8 @@
                                                             <th>Bus Number</th>
                                                             <th>Departure Schedule</th>
                                                             <th>Departure Date</th>
-                                                            <th>Return Date</th>
                                                             <th>Return Schedule</th>
+                                                            <th>Return Date</th>
                                                             <th>Closing Date</th>
                                                             <th>Merge Sale</th>
                                                             <th>Merge Expense</th>
