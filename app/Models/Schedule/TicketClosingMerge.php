@@ -14,6 +14,7 @@ use App\Models\Terminal;
 use App\Models\User;
 use App\Models\Ticket;
 use App\Models\Expense\TicketMergeExpense;
+use App\Models\TicketClosingShortage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -33,6 +34,12 @@ class TicketClosingMerge extends Model
     {
         return $this->hasOne( Bus::class, 'id', 'bus_id' );
     }
+public function shortage()
+{
+    return $this->hasMany(TicketClosingShortage::class, 'ticket_closing_id', 'id');
+}
+
+
     
     public function closing()
     {

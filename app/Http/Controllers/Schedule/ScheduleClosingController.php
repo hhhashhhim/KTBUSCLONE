@@ -149,28 +149,61 @@ class ScheduleClosingController extends Controller
 }
 
     
-    public function commissionClosing()
-    {
-        if(!checkForSubmenu("closing"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
-        $closings = TicketClosing::where('company_id', Auth::user()->company_id)
-        ->with("bus:id,bus_number", "schedule:id,name,route_id", "schedule.route:id,name")
-        ->with(["account_transaction"=>function($q){
-            $q->where("posting_type","ticket_closing");
-        }])
-        ->where(["hide"=>0,"commission_route"=>1])
-        ->get()
-        ->groupBy('ticket_merge_id')
-        ->filter(function ($group){
-            return $group->count() == 1;
-        });
-        $data = [
-            "closings" => $closings,
-        ];
-        return $data;
+   public function commissionClosing(Request $request)
+{
+    if (!checkForSubmenu("closing")) {
+        return response()->json([
+            "Error" => ['You are not authorized to access this url']
+        ], 403);
     }
+
+    $user = Auth::user();
+
+    // Base query
+    $query = TicketClosing::where('company_id', $user->company_id)
+        ->with(
+            "bus:id,bus_number",
+            "schedule:id,name,route_id",
+            "schedule.route:id,name"
+        )
+        ->with(["account_transaction" => function ($q) {
+            $q->where("posting_type", "ticket_closing");
+        }])
+        ->where([
+            "hide" => 0,
+            "commission_route" => 1
+        ]);
+
+    // 🔹 Filters
+    if ($request->bus_number) {
+        $query->where('bus_id', $request->bus_number);
+    }
+
+    if ($request->from_date) {
+        $query->whereDate('schedule_date', '>=', $request->from_date);
+    }
+
+    if ($request->to_date) {
+        $query->whereDate('schedule_date', '<=', $request->to_date);
+    }
+
+    // Get results
+    $closings = $query->get()
+        ->groupBy('ticket_merge_id')
+        ->filter(fn($group) => $group->count() == 1);
+
+    // Get buses list
+    $buses = Bus::where('company_id', $user->company_id)
+        ->select('id', 'bus_number')
+        ->orderBy('bus_number')
+        ->get();
+
+    return response()->json([
+        "closings" => $closings,
+        "buses" => $buses
+    ]);
+}
+
     
     public function commissionClosingStore(Request $request)
     {
@@ -369,20 +402,49 @@ class ScheduleClosingController extends Controller
 
 
     public function spareUnclosing(Request $request)
-    {
-        if(!checkForSubmenu("closing"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
-        $closings = TicketClosing::where('company_id', Auth::user()->company_id)
-        ->with("bus:id,bus_number", "schedule:id,name,route_id", "schedule.route:id,name")
-        ->where("hide",1)
-        ->get();
-        $data = [
-            "closings" => $closings,
-        ];
-        return $data;
+{
+    if (!checkForSubmenu("closing")) {
+        return response()->json([
+            "Error" => ['You are not authorized to access this url']
+        ], 403);
     }
+
+    $user = Auth::user();
+ $buses = Bus::where('company_id', Auth::user()->company_id)
+        ->select('id', 'bus_number')
+        ->orderBy('bus_number')
+        ->get();
+    // Base query with relationships
+    $closingsQuery = TicketClosing::where('company_id', $user->company_id)
+        ->with(
+            "bus:id,bus_number",
+            "schedule:id,name,route_id",
+            "schedule.route:id,name"
+        )
+        ->where("hide", 1);
+
+    // 🔹 Apply filters
+    if ($request->bus_number) {
+        $closingsQuery->where('bus_id', $request->bus_number);
+    }
+
+    if ($request->from_date) {
+        $closingsQuery->whereDate('schedule_date', '>=', $request->from_date);
+    }
+
+    if ($request->to_date) {
+        $closingsQuery->whereDate('schedule_date', '<=', $request->to_date);
+    }
+
+    // Get results
+    $closings = $closingsQuery->get();
+
+    return [
+        "closings" => $closings,
+         "buses" => $buses
+    ];
+}
+
     
     public function mergeClosing(Request $request)
     {
@@ -400,6 +462,7 @@ class ScheduleClosingController extends Controller
                     "schedule_departure_date" => $mergeOne->schedule_departure_date,
                     "schedule_return_date" => $mergeTwo->schedule_departure_date,
                     "schedule_complete" => 1,
+                     "closing_date" => Carbon::now(),
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
                 ]);
@@ -497,7 +560,7 @@ class ScheduleClosingController extends Controller
             }
     }
 
-   public function merges(Request $request)
+ public function merges(Request $request)
 {
     if (!checkForSubmenu("merges")) {
         return response()->json([
@@ -515,6 +578,7 @@ class ScheduleClosingController extends Controller
     ->withSum('expenses', 'amount')
     ->with([
         'bus:id,bus_number',
+         'shortage:id,ticket_closing_id,terminal_id,shortage,total_receivable', // belongsTo relation
         'closing:id,ticket_merge_id,schedule_id',
         'closing.schedule:id,name',
         'tickets' => function ($q) {
@@ -522,7 +586,8 @@ class ScheduleClosingController extends Controller
               ->whereIn('type', ['booked', 'over-issue'])
               ->with([
                   'elt:id,ticket_id,elt_price',
-                  'schedule:id,route_id'
+                  'schedule:id,route_id',
+                  'cancel_ticket:id,ticket_id,percentage'
               ])
               ->select(
                   'id',
@@ -537,37 +602,36 @@ class ScheduleClosingController extends Controller
     ]);
 
     // Filters
-    if ($request->bus_number) {
-        $query->where('bus_id', $request->bus_number);
-    }
-
-    if ($request->from_date) {
-        $query->whereDate('schedule_departure_date', '>=', $request->from_date);
-    }
-
-    if ($request->to_date) {
-        $query->whereDate('schedule_departure_date', '<=', $request->to_date);
-    }
+    if ($request->bus_number) $query->where('bus_id', $request->bus_number);
+    if ($request->from_date) $query->whereDate('schedule_departure_date', '>=', $request->from_date);
+    if ($request->to_date) $query->whereDate('schedule_departure_date', '<=', $request->to_date);
 
     $limit = (!$request->from_date && !$request->to_date) ? 20 : 2000;
 
-    $merges = $query
-        ->orderByDesc('schedule_departure_date')
-        ->limit($limit)
-        ->get([
-            'id',
-            'schedule_departure_date',
-            'schedule_return_date',
-            'bus_id',
-            'closing_date'
-        ]);
+    $merges = $query->orderByDesc('schedule_departure_date')
+                    ->limit($limit)
+                    ->get([
+                        'id',
+                        'schedule_departure_date',
+                        'schedule_return_date',
+                        'bus_id',
+                        'closing_date'
+                    ]);
 
-    // 🔹 Preload commissions once (IMPORTANT)
-    $terminalCommissions = TerminalCommission::where('company_id', $user->terminal_id)
+    // Preload all commissions once
+    $terminalCommissions = TerminalCommission::where('company_id', $user->company_id)
         ->get()
-        ->groupBy(fn ($c) => $c->terminal_id . '_' . $c->route_id);
+        ->groupBy(fn($c) => $c->terminal_id . '_' . $c->route_id);
 
-    // 🔹 Process merges
+    // Preload all canceled tickets at once
+    $mergeIds = $merges->pluck('id');
+    $allCanceledTickets = Ticket::onlyTrashed()
+        ->whereIn('ticket_merge_id', $mergeIds)
+        ->where('type', 'canceled')
+        ->with('cancel_ticket:id,ticket_id,percentage')
+        ->get()
+        ->groupBy('ticket_merge_id');
+
     foreach ($merges as $merge) {
 
         $merge->seat_fare = $merge->tickets->sum('seat_fare');
@@ -575,67 +639,43 @@ class ScheduleClosingController extends Controller
 
         $eltAmount = 0;
         $commission = 0;
-        $closingOne = [];
-        $closingTwo = [];
+        $closingOneIds = [];
+        $closingTwoIds = [];
 
         foreach ($merge->tickets as $ticket) {
 
-            // ELT
-            if ($ticket->elt) {
-                $eltAmount += $ticket->elt->elt_price;
-            }
+            $eltAmount += $ticket->elt->elt_price ?? 0;
 
             $key = $ticket->terminal_id . '_' . $ticket->schedule->route_id;
             $terminalCommission = $terminalCommissions[$key][0] ?? null;
 
             if ($terminalCommission) {
-
                 if ($merge->closing[0]->id == $ticket->ticket_closing_id) {
-                    $closingOne[] = $terminalCommission->id;
+                    $closingOneIds[] = $terminalCommission->id;
                 } else {
-                    $closingTwo[] = $terminalCommission->id;
+                    $closingTwoIds[] = $terminalCommission->id;
                 }
 
                 $netFare = $ticket->seat_fare - $ticket->discount;
-
-                // Percentage / flat commission
-                if ($terminalCommission->flat_commission == 0) {
-                    $commission += ($netFare / 100) * $terminalCommission->percentage_commission;
-                } else {
-                    $commission += $terminalCommission->flat_commission;
-                }
-
-                // Adjustment commission
-                $commission += ($netFare / 100) * $terminalCommission->adjustment_commission;
+                $commission += $terminalCommission->flat_commission 
+                    ? $terminalCommission->flat_commission 
+                    : ($netFare * $terminalCommission->percentage_commission / 100);
+                $commission += ($netFare * $terminalCommission->adjustment_commission / 100);
             }
         }
 
-        // Fix commission (batch)
-        $commission += TerminalCommission::whereIn('id', array_unique($closingOne))
-            ->sum('fix_commission');
+        // Add fixed commissions in memory
+        $flattenCommissions = $terminalCommissions->flatten();
+        $commission += array_sum(array_map(fn($id) => $flattenCommissions->firstWhere('id', $id)->fix_commission ?? 0, array_unique($closingOneIds)));
+        $commission += array_sum(array_map(fn($id) => $flattenCommissions->firstWhere('id', $id)->fix_commission ?? 0, array_unique($closingTwoIds)));
 
-        $commission += TerminalCommission::whereIn('id', array_unique($closingTwo))
-            ->sum('fix_commission');
-
-        $merge->elt        = $eltAmount;
+        $merge->elt = $eltAmount;
         $merge->commission = (int) $commission;
 
-        // 🔹 Cancel tickets refund
-        $refundAmount = Ticket::onlyTrashed()
-            ->where([
-                'company_id' => $user->company_id,
-                'ticket_merge_id' => $merge->id,
-                'type' => 'canceled'
-            ])
-            ->with('cancel_ticket:id,ticket_id,percentage')
-            ->get()
-            ->sum(function ($ticket) {
-                if (!$ticket->cancel_ticket) return 0;
-                return (($ticket->seat_fare - $ticket->discount) / 100)
-                        * $ticket->cancel_ticket->percentage;
-            });
-
-        $merge->refund = $refundAmount;
+        // Refund
+        $merge->refund = collect($allCanceledTickets[$merge->id] ?? [])->sum(function($ticket){
+            return $ticket->cancel_ticket ? ($ticket->seat_fare - $ticket->discount) * $ticket->cancel_ticket->percentage / 100 : 0;
+        });
     }
 
     return [

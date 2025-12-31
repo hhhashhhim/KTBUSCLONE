@@ -308,6 +308,10 @@
                     {
                         "name": "add-expense",
                         "allow": true
+                    },
+                    {
+                        "name": "merges-closing-date",
+                        "allow": true
                     }
                 ]
             }

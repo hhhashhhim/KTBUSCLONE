@@ -55,6 +55,7 @@ class RescheduleReportController extends Controller
                 "terminal_id",
                 "schedule_id",
                 "schedule_date",
+                'schedule_time_exact',
                 "customer_id",
                 "seat_fare",
                 "discount",
