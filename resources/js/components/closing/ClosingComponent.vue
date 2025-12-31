@@ -204,7 +204,7 @@
                         <td>
                           <select
                             class="form-control rounded-0"
-                            v-model="selectedBank"
+                            v-model="cashBankReturn[terminalId].selectedBankId"
                           >
                             <option value="" selected disabled>
                               Select Bank

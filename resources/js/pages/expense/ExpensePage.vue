@@ -302,119 +302,106 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-md-12 col-lg-12">
-                    <div class="card card-primary ">
-                        <div class="card-header">
-                            <h4>Expenses</h4>
-                        </div>
-                        <div class="card-body">
-                            <!-- Table -->
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card">
+              <div class="col-12 col-md-12">
+                <div class="card p-3">
+                      <h5 class="text-center">Expenses</h5>
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Total Expense Amount</th>
+                        <th>Total Paid</th>
+                        <th>Credit Balance</th>
+                        <!-- <th>Invoice number</th> -->
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(i, index) in loop" :key="index">
+                        <td>
+                          <!-- {{ items[0] ? items[0].price : '' }} -->
+                          <select
+                            class="form-control rounded-0"
+                            @change="saveRow($event, 'first', index)"
+                            :value="postData.category[index]"
+                            :disabled="editAble"
+                          >
+                            <option value="" selected>Select Category</option>
+                            <option
+                              v-for="(category, i) in categories"
+                              :value="category.id"
+                              :key="i"
+                            >
+                              {{ category.name }}
+                            </option>
+                          </select>
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            class="form-control"
+                            @keyup="saveRow($event, 'second', index)"
+                            :value="postData.description[index]"
+                            :disabled="editAble"
+                          />
+                        </td>
+                        <td>
+                          <!-- Total Expense -->
+                          <input
+                            type="number"
+                            min="0"
+                            class="form-control rounded-0"
+                            v-model.number="postData.amount[index]"
+                            @input="syncPaid(index)"
+                          />
+                        </td>
 
-                                        <div class="card-body">
-                                            <div class="table-responsive">
-                                                <table class="table table-striped">
-                                                    <thead>
-                                                    <tr>
-                                                        <th>Category</th>
-                                                        <th>Description</th>
-                                                        <th>Amount</th>
-                                                        <th>Paid</th>
-                                                        <th>Entry In Ledger</th>
-                                                        <th>Invoice number</th>
-                                                        <th>Action</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <tr v-for="(i,index) in loop" :key="index">
-                                                        <td>
-                                                            <!-- {{ items[0] ? items[0].price : '' }} -->
-                                                            <select class="form-control rounded-0"
-                                                                    @change="saveRow($event,'first',index)"
-                                                                    :value="postData.category[index]"
-                                                                    :disabled="editAble">
-                                                                <option value="" selected>Select Category</option>
-                                                                <option v-for="(category, i) in categories"
-                                                                        :value="category.id" :key="i">
-                                                                    {{ category.name }}
-                                                                </option>
-                                                            </select>
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" class="form-control"
-                                                                   @keyup="saveRow($event,'second',index)"
-                                                                   :value="postData.description[index]"
-                                                                   :disabled="editAble"/>
-                                                        </td>
-                                                        <td>
-                                                            <input type="number" min="0" class="form-control"
-                                                                   @keyup="saveRow($event,'third',index)"
-                                                                   :value="postData.amount[index]"
-                                                                   :disabled="editAble"/>
-                                                        </td>
-                                                        <td>
-                                                            <input v-if="postData.ledger[index]" type="number" min="0" class="form-control"
-                                                                   @keyup="saveRow($event,'five',index)"
-                                                                   :value="postData.paid[index]"
-                                                                   :disabled="editAble"/>
-                                                        </td>
-                                                        <td>
-                                                            <input type="checkbox" :checked="postData.ledger[index]" @change="saveRow($event, 'six', index)" :disabled="editAble">
-                                                        </td>
-                                                        <td>
-                                                            <input type="text" class="form-control"
-                                                                   @keyup="saveRow($event,'fourth',index)"
-                                                                   :value="postData.invoice[index]"
-                                                                   disabled/>
-                                                        </td>
-                                                        <td v-if="!editAble">
-                                                            <button class="btn btn-outline-primary mx-2"
-                                                                    @click="addRow">Add
-                                                            </button>
-                                                            <button class="btn btn-outline-danger"
-                                                                    @click="removeRow($event,index)" v-if="loop != 1">
-                                                                Remove
-                                                            </button>
-                                                        </td>
-                                                        <td v-else></td>
-                                                    </tr>
-                                                    <tr class="mt-1">
-                                                        <td></td>
-                                                        <td>
-                                                            <div class="form-group">
-                                                                <label for="totalNums">Total Sale</label>
-                                                                <input id="totalSale" type="text"
-                                                                       class="form-control mr-4" disabled
-                                                                       :value="totalSale"/>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="form-group">
-                                                                <label for="totalNums">Total Amount</label>
-                                                                <input id="totalNums" type="text"
-                                                                       class="form-control mr-4" disabled
-                                                                       :value="totalAmount"/>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="form-group">
-                                                                <label for="netProfit">Net Profit</label>
-                                                                <input id="netProfit" type="text"
-                                                                       class="form-control mr-4" disabled
-                                                                       :value="netProfit"/>
-                                                            </div>
-                                                        </td>
-                                                        <td></td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                                <div class="d-flex justify-content-end">
-                                                    <button v-if="!checkClosing" type="button" class=" text-light btn btn-danger mr-1" 
+                        <td>
+                          <!-- Total Expense Paid -->
+                          <input
+                            type="number"
+                            min="0"
+                            class="form-control rounded-0"
+                            v-model.number="postData.paid[index]"
+                          />
+                        </td>
+
+                        <td>
+                          <!-- Balance -->
+                          <input
+                            type="number"
+                            class="form-control rounded-0"
+                            :value="balances[index]"
+                            readonly
+                          />
+                        </td>
+                        <td class="add-btn" v-if="!editAble">
+                          <button
+                            class="btn btn-outline-primary mx-2"
+                            @click="addRow"
+                          >
+                            Add
+                          </button>
+                          <button
+                            class="btn btn-outline-danger"
+                            @click="removeRow($event, index)"
+                            v-if="loop != 1"
+                          >
+                            Remove
+                          </button>
+                        </td>
+                        <td v-else></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                   <div class="d-flex justify-content-end">
+                                                    <div v-if="totalShortage == 0">
+                                                        <button v-if="!checkClosing" type="button" class=" text-light btn btn-danger mr-1" 
                                                         data-target="#accountModal" data-toggle="modal"
                                                         :disabled="loading">Update Account
                                                     </button>
+                                                    </div>
                                                     <button type="button" class="btn btn-outline-success mr-4"
                                                             @click="add" :disabled="loading" v-if="!editAble">
                                                         {{ loading ? 'Loading...' : 'Save' }}
@@ -427,14 +414,7 @@
                                                             v-if="!editAble && postData.category.length != 0">Cancel
                                                     </button>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- END TABLE -->
-                        </div>
-                    </div>
+                </div>
                 </div>
             </div>
 
@@ -678,44 +658,51 @@ export default {
              this.isLoading = false;
         },
         saveRow(event, fieldName, index) {
-            // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
-            if (fieldName == "first") {
-                this.postData.category[index] = event.target.value;
-            }
-            if (fieldName == "second") {
-                this.postData.description[index] = event.target.value;
-            }
-            if (fieldName == "third") {
-                this.postData.amount[index] = event.target.value;
-            }
-            if (fieldName == "fourth") {
-                this.postData.invoice[index] = event.target.value;
-            }
-            if (fieldName == "five") {
-                this.postData.paid[index] = event.target.value;
-            }
-            if (fieldName == "six") {
-                this.postData.ledger[index] = event.target.checked;
-            }
+      // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+      if (fieldName == "first") {
+        this.postData.category[index] = event.target.value;
+      }
+      if (fieldName == "second") {
+        this.postData.description[index] = event.target.value;
+      }
+      if (fieldName == "third") {
+        this.postData.amount[index] = event.target.value;
+      }
+      if (fieldName == "fourth") {
+        this.postData.invoice[index] = event.target.value;
+      }
+      if (fieldName == "five") {
+        this.postData.paid[index] = event.target.value;
+      }
+      if (fieldName == "six") {
+        this.postData.ledger[index] = event.target.checked;
+      }
 
-            // total amount sum only for show
-            this.totalAmount = this.postData.amount.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
-            this.netProfit = this.totalSale - this.totalAmount;
-        },
-        addRow() {
-            this.loop++;
-        },
-        removeRow(event, index) {
-            this.postData.category.splice(index, 1);
-            this.postData.description.splice(index, 1);
-            this.postData.amount.splice(index, 1);
-            this.postData.invoice.splice(index, 1);
-            this.loop--;
+      // total amount sum only for show
+      this.totalAmount = this.postData.amount.reduce(
+        (a, b) => parseFloat(a) + parseFloat(b),
+        0
+      );
+      this.netProfit = this.totalSale - this.totalAmount;
+    },
+    addRow() {
+      this.loop++;
+    },
+    removeRow(event, index) {
+      this.postData.category.splice(index, 1);
+      this.postData.description.splice(index, 1);
+      this.postData.amount.splice(index, 1);
+      this.postData.paid.splice(index, 1);
+      this.postData.invoice.splice(index, 1);
+      this.loop--;
 
-            // total amount sum only for show
-            this.totalAmount = this.postData.amount.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
-            this.netProfit = this.totalSale - this.totalAmount;
-        },
+      // total amount sum only for show
+      this.totalAmount = this.postData.amount.reduce(
+        (a, b) => parseFloat(a) + parseFloat(b),
+        0
+      );
+      this.netProfit = this.totalSale - this.totalAmount;
+    },
         async add() {
 
             // validation for empty data
@@ -886,13 +873,26 @@ totalShortage() {
         0
     );
 },
+  balances() {
+      return this.postData.amount.map((amt, index) => {
+        let paid = this.postData.paid[index] || 0;
 
+        // Clamp paid so it never exceeds amount
+        if (paid > amt) {
+          paid = amt;
+          this.postData.paid[index] = paid;
+        }
+
+        return amt - paid;
+      });
+    },
 
     profitLoss() {
     // Ensure shortages and expenses are arrays
     const shortages = this.shortages || [];
     const expenses = this.expenses || [];
-
+       
+        
     // If no shortages, return 0
 
     const totalReceivable = shortages.reduce(
@@ -914,8 +914,10 @@ totalShortage() {
         (sum, item) => sum + Number(item.amount ?? 0),
         0
     );
+console.log(totalExpenses);
 
     return totalReceivable - (totalKtCommission + totalOtherCommission + totalExpenses);
+
 },
 
     startTotals() {

@@ -8,7 +8,48 @@
                             <h4>Spare Unclosing Detail</h4>
                         </div>
                         <div class="card-body">
-                            
+                            <form @submit.prevent="fetchData">
+    <div class="row px-2 mb-4 align-items-end">
+        <div class="col-md-3">
+            <label for="terminalFilter">Select Bus</label>
+            <select id="terminalFilter" class="form-control"
+                    v-model="filterData.bus_number">
+                <option value="">Select Bus</option>
+                <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
+                    {{ bus.bus_number }}
+                </option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="fromDate">Schedule Date</label>
+            <input id="fromDate" type="date" class="form-control"
+                   v-model="filterData.from_date">
+        </div>
+
+        <div class="col-md-3">
+            <label for="toDate">Return Date</label>
+            <input id="toDate" type="date" class="form-control"
+                   v-model="filterData.to_date">
+        </div>
+
+       <div class="col-md-3">
+  <div class="row">
+    <div class="col-6 pr-1">
+      <button type="submit" class="btn btn-primary w-100">
+        Filter
+      </button>
+    </div>
+    <div class="col-6 pl-1">
+      <button type="button" class="btn btn-danger w-100" @click="resetFilters">
+        Reset
+      </button>
+    </div>
+  </div>
+</div>
+
+    </div>
+</form>
                             <!-- Table -->
                             <div class="row">
                                 <div class="col-12">
@@ -23,8 +64,7 @@
                                                 <table
                                                     class="table table-striped table-hover"
                                                     id="closing_table"
-                                                    style="border-collapse: separate;
-                                                    border-spacing: 0 10px;"
+                                                   
                                                 >
                                                     <thead>
                                                     <tr>
@@ -118,6 +158,12 @@ export default {
             },
             success: false,
             errors: false,
+              filterData: {
+                  bus_number: "",
+                  from_date: "",
+                  to_date: ""
+                },
+                 buses: [],
         };
     },
     async created() {
@@ -138,15 +184,46 @@ export default {
         clearForm: function () {
             this.data = {};
         },
-        async fetchData() {
-            const res = await this.callApi("post", "booking/close/schedule/unclosing/spare");
-            if (res.status == 200) {
-                this.closings = res.data.closings;
-            } else {
-                console.log(res);
-            }
-        },
+       async fetchData() {
+    const res = await this.callApi(
+        "post",
+        "booking/close/schedule/unclosing/spare",
+        this.filterData
+    );
+    if (res.status === 200) {
 
+        // Step 1: destroy existing DataTable if exists
+        if ($.fn.dataTable.isDataTable("#closing_table")) {
+            $("#closing_table").DataTable().destroy();
+        }
+
+        // Step 2: update Vue data
+        this.closings = res.data.closings;
+        this.buses = res.data.buses || [];
+
+        // Step 3: Initialize DataTable only if data exists
+        this.$nextTick(() => {
+            if (this.closings.length > 0) {
+                $("#closing_table").DataTable({
+                    pageLength: 10,
+                    responsive: true,
+                    autoWidth: false,
+                    ordering: true
+                });
+            }
+        });
+    } else {
+        console.log(res);
+    }
+},
+resetFilters() {
+  this.filterData = {
+    bus_number: "",
+    from_date: "",
+    to_date: ""
+  };
+  this.fetchData();
+},
         async revertUnclosing() {
             
             this.loading = true;

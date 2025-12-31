@@ -18,13 +18,13 @@
     <div class="row px-2 mb-4 align-items-end">
         <div class="col-md-3">
             <label for="terminalFilter">Select Bus</label>
-            <select id="terminalFilter" class="form-control"
-                    v-model="filterData.bus_number">
-                <option value="">Select Bus</option>
-                <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
-                    {{ bus.bus_number }}
-                </option>
-            </select>
+           <select id="terminalFilter" class="form-control" v-model.number="filterData.bus_number">
+    <option value="">Select Bus</option>
+    <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
+        {{ bus.bus_number }}
+    </option>
+</select>
+
         </div>
 
         <div class="col-md-3">
@@ -86,6 +86,7 @@
                                                             <th>Merge Sale</th>
                                                             <th>Merge Expense</th>
                                                             <th>Net Sale</th>
+                                                            <th>Shortage</th>
                                                             <th width="200px" v-if="checkForSubmenuButtons('add-expense')">Action</th>
                                                         </tr>
                                                         </thead>
@@ -149,39 +150,54 @@
         (merge.expenses_sum_amount || 0)
       }}
     </td>
+<td>
+      <span 
+    :class="{
+      'dot-green': !merge.shortage.some(s => parseFloat(s.shortage || 0) > 0),
+      'dot-red': merge.shortage.some(s => parseFloat(s.shortage || 0) > 0)
+    }"
+    title="Shortage Status"
+  ></span>
+  <!-- {{ parseInt(merge.shortage.reduce((sum, s) => sum + parseFloat(s.shortage || 0), 0)) }} -->
+</td>
 
     <td v-if="checkForSubmenuButtons('add-expense')">
-      <router-link
-        target="_blank"
-        class="btn btn-success mx-1"
-        :to="{ name:'expense-page', params: { id: merge.id }}"
-        title="Add Expense"
-      >
-        <i class="fas fa-plus"></i>
-      </router-link>
+  <router-link
+    target="_blank"
+    class="btn btn-success mx-1"
+    :to="{ name:'expense-page', params: { id: merge.id }}"
+    title="Add Expense"
+  >
+    <i class="fas fa-plus"></i>
+  </router-link>
 
-      <router-link
-        target="_blank"
-        class="btn btn-success mx-1"
-        :to="{ name:'header-link-page', params: { id: merge.id }}"
-        title="Header Link"
-      >
-        Link
-      </router-link>
+  <router-link
+    target="_blank"
+    class="btn btn-success mx-1"
+    :to="{ name:'header-link-page', params: { id: merge.id }}"
+    title="Header Link"
+  >
+    Link
+  </router-link>
 
-      <button
-        title="Closing Date"
-        data-target="#date-modal"
-        data-toggle="modal"
-        @click="
-          closingData.mergeId = merge.id;
-          closingData.closingDate = merge.closing_date
-        "
-        class="btn btn-info mx-1"
-      >
-        <i class="far fa-clock"></i>
-      </button>
-    </td>
+  <!-- Closing Date Button with Permission Check -->
+  <button
+    v-if="checkForSubmenuButtons('merges-closing-date')"
+    title="Closing Date"
+    data-target="#date-modal"
+    data-toggle="modal"
+    @click="
+      closingData.mergeId = merge.id;
+      closingData.closingDate = merge.closing_date
+    "
+    class="btn btn-info mx-1"
+  >
+    <i class="far fa-clock"></i>
+  </button>
+
+  <!-- Shortage Dot -->
+</td>
+
   </tr>
 
   <!-- Totals -->
@@ -190,6 +206,15 @@
     <td><b>{{ totalSale }}</b></td>
     <td><b>{{ totalExpense }}</b></td>
     <td><b>{{ totalSale - totalExpense }}</b></td>
+      <!-- Shortage status dot -->
+  <!-- <td>
+    <span 
+      :class="{
+        'dot-green': !hasShortage,
+        'dot-red': hasShortage
+      }"
+    ></span>
+  </td> -->
   </tr>
 </tbody>
 
@@ -306,22 +331,19 @@ export default {
         close() {
             $("#date-modal").click();
         },
-        async fetchData() {
-            this.tableLoading = true;
-            const res = await this.callApi("post", "booking/close/schedule/merges");
-            if (res.status == 200) {
-                this.merges = res.data.merges;
-                this.buses = res.data.buses;
-                this.tableLoading = false;
-            } else {
-                console.log(res);
-            }
-            // setTimeout(() => {
-            //     $('#merge_table').DataTable({
-            //         'order': []
-            //     });
-            // }, 300);
-        },
+         async fetchBuses() {
+  try {
+    const res = await this.callApi("post", "buses");
+    console.log("Buses API response:", res); // check the structure
+    if (res.status === 200) {
+      // adjust based on actual path
+      this.buses = res.data.buses || res.data; 
+    }
+  } catch (error) {
+    console.error("Error fetching buses:", error);
+  }
+},
+
         async fetchMerges() {
     try {
         this.tableLoading = true;
@@ -399,16 +421,28 @@ resetFilters() {
     },
     computed: {
         ...mapGetters(["getDeletingObj"]),
+         hasShortage() {
+    return this.merges.some(merge =>
+      merge.shortage.some(s => parseFloat(s.shortage || 0) > 0)
+    );
+  }
     },
     watch: {
         merges(){
-            this.totalSale = this.merges.reduce((sum, single) => {
-                return sum + parseInt(single.seat_fare) + parseInt(single.elt) + parseInt(single.refund) - parseInt(single.discount) - parseInt(single.commission);
-            }, 0);
+          this.totalSale = this.merges.reduce((sum, single) => {
+    const seatFare   = parseFloat(single.seat_fare) || 0;
+    const elt        = parseFloat(single.elt) || 0;
+    const refund     = parseFloat(single.refund) || 0;
+    const discount   = parseFloat(single.discount) || 0;
+    const commission = parseFloat(single.commission) || 0;
 
-            this.totalExpense = this.merges.reduce((sum, single) => {
-                return sum + parseFloat(single.expenses_sum_amount);
-            }, 0);
+    return sum + seatFare + elt + refund - discount - commission;
+}, 0);
+
+this.totalExpense = this.merges.reduce((sum, single) => {
+    return sum + (parseFloat(single.expenses_sum_amount) || 0);
+}, 0);
+
        },
         getDeletingObj(obj) {
             if (obj.isDeleted) {
@@ -417,6 +451,9 @@ resetFilters() {
             }
         },
     },
+     async mounted() {
+    await this.fetchBuses();  // load buses on component mount
+  },
 };
 </script>
 <style scoped>
@@ -425,5 +462,21 @@ resetFilters() {
     margin: 0 auto;
     padding: 2em;
   }
+  .dot-green {
+  height: 12px;
+  width: 12px;
+  background-color: green;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-red {
+  height: 12px;
+  width: 12px;
+  background-color: red;
+  border-radius: 50%;
+  display: inline-block;
+}
+
 </style>
 

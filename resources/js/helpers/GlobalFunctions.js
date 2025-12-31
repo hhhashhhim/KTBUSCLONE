@@ -86,7 +86,7 @@ export default {
     */
     insertComma(value) 
     {
-        if (!value) return '';
+        if (!value) return '0';
   
         // Remove existing commas
         let number = value.toString().replace(/,/g, '');

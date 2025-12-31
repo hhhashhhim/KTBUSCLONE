@@ -8,7 +8,48 @@
                             <h4>Commission Closing Detail</h4>
                         </div>
                         <div class="card-body">
-                            
+                            <form @submit.prevent="fetchData">
+    <div class="row px-2 mb-4 align-items-end">
+        <div class="col-md-3">
+            <label for="terminalFilter">Select Bus</label>
+            <select id="terminalFilter" class="form-control"
+                    v-model="filterData.bus_number">
+                <option value="">Select Bus</option>
+                <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
+                    {{ bus.bus_number }}
+                </option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="fromDate">Schedule Date</label>
+            <input id="fromDate" type="date" class="form-control"
+                   v-model="filterData.from_date">
+        </div>
+
+        <div class="col-md-3">
+            <label for="toDate">Return Date</label>
+            <input id="toDate" type="date" class="form-control"
+                   v-model="filterData.to_date">
+        </div>
+
+       <div class="col-md-3">
+  <div class="row">
+    <div class="col-6 pr-1">
+      <button type="submit" class="btn btn-primary w-100">
+        Filter
+      </button>
+    </div>
+    <div class="col-6 pl-1">
+      <button type="button" class="btn btn-danger w-100" @click="resetFilters">
+        Reset
+      </button>
+    </div>
+  </div>
+</div>
+
+    </div>
+</form>
                             <!-- Table -->
                             <div class="row">
                                 <div class="col-12">
@@ -20,8 +61,6 @@
                                                 <table
                                                     class="table table-striped table-hover"
                                                     id="closing_table"
-                                                    style="border-collapse: separate;
-                                                    border-spacing: 0 10px;"
                                                 >
                                                     <thead>
                                                     <tr>
@@ -120,32 +159,40 @@ export default {
         NewTransaction,
         Hide
     },
-    data() {
-        return {
-            btnLoading: false,
-            loading: false,
-            closings: [],
-            permissions: [],
-            validationErrors: "",
-            formID: "schedule_closing_form",
-            hideFormID: "hide_schedule_form",
-            delId: "",
-            seatNo: 0,
-            terminals: [],
-            heads: [],
-            addDataReset: {},
-            addData: {
-                terminal: "0",
-                closeId: "0",
-                ledgers: [],
-                credits: [],
-                debits: [],
-                narrations: [],
-            },
-            success: false,
-            errors: false,
-        };
-    },
+   data() {
+    return {
+        btnLoading: false,
+        loading: false,
+        closings: [],      // grouped data from API
+        flatClosings: [],  // flattened for DataTables
+        permissions: [],
+        validationErrors: "",
+        formID: "schedule_closing_form",
+        hideFormID: "hide_schedule_form",
+        delId: "",
+        seatNo: 0,
+        terminals: [],
+        heads: [],
+        addDataReset: {},
+        addData: {
+            terminal: "0",
+            closeId: "0",
+            ledgers: [],
+            credits: [],
+            debits: [],
+            narrations: [],
+        },
+        success: false,
+        errors: false,
+        filterData: {
+            bus_number: "",
+            from_date: "",
+            to_date: ""
+        },
+        buses: [],
+        dataTable: null
+    };
+},
     async created() {
         this.addDataReset = JSON.parse(JSON.stringify(this.addData));
         $('.modal').remove();
@@ -182,14 +229,54 @@ export default {
             }
             this.tableLoading = false;
         },
-        async fetchData() {
-            const res = await this.callApi("post", "booking/close/schedule/closing/commission");
-            if (res.status == 200) {
-                this.closings = res.data.closings;
-            } else {
-                console.log(res);
+       async fetchData() {
+    const res = await this.callApi(
+        "post",
+        "booking/close/schedule/closing/commission",
+        this.filterData
+    );
+
+    if (res.status === 200) {
+
+        // Step 1: destroy existing DataTable if exists
+        if ($.fn.dataTable.isDataTable("#closing_table")) {
+            $("#closing_table").DataTable().destroy();
+        }
+
+        // Step 2: update Vue data
+        this.closings = res.data.closings;
+        this.buses = res.data.buses || [];
+
+        // Step 3: flatten grouped data for DataTables
+        this.flatClosings = [];
+        this.closings.forEach(group => {
+            this.flatClosings.push(...group);
+        });
+
+        // Step 4: Initialize DataTable only if data exists
+        this.$nextTick(() => {
+            if (this.flatClosings.length > 0) {
+                $("#closing_table").DataTable({
+                    pageLength: 10,
+                    responsive: true,
+                    autoWidth: false,
+                    ordering: true
+                });
             }
-        },
+        });
+
+    } else {
+        console.log(res);
+    }
+},
+resetFilters() {
+  this.filterData = {
+    bus_number: "",
+    from_date: "",
+    to_date: ""
+  };
+  this.fetchData();
+},
 
         async hideUnclosing() {
             
