@@ -76,10 +76,16 @@
                                                 <div class="form-group mb-0">
                                                     <label>CNIC <span class="text-danger"
                                                             v-if="this.addForm.type != 'advance booking'">*</span></label>
-                                                    <vue-mask @blur="handleBlur" class="form-control"
-                                                        v-model="addForm.customerCNIC" mask="00000-0000000-0"
-                                                        :raw="false" :options="options">
-                                                    </vue-mask>
+                                                  <vue-mask
+    @blur="handleBlur"
+    class="form-control"
+    v-model="addForm.customerCNIC"
+    mask="00000-0000000-0"
+    :raw="false"
+    :options="options"
+    :disabled="isCustomerLocked">
+</vue-mask>
+
 
 
                                                 </div>
@@ -87,8 +93,14 @@
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label>Full Name <span class="text-danger ml-1">*</span></label>
-                                                    <input type="text" class="form-control" id="fullName"
-                                                        v-model="addForm.customerName" />
+                                                   <input
+    type="text"
+    class="form-control"
+    id="fullName"
+    v-model="addForm.customerName"
+    :disabled="isCustomerLocked"
+/>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -96,16 +108,28 @@
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label>Contact <span class="text-danger ml-1">*</span></label>
-                                                    <vue-mask class="form-control" v-model="addForm.contact"
-                                                        mask="0000-0000000" :raw="false" :options="optionsPhone">
-                                                    </vue-mask>
+                                                    <vue-mask
+    class="form-control"
+    v-model="addForm.contact"
+    mask="0000-0000000"
+    :raw="false"
+    :options="optionsPhone"
+    :disabled="isCustomerLocked">
+</vue-mask>
+
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label>Remarks</label>
-                                                    <input type="text" class="form-control" id="remarks"
-                                                        v-model="addForm.remarks" />
+                                                    <input
+    type="text"
+    class="form-control"
+    id="remarks"
+    v-model="addForm.remarks"
+    :disabled="isCustomerLocked"
+/>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -118,33 +142,39 @@
                                                     this.discountLabel
                                                 }}</label>
                                             </div>
-                                            <div class="col-md-6">
+                                    <div class="col-md-6">
+    <!-- POINTS -->
+    <div class="custom-control custom-checkbox" v-if="showPointsCheckbox">
+        <input
+            type="checkbox"
+            class="custom-control-input"
+            id="pointsCheckBox"
+            :checked="selectedOption === 'points'"
+            :disabled="isCustomerLocked"
+            @click="handleCheckboxClick($event, 'points')"
+        >
+        <label class="custom-control-label" for="pointsCheckBox">
+            Points Usage
+        </label>
+    </div>
 
-                                                <!-- POINTS CHECKBOX -->
-                                                <!-- POINTS -->
-                                                <div class="custom-control custom-checkbox" v-if="showPointsCheckbox">
-                                                    <input type="checkbox" class="custom-control-input"
-                                                        id="pointsCheckBox" name="pointsUsage" value="points"
-                                                        :checked="selectedOption === 'points'"
-                                                        @change="onRadioChange('points')">
-                                                    <label class="custom-control-label" for="pointsCheckBox">
-                                                        Points Usage
-                                                    </label>
-                                                </div>
-
-                                                <!-- DISCOUNT -->
-                                                <div class="custom-control custom-checkbox" v-if="showDiscountCheckbox">
-                                                    <input type="checkbox" class="custom-control-input"
-                                                        id="discountCheckBox" name="pointsUsage" value="discount"
-                                                        :checked="selectedOption === 'discount'"
-                                                        @change="onRadioChange('discount')">
-                                                    <label class="custom-control-label" for="discountCheckBox">
-                                                        Discount Usage
-                                                    </label>
-                                                </div>
+    <!-- DISCOUNT -->
+    <div class="custom-control custom-checkbox" v-if="showDiscountCheckbox">
+        <input
+            type="checkbox"
+            class="custom-control-input"
+            id="discountCheckBox"
+            :checked="selectedOption === 'discount'"
+            :disabled="isCustomerLocked"
+            @click="handleCheckboxClick($event, 'discount')"
+        >
+        <label class="custom-control-label" for="discountCheckBox">
+            Discount Usage
+        </label>
+    </div>
+</div>
 
 
-                                            </div>
 
                                         </div>
                                         <div class="row bg-light-green pt-2" v-if="selectedOption === 'points'">
@@ -331,13 +361,6 @@
                                                         @keyup="calculateTotal()"
                                                         :readonly="addForm.discount_otp_valid || !checkForSubmenuButtons('discount-field')" />
                                                     <!-- always readonly since discount is applied via OTP -->
-
-
-                                                    <!-- <input type="text" @keypress="isNumberDiscount($event)"
-                                                        @keyup="calculateTotal()"
-                                                        :readonly="!checkForSubmenuButtons('discount-field')"
-                                                        class="form-control" id="fareDiscount"
-                                                        v-model="addForm.discount" /> -->
                                                 </div>
                                             </div>
                                             <div class="col-md-2 pl-0">
@@ -1857,46 +1880,76 @@ export default {
         }, 2000);
     },
     methods: {
+        handleCheckboxClick(e, type) {
+
+    // 🚫 No seat → hard stop
+    if (!this.hasAnySeatSelected) {
+        e.preventDefault();
+
+        swal({
+            title: "Hold on",
+            text: "Please select a seat first",
+            icon: "warning",
+            timer: 2000
+        });
+
+        return;
+    }
+
+    // ✅ Seat exists → allow toggle
+    this.onRadioChange(type);
+},
+
         onRadioChange(type) {
 
-            // --- If clicking the same radio again → unselect it ---
-            if (this.selectedOption === type) {
-                this.selectedOption = null;
-                this.pointsUsage = false;
-                this.discountUsage = false;
+    // 🚫 No seat selected → block checkbox
+    if (!this.hasAnySeatSelected) {
+        swal({
+            title: "Hold on",
+            text: "Please select a seat first",
+            icon: "warning",
+            timer: 2000
+        });
 
-                // Reset both fields
-                this.addForm.discountOtp = "";
-                this.addForm.discount_otp_valid = false;
-                this.addForm.pointsUseInput = "";
-                this.addForm.otp = "";
-                this.addForm.otp_valid = false;
-                return;
-            }
+        // Force uncheck
+        this.selectedOption = null;
+        this.pointsUsage = false;
+        this.discountUsage = false;
+        return;
+    }
 
-            // --- If switching to POINTS ---
-            if (type === "points") {
-                this.selectedOption = "points";
-                this.pointsUsage = true;
-                this.discountUsage = false;
+    // --- Toggle OFF if same option clicked ---
+    if (this.selectedOption === type) {
+        this.selectedOption = null;
+        this.pointsUsage = false;
+        this.discountUsage = false;
 
-                // Reset discount fields
-                this.addForm.discountOtp = "";
-                this.addForm.discount_otp_valid = false;
-            }
+        this.addForm.discountOtp = "";
+        this.addForm.discount_otp_valid = false;
+        this.addForm.pointsUseInput = "";
+        this.addForm.otp = "";
+        this.addForm.otp_valid = false;
+        return;
+    }
 
-            // --- If switching to DISCOUNT ---
-            else if (type === "discount") {
-                this.selectedOption = "discount";
-                this.discountUsage = true;
-                this.pointsUsage = false;
+    if (type === "points") {
+        this.selectedOption = "points";
+        this.pointsUsage = true;
+        this.discountUsage = false;
 
-                // Reset points fields
-                this.addForm.pointsUseInput = "";
-                this.addForm.otp = "";
-                this.addForm.otp_valid = false;
-            }
-        },
+        this.addForm.discountOtp = "";
+        this.addForm.discount_otp_valid = false;
+    } 
+    else if (type === "discount") {
+        this.selectedOption = "discount";
+        this.discountUsage = true;
+        this.pointsUsage = false;
+
+        this.addForm.pointsUseInput = "";
+        this.addForm.otp = "";
+        this.addForm.otp_valid = false;
+    }
+},
         handleBlur() {
             this.getCustomer('addFormCNIC');
             this.getPoints('addFormCNIC');
@@ -3363,6 +3416,19 @@ export default {
                     timer: 2000
                 });
             }
+            // 🔁 If all seats are unselected → reset checkbox
+if (!this.hasAnySeatSelected) {
+    this.selectedOption = null;
+    this.pointsUsage = false;
+    this.discountUsage = false;
+
+    this.addForm.discountOtp = "";
+    this.addForm.discount_otp_valid = false;
+    this.addForm.pointsUseInput = "";
+    this.addForm.otp = "";
+    this.addForm.otp_valid = false;
+}
+
 
         },
 
@@ -4677,7 +4743,24 @@ export default {
     watch: {
         'addForm.terminalId': function (newVal) {
             this.$store.state.user.terminal_id = newVal;
+        },
+         hasAnySeatSelected(val) {
+        if (!val) {
+            // Reset discount
+            this.addForm.discount = 0;
+
+            // Also reset discount usage state (important)
+            this.selectedOption = null;
+            this.discountUsage = false;
+
+            // Reset discount OTP
+            this.addForm.discountOtp = "";
+            this.addForm.discount_otp_valid = false;
+
+            // Recalculate totals
+            this.calculateTotal();
         }
+    }
     },
 
     computed: {
@@ -4697,6 +4780,18 @@ export default {
             }
             return result;
         },
+         hasAnySeatSelected() {
+        return (
+            this.selectedSeats.length > 0 ||
+            this.selectedBookedSeats.length > 0
+        );
+    },
+     isCustomerLocked() {
+        return (
+            this.addForm.otp_valid === true ||
+            this.addForm.discount_otp_valid === true
+        );
+    }
     },
 }
     ;
