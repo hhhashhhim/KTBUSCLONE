@@ -1453,14 +1453,14 @@
                                                         @click="passDataToCancelModel(innerItem); this.cancelData.percentage = 0">
                                                         Cancel Ticket
                                                     </button>
-                                                   <button
+                                                   <!-- <button
   v-if="canShowJazzCashRefund"
   type="button"
   class="btn btn-danger ml-2"
   @click="passDataToCancelRefundModel(innerItem); this.cancelData.percentage = 0"
 >
   Cancel Ticket & Refund
-</button>
+</button> -->
 
 
 
