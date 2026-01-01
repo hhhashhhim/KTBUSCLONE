@@ -35463,7 +35463,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             switch (_context2.prev = _context2.next) {
               case 0:
                 if ((e.metaKey || e.altKey) && String.fromCharCode(e.which).toLowerCase() == 'm') {
-                  if (_this3.checkForSubmenuButtons('seat-details-shortcut') || _this3.checkForSubmenu('seat-details-shortcut')) {
+                  if (_this3.checkForSubmenuButtons('seat-details-shortcut')) {
                     _this3.seatDetails();
                   } else {
                     swal({

@@ -2108,7 +2108,7 @@ export default {
 
         async altM(e) {
             if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() == 'm')) {
-                if (this.checkForSubmenuButtons('seat-details-shortcut') || this.checkForSubmenu('seat-details-shortcut')) {
+                if (this.checkForSubmenuButtons('seat-details-shortcut')) {
                     this.seatDetails();
                 } else {
                     swal({
