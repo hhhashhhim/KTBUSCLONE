@@ -4928,20 +4928,19 @@ if (!this.hasAnySeatSelected) {
             }
 
         },
-          checkForSubmenu(moduleName) {
-    let permissions = this.permissions;
-
-    for (let i = 0; i < permissions.length; i++) {
-        for (let j = 0; j < permissions[i].childs.length; j++) {
-            const subMenuItem = permissions[i].childs[j];
-            if (subMenuItem.name === moduleName) {
-                return subMenuItem.allow; // return immediately when found
+           checkForSubmenu(moduleName) {
+            let permissions = this.permissions;
+            let valid = false;
+            for (let i = 0; i < permissions.length; i++) {
+                permissions[i].childs.forEach(subMenuItem => {
+                    if (subMenuItem.name === moduleName) {
+                        valid = subMenuItem.allow;
+                        return;
+                    }
+                });
             }
-        }
-    }
-
-    return false; // if not found
-},
+            return valid;
+        },
     },
 
     watch: {

@@ -39865,18 +39865,18 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     checkForSubmenu: function checkForSubmenu(moduleName) {
       var permissions = this.permissions;
+      var valid = false;
 
       for (var i = 0; i < permissions.length; i++) {
-        for (var j = 0; j < permissions[i].childs.length; j++) {
-          var subMenuItem = permissions[i].childs[j];
-
+        permissions[i].childs.forEach(function (subMenuItem) {
           if (subMenuItem.name === moduleName) {
-            return subMenuItem.allow; // return immediately when found
+            valid = subMenuItem.allow;
+            return;
           }
-        }
+        });
       }
 
-      return false; // if not found
+      return valid;
     }
   },
   watch: {
