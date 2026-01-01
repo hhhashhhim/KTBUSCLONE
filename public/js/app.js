@@ -39926,6 +39926,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     isCustomerLocked: function isCustomerLocked() {
       return this.addForm.otp_valid === true || this.addForm.discount_otp_valid === true;
+    },
+    computed: {
+      canShowJazzCashRefund: function canShowJazzCashRefund() {
+        var hasSubmenu = this.checkForSubmenu('jazz-cash-refund'); // called once
+
+        return hasSubmenu && ['booked', 'advance booking'].includes(this.innerItem.type) && this.innerItem.terminal_id === 14 && this.innerItem.transaction_id !== null;
+      }
     }
   }
 });
@@ -92642,10 +92649,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }
       }, " Cancel Ticket ", 8
       /* PROPS */
-      , _hoisted_552)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), function () {
-        var hasSubmenu = $options.checkForSubmenu('jazz-cash-refund');
-        return hasSubmenu && (innerItem.type == 'booked' || innerItem.type == 'advance booking') && innerItem.terminal_id === 14 && innerItem.transaction_id !== null;
-      }() ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      , _hoisted_552)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.canShowJazzCashRefund ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 6,
         type: "button",
         "class": "btn btn-danger ml-2",

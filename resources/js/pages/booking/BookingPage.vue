@@ -1454,23 +1454,14 @@
                                                         Cancel Ticket
                                                     </button>
                                                    <button
-v-if="(
-    (() => {
-        const hasSubmenu = checkForSubmenu('jazz-cash-refund');
-        return (
-            (hasSubmenu && (innerItem.type == 'booked' || innerItem.type == 'advance booking')) &&
-            innerItem.terminal_id === 14 &&
-            innerItem.transaction_id !== null
-        );
-    })()
-)"
-type="button"
-class="btn btn-danger ml-2"
-@click="passDataToCancelRefundModel(innerItem); this.cancelData.percentage = 0"
+  v-if="canShowJazzCashRefund"
+  type="button"
+  class="btn btn-danger ml-2"
+  @click="passDataToCancelRefundModel(innerItem); this.cancelData.percentage = 0"
 >
-
-    Cancel Ticket & Refund
+  Cancel Ticket & Refund
 </button>
+
 
 
                                                 </div>
@@ -5003,7 +4994,17 @@ if (!this.hasAnySeatSelected) {
             this.addForm.otp_valid === true ||
             this.addForm.discount_otp_valid === true
         );
+    },
+    computed: {
+    canShowJazzCashRefund() {
+        const hasSubmenu = this.checkForSubmenu('jazz-cash-refund'); // called once
+        return hasSubmenu &&
+               ['booked', 'advance booking'].includes(this.innerItem.type) &&
+               this.innerItem.terminal_id === 14 &&
+               this.innerItem.transaction_id !== null;
     }
+}
+
     },
 }
     ;
