@@ -97,7 +97,7 @@
                                                             <tr v-for="(filter,i) in filters" :key="i"
                                                                 :class="filter.badge">
                                                                 <td>{{ filter.bus_time }}</td>
-                                                                <td>{{ filter.terminal_name }}</td>
+                                                                <td>{{ filter?.terminal?.name }}</td>
                                                                 <td>{{ filter.cancel_by }}</td>
                                                                 <td>{{ filter.seat_no }}</td>
                                                                 <td>{{ filter.type }}</td>

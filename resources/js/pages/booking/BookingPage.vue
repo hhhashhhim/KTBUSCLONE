@@ -1211,6 +1211,57 @@
                 </div>
             </div>
         </div>
+         <div class="modal fade" id="cancelRefundModel" tabindex="3" aria-labelledby="cancelRefundModelLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancelRefundModelLabel">Cancel Refund Ticket</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                            @click="closeCancel()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" v-if="cancelData.dataType == 'booked'">
+                        <div class="form-group">
+                            <label for="cancel_percentage">Percentage {{ cancelData.dataType }}<span
+                                    class="text-muted ml-2">(Optional)</span></label>
+                            <select id="cancel_percentage" class="form-control" v-model="cancelData.percentage">
+                                <option value="first">Select Cancellation Percentage</option>
+                                <option value="0">0%</option>
+                                    <option value="10">10%</option>
+    <option value="20">20%</option>
+    <option value="30">30%</option>
+    <option value="40">40%</option>
+    <option value="50">50%</option>
+    <option value="60">60%</option>
+    <option value="70">70%</option>
+    <option value="80">80%</option>
+    <option value="90">90%</option>
+    <option value="100">100%</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="caceling_remakrs">Remarks</label>
+                            <textarea type="text" class="form-control" id="caceling_remakrs" v-model="cancelData.reason"
+                                placeholder="Reason for canceling a seat"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-body" v-if="cancelData.dataType == 'advance booking'">
+
+                        Are you sure you want to cancel ticket ?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" :disabled="cancelLoading"
+                             @click="cancelRefundBooking(cancelData)">
+                            {{ getSchedule ? "Loading..." : 'Cancel Ticket' }}
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeRefundCancel()">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Model Cancel All ticket-->
         <div class="modal fade" id="cancel_all_ticket" tabindex="4" aria-labelledby="cancelAllModelLabel"
             aria-hidden="true">
@@ -1402,6 +1453,21 @@
                                                         @click="passDataToCancelModel(innerItem); this.cancelData.percentage = 0">
                                                         Cancel Ticket
                                                     </button>
+                                                   <button
+    v-if="(
+            ((checkForSubmenu('jazz-cash-refund') && innerItem.type == 'booked') || 
+             (checkForSubmenu('jazz-cash-refund') && innerItem.type == 'advance booking'))
+            && innerItem.terminal_id === 14 
+            && innerItem.transaction_id !== null
+          )"
+    type="button"
+    class="btn btn-danger ml-2"
+    @click="passDataToCancelRefundModel(innerItem); this.cancelData.percentage = 0"
+>
+    Cancel Ticket & Refund
+</button>
+
+
                                                 </div>
                                             </div>
                                         </div>
@@ -1812,10 +1878,12 @@ export default {
             selectedOption: null,
             showPointsCheckbox: false,
             showDiscountCheckbox: false,
+             permissions: [],
 
         };
     },
     async created() {
+          this.permissions = this.$store.state.permissions;
         $('.modal').remove();
         this.fetchAllSchedules();
         this.showBookingDiv = false;
@@ -1980,6 +2048,9 @@ export default {
         closeCancel() {
             $("#cancelModel").modal('hide');
         },
+        closeRefundCancel() {
+            $("#cancelRefundModel").modal('hide');
+        },
         // end
         openAdvanceModel() {
             this.closeAdvanceCashModel = true;
@@ -2037,7 +2108,7 @@ export default {
 
         async altM(e) {
             if ((e.metaKey || e.altKey) && (String.fromCharCode(e.which).toLowerCase() == 'm')) {
-                if (this.checkForSubmenuButtons('seat-details-shortcut')) {
+                if (this.checkForSubmenuButtons('seat-details-shortcut') || this.checkForSubmenu('seat-details-shortcut')) {
                     this.seatDetails();
                 } else {
                     swal({
@@ -4052,6 +4123,24 @@ if (!this.hasAnySeatSelected) {
             }
             $("#cancelModel").modal('show');
         },
+        passDataToCancelRefundModel: function (data) {
+           this.cancelData = {
+        dataType: data.type,
+        dataDate: data.date,
+        dataSchedule: data.schedule_id,
+        dataCustomer: data.customer_id,
+        dataDeparture: data.departure_city_id,
+        dataDestination: data.destination_city_id,
+        dataSeat_no: data.seat_no,
+
+        // ✅ THIS FIXES REFUND
+        amount: Number(data.seat_fare),
+
+        percentage: 0,
+        reason: "",
+    };
+            $("#cancelRefundModel").modal('show');
+        },
 
         cancelAllModal: function () {
             $("#cancel_all_ticket").modal('show');
@@ -4109,6 +4198,111 @@ if (!this.hasAnySeatSelected) {
             }
             this.cancelLoading = false;
         },
+     async cancelRefundBooking(dataEnter) {
+    this.cancelLoading = true;
+
+    try {
+        /* ======================
+           VALIDATION
+        ====================== */
+        if (dataEnter.dataType === "booked") {
+
+            if (dataEnter.percentage === null || dataEnter.percentage === undefined) {
+                Swal.fire("Warning", "Please select a refund percentage.", "warning");
+                return;
+            }
+
+            if (!dataEnter.reason || !dataEnter.reason.trim()) {
+                Swal.fire("Warning", "Please enter a refund reason.", "warning");
+                return;
+            }
+        }
+
+        /* ======================
+           STEP 1: CANCEL
+        ====================== */
+        const cancelData = {
+            date: dataEnter.dataDate,
+            schedule_id: dataEnter.dataSchedule,
+            customer_id: dataEnter.dataCustomer,
+            departure_id: dataEnter.dataDeparture,
+            destination_id: dataEnter.dataDestination,
+            seat_no: dataEnter.dataSeat_no,
+            percentage: dataEnter.percentage,
+            remarks: dataEnter.reason,
+        };
+
+        const resCancelBooking = await this.callApi(
+            "post",
+            "booking/canceling",
+            cancelData
+        );
+
+        if (resCancelBooking.status !== 200) {
+            Swal.fire("Error", "Unable to cancel booking.", "error");
+            return;
+        }
+
+        /* ======================
+           STEP 2: REFUND
+        ====================== */
+        if (dataEnter.dataType === "booked") {
+
+            const ticketId = resCancelBooking.data.tickets?.[0];
+
+            if (!ticketId) {
+                Swal.fire("Error", "Ticket ID missing for refund.", "error");
+                return;
+            }
+
+            // ✅ 0% refund → cancel only
+            if (Number(dataEnter.percentage) === 0) {
+                Swal.fire("Success", "Ticket cancelled successfully (No refund).", "info");
+                return;
+            }
+
+            // ✅ seat_fare check
+            if (!dataEnter.amount || dataEnter.amount <= 0) {
+                Swal.fire("Error", "Seat fare missing for refund.", "error");
+                return;
+            }
+
+            const refundPayload = {
+                ticket_id: ticketId,
+                refund_percentage: Number(dataEnter.percentage),
+                refund_amount:
+                    (Number(dataEnter.amount) * Number(dataEnter.percentage)) / 100,
+                refund_reason: dataEnter.reason.trim(),
+            };
+
+            console.log("📦 Refund Payload:", refundPayload);
+
+            await this.callApi("post", "allBooking/refund", refundPayload);
+
+            Swal.fire("Success", "Refund processed successfully.", "success");
+        }
+
+        /* ======================
+           FINAL
+        ====================== */
+        await this.callApi(
+            "post",
+            "booking/whatsapp/cancel/message",
+            { tickets: resCancelBooking.data.tickets }
+        );
+
+        this.fetchScheduleData();
+        this.resetArrays();
+        this.closeCancel();
+        this.closeRefundCancel();
+
+    } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Cancel or refund failed.", "error");
+    } finally {
+        this.cancelLoading = false;
+    }
+},
 
         //over issue model complete data
         passDataToOverIssueModel: function (data) {
@@ -4737,6 +4931,19 @@ if (!this.hasAnySeatSelected) {
                 this.$refs.refBusInvoice.submit();
             }
 
+        },
+           checkForSubmenu(moduleName) {
+            let permissions = this.permissions;
+            let valid = false;
+            for (let i = 0; i < permissions.length; i++) {
+                permissions[i].childs.forEach(subMenuItem => {
+                    if (subMenuItem.name === moduleName) {
+                        valid = subMenuItem.allow;
+                        return;
+                    }
+                });
+            }
+            return valid;
         },
     },
 

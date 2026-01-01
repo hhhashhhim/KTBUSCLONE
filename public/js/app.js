@@ -30464,86 +30464,80 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "ScheduleDropReportPage",
-  components: {},
   data: function data() {
     return {
-      validationErrors: [],
       dropSchedules: [],
-      loading: false,
-      formID: 'schedule_drop',
-      editFormID: 'edit_schedule_drop',
-      success: false,
-      errors: false
+      schedules: [],
+      filterData: {
+        bus_number: '',
+        schedule_id: '',
+        from_date: new Date().toISOString().split('T')[0],
+        to_date: new Date().toISOString().split('T')[0]
+      }
     };
   },
-  created: function created() {
-    var _this = this;
-
-    return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-      var currentRouteName;
-      return _regeneratorRuntime().wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              $('.modal').remove();
-
-              _this.fetchHeadersData();
-
-              currentRouteName = _this.$route.name;
-
-              if (currentRouteName == 'booking-page') {
-                window.addEventListener('keydown', _this.enterKey);
-                window.addEventListener('keydown', _this.altM);
-              } else {
-                window.removeEventListener('keydown', _this.enterKey);
-                window.removeEventListener('keydown', _this.altM);
-              }
-
-            case 4:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, _callee);
-    }))();
+  mounted: function mounted() {
+    this.fetchHeadersData();
   },
   methods: {
-    clearForm: function clearForm() {
-      this.data = {};
-    },
     fetchHeadersData: function fetchHeadersData() {
-      var _this2 = this;
+      var _this = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var resReport;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context.prev = _context.next) {
               case 0:
-                _context2.next = 2;
-                return _this2.callApi("post", 'report/schedules/drop');
+                _context.next = 2;
+                return _this.callApi("post", 'report/schedules/drop', _this.filterData);
 
               case 2:
-                resReport = _context2.sent;
+                res = _context.sent;
 
-                if (resReport.status == 200) {
-                  _this2.dropSchedules = resReport.data;
+                if (res.status === 200) {
+                  _this.dropSchedules = res.data.dropSchedules; // Wait for Vue to render table rows
+
+                  _this.$nextTick(function () {
+                    // Destroy existing DataTable safely
+                    if ($.fn.DataTable.isDataTable('#schedule_drop')) {
+                      $('#schedule_drop').DataTable().destroy();
+                    } // Re-initialize DataTable
+
+
+                    $('#schedule_drop').DataTable({
+                      responsive: true,
+                      autoWidth: false,
+                      paging: true,
+                      searching: true,
+                      ordering: true,
+                      destroy: true,
+                      // ensures safe re-init
+                      language: {
+                        emptyTable: "No data available"
+                      }
+                    });
+                  });
                 }
 
-                setTimeout(function () {
-                  $("#schedule_drop").DataTable();
-                }, 300);
-
-              case 5:
+              case 4:
               case "end":
-                return _context2.stop();
+                return _context.stop();
             }
           }
-        }, _callee2);
+        }, _callee);
       }))();
+    },
+    resetFilters: function resetFilters() {
+      this.filterData = {
+        bus_number: '',
+        schedule_id: '',
+        from_date: new Date().toISOString().split('T')[0],
+        to_date: new Date().toISOString().split('T')[0]
+      };
+      this.fetchHeadersData(); // Refresh table
     }
   }
 });
@@ -35222,7 +35216,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         title: '',
         body: ''
       }
-    }, _defineProperty(_ref, "selectedOption", null), _defineProperty(_ref, "showPointsCheckbox", false), _defineProperty(_ref, "showDiscountCheckbox", false), _ref;
+    }, _defineProperty(_ref, "selectedOption", null), _defineProperty(_ref, "showPointsCheckbox", false), _defineProperty(_ref, "showDiscountCheckbox", false), _defineProperty(_ref, "permissions", []), _ref;
   },
   created: function created() {
     var _this = this;
@@ -35233,6 +35227,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
+              _this.permissions = _this.$store.state.permissions;
               $('.modal').remove();
 
               _this.fetchAllSchedules();
@@ -35249,7 +35244,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 window.removeEventListener('keydown', _this.altM);
               }
 
-            case 6:
+            case 7:
             case "end":
               return _context.stop();
           }
@@ -35407,6 +35402,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     closeCancel: function closeCancel() {
       $("#cancelModel").modal('hide');
     },
+    closeRefundCancel: function closeRefundCancel() {
+      $("#cancelRefundModel").modal('hide');
+    },
     // end
     openAdvanceModel: function openAdvanceModel() {
       this.closeAdvanceCashModel = true;
@@ -35465,7 +35463,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             switch (_context2.prev = _context2.next) {
               case 0:
                 if ((e.metaKey || e.altKey) && String.fromCharCode(e.which).toLowerCase() == 'm') {
-                  if (_this3.checkForSubmenuButtons('seat-details-shortcut')) {
+                  if (_this3.checkForSubmenuButtons('seat-details-shortcut') || _this3.checkForSubmenu('seat-details-shortcut')) {
                     _this3.seatDetails();
                   } else {
                     swal({
@@ -38591,6 +38589,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       };
       $("#cancelModel").modal('show');
     },
+    passDataToCancelRefundModel: function passDataToCancelRefundModel(data) {
+      this.cancelData = {
+        dataType: data.type,
+        dataDate: data.date,
+        dataSchedule: data.schedule_id,
+        dataCustomer: data.customer_id,
+        dataDeparture: data.departure_city_id,
+        dataDestination: data.destination_city_id,
+        dataSeat_no: data.seat_no,
+        // ✅ THIS FIXES REFUND
+        amount: Number(data.seat_fare),
+        percentage: 0,
+        reason: ""
+      };
+      $("#cancelRefundModel").modal('show');
+    },
     cancelAllModal: function cancelAllModal() {
       $("#cancel_all_ticket").modal('show');
     },
@@ -38679,6 +38693,154 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }, _callee37);
       }))();
     },
+    cancelRefundBooking: function cancelRefundBooking(dataEnter) {
+      var _this39 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee38() {
+        var cancelData, resCancelBooking, _resCancelBooking$dat, ticketId, refundPayload;
+
+        return _regeneratorRuntime().wrap(function _callee38$(_context38) {
+          while (1) {
+            switch (_context38.prev = _context38.next) {
+              case 0:
+                _this39.cancelLoading = true;
+                _context38.prev = 1;
+
+                if (!(dataEnter.dataType === "booked")) {
+                  _context38.next = 9;
+                  break;
+                }
+
+                if (!(dataEnter.percentage === null || dataEnter.percentage === undefined)) {
+                  _context38.next = 6;
+                  break;
+                }
+
+                Swal.fire("Warning", "Please select a refund percentage.", "warning");
+                return _context38.abrupt("return");
+
+              case 6:
+                if (!(!dataEnter.reason || !dataEnter.reason.trim())) {
+                  _context38.next = 9;
+                  break;
+                }
+
+                Swal.fire("Warning", "Please enter a refund reason.", "warning");
+                return _context38.abrupt("return");
+
+              case 9:
+                /* ======================
+                   STEP 1: CANCEL
+                ====================== */
+                cancelData = {
+                  date: dataEnter.dataDate,
+                  schedule_id: dataEnter.dataSchedule,
+                  customer_id: dataEnter.dataCustomer,
+                  departure_id: dataEnter.dataDeparture,
+                  destination_id: dataEnter.dataDestination,
+                  seat_no: dataEnter.dataSeat_no,
+                  percentage: dataEnter.percentage,
+                  remarks: dataEnter.reason
+                };
+                _context38.next = 12;
+                return _this39.callApi("post", "booking/canceling", cancelData);
+
+              case 12:
+                resCancelBooking = _context38.sent;
+
+                if (!(resCancelBooking.status !== 200)) {
+                  _context38.next = 16;
+                  break;
+                }
+
+                Swal.fire("Error", "Unable to cancel booking.", "error");
+                return _context38.abrupt("return");
+
+              case 16:
+                if (!(dataEnter.dataType === "booked")) {
+                  _context38.next = 32;
+                  break;
+                }
+
+                ticketId = (_resCancelBooking$dat = resCancelBooking.data.tickets) === null || _resCancelBooking$dat === void 0 ? void 0 : _resCancelBooking$dat[0];
+
+                if (ticketId) {
+                  _context38.next = 21;
+                  break;
+                }
+
+                Swal.fire("Error", "Ticket ID missing for refund.", "error");
+                return _context38.abrupt("return");
+
+              case 21:
+                if (!(Number(dataEnter.percentage) === 0)) {
+                  _context38.next = 24;
+                  break;
+                }
+
+                Swal.fire("Success", "Ticket cancelled successfully (No refund).", "info");
+                return _context38.abrupt("return");
+
+              case 24:
+                if (!(!dataEnter.amount || dataEnter.amount <= 0)) {
+                  _context38.next = 27;
+                  break;
+                }
+
+                Swal.fire("Error", "Seat fare missing for refund.", "error");
+                return _context38.abrupt("return");
+
+              case 27:
+                refundPayload = {
+                  ticket_id: ticketId,
+                  refund_percentage: Number(dataEnter.percentage),
+                  refund_amount: Number(dataEnter.amount) * Number(dataEnter.percentage) / 100,
+                  refund_reason: dataEnter.reason.trim()
+                };
+                console.log("📦 Refund Payload:", refundPayload);
+                _context38.next = 31;
+                return _this39.callApi("post", "allBooking/refund", refundPayload);
+
+              case 31:
+                Swal.fire("Success", "Refund processed successfully.", "success");
+
+              case 32:
+                _context38.next = 34;
+                return _this39.callApi("post", "booking/whatsapp/cancel/message", {
+                  tickets: resCancelBooking.data.tickets
+                });
+
+              case 34:
+                _this39.fetchScheduleData();
+
+                _this39.resetArrays();
+
+                _this39.closeCancel();
+
+                _this39.closeRefundCancel();
+
+                _context38.next = 44;
+                break;
+
+              case 40:
+                _context38.prev = 40;
+                _context38.t0 = _context38["catch"](1);
+                console.error(_context38.t0);
+                Swal.fire("Error", "Cancel or refund failed.", "error");
+
+              case 44:
+                _context38.prev = 44;
+                _this39.cancelLoading = false;
+                return _context38.finish(44);
+
+              case 47:
+              case "end":
+                return _context38.stop();
+            }
+          }
+        }, _callee38, null, [[1, 40, 44, 47]]);
+      }))();
+    },
     //over issue model complete data
     passDataToOverIssueModel: function passDataToOverIssueModel(data) {
       this.overIssueData = {
@@ -38692,20 +38854,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       $("#overIssue_model").modal('show');
     },
     addOverIssueTicket: function addOverIssueTicket(dataEnter) {
-      var _this39 = this;
+      var _this40 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee38() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee39() {
         var data, resOverIssue;
-        return _regeneratorRuntime().wrap(function _callee38$(_context38) {
+        return _regeneratorRuntime().wrap(function _callee39$(_context39) {
           while (1) {
-            switch (_context38.prev = _context38.next) {
+            switch (_context39.prev = _context39.next) {
               case 0:
                 if (!(dataEnter.reason == '' || typeof dataEnter.reason == 'undefined')) {
-                  _context38.next = 2;
+                  _context39.next = 2;
                   break;
                 }
 
-                return _context38.abrupt("return", swal({
+                return _context39.abrupt("return", swal({
                   title: "Required!!",
                   text: "Remarks is Required!",
                   icon: "error",
@@ -38723,11 +38885,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   percentage: dataEnter.percentage,
                   remarks: dataEnter.reason
                 };
-                _context38.next = 5;
-                return _this39.callApi("post", "booking/overIssueAdd", data);
+                _context39.next = 5;
+                return _this40.callApi("post", "booking/overIssueAdd", data);
 
               case 5:
-                resOverIssue = _context38.sent;
+                resOverIssue = _context39.sent;
 
                 if (resOverIssue.status == 200) {
                   swal({
@@ -38737,9 +38899,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this39.fetchScheduleData();
+                  _this40.fetchScheduleData();
 
-                  _this39.closeModal();
+                  _this40.closeModal();
                 }
 
                 if (resOverIssue.status == 422 && resOverIssue.data.message) {
@@ -38772,23 +38934,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 9:
               case "end":
-                return _context38.stop();
+                return _context39.stop();
             }
           }
-        }, _callee38);
+        }, _callee39);
       }))();
     },
     //ELT MODEL DATA
     passDataToEltModel: function passDataToEltModel(data) {
-      var _this40 = this;
+      var _this41 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee39() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee40() {
         var resELT;
-        return _regeneratorRuntime().wrap(function _callee39$(_context39) {
+        return _regeneratorRuntime().wrap(function _callee40$(_context40) {
           while (1) {
-            switch (_context39.prev = _context39.next) {
+            switch (_context40.prev = _context40.next) {
               case 0:
-                _this40.eltData = {
+                _this41.eltData = {
                   dataDate: data.date,
                   dataCustomer: data.customer_id,
                   dataSchedule: data.schedule_id,
@@ -38797,50 +38959,50 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   dataSeat_no: data.seat_no,
                   dataSeatFare: data.seat_fare
                 };
-                _context39.next = 3;
-                return _this40.callApi("post", "booking/elt/fetch/old", data);
+                _context40.next = 3;
+                return _this41.callApi("post", "booking/elt/fetch/old", data);
 
               case 3:
-                resELT = _context39.sent;
+                resELT = _context40.sent;
 
                 if (resELT.status == 200) {
-                  _this40.editAbleELT = true;
-                  _this40.eltData.eltWeight = resELT.data.elt_weight;
-                  _this40.eltData.eltPrice = resELT.data.elt_price;
-                  _this40.eltData.dataDescription = resELT.data.elt_description;
-                  _this40.eltData.alreadyExist = resELT.data.alreadyExist;
+                  _this41.editAbleELT = true;
+                  _this41.eltData.eltWeight = resELT.data.elt_weight;
+                  _this41.eltData.eltPrice = resELT.data.elt_price;
+                  _this41.eltData.dataDescription = resELT.data.elt_description;
+                  _this41.eltData.alreadyExist = resELT.data.alreadyExist;
                 } else if (resELT.status == 204) {
-                  _this40.editAbleELT = false;
-                  _this40.eltData.eltWeight = '';
-                  _this40.eltData.eltPrice = '';
-                  _this40.eltData.dataDescription = '';
+                  _this41.editAbleELT = false;
+                  _this41.eltData.eltWeight = '';
+                  _this41.eltData.eltPrice = '';
+                  _this41.eltData.dataDescription = '';
                 }
 
                 $("#addELTModel").modal('show');
 
               case 6:
               case "end":
-                return _context39.stop();
+                return _context40.stop();
             }
           }
-        }, _callee39);
+        }, _callee40);
       }))();
     },
     addEltToTicket: function addEltToTicket(dataEnter) {
-      var _this41 = this;
+      var _this42 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee40() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee41() {
         var data, resOverIssue;
-        return _regeneratorRuntime().wrap(function _callee40$(_context40) {
+        return _regeneratorRuntime().wrap(function _callee41$(_context41) {
           while (1) {
-            switch (_context40.prev = _context40.next) {
+            switch (_context41.prev = _context41.next) {
               case 0:
                 if (!(dataEnter.eltWeight == '' || typeof dataEnter.eltWeight == 'undefined')) {
-                  _context40.next = 2;
+                  _context41.next = 2;
                   break;
                 }
 
-                return _context40.abrupt("return", swal({
+                return _context41.abrupt("return", swal({
                   title: "required!",
                   text: "Weight is Required",
                   icon: "error",
@@ -38849,11 +39011,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 2:
                 if (!(dataEnter.eltPrice == '' || typeof dataEnter.eltPrice == 'undefined')) {
-                  _context40.next = 4;
+                  _context41.next = 4;
                   break;
                 }
 
-                return _context40.abrupt("return", swal({
+                return _context41.abrupt("return", swal({
                   title: "required!",
                   text: "Price is Required",
                   icon: "error",
@@ -38874,21 +39036,21 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   eltDescription: dataEnter.dataDescription,
                   alreadyExist: dataEnter.alreadyExist
                 };
-                _this41.EltButton = true;
-                _context40.next = 8;
-                return _this41.callApi("post", "booking/elt", data);
+                _this42.EltButton = true;
+                _context41.next = 8;
+                return _this42.callApi("post", "booking/elt", data);
 
               case 8:
-                resOverIssue = _context40.sent;
+                resOverIssue = _context41.sent;
 
                 if (resOverIssue.status == 201) {
-                  _this41.EltButton = false;
-                  _this41.eltIds = resOverIssue.data.id;
+                  _this42.EltButton = false;
+                  _this42.eltIds = resOverIssue.data.id;
 
-                  _this41.fetchScheduleData();
+                  _this42.fetchScheduleData();
 
                   setTimeout(function () {
-                    _this41.$refs.refElt.submit();
+                    _this42.$refs.refElt.submit();
                   }, 700);
                   swal({
                     title: "Success",
@@ -38897,17 +39059,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this41.closeModal();
+                  _this42.closeModal();
                 }
 
                 if (resOverIssue.status == 200) {
-                  _this41.EltButton = false;
-                  _this41.eltIds = resOverIssue.data.id;
+                  _this42.EltButton = false;
+                  _this42.eltIds = resOverIssue.data.id;
 
-                  _this41.fetchScheduleData();
+                  _this42.fetchScheduleData();
 
                   setTimeout(function () {
-                    _this41.$refs.refElt.submit();
+                    _this42.$refs.refElt.submit();
                   }, 700);
                   swal({
                     title: "Success",
@@ -38916,11 +39078,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this41.closeModal();
+                  _this42.closeModal();
                 }
 
                 if (resOverIssue.status == 422 && resOverIssue.data.message) {
-                  _this41.EltButton = false;
+                  _this42.EltButton = false;
                   swal({
                     title: "Error",
                     text: resOverIssue.data.message,
@@ -38928,14 +39090,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this41.closeModal();
+                  _this42.closeModal();
                 }
 
                 if (resOverIssue.status == 422) {
                   (function () {
-                    _this41.EltButton = false;
+                    _this42.EltButton = false;
 
-                    _this41.closeModal();
+                    _this42.closeModal();
 
                     var errorContent = "";
                     var count = 0;
@@ -38956,27 +39118,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 13:
               case "end":
-                return _context40.stop();
+                return _context41.stop();
             }
           }
-        }, _callee40);
+        }, _callee41);
       }))();
     },
     allRescheduleData: function allRescheduleData() {
-      var _this42 = this;
+      var _this43 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee41() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee42() {
         var arraySingleRescheduleData, oldSeats, totalFare, resReDepartureCity;
-        return _regeneratorRuntime().wrap(function _callee41$(_context41) {
+        return _regeneratorRuntime().wrap(function _callee42$(_context42) {
           while (1) {
-            switch (_context41.prev = _context41.next) {
+            switch (_context42.prev = _context42.next) {
               case 0:
                 arraySingleRescheduleData = [];
                 oldSeats = [];
                 totalFare = 0;
-                _this42.reSpecificCities = [];
-                _this42.rescheduleData.rescheduleSchedule = [];
-                Object.entries(_this42.selectedSeatDataBackEnd).forEach(function (singleSeat, i) {
+                _this43.reSpecificCities = [];
+                _this43.rescheduleData.rescheduleSchedule = [];
+                Object.entries(_this43.selectedSeatDataBackEnd).forEach(function (singleSeat, i) {
                   var _singleSeat$1$0$disco;
 
                   var singlePostData = {};
@@ -38995,34 +39157,34 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   arraySingleRescheduleData['totalFare'] = totalFare;
                   arraySingleRescheduleData['oldSeats'] = oldSeats;
                 });
-                _this42.mainAllRescheduleData = arraySingleRescheduleData;
-                _this42.rescheduleData.dataDepartureCity = parseInt(_this42.mainAllRescheduleData[0].dataDepartureCity);
-                _this42.rescheduleData.rescheduleDate = _this42.mainAllRescheduleData[0].rescheduleDate;
-                _this42.rescheduleData.rescheduleSchedule = 0;
+                _this43.mainAllRescheduleData = arraySingleRescheduleData;
+                _this43.rescheduleData.dataDepartureCity = parseInt(_this43.mainAllRescheduleData[0].dataDepartureCity);
+                _this43.rescheduleData.rescheduleDate = _this43.mainAllRescheduleData[0].rescheduleDate;
+                _this43.rescheduleData.rescheduleSchedule = 0;
 
-                if (!(parseInt(_this42.rescheduleData.dataDepartureCity) == 0)) {
-                  _context41.next = 14;
+                if (!(parseInt(_this43.rescheduleData.dataDepartureCity) == 0)) {
+                  _context42.next = 14;
                   break;
                 }
 
-                _this42.rescheduleData.rescheduleDestinationCity = 0;
-                _context41.next = 18;
+                _this43.rescheduleData.rescheduleDestinationCity = 0;
+                _context42.next = 18;
                 break;
 
               case 14:
-                _context41.next = 16;
-                return _this42.callApi("post", "booking/getDestination", {
-                  id: _this42.mainAllRescheduleData[0].dataDepartureCity
+                _context42.next = 16;
+                return _this43.callApi("post", "booking/getDestination", {
+                  id: _this43.mainAllRescheduleData[0].dataDepartureCity
                 });
 
               case 16:
-                resReDepartureCity = _context41.sent;
+                resReDepartureCity = _context42.sent;
 
                 if (resReDepartureCity.length == 0) {
-                  _this42.rescheduleData.rescheduleDestinationCity = 0;
+                  _this43.rescheduleData.rescheduleDestinationCity = 0;
                 } else {
-                  _this42.rescheduleData.rescheduleDestinationCity = 0;
-                  _this42.reSpecificCities = resReDepartureCity.data;
+                  _this43.rescheduleData.rescheduleDestinationCity = 0;
+                  _this43.reSpecificCities = resReDepartureCity.data;
                 }
 
               case 18:
@@ -39030,25 +39192,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 19:
               case "end":
-                return _context41.stop();
+                return _context42.stop();
             }
           }
-        }, _callee41);
+        }, _callee42);
       }))();
     },
     // Reschedule model
     passDataToRescheduleModel: function passDataToRescheduleModel(data) {
-      var _this43 = this;
+      var _this44 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee42() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee43() {
         var resReDepartureCity;
-        return _regeneratorRuntime().wrap(function _callee42$(_context42) {
+        return _regeneratorRuntime().wrap(function _callee43$(_context43) {
           while (1) {
-            switch (_context42.prev = _context42.next) {
+            switch (_context43.prev = _context43.next) {
               case 0:
-                _this43.mainAllRescheduleData = [];
-                _this43.reSpecificCities = [];
-                _this43.rescheduleData = {
+                _this44.mainAllRescheduleData = [];
+                _this44.reSpecificCities = [];
+                _this44.rescheduleData = {
                   rescheduleDate: data.date,
                   existingDate: data.date,
                   dataCustomer: data.customer_id,
@@ -39060,33 +39222,33 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   dataSeatDiscount: data.discount,
                   dataAll: data
                 };
-                _this43.mainAllRescheduleData[0] = _this43.rescheduleData;
-                _this43.mainAllRescheduleData.totalFare = parseInt(_this43.rescheduleData.dataSeatFare) - parseInt(_this43.rescheduleData.dataSeatDiscount);
-                _this43.mainAllRescheduleData.oldSeats = _this43.rescheduleData.dataSeat_no;
+                _this44.mainAllRescheduleData[0] = _this44.rescheduleData;
+                _this44.mainAllRescheduleData.totalFare = parseInt(_this44.rescheduleData.dataSeatFare) - parseInt(_this44.rescheduleData.dataSeatDiscount);
+                _this44.mainAllRescheduleData.oldSeats = _this44.rescheduleData.dataSeat_no;
 
-                if (!(parseInt(_this43.rescheduleData.dataDepartureCity) == 0)) {
-                  _context42.next = 10;
+                if (!(parseInt(_this44.rescheduleData.dataDepartureCity) == 0)) {
+                  _context43.next = 10;
                   break;
                 }
 
-                _this43.rescheduleData.rescheduleDestinationCity = 0;
-                _context42.next = 14;
+                _this44.rescheduleData.rescheduleDestinationCity = 0;
+                _context43.next = 14;
                 break;
 
               case 10:
-                _context42.next = 12;
-                return _this43.callApi("post", "booking/getDestination", {
-                  id: parseInt(_this43.rescheduleData.dataDepartureCity)
+                _context43.next = 12;
+                return _this44.callApi("post", "booking/getDestination", {
+                  id: parseInt(_this44.rescheduleData.dataDepartureCity)
                 });
 
               case 12:
-                resReDepartureCity = _context42.sent;
+                resReDepartureCity = _context43.sent;
 
                 if (resReDepartureCity.length == 0) {
-                  _this43.rescheduleData.rescheduleDestinationCity = 0;
+                  _this44.rescheduleData.rescheduleDestinationCity = 0;
                 } else {
-                  _this43.rescheduleData.rescheduleDestinationCity = 0;
-                  _this43.reSpecificCities = resReDepartureCity.data;
+                  _this44.rescheduleData.rescheduleDestinationCity = 0;
+                  _this44.reSpecificCities = resReDepartureCity.data;
                 }
 
               case 14:
@@ -39094,32 +39256,32 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 15:
               case "end":
-                return _context42.stop();
+                return _context43.stop();
             }
           }
-        }, _callee42);
+        }, _callee43);
       }))();
     },
     dropScheduleData: function dropScheduleData() {
-      var _this44 = this;
+      var _this45 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee43() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee44() {
         var resDropSchedule;
-        return _regeneratorRuntime().wrap(function _callee43$(_context43) {
+        return _regeneratorRuntime().wrap(function _callee44$(_context44) {
           while (1) {
-            switch (_context43.prev = _context43.next) {
+            switch (_context44.prev = _context44.next) {
               case 0:
-                _this44.dropScheduleButton = true;
-                _context43.next = 3;
-                return _this44.callApi("post", "booking/dropSchedule", _this44.dropScheduleFormData);
+                _this45.dropScheduleButton = true;
+                _context44.next = 3;
+                return _this45.callApi("post", "booking/dropSchedule", _this45.dropScheduleFormData);
 
               case 3:
-                resDropSchedule = _context43.sent;
+                resDropSchedule = _context44.sent;
 
                 if (resDropSchedule.status == 200) {
-                  _this44.dropScheduleButton = false;
+                  _this45.dropScheduleButton = false;
 
-                  _this44.busDropCheck();
+                  _this45.busDropCheck();
 
                   swal({
                     title: "Success",
@@ -39128,12 +39290,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this44.closeModal();
+                  _this45.closeModal();
                 }
 
                 if (resDropSchedule.status == 422) {
                   (function () {
-                    _this44.dropScheduleButton = false;
+                    _this45.dropScheduleButton = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -39153,44 +39315,44 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 6:
               case "end":
-                return _context43.stop();
+                return _context44.stop();
             }
           }
-        }, _callee43);
+        }, _callee44);
       }))();
     },
     rescheduleSeats: function rescheduleSeats() {
-      var _this45 = this;
+      var _this46 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee44() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee45() {
         var resReschedule;
-        return _regeneratorRuntime().wrap(function _callee44$(_context44) {
+        return _regeneratorRuntime().wrap(function _callee45$(_context45) {
           while (1) {
-            switch (_context44.prev = _context44.next) {
+            switch (_context45.prev = _context45.next) {
               case 0:
-                if (!(_this45.alreadyBookedSeat.length != _this45.mainAllRescheduleData.length)) {
-                  _context44.next = 4;
+                if (!(_this46.alreadyBookedSeat.length != _this46.mainAllRescheduleData.length)) {
+                  _context45.next = 4;
                   break;
                 }
 
-                _this45.alreadyBookedSeat = [];
+                _this46.alreadyBookedSeat = [];
 
-                _this45.fetchReScheduleData();
+                _this46.fetchReScheduleData();
 
-                return _context44.abrupt("return", swal({
+                return _context45.abrupt("return", swal({
                   title: "Oops",
-                  text: "Your Just Select " + _this45.mainAllRescheduleData.length + " for Reschedule",
+                  text: "Your Just Select " + _this46.mainAllRescheduleData.length + " for Reschedule",
                   icon: "error",
                   timer: 2000
                 }));
 
               case 4:
-                if (!(parseInt(_this45.rescheduleData.dataDepartureCity) == 0)) {
-                  _context44.next = 6;
+                if (!(parseInt(_this46.rescheduleData.dataDepartureCity) == 0)) {
+                  _context45.next = 6;
                   break;
                 }
 
-                return _context44.abrupt("return", swal({
+                return _context45.abrupt("return", swal({
                   title: "Required!!",
                   text: "Please Select Departure City",
                   icon: "error",
@@ -39198,12 +39360,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 6:
-                if (!(_this45.rescheduleData.rescheduleDestinationCity == 0)) {
-                  _context44.next = 8;
+                if (!(_this46.rescheduleData.rescheduleDestinationCity == 0)) {
+                  _context45.next = 8;
                   break;
                 }
 
-                return _context44.abrupt("return", swal({
+                return _context45.abrupt("return", swal({
                   title: "Required!!",
                   text: "Please Select Destination City",
                   icon: "error",
@@ -39211,12 +39373,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 8:
-                if (!(_this45.rescheduleData.rescheduleDate == '' || typeof _this45.rescheduleData.rescheduleDate == 'undefined')) {
-                  _context44.next = 10;
+                if (!(_this46.rescheduleData.rescheduleDate == '' || typeof _this46.rescheduleData.rescheduleDate == 'undefined')) {
+                  _context45.next = 10;
                   break;
                 }
 
-                return _context44.abrupt("return", swal({
+                return _context45.abrupt("return", swal({
                   title: "Required!!",
                   text: "Date is Required",
                   icon: "error",
@@ -39224,12 +39386,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 10:
-                if (!(_this45.rescheduleData.rescheduleSchedule == 0)) {
-                  _context44.next = 12;
+                if (!(_this46.rescheduleData.rescheduleSchedule == 0)) {
+                  _context45.next = 12;
                   break;
                 }
 
-                return _context44.abrupt("return", swal({
+                return _context45.abrupt("return", swal({
                   title: "Required!!",
                   text: "Please Select Departure Time!!",
                   icon: "error",
@@ -39237,34 +39399,34 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 12:
-                _this45.mainAllRescheduleData.map(function (single, index) {
-                  single.selected_seatNo = _this45.alreadyBookedSeat[index];
-                  single.selected_seatClass = _this45.alreadyBookedSeatClass[index];
-                  single.selected_seatFare = _this45.alreadyBookedSeatFare[index];
-                  single.reason = _this45.rescheduleData.reason;
-                  single.rescheduleDate = _this45.rescheduleData.rescheduleDate;
-                  single.rescheduleSchedule = _this45.rescheduleData.rescheduleSchedule;
-                  single.rescheduleType = _this45.rescheduleSeatType;
-                  single.overIssueReschedule = _this45.overIssueScheduleCheckBox;
-                  single.newDepartureTime = _this45.rescheduleData.rescheduleSchedule;
-                  single.rescheduleDiscount = _this45.rescheduleDiscount;
-                  single.dataDepartureCity = parseInt(_this45.rescheduleData.dataDepartureCity);
-                  single.dataDestination = _this45.rescheduleData.rescheduleDestinationCity;
-                  single.departure_time = _this45.rescheduleData.departure_time;
+                _this46.mainAllRescheduleData.map(function (single, index) {
+                  single.selected_seatNo = _this46.alreadyBookedSeat[index];
+                  single.selected_seatClass = _this46.alreadyBookedSeatClass[index];
+                  single.selected_seatFare = _this46.alreadyBookedSeatFare[index];
+                  single.reason = _this46.rescheduleData.reason;
+                  single.rescheduleDate = _this46.rescheduleData.rescheduleDate;
+                  single.rescheduleSchedule = _this46.rescheduleData.rescheduleSchedule;
+                  single.rescheduleType = _this46.rescheduleSeatType;
+                  single.overIssueReschedule = _this46.overIssueScheduleCheckBox;
+                  single.newDepartureTime = _this46.rescheduleData.rescheduleSchedule;
+                  single.rescheduleDiscount = _this46.rescheduleDiscount;
+                  single.dataDepartureCity = parseInt(_this46.rescheduleData.dataDepartureCity);
+                  single.dataDestination = _this46.rescheduleData.rescheduleDestinationCity;
+                  single.departure_time = _this46.rescheduleData.departure_time;
                 });
 
-                _this45.loadingRescheduleButton = true;
-                _context44.next = 16;
-                return _this45.callApi("post", "booking/store", {
-                  'data': _this45.mainAllRescheduleData,
+                _this46.loadingRescheduleButton = true;
+                _context45.next = 16;
+                return _this46.callApi("post", "booking/store", {
+                  'data': _this46.mainAllRescheduleData,
                   "rc_flag": 1
                 });
 
               case 16:
-                resReschedule = _context44.sent;
+                resReschedule = _context45.sent;
 
                 if (resReschedule.status == 200) {
-                  _this45.loadingRescheduleButton = false;
+                  _this46.loadingRescheduleButton = false;
                   swal({
                     title: "Success",
                     text: "Seat Reschedule Successfully",
@@ -39272,15 +39434,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this45.fetchScheduleData();
+                  _this46.fetchScheduleData();
 
-                  _this45.fetchReScheduleData();
+                  _this46.fetchReScheduleData();
 
-                  _this45.closeModal();
+                  _this46.closeModal();
                 } else {
                   if (resReschedule.status == 422) {
                     (function () {
-                      _this45.loadingRescheduleButton = false;
+                      _this46.loadingRescheduleButton = false;
                       var errorContent = "";
                       var count = 0;
 
@@ -39301,22 +39463,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 18:
               case "end":
-                return _context44.stop();
+                return _context45.stop();
             }
           }
-        }, _callee44);
+        }, _callee45);
       }))();
     },
     // Duplicate Ticket
     duplicateTicket: function duplicateTicket(data) {
-      var _this46 = this;
+      var _this47 = this;
 
       this.ticketsId = data.id;
       setTimeout(function () {
         if (data.type == "booked" || data.type == "over-issue") {
-          _this46.$refs.refDuplicateTicket.submit();
+          _this47.$refs.refDuplicateTicket.submit();
 
-          _this46.closeModal();
+          _this47.closeModal();
         } else {
           swal({
             title: "OOppss!!!",
@@ -39325,139 +39487,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             timer: 2000
           });
 
-          _this46.closeModal();
+          _this47.closeModal();
         }
       }, 700);
     },
     // Duplicate All Ticket
     allTicketDuplicate: function allTicketDuplicate() {
-      var _this47 = this;
+      var _this48 = this;
 
       this.duplicateAllTicket = this.duplicateAllTicket.join('-');
       setTimeout(function () {
-        _this47.$refs.refDuplicateAllTicket.submit();
+        _this48.$refs.refDuplicateAllTicket.submit();
 
-        _this47.closeModal();
+        _this48.closeModal();
       }, 700);
     },
     // Get Passengers list
     getCustomerList: function getCustomerList() {
-      var _this48 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee45() {
-        var resCheckedBus;
-        return _regeneratorRuntime().wrap(function _callee45$(_context45) {
-          while (1) {
-            switch (_context45.prev = _context45.next) {
-              case 0:
-                if (!(_this48.addForm.departureCity == 0)) {
-                  _context45.next = 2;
-                  break;
-                }
-
-                return _context45.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Please Select Departure City",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 2:
-                if (!(_this48.addForm.destinationCity == 0)) {
-                  _context45.next = 4;
-                  break;
-                }
-
-                return _context45.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Please Select Destination City",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 4:
-                if (_this48.addForm.date) {
-                  _context45.next = 6;
-                  break;
-                }
-
-                return _context45.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Date is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 6:
-                if (!(_this48.addForm.schedule == 0)) {
-                  _context45.next = 8;
-                  break;
-                }
-
-                return _context45.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Departure Time is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 8:
-                if (!_this48.checkForSubmenuButtons('check-assigned-bus')) {
-                  _context45.next = 20;
-                  break;
-                }
-
-                _context45.next = 11;
-                return _this48.callApi("post", "booking/check/bus/assigned", {
-                  scheduleId: _this48.addForm.schedule,
-                  date: _this48.addForm.date,
-                  departureCity: _this48.addForm.departureCity,
-                  destinationCity: _this48.addForm.destinationCity
-                });
-
-              case 11:
-                resCheckedBus = _context45.sent;
-
-                if (!(resCheckedBus.status == 200)) {
-                  _context45.next = 16;
-                  break;
-                }
-
-                _this48.$refs.refPassengerList.submit();
-
-                _context45.next = 18;
-                break;
-
-              case 16:
-                if (!(resCheckedBus.status == 204)) {
-                  _context45.next = 18;
-                  break;
-                }
-
-                return _context45.abrupt("return", swal({
-                  title: "OOPS!!",
-                  text: "Please Assign Bus First!",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 18:
-                _context45.next = 21;
-                break;
-
-              case 20:
-                _this48.$refs.refPassengerList.submit();
-
-              case 21:
-              case "end":
-                return _context45.stop();
-            }
-          }
-        }, _callee45);
-      }))();
-    },
-    // Get Terminal Invoice
-    getTerminalInvoice: function getTerminalInvoice() {
       var _this49 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee46() {
@@ -39518,25 +39564,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 8:
-                if (!(_this49.addForm.terminalId == 0 && _this49.$store.state.user.terminal_id == null)) {
-                  _context46.next = 10;
-                  break;
-                }
-
-                return _context46.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Terminal is Required! Please Select it From DropDown or Assign Terminal to your Account",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 10:
                 if (!_this49.checkForSubmenuButtons('check-assigned-bus')) {
-                  _context46.next = 22;
+                  _context46.next = 20;
                   break;
                 }
 
-                _context46.next = 13;
+                _context46.next = 11;
                 return _this49.callApi("post", "booking/check/bus/assigned", {
                   scheduleId: _this49.addForm.schedule,
                   date: _this49.addForm.date,
@@ -39544,22 +39577,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   destinationCity: _this49.addForm.destinationCity
                 });
 
-              case 13:
+              case 11:
                 resCheckedBus = _context46.sent;
 
                 if (!(resCheckedBus.status == 200)) {
-                  _context46.next = 18;
+                  _context46.next = 16;
                   break;
                 }
 
-                _this49.$refs.refTerminalInvoice.submit();
+                _this49.$refs.refPassengerList.submit();
 
-                _context46.next = 20;
+                _context46.next = 18;
                 break;
 
-              case 18:
+              case 16:
                 if (!(resCheckedBus.status == 204)) {
-                  _context46.next = 20;
+                  _context46.next = 18;
                   break;
                 }
 
@@ -39570,14 +39603,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 20:
-                _context46.next = 23;
+              case 18:
+                _context46.next = 21;
                 break;
 
-              case 22:
-                _this49.$refs.refTerminalInvoice.submit();
+              case 20:
+                _this49.$refs.refPassengerList.submit();
 
-              case 23:
+              case 21:
               case "end":
                 return _context46.stop();
             }
@@ -39585,8 +39618,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }, _callee46);
       }))();
     },
-    // Get Bus Invoice
-    getBusInvoice: function getBusInvoice() {
+    // Get Terminal Invoice
+    getTerminalInvoice: function getTerminalInvoice() {
       var _this50 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee47() {
@@ -39647,12 +39680,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 8:
-                if (!_this50.checkForSubmenuButtons('check-assign-bus')) {
-                  _context47.next = 20;
+                if (!(_this50.addForm.terminalId == 0 && _this50.$store.state.user.terminal_id == null)) {
+                  _context47.next = 10;
                   break;
                 }
 
-                _context47.next = 11;
+                return _context47.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Terminal is Required! Please Select it From DropDown or Assign Terminal to your Account",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 10:
+                if (!_this50.checkForSubmenuButtons('check-assigned-bus')) {
+                  _context47.next = 22;
+                  break;
+                }
+
+                _context47.next = 13;
                 return _this50.callApi("post", "booking/check/bus/assigned", {
                   scheduleId: _this50.addForm.schedule,
                   date: _this50.addForm.date,
@@ -39660,22 +39706,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   destinationCity: _this50.addForm.destinationCity
                 });
 
-              case 11:
+              case 13:
                 resCheckedBus = _context47.sent;
 
                 if (!(resCheckedBus.status == 200)) {
-                  _context47.next = 16;
+                  _context47.next = 18;
                   break;
                 }
 
-                _this50.$refs.refBusInvoice.submit();
+                _this50.$refs.refTerminalInvoice.submit();
 
-                _context47.next = 18;
+                _context47.next = 20;
                 break;
 
-              case 16:
+              case 18:
                 if (!(resCheckedBus.status == 204)) {
-                  _context47.next = 18;
+                  _context47.next = 20;
                   break;
                 }
 
@@ -39686,20 +39732,151 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 18:
-                _context47.next = 21;
+              case 20:
+                _context47.next = 23;
                 break;
 
-              case 20:
-                _this50.$refs.refBusInvoice.submit();
+              case 22:
+                _this50.$refs.refTerminalInvoice.submit();
 
-              case 21:
+              case 23:
               case "end":
                 return _context47.stop();
             }
           }
         }, _callee47);
       }))();
+    },
+    // Get Bus Invoice
+    getBusInvoice: function getBusInvoice() {
+      var _this51 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee48() {
+        var resCheckedBus;
+        return _regeneratorRuntime().wrap(function _callee48$(_context48) {
+          while (1) {
+            switch (_context48.prev = _context48.next) {
+              case 0:
+                if (!(_this51.addForm.departureCity == 0)) {
+                  _context48.next = 2;
+                  break;
+                }
+
+                return _context48.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Please Select Departure City",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 2:
+                if (!(_this51.addForm.destinationCity == 0)) {
+                  _context48.next = 4;
+                  break;
+                }
+
+                return _context48.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Please Select Destination City",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 4:
+                if (_this51.addForm.date) {
+                  _context48.next = 6;
+                  break;
+                }
+
+                return _context48.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Date is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 6:
+                if (!(_this51.addForm.schedule == 0)) {
+                  _context48.next = 8;
+                  break;
+                }
+
+                return _context48.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Departure Time is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 8:
+                if (!_this51.checkForSubmenuButtons('check-assign-bus')) {
+                  _context48.next = 20;
+                  break;
+                }
+
+                _context48.next = 11;
+                return _this51.callApi("post", "booking/check/bus/assigned", {
+                  scheduleId: _this51.addForm.schedule,
+                  date: _this51.addForm.date,
+                  departureCity: _this51.addForm.departureCity,
+                  destinationCity: _this51.addForm.destinationCity
+                });
+
+              case 11:
+                resCheckedBus = _context48.sent;
+
+                if (!(resCheckedBus.status == 200)) {
+                  _context48.next = 16;
+                  break;
+                }
+
+                _this51.$refs.refBusInvoice.submit();
+
+                _context48.next = 18;
+                break;
+
+              case 16:
+                if (!(resCheckedBus.status == 204)) {
+                  _context48.next = 18;
+                  break;
+                }
+
+                return _context48.abrupt("return", swal({
+                  title: "OOPS!!",
+                  text: "Please Assign Bus First!",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 18:
+                _context48.next = 21;
+                break;
+
+              case 20:
+                _this51.$refs.refBusInvoice.submit();
+
+              case 21:
+              case "end":
+                return _context48.stop();
+            }
+          }
+        }, _callee48);
+      }))();
+    },
+    checkForSubmenu: function checkForSubmenu(moduleName) {
+      var permissions = this.permissions;
+      var valid = false;
+
+      for (var i = 0; i < permissions.length; i++) {
+        permissions[i].childs.forEach(function (subMenuItem) {
+          if (subMenuItem.name === moduleName) {
+            valid = subMenuItem.allow;
+            return;
+          }
+        });
+      }
+
+      return valid;
     }
   },
   watch: {
@@ -40067,7 +40244,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 12:
                 res = _context6.sent;
-                console.log("📥 Refund API Response:", res);
+                // console.log("📥 Refund API Response:", res);
                 data = res === null || res === void 0 ? void 0 : res.data;
                 ppMessage = (data === null || data === void 0 ? void 0 : (_data$response = data.response) === null || _data$response === void 0 ? void 0 : _data$response.pp_ResponseMessage) || "";
                 genericMsg = (data === null || data === void 0 ? void 0 : data.message) || "";
@@ -40096,11 +40273,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   });
                 }
 
-                _context6.next = 26;
+                _context6.next = 25;
                 break;
 
-              case 22:
-                _context6.prev = 22;
+              case 21:
+                _context6.prev = 21;
                 _context6.t0 = _context6["catch"](9);
                 console.error("Refund Error:", _context6.t0);
                 Swal.fire({
@@ -40109,12 +40286,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   text: "Refund failed due to a network or server issue."
                 });
 
-              case 26:
+              case 25:
               case "end":
                 return _context6.stop();
             }
           }
-        }, _callee6, null, [[9, 22]]);
+        }, _callee6, null, [[9, 21]]);
       }))();
     },
     closeRefundModal: function closeRefundModal() {
@@ -81246,12 +81423,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8
   /* PROPS */
   , _hoisted_38)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("table", _hoisted_39, [_hoisted_40, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters, function (filter, i) {
+    var _filter$terminal;
+
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(filter.badge)
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter.bus_time), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter.terminal_name), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter === null || filter === void 0 ? void 0 : (_filter$terminal = filter.terminal) === null || _filter$terminal === void 0 ? void 0 : _filter$terminal.name), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter.cancel_by), 1
     /* TEXT */
@@ -83650,33 +83829,109 @@ var _hoisted_7 = {
   "class": "card-body"
 };
 var _hoisted_8 = {
-  "class": "row"
+  "class": "row px-2 mb-4 align-items-end"
 };
 var _hoisted_9 = {
+  "class": "col-md-4"
+};
+
+var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "fromDate"
+}, "From Date", -1
+/* HOISTED */
+);
+
+var _hoisted_11 = {
+  "class": "col-md-4"
+};
+
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": "toDate"
+}, "To Date", -1
+/* HOISTED */
+);
+
+var _hoisted_13 = {
+  "class": "col-md-4 d-flex justify-content-center"
+};
+
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  type: "submit",
+  "class": "btn w-100 btn-primary mr-2"
+}, "Filter", -1
+/* HOISTED */
+);
+
+var _hoisted_15 = {
+  "class": "row"
+};
+var _hoisted_16 = {
   "class": "col-12"
 };
-var _hoisted_10 = {
+var _hoisted_17 = {
   "class": "card"
 };
-var _hoisted_11 = {
+var _hoisted_18 = {
   "class": "card-body"
 };
-var _hoisted_12 = {
+var _hoisted_19 = {
   "class": "table-responsive"
 };
-var _hoisted_13 = {
+var _hoisted_20 = {
   "class": "table table-striped table-hover",
   id: "schedule_drop"
 };
 
-var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Schedule"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Schedule Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Route"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Drop By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Drop Time")])], -1
+var _hoisted_21 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Schedule"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Schedule Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Route"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Drop By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Drop Time")])], -1
 /* HOISTED */
 );
 
+var _hoisted_22 = {
+  key: 0
+};
+
+var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  colspan: "6",
+  "class": "text-center"
+}, "No data available", -1
+/* HOISTED */
+);
+
+var _hoisted_24 = [_hoisted_23];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.dropSchedules, function (drop, i) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+    onSubmit: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.fetchHeadersData && $options.fetchHeadersData.apply($options, arguments);
+    }, ["prevent"]))
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Optional schedule dropdown "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"col-md-3\">\r\n      <label for=\"scheduleFilter\">Select Schedule</label>\r\n      <select id=\"scheduleFilter\" class=\"form-control\" v-model=\"filterData.schedule_id\">\r\n        <option value=\"\">All Schedules</option>\r\n        <option v-for=\"schedule in schedules\" :key=\"schedule.id\" :value=\"schedule.id\">\r\n          {{ schedule.name }}\r\n        </option>\r\n      </select>\r\n    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" From Date "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [_hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    id: "fromDate",
+    type: "date",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
+      return $data.filterData.from_date = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filterData.from_date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" To Date "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [_hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    id: "toDate",
+    type: "date",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+      return $data.filterData.to_date = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filterData.to_date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Buttons "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn w-100 btn-danger",
+    onClick: _cache[2] || (_cache[2] = function () {
+      return $options.resetFilters && $options.resetFilters.apply($options, arguments);
+    })
+  }, "Reset")])])], 32
+  /* HYDRATE_EVENTS */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_20, [_hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [$data.dropSchedules.length === 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_22, _hoisted_24)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.dropSchedules, function (drop, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
-      key: i
+      key: drop.id
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i + 1), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(drop.schedule.name), 1
@@ -90450,9 +90705,9 @@ var _hoisted_430 = {
 var _hoisted_431 = ["disabled"];
 var _hoisted_432 = {
   "class": "modal fade",
-  id: "cancel_all_ticket",
-  tabindex: "4",
-  "aria-labelledby": "cancelAllModelLabel",
+  id: "cancelRefundModel",
+  tabindex: "3",
+  "aria-labelledby": "cancelRefundModelLabel",
   "aria-hidden": "true"
 };
 var _hoisted_433 = {
@@ -90468,8 +90723,8 @@ var _hoisted_435 = {
 var _hoisted_436 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
     "class": "modal-title",
-    id: "cancelAllModelLabel"
-  }, "Cancel Ticket", -1
+    id: "cancelRefundModelLabel"
+  }, "Cancel Refund Ticket", -1
   /* HOISTED */
   );
 });
@@ -90490,8 +90745,85 @@ var _hoisted_439 = {
 var _hoisted_440 = {
   "class": "form-group"
 };
+var _hoisted_441 = {
+  "for": "cancel_percentage"
+};
 
-var _hoisted_441 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_442 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "text-muted ml-2"
+  }, "(Optional)", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_443 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"first\" data-v-03b302d9>Select Cancellation Percentage</option><option value=\"0\" data-v-03b302d9>0%</option><option value=\"10\" data-v-03b302d9>10%</option><option value=\"20\" data-v-03b302d9>20%</option><option value=\"30\" data-v-03b302d9>30%</option><option value=\"40\" data-v-03b302d9>40%</option><option value=\"50\" data-v-03b302d9>50%</option><option value=\"60\" data-v-03b302d9>60%</option><option value=\"70\" data-v-03b302d9>70%</option><option value=\"80\" data-v-03b302d9>80%</option><option value=\"90\" data-v-03b302d9>90%</option><option value=\"100\" data-v-03b302d9>100%</option>", 12);
+
+var _hoisted_455 = [_hoisted_443];
+var _hoisted_456 = {
+  "class": "form-group"
+};
+
+var _hoisted_457 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "caceling_remakrs"
+  }, "Remarks", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_458 = {
+  key: 1,
+  "class": "modal-body"
+};
+var _hoisted_459 = {
+  "class": "modal-footer"
+};
+var _hoisted_460 = ["disabled"];
+var _hoisted_461 = {
+  "class": "modal fade",
+  id: "cancel_all_ticket",
+  tabindex: "4",
+  "aria-labelledby": "cancelAllModelLabel",
+  "aria-hidden": "true"
+};
+var _hoisted_462 = {
+  "class": "modal-dialog modal-lg modal-dialog-centered"
+};
+var _hoisted_463 = {
+  "class": "modal-content"
+};
+var _hoisted_464 = {
+  "class": "modal-header"
+};
+
+var _hoisted_465 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
+    "class": "modal-title",
+    id: "cancelAllModelLabel"
+  }, "Cancel Ticket", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_466 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "aria-hidden": "true"
+  }, "×", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_467 = [_hoisted_466];
+var _hoisted_468 = {
+  key: 0,
+  "class": "modal-body"
+};
+var _hoisted_469 = {
+  "class": "form-group"
+};
+
+var _hoisted_470 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "cancel_percentage"
   }, "Percentage", -1
@@ -90499,14 +90831,14 @@ var _hoisted_441 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_442 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"first\" data-v-03b302d9>Select Cancellation Percentage</option><option value=\"0\" data-v-03b302d9>0%</option><option value=\"10\" data-v-03b302d9>10%</option><option value=\"20\" data-v-03b302d9>20%</option><option value=\"30\" data-v-03b302d9>30%</option><option value=\"40\" data-v-03b302d9>40%</option><option value=\"50\" data-v-03b302d9>50%</option>", 7);
+var _hoisted_471 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"first\" data-v-03b302d9>Select Cancellation Percentage</option><option value=\"0\" data-v-03b302d9>0%</option><option value=\"10\" data-v-03b302d9>10%</option><option value=\"20\" data-v-03b302d9>20%</option><option value=\"30\" data-v-03b302d9>30%</option><option value=\"40\" data-v-03b302d9>40%</option><option value=\"50\" data-v-03b302d9>50%</option>", 7);
 
-var _hoisted_449 = [_hoisted_442];
-var _hoisted_450 = {
+var _hoisted_478 = [_hoisted_471];
+var _hoisted_479 = {
   "class": "form-group"
 };
 
-var _hoisted_451 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_480 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": ""
   }, "Remarks", -1
@@ -90514,32 +90846,32 @@ var _hoisted_451 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_452 = {
+var _hoisted_481 = {
   key: 1,
   "class": "modal-body"
 };
-var _hoisted_453 = {
+var _hoisted_482 = {
   "class": "modal-footer"
 };
-var _hoisted_454 = ["disabled"];
-var _hoisted_455 = {
+var _hoisted_483 = ["disabled"];
+var _hoisted_484 = {
   "class": "modal fade",
   id: "seatAllDetailsModal",
   tabindex: "-1",
   "aria-labelledby": "seatAllDetailsModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_456 = {
+var _hoisted_485 = {
   "class": "modal-dialog modal-xl modal-dialog-scrollable"
 };
-var _hoisted_457 = {
+var _hoisted_486 = {
   "class": "modal-content"
 };
-var _hoisted_458 = {
+var _hoisted_487 = {
   "class": "modal-header"
 };
 
-var _hoisted_459 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_488 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
     "class": "modal-title",
     id: "seatAllDetailsModalLabel"
@@ -90548,7 +90880,7 @@ var _hoisted_459 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_460 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_489 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "aria-hidden": "true"
   }, "×", -1
@@ -90556,40 +90888,40 @@ var _hoisted_460 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_461 = [_hoisted_460];
-var _hoisted_462 = {
+var _hoisted_490 = [_hoisted_489];
+var _hoisted_491 = {
   "class": "modal-body p-0"
 };
-var _hoisted_463 = {
+var _hoisted_492 = {
   "class": "card-body"
 };
-var _hoisted_464 = {
+var _hoisted_493 = {
   "class": "row mb-3"
 };
-var _hoisted_465 = {
+var _hoisted_494 = {
   "class": "col-md-12"
 };
-var _hoisted_466 = {
+var _hoisted_495 = {
   "class": "row"
 };
-var _hoisted_467 = {
+var _hoisted_496 = {
   "class": "col-12"
 };
-var _hoisted_468 = {
+var _hoisted_497 = {
   "class": "card"
 };
-var _hoisted_469 = {
+var _hoisted_498 = {
   "class": "card-body p-3"
 };
-var _hoisted_470 = {
+var _hoisted_499 = {
   key: 0,
   "class": "row ml-2 border-bottom"
 };
-var _hoisted_471 = {
+var _hoisted_500 = {
   "class": "col-md-4 d-flex justify-content-start"
 };
 
-var _hoisted_472 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_501 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Seat :", -1
@@ -90597,14 +90929,14 @@ var _hoisted_472 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_473 = {
+var _hoisted_502 = {
   "class": "mb-0 text-muted"
 };
-var _hoisted_474 = {
+var _hoisted_503 = {
   "class": "col-md-4 d-flex justify-content-start"
 };
 
-var _hoisted_475 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_504 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h6", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Booked By :", -1
@@ -90612,14 +90944,14 @@ var _hoisted_475 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_476 = {
+var _hoisted_505 = {
   "class": "mb-0 text-muted"
 };
-var _hoisted_477 = {
+var _hoisted_506 = {
   "class": "col-md-4 d-flex justify-content-end"
 };
 
-var _hoisted_478 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_507 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Type:", -1
@@ -90627,23 +90959,23 @@ var _hoisted_478 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_479 = {
+var _hoisted_508 = {
   "class": "mb-0 text-muted text-capitalize"
 };
-var _hoisted_480 = {
+var _hoisted_509 = {
   key: 0
 };
-var _hoisted_481 = {
+var _hoisted_510 = {
   "class": "row my-3 pl-3"
 };
-var _hoisted_482 = {
+var _hoisted_511 = {
   "class": "col-md-4"
 };
-var _hoisted_483 = {
+var _hoisted_512 = {
   "class": "d-flex"
 };
 
-var _hoisted_484 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_513 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Date :", -1
@@ -90651,14 +90983,14 @@ var _hoisted_484 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_485 = {
+var _hoisted_514 = {
   "class": "mb-0"
 };
-var _hoisted_486 = {
+var _hoisted_515 = {
   "class": "d-flex"
 };
 
-var _hoisted_487 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_516 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, " Bus Class :", -1
@@ -90666,14 +90998,14 @@ var _hoisted_487 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_488 = {
+var _hoisted_517 = {
   "class": "mb-0"
 };
-var _hoisted_489 = {
+var _hoisted_518 = {
   "class": "d-flex"
 };
 
-var _hoisted_490 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_519 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Schedule : ", -1
@@ -90681,17 +91013,17 @@ var _hoisted_490 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_491 = {
+var _hoisted_520 = {
   "class": "mb-0"
 };
-var _hoisted_492 = {
+var _hoisted_521 = {
   "class": "col-md-4"
 };
-var _hoisted_493 = {
+var _hoisted_522 = {
   "class": "d-flex"
 };
 
-var _hoisted_494 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_523 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Customer Name : ", -1
@@ -90699,14 +91031,14 @@ var _hoisted_494 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_495 = {
+var _hoisted_524 = {
   "class": "mb-0"
 };
-var _hoisted_496 = {
+var _hoisted_525 = {
   "class": "d-flex"
 };
 
-var _hoisted_497 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_526 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Customer Cnic :", -1
@@ -90714,14 +91046,14 @@ var _hoisted_497 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_498 = {
+var _hoisted_527 = {
   "class": "mb-0"
 };
-var _hoisted_499 = {
+var _hoisted_528 = {
   "class": "d-flex"
 };
 
-var _hoisted_500 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_529 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Customer Phone : ", -1
@@ -90729,17 +91061,17 @@ var _hoisted_500 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_501 = {
+var _hoisted_530 = {
   "class": "mb-0"
 };
-var _hoisted_502 = {
+var _hoisted_531 = {
   "class": "col-md-4"
 };
-var _hoisted_503 = {
+var _hoisted_532 = {
   "class": "d-flex"
 };
 
-var _hoisted_504 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_533 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Booking Date & Time : ", -1
@@ -90747,14 +91079,14 @@ var _hoisted_504 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_505 = {
+var _hoisted_534 = {
   "class": "mb-0"
 };
-var _hoisted_506 = {
+var _hoisted_535 = {
   "class": "d-flex"
 };
 
-var _hoisted_507 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_536 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, " Departure City :", -1
@@ -90762,14 +91094,14 @@ var _hoisted_507 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_508 = {
+var _hoisted_537 = {
   "class": "mb-0"
 };
-var _hoisted_509 = {
+var _hoisted_538 = {
   "class": "d-flex"
 };
 
-var _hoisted_510 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_539 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Destination City : ", -1
@@ -90777,17 +91109,17 @@ var _hoisted_510 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_511 = {
+var _hoisted_540 = {
   "class": "mb-0"
 };
-var _hoisted_512 = {
+var _hoisted_541 = {
   "class": "col-md-4"
 };
-var _hoisted_513 = {
+var _hoisted_542 = {
   "class": "d-flex"
 };
 
-var _hoisted_514 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_543 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mb-0 font-weight-bold mr-3"
   }, "Tracking Id", -1
@@ -90795,39 +91127,40 @@ var _hoisted_514 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_515 = {
+var _hoisted_544 = {
   "class": "mb-0"
 };
-var _hoisted_516 = {
+var _hoisted_545 = {
   "class": "row mt-3"
 };
-var _hoisted_517 = {
+var _hoisted_546 = {
   "class": "col-md-12 text-right"
 };
-var _hoisted_518 = ["onClick"];
-var _hoisted_519 = ["onClick"];
-var _hoisted_520 = ["onClick"];
-var _hoisted_521 = ["onClick"];
-var _hoisted_522 = ["onClick"];
-var _hoisted_523 = ["onClick"];
-var _hoisted_524 = {
+var _hoisted_547 = ["onClick"];
+var _hoisted_548 = ["onClick"];
+var _hoisted_549 = ["onClick"];
+var _hoisted_550 = ["onClick"];
+var _hoisted_551 = ["onClick"];
+var _hoisted_552 = ["onClick"];
+var _hoisted_553 = ["onClick"];
+var _hoisted_554 = {
   "class": "modal fade",
   id: "busClassModal",
   tabindex: "-1",
   "aria-labelledby": "seatAllDetailsModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_525 = {
+var _hoisted_555 = {
   "class": "modal-dialog modal-dialog-scrollable"
 };
-var _hoisted_526 = {
+var _hoisted_556 = {
   "class": "modal-content"
 };
-var _hoisted_527 = {
+var _hoisted_557 = {
   "class": "modal-header"
 };
 
-var _hoisted_528 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_558 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
     "class": "modal-title",
     id: ""
@@ -90836,7 +91169,7 @@ var _hoisted_528 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_529 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_559 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "aria-hidden": "true"
   }, "×", -1
@@ -90844,21 +91177,21 @@ var _hoisted_529 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_530 = [_hoisted_529];
-var _hoisted_531 = {
+var _hoisted_560 = [_hoisted_559];
+var _hoisted_561 = {
   "class": "modal-body p-0"
 };
-var _hoisted_532 = {
+var _hoisted_562 = {
   "class": "card-body"
 };
-var _hoisted_533 = {
+var _hoisted_563 = {
   "class": "row"
 };
-var _hoisted_534 = {
+var _hoisted_564 = {
   "class": "form-group col-md-12"
 };
 
-var _hoisted_535 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_565 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "city_id"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus Class"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -90868,7 +91201,7 @@ var _hoisted_535 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_536 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_566 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "0"
   }, "Select Bus Class", -1
@@ -90876,18 +91209,18 @@ var _hoisted_536 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_537 = ["value"];
-var _hoisted_538 = {
+var _hoisted_567 = ["value"];
+var _hoisted_568 = {
   "class": "modal-footer bg-whitesmoke br"
 };
-var _hoisted_539 = {
+var _hoisted_569 = {
   "class": "row"
 };
-var _hoisted_540 = {
+var _hoisted_570 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_541 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_571 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "city_id"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -90897,7 +91230,7 @@ var _hoisted_541 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_542 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_572 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: ""
   }, "Select Bus Class", -1
@@ -90905,12 +91238,12 @@ var _hoisted_542 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_543 = ["value"];
-var _hoisted_544 = {
+var _hoisted_573 = ["value"];
+var _hoisted_574 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_545 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_575 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "city_id"
   }, "Route", -1
@@ -90918,11 +91251,11 @@ var _hoisted_545 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_546 = {
+var _hoisted_576 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_547 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_577 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Date "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -90932,11 +91265,11 @@ var _hoisted_547 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_548 = {
+var _hoisted_578 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_549 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_579 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "city_id"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Schedule "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -90946,11 +91279,11 @@ var _hoisted_549 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_550 = {
+var _hoisted_580 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_551 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_581 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus Driver "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -90960,12 +91293,12 @@ var _hoisted_551 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_552 = ["value"];
-var _hoisted_553 = {
+var _hoisted_582 = ["value"];
+var _hoisted_583 = {
   "class": "form-group col-md-6"
 };
 
-var _hoisted_554 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_584 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "name"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bus Host "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -90975,12 +91308,12 @@ var _hoisted_554 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_555 = ["value"];
-var _hoisted_556 = {
+var _hoisted_585 = ["value"];
+var _hoisted_586 = {
   "class": "form-group col-md-12"
 };
 
-var _hoisted_557 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_587 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "location"
   }, "Description", -1
@@ -90988,35 +91321,35 @@ var _hoisted_557 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_558 = ["disabled"];
-var _hoisted_559 = ["disabled"];
-var _hoisted_560 = ["action"];
-var _hoisted_561 = ["value"];
-var _hoisted_562 = ["value"];
-var _hoisted_563 = ["value"];
-var _hoisted_564 = ["value"];
-var _hoisted_565 = ["value"];
-var _hoisted_566 = ["value"];
-var _hoisted_567 = ["action"];
-var _hoisted_568 = ["value"];
-var _hoisted_569 = ["value"];
-var _hoisted_570 = ["value"];
-var _hoisted_571 = ["value"];
-var _hoisted_572 = ["value"];
-var _hoisted_573 = ["value"];
-var _hoisted_574 = ["value"];
-var _hoisted_575 = ["action"];
-var _hoisted_576 = ["value"];
-var _hoisted_577 = ["value"];
-var _hoisted_578 = ["value"];
-var _hoisted_579 = ["value"];
-var _hoisted_580 = ["value"];
-var _hoisted_581 = ["value"];
-var _hoisted_582 = ["action"];
-var _hoisted_583 = ["value"];
-var _hoisted_584 = ["value"];
+var _hoisted_588 = ["disabled"];
+var _hoisted_589 = ["disabled"];
+var _hoisted_590 = ["action"];
+var _hoisted_591 = ["value"];
+var _hoisted_592 = ["value"];
+var _hoisted_593 = ["value"];
+var _hoisted_594 = ["value"];
+var _hoisted_595 = ["value"];
+var _hoisted_596 = ["value"];
+var _hoisted_597 = ["action"];
+var _hoisted_598 = ["value"];
+var _hoisted_599 = ["value"];
+var _hoisted_600 = ["value"];
+var _hoisted_601 = ["value"];
+var _hoisted_602 = ["value"];
+var _hoisted_603 = ["value"];
+var _hoisted_604 = ["value"];
+var _hoisted_605 = ["action"];
+var _hoisted_606 = ["value"];
+var _hoisted_607 = ["value"];
+var _hoisted_608 = ["value"];
+var _hoisted_609 = ["value"];
+var _hoisted_610 = ["value"];
+var _hoisted_611 = ["value"];
+var _hoisted_612 = ["action"];
+var _hoisted_613 = ["value"];
+var _hoisted_614 = ["value"];
 
-var _hoisted_585 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_615 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "duplicate",
@@ -91026,11 +91359,11 @@ var _hoisted_585 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_586 = ["action"];
-var _hoisted_587 = ["value"];
-var _hoisted_588 = ["value"];
+var _hoisted_616 = ["action"];
+var _hoisted_617 = ["value"];
+var _hoisted_618 = ["value"];
 
-var _hoisted_589 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_619 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "duplicate",
@@ -91040,11 +91373,11 @@ var _hoisted_589 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_590 = ["action"];
-var _hoisted_591 = ["value"];
-var _hoisted_592 = ["value"];
+var _hoisted_620 = ["action"];
+var _hoisted_621 = ["value"];
+var _hoisted_622 = ["value"];
 
-var _hoisted_593 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_623 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "duplicate",
@@ -91054,9 +91387,9 @@ var _hoisted_593 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_594 = ["action"];
-var _hoisted_595 = ["value"];
-var _hoisted_596 = ["value"];
+var _hoisted_624 = ["action"];
+var _hoisted_625 = ["value"];
+var _hoisted_626 = ["value"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _$data$totalAlreadyBo,
       _$data$alreadyBookedS,
@@ -92106,49 +92439,51 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[91] || (_cache[91] = function ($event) {
       return $options.closeCancel();
     })
-  }, " Close ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Model Cancel All ticket"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_432, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_433, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_434, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_435, [_hoisted_436, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, " Close ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_432, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_433, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_434, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_435, [_hoisted_436, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "close",
     "data-dismiss": "modal",
     "aria-label": "Close",
     onClick: _cache[92] || (_cache[92] = function ($event) {
-      return $options.closeModal();
+      return $options.closeCancel();
     })
-  }, _hoisted_438)]), $data.cancelAllData.cancelAllSeatType[0] == 'booked' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_439, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_440, [_hoisted_441, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, _hoisted_438)]), $data.cancelData.dataType == 'booked' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_439, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_440, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_441, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Percentage " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.cancelData.dataType), 1
+  /* TEXT */
+  ), _hoisted_442]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     id: "cancel_percentage",
     "class": "form-control",
     "onUpdate:modelValue": _cache[93] || (_cache[93] = function ($event) {
-      return $data.cancelAllData.percentage = $event;
+      return $data.cancelData.percentage = $event;
     })
-  }, _hoisted_449, 512
+  }, _hoisted_455, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.cancelAllData.percentage]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_450, [_hoisted_451, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.cancelData.percentage]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_456, [_hoisted_457, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
     type: "text",
     "class": "form-control",
-    id: "",
+    id: "caceling_remakrs",
     "onUpdate:modelValue": _cache[94] || (_cache[94] = function ($event) {
-      return $data.cancelAllData.reason = $event;
+      return $data.cancelData.reason = $event;
     }),
     placeholder: "Reason for canceling a seat"
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.cancelAllData.reason]])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.cancelAllData.cancelAllSeatType[0] == 'advance booking' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_452, " Are you sure you want to cancel all ticket ? ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_453, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.cancelData.reason]])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.cancelData.dataType == 'advance booking' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_458, " Are you sure you want to cancel ticket ? ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_459, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-primary",
     disabled: $data.cancelLoading,
     onClick: _cache[95] || (_cache[95] = function ($event) {
-      return $options.allSeatCancel();
+      return $options.cancelRefundBooking($data.cancelData);
     })
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.getSchedule ? "Loading..." : 'Cancel Ticket'), 9
   /* TEXT, PROPS */
-  , _hoisted_454), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  , _hoisted_460), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-secondary",
     "data-dismiss": "modal",
     onClick: _cache[96] || (_cache[96] = function ($event) {
-      return $options.closeModal();
+      return $options.closeRefundCancel();
     })
-  }, " Close ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Modal for details"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_455, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_456, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_457, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_458, [_hoisted_459, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, " Close ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Model Cancel All ticket"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_461, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_462, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_463, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_464, [_hoisted_465, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "close",
     "data-dismiss": "modal",
@@ -92156,11 +92491,53 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[97] || (_cache[97] = function ($event) {
       return $options.closeModal();
     })
-  }, _hoisted_461)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_462, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("loop for number of seats"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_463, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_464, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_465, [this.allRescheduleButton && _ctx.checkForSubmenuButtons('reschedule-seats') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+  }, _hoisted_467)]), $data.cancelAllData.cancelAllSeatType[0] == 'booked' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_468, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_469, [_hoisted_470, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    id: "cancel_percentage",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[98] || (_cache[98] = function ($event) {
+      return $data.cancelAllData.percentage = $event;
+    })
+  }, _hoisted_478, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.cancelAllData.percentage]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_479, [_hoisted_480, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+    type: "text",
+    "class": "form-control",
+    id: "",
+    "onUpdate:modelValue": _cache[99] || (_cache[99] = function ($event) {
+      return $data.cancelAllData.reason = $event;
+    }),
+    placeholder: "Reason for canceling a seat"
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.cancelAllData.reason]])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.cancelAllData.cancelAllSeatType[0] == 'advance booking' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_481, " Are you sure you want to cancel all ticket ? ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_482, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-primary",
+    disabled: $data.cancelLoading,
+    onClick: _cache[100] || (_cache[100] = function ($event) {
+      return $options.allSeatCancel();
+    })
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.getSchedule ? "Loading..." : 'Cancel Ticket'), 9
+  /* TEXT, PROPS */
+  , _hoisted_483), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-secondary",
+    "data-dismiss": "modal",
+    onClick: _cache[101] || (_cache[101] = function ($event) {
+      return $options.closeModal();
+    })
+  }, " Close ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Modal for details"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_484, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_485, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_486, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_487, [_hoisted_488, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "close",
+    "data-dismiss": "modal",
+    "aria-label": "Close",
+    onClick: _cache[102] || (_cache[102] = function ($event) {
+      return $options.closeModal();
+    })
+  }, _hoisted_490)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_491, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("loop for number of seats"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_492, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_493, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_494, [this.allRescheduleButton && _ctx.checkForSubmenuButtons('reschedule-seats') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 0,
     type: "button",
     "class": "shadow-style btn btn-primary ml-2",
-    onClick: _cache[98] || (_cache[98] = function ($event) {
+    onClick: _cache[103] || (_cache[103] = function ($event) {
       $options.allRescheduleData();
       _this.rescheduleData.rescheduleSchedule = 0;
       _this.seatMapReschedule = false;
@@ -92168,46 +92545,46 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, "Reschedule All ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), this.duplicateAllSeatType[0] == 'booked' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 1,
     type: "button",
-    onClick: _cache[99] || (_cache[99] = function ($event) {
+    onClick: _cache[104] || (_cache[104] = function ($event) {
       $options.allTicketDuplicate();
     }),
     "class": "btn btn-secondary text-dark ml-2"
   }, " Duplicate All Ticket ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), this.cancelAllData.cancelAllSeatType[0] == 'booked' && _ctx.checkForSubmenuButtons('cancel-ticket') || this.cancelAllData.cancelAllSeatType[0] == 'advance booking' && _ctx.checkForSubmenuButtons('reserved-cancel') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 2,
     type: "button",
-    onClick: _cache[100] || (_cache[100] = function ($event) {
+    onClick: _cache[105] || (_cache[105] = function ($event) {
       $options.cancelAllModal();
     }),
     "class": "btn btn-danger ml-2"
-  }, " Cancel All Ticket ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_466, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_467, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedSeatDataBackEnd, function (singleItems, i) {
-    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_468, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(singleItems, function (innerItem, key, j) {
-      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_469, [key == 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_470, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_471, [_hoisted_472, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", _hoisted_473, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.seat_no), 1
+  }, " Cancel All Ticket ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_495, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_496, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedSeatDataBackEnd, function (singleItems, i) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_497, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(singleItems, function (innerItem, key, j) {
+      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_498, [key == 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_499, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_500, [_hoisted_501, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", _hoisted_502, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.seat_no), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_474, [_hoisted_475, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h6", _hoisted_476, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.added_name.name), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_503, [_hoisted_504, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h6", _hoisted_505, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.added_name.name), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_477, [_hoisted_478, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", _hoisted_479, [innerItem.is_partial == 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_480, "Partial - ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.type), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_506, [_hoisted_507, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", _hoisted_508, [innerItem.is_partial == 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_509, "Partial - ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.type), 1
       /* TEXT */
-      )])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_481, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_482, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_483, [_hoisted_484, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_485, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.date), 1
+      )])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_510, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_511, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_512, [_hoisted_513, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_514, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.date), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_486, [_hoisted_487, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_488, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.bus_class.name), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_515, [_hoisted_516, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_517, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.bus_class.name), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_489, [_hoisted_490, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_491, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.schedule.name), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_518, [_hoisted_519, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_520, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.schedule.name), 1
       /* TEXT */
-      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_492, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_493, [_hoisted_494, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_495, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.customer.name), 1
+      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_521, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_522, [_hoisted_523, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_524, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.customer.name), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_496, [_hoisted_497, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_498, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.auth_terminal.other_terminal_passenger_detail == 1 || innerItem.terminal_id == _this.auth_terminal.id ? $options.cnicFormat(innerItem.customer.cnic) : "---"), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_525, [_hoisted_526, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_527, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.auth_terminal.other_terminal_passenger_detail == 1 || innerItem.terminal_id == _this.auth_terminal.id ? $options.cnicFormat(innerItem.customer.cnic) : "---"), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_499, [_hoisted_500, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_501, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.auth_terminal.other_terminal_passenger_detail == 1 || innerItem.terminal_id == _this.auth_terminal.id ? $options.phoneFormat(innerItem.customer.contact) : "---"), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_528, [_hoisted_529, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_530, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.auth_terminal.other_terminal_passenger_detail == 1 || innerItem.terminal_id == _this.auth_terminal.id ? $options.phoneFormat(innerItem.customer.contact) : "---"), 1
       /* TEXT */
-      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_502, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_503, [_hoisted_504, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_505, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.bookingDate), 1
+      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_531, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_532, [_hoisted_533, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_534, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.bookingDate), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_506, [_hoisted_507, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_508, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.departure_city.name), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_535, [_hoisted_536, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_537, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.departure_city.name), 1
       /* TEXT */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_509, [_hoisted_510, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_511, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.destination_city.name), 1
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_538, [_hoisted_539, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_540, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.destination_city.name), 1
       /* TEXT */
-      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_512, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_513, [_hoisted_514, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_515, "T" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.id) + "@" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.invoice_id), 1
+      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_541, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_542, [_hoisted_543, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_544, "T" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.id) + "@" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(innerItem.invoice_id), 1
       /* TEXT */
-      )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Buttons"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_516, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_517, [innerItem.type == 'booked' && _ctx.checkForSubmenuButtons('duplicate-ticket') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Buttons"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_545, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_546, [innerItem.type == 'booked' && _ctx.checkForSubmenuButtons('duplicate-ticket') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 0,
         type: "button",
         "class": "btn btn-secondary text-dark",
@@ -92216,7 +92593,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }
       }, "Duplicate Ticket ", 8
       /* PROPS */
-      , _hoisted_518)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('resend-sms') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      , _hoisted_547)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('resend-sms') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 1,
         type: "button",
         onClick: function onClick($event) {
@@ -92225,7 +92602,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "class": "btn btn-success ml-2"
       }, "Resend SMS ", 8
       /* PROPS */
-      , _hoisted_519)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('add-elt') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      , _hoisted_548)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('add-elt') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 2,
         type: "button",
         "class": "btn btn-info ml-2",
@@ -92234,7 +92611,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }
       }, " Add ELT ", 8
       /* PROPS */
-      , _hoisted_520)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('reschedule-seats') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      , _hoisted_549)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('reschedule-seats') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 3,
         type: "button",
         "class": "btn btn-primary ml-2",
@@ -92245,7 +92622,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }
       }, "Reschedule ", 8
       /* PROPS */
-      , _hoisted_521)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('overissue-seat') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      , _hoisted_550)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('overissue-seat') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 4,
         type: "button",
         "class": "btn btn-warning ml-2",
@@ -92255,7 +92632,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }
       }, " Over Issue ", 8
       /* PROPS */
-      , _hoisted_522)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('cancel-ticket') && innerItem.type == 'booked' || _ctx.checkForSubmenuButtons('reserved-cancel') && innerItem.type == 'advance booking' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      , _hoisted_551)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.checkForSubmenuButtons('cancel-ticket') && innerItem.type == 'booked' || _ctx.checkForSubmenuButtons('reserved-cancel') && innerItem.type == 'advance booking' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 5,
         type: "button",
         "class": "btn btn-danger ml-2",
@@ -92265,40 +92642,50 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }
       }, " Cancel Ticket ", 8
       /* PROPS */
-      , _hoisted_523)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]);
+      , _hoisted_552)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ($options.checkForSubmenu('jazz-cash-refund') && innerItem.type == 'booked' || $options.checkForSubmenu('jazz-cash-refund') && innerItem.type == 'advance booking') && innerItem.terminal_id === 14 && innerItem.transaction_id !== null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+        key: 6,
+        type: "button",
+        "class": "btn btn-danger ml-2",
+        onClick: function onClick($event) {
+          $options.passDataToCancelRefundModel(innerItem);
+          _this.cancelData.percentage = 0;
+        }
+      }, " Cancel Ticket & Refund ", 8
+      /* PROPS */
+      , _hoisted_553)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]);
     }), 256
     /* UNKEYED_FRAGMENT */
     ))]);
   }), 256
   /* UNKEYED_FRAGMENT */
-  ))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_524, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_525, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_526, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_527, [_hoisted_528, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_554, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_555, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_556, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_557, [_hoisted_558, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "close",
     "data-dismiss": "modal",
     "aria-label": "Close",
-    onClick: _cache[101] || (_cache[101] = function ($event) {
+    onClick: _cache[106] || (_cache[106] = function ($event) {
       return $options.closeModal();
     })
-  }, _hoisted_530)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_531, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("loop for number of seats"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_532, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_533, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_534, [_hoisted_535, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, _hoisted_560)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_561, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("loop for number of seats"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_562, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_563, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_564, [_hoisted_565, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "form-control",
-    "onUpdate:modelValue": _cache[102] || (_cache[102] = function ($event) {
+    "onUpdate:modelValue": _cache[107] || (_cache[107] = function ($event) {
       return $data.busClassData.bus_class = $event;
     })
-  }, [_hoisted_536, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.bus_classes, function (bus_class, i) {
+  }, [_hoisted_566, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.bus_classes, function (bus_class, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: i,
       value: bus_class.id
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus_class.name), 9
     /* TEXT, PROPS */
-    , _hoisted_537);
+    , _hoisted_567);
   }), 128
   /* KEYED_FRAGMENT */
   ))], 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.busClassData.bus_class]])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_538, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.busClassData.bus_class]])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_568, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-primary",
-    onClick: _cache[103] || (_cache[103] = function ($event) {
+    onClick: _cache[108] || (_cache[108] = function ($event) {
       return $options.updateBusClass();
     })
   }, " Update ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Close Schedule "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Add, {
@@ -92312,75 +92699,75 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         key: 0,
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[111] || (_cache[111] = function () {
+        onClick: _cache[116] || (_cache[116] = function () {
           return $options.updateCloseSchedule && $options.updateCloseSchedule.apply($options, arguments);
         }),
         disabled: $data.loading
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Update Schedule'), 9
       /* TEXT, PROPS */
-      , _hoisted_558)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      , _hoisted_588)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 1,
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[112] || (_cache[112] = function () {
+        onClick: _cache[117] || (_cache[117] = function () {
           return $options.closeSchedule && $options.closeSchedule.apply($options, arguments);
         }),
         disabled: $data.loading
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Close Booking'), 9
       /* TEXT, PROPS */
-      , _hoisted_559))];
+      , _hoisted_589))];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_539, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_540, [_hoisted_541, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_569, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_570, [_hoisted_571, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
-        "onUpdate:modelValue": _cache[104] || (_cache[104] = function ($event) {
+        "onUpdate:modelValue": _cache[109] || (_cache[109] = function ($event) {
           return $data.dataForClose.bus = $event;
         })
-      }, [_hoisted_542, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.buses, function (bus, i) {
+      }, [_hoisted_572, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.buses, function (bus, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
           key: i,
           value: bus.id
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.bus_number), 9
         /* TEXT, PROPS */
-        , _hoisted_543);
+        , _hoisted_573);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataForClose.bus]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_544, [_hoisted_545, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataForClose.bus]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_574, [_hoisted_575, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         placeholder: "N/A",
         readonly: "",
-        "onUpdate:modelValue": _cache[105] || (_cache[105] = function ($event) {
+        "onUpdate:modelValue": _cache[110] || (_cache[110] = function ($event) {
           return $data.dataForClose.route_name = $event;
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataForClose.route_name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_546, [_hoisted_547, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataForClose.route_name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_576, [_hoisted_577, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "date",
         "class": "form-control",
         placeholder: "Enter Bus Name",
         readonly: "",
-        "onUpdate:modelValue": _cache[106] || (_cache[106] = function ($event) {
+        "onUpdate:modelValue": _cache[111] || (_cache[111] = function ($event) {
           return $data.dataForClose.date = $event;
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataForClose.date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_548, [_hoisted_549, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataForClose.date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_578, [_hoisted_579, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "text",
         "class": "form-control",
         placeholder: "N/A",
         readonly: "",
-        "onUpdate:modelValue": _cache[107] || (_cache[107] = function ($event) {
+        "onUpdate:modelValue": _cache[112] || (_cache[112] = function ($event) {
           return $data.dataForClose.schedule_detail = $event;
         })
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataForClose.schedule_detail]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_550, [_hoisted_551, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataForClose.schedule_detail]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_580, [_hoisted_581, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
         id: "assignDriver",
-        "onUpdate:modelValue": _cache[108] || (_cache[108] = function ($event) {
+        "onUpdate:modelValue": _cache[113] || (_cache[113] = function ($event) {
           return $data.dataForClose.drivers = $event;
         }),
         multiple: ""
@@ -92390,15 +92777,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           value: driver.id
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(driver.name), 9
         /* TEXT, PROPS */
-        , _hoisted_552);
+        , _hoisted_582);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataForClose.drivers]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_553, [_hoisted_554, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataForClose.drivers]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_583, [_hoisted_584, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control rounded-0",
         id: "assignHost",
-        "onUpdate:modelValue": _cache[109] || (_cache[109] = function ($event) {
+        "onUpdate:modelValue": _cache[114] || (_cache[114] = function ($event) {
           return $data.dataForClose.hosts = $event;
         }),
         multiple: ""
@@ -92408,16 +92795,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           value: host.user_id
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(host.name), 9
         /* TEXT, PROPS */
-        , _hoisted_555);
+        , _hoisted_585);
       }), 128
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataForClose.hosts]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_556, [_hoisted_557, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataForClose.hosts]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_586, [_hoisted_587, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
         "class": "form-control",
         placeholder: "Enter Description",
         id: "location",
-        "onUpdate:modelValue": _cache[110] || (_cache[110] = function ($event) {
+        "onUpdate:modelValue": _cache[115] || (_cache[115] = function ($event) {
           return $data.dataForClose.description = $event;
         }),
         cols: "30",
@@ -92448,39 +92835,39 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: this.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_561), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_591), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "destination_city_id",
     value: this.addForm.destinationCity
   }, null, 8
   /* PROPS */
-  , _hoisted_562), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_592), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "departure_city_id",
     value: this.addForm.departureCity
   }, null, 8
   /* PROPS */
-  , _hoisted_563), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_593), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "date",
     value: this.addForm.date
   }, null, 8
   /* PROPS */
-  , _hoisted_564), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_594), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "schedule_id",
     value: this.addForm.schedule
   }, null, 8
   /* PROPS */
-  , _hoisted_565), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_595), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "departure_time",
     value: this.addForm.departure_time
   }, null, 8
   /* PROPS */
-  , _hoisted_566)], 8
+  , _hoisted_596)], 8
   /* PROPS */
-  , _hoisted_560), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Print Terminal Invoice"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+  , _hoisted_590), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Print Terminal Invoice"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/terminal/invoice',
     method: "POST",
     ref: "refTerminalInvoice",
@@ -92491,45 +92878,45 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: this.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_568), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_598), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "destination_city_id",
     value: this.addForm.destinationCity
   }, null, 8
   /* PROPS */
-  , _hoisted_569), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_599), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "departure_city_id",
     value: this.addForm.departureCity
   }, null, 8
   /* PROPS */
-  , _hoisted_570), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_600), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "date",
     value: this.addForm.date
   }, null, 8
   /* PROPS */
-  , _hoisted_571), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_601), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "schedule_id",
     value: this.addForm.schedule
   }, null, 8
   /* PROPS */
-  , _hoisted_572), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_602), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "terminal_id",
     value: this.addForm.terminalId
   }, null, 8
   /* PROPS */
-  , _hoisted_573), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_603), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "departure_time",
     value: this.addForm.departure_time
   }, null, 8
   /* PROPS */
-  , _hoisted_574)], 8
+  , _hoisted_604)], 8
   /* PROPS */
-  , _hoisted_567), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Print Bus Invoice "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+  , _hoisted_597), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Print Bus Invoice "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/bus/invoice',
     method: "POST",
     ref: "refBusInvoice",
@@ -92540,39 +92927,39 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: this.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_576), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_606), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "destination_city_id",
     value: this.addForm.destinationCity
   }, null, 8
   /* PROPS */
-  , _hoisted_577), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_607), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "departure_city_id",
     value: this.addForm.departureCity
   }, null, 8
   /* PROPS */
-  , _hoisted_578), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_608), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "date",
     value: this.addForm.date
   }, null, 8
   /* PROPS */
-  , _hoisted_579), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_609), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "schedule_id",
     value: this.addForm.schedule
   }, null, 8
   /* PROPS */
-  , _hoisted_580), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_610), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "departure_time",
     value: this.addForm.departure_time
   }, null, 8
   /* PROPS */
-  , _hoisted_581)], 8
+  , _hoisted_611)], 8
   /* PROPS */
-  , _hoisted_575), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        print Customer Ticket Print"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+  , _hoisted_605), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        print Customer Ticket Print"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/customer/ticket',
     method: "POST",
     ref: "refTicket",
@@ -92583,15 +92970,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: this.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_583), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_613), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "ticket_ids",
     value: this.ticketsIds
   }, null, 8
   /* PROPS */
-  , _hoisted_584), _hoisted_585], 8
+  , _hoisted_614), _hoisted_615], 8
   /* PROPS */
-  , _hoisted_582), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        print Customer Duplicate Ticket Print"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+  , _hoisted_612), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        print Customer Duplicate Ticket Print"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/customer/ticket',
     method: "POST",
     ref: "refDuplicateTicket",
@@ -92602,15 +92989,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: this.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_587), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_617), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "ticket_id",
     value: this.ticketsId
   }, null, 8
   /* PROPS */
-  , _hoisted_588), _hoisted_589], 8
+  , _hoisted_618), _hoisted_619], 8
   /* PROPS */
-  , _hoisted_586), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        print Customer Duplicate All Ticket Print"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+  , _hoisted_616), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        print Customer Duplicate All Ticket Print"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/customer/ticket',
     method: "POST",
     ref: "refDuplicateAllTicket",
@@ -92621,15 +93008,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: this.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_591), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_621), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "ticket_ids",
     value: this.duplicateAllTicket
   }, null, 8
   /* PROPS */
-  , _hoisted_592), _hoisted_593], 8
+  , _hoisted_622), _hoisted_623], 8
   /* PROPS */
-  , _hoisted_590), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        Elt Customer PDF Form  "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+  , _hoisted_620), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("        Elt Customer PDF Form  "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/customer/elt',
     method: "POST",
     ref: "refElt",
@@ -92640,15 +93027,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: this.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_595), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_625), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "elt_ids",
     value: this.eltIds
   }, null, 8
   /* PROPS */
-  , _hoisted_596)], 8
+  , _hoisted_626)], 8
   /* PROPS */
-  , _hoisted_594)]);
+  , _hoisted_624)]);
 }
 
 /***/ }),
