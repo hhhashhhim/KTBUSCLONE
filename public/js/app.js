@@ -39865,18 +39865,18 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     checkForSubmenu: function checkForSubmenu(moduleName) {
       var permissions = this.permissions;
-      var valid = false;
 
       for (var i = 0; i < permissions.length; i++) {
-        permissions[i].childs.forEach(function (subMenuItem) {
+        for (var j = 0; j < permissions[i].childs.length; j++) {
+          var subMenuItem = permissions[i].childs[j];
+
           if (subMenuItem.name === moduleName) {
-            valid = subMenuItem.allow;
-            return;
+            return subMenuItem.allow; // return immediately when found
           }
-        });
+        }
       }
 
-      return valid;
+      return false; // if not found
     }
   },
   watch: {
@@ -39927,12 +39927,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     isCustomerLocked: function isCustomerLocked() {
       return this.addForm.otp_valid === true || this.addForm.discount_otp_valid === true;
     },
-    computed: {
-      canShowJazzCashRefund: function canShowJazzCashRefund() {
-        var hasSubmenu = this.checkForSubmenu('jazz-cash-refund'); // called once
+    canShowJazzCashRefund: function canShowJazzCashRefund() {
+      var hasSubmenu = this.checkForSubmenu('jazz-cash-refund'); // called once
 
-        return hasSubmenu && ['booked', 'advance booking'].includes(this.innerItem.type) && this.innerItem.terminal_id === 14 && this.innerItem.transaction_id !== null;
-      }
+      return hasSubmenu && ['booked', 'advance booking'].includes(this.innerItem.type) && this.innerItem.terminal_id === 14 && this.innerItem.transaction_id !== null;
     }
   }
 });
@@ -92649,7 +92647,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }
       }, " Cancel Ticket ", 8
       /* PROPS */
-      , _hoisted_552)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.canShowJazzCashRefund ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      , _hoisted_552)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canShowJazzCashRefund ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 6,
         type: "button",
         "class": "btn btn-danger ml-2",

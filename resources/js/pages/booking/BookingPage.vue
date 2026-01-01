@@ -4928,19 +4928,20 @@ if (!this.hasAnySeatSelected) {
             }
 
         },
-           checkForSubmenu(moduleName) {
-            let permissions = this.permissions;
-            let valid = false;
-            for (let i = 0; i < permissions.length; i++) {
-                permissions[i].childs.forEach(subMenuItem => {
-                    if (subMenuItem.name === moduleName) {
-                        valid = subMenuItem.allow;
-                        return;
-                    }
-                });
+          checkForSubmenu(moduleName) {
+    let permissions = this.permissions;
+
+    for (let i = 0; i < permissions.length; i++) {
+        for (let j = 0; j < permissions[i].childs.length; j++) {
+            const subMenuItem = permissions[i].childs[j];
+            if (subMenuItem.name === moduleName) {
+                return subMenuItem.allow; // return immediately when found
             }
-            return valid;
-        },
+        }
+    }
+
+    return false; // if not found
+},
     },
 
     watch: {
@@ -4995,7 +4996,7 @@ if (!this.hasAnySeatSelected) {
             this.addForm.discount_otp_valid === true
         );
     },
-    computed: {
+
     canShowJazzCashRefund() {
         const hasSubmenu = this.checkForSubmenu('jazz-cash-refund'); // called once
         return hasSubmenu &&
@@ -5003,7 +5004,7 @@ if (!this.hasAnySeatSelected) {
                this.innerItem.terminal_id === 14 &&
                this.innerItem.transaction_id !== null;
     }
-}
+
 
     },
 }
