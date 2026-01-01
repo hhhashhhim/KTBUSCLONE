@@ -27,7 +27,7 @@ class ConfirmCancellationReportController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $tickets = Ticket::with('cancel_ticket', 'schedule:id,time')
+        $tickets = Ticket::with('cancel_ticket', 'schedule:id,time', 'terminal')
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'canceled')
             ->onlyTrashed()
@@ -52,7 +52,7 @@ class ConfirmCancellationReportController extends Controller
             })
             ->orderBy('id','DESC')
             ->limit(($request->fromDate == '' && $request->toDate == '') ? 50 : 2000)
-            ->get(["id","terminal_name","schedule_id","schedule_date","customer_id","seat_fare","discount","seat_no"]);
+            ->get(["id","terminal_id","schedule_id","schedule_date","customer_id","seat_fare","discount","seat_no"]);
 
         $tickets->map(function ($q) {
 
