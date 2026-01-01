@@ -1454,16 +1454,21 @@
                                                         Cancel Ticket
                                                     </button>
                                                    <button
-    v-if="(
-            ((checkForSubmenu('jazz-cash-refund') && innerItem.type == 'booked') || 
-             (checkForSubmenu('jazz-cash-refund') && innerItem.type == 'advance booking'))
-            && innerItem.terminal_id === 14 
-            && innerItem.transaction_id !== null
-          )"
-    type="button"
-    class="btn btn-danger ml-2"
-    @click="passDataToCancelRefundModel(innerItem); this.cancelData.percentage = 0"
+v-if="(
+    (() => {
+        const hasSubmenu = checkForSubmenu('jazz-cash-refund');
+        return (
+            (hasSubmenu && (innerItem.type == 'booked' || innerItem.type == 'advance booking')) &&
+            innerItem.terminal_id === 14 &&
+            innerItem.transaction_id !== null
+        );
+    })()
+)"
+type="button"
+class="btn btn-danger ml-2"
+@click="passDataToCancelRefundModel(innerItem); this.cancelData.percentage = 0"
 >
+
     Cancel Ticket & Refund
 </button>
 

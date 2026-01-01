@@ -92642,7 +92642,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }
       }, " Cancel Ticket ", 8
       /* PROPS */
-      , _hoisted_552)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ($options.checkForSubmenu('jazz-cash-refund') && innerItem.type == 'booked' || $options.checkForSubmenu('jazz-cash-refund') && innerItem.type == 'advance booking') && innerItem.terminal_id === 14 && innerItem.transaction_id !== null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      , _hoisted_552)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), function () {
+        var hasSubmenu = $options.checkForSubmenu('jazz-cash-refund');
+        return hasSubmenu && (innerItem.type == 'booked' || innerItem.type == 'advance booking') && innerItem.terminal_id === 14 && innerItem.transaction_id !== null;
+      }() ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 6,
         type: "button",
         "class": "btn btn-danger ml-2",
