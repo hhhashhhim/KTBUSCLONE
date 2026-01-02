@@ -1456,9 +1456,7 @@
                                                    <button
   v-if="
     checkForSubmenu('jazz-cash-refund') &&
-    innerItem.type === 'booked' &&
-    innerItem.terminal_id == 14 &&
-    innerItem.transaction_id != null
+    innerItem.type === 'booked' 
   "
   type="button"
   class="btn btn-danger ml-2"
