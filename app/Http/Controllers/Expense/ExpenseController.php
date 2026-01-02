@@ -119,6 +119,7 @@ class ExpenseController extends Controller
             "sale"     => $merge->seat_fare - $merge->discount - $merge->commission + $merge->elt + $merge->refund,
             "closing"  => $checkClosing ? true : false,
             'shortage' => $shortage,
+            'details'  => TicketClosingMerge::with('bus','closing.schedule.route')->where('id', $request->ticket_merge_id)->first() 
         ];
     }
 
