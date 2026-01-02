@@ -1453,10 +1453,12 @@
                                                         @click="passDataToCancelModel(innerItem); this.cancelData.percentage = 0">
                                                         Cancel Ticket
                                                     </button>
-                                                   <button
+<button
   v-if="
     checkForSubmenu('jazz-cash-refund') &&
-    innerItem.type === 'booked' 
+    innerItem.type === 'booked' &&
+    Number(innerItem.terminal_id) == 14 &&
+    innerItem.transaction_id != null
   "
   type="button"
   class="btn btn-danger ml-2"
@@ -1464,6 +1466,7 @@
 >
   Cancel & Refund Ticket
 </button>
+
 
 
 
