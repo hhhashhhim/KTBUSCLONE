@@ -600,7 +600,9 @@ class ScheduleClosingController extends Controller
               );
         }
     ]);
-
+ $buses = Bus::where('company_id', $user->company_id)
+        ->orderBy('id')
+        ->get();
     // Filters
     if ($request->bus_number) $query->where('bus_id', $request->bus_number);
     if ($request->from_date) $query->whereDate('schedule_departure_date', '>=', $request->from_date);
@@ -680,9 +682,7 @@ class ScheduleClosingController extends Controller
 
     return [
         'merges' => $merges,
-        'buses'  => Bus::where('company_id', $user->company_id)
-                        ->orderBy('id')
-                        ->get(['id', 'bus_number'])
+        'buses'  => $buses
     ];
 }
 
