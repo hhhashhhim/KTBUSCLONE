@@ -66496,7 +66496,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     close: function close() {
       $("#date-modal").click();
     },
-    fetchBuses: function fetchBuses() {
+    //          async fetchBuses() {
+    //   try {
+    //     const res = await this.callApi("post", "buses");
+    //     console.log("Buses API response:", res); // check the structure
+    //     if (res.status === 200) {
+    //       // adjust based on actual path
+    //       this.buses = res.data.buses || res.data; 
+    //     }
+    //   } catch (error) {
+    //     console.error("Error fetching buses:", error);
+    //   }
+    // },
+    fetchMerges: function fetchMerges() {
       var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
@@ -66506,16 +66518,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 _context.prev = 0;
-                _context.next = 3;
-                return _this.callApi("post", "buses");
+                _this.tableLoading = true;
+                _context.next = 4;
+                return _this.callApi("post", "booking/close/schedule/merges", _this.filterData);
 
-              case 3:
+              case 4:
                 res = _context.sent;
-                console.log("Buses API response:", res); // check the structure
 
                 if (res.status === 200) {
-                  // adjust based on actual path
+                  _this.merges = res.data.merges;
                   _this.buses = res.data.buses || res.data;
+                } else {
+                  console.error("API returned error:", res);
                 }
 
                 _context.next = 11;
@@ -66524,59 +66538,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 8:
                 _context.prev = 8;
                 _context.t0 = _context["catch"](0);
-                console.error("Error fetching buses:", _context.t0);
+                console.error("Error fetching merges:", _context.t0);
 
               case 11:
+                _context.prev = 11;
+                _this.tableLoading = false; // ensures loader stops even on error
+
+                return _context.finish(11);
+
+              case 14:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, null, [[0, 8]]);
-      }))();
-    },
-    fetchMerges: function fetchMerges() {
-      var _this2 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var res;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                _context2.prev = 0;
-                _this2.tableLoading = true;
-                _context2.next = 4;
-                return _this2.callApi("post", "booking/close/schedule/merges", _this2.filterData);
-
-              case 4:
-                res = _context2.sent;
-
-                if (res.status === 200) {
-                  _this2.merges = res.data.merges;
-                } else {
-                  console.error("API returned error:", res);
-                }
-
-                _context2.next = 11;
-                break;
-
-              case 8:
-                _context2.prev = 8;
-                _context2.t0 = _context2["catch"](0);
-                console.error("Error fetching merges:", _context2.t0);
-
-              case 11:
-                _context2.prev = 11;
-                _this2.tableLoading = false; // ensures loader stops even on error
-
-                return _context2.finish(11);
-
-              case 14:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, null, [[0, 8, 11, 14]]);
+        }, _callee, null, [[0, 8, 11, 14]]);
       }))();
     },
     resetFilters: function resetFilters() {
@@ -66588,20 +66563,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.fetchMerges(); // optional: refresh table after reset
     },
     updateClosingDate: function updateClosingDate() {
-      var _this3 = this;
+      var _this2 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
-                if (!(_this3.closingData.closingDate == "")) {
-                  _context3.next = 2;
+                if (!(_this2.closingData.closingDate == "")) {
+                  _context2.next = 2;
                   break;
                 }
 
-                return _context3.abrupt("return", swal({
+                return _context2.abrupt("return", swal({
                   title: "Required!",
                   text: "Date Field is Required ",
                   icon: "error",
@@ -66609,15 +66584,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                _this3.loading = true;
-                _context3.next = 5;
-                return _this3.callApi("post", "booking/close/schedule/closing/date/update", _this3.closingData);
+                _this2.loading = true;
+                _context2.next = 5;
+                return _this2.callApi("post", "booking/close/schedule/closing/date/update", _this2.closingData);
 
               case 5:
-                res = _context3.sent;
+                res = _context2.sent;
 
                 if (res.status == 200) {
-                  _this3.close();
+                  _this2.close();
 
                   swal({
                     title: "Success",
@@ -66625,13 +66600,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     icon: "success",
                     timer: 2000
                   });
-                  _this3.loading = false;
+                  _this2.loading = false;
 
-                  _this3.fetchMerges();
+                  _this2.fetchMerges();
                 } else {
                   if (res.status == 422) {
                     (function () {
-                      _this3.loading = false;
+                      _this2.loading = false;
                       var errorContent = "";
                       var count = 0;
 
@@ -66655,10 +66630,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 7:
               case "end":
-                return _context3.stop();
+                return _context2.stop();
             }
           }
-        }, _callee3);
+        }, _callee2);
       }))();
     }
   },
@@ -66692,22 +66667,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   mounted: function mounted() {
-    var _this4 = this;
+    var _this3 = this;
 
-    return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-      return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+    return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context3.prev = _context3.next) {
             case 0:
-              _context4.next = 2;
-              return _this4.fetchBuses();
+              _context3.next = 2;
+              return _this3.fetchBuses();
 
             case 2:
             case "end":
-              return _context4.stop();
+              return _context3.stop();
           }
         }
-      }, _callee4);
+      }, _callee3);
     }))();
   }
 });

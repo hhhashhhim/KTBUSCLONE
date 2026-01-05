@@ -331,18 +331,18 @@ export default {
         close() {
             $("#date-modal").click();
         },
-         async fetchBuses() {
-  try {
-    const res = await this.callApi("post", "buses");
-    console.log("Buses API response:", res); // check the structure
-    if (res.status === 200) {
-      // adjust based on actual path
-      this.buses = res.data.buses || res.data; 
-    }
-  } catch (error) {
-    console.error("Error fetching buses:", error);
-  }
-},
+//          async fetchBuses() {
+//   try {
+//     const res = await this.callApi("post", "buses");
+//     console.log("Buses API response:", res); // check the structure
+//     if (res.status === 200) {
+//       // adjust based on actual path
+//       this.buses = res.data.buses || res.data; 
+//     }
+//   } catch (error) {
+//     console.error("Error fetching buses:", error);
+//   }
+// },
 
         async fetchMerges() {
     try {
@@ -355,6 +355,7 @@ export default {
 
         if (res.status === 200) {
             this.merges = res.data.merges;
+            this.buses = res.data.buses || res.data; 
         } else {
             console.error("API returned error:", res);
         }
