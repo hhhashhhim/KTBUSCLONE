@@ -129864,13 +129864,13 @@ var _hoisted_18 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_19 = {
-  "class": "col-md-3 d-flex justify-content-center"
+  "class": "col-md-12 d-flex justify-content-center mt-4"
 };
 
 var _hoisted_20 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "submit",
-    "class": "btn btn-primary mr-2"
+    "class": "btn w-100 btn-primary mr-2"
   }, " Filter ", -1
   /* HOISTED */
   );
@@ -130147,7 +130147,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* NEED_PATCH */
   ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filterData.closing_date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [_hoisted_20, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
-    "class": "btn btn-danger",
+    "class": "btn w-100 btn-danger",
     onClick: _cache[4] || (_cache[4] = function () {
       return $options.resetFilters && $options.resetFilters.apply($options, arguments);
     })

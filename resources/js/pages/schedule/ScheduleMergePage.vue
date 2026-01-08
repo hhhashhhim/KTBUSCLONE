@@ -44,11 +44,11 @@
                    v-model="filterData.closing_date">
         </div>
 
-        <div class="col-md-3 d-flex justify-content-center">
-            <button type="submit" class="btn btn-primary mr-2">
+        <div class="col-md-12 d-flex justify-content-center mt-4">
+            <button type="submit" class="btn w-100 btn-primary mr-2">
                 Filter
             </button>
-            <button type="button" class="btn btn-danger" @click="resetFilters">
+            <button type="button" class="btn w-100 btn-danger" @click="resetFilters">
                 Reset
             </button>
         </div>
