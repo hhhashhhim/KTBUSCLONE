@@ -49,6 +49,8 @@
                         <th>Terminal Name</th>
                         <th>Passenger Count</th>
                         <th>KT Commission</th>
+                        <th>ELT</th>
+                        <th>Cancellation Amount</th>
                         <th>Total Receivable</th>
                         <th>Other Commission</th>
                         <!-- <th>Receivable Cash</th>
@@ -66,8 +68,10 @@
                         :key="'start-' + terminalId"
                       >
                         <td>{{ tickets[0].terminal.name }}</td>
-                        <td>{{ tickets.length }}</td>
+                        <td>{{ tickets.filter(t => t.type != 'canceled').length }}</td>
                         <td>{{ totalCommission(tickets) }}</td>
+                        <td>{{ totalELT(tickets) }}</td>
+                        <td>{{ totalCancelAmount(tickets) }}</td>
                         <td>{{ totalFare(tickets) }}</td>
                         <td>{{ totalOtherCommission(tickets) }}</td>
                         <td>
@@ -76,12 +80,14 @@
                             class="form-control"
                             v-model="cashBankStart[terminalId].cash"
                             @input="updateCash(terminalId, tickets)"
+                            :disabled="totalFare(tickets) == 0"
                           />
                         </td>
                         <td>
                           <select
                             class="form-control rounded-0"
                             v-model="cashBankStart[terminalId].selectedBankId"
+                            :disabled="totalFare(tickets) == 0"
                           >
                             <option value="" selected disabled>
                               Select Bank
@@ -102,6 +108,7 @@
                             class="form-control"
                             v-model.number="cashBankStart[terminalId].bank"
                             @input="updateBank(terminalId, tickets)"
+                            :disabled="totalFare(tickets) == 0"
                           />
                         </td>
 
@@ -129,6 +136,13 @@
                         <th>
                           {{ totalCommissions(data.schedule_start) }}
                         </th>
+                        <th>
+                          {{ grandTotalELT(data.schedule_start) }}
+                        </th>
+                        <th>
+                          {{ grandTotalCancel(data.schedule_start) }}
+                        </th>
+                        
                         <th>
                           {{ sumReceivable() }}
                         </th>
@@ -172,6 +186,8 @@
                         <th>Terminal Name</th>
                         <th>Passenger Count</th>
                         <th>KT Commission</th>
+                         <th>ELT</th>
+                         <th>Cancellation Amount</th>
                         <th>Total Receivable</th>
                         <th>Other Commission</th>
                         <th>Total Received in Cash</th>
@@ -187,8 +203,10 @@
                         :key="'return-' + terminalId"
                       >
                         <td>{{ tickets[0].terminal.name }}</td>
-                        <td>{{ tickets.length }}</td>
+                       <td>{{ tickets.filter(t => t.type != 'canceled').length }}</td>
                         <td>{{ totalCommission(tickets) }}</td>
+                        <td>{{ totalELT(tickets) }}</td>
+                        <td>{{ totalCancelAmount(tickets) }}</td>
                         <td>{{ totalFare(tickets) }}</td>
                         <td>{{ totalOtherCommission(tickets) }}</td>
 
@@ -199,12 +217,14 @@
                             class="form-control"
                             v-model.number="cashBankReturn[terminalId].cash"
                             @input="editingField = 'cash'"
+                             :disabled="totalFare(tickets) == 0"
                           />
                         </td>
                         <td>
                           <select
                             class="form-control rounded-0"
                             v-model="cashBankReturn[terminalId].selectedBankId"
+                             :disabled="totalFare(tickets) == 0"
                           >
                             <option value="" selected disabled>
                               Select Bank
@@ -225,6 +245,7 @@
                             class="form-control"
                             v-model.number="cashBankReturn[terminalId].bank"
                             @input="editingField = 'bank'"
+                             :disabled="totalFare(tickets) == 0"
                           />
                         </td>
 
@@ -251,6 +272,13 @@
                         <th>
                           {{ totalCommissions(data.schedule_return) }}
                         </th>
+                        <th>
+                          {{ grandTotalELT(data.schedule_return) }}
+                        </th>
+                        <th>
+                          {{ grandTotalCancel(data.schedule_return) }}
+                        </th>
+                        
                         <th>
                           {{ sumReceivableReturn() }}
                         </th>
@@ -721,8 +749,9 @@ export default {
         Object.entries(val).forEach(([terminalId, tickets]) => {
           if (this.cashBankStart[terminalId]) return;
 
-          const rawTotal =
-            this.totalFare(tickets) - this.totalOtherCommission(tickets);
+          const rawTotal = this.totalFare(tickets) - this.totalOtherCommission(tickets) ;
+        
+          
           const commission = this.totalOtherCommission(tickets);
           const total = Math.round(rawTotal);
           const method = tickets[0].terminal.recovery_method;
@@ -746,8 +775,7 @@ export default {
         Object.entries(val).forEach(([terminalId, tickets]) => {
           if (this.cashBankReturn[terminalId]) return;
 
-          const rawTotal =
-            this.totalFare(tickets) - this.totalOtherCommission(tickets);
+          const rawTotal = this.totalFare(tickets) - this.totalOtherCommission(tickets);
           const total = Math.round(rawTotal);
           const commission = this.totalOtherCommission(tickets);
           const method = tickets[0].terminal.recovery_method;
@@ -908,14 +936,41 @@ export default {
 
     totalFare(tickets) {
   return tickets.reduce((sum, t) => {
-    const fare = parseFloat(t.seat_fare) || 0;
-    const discount = parseFloat(t.discount) || 0;
-    // console.log("test", t.discount);
-    
-    return sum + (fare - discount);
+    if(t.type != 'canceled'){
+      const fare = parseFloat(t.seat_fare) || 0;
+      const discount = parseFloat(t.discount) || 0;
+       const ticketELT = parseFloat(t?.elt?.elt_price) || 0;
+            // console.log("test", t.discount);
+            return sum + ( (fare + ticketELT) - discount );
+    }else{
+      const percentage = parseFloat(t?.cancel_ticket?.percentage) || 0;
+      
+          const seatFare   = parseFloat(t?.seat_fare) || 0;
+
+          const cancelAmount = (seatFare * percentage) / 100;
+           return sum + cancelAmount ;
+    } 
   }, 0);
 
 },
+   totalELT(tickets) {
+  return tickets.reduce((sum, t) => {
+    const ticketELT = parseFloat(t?.elt?.elt_price) || 0;
+    return sum + ticketELT;
+  }, 0);
+},
+  totalCancelAmount(tickets) {
+  return tickets.reduce((sum, t) => {
+    const percentage = parseFloat(t?.cancel_ticket?.percentage) || 0;
+    const seatFare   = parseFloat(t?.seat_fare) || 0;
+
+    const cancelAmount = (seatFare * percentage) / 100;
+
+    return sum + cancelAmount;
+  }, 0);
+},
+
+
 
     sumByRecovery(schedule, method) {
       if (!schedule) return 0;
@@ -1043,6 +1098,20 @@ export default {
         0
       );
     },
+    grandTotalELT(data) {
+      const groups = data || {};
+      return Object.values(groups).reduce(
+        (sum, tickets) => sum + this.totalELT(tickets),
+        0
+      );
+    },
+    grandTotalCancel(data) {
+      const groups = data || {};
+      return Object.values(groups).reduce(
+        (sum, tickets) => sum + this.totalCancelAmount(tickets),
+        0
+      );
+    },
     totalCommissions(data) {
       const groups = data || {};
       return Object.values(groups).reduce(
@@ -1072,47 +1141,53 @@ export default {
       }
     },
    
-    totalCommission(list) {
-      return list.reduce((sum, t) => {
-        // const fix = Number(t.commission?.fix_commission || 0);
-        // const flat = Number(t.commission?.flat_commission || 0);
-        // const percent = Number(t.commission?.percentage_commission || 0);
-        const adjPercent = Number(t.commission?.adjustment_commission || 0);
+   totalCommission(list) {
+  return list.reduce((sum, t) => {
+    // 1. Check if the ticket is canceled. 
+    // If it is, skip the calculation and return the current sum.
+    if (t.type == 'canceled') {
+      return sum;
+    }
 
-        // // If flat > 0 use flat, else percentage
-        // const flatOrPercentage = flat > 0
-        //     ? flat
-        //     : (percent / 100) * Number(t.seat_fare);
+    // 2. Otherwise, proceed with the calculation
+    const adjPercent = Number(t.commission?.adjustment_commission || 0);
 
-        // Adjustment % always on seat fare
-        const adjustment =
-          (adjPercent / 100) * Number(t.seat_fare - t.discount);
+    // Adjustment % always on seat fare (after discount)
+    const adjustment = (adjPercent / 100) * Number(t.seat_fare - t.discount);
 
-        // return sum + fix + flatOrPercentage + adjustment;
-        return sum + adjustment;
-      }, 0);
-    },
+    return sum + adjustment;
+  }, 0);
+},
     receivable(terminalId, tickets) {
       return this.totalFare(tickets) - this.totalOtherCommission(tickets);
     },
     totalOtherCommission(list) {
-      let fixCommission = 0;
+  let fixCommission = 0;
 
-      const value = list.reduce((sum, t) => {
-        const fare = parseFloat(t.seat_fare || 0);
-        const discount = parseFloat(t.discount) || 0;
-        const afterDiscount = fare - discount;
-        fixCommission = parseFloat(t.commission?.fix_commission || 0);
-        const flat = parseFloat(t.commission?.flat_commission || 0);
-        const percent = parseFloat(t.commission?.percentage_commission || 0);
-        const flatOrPercentage = flat > 0 ? flat : (percent / 100) * afterDiscount;
+  const value = list.reduce((sum, t) => {
+    // 1. Skip if ticket is canceled
+    if (t.type == 'canceled') {
+      return sum;
+    }
 
-        return sum + flatOrPercentage;
-      }, 0);
+    const fare = parseFloat(t.seat_fare || 0);
+    const discount = parseFloat(t.discount) || 0;
+    const afterDiscount = fare - discount;
 
-      // Round the final result to the nearest whole number
-      return Math.round(value + fixCommission);
-    },
+    // Update fixCommission (only from active tickets)
+    fixCommission = parseFloat(t.commission?.fix_commission || 0);
+
+    const flat = parseFloat(t.commission?.flat_commission || 0);
+    const percent = parseFloat(t.commission?.percentage_commission || 0);
+    
+    const flatOrPercentage = flat > 0 ? flat : (percent / 100) * afterDiscount;
+
+    return sum + flatOrPercentage;
+  }, 0);
+
+  // Round the final result
+  return Math.round(value + fixCommission);
+},
     saveRow(event, fieldName, index) {
       // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
       if (fieldName == "first") {
@@ -1160,8 +1235,8 @@ export default {
       this.netProfit = this.totalSale - this.totalAmount;
     },
 
- // ===== Merge Schedule API =====
-async mergeScheduleApi(addData = {}) {
+//  // ===== Merge Schedule API =====
+ async mergeScheduleApi(addData = {}) {
   const payload = {
     ...addData,
     expenses:this.postData,
@@ -1214,26 +1289,19 @@ async saveTicketClosingShortage() {
     const mergedResult = await this.mergeScheduleApi(this.addData);
     // Step 2: Store merged data for the component
     this.closingData = mergedResult;
-
-    // Step 3: Ticket closing logic
-    const calcKtCommission = (tickets) =>
-      tickets?.length
-        ? tickets.reduce(
-            (sum, t) =>
-              sum + ((t.commission?.adjustment_commission || 0) / 100) * (t.seat_fare - t.discount),
-            0
-          )
-        : 0;
-
-    const mapRows = (cashBank, schedule) =>
+    
+    // Step 4: Save Start
+const mapRows = (cashBank, schedule) =>
       Object.entries(cashBank).map(([terminalId, row]) => {
         const tickets = schedule[terminalId] || [];
         return {
           terminal_id: Number(terminalId),
-          passenger_count: tickets.length,
-          kt_commission: calcKtCommission(tickets),
-          other_commission: row.commission || 0,
+          passenger_count: tickets.filter(ticket => ticket.status != 'canceled').length,
+          kt_commission: this.totalCommission(tickets),
+          elt: this.totalELT(tickets),
+          cancellation_amount: this.totalCancelAmount(tickets),
           total_receivable: row.total + row.commission,
+          other_commission: row.commission || 0,
           total_received_cash: row.cash,
           bank_id: row.selectedBankId || null,
           total_received_bank: row.bank,
@@ -1242,8 +1310,6 @@ async saveTicketClosingShortage() {
           mergeId: mergedResult.id
         };
       });
-
-    // Step 4: Save Start
 
     await this.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
       ticket_closing_id: mergedResult.id,
@@ -1257,6 +1323,10 @@ async saveTicketClosingShortage() {
       type: "return",
       rows: mapRows(this.cashBankReturn, this.data.schedule_return),
     });
+
+    
+    
+
 
     Swal.fire({
       icon: "success",
@@ -1277,6 +1347,63 @@ async saveTicketClosingShortage() {
   }
 },
 
+// async saveTicketClosingShortage() {
+//   this.loading = true;
+
+//   try {
+//     // Step 1 & 2: SKIP MERGE API
+//     // We create a dummy ID so the code doesn't break
+//     const dummyId = 999; 
+
+//     // Step 3: Calculation Logic
+//     const mapRows = (cashBank, schedule) =>
+//       Object.entries(cashBank).map(([terminalId, row]) => {
+//         // Filter tickets to exclude canceled ones for accuracy
+//         const allTickets = schedule[terminalId] || [];
+//         const activeTickets = allTickets.filter(t => t.type !== 'canceled');
+        
+//         return {
+//           terminal_id: Number(terminalId),
+//           passenger_count: activeTickets.length,
+//           kt_commission: this.totalCommission(allTickets), 
+//           elt: this.totalELT(allTickets),
+//           cancellation_amount: this.totalCancelAmount(allTickets),
+//           // Calculation check
+//           total_receivable: row.total + row.commission,
+//           other_commission: row.commission || 0,
+//           total_received_cash: row.cash,
+//           bank_id: row.selectedBankId || null,
+//           total_received_bank: row.bank,
+//           shortage: row.shortage,
+//           received: row.cash + row.bank,
+//           mergeId: dummyId // Using dummy ID instead of mergedResult.id
+//         };
+//       });
+
+//     // Step 4: Prepare Payloads
+//     const startPayload = mapRows(this.cashBankStart, this.data.schedule_start);
+//     const returnPayload = mapRows(this.cashBankReturn, this.data.schedule_return);
+
+//     // LOG TO CONSOLE AS A TABLE (Easier to read than a list)
+//     console.log("--- START DATA CHECK ---");
+//     console.table(startPayload);
+    
+//     console.log("--- RETURN DATA CHECK ---");
+//     console.table(returnPayload);
+
+//     // Show a message to confirm it's just a check
+//     Swal.fire({
+//       icon: "info",
+//       title: "Check Mode",
+//       text: "Check the browser console (F12) to see the calculated values.",
+//     });
+
+//   } catch (error) {
+//     console.error("Error during calculation check:", error);
+//   } finally {
+//     this.loading = false;
+//   }
+// },
     closeexampleModal() {
       $("#exampleModal").click();
     },

@@ -38,6 +38,11 @@
             <input id="toDate" type="date" class="form-control"
                    v-model="filterData.to_date">
         </div>
+        <div class="col-md-3">
+            <label for="toDate">Closing Date</label>
+            <input id="toDate" type="date" class="form-control"
+                   v-model="filterData.closing_date">
+        </div>
 
         <div class="col-md-3 d-flex justify-content-center">
             <button type="submit" class="btn btn-primary mr-2">
@@ -128,11 +133,7 @@
 
     <td>
       {{
-        (merge.seat_fare || 0) +
-        (merge.elt || 0) +
-        (merge.refund || 0) -
-        (merge.discount || 0) -
-        (merge.commission || 0)
+        $insertComma(merge.shortage_sum_total_receivable || 0)
       }}
     </td>
 
@@ -141,14 +142,7 @@
     </td>
 
     <td class="bg-danger">
-      {{
-        (merge.seat_fare || 0) +
-        (merge.elt || 0) +
-        (merge.refund || 0) -
-        (merge.discount || 0) -
-        (merge.commission || 0) -
-        (merge.expenses_sum_amount || 0)
-      }}
+        {{ $insertComma(merge.shortage_sum_total_receivable - merge.expenses_sum_amount  || 0) }}
     </td>
 <td>
       <span 
@@ -203,9 +197,9 @@
   <!-- Totals -->
   <tr>
     <td colspan="6"></td>
-    <td><b>{{ totalSale }}</b></td>
-    <td><b>{{ totalExpense }}</b></td>
-    <td><b>{{ totalSale - totalExpense }}</b></td>
+    <td><b>{{ $insertComma(totalSale) }}</b></td>
+    <td><b>{{ $insertComma(totalExpense) }}</b></td>
+    <td><b>{{ $insertComma(totalSale - totalExpense) }}</b></td>
       <!-- Shortage status dot -->
   <!-- <td>
     <span 
@@ -301,6 +295,7 @@ export default {
                 bus_number: "",
                 from_date: new Date().toISOString().split('T')[0],
                 to_date: new Date().toISOString().split('T')[0],
+                closing_date: new Date().toISOString().split('T')[0],
             },
             // formID: "schedule_closing_form",
             // editFormID: "edit_schedule_closing_form",
@@ -370,6 +365,7 @@ resetFilters() {
         bus_number: '',
         from_date: new Date().toISOString().split('T')[0],
                 to_date: new Date().toISOString().split('T')[0],
+                closing_date: new Date().toISOString().split('T')[0],
     };
     this.fetchMerges(); // optional: refresh table after reset
 },
@@ -429,19 +425,14 @@ resetFilters() {
     },
     watch: {
         merges(){
-          this.totalSale = this.merges.reduce((sum, single) => {
-    const seatFare   = parseFloat(single.seat_fare) || 0;
-    const elt        = parseFloat(single.elt) || 0;
-    const refund     = parseFloat(single.refund) || 0;
-    const discount   = parseFloat(single.discount) || 0;
-    const commission = parseFloat(single.commission) || 0;
 
-    return sum + seatFare + elt + refund - discount - commission;
-}, 0);
+  this.totalSale = this.merges.reduce((sum, single) => {
+        return sum + (parseFloat(single.shortage_sum_total_receivable) || 0);
+    }, 0);
 
-this.totalExpense = this.merges.reduce((sum, single) => {
-    return sum + (parseFloat(single.expenses_sum_amount) || 0);
-}, 0);
+    this.totalExpense = this.merges.reduce((sum, single) => {
+        return sum + (parseFloat(single.expenses_sum_amount) || 0);
+    }, 0);
 
        },
         getDeletingObj(obj) {

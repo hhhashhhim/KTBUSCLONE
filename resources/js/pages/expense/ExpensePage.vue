@@ -198,12 +198,14 @@
                       <tr>
                         <th>Terminal Name</th>
                         <th>Passenger Count</th>
-                        <th>KT Commission</th>
-                        <th>Total Receivable</th>
-                        <th>Other Commission</th>
-                        <th>Total Received in Cash</th>
+                        <th>KT Comm</th>
+                        <th>ELT</th>
+                        <th>Cancellation Amount</th>
+                        <th>Receivable</th>
+                        <th>Other Comm</th>
+                        <th>Received in Cash</th>
                         <th>Select Bank</th>
-                        <th>Total Received in Bank</th>
+                        <th>Received in Bank</th>
                         <th>Shortage</th>
                         <th>Received</th>
                         <th>Action</th>
@@ -218,6 +220,8 @@
                         <td>{{ item?.terminal?.name }}</td>
                         <td>{{ item.passenger_count }}</td>
                         <td>{{ item.kt_commission }}</td>
+                        <td>{{ item.elt }}</td>
+                        <td>{{ item.cancellation_amount }}</td>
                         <td>{{ item.total_receivable }}</td>
                         <td>{{ item.other_commission }}</td>
                         <td>
@@ -309,6 +313,12 @@
                           {{ $insertComma(startTotals.totalktCommission) }}
                         </td>
                         <td>
+                          {{ $insertComma(startTotals.totalELT) }}
+                        </td>
+                        <td>
+                          {{ $insertComma(startTotals.totalCancellationAmount) }}
+                        </td>
+                        <td>
                           {{ $insertComma(startTotals.totalReceivables) }}
                         </td>
                         <td>
@@ -337,12 +347,14 @@
                       <tr>
                         <th>Terminal Name</th>
                         <th>Passenger Count</th>
-                        <th>KT Commission</th>
-                        <th>Total Receivable</th>
-                        <th>Other Commission</th>
-                        <th>Total Received in Cash</th>
+                        <th>KT Comm</th>
+                        <th>ELT</th>
+                        <th>Cancellation Amount</th>
+                        <th>Receivable</th>
+                        <th>Other Comm</th>
+                        <th>Received in Cash</th>
                         <th>Select Bank</th>
-                        <th>Total Received in Bank</th>
+                        <th>Received in Bank</th>
                         <th>Shortage</th>
                         <th>Received</th>
                         <th>Action</th>
@@ -357,6 +369,8 @@
                         <td>{{ item?.terminal?.name }}</td>
                         <td>{{ item.passenger_count }}</td>
                         <td>{{ item.kt_commission }}</td>
+                        <td>{{ item.elt }}</td>
+                        <td>{{ item.cancellation_amount }}</td>
                         <td>{{ item.total_receivable }}</td>
                         <td>{{ item.other_commission }}</td>
                         <td>
@@ -446,6 +460,12 @@
                         </td>
                         <td>
                           {{ $insertComma(returnTotals.totalktCommission) }}
+                        </td>
+                         <td>
+                          {{ $insertComma(returnTotals.totalELT) }}
+                        </td>
+                        <td>
+                          {{ $insertComma(returnTotals.totalCancellationAmount) }}
                         </td>
                         <td>
                           {{ $insertComma(returnTotals.totalReceivables) }}
@@ -1222,6 +1242,14 @@ export default {
           (sum, i) => sum + Number(i.kt_commission ?? 0),
           0
         ),
+        totalELT: this.startShortages.reduce(
+          (sum, i) => sum + Number(i.elt ?? 0),
+          0
+        ),
+        totalCancellationAmount: this.startShortages.reduce(
+          (sum, i) => sum + Number(i.cancellation_amount ?? 0),
+          0
+        ),
         totalReceivables: this.startShortages.reduce(
           (sum, i) => sum + Number(i.total_receivable ?? 0),
           0
@@ -1257,6 +1285,14 @@ export default {
         ),
         totalktCommission: this.returnShortages.reduce(
           (sum, i) => sum + Number(i.kt_commission ?? 0),
+          0
+        ),
+         totalELT: this.returnShortages.reduce(
+          (sum, i) => sum + Number(i.elt ?? 0),
+          0
+        ),
+        totalCancellationAmount: this.returnShortages.reduce(
+          (sum, i) => sum + Number(i.cancellation_amount ?? 0),
           0
         ),
         totalReceivables: this.returnShortages.reduce(
