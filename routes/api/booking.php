@@ -90,6 +90,7 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
 
         Route::group(['prefix' => '/merges', [CustomMiddleware::class]], function () {
             Route::post('/', [ScheduleClosingController::class, 'merges']);
+            Route::post('/buses', [ScheduleClosingController::class, 'buses']);
         });
     });
 

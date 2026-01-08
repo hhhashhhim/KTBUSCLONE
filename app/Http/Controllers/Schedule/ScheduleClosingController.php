@@ -323,9 +323,10 @@ class ScheduleClosingController extends Controller
     $tickets = Ticket::withTrashed()
         ->where('company_id', $companyId)
         ->whereIn('ticket_closing_id', [$closingPairs[0]->id, $closingPairs[1]->id])
-        ->whereIn('type', ['booked', 'over-issue'])
+        ->whereIn('type', ['booked', 'over-issue', 'canceled'])
         ->with([
             'elt',
+            'cancel_ticket',
             'terminal:id,name,recovery_method',
             'commission' => function ($q) use ($routeIdStart, $routeIdReturn) {
                 $q->whereIn('route_id', [$routeIdStart, $routeIdReturn]);
@@ -682,6 +683,15 @@ class ScheduleClosingController extends Controller
 
     return [
         'merges' => $merges,
+        'buses'  => $buses
+    ];
+}
+public function buses(){
+     $user = Auth::user();
+     $buses = Bus::where('company_id', $user->company_id)
+        ->orderBy('id')
+        ->get();
+         return [
         'buses'  => $buses
     ];
 }

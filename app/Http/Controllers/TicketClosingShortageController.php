@@ -16,7 +16,6 @@ class TicketClosingShortageController extends Controller
         'ticket_closing_id' => 'required|integer',
         'type' => 'nullable|in:start,return',
         'rows' => 'required|array',
-
         'rows.*.terminal_id' => 'required|integer',
         'rows.*.passenger_count' => 'required|integer',
         'rows.*.kt_commission' => 'required|numeric',
@@ -39,6 +38,8 @@ class TicketClosingShortageController extends Controller
             [
                 'passenger_count' => $row['passenger_count'],
                 'kt_commission' => $row['kt_commission'],
+                'elt' => $row['elt'],
+                'cancellation_amount' => $row['cancellation_amount'],
                 'other_commission' => $row['other_commission'],
                 'total_receivable' => $row['total_receivable'],
                 'total_received_cash' => $row['total_received_cash'],

@@ -17,6 +17,8 @@ class TicketClosingShortage extends Model
         'terminal_id',
         'passenger_count',
         'kt_commission',
+        'elt',
+        'cancellation_amount',
         'other_commission',
         'total_receivable',
         'total_received_cash',
