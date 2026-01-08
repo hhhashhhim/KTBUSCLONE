@@ -576,110 +576,35 @@ class ScheduleClosingController extends Controller
         'company_id' => $user->company_id,
         'schedule_complete' => 1
     ])
-    ->withSum('expenses', 'amount')
     ->with([
         'bus:id,bus_number',
-         'shortage:id,ticket_closing_id,terminal_id,shortage,total_receivable', // belongsTo relation
+        'shortage:id,ticket_closing_id,terminal_id,shortage,total_receivable', // belongsTo relation
         'closing:id,ticket_merge_id,schedule_id',
-        'closing.schedule:id,name',
-        'tickets' => function ($q) {
-            $q->withTrashed()
-              ->whereIn('type', ['booked', 'over-issue'])
-              ->with([
-                  'elt:id,ticket_id,elt_price',
-                  'schedule:id,route_id',
-                  'cancel_ticket:id,ticket_id,percentage'
-              ])
-              ->select(
-                  'id',
-                  'ticket_merge_id',
-                  'seat_fare',
-                  'discount',
-                  'schedule_id',
-                  'terminal_id',
-                  'ticket_closing_id'
-              );
-        }
+        'closing.schedule:id,name'
     ]);
- $buses = Bus::where('company_id', $user->company_id)
+     $buses = Bus::where('company_id', $user->company_id)
         ->orderBy('id')
         ->get();
     // Filters
     if ($request->bus_number) $query->where('bus_id', $request->bus_number);
     if ($request->from_date) $query->whereDate('schedule_departure_date', '>=', $request->from_date);
     if ($request->to_date) $query->whereDate('schedule_departure_date', '<=', $request->to_date);
+    if ($request->closing_date) $query->whereDate('closing_date', $request->closing_date);
 
     $limit = (!$request->from_date && !$request->to_date) ? 20 : 2000;
 
-    $merges = $query->orderByDesc('schedule_departure_date')
-                    ->limit($limit)
-                    ->get([
-                        'id',
-                        'schedule_departure_date',
-                        'schedule_return_date',
-                        'bus_id',
-                        'closing_date'
-                    ]);
+    $merges = $query
+    ->withSum('shortage', 'total_receivable')
+    ->withSum('shortage', 'other_commission')
+    ->withSum('shortage', 'kt_commission')
+    ->withSum('expenses', 'amount')
+    ->get()
+    ->map(function ($item) {
+        // Calculate the difference and add it as a new attribute
+        $item->expenses_sum_amount = $item->shortage_sum_kt_commission + $item->shortage_sum_other_commission + $item->expenses_sum_amount;
+        return $item;
+    });
 
-    // Preload all commissions once
-    $terminalCommissions = TerminalCommission::where('company_id', $user->company_id)
-        ->get()
-        ->groupBy(fn($c) => $c->terminal_id . '_' . $c->route_id);
-
-    // Preload all canceled tickets at once
-    $mergeIds = $merges->pluck('id');
-    $allCanceledTickets = Ticket::onlyTrashed()
-        ->whereIn('ticket_merge_id', $mergeIds)
-        ->where('type', 'canceled')
-        ->with('cancel_ticket:id,ticket_id,percentage')
-        ->get()
-        ->groupBy('ticket_merge_id');
-
-    foreach ($merges as $merge) {
-
-        $merge->seat_fare = $merge->tickets->sum('seat_fare');
-        $merge->discount  = $merge->tickets->sum('discount');
-
-        $eltAmount = 0;
-        $commission = 0;
-        $closingOneIds = [];
-        $closingTwoIds = [];
-
-        foreach ($merge->tickets as $ticket) {
-
-            $eltAmount += $ticket->elt->elt_price ?? 0;
-
-            $key = $ticket->terminal_id . '_' . $ticket->schedule->route_id;
-            $terminalCommission = $terminalCommissions[$key][0] ?? null;
-
-            if ($terminalCommission) {
-                if ($merge->closing[0]->id == $ticket->ticket_closing_id) {
-                    $closingOneIds[] = $terminalCommission->id;
-                } else {
-                    $closingTwoIds[] = $terminalCommission->id;
-                }
-
-                $netFare = $ticket->seat_fare - $ticket->discount;
-                $commission += $terminalCommission->flat_commission 
-                    ? $terminalCommission->flat_commission 
-                    : ($netFare * $terminalCommission->percentage_commission / 100);
-                $commission += ($netFare * $terminalCommission->adjustment_commission / 100);
-            }
-        }
-
-        // Add fixed commissions in memory
-        $flattenCommissions = $terminalCommissions->flatten();
-        $commission += array_sum(array_map(fn($id) => $flattenCommissions->firstWhere('id', $id)->fix_commission ?? 0, array_unique($closingOneIds)));
-        $commission += array_sum(array_map(fn($id) => $flattenCommissions->firstWhere('id', $id)->fix_commission ?? 0, array_unique($closingTwoIds)));
-
-        $merge->elt = $eltAmount;
-        $merge->commission = (int) $commission;
-
-        // Refund
-        $merge->refund = collect($allCanceledTickets[$merge->id] ?? [])->sum(function($ticket){
-            return $ticket->cancel_ticket ? ($ticket->seat_fare - $ticket->discount) * $ticket->cancel_ticket->percentage / 100 : 0;
-        });
-    }
 
     return [
         'merges' => $merges,

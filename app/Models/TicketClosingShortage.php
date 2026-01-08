@@ -19,8 +19,8 @@ class TicketClosingShortage extends Model
         'kt_commission',
         'elt',
         'cancellation_amount',
+        'total_receivable', // Before Other Commission
         'other_commission',
-        'total_receivable',
         'total_received_cash',
         'bank_id',
         'total_received_bank',

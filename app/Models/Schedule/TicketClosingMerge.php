@@ -23,7 +23,17 @@ class TicketClosingMerge extends Model
 {
     use HasFactory, SoftDeletes;
     //This will generate on assigning bus and on merge two records will be deleted and one record for both created
-    protected $guarded = [];
+    protected $fillable = [
+        "bus_id",
+        "schedule_departure_date",
+        "schedule_return_date",
+        "schedule_complete",
+        "description",
+        "closing_date",
+        "company_id",
+        "added_by",
+        "time",
+    ];
 
     public function addedBy()
     {
@@ -34,10 +44,11 @@ class TicketClosingMerge extends Model
     {
         return $this->hasOne( Bus::class, 'id', 'bus_id' );
     }
-public function shortage()
-{
-    return $this->hasMany(TicketClosingShortage::class, 'ticket_closing_id', 'id');
-}
+    
+    public function shortage()
+    {
+        return $this->hasMany(TicketClosingShortage::class, 'ticket_closing_id', 'id');
+    }
 
 
     
