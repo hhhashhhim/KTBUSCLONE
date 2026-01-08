@@ -218,12 +218,12 @@
                         :key="'start-' + index"
                       >
                         <td>{{ item?.terminal?.name }}</td>
-                        <td>{{ item.passenger_count }}</td>
-                        <td>{{ item.kt_commission }}</td>
-                        <td>{{ item.elt }}</td>
-                        <td>{{ item.cancellation_amount }}</td>
-                        <td>{{ item.total_receivable }}</td>
-                        <td>{{ item.other_commission }}</td>
+                        <td>{{  $insertComma(item.passenger_count )}}</td>
+                        <td>{{  $insertComma(item.kt_commission )}}</td>
+                        <td>{{  $insertComma(item.elt )}}</td>
+                        <td>{{  $insertComma(item.cancellation_amount )}}</td>
+                        <td>{{  $insertComma(item.total_receivable )}}</td>
+                        <td>{{  $insertComma(item.other_commission )}}</td>
                         <td>
                           <input
                             v-if="isEditing(item)"
@@ -367,12 +367,12 @@
                         :key="'return-' + index"
                       >
                         <td>{{ item?.terminal?.name }}</td>
-                        <td>{{ item.passenger_count }}</td>
-                        <td>{{ item.kt_commission }}</td>
-                        <td>{{ item.elt }}</td>
-                        <td>{{ item.cancellation_amount }}</td>
-                        <td>{{ item.total_receivable }}</td>
-                        <td>{{ item.other_commission }}</td>
+                        <td>{{  $insertComma(item.passenger_count )}}</td>
+                        <td>{{  $insertComma(item.kt_commission )}}</td>
+                        <td>{{  $insertComma(item.elt )}}</td>
+                        <td>{{  $insertComma(item.cancellation_amount )}}</td>
+                        <td>{{  $insertComma(item.total_receivable )}}</td>
+                        <td>{{  $insertComma(item.other_commission )}}</td>
                         <td>
                           <input
                             v-if="isEditing(item)"
