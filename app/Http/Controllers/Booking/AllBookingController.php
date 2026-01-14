@@ -168,8 +168,8 @@ class AllBookingController extends Controller
     $validated = $request->validate([
         'ticket_id'         => 'required|integer|exists:tickets,id',
         'refund_reason'     => 'required|string',
-        'refund_percentage' => 'required|numeric|min:1|max:100', // company %
-        'refund_amount'     => 'required|numeric|min:1',         // ignored for calculation
+        'refund_percentage' => 'required|numeric|min:0|max:100', // company %
+        'refund_amount'     => 'required|numeric|min:0',         // ignored for calculation
     ]);
 
     $ticket = Ticket::withTrashed()->find($request->ticket_id);
@@ -181,31 +181,22 @@ class AllBookingController extends Controller
         ], 404);
     }
 
-    /* ===============================
-       ✅ CORRECT REFUND CALCULATION
-       =============================== */
-
-    $totalAmount    = (float) $ticket->paid_amount;          // original paid amount
+    $totalAmount    = (float) $ticket->seat_fare;          // original paid amount
     $companyPercent = (float) $request->refund_percentage;   // company share %
 
     $companyAmount         = ($totalAmount * $companyPercent) / 100;
     $customerRefundAmount = $totalAmount - $companyAmount;
 
-    // safety check
-    if ($customerRefundAmount <= 0) {
+ 
+    if ($customerRefundAmount < 0) {
         return response()->json([
             'success' => false,
             'message' => 'No refundable amount for customer.',
         ], 422);
     }
 
-    // convert to paisa for JazzCash
+  
     $refundAmount = $customerRefundAmount * 100;
-
-    /* ===============================
-       🏦 JazzCash credentials
-       =============================== */
-
     $merchantID    = '00151726';
     $password      = 'vs8z12syy0';
     $merchantMPIN  = '7863';
@@ -220,10 +211,6 @@ class AllBookingController extends Controller
         'pp_Amount'       => (string) $refundAmount,
     ];
 
-    /* ===============================
-       🔐 Secure Hash
-       =============================== */
-
     ksort($data);
     $hashString = $integritySalt;
 
@@ -234,29 +221,19 @@ class AllBookingController extends Controller
     }
 
     $data['pp_SecureHash'] = hash_hmac('sha256', $hashString, $integritySalt);
-
-    /* ===============================
-       🌐 Send Refund Request
-       =============================== */
-
     $response = Http::asForm()->post(
         'https://payments.jazzcash.com.pk/ApplicationAPI/API/Purchase/domwalletrefundtransaction',
         $data
     );
 
     $responseData = $response->json();
-
-    /* ===============================
-       🧠 Handle Response
-       =============================== */
-
     $ppMessage = $responseData['pp_ResponseMessage'] ?? '';
     $isSuccess = stripos($ppMessage, 'successful') !== false;
 
     if ($isSuccess) {
         $ticket->update([
-            'refund_amount'     => $customerRefundAmount, // what customer received
-            'refund_percentage' => $companyPercent,        // company share %
+            'refund_amount'     => $customerRefundAmount, 
+            'refund_percentage' => $companyPercent,
             'refund_reason'     => $request->refund_reason,
         ]);
     }
