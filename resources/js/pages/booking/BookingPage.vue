@@ -76,15 +76,10 @@
                                                 <div class="form-group mb-0">
                                                     <label>CNIC <span class="text-danger"
                                                             v-if="this.addForm.type != 'advance booking'">*</span></label>
-                                                  <vue-mask
-    @blur="handleBlur"
-    class="form-control"
-    v-model="addForm.customerCNIC"
-    mask="00000-0000000-0"
-    :raw="false"
-    :options="options"
-    :disabled="isCustomerLocked">
-</vue-mask>
+                                                    <vue-mask @blur="handleBlur" class="form-control"
+                                                        v-model="addForm.customerCNIC" mask="00000-0000000-0"
+                                                        :raw="false" :options="options" :disabled="isCustomerLocked">
+                                                    </vue-mask>
 
 
 
@@ -93,13 +88,8 @@
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label>Full Name <span class="text-danger ml-1">*</span></label>
-                                                   <input
-    type="text"
-    class="form-control"
-    id="fullName"
-    v-model="addForm.customerName"
-    :disabled="isCustomerLocked"
-/>
+                                                    <input type="text" class="form-control" id="fullName"
+                                                        v-model="addForm.customerName" :disabled="isCustomerLocked" />
 
                                                 </div>
                                             </div>
@@ -108,27 +98,18 @@
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label>Contact <span class="text-danger ml-1">*</span></label>
-                                                    <vue-mask
-    class="form-control"
-    v-model="addForm.contact"
-    mask="0000-0000000"
-    :raw="false"
-    :options="optionsPhone"
-    :disabled="isCustomerLocked">
-</vue-mask>
+                                                    <vue-mask class="form-control" v-model="addForm.contact"
+                                                        mask="0000-0000000" :raw="false" :options="optionsPhone"
+                                                        :disabled="isCustomerLocked">
+                                                    </vue-mask>
 
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0">
                                                     <label>Remarks</label>
-                                                    <input
-    type="text"
-    class="form-control"
-    id="remarks"
-    v-model="addForm.remarks"
-    :disabled="isCustomerLocked"
-/>
+                                                    <input type="text" class="form-control" id="remarks"
+                                                        v-model="addForm.remarks" :disabled="isCustomerLocked" />
 
                                                 </div>
                                             </div>
@@ -137,42 +118,34 @@
                                             <div class="col-md-6">
                                                 <label class="py-2 text-danger" v-if="this.haveLabel">{{
                                                     this.label
-                                                }}</label>
+                                                    }}</label>
                                                 <label class="py-2 text-danger" v-if="this.haveLabel">{{
                                                     this.discountLabel
-                                                }}</label>
+                                                    }}</label>
                                             </div>
-                                    <div class="col-md-6">
-    <!-- POINTS -->
-    <div class="custom-control custom-checkbox" v-if="showPointsCheckbox">
-        <input
-            type="checkbox"
-            class="custom-control-input"
-            id="pointsCheckBox"
-            :checked="selectedOption === 'points'"
-            :disabled="isCustomerLocked"
-            @click="handleCheckboxClick($event, 'points')"
-        >
-        <label class="custom-control-label" for="pointsCheckBox">
-            Points Usage
-        </label>
-    </div>
+                                            <div class="col-md-6">
+                                                <!-- POINTS -->
+                                                <div class="custom-control custom-checkbox" v-if="showPointsCheckbox">
+                                                    <input type="checkbox" class="custom-control-input"
+                                                        id="pointsCheckBox" :checked="selectedOption === 'points'"
+                                                        :disabled="isCustomerLocked"
+                                                        @click="handleCheckboxClick($event, 'points')">
+                                                    <label class="custom-control-label" for="pointsCheckBox">
+                                                        Points Usage
+                                                    </label>
+                                                </div>
 
-    <!-- DISCOUNT -->
-    <div class="custom-control custom-checkbox" v-if="showDiscountCheckbox">
-        <input
-            type="checkbox"
-            class="custom-control-input"
-            id="discountCheckBox"
-            :checked="selectedOption === 'discount'"
-            :disabled="isCustomerLocked"
-            @click="handleCheckboxClick($event, 'discount')"
-        >
-        <label class="custom-control-label" for="discountCheckBox">
-            Discount Usage
-        </label>
-    </div>
-</div>
+                                                <!-- DISCOUNT -->
+                                                <div class="custom-control custom-checkbox" v-if="showDiscountCheckbox">
+                                                    <input type="checkbox" class="custom-control-input"
+                                                        id="discountCheckBox" :checked="selectedOption === 'discount'"
+                                                        :disabled="isCustomerLocked"
+                                                        @click="handleCheckboxClick($event, 'discount')">
+                                                    <label class="custom-control-label" for="discountCheckBox">
+                                                        Discount Usage
+                                                    </label>
+                                                </div>
+                                            </div>
 
 
 
@@ -282,6 +255,14 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="col-md-6" v-if=" checkForSubmenu('jazz-cash-refund')" >
+                                                <div class="form-group mb-0">
+                                                    <label>Transaction No <span
+                                                            class="text-danger ml-1">*</span></label>
+                                                    <input 
+                                                        type="text" class="form-control" id="fullName" v-model="addForm.transaction_id" :disabled="isCustomerLocked" />
+                                                </div>
+                                            </div>
                                             <div class="col-md-6">
                                                 <div class="form-group mb-0" v-if="showDropdown">
                                                     <label for="Terminals" class="mb-0">Select Bank</label>
@@ -357,8 +338,7 @@
                                                 <div class="form-group mb-0">
                                                     <label>Discount <span class="ml-2 text-muted"></span></label>
                                                     <input type="text" class="form-control" id="fareDiscount"
-                                                        v-model.number="addForm.discount" 
-                                                        @keyup="calculateTotal()"
+                                                        v-model.number="addForm.discount" @keyup="calculateTotal()"
                                                         :readonly="addForm.discount_otp_valid || !checkForSubmenuButtons('discount-field')" />
                                                     <!-- always readonly since discount is applied via OTP -->
                                                 </div>
@@ -787,7 +767,7 @@
                                                     <h4 class="mb-0 font-weight-bold mr-3">Type:</h4>
                                                     <h4 class="mb-0 text-muted text-capitalize">{{
                                                         singleSeat.type
-                                                    }}</h4>
+                                                        }}</h4>
                                                 </div>
                                             </div>
                                             <div class="row my-3 pl-3">
@@ -1211,7 +1191,8 @@
                 </div>
             </div>
         </div>
-         <div class="modal fade" id="cancelRefundModel" tabindex="3" aria-labelledby="cancelRefundModelLabel" aria-hidden="true">
+        <div class="modal fade" id="cancelRefundModel" tabindex="3" aria-labelledby="cancelRefundModelLabel"
+            aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -1228,16 +1209,16 @@
                             <select id="cancel_percentage" class="form-control" v-model="cancelData.percentage">
                                 <option value="first">Select Cancellation Percentage</option>
                                 <option value="0">0%</option>
-                                    <option value="10">10%</option>
-    <option value="20">20%</option>
-    <option value="30">30%</option>
-    <option value="40">40%</option>
-    <option value="50">50%</option>
-    <option value="60">60%</option>
-    <option value="70">70%</option>
-    <option value="80">80%</option>
-    <option value="90">90%</option>
-    <option value="100">100%</option>
+                                <option value="10">10%</option>
+                                <option value="20">20%</option>
+                                <option value="30">30%</option>
+                                <option value="40">40%</option>
+                                <option value="50">50%</option>
+                                <option value="60">60%</option>
+                                <option value="70">70%</option>
+                                <option value="80">80%</option>
+                                <option value="90">90%</option>
+                                <option value="100">100%</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -1252,10 +1233,11 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" :disabled="cancelLoading"
-                             @click="cancelRefundBooking(cancelData)">
+                            @click="cancelRefundBooking(cancelData)">
                             {{ getSchedule ? "Loading..." : 'Cancel Ticket' }}
                         </button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeRefundCancel()">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                            @click="closeRefundCancel()">
                             Close
                         </button>
                     </div>
@@ -1453,19 +1435,14 @@
                                                         @click="passDataToCancelModel(innerItem); this.cancelData.percentage = 0">
                                                         Cancel Ticket
                                                     </button>
-<button
-  v-if="
-    checkForSubmenu('jazz-cash-refund') &&
-    innerItem.type === 'booked' && 
-    Number(innerItem.terminal_id) == 14 &&
-    innerItem.transaction_id != null
-  "
-  type="button"
-  class="btn btn-danger ml-2"
-  @click="passDataToCancelRefundModel(innerItem); cancelData.percentage = 0"
->
-  Cancel & Refund Ticket
-</button>
+                                                    <button v-if="
+                                                        checkForSubmenu('jazz-cash-refund') &&
+                                                        innerItem.type === 'booked' &&
+                                                        Number(innerItem.terminal_id) == 14 &&
+                                                        innerItem.transaction_id != null
+                                                    " type="button" class="btn btn-danger ml-2" @click="passDataToCancelRefundModel(innerItem); cancelData.percentage = 0">
+                                                        Cancel & Refund Ticket
+                                                    </button>
 
 
 
@@ -1842,6 +1819,7 @@ export default {
                 discountOtp: "",
                 discount_otp_valid: false,
                 discountOtpCnic: "",
+                transaction_id: "",
             },
             advanceCash: {
                 sale: 0,
@@ -1880,12 +1858,12 @@ export default {
             selectedOption: null,
             showPointsCheckbox: false,
             showDiscountCheckbox: false,
-             permissions: [],
+            permissions: [],
 
         };
     },
     async created() {
-          this.permissions = this.$store.state.permissions;
+        this.permissions = this.$store.state.permissions;
         $('.modal').remove();
         this.fetchAllSchedules();
         this.showBookingDiv = false;
@@ -1952,74 +1930,74 @@ export default {
     methods: {
         handleCheckboxClick(e, type) {
 
-    // 🚫 No seat → hard stop
-    if (!this.hasAnySeatSelected) {
-        e.preventDefault();
+            // 🚫 No seat → hard stop
+            if (!this.hasAnySeatSelected) {
+                e.preventDefault();
 
-        swal({
-            title: "Hold on",
-            text: "Please select a seat first",
-            icon: "warning",
-            timer: 2000
-        });
+                swal({
+                    title: "Hold on",
+                    text: "Please select a seat first",
+                    icon: "warning",
+                    timer: 2000
+                });
 
-        return;
-    }
+                return;
+            }
 
-    // ✅ Seat exists → allow toggle
-    this.onRadioChange(type);
-},
+            // ✅ Seat exists → allow toggle
+            this.onRadioChange(type);
+        },
 
         onRadioChange(type) {
 
-    // 🚫 No seat selected → block checkbox
-    if (!this.hasAnySeatSelected) {
-        swal({
-            title: "Hold on",
-            text: "Please select a seat first",
-            icon: "warning",
-            timer: 2000
-        });
+            // 🚫 No seat selected → block checkbox
+            if (!this.hasAnySeatSelected) {
+                swal({
+                    title: "Hold on",
+                    text: "Please select a seat first",
+                    icon: "warning",
+                    timer: 2000
+                });
 
-        // Force uncheck
-        this.selectedOption = null;
-        this.pointsUsage = false;
-        this.discountUsage = false;
-        return;
-    }
+                // Force uncheck
+                this.selectedOption = null;
+                this.pointsUsage = false;
+                this.discountUsage = false;
+                return;
+            }
 
-    // --- Toggle OFF if same option clicked ---
-    if (this.selectedOption === type) {
-        this.selectedOption = null;
-        this.pointsUsage = false;
-        this.discountUsage = false;
+            // --- Toggle OFF if same option clicked ---
+            if (this.selectedOption === type) {
+                this.selectedOption = null;
+                this.pointsUsage = false;
+                this.discountUsage = false;
 
-        this.addForm.discountOtp = "";
-        this.addForm.discount_otp_valid = false;
-        this.addForm.pointsUseInput = "";
-        this.addForm.otp = "";
-        this.addForm.otp_valid = false;
-        return;
-    }
+                this.addForm.discountOtp = "";
+                this.addForm.discount_otp_valid = false;
+                this.addForm.pointsUseInput = "";
+                this.addForm.otp = "";
+                this.addForm.otp_valid = false;
+                return;
+            }
 
-    if (type === "points") {
-        this.selectedOption = "points";
-        this.pointsUsage = true;
-        this.discountUsage = false;
+            if (type === "points") {
+                this.selectedOption = "points";
+                this.pointsUsage = true;
+                this.discountUsage = false;
 
-        this.addForm.discountOtp = "";
-        this.addForm.discount_otp_valid = false;
-    } 
-    else if (type === "discount") {
-        this.selectedOption = "discount";
-        this.discountUsage = true;
-        this.pointsUsage = false;
+                this.addForm.discountOtp = "";
+                this.addForm.discount_otp_valid = false;
+            }
+            else if (type === "discount") {
+                this.selectedOption = "discount";
+                this.discountUsage = true;
+                this.pointsUsage = false;
 
-        this.addForm.pointsUseInput = "";
-        this.addForm.otp = "";
-        this.addForm.otp_valid = false;
-    }
-},
+                this.addForm.pointsUseInput = "";
+                this.addForm.otp = "";
+                this.addForm.otp_valid = false;
+            }
+        },
         handleBlur() {
             this.getCustomer('addFormCNIC');
             this.getPoints('addFormCNIC');
@@ -3490,17 +3468,17 @@ export default {
                 });
             }
             // 🔁 If all seats are unselected → reset checkbox
-if (!this.hasAnySeatSelected) {
-    this.selectedOption = null;
-    this.pointsUsage = false;
-    this.discountUsage = false;
+            if (!this.hasAnySeatSelected) {
+                this.selectedOption = null;
+                this.pointsUsage = false;
+                this.discountUsage = false;
 
-    this.addForm.discountOtp = "";
-    this.addForm.discount_otp_valid = false;
-    this.addForm.pointsUseInput = "";
-    this.addForm.otp = "";
-    this.addForm.otp_valid = false;
-}
+                this.addForm.discountOtp = "";
+                this.addForm.discount_otp_valid = false;
+                this.addForm.pointsUseInput = "";
+                this.addForm.otp = "";
+                this.addForm.otp_valid = false;
+            }
 
 
         },
@@ -3806,6 +3784,7 @@ if (!this.hasAnySeatSelected) {
                     remarks: '',
                     gender: "1",
                     customerCNIC: "",
+                    transaction_id: "",
                 };
 
                 this.label = "";
@@ -4126,21 +4105,21 @@ if (!this.hasAnySeatSelected) {
             $("#cancelModel").modal('show');
         },
         passDataToCancelRefundModel: function (data) {
-           this.cancelData = {
-        dataType: data.type,
-        dataDate: data.date,
-        dataSchedule: data.schedule_id,
-        dataCustomer: data.customer_id,
-        dataDeparture: data.departure_city_id,
-        dataDestination: data.destination_city_id,
-        dataSeat_no: data.seat_no,
+            this.cancelData = {
+                dataType: data.type,
+                dataDate: data.date,
+                dataSchedule: data.schedule_id,
+                dataCustomer: data.customer_id,
+                dataDeparture: data.departure_city_id,
+                dataDestination: data.destination_city_id,
+                dataSeat_no: data.seat_no,
 
-        // ✅ THIS FIXES REFUND
-        amount: Number(data.seat_fare),
+                // ✅ THIS FIXES REFUND
+                amount: Number(data.seat_fare),
 
-        percentage: 0,
-        reason: "",
-    };
+                percentage: 0,
+                reason: "",
+            };
             $("#cancelRefundModel").modal('show');
         },
 
@@ -4200,111 +4179,111 @@ if (!this.hasAnySeatSelected) {
             }
             this.cancelLoading = false;
         },
-     async cancelRefundBooking(dataEnter) {
-    this.cancelLoading = true;
+        async cancelRefundBooking(dataEnter) {
+            this.cancelLoading = true;
 
-    try {
-        /* ======================
-           VALIDATION
-        ====================== */
-        if (dataEnter.dataType === "booked") {
+            try {
+                /* ======================
+                   VALIDATION
+                ====================== */
+                if (dataEnter.dataType === "booked") {
 
-            if (dataEnter.percentage === null || dataEnter.percentage === undefined) {
-                Swal.fire("Warning", "Please select a refund percentage.", "warning");
-                return;
+                    if (dataEnter.percentage === null || dataEnter.percentage === undefined) {
+                        Swal.fire("Warning", "Please select a refund percentage.", "warning");
+                        return;
+                    }
+
+                    if (!dataEnter.reason || !dataEnter.reason.trim()) {
+                        Swal.fire("Warning", "Please enter a refund reason.", "warning");
+                        return;
+                    }
+                }
+
+                /* ======================
+                   STEP 1: CANCEL
+                ====================== */
+                const cancelData = {
+                    date: dataEnter.dataDate,
+                    schedule_id: dataEnter.dataSchedule,
+                    customer_id: dataEnter.dataCustomer,
+                    departure_id: dataEnter.dataDeparture,
+                    destination_id: dataEnter.dataDestination,
+                    seat_no: dataEnter.dataSeat_no,
+                    percentage: dataEnter.percentage,
+                    remarks: dataEnter.reason,
+                };
+
+                const resCancelBooking = await this.callApi(
+                    "post",
+                    "booking/canceling",
+                    cancelData
+                );
+
+                if (resCancelBooking.status !== 200) {
+                    Swal.fire("Error", "Unable to cancel booking.", "error");
+                    return;
+                }
+
+                /* ======================
+                   STEP 2: REFUND
+                ====================== */
+                if (dataEnter.dataType === "booked") {
+
+                    const ticketId = resCancelBooking.data.tickets?.[0];
+
+                    if (!ticketId) {
+                        Swal.fire("Error", "Ticket ID missing for refund.", "error");
+                        return;
+                    }
+
+                    // ✅ 0% refund → cancel only
+                    if (Number(dataEnter.percentage) === 0) {
+                        Swal.fire("Success", "Ticket cancelled successfully (No refund).", "info");
+                        return;
+                    }
+
+                    // ✅ seat_fare check
+                    if (!dataEnter.amount || dataEnter.amount <= 0) {
+                        Swal.fire("Error", "Seat fare missing for refund.", "error");
+                        return;
+                    }
+
+                    const refundPayload = {
+                        ticket_id: ticketId,
+                        refund_percentage: Number(dataEnter.percentage),
+                        refund_amount:
+                            (Number(dataEnter.amount) * Number(dataEnter.percentage)) / 100,
+                        refund_reason: dataEnter.reason.trim(),
+                    };
+
+                    console.log("📦 Refund Payload:", refundPayload);
+
+                    await this.callApi("post", "allBooking/refund", refundPayload);
+
+                    Swal.fire("Success", "Refund processed successfully.", "success");
+                }
+
+                /* ======================
+                   FINAL
+                ====================== */
+                await this.callApi(
+                    "post",
+                    "booking/whatsapp/cancel/message",
+                    { tickets: resCancelBooking.data.tickets }
+                );
+
+                this.fetchScheduleData();
+                this.resetArrays();
+                this.closeCancel();
+                this.closeRefundCancel();
+
+            } catch (err) {
+                console.error(err);
+                Swal.fire("Error", "Cancel or refund failed.", "error");
+            } finally {
+                this.cancelLoading = false;
             }
-
-            if (!dataEnter.reason || !dataEnter.reason.trim()) {
-                Swal.fire("Warning", "Please enter a refund reason.", "warning");
-                return;
-            }
-        }
-
-        /* ======================
-           STEP 1: CANCEL
-        ====================== */
-        const cancelData = {
-            date: dataEnter.dataDate,
-            schedule_id: dataEnter.dataSchedule,
-            customer_id: dataEnter.dataCustomer,
-            departure_id: dataEnter.dataDeparture,
-            destination_id: dataEnter.dataDestination,
-            seat_no: dataEnter.dataSeat_no,
-            percentage: dataEnter.percentage,
-            remarks: dataEnter.reason,
-        };
-
-        const resCancelBooking = await this.callApi(
-            "post",
-            "booking/canceling",
-            cancelData
-        );
-
-        if (resCancelBooking.status !== 200) {
-            Swal.fire("Error", "Unable to cancel booking.", "error");
-            return;
-        }
-
-        /* ======================
-           STEP 2: REFUND
-        ====================== */
-        if (dataEnter.dataType === "booked") {
-
-            const ticketId = resCancelBooking.data.tickets?.[0];
-
-            if (!ticketId) {
-                Swal.fire("Error", "Ticket ID missing for refund.", "error");
-                return;
-            }
-
-            // ✅ 0% refund → cancel only
-            if (Number(dataEnter.percentage) === 0) {
-                Swal.fire("Success", "Ticket cancelled successfully (No refund).", "info");
-                return;
-            }
-
-            // ✅ seat_fare check
-            if (!dataEnter.amount || dataEnter.amount <= 0) {
-                Swal.fire("Error", "Seat fare missing for refund.", "error");
-                return;
-            }
-
-            const refundPayload = {
-                ticket_id: ticketId,
-                refund_percentage: Number(dataEnter.percentage),
-                refund_amount:
-                    (Number(dataEnter.amount) * Number(dataEnter.percentage)) / 100,
-                refund_reason: dataEnter.reason.trim(),
-            };
-
-            console.log("📦 Refund Payload:", refundPayload);
-
-            await this.callApi("post", "allBooking/refund", refundPayload);
-
-            Swal.fire("Success", "Refund processed successfully.", "success");
-        }
-
-        /* ======================
-           FINAL
-        ====================== */
-        await this.callApi(
-            "post",
-            "booking/whatsapp/cancel/message",
-            { tickets: resCancelBooking.data.tickets }
-        );
-
-        this.fetchScheduleData();
-        this.resetArrays();
-        this.closeCancel();
-        this.closeRefundCancel();
-
-    } catch (err) {
-        console.error(err);
-        Swal.fire("Error", "Cancel or refund failed.", "error");
-    } finally {
-        this.cancelLoading = false;
-    }
-},
+        },
 
         //over issue model complete data
         passDataToOverIssueModel: function (data) {
@@ -4934,7 +4913,7 @@ if (!this.hasAnySeatSelected) {
             }
 
         },
-           checkForSubmenu(moduleName) {
+        checkForSubmenu(moduleName) {
             let permissions = this.permissions;
             let valid = false;
             for (let i = 0; i < permissions.length; i++) {
@@ -4953,23 +4932,23 @@ if (!this.hasAnySeatSelected) {
         'addForm.terminalId': function (newVal) {
             this.$store.state.user.terminal_id = newVal;
         },
-         hasAnySeatSelected(val) {
-        if (!val) {
-            // Reset discount
-            this.addForm.discount = 0;
+        hasAnySeatSelected(val) {
+            if (!val) {
+                // Reset discount
+                this.addForm.discount = 0;
 
-            // Also reset discount usage state (important)
-            this.selectedOption = null;
-            this.discountUsage = false;
+                // Also reset discount usage state (important)
+                this.selectedOption = null;
+                this.discountUsage = false;
 
-            // Reset discount OTP
-            this.addForm.discountOtp = "";
-            this.addForm.discount_otp_valid = false;
+                // Reset discount OTP
+                this.addForm.discountOtp = "";
+                this.addForm.discount_otp_valid = false;
 
-            // Recalculate totals
-            this.calculateTotal();
+                // Recalculate totals
+                this.calculateTotal();
+            }
         }
-    }
     },
 
     computed: {
@@ -4989,26 +4968,26 @@ if (!this.hasAnySeatSelected) {
             }
             return result;
         },
-         hasAnySeatSelected() {
-        return (
-            this.selectedSeats.length > 0 ||
-            this.selectedBookedSeats.length > 0
-        );
-    },
-     isCustomerLocked() {
-        return (
-            this.addForm.otp_valid === true ||
-            this.addForm.discount_otp_valid === true
-        );
-    },
+        hasAnySeatSelected() {
+            return (
+                this.selectedSeats.length > 0 ||
+                this.selectedBookedSeats.length > 0
+            );
+        },
+        isCustomerLocked() {
+            return (
+                this.addForm.otp_valid === true ||
+                this.addForm.discount_otp_valid === true
+            );
+        },
 
-    canShowJazzCashRefund() {
-        const hasSubmenu = this.checkForSubmenu('jazz-cash-refund'); // called once
-        return hasSubmenu &&
-               ['booked', 'advance booking'].includes(this.innerItem.type) &&
-               this.innerItem.terminal_id === 14 &&
-               this.innerItem.transaction_id !== null;
-    }
+        canShowJazzCashRefund() {
+            const hasSubmenu = this.checkForSubmenu('jazz-cash-refund'); // called once
+            return hasSubmenu &&
+                ['booked', 'advance booking'].includes(this.innerItem.type) &&
+                this.innerItem.terminal_id === 14 &&
+                this.innerItem.transaction_id !== null;
+        }
 
 
     },

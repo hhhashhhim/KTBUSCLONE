@@ -413,7 +413,7 @@
             <!-- Refund Percentage -->
             <div class="mb-3">
               <label for="refundPercentage" class="form-label fw-semibold"
-                >Refund Percentage</label
+                >Cancellation Charges</label
               >
               <select
                 v-model="refundPercentage"
@@ -422,7 +422,7 @@
               >
                 <option disabled value="">Select percentage</option>
                 <option
-                  v-for="p in [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]"
+                  v-for="p in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]"
                   :key="p"
                   :value="p"
                 >
@@ -658,14 +658,15 @@ export default {
     },
 
     async confirmRefund() {
-      if (!this.refundPercentage) {
-        Swal.fire({
-          icon: "warning",
-          title: "Missing Information",
-          text: "Please select a refund percentage.",
-        });
-        return;
-      }
+     if (this.refundPercentage === null || this.refundPercentage === '') {
+  Swal.fire({
+    icon: "warning",
+    title: "Missing Information",
+    text: "Please select a refund percentage.",
+  });
+  return;
+}
+
 
       if (!this.refundReason.trim()) {
         Swal.fire({
