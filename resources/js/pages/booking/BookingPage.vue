@@ -257,10 +257,9 @@
                                             </div>
                                             <div class="col-md-6" v-if=" checkForSubmenu('jazz-cash-refund')" >
                                                 <div class="form-group mb-0">
-                                                    <label>Transaction No <span
-                                                            class="text-danger ml-1">*</span></label>
+                                                    <label>Transaction No</label>
                                                     <input 
-                                                        type="text" class="form-control" id="fullName" v-model="addForm.transaction_id" :disabled="isCustomerLocked" />
+                                                        type="text" class="form-control" id="fullName" v-model="addForm.transaction_id" />
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
