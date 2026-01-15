@@ -392,7 +392,7 @@ if (!empty($request->usageDiscount) && !empty($request->discount_otp_valid) && $
                         $ticket = Ticket::create([
                             'company_id'          => Auth::user()->company_id,
                             'departure_city_id'   => $request->departureCity,
-                            'transaction_id' => 'T' . $request->transaction_id,
+                            'transaction_id'      => $request->transaction_id,
                             'destination_city_id' => $request->destinationCity,
                             'seat_no'             => $seat,
                             'bus_class_id'        => $detail->bus_class_id,
