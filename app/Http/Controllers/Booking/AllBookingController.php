@@ -150,7 +150,6 @@ class AllBookingController extends Controller
                 "addedBy:id,name",
                 "scheduleDetail:id,departure_time",
                 "cancel_ticket:id,ticket_id,added_by,created_at",
-                "cancel_ticket.added_by_name:id,name",
                 "overIssueSeats:id,ticket_id,added_by,created_at",
                 "overIssueSeats.overissue_by:id,name"
             )->select(
@@ -181,7 +180,7 @@ class AllBookingController extends Controller
         ], 404);
     }
 
-    $totalAmount    = (float) $ticket->seat_fare;          // original paid amount
+    $totalAmount    = (float) $ticket->seat_fare - $ticket->discount;          // original paid amount
     $companyPercent = (float) $request->refund_percentage;   // company share %
 
     $companyAmount         = ($totalAmount * $companyPercent) / 100;
