@@ -1244,6 +1244,7 @@ export default {
     mergeIds: addData.mergeIds?.length ? addData.mergeIds : this.mergeIds || [],
   };
 
+
   if (!payload.busIds.length || !payload.mergeIds.length) {
     Swal.fire({
       icon: "error",

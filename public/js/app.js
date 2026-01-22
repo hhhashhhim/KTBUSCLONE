@@ -40357,7 +40357,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.selectedRefund = {
         refund_amount: record.refund_amount,
         refund_percentage: record.refund_percentage,
-        refund_reason: record.refund_reason
+        seat_fare: record.seat_fare,
+        discount: record.discount
       };
       var modal = new bootstrap.Modal(document.getElementById("refundDetailsModal"));
       modal.show();
@@ -40367,7 +40368,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     calculatedRefundAmount: function calculatedRefundAmount() {
       if (!this.selectedRecord || !this.refundPercentage) return 0;
       var fare = parseFloat(this.selectedRecord.seat_fare || 0);
-      return (fare * this.refundPercentage / 100).toFixed(2);
+      var discount = parseFloat(this.selectedRecord.discount || 0);
+      var netAmount = fare - discount; // seat fare minus discount
+
+      var refundAmount = netAmount * this.refundPercentage / 100;
+      return refundAmount.toFixed(2);
     }
   }),
   watch: {
@@ -93869,25 +93874,31 @@ var _hoisted_128 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_129 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Refund Percentage:", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Cancellation Amount:", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_130 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Refund Percentage:", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_131 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Refund Reason:")], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_131 = {
+var _hoisted_132 = {
   "class": "border p-2 rounded bg-light"
 };
-var _hoisted_132 = {
+var _hoisted_133 = {
   "class": "modal-footer"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _$data$selectedRecord, _$data$selectedRecord2, _$data$selectedRecord3, _$data$selectedRecord4;
+  var _$data$selectedRecord, _$data$selectedRecord2, _$data$selectedRecord3, _$data$selectedRecord4, _$data$selectedRecord5, _$data$selectedRefund, _$data$selectedRefund2, _$data$selectedRefund3;
 
   var _component_vue_mask = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("vue-mask");
 
@@ -94080,17 +94091,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatDate(record.created_at)), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(record.type == "canceled" ? record.cancel_ticket.added_by_name ? record.cancel_ticket.added_by_name.name : "Auto" : "N/A"), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(record.type == "canceled" ? $options.formatDate(record.cancel_ticket.created_at) : "N/A"), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(record.type == "over-issue" ? record.over_issue_seats.overissue_by.name : "N/A"), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td>\r\n                                  {{\r\n                                    record.type == \"canceled\"\r\n                                      ? record.cancel_ticket.added_by_name\r\n                                        ? record.cancel_ticket.added_by_name\r\n                                            .name\r\n                                        : \"Auto\"\r\n                                      : \"N/A\"\r\n                                  }}\r\n                                </td> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td>\r\n                                  {{\r\n                                    record.type == \"canceled\"\r\n                                      ? formatDate(\r\n                                          record.cancel_ticket.created_at\r\n                                        )\r\n                                      : \"N/A\"\r\n                                  }}\r\n                                </td> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(record.type == "over-issue" ? record.over_issue_seats.overissue_by.name : "N/A"), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(record.type == "over-issue" ? $options.formatDate(record.over_issue_seats.created_at) : "N/A"), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(record.refund_amount ? "Refunded" : record.type), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [record.refund_amount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_69, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(record.refund_amount) + " → (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(record.refund_percentage) + "%) ", 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [record.refund_amount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_69, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(record.refund_amount) + " → (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(100 - (record.refund_percentage || 0)) + "%) ", 1
     /* TEXT */
     )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_70, "-"))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [record.refund_amount === null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 0,
@@ -94126,7 +94133,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_107, [_hoisted_108, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$data$selectedRecord3 = $data.selectedRecord) === null || _$data$selectedRecord3 === void 0 ? void 0 : _$data$selectedRecord3.seat_no), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_109, [_hoisted_110, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$data$selectedRecord4 = $data.selectedRecord) === null || _$data$selectedRecord4 === void 0 ? void 0 : _$data$selectedRecord4.seat_fare), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_109, [_hoisted_110, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(((_$data$selectedRecord4 = $data.selectedRecord) === null || _$data$selectedRecord4 === void 0 ? void 0 : _$data$selectedRecord4.seat_fare) - ((_$data$selectedRecord5 = $data.selectedRecord) === null || _$data$selectedRecord5 === void 0 ? void 0 : _$data$selectedRecord5.discount)), 1
   /* TEXT */
   )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Refund Percentage "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_111, [_hoisted_112, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
@@ -94145,7 +94152,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* STABLE_FRAGMENT */
   ))], 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.refundPercentage]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Calculated Refund "), $data.selectedRecord && $data.refundPercentage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_115, [_hoisted_116, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Refund Amount: "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.calculatedRefundAmount), 1
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.refundPercentage]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Calculated Refund "), $data.selectedRecord && $data.refundPercentage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_115, [_hoisted_116, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Cancellation Amount: "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.calculatedRefundAmount), 1
   /* TEXT */
   )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Refund Reason "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_117, [_hoisted_118, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
     "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
@@ -94178,11 +94185,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "aria-label": "Close"
   }, _hoisted_126)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_127, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [_hoisted_128, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.selectedRefund.refund_amount) + " PKR ", 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [_hoisted_129, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.selectedRefund.refund_percentage) + "% ", 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [_hoisted_129, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(Math.max(0, parseFloat(((_$data$selectedRefund = $data.selectedRefund) === null || _$data$selectedRefund === void 0 ? void 0 : _$data$selectedRefund.seat_fare) || 0) - parseFloat(((_$data$selectedRefund2 = $data.selectedRefund) === null || _$data$selectedRefund2 === void 0 ? void 0 : _$data$selectedRefund2.discount) || 0) - parseFloat(((_$data$selectedRefund3 = $data.selectedRefund) === null || _$data$selectedRefund3 === void 0 ? void 0 : _$data$selectedRefund3.refund_amount) || 0))) + " PKR ", 1
   /* TEXT */
-  )]), _hoisted_130, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_131, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.selectedRefund.refund_reason), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [_hoisted_130, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(100 - $data.selectedRefund.refund_percentage) + "% ", 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_132, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  )]), _hoisted_131, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_132, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.selectedRefund.refund_reason), 1
+  /* TEXT */
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_133, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-secondary",
     onClick: _cache[26] || (_cache[26] = function ($event) {

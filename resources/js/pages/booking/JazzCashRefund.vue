@@ -260,7 +260,7 @@
                                   }}
                                 </td>
                                 <td>{{ formatDate(record.created_at) }}</td>
-                                <td>
+                                <!-- <td>
                                   {{
                                     record.type == "canceled"
                                       ? record.cancel_ticket.added_by_name
@@ -269,8 +269,8 @@
                                         : "Auto"
                                       : "N/A"
                                   }}
-                                </td>
-                                <td>
+                                </td> -->
+                                <!-- <td>
                                   {{
                                     record.type == "canceled"
                                       ? formatDate(
@@ -278,7 +278,7 @@
                                         )
                                       : "N/A"
                                   }}
-                                </td>
+                                </td> -->
                                 <td>
                                   {{
                                     record.type == "over-issue"
@@ -306,9 +306,7 @@
 
                                 <td>
                                   <span v-if="record.refund_amount">
-                                    {{ record.refund_amount }} → ({{
-                                      record.refund_percentage
-                                    }}%)
+                                    {{ record.refund_amount }} → ({{ 100 - (record.refund_percentage || 0) }}%)
                                   </span>
                                   <span v-else>-</span>
                                 </td>
@@ -406,7 +404,7 @@
                 <strong>Seat No:</strong> {{ selectedRecord?.seat_no }}
               </p>
               <p class="mb-3">
-                <strong>Fare:</strong> {{ selectedRecord?.seat_fare }}
+                <strong>Fare:</strong> {{ selectedRecord?.seat_fare - selectedRecord?.discount }}
               </p>
             </div>
 
@@ -437,7 +435,7 @@
               class="alert alert-info py-2 mb-3"
             >
               <i class="bi bi-cash-coin me-1"></i>
-              Refund Amount: <strong>{{ calculatedRefundAmount }}</strong>
+              Cancellation Amount: <strong>{{ calculatedRefundAmount }}</strong>
             </div>
 
             <!-- Refund Reason -->
@@ -503,9 +501,21 @@
               <strong>Refund Amount:</strong>
               {{ selectedRefund.refund_amount }} PKR
             </p>
+           <p>
+  <strong>Cancellation Amount:</strong>
+  {{
+    Math.max(
+      0,
+      parseFloat(selectedRefund?.seat_fare || 0)
+      - parseFloat(selectedRefund?.discount || 0)
+      - parseFloat(selectedRefund?.refund_amount || 0)
+    )
+  }} PKR
+</p>
+
             <p>
               <strong>Refund Percentage:</strong>
-              {{ selectedRefund.refund_percentage }}%
+              {{ 100 - ( selectedRefund.refund_percentage )}}%
             </p>
             <p><strong>Refund Reason:</strong></p>
             <p class="border p-2 rounded bg-light">
@@ -749,7 +759,8 @@ export default {
       this.selectedRefund = {
         refund_amount: record.refund_amount,
         refund_percentage: record.refund_percentage,
-        refund_reason: record.refund_reason,
+        seat_fare: record.seat_fare,
+        discount: record.discount,
       };
       const modal = new bootstrap.Modal(
         document.getElementById("refundDetailsModal")
@@ -760,9 +771,15 @@ export default {
   computed: {
     ...mapGetters(["getDeletingObj"]),
     calculatedRefundAmount() {
-      if (!this.selectedRecord || !this.refundPercentage) return 0;
-      const fare = parseFloat(this.selectedRecord.seat_fare || 0);
-      return ((fare * this.refundPercentage) / 100).toFixed(2);
+       if (!this.selectedRecord || !this.refundPercentage) return 0;
+
+    const fare = parseFloat(this.selectedRecord.seat_fare || 0);
+    const discount = parseFloat(this.selectedRecord.discount || 0);
+
+    const netAmount = fare - discount; // seat fare minus discount
+    const refundAmount = (netAmount * this.refundPercentage) / 100;
+
+    return refundAmount.toFixed(2);
     },
   },
   watch: {

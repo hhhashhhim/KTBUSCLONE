@@ -93,7 +93,7 @@ import DiscountType from "./pages/discountType/DiscountCardTypePage.vue";
 
 const routes = [
     {
-        path: url + "", 
+        path: url + "",  
         component: Users,
         name: "home", 
     },
