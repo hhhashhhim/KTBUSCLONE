@@ -190,14 +190,6 @@
                     <span>Total Gross Sale:</span>
                     <span>{{ number_format($data['merges']->sum('sale')) }}</span>
                 </div>
-
-                @foreach ($data['dynamicTypes'] as $type)
-                    <div class="summary-row">
-                        <span>Total {{ $type }}:</span>
-                        <span>{{ number_format($data['merges']->sum(fn($m) => $m['types'][$type] ?? 0)) }}</span>
-                    </div>
-                @endforeach
-
                 <div class="summary-row">
                     <span>Total Expenses:</span>
                     <span style="color: red;">- {{ number_format($data['merges']->sum('expense')) }}</span>
@@ -207,6 +199,15 @@
                     <span>Net Sale:</span>
                     <span>{{ number_format($data['merges']->sum('net_sale')) }}</span>
                 </div>
+                @foreach ($data['dynamicTypes'] as $type)
+                    <div class="summary-row">
+                        <span>Total {{ $type }}:</span>
+                        <span style="color: red;">-
+                            {{ number_format($data['merges']->sum(fn($m) => $m['types'][$type] ?? 0)) }}</span>
+                    </div>
+                @endforeach
+
+
 
                 <div class="summary-row" style="background-color: #eee;">
                     <span>NET CASH:</span>
