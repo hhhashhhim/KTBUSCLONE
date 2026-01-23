@@ -9,9 +9,8 @@ use Illuminate\Support\Facades\Auth;
 
 class TicketClosingShortageController extends Controller
 {
-    public function store(Request $request)
+public function store(Request $request)
 {
-
     $request->validate([
         'ticket_closing_id' => 'required|integer',
         'type' => 'nullable|in:start,return',
@@ -36,6 +35,8 @@ class TicketClosingShortageController extends Controller
                 'type' => $request->type,
             ],
             [
+                'bus_id'          => $request->busIds[0] ?? 0,
+                'route_id'        => $request->route,
                 'passenger_count' => $row['passenger_count'],
                 'kt_commission' => $row['kt_commission'],
                 'elt' => $row['elt'],

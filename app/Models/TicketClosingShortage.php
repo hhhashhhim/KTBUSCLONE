@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Models\Account\Bank;
+use App\Models\Bus\Bus;
 use App\Models\Schedule\TicketClosing;
+use App\Models\Schedule\TicketClosingMerge;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,10 +17,12 @@ class TicketClosingShortage extends Model
 
     protected $fillable = [
         'terminal_id',
+        'bus_id',
         'passenger_count',
         'kt_commission',
         'elt',
         'cancellation_amount',
+        'route_id',
         'total_receivable', // Before Other Commission
         'other_commission',
         'total_received_cash',
@@ -42,6 +46,11 @@ class TicketClosingShortage extends Model
         return $this->belongsTo(Terminal::class);
     }
 
+    public function bus()
+    {
+        return $this->belongsTo(Bus::class);
+    }
+
     public function bank()
     {
         return $this->belongsTo(Bank::class);
@@ -50,5 +59,10 @@ class TicketClosingShortage extends Model
     public function ticketClosing()
     {
         return $this->belongsTo(TicketClosing::class);
+    }
+
+    public function ticket_closing_merge()
+    {
+        return $this->belongsTo(TicketClosingMerge::class, 'ticket_closing_id');
     }
 }

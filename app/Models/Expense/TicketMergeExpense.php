@@ -12,7 +12,23 @@ use Illuminate\Support\Facades\Auth;
 class TicketMergeExpense extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $guarded = [];
+    protected $fillable = [
+        'ticket_merge_id',
+        'start_route_id',
+        'return_route_id',
+        'bus_id',
+        'expense_category_id',
+        'description',
+        'amount', // Total Expense Amount
+        'paid', // if paid 0 then it is credit
+        'ledger',
+        'invoice',
+        'added_by',
+        'company_id',
+        'time',
+        'updated_by',
+        'updated_at'
+    ];
 
    
     public function addedBy()

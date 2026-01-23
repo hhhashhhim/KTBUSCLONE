@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <style>
         @page {
@@ -31,55 +32,190 @@
             border-collapse: collapse;
             width: 100% !important;
         }
-        .text-center
-        {
+
+        .text-center {
             text-align: center;
         }
-    </style>
 
-    <title> Daily Summary Report</title>
+        th,
+        td {
+            padding: 5px;
+            border: 1px solid black;
+        }
+
+        .summary-wrapper {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .summary-box {
+            float: right;
+            width: 250px;
+            border: 2px solid black;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            font-size: 11pt;
+            border-bottom: 1px dotted #ccc;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 12pt;
+            margin-top: 5px;
+            border-top: 2px solid black;
+        }
+
+        /* Clearfix for the float */
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        .summary-box-left {
+            float: left;
+            width: 250px;
+            border: 2px solid black;
+            padding: 10px;
+            background-color: #ffffff;
+        }
+
+        /* Maintain the existing summary-row styles for consistency */
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            font-size: 11pt;
+            border-bottom: 1px dotted #ccc;
+        }
+    </style>
+    <title>Daily Summary Report</title>
 </head>
 
 <body>
 
+    <div style="border: 2px solid black; padding: 15px 3px 5px 3px !important;">
+        <div id="info">
+            <div class="companyName">
+                <span>CLOSING SUMMARY FOR {{ date('d-M-Y', strtotime($data['closing_date'])) }}</span>
+            </div>
+        </div>
+        <br>
 
-<div style="border: 2px solid black; padding: 15px 3px 5px 3px !important;">
-    <div id="info">
-        <div class="companyName"><span>(City Name) Closing {{ date('d/m/Y') }}</span></div>
+        <table border="2">
+            <thead>
+                <tr>
+                    <th>Sr NO</th>
+                    <th>Bus NO</th>
+                    <th>Sale</th>
+                    <th>Expense</th>
+                    <th>Net Sale</th>
+                    {{-- Dynamic Headers for Portals --}}
+                    @foreach ($data['dynamicTypes'] as $type)
+                        <th>{{ $type }}</th>
+                    @endforeach
+                    <th>Net Cash</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($data['merges'] as $key => $item)
+                    <tr>
+                        <td class="text-center">{{ $key + 1 }}</td>
+                        <td>{{ $item['bus_no'] }}</td>
+
+                        <td>{{ number_format($item['sale']) }}</td>
+                        <td>{{ number_format($item['expense']) }}</td>
+                        <td>{{ number_format($item['net_sale']) }}</td>
+                        {{-- Dynamic Values for Portals --}}
+                        @foreach ($data['dynamicTypes'] as $type)
+                            <td class="text-center">
+                                {{ number_format($item['types'][$type] ?? 0) }}
+                            </td>
+                        @endforeach
+                        <td>{{ number_format($item['net_cash']) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+            <tfoot>
+                <tr style="font-weight: bold;">
+                    <td colspan="2" class="text-center">Total</td>
+
+                    <td>{{ number_format($data['merges']->sum('sale')) }}</td>
+                    <td>{{ number_format($data['merges']->sum('expense')) }}</td>
+                    <td>{{ number_format($data['merges']->sum('net_sale')) }}</td>
+                    {{-- Dynamic Totals for Portals --}}
+                    @foreach ($data['dynamicTypes'] as $type)
+                        <td>
+                            {{ number_format($data['merges']->sum(fn($m) => $m['types'][$type] ?? 0)) }}
+                        </td>
+                    @endforeach
+                    <td>{{ number_format($data['merges']->sum('net_cash')) }}</td>
+                </tr>
+            </tfoot>
+        </table>
+        <div class="summary-wrapper clearfix">
+            <div class="summary-box-left">
+                <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
+                    TOTAL CREDIT EXPENSES
+                </div>
+
+                @foreach ($data['expenses'] as $expense)
+                    <div class="summary-row">
+                        <span>{{ $expense['expense_category']['name'] }}</span>
+                        <span>{{ number_format($expense['amount']) }}</span>
+                    </div>
+                @endforeach
+
+                {{-- Total Row --}}
+                <div class="summary-row"
+                    style="border-top: 2px solid black; font-weight: bold; margin-top: 5px; background-color: #f2f2f2;">
+                    <span>Total Credit:</span>
+                    <span>{{ number_format($data['expenses']->sum('amount')) }}</span>
+                </div>
+
+            </div>
+            <div class="summary-box">
+                <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
+                    GRAND SUMMARY
+                </div>
+
+                <div class="summary-row">
+                    <span>Total Gross Sale:</span>
+                    <span>{{ number_format($data['merges']->sum('sale')) }}</span>
+                </div>
+
+                @foreach ($data['dynamicTypes'] as $type)
+                    <div class="summary-row">
+                        <span>Total {{ $type }}:</span>
+                        <span>{{ number_format($data['merges']->sum(fn($m) => $m['types'][$type] ?? 0)) }}</span>
+                    </div>
+                @endforeach
+
+                <div class="summary-row">
+                    <span>Total Expenses:</span>
+                    <span style="color: red;">- {{ number_format($data['merges']->sum('expense')) }}</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Net Sale:</span>
+                    <span>{{ number_format($data['merges']->sum('net_sale')) }}</span>
+                </div>
+
+                <div class="summary-row" style="background-color: #eee;">
+                    <span>NET CASH:</span>
+                    <span>{{ number_format($data['merges']->sum('net_cash')) }}</span>
+                </div>
+            </div>
+        </div>
     </div>
-    <br>
 
-    <table border="2">
-        <tr>
-            <th>Sr NO</th>
-            <th>Bus NO</th>
-            <th>Departure Date</th>
-            <th>Return Date</th>
-            <th>Closing Date</th>
-            <th>Sale</th>
-            <th>Expense</th>
-            <th>Net Sale</th>
-        </tr>
-        
-        @foreach($data['merges'] as $key => $merge)
-        <tr>
-            <td>{{$key + 1}}</td>
-            <td>{{$merge->bus->bus_number}}</td>
-            <td>{{$merge->schedule_departure_date}}</td>
-            <td>{{$merge->schedule_return_date}}</td>
-            <td>{{$merge->closing_date??"N/A"}}</td>
-            <td>{{($merge->seat_fare) + ($merge->elt) + ($merge->refund) - ($merge->discount) - ($merge->commission)}}</td>
-            <td>{{intVal($merge->expenses_sum_amount)}}</td>
-            <td>{{($merge->seat_fare) + ($merge->elt) + ($merge->refund) - ($merge->discount) - ($merge->commission) - ($merge->expenses_sum_amount)}}</td>
-        </tr>
-        @endforeach
-        <tr>
-            <td colspan="5" class="text-center"><b>Total<b></td>
-            <td><b>{{($data['merges']->sum('seat_fare')) + ($data['merges']->sum('elt')) + ($data['merges']->sum('refund')) - ($data['merges']->sum('discount')) - ($data['merges']->sum('commission'))}}<b></td>
-            <td><b>{{$data['merges']->sum('expenses_sum_amount')}}<b></td>
-            <td><b>{{($data['merges']->sum('seat_fare')) + ($data['merges']->sum('elt')) + ($data['merges']->sum('refund')) - ($data['merges']->sum('discount')) - ($data['merges']->sum('commission')) - ($data['merges']->sum('expenses_sum_amount'))}}<b></td>
-        </tr>
-    </table>
-</div>
 </body>
+
 </html>
