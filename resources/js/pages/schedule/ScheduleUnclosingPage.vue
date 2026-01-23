@@ -313,7 +313,7 @@
             </Hide>
         </div>
     </section>
-    <Closing :data="closingData" :banks="banks" :busIds="busIds" :mergeIds="mergeIds" :addData="addData" @fetchData="fetchData($event)"/>
+    <Closing :data="closingData" :routes="routes" :banks="banks" :busIds="busIds" :mergeIds="mergeIds" :addData="addData" @fetchData="fetchData($event)"/>
 </template>
 
 <script>
@@ -349,6 +349,10 @@ export default {
             errors: false,
             closingData : {},
              buses: [],
+             routes  : {
+                start : "",
+                return : ""
+             }
         };
     },
     async created() {
@@ -408,6 +412,11 @@ export default {
       this.banks = res.data.banks;
       this.busIds = res.data.busIds;
       this.mergeIds = res.data.mergeIds;
+      this.routes = {
+        start : res.data.startRoute,
+        return : res.data.returnRoute,
+      };
+
 
       // ✅ Open modal after success
       $("#exampleModal").modal("show");

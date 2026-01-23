@@ -699,7 +699,7 @@
 
 <script>
 export default {
-  props: ["data", "banks", "busIds", "mergeIds"],
+  props: ["data", "banks", "busIds", "mergeIds", 'routes'],
   data() {
     return {
       categories: [],
@@ -1239,6 +1239,7 @@ export default {
  async mergeScheduleApi(addData = {}) {
   const payload = {
     ...addData,
+    routes : this.routes,
     expenses:this.postData,
     busIds: addData.busIds?.length ? addData.busIds : this.busIds || [],
     mergeIds: addData.mergeIds?.length ? addData.mergeIds : this.mergeIds || [],
@@ -1315,6 +1316,8 @@ const mapRows = (cashBank, schedule) =>
     await this.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
       ticket_closing_id: mergedResult.id,
       type: "start",
+      route : this.routes.start,
+      busIds: this.busIds,
       rows: mapRows(this.cashBankStart, this.data.schedule_start),
     });
 
@@ -1322,6 +1325,8 @@ const mapRows = (cashBank, schedule) =>
     await this.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
       ticket_closing_id: mergedResult.id,
       type: "return",
+      route : this.routes.return,
+      busIds: this.busIds,
       rows: mapRows(this.cashBankReturn, this.data.schedule_return),
     });
 
