@@ -998,33 +998,34 @@ export default {
     sumReturnBank() {
       return this.sumByRecovery(this.data?.schedule_return, "bank");
     },
-    sumReceivable() {
-      return Object.values(this.cashBankStart).reduce(
-        (sum, row) => sum + (Number(row.total) + Number(row.commission) || 0),
-        0
-      );
-    },
+   sumReceivable() {
+  return Object.values(this.cashBankStart).reduce((sum, row) => {
+    if (row.type == 'canceled') return sum; // skip canceled rows
+    return sum + (Number(row.total) + Number(row.commission) || 0);
+  }, 0);
+},
 
-    sumCash() {
-      return Object.values(this.cashBankStart).reduce(
-        (sum, row) => sum + (Number(row.cash) || 0),
-        0
-      );
-    },
+sumCash() {
+  return Object.values(this.cashBankStart).reduce((sum, row) => {
+    if (row.type == 'canceled') return sum;
+    return sum + (Number(row.cash) || 0);
+  }, 0);
+},
 
-    sumBank() {
-      return Object.values(this.cashBankStart).reduce(
-        (sum, row) => sum + (Number(row.bank) || 0),
-        0
-      );
-    },
+sumBank() {
+  return Object.values(this.cashBankStart).reduce((sum, row) => {
+    if (row.type == 'canceled') return sum;
+    return sum + (Number(row.bank) || 0);
+  }, 0);
+},
 
-    sumShortage() {
-      return Object.values(this.cashBankStart).reduce(
-        (sum, row) => sum + (Number(row.shortage) || 0),
-        0
-      );
-    },
+sumShortage() {
+  return Object.values(this.cashBankStart).reduce((sum, row) => {
+    if (row.type == 'canceled') return sum;
+    return sum + (Number(row.shortage) || 0);
+  }, 0);
+},
+
  close(){
             $('#exampleModal').click();
         },
@@ -1087,7 +1088,7 @@ export default {
   const groups = data || {};
   return Object.values(groups).reduce((sum, tickets) => {
     // Count only tickets that are not canceled
-    const validTickets = tickets.filter(t => t.type !== 'canceled');
+    const validTickets = tickets.filter(t => t.type != 'canceled');
     return sum + validTickets.length;
   }, 0); 
 },

@@ -27707,21 +27707,26 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
     },
     sumReceivable: function sumReceivable() {
       return Object.values(this.cashBankStart).reduce(function (sum, row) {
+        if (row.type == 'canceled') return sum; // skip canceled rows
+
         return sum + (Number(row.total) + Number(row.commission) || 0);
       }, 0);
     },
     sumCash: function sumCash() {
       return Object.values(this.cashBankStart).reduce(function (sum, row) {
+        if (row.type == 'canceled') return sum;
         return sum + (Number(row.cash) || 0);
       }, 0);
     },
     sumBank: function sumBank() {
       return Object.values(this.cashBankStart).reduce(function (sum, row) {
+        if (row.type == 'canceled') return sum;
         return sum + (Number(row.bank) || 0);
       }, 0);
     },
     sumShortage: function sumShortage() {
       return Object.values(this.cashBankStart).reduce(function (sum, row) {
+        if (row.type == 'canceled') return sum;
         return sum + (Number(row.shortage) || 0);
       }, 0);
     },
@@ -27773,7 +27778,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       return Object.values(groups).reduce(function (sum, tickets) {
         // Count only tickets that are not canceled
         var validTickets = tickets.filter(function (t) {
-          return t.type !== 'canceled';
+          return t.type != 'canceled';
         });
         return sum + validTickets.length;
       }, 0);
