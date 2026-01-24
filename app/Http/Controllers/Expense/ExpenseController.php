@@ -149,7 +149,7 @@ class ExpenseController extends Controller
                         'expense_category_id' => $request->category[$key],
                         'description' => $request->description[$key],
                         'amount' => $request->amount[$key],
-                        'paid' => isset($request->paid[$key]) ? $request->paid[$key] : $request->amount[$key],
+                        'paid' => isset($request->paid[$key]) ? $request->paid[$key] : 0,
                         'ledger' => isset($request->ledger[$key]) ? $request->ledger[$key] : false,
                         'invoice' => "exp-".++$i.'-'.$request->ticket_merge_id,
                         'company_id' => Auth::user()->company_id,
