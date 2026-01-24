@@ -303,7 +303,17 @@ class ScheduleClosingController extends Controller
         $mergeIds = $request->mergeIds;
 
         // Get closing pairs with schedule in a single query
-        $closingPairs = TicketClosing::with('schedule:id,route_id')
+          $closingPairsOne = TicketClosing::with('schedule:id,route_id')
+            ->where('company_id', $companyId)
+            ->where('ticket_merge_id', $mergeIds[0])
+            ->first();
+
+        $closingPairsTwo = TicketClosing::with('schedule:id,route_id', 'schedule.route')
+            ->where('company_id', $companyId)
+            ->where('ticket_merge_id', $mergeIds[1])
+            ->first();
+        
+        $closingPairs = TicketClosing::with('schedule:id,route_id','schedule.route')
             ->where('company_id', $companyId)
             ->whereIn('ticket_merge_id', $mergeIds)
             ->get();
@@ -313,13 +323,13 @@ class ScheduleClosingController extends Controller
         }
 
         // Preload route IDs
-        $routeIdStart  = $closingPairs[0]->schedule->route_id;
-        $routeIdReturn = $closingPairs[1]->schedule->route_id;
+        $routeIdStart  = $closingPairsOne->schedule->route_id;
+        $routeIdReturn = $closingPairsTwo->schedule->route_id;
 
         // Fetch tickets
         $tickets = Ticket::withTrashed()
             ->where('company_id', $companyId)
-            ->whereIn('ticket_closing_id', [$closingPairs[0]->id, $closingPairs[1]->id])
+            ->whereIn('ticket_closing_id', [$closingPairsOne->id, $closingPairsTwo->id])
             ->whereIn('type', ['booked', 'over-issue', 'canceled'])
             ->with([
                 'elt',
@@ -333,8 +343,8 @@ class ScheduleClosingController extends Controller
 
         // Group tickets by schedule
         $data = (object)[];
-        $data->schedule_start  = $tickets->where('ticket_closing_id', $closingPairs[0]->id)->groupBy('terminal_id');
-        $data->schedule_return = $tickets->where('ticket_closing_id', $closingPairs[1]->id)->groupBy('terminal_id');
+        $data->schedule_start  = $tickets->where('ticket_closing_id', $closingPairsOne->id)->groupBy('terminal_id');
+        $data->schedule_return = $tickets->where('ticket_closing_id', $closingPairsTwo->id)->groupBy('terminal_id');
 
         // Expenses
         $data->expense = TicketMergeExpense::where('company_id', $companyId)
@@ -352,8 +362,8 @@ class ScheduleClosingController extends Controller
         $scheduleIds = $closingPairs->pluck('schedule_id');
         $routes = Schedule::with('route:id,name')->where('company_id', $companyId)->whereIn('id', $scheduleIds)->get();
 
-        $singleData->city_one = explode("-", $routes[0]->route->name)[0];
-        $singleData->city_two = explode("-", $routes[1]->route->name ?? $routes[0]->route->name)[0];
+        $singleData->city_one = explode("-", $closingPairsOne->schedule->route->name)[0];
+        $singleData->city_two = explode("-", $closingPairsTwo->schedule->route->name)[0];
 
         // Refund calculations
         $cancelTickets = Ticket::onlyTrashed()

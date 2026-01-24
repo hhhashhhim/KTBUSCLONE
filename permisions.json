@@ -484,10 +484,9 @@
                 "allow": true
             },
             {
-                "name": "jazz-cash-refund", 
+                "name": "jazz-cash-refund",
                 "allow": true
             },
-           
             {
                 "name": "counter-expenses",
                 "allow": true,
@@ -525,6 +524,10 @@
                         "allow": true
                     }
                 ]
+            },
+            {
+                "name": "dailyExpense",
+                "allow": true
             }
         ]
     },

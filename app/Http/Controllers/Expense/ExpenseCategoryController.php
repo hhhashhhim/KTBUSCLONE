@@ -52,6 +52,7 @@ class ExpenseCategoryController extends Controller
 
                 $category = ExpenseCategory::create([
                     'name' => $request->name,
+                    'include_in_closing' => $request->include_in_closing_summary,
                     'company_id' => Auth::user()->company_id,
                     'added_by' => Auth::user()->id,
                 ]);
@@ -93,6 +94,7 @@ class ExpenseCategoryController extends Controller
 
                 $data =  $expCtg->update([
                     'name' => $request->name,
+                    'include_in_closing' => $request->include_in_closing_summary,
                 ]);
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
