@@ -139245,7 +139245,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _pages_booking_JazzCashRefund_vue__WEBPACK_IMPORTED_MODULE_85__ = __webpack_require__(/*! ./pages/booking/JazzCashRefund.vue */ "./resources/js/pages/booking/JazzCashRefund.vue");
 /* harmony import */ var _pages_discountType_DiscountCardAssignPage_vue__WEBPACK_IMPORTED_MODULE_86__ = __webpack_require__(/*! ./pages/discountType/DiscountCardAssignPage.vue */ "./resources/js/pages/discountType/DiscountCardAssignPage.vue");
 /* harmony import */ var _pages_discountType_DiscountCardTypePage_vue__WEBPACK_IMPORTED_MODULE_87__ = __webpack_require__(/*! ./pages/discountType/DiscountCardTypePage.vue */ "./resources/js/pages/discountType/DiscountCardTypePage.vue");
-/* provided dependency */ var process = __webpack_require__(/*! process/browser.js */ "./node_modules/process/browser.js");
 
 
 
@@ -139336,7 +139335,7 @@ __webpack_require__.r(__webpack_exports__);
 
  // const url = "/kt-dev/";
 
-var url = process.env(MIX_API_URL_ROUTE);
+var url = "/";
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
