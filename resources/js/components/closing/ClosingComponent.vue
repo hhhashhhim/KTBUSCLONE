@@ -953,12 +953,16 @@ export default {
   }, 0);
 
 },
-   totalELT(tickets) {
+  totalELT(tickets) {
   return tickets.reduce((sum, t) => {
+    // Skip canceled tickets
+    if (t.type == 'canceled') return sum;
+
     const ticketELT = parseFloat(t?.elt?.elt_price) || 0;
     return sum + ticketELT;
   }, 0);
 },
+
   totalCancelAmount(tickets) {
   return tickets.reduce((sum, t) => {
     const percentage = parseFloat(t?.cancel_ticket?.percentage) || 0;
@@ -1029,12 +1033,12 @@ sumShortage() {
  close(){
             $('#exampleModal').click();
         },
-    sumReceived() {
-      return Object.values(this.cashBankStart).reduce(
-        (sum, row) => sum + (Number(row.cash) || 0) + (Number(row.bank) || 0),
-        0
-      );
-    },
+   sumReceived() {
+  return Object.values(this.cashBankStart).reduce((sum, row) => {
+    if (row.type == 'canceled') return sum; // skip canceled rows
+    return sum + (Number(row.cash) || 0) + (Number(row.bank) || 0);
+  }, 0);
+},
 
     netAmount(id) {
       const row = this.cashBank[id];
@@ -1093,20 +1097,24 @@ sumShortage() {
   }, 0); 
 },
 
-    totalCommissions(data) {
-      const groups = data || {};
-      return Object.values(groups).reduce(
-        (sum, tickets) => sum + this.totalCommission(tickets),
-        0
-      );
-    },
-    grandTotalELT(data) {
-      const groups = data || {};
-      return Object.values(groups).reduce(
-        (sum, tickets) => sum + this.totalELT(tickets),
-        0
-      );
-    },
+totalCommissions(data) {
+  const groups = data || {};
+  return Object.values(groups).reduce((sum, tickets) => {
+    // Only include tickets that are not canceled
+    const validTickets = tickets.filter(t => t.type != 'canceled');
+    return sum + this.totalCommission(validTickets);
+  }, 0);
+},
+
+grandTotalELT(data) {
+  const groups = data || {};
+  return Object.values(groups).reduce((sum, tickets) => {
+    // Only include tickets that are not canceled
+    const validTickets = tickets.filter(t => t.type != 'canceled');
+    return sum + this.totalELT(validTickets);
+  }, 0);
+},
+
     grandTotalCancel(data) {
       const groups = data || {};
       return Object.values(groups).reduce(
@@ -1114,21 +1122,14 @@ sumShortage() {
         0
       );
     },
-    totalCommissions(data) {
-      const groups = data || {};
-      return Object.values(groups).reduce(
-        (sum, tickets) => sum + this.totalCommission(tickets),
-        0
-      );
-    },
-    sumOtherCommissions(data) {
-      const groups = data || {};
-      return Object.values(groups).reduce(
-        (sum, tickets) => sum + this.totalOtherCommission(tickets),
-        0
-      );
-    },
-
+sumOtherCommissions(data) {
+  const groups = data || {};
+  return Object.values(groups).reduce((sum, tickets) => {
+    // Only include tickets that are not canceled
+    const validTickets = tickets.filter(t => t.type != 'canceled');
+    return sum + this.totalOtherCommission(validTickets);
+  }, 0);
+},
     totalAmounts(data) {
       const groups = data || {};
       return Object.values(groups).reduce(

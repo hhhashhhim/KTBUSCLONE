@@ -27377,8 +27377,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
-var _methods;
-
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
@@ -27584,7 +27582,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       });
     }
   },
-  methods: (_methods = {
+  methods: {
     updateCash: function updateCash(terminalId, tickets) {
       var row = this.cashBankStart[terminalId];
       var receivable = this.receivable(terminalId, tickets);
@@ -27658,6 +27656,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       return tickets.reduce(function (sum, t) {
         var _t$elt2;
 
+        // Skip canceled tickets
+        if (t.type == 'canceled') return sum;
         var ticketELT = parseFloat(t === null || t === void 0 ? void 0 : (_t$elt2 = t.elt) === null || _t$elt2 === void 0 ? void 0 : _t$elt2.elt_price) || 0;
         return sum + ticketELT;
       }, 0);
@@ -27735,6 +27735,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
     },
     sumReceived: function sumReceived() {
       return Object.values(this.cashBankStart).reduce(function (sum, row) {
+        if (row.type == 'canceled') return sum; // skip canceled rows
+
         return sum + (Number(row.cash) || 0) + (Number(row.bank) || 0);
       }, 0);
     },
@@ -27788,7 +27790,11 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
       var groups = data || {};
       return Object.values(groups).reduce(function (sum, tickets) {
-        return sum + _this8.totalCommission(tickets);
+        // Only include tickets that are not canceled
+        var validTickets = tickets.filter(function (t) {
+          return t.type != 'canceled';
+        });
+        return sum + _this8.totalCommission(validTickets);
       }, 0);
     },
     grandTotalELT: function grandTotalELT(data) {
@@ -27796,7 +27802,11 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
       var groups = data || {};
       return Object.values(groups).reduce(function (sum, tickets) {
-        return sum + _this9.totalELT(tickets);
+        // Only include tickets that are not canceled
+        var validTickets = tickets.filter(function (t) {
+          return t.type != 'canceled';
+        });
+        return sum + _this9.totalELT(validTickets);
       }, 0);
     },
     grandTotalCancel: function grandTotalCancel(data) {
@@ -27806,323 +27816,383 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       return Object.values(groups).reduce(function (sum, tickets) {
         return sum + _this10.totalCancelAmount(tickets);
       }, 0);
-    }
-  }, _defineProperty(_methods, "totalCommissions", function totalCommissions(data) {
-    var _this11 = this;
+    },
+    sumOtherCommissions: function sumOtherCommissions(data) {
+      var _this11 = this;
 
-    var groups = data || {};
-    return Object.values(groups).reduce(function (sum, tickets) {
-      return sum + _this11.totalCommission(tickets);
-    }, 0);
-  }), _defineProperty(_methods, "sumOtherCommissions", function sumOtherCommissions(data) {
-    var _this12 = this;
+      var groups = data || {};
+      return Object.values(groups).reduce(function (sum, tickets) {
+        // Only include tickets that are not canceled
+        var validTickets = tickets.filter(function (t) {
+          return t.type != 'canceled';
+        });
+        return sum + _this11.totalOtherCommission(validTickets);
+      }, 0);
+    },
+    totalAmounts: function totalAmounts(data) {
+      var _this12 = this;
 
-    var groups = data || {};
-    return Object.values(groups).reduce(function (sum, tickets) {
-      return sum + _this12.totalOtherCommission(tickets);
-    }, 0);
-  }), _defineProperty(_methods, "totalAmounts", function totalAmounts(data) {
-    var _this13 = this;
+      var groups = data || {};
+      return Object.values(groups).reduce(function (sum, tickets) {
+        return sum + _this12.totalFare(tickets);
+      }, 0);
+    },
+    fetchData: function fetchData() {
+      var _this13 = this;
 
-    var groups = data || {};
-    return Object.values(groups).reduce(function (sum, tickets) {
-      return sum + _this13.totalFare(tickets);
-    }, 0);
-  }), _defineProperty(_methods, "fetchData", function fetchData() {
-    var _this14 = this;
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return _this13.callApi("post", "expenses/categories");
 
-    return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-      var res;
-      return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              _context2.next = 2;
-              return _this14.callApi("post", "expenses/categories");
+              case 2:
+                res = _context2.sent;
 
-            case 2:
-              res = _context2.sent;
+                if (res.status == 200) {
+                  _this13.categories = res.data;
+                }
 
-              if (res.status == 200) {
-                _this14.categories = res.data;
-              }
-
-            case 4:
-            case "end":
-              return _context2.stop();
+              case 4:
+              case "end":
+                return _context2.stop();
+            }
           }
+        }, _callee2);
+      }))();
+    },
+    totalCommission: function totalCommission(list) {
+      return list.reduce(function (sum, t) {
+        var _t$commission;
+
+        // 1. Check if the ticket is canceled. 
+        // If it is, skip the calculation and return the current sum.
+        if (t.type == 'canceled') {
+          return sum;
+        } // 2. Otherwise, proceed with the calculation
+
+
+        var adjPercent = Number(((_t$commission = t.commission) === null || _t$commission === void 0 ? void 0 : _t$commission.adjustment_commission) || 0); // Adjustment % always on seat fare (after discount)
+
+        var adjustment = adjPercent / 100 * Number(t.seat_fare - t.discount);
+        return sum + adjustment;
+      }, 0);
+    },
+    receivable: function receivable(terminalId, tickets) {
+      return this.totalFare(tickets) - this.totalOtherCommission(tickets);
+    },
+    totalOtherCommission: function totalOtherCommission(list) {
+      var fixCommission = 0;
+      var value = list.reduce(function (sum, t) {
+        var _t$commission2, _t$commission3, _t$commission4;
+
+        // 1. Skip if ticket is canceled
+        if (t.type == 'canceled') {
+          return sum;
         }
-      }, _callee2);
-    }))();
-  }), _defineProperty(_methods, "totalCommission", function totalCommission(list) {
-    return list.reduce(function (sum, t) {
-      var _t$commission;
 
-      // 1. Check if the ticket is canceled. 
-      // If it is, skip the calculation and return the current sum.
-      if (t.type == 'canceled') {
-        return sum;
-      } // 2. Otherwise, proceed with the calculation
+        var fare = parseFloat(t.seat_fare || 0);
+        var discount = parseFloat(t.discount) || 0;
+        var afterDiscount = fare - discount; // Update fixCommission (only from active tickets)
 
+        fixCommission = parseFloat(((_t$commission2 = t.commission) === null || _t$commission2 === void 0 ? void 0 : _t$commission2.fix_commission) || 0);
+        var flat = parseFloat(((_t$commission3 = t.commission) === null || _t$commission3 === void 0 ? void 0 : _t$commission3.flat_commission) || 0);
+        var percent = parseFloat(((_t$commission4 = t.commission) === null || _t$commission4 === void 0 ? void 0 : _t$commission4.percentage_commission) || 0);
+        var flatOrPercentage = flat > 0 ? flat : percent / 100 * afterDiscount;
+        return sum + flatOrPercentage;
+      }, 0); // Round the final result
 
-      var adjPercent = Number(((_t$commission = t.commission) === null || _t$commission === void 0 ? void 0 : _t$commission.adjustment_commission) || 0); // Adjustment % always on seat fare (after discount)
-
-      var adjustment = adjPercent / 100 * Number(t.seat_fare - t.discount);
-      return sum + adjustment;
-    }, 0);
-  }), _defineProperty(_methods, "receivable", function receivable(terminalId, tickets) {
-    return this.totalFare(tickets) - this.totalOtherCommission(tickets);
-  }), _defineProperty(_methods, "totalOtherCommission", function totalOtherCommission(list) {
-    var fixCommission = 0;
-    var value = list.reduce(function (sum, t) {
-      var _t$commission2, _t$commission3, _t$commission4;
-
-      // 1. Skip if ticket is canceled
-      if (t.type == 'canceled') {
-        return sum;
+      return Math.round(value + fixCommission);
+    },
+    saveRow: function saveRow(event, fieldName, index) {
+      // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
+      if (fieldName == "first") {
+        this.postData.category[index] = event.target.value;
       }
 
-      var fare = parseFloat(t.seat_fare || 0);
-      var discount = parseFloat(t.discount) || 0;
-      var afterDiscount = fare - discount; // Update fixCommission (only from active tickets)
+      if (fieldName == "second") {
+        this.postData.description[index] = event.target.value;
+      }
 
-      fixCommission = parseFloat(((_t$commission2 = t.commission) === null || _t$commission2 === void 0 ? void 0 : _t$commission2.fix_commission) || 0);
-      var flat = parseFloat(((_t$commission3 = t.commission) === null || _t$commission3 === void 0 ? void 0 : _t$commission3.flat_commission) || 0);
-      var percent = parseFloat(((_t$commission4 = t.commission) === null || _t$commission4 === void 0 ? void 0 : _t$commission4.percentage_commission) || 0);
-      var flatOrPercentage = flat > 0 ? flat : percent / 100 * afterDiscount;
-      return sum + flatOrPercentage;
-    }, 0); // Round the final result
+      if (fieldName == "third") {
+        this.postData.amount[index] = event.target.value;
+      }
 
-    return Math.round(value + fixCommission);
-  }), _defineProperty(_methods, "saveRow", function saveRow(event, fieldName, index) {
-    // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
-    if (fieldName == "first") {
-      this.postData.category[index] = event.target.value;
-    }
+      if (fieldName == "fourth") {
+        this.postData.invoice[index] = event.target.value;
+      }
 
-    if (fieldName == "second") {
-      this.postData.description[index] = event.target.value;
-    }
+      if (fieldName == "five") {
+        this.postData.paid[index] = event.target.value;
+      }
 
-    if (fieldName == "third") {
-      this.postData.amount[index] = event.target.value;
-    }
-
-    if (fieldName == "fourth") {
-      this.postData.invoice[index] = event.target.value;
-    }
-
-    if (fieldName == "five") {
-      this.postData.paid[index] = event.target.value;
-    }
-
-    if (fieldName == "six") {
-      this.postData.ledger[index] = event.target.checked;
-    } // total amount sum only for show
+      if (fieldName == "six") {
+        this.postData.ledger[index] = event.target.checked;
+      } // total amount sum only for show
 
 
-    this.totalAmount = this.postData.amount.reduce(function (a, b) {
-      return parseFloat(a) + parseFloat(b);
-    }, 0);
-    this.netProfit = this.totalSale - this.totalAmount;
-  }), _defineProperty(_methods, "addRow", function addRow() {
-    this.loop++;
-  }), _defineProperty(_methods, "removeRow", function removeRow(event, index) {
-    this.postData.category.splice(index, 1);
-    this.postData.description.splice(index, 1);
-    this.postData.amount.splice(index, 1);
-    this.postData.paid.splice(index, 1);
-    this.postData.invoice.splice(index, 1);
-    this.loop--; // total amount sum only for show
+      this.totalAmount = this.postData.amount.reduce(function (a, b) {
+        return parseFloat(a) + parseFloat(b);
+      }, 0);
+      this.netProfit = this.totalSale - this.totalAmount;
+    },
+    addRow: function addRow() {
+      this.loop++;
+    },
+    removeRow: function removeRow(event, index) {
+      this.postData.category.splice(index, 1);
+      this.postData.description.splice(index, 1);
+      this.postData.amount.splice(index, 1);
+      this.postData.paid.splice(index, 1);
+      this.postData.invoice.splice(index, 1);
+      this.loop--; // total amount sum only for show
 
-    this.totalAmount = this.postData.amount.reduce(function (a, b) {
-      return parseFloat(a) + parseFloat(b);
-    }, 0);
-    this.netProfit = this.totalSale - this.totalAmount;
-  }), _defineProperty(_methods, "mergeScheduleApi", function mergeScheduleApi() {
-    var _arguments = arguments,
-        _this15 = this;
+      this.totalAmount = this.postData.amount.reduce(function (a, b) {
+        return parseFloat(a) + parseFloat(b);
+      }, 0);
+      this.netProfit = this.totalSale - this.totalAmount;
+    },
+    //  // ===== Merge Schedule API =====
+    mergeScheduleApi: function mergeScheduleApi() {
+      var _arguments = arguments,
+          _this14 = this;
 
-    return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-      var _addData$busIds, _addData$mergeIds;
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var _addData$busIds, _addData$mergeIds;
 
-      var addData, payload, res, _mergedData$busIds, _mergedData$mergeIds, mergedData, _error$response, _error$response$data, _error$response$data$, errMsg;
+        var addData, payload, res, _mergedData$busIds, _mergedData$mergeIds, mergedData, _error$response, _error$response$data, _error$response$data$, errMsg;
 
-      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              addData = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : {};
-              payload = _objectSpread(_objectSpread({}, addData), {}, {
-                routes: _this15.routes,
-                expenses: _this15.postData,
-                busIds: (_addData$busIds = addData.busIds) !== null && _addData$busIds !== void 0 && _addData$busIds.length ? addData.busIds : _this15.busIds || [],
-                mergeIds: (_addData$mergeIds = addData.mergeIds) !== null && _addData$mergeIds !== void 0 && _addData$mergeIds.length ? addData.mergeIds : _this15.mergeIds || []
-              });
-
-              if (!(!payload.busIds.length || !payload.mergeIds.length)) {
-                _context3.next = 5;
-                break;
-              }
-
-              Swal.fire({
-                icon: "error",
-                title: "Cannot merge",
-                text: "Bus IDs or Merge IDs are empty. Fetch unclosing data first."
-              });
-              return _context3.abrupt("return", null);
-
-            case 5:
-              _context3.prev = 5;
-              _context3.next = 8;
-              return _this15.callApi("post", "booking/close/schedule/closing/merge", payload);
-
-            case 8:
-              res = _context3.sent;
-
-              if (!(res.status === 200 || res.status === 201)) {
-                _context3.next = 17;
-                break;
-              }
-
-              mergedData = res.data || {};
-              _this15.mergedData = mergedData; // Update stored IDs if returned
-
-              if ((_mergedData$busIds = mergedData.busIds) !== null && _mergedData$busIds !== void 0 && _mergedData$busIds.length) _this15.busIds = mergedData.busIds;
-              if ((_mergedData$mergeIds = mergedData.mergeIds) !== null && _mergedData$mergeIds !== void 0 && _mergedData$mergeIds.length) _this15.mergeIds = mergedData.mergeIds;
-              return _context3.abrupt("return", mergedData);
-
-            case 17:
-              throw new Error("Merge failed with status ".concat(res.status));
-
-            case 18:
-              _context3.next = 25;
-              break;
-
-            case 20:
-              _context3.prev = 20;
-              _context3.t0 = _context3["catch"](5);
-              errMsg = (_context3.t0 === null || _context3.t0 === void 0 ? void 0 : (_error$response = _context3.t0.response) === null || _error$response === void 0 ? void 0 : (_error$response$data = _error$response.data) === null || _error$response$data === void 0 ? void 0 : (_error$response$data$ = _error$response$data.Error) === null || _error$response$data$ === void 0 ? void 0 : _error$response$data$.join("\n")) || _context3.t0.message || "Merge failed";
-              Swal.fire({
-                icon: "error",
-                title: "Merge Error",
-                text: errMsg
-              });
-              throw new Error(errMsg);
-
-            case 25:
-            case "end":
-              return _context3.stop();
-          }
-        }
-      }, _callee3, null, [[5, 20]]);
-    }))();
-  }), _defineProperty(_methods, "saveTicketClosingShortage", function saveTicketClosingShortage() {
-    var _this16 = this;
-
-    return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-      var mergedResult, mapRows;
-      return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              _this16.loading = true;
-              _context4.prev = 1;
-              _context4.next = 4;
-              return _this16.mergeScheduleApi(_this16.addData);
-
-            case 4:
-              mergedResult = _context4.sent;
-              // Step 2: Store merged data for the component
-              _this16.closingData = mergedResult; // Step 4: Save Start
-
-              mapRows = function mapRows(cashBank, schedule) {
-                return Object.entries(cashBank).map(function (_ref5) {
-                  var _ref6 = _slicedToArray(_ref5, 2),
-                      terminalId = _ref6[0],
-                      row = _ref6[1];
-
-                  var tickets = schedule[terminalId] || [];
-                  return {
-                    terminal_id: Number(terminalId),
-                    passenger_count: tickets.filter(function (ticket) {
-                      return ticket.status != 'canceled';
-                    }).length,
-                    kt_commission: _this16.totalCommission(tickets),
-                    elt: _this16.totalELT(tickets),
-                    cancellation_amount: _this16.totalCancelAmount(tickets),
-                    total_receivable: row.total + row.commission,
-                    other_commission: row.commission || 0,
-                    total_received_cash: row.cash,
-                    bank_id: row.selectedBankId || null,
-                    total_received_bank: row.bank,
-                    shortage: row.shortage,
-                    received: row.cash + row.bank,
-                    mergeId: mergedResult.id
-                  };
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                addData = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : {};
+                payload = _objectSpread(_objectSpread({}, addData), {}, {
+                  routes: _this14.routes,
+                  expenses: _this14.postData,
+                  busIds: (_addData$busIds = addData.busIds) !== null && _addData$busIds !== void 0 && _addData$busIds.length ? addData.busIds : _this14.busIds || [],
+                  mergeIds: (_addData$mergeIds = addData.mergeIds) !== null && _addData$mergeIds !== void 0 && _addData$mergeIds.length ? addData.mergeIds : _this14.mergeIds || []
                 });
-              };
 
-              _context4.next = 9;
-              return _this16.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
-                ticket_closing_id: mergedResult.id,
-                type: "start",
-                route: _this16.routes.start,
-                busIds: _this16.busIds,
-                rows: mapRows(_this16.cashBankStart, _this16.data.schedule_start)
-              });
+                if (!(!payload.busIds.length || !payload.mergeIds.length)) {
+                  _context3.next = 5;
+                  break;
+                }
 
-            case 9:
-              _context4.next = 11;
-              return _this16.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
-                ticket_closing_id: mergedResult.id,
-                type: "return",
-                route: _this16.routes["return"],
-                busIds: _this16.busIds,
-                rows: mapRows(_this16.cashBankReturn, _this16.data.schedule_return)
-              });
+                Swal.fire({
+                  icon: "error",
+                  title: "Cannot merge",
+                  text: "Bus IDs or Merge IDs are empty. Fetch unclosing data first."
+                });
+                return _context3.abrupt("return", null);
 
-            case 11:
-              Swal.fire({
-                icon: "success",
-                title: "Saved!",
-                text: "Ticket closing saved successfully",
-                timer: 1500,
-                showConfirmButton: false
-              });
+              case 5:
+                _context3.prev = 5;
+                _context3.next = 8;
+                return _this14.callApi("post", "booking/close/schedule/closing/merge", payload);
 
-              _this16.$emit('fetchData');
+              case 8:
+                res = _context3.sent;
 
-              _this16.closeexampleModal();
+                if (!(res.status === 200 || res.status === 201)) {
+                  _context3.next = 17;
+                  break;
+                }
 
-              _context4.next = 20;
-              break;
+                mergedData = res.data || {};
+                _this14.mergedData = mergedData; // Update stored IDs if returned
 
-            case 16:
-              _context4.prev = 16;
-              _context4.t0 = _context4["catch"](1);
-              console.error(_context4.t0);
-              Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: _context4.t0.message || "Failed to save ticket closing"
-              });
+                if ((_mergedData$busIds = mergedData.busIds) !== null && _mergedData$busIds !== void 0 && _mergedData$busIds.length) _this14.busIds = mergedData.busIds;
+                if ((_mergedData$mergeIds = mergedData.mergeIds) !== null && _mergedData$mergeIds !== void 0 && _mergedData$mergeIds.length) _this14.mergeIds = mergedData.mergeIds;
+                return _context3.abrupt("return", mergedData);
 
-            case 20:
-              _context4.prev = 20;
-              _this16.loading = false;
-              return _context4.finish(20);
+              case 17:
+                throw new Error("Merge failed with status ".concat(res.status));
 
-            case 23:
-            case "end":
-              return _context4.stop();
+              case 18:
+                _context3.next = 25;
+                break;
+
+              case 20:
+                _context3.prev = 20;
+                _context3.t0 = _context3["catch"](5);
+                errMsg = (_context3.t0 === null || _context3.t0 === void 0 ? void 0 : (_error$response = _context3.t0.response) === null || _error$response === void 0 ? void 0 : (_error$response$data = _error$response.data) === null || _error$response$data === void 0 ? void 0 : (_error$response$data$ = _error$response$data.Error) === null || _error$response$data$ === void 0 ? void 0 : _error$response$data$.join("\n")) || _context3.t0.message || "Merge failed";
+                Swal.fire({
+                  icon: "error",
+                  title: "Merge Error",
+                  text: errMsg
+                });
+                throw new Error(errMsg);
+
+              case 25:
+              case "end":
+                return _context3.stop();
+            }
           }
-        }
-      }, _callee4, null, [[1, 16, 20, 23]]);
-    }))();
-  }), _defineProperty(_methods, "closeexampleModal", function closeexampleModal() {
-    $("#exampleModal").click();
-  }), _methods)
+        }, _callee3, null, [[5, 20]]);
+      }))();
+    },
+    // ===== Save Ticket Closing Shortage =====
+    saveTicketClosingShortage: function saveTicketClosingShortage() {
+      var _this15 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var mergedResult, mapRows;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _this15.loading = true;
+                _context4.prev = 1;
+                _context4.next = 4;
+                return _this15.mergeScheduleApi(_this15.addData);
+
+              case 4:
+                mergedResult = _context4.sent;
+                // Step 2: Store merged data for the component
+                _this15.closingData = mergedResult; // Step 4: Save Start
+
+                mapRows = function mapRows(cashBank, schedule) {
+                  return Object.entries(cashBank).map(function (_ref5) {
+                    var _ref6 = _slicedToArray(_ref5, 2),
+                        terminalId = _ref6[0],
+                        row = _ref6[1];
+
+                    var tickets = schedule[terminalId] || [];
+                    return {
+                      terminal_id: Number(terminalId),
+                      passenger_count: tickets.filter(function (ticket) {
+                        return ticket.status != 'canceled';
+                      }).length,
+                      kt_commission: _this15.totalCommission(tickets),
+                      elt: _this15.totalELT(tickets),
+                      cancellation_amount: _this15.totalCancelAmount(tickets),
+                      total_receivable: row.total + row.commission,
+                      other_commission: row.commission || 0,
+                      total_received_cash: row.cash,
+                      bank_id: row.selectedBankId || null,
+                      total_received_bank: row.bank,
+                      shortage: row.shortage,
+                      received: row.cash + row.bank,
+                      mergeId: mergedResult.id
+                    };
+                  });
+                };
+
+                _context4.next = 9;
+                return _this15.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
+                  ticket_closing_id: mergedResult.id,
+                  type: "start",
+                  route: _this15.routes.start,
+                  busIds: _this15.busIds,
+                  rows: mapRows(_this15.cashBankStart, _this15.data.schedule_start)
+                });
+
+              case 9:
+                _context4.next = 11;
+                return _this15.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
+                  ticket_closing_id: mergedResult.id,
+                  type: "return",
+                  route: _this15.routes["return"],
+                  busIds: _this15.busIds,
+                  rows: mapRows(_this15.cashBankReturn, _this15.data.schedule_return)
+                });
+
+              case 11:
+                Swal.fire({
+                  icon: "success",
+                  title: "Saved!",
+                  text: "Ticket closing saved successfully",
+                  timer: 1500,
+                  showConfirmButton: false
+                });
+
+                _this15.$emit('fetchData');
+
+                _this15.closeexampleModal();
+
+                _context4.next = 20;
+                break;
+
+              case 16:
+                _context4.prev = 16;
+                _context4.t0 = _context4["catch"](1);
+                console.error(_context4.t0);
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: _context4.t0.message || "Failed to save ticket closing"
+                });
+
+              case 20:
+                _context4.prev = 20;
+                _this15.loading = false;
+                return _context4.finish(20);
+
+              case 23:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, null, [[1, 16, 20, 23]]);
+      }))();
+    },
+    // async saveTicketClosingShortage() {
+    //   this.loading = true;
+    //   try {
+    //     // Step 1 & 2: SKIP MERGE API
+    //     // We create a dummy ID so the code doesn't break
+    //     const dummyId = 999; 
+    //     // Step 3: Calculation Logic
+    //     const mapRows = (cashBank, schedule) =>
+    //       Object.entries(cashBank).map(([terminalId, row]) => {
+    //         // Filter tickets to exclude canceled ones for accuracy
+    //         const allTickets = schedule[terminalId] || [];
+    //         const activeTickets = allTickets.filter(t => t.type !== 'canceled');
+    //         return {
+    //           terminal_id: Number(terminalId),
+    //           passenger_count: activeTickets.length,
+    //           kt_commission: this.totalCommission(allTickets), 
+    //           elt: this.totalELT(allTickets),
+    //           cancellation_amount: this.totalCancelAmount(allTickets),
+    //           // Calculation check
+    //           total_receivable: row.total + row.commission,
+    //           other_commission: row.commission || 0,
+    //           total_received_cash: row.cash,
+    //           bank_id: row.selectedBankId || null,
+    //           total_received_bank: row.bank,
+    //           shortage: row.shortage,
+    //           received: row.cash + row.bank,
+    //           mergeId: dummyId // Using dummy ID instead of mergedResult.id
+    //         };
+    //       });
+    //     // Step 4: Prepare Payloads
+    //     const startPayload = mapRows(this.cashBankStart, this.data.schedule_start);
+    //     const returnPayload = mapRows(this.cashBankReturn, this.data.schedule_return);
+    //     // LOG TO CONSOLE AS A TABLE (Easier to read than a list)
+    //     console.log("--- START DATA CHECK ---");
+    //     console.table(startPayload);
+    //     console.log("--- RETURN DATA CHECK ---");
+    //     console.table(returnPayload);
+    //     // Show a message to confirm it's just a check
+    //     Swal.fire({
+    //       icon: "info",
+    //       title: "Check Mode",
+    //       text: "Check the browser console (F12) to see the calculated values.",
+    //     });
+    //   } catch (error) {
+    //     console.error("Error during calculation check:", error);
+    //   } finally {
+    //     this.loading = false;
+    //   }
+    // },
+    closeexampleModal: function closeexampleModal() {
+      $("#exampleModal").click();
+    }
+  }
 });
 
 /***/ }),
