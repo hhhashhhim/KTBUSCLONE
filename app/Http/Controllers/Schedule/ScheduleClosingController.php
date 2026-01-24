@@ -510,7 +510,7 @@ class ScheduleClosingController extends Controller
                     'expense_category_id' => $expenses['category'][$key],
                     'description' => $expenses['description'][$key] ?? '-',
                     'amount' => $expenses['amount'][$key],
-                    'paid' => isset($expenses['paid'][$key]) ? $expenses['paid'][$key] : $expenses['amount'][$key],
+                    'paid' => isset($expenses['paid'][$key]) ? $expenses['paid'][$key] : 0,
                     'ledger' => 1,
                     'invoice' => "exp-" . ++$i . '-' . $merge->id,
                     'company_id' => Auth::user()->company_id,
@@ -910,10 +910,14 @@ class ScheduleClosingController extends Controller
             })
             ->values();
 
-       $creditExpenses = TicketMergeExpense::with('expense_category:id,name')
-            ->whereColumn('amount', '!=', 'paid') // Compares two columns in the same row
-            ->whereIn('ticket_merge_id', $merges)
-            ->get();
+     $creditExpenses = TicketMergeExpense::with('expense_category:id,name')
+        ->whereColumn('amount', '!=', 'paid') // Compare two columns in the same row
+        ->whereIn('ticket_merge_id', $merges)
+        ->whereHas('expense_category', function($query) {
+            $query->where('include_in_closing', '1');
+        })
+        ->get();
+
 
         $data = [
             'dynamicTypes' => $dynamicTypes,
