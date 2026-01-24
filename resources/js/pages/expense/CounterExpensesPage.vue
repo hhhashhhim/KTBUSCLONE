@@ -58,30 +58,59 @@
             </div>
 
             <!-- Add Modal -->
-            <Add
-                heading="Add Counter Expenses"
-                :errors="this.validationErrors"
-                :success="success"
-                :formID="formID"
-            >
-                <div class="row">
-                    <div class=" form-group col-md-12">
-                        <label for="name">Amount <span class="text-danger ml-1">*</span></label>
-                        <input type="text" class="form-control" placeholder="Enter Specific Amount"
-                               v-model="data.amount" @keypress="isNumber($event)">
-                    </div>
-                    <div class=" form-group col-md-12">
-                        <label for="name">Narration <span class="text-danger ml-1">*</span></label>
-                        <textarea class="form-control" placeholder="Describe Narration"
-                                  v-model="data.narration"></textarea>
-                    </div>
+           <Add
+    heading="Add Counter Expenses"
+    :errors="validationErrors"
+    :success="success"
+    :formID="formID"
+>
+    <div class="row">
+        <!-- Amount -->
+        <div class="form-group col-md-4">
+            <label for="amount">Amount <span class="text-danger ml-1">*</span></label>
+            <input type="text" class="form-control" placeholder="Enter Specific Amount"
+                   v-model="data.amount" @keypress="isNumber($event)">
+        </div>
+ <!-- Single Bill Posting (Image) -->
+        <div class="form-group col-md-4">
+            <label>Bill Posting <span class="text-danger ml-1">(Optional)</span></label>
+            <!-- <input type="file" class="form-control" placeholder="" v-model="data.bill_post" /> -->
+        </div>
+
+        <!-- Cash / Bank -->
+        <div class="form-group col-md-4">
+            <label>Payment Method <span class="text-danger ml-1">*</span></label>
+            <div class="d-flex align-items-center mt-2">
+                <div class="form-check mr-4">
+                    <input class="form-check-input" type="radio" id="cash" value="cash"
+                           v-model="data.payment_method">
+                    <label class="form-check-label" for="cash">Cash</label>
                 </div>
-                <template v-slot:button>
-                    <button type="button" class="btn btn-primary" :disabled="loading" @click="add()">
-                        {{ loading ? 'Loading...' : 'Add Counter Expenses' }}
-                    </button>
-                </template>
-            </Add>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="bank" value="bank"
+                           v-model="data.payment_method">
+                    <label class="form-check-label" for="bank">Bank</label>
+                </div>
+            </div>
+        </div>
+        <!-- Narration -->
+        <div class="form-group col-md-12">
+            <label for="narration">Narration <span class="text-danger ml-1">*</span></label>
+            <textarea class="form-control" placeholder="Describe Narration"
+                      v-model="data.narration"></textarea>
+        </div>
+
+       
+    </div>
+
+    <!-- Button -->
+    <template v-slot:button>
+        <button type="button" class="btn btn-primary" :disabled="loading" @click="add()">
+            {{ loading ? 'Loading...' : 'Add Counter Expenses' }}
+        </button>
+    </template>
+</Add>
+
 
             <!-- Add Modal -->
             <Edit
@@ -137,6 +166,8 @@ export default {
             deleteFormID: 'delete_counter_expenses',
             data: {
                 amount: "",
+                narration: "",
+                payment_method: "",
                 narration: "",
             },
             dataEdit: {

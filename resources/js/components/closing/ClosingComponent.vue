@@ -1083,13 +1083,14 @@ export default {
       );
     },
 
-    totalPassengers(data) {
-      const groups = data || {};
-      return Object.values(groups).reduce(
-        (sum, tickets) => sum + tickets.length,
-        0
-      );
-    },
+  totalPassengers(data) {
+  const groups = data || {};
+  return Object.values(groups).reduce((sum, tickets) => {
+    // Count only tickets that are not canceled
+    const validTickets = tickets.filter(t => t.type !== 'canceled');
+    return sum + validTickets.length;
+  }, 0); 
+},
 
     totalCommissions(data) {
       const groups = data || {};

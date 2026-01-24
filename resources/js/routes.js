@@ -87,7 +87,6 @@ import PR from "./pages/inventory/products/PurchaseRequisitionNote.vue";
 import JazzCashRefund from "./pages/booking/JazzCashRefund.vue";
 import DiscountCardAssignPage from "./pages/discountType/DiscountCardAssignPage.vue";
 import DiscountType from "./pages/discountType/DiscountCardTypePage.vue";
-
 // const url = "/kt-dev/";
  const url = '/' 
 
@@ -328,6 +327,7 @@ const routes = [
         component: ExpenseCategoryPage,
         name: "expense-category-page",
     },
+   
     {
         path: url + "expenses/:id",
         component: ExpensePage,
