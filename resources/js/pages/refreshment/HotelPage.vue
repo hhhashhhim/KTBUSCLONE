@@ -289,7 +289,7 @@ export default {
 
         await this.fetchData();
         this.permissions = this.$store.state.permissions;
-        setTimeout(() => {
+        setTimeout(() => { 
             $("#hotel_table").DataTable();
         }, 500);
     },

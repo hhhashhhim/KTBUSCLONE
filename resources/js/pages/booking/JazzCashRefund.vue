@@ -260,7 +260,7 @@
                                   }}
                                 </td>
                                 <td>{{ formatDate(record.created_at) }}</td>
-                                <!-- <td>
+                                <td>
                                   {{
                                     record.type == "canceled"
                                       ? record.cancel_ticket.added_by_name
@@ -269,8 +269,8 @@
                                         : "Auto"
                                       : "N/A"
                                   }}
-                                </td> -->
-                                <!-- <td>
+                                </td>
+                                <td>
                                   {{
                                     record.type == "canceled"
                                       ? formatDate(
@@ -278,7 +278,7 @@
                                         )
                                       : "N/A"
                                   }}
-                                </td> -->
+                                </td>
                                 <td>
                                   {{
                                     record.type == "over-issue"
