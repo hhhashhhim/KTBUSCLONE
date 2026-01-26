@@ -15,7 +15,7 @@ class AlterTableCounterExpensesAddBillAndCashbankOptionColumns extends Migration
     {
         Schema::table('counter_expenses', function (Blueprint $table) {
             $table->string('bill_post')->default(0)->after('amount');
-            $table->bigInteger('expense_from')->default(0)->after('bill_post');
+            $table->string('payment_method')->default(0)->after('bill_post');
 
         });
     }
@@ -27,8 +27,8 @@ class AlterTableCounterExpensesAddBillAndCashbankOptionColumns extends Migration
      */
     public function down()
     {
-        Schema::table('expense_categories', function (Blueprint $table) {
-           $table->dropColumn(['bill_post', 'expense_from']);
+        Schema::table('counter_expenses', function (Blueprint $table) {
+           $table->dropColumn(['bill_post', 'payment_method']);
         });
     }
 }
