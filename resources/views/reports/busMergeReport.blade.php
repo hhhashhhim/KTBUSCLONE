@@ -223,22 +223,24 @@
                 </div>
                 <div class="summary-row" style="background-color: #eee;">
                     <span>Net Payable:</span>
-                    @php
-                    $expenses = $data['expenses']->sum('amount');
-                    $mergesMinusCounter = $data['merges']->sum('net_cash') - $data['counterExpense'];
-
-                    // If mergesMinusCounter is negative, subtract from expenses, else add
-                    $total = $mergesMinusCounter < 0 
-                            ? $expenses - abs($mergesMinusCounter) 
-                            : $expenses + $mergesMinusCounter;
-                @endphp
+                
 
 <span>
-    {{ $total >= 0 ? '+' : '-' }}{{ number_format(abs($total)) }}
+      
+@if ($data['merges']->sum('net_cash') - $data['counterExpense'] >= 0 ) 
+{{ number_format($data['expenses']->sum('amount')) + ($data['merges']->sum('net_cash') - $data['counterExpense']) }}
+
+@else 
+  {{ number_format($data['expenses']->sum('amount')) - ($data['merges']->sum('net_cash') - $data['counterExpense']) }}
+@endif
+
+
+
+
+
+
+@endphp
 </span>
-
-
-<span>{{ $total }}</span>
 
                 </div>
             </div>
