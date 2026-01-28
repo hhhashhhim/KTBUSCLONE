@@ -46030,21 +46030,59 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       editFormID: 'edit_counter_expenses',
       deleteFormID: 'delete_counter_expenses',
       data: {
-        amount: "",
-        payment_method: "",
         bill_post: null,
-        narration: ""
-      },
-      dataEdit: {
-        amount: "",
+        amount: 0,
+        // <-- add this
         narration: "",
         payment_method: "",
+        // <-- add this
+        total: 0,
+        cash_payment: 0,
+        bank_payment: 0,
+        cash_id: "",
+        bank_id: "",
+        category_id: ""
+      },
+      dataEdit: {
+        id: null,
+        amount: 0,
+        total: 0,
+        narration: "",
+        payment_method: "",
+        cash_payment: 0,
+        bank_payment: 0,
+        cash_id: "",
+        bank_id: "",
+        category_id: "",
         bill_post: null
       },
+      filters: {
+        cash_id: '',
+        bank_id: '',
+        category_id: '',
+        amount: '',
+        narration: ''
+      },
+      categories: [],
+      // fill from API
+      banks: [],
+      cashes: [],
+      subtotal: 0,
       delId: "",
       success: false,
       errors: false
     };
+  },
+  computed: {
+    totalPayment: function totalPayment() {
+      return (Number(this.data.cash_payment) || 0) + (Number(this.data.bank_payment) || 0);
+    },
+    totalPaymentEdit: function totalPaymentEdit() {
+      return (Number(this.dataEdit.cash_payment) || 0) + (Number(this.dataEdit.bank_payment) || 0);
+    },
+    remaining: function remaining() {
+      return Math.max(this.data.total - this.totalPayment, 0);
+    }
   },
   created: function created() {
     var _this = this;
@@ -46086,6 +46124,133 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var ext = name.split('.').pop().toLowerCase();
       return imageExtensions.includes(ext);
     },
+    fetchBanks: function fetchBanks() {
+      var _this2 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var res, _err$response;
+
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.prev = 0;
+                _context2.next = 3;
+                return _this2.callApi("get", "accounts/heads/banks");
+
+              case 3:
+                res = _context2.sent;
+                _this2.banks = res.data.accountHeadBanks;
+                _context2.next = 10;
+                break;
+
+              case 7:
+                _context2.prev = 7;
+                _context2.t0 = _context2["catch"](0);
+                console.error("Bank API error:", ((_err$response = _context2.t0.response) === null || _err$response === void 0 ? void 0 : _err$response.data) || _context2.t0);
+
+              case 10:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, null, [[0, 7]]);
+      }))();
+    },
+    fetchCashes: function fetchCashes() {
+      var _this3 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var res, _err$response2;
+
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.prev = 0;
+                _context3.next = 3;
+                return _this3.callApi("get", "accounts/heads/cash");
+
+              case 3:
+                res = _context3.sent;
+                _this3.cashes = res.data.accountHeadCash;
+                _context3.next = 10;
+                break;
+
+              case 7:
+                _context3.prev = 7;
+                _context3.t0 = _context3["catch"](0);
+                console.error("Cash API error:", ((_err$response2 = _context3.t0.response) === null || _err$response2 === void 0 ? void 0 : _err$response2.data) || _context3.t0);
+
+              case 10:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, null, [[0, 7]]);
+      }))();
+    },
+    fetchData: function fetchData() {
+      var _this4 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _context4.prev = 0;
+                _context4.next = 3;
+                return _this4.callApi("post", "expenses/categories");
+
+              case 3:
+                res = _context4.sent;
+
+                if (res.status == 200) {
+                  _this4.categories = res.data;
+                }
+
+                _context4.next = 10;
+                break;
+
+              case 7:
+                _context4.prev = 7;
+                _context4.t0 = _context4["catch"](0);
+                console.error(_context4.t0);
+
+              case 10:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, null, [[0, 7]]);
+      }))();
+    },
+    recalculateTotal: function recalculateTotal() {
+      this.data.total = this.subtotal - (parseFloat(this.data.discount) || 0) + (parseFloat(this.data.tax) || 0);
+    },
+    getCashName: function getCashName(cashId) {
+      var cash = this.cashes.find(function (c) {
+        return c.id == cashId;
+      });
+      return cash ? cash.name : "-";
+    },
+    resetFilters: function resetFilters() {
+      this.filters = {
+        cash_id: '',
+        bank_id: '',
+        category_id: '',
+        amount: '',
+        narration: ''
+      };
+      this.fetchCounterExpenses(); // Reload full table
+    },
+    getBankName: function getBankName(bankId) {
+      var bank = this.banks.find(function (b) {
+        return b.id == bankId;
+      });
+      return bank ? bank.head_bank ? bank.head_bank.name : bank.name : "-";
+    },
     getFileName: function getFileName(file) {
       // Return filename from path
       return typeof file == 'string' ? file.split('/').pop() : file.name;
@@ -46100,22 +46265,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.data = {};
     },
     fetchCounterExpenses: function fetchCounterExpenses() {
-      var _this2 = this;
+      var _this5 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var resCounterExpenses;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                _context2.next = 2;
-                return _this2.callApi("post", 'counter/expenses');
+                _context5.next = 2;
+                return _this5.callApi("post", 'counter/expenses', _this5.filters);
 
               case 2:
-                resCounterExpenses = _context2.sent;
+                resCounterExpenses = _context5.sent;
 
                 if (resCounterExpenses.status == 200) {
-                  _this2.counterExpenses = resCounterExpenses.data;
+                  _this5.counterExpenses = resCounterExpenses.data;
                 }
 
                 setTimeout(function () {
@@ -46124,10 +46289,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 5:
               case "end":
-                return _context2.stop();
+                return _context5.stop();
             }
           }
-        }, _callee2);
+        }, _callee5);
       }))();
     },
     isNumber: function isNumber(evt) {
@@ -46141,77 +46306,120 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     add: function add() {
-      var _this3 = this;
+      var _this6 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var formData, resCounter;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        var cashPayment, bankPayment, totalPayment, formData, resCounter;
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                _this3.validationErrors = []; // ✅ Basic Validations
+                _this6.validationErrors = []; // ✅ Basic validations
 
-                if (_this3.data.amount) {
-                  _context3.next = 3;
+                if (_this6.data.narration) {
+                  _context6.next = 3;
                   break;
                 }
 
-                return _context3.abrupt("return", swal({
-                  title: "Required",
-                  text: "Expenses Amount is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 3:
-                if (_this3.data.narration) {
-                  _context3.next = 5;
-                  break;
-                }
-
-                return _context3.abrupt("return", swal({
+                return _context6.abrupt("return", swal({
                   title: "Required",
                   text: "Expenses Narration is Required",
                   icon: "error",
                   timer: 2000
                 }));
 
-              case 5:
-                if (_this3.data.payment_method) {
-                  _context3.next = 7;
+              case 3:
+                if (_this6.data.category_id) {
+                  _context6.next = 5;
                   break;
                 }
 
-                return _context3.abrupt("return", swal({
+                return _context6.abrupt("return", swal({
                   title: "Required",
-                  text: "Payment Method is Required",
+                  text: "Expense Category is Required",
                   icon: "error",
                   timer: 2000
                 }));
 
-              case 7:
-                _this3.loading = true;
-                _context3.prev = 8;
-                // 🔥 Prepare FormData for files
+              case 5:
+                // ✅ Payment validation
+                cashPayment = Number(_this6.data.cash_payment) || 0;
+                bankPayment = Number(_this6.data.bank_payment) || 0;
+                totalPayment = cashPayment + bankPayment;
+
+                if (!(totalPayment <= 0)) {
+                  _context6.next = 10;
+                  break;
+                }
+
+                return _context6.abrupt("return", swal({
+                  title: "Required",
+                  text: "Enter Cash or Bank Payment",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 10:
+                if (!(cashPayment > 0 && !_this6.data.cash_id)) {
+                  _context6.next = 12;
+                  break;
+                }
+
+                return _context6.abrupt("return", swal({
+                  title: "Required",
+                  text: "Select Cash Ledger",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 12:
+                if (!(bankPayment > 0 && !_this6.data.bank_id)) {
+                  _context6.next = 14;
+                  break;
+                }
+
+                return _context6.abrupt("return", swal({
+                  title: "Required",
+                  text: "Select Bank Ledger",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 14:
+                _this6.loading = true;
+                _context6.prev = 15;
+                // 🔥 Prepare FormData safely
                 formData = new FormData();
-                formData.append('amount', _this3.data.amount);
-                formData.append('narration', _this3.data.narration);
-                formData.append('payment_method', _this3.data.payment_method); // Only append bill_post if a file is selected
+                formData.append('total', _this6.data.total || totalPayment); // total fallback
 
-                if (_this3.data.bill_post instanceof File) {
-                  formData.append('bill_post', _this3.data.bill_post);
-                } // Call API
+                formData.append('narration', _this6.data.narration);
+                formData.append('category_id', _this6.data.category_id); // Only append cash/bank fields if values exist
+
+                if (cashPayment > 0) {
+                  formData.append('cash_payment', cashPayment);
+                  formData.append('cash_id', _this6.data.cash_id);
+                }
+
+                if (bankPayment > 0) {
+                  formData.append('bank_payment', bankPayment);
+                  formData.append('bank_id', _this6.data.bank_id);
+                } // Bill file
 
 
-                _context3.next = 16;
-                return _this3.callApi("post", "counter/expenses/store", formData, {
+                if (_this6.data.bill_post instanceof File) {
+                  formData.append('bill_post', _this6.data.bill_post);
+                } // 🚀 Call API
+
+
+                _context6.next = 25;
+                return _this6.callApi("post", "counter/expenses/store", formData, {
                   headers: {
                     "Content-Type": "multipart/form-data"
                   }
                 });
 
-              case 16:
-                resCounter = _context3.sent;
+              case 25:
+                resCounter = _context6.sent;
 
                 // ✅ Success
                 if (resCounter.status === 201) {
@@ -46224,27 +46432,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   });
                   $("#counter_expenses_table").DataTable().destroy();
 
-                  _this3.fetchCounterExpenses();
+                  _this6.fetchCounterExpenses();
 
-                  _this3.clearForm();
+                  _this6.clearForm();
                 }
 
-                _context3.next = 23;
+                _context6.next = 32;
                 break;
 
-              case 20:
-                _context3.prev = 20;
-                _context3.t0 = _context3["catch"](8);
+              case 29:
+                _context6.prev = 29;
+                _context6.t0 = _context6["catch"](15);
 
-                // ✅ Handle Validation Errors from backend
-                if (_context3.t0.response && _context3.t0.response.status === 422) {
+                // ✅ Handle validation errors from backend
+                if (_context6.t0.response && _context6.t0.response.status === 422) {
                   (function () {
-                    _this3.validationErrors = _context3.t0.response.data.errors || {};
+                    _this6.validationErrors = _context6.t0.response.data.errors || {};
                     var errorContent = "";
                     var count = 0;
 
-                    for (var key in _this3.validationErrors) {
-                      _this3.validationErrors[key].forEach(function (msg) {
+                    for (var key in _this6.validationErrors) {
+                      _this6.validationErrors[key].forEach(function (msg) {
                         errorContent += ++count + " - " + msg + "\n";
                       });
                     }
@@ -46257,7 +46465,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     });
                   })();
                 } else {
-                  // Other errors
                   swal({
                     title: "Error",
                     text: "Something went wrong. Please try again.",
@@ -46266,99 +46473,166 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   });
                 }
 
-              case 23:
-                _context3.prev = 23;
-                _this3.loading = false; // always turn off loading
+              case 32:
+                _context6.prev = 32;
+                _this6.loading = false;
+                return _context6.finish(32);
 
-                return _context3.finish(23);
-
-              case 26:
+              case 35:
               case "end":
-                return _context3.stop();
+                return _context6.stop();
             }
           }
-        }, _callee3, null, [[8, 20, 23, 26]]);
+        }, _callee6, null, [[15, 29, 32, 35]]);
       }))();
     },
     edit: function edit(singleRecord) {
       this.dataEdit = singleRecord;
     },
     update: function update() {
-      var _this4 = this;
+      var _this7 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var formData, resEdit;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+        var cashPayment, bankPayment, totalPayment, formData, resEdit;
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
-                _this4.validationErrors = [];
+                _this7.validationErrors = []; // ✅ Basic validations
 
-                if (_this4.dataEdit.amount) {
-                  _context4.next = 3;
+                if (_this7.dataEdit.narration) {
+                  _context7.next = 3;
                   break;
                 }
 
-                return _context4.abrupt("return", swal("Required", "Expenses Amount is Required", "error"));
+                return _context7.abrupt("return", swal({
+                  title: "Required",
+                  text: "Expenses Narration is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
 
               case 3:
-                if (_this4.dataEdit.narration) {
-                  _context4.next = 5;
+                if (_this7.dataEdit.category_id) {
+                  _context7.next = 5;
                   break;
                 }
 
-                return _context4.abrupt("return", swal("Required", "Expenses Narration is Required", "error"));
+                return _context7.abrupt("return", swal({
+                  title: "Required",
+                  text: "Expense Category is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
 
               case 5:
-                if (_this4.dataEdit.payment_method) {
-                  _context4.next = 7;
+                cashPayment = Number(_this7.dataEdit.cash_payment) || 0;
+                bankPayment = Number(_this7.dataEdit.bank_payment) || 0;
+                totalPayment = cashPayment + bankPayment; // ✅ Ensure at least one payment is provided
+
+                if (!(totalPayment <= 0)) {
+                  _context7.next = 10;
                   break;
                 }
 
-                return _context4.abrupt("return", swal("Required", "Payment Method is Required", "error"));
+                return _context7.abrupt("return", swal({
+                  title: "Required",
+                  text: "Enter either Cash or Bank Payment",
+                  icon: "error",
+                  timer: 2000
+                }));
 
-              case 7:
-                _this4.loadingEdit = true;
-                formData = new FormData();
-                formData.append('id', _this4.dataEdit.id);
-                formData.append('amount', _this4.dataEdit.amount);
-                formData.append('narration', _this4.dataEdit.narration);
-                formData.append('payment_method', _this4.dataEdit.payment_method);
-
-                if (_this4.dataEdit.bill_post instanceof File) {
-                  formData.append('bill_post', _this4.dataEdit.bill_post);
+              case 10:
+                if (!(cashPayment > 0 && !_this7.dataEdit.cash_id)) {
+                  _context7.next = 12;
+                  break;
                 }
 
-                _context4.next = 16;
-                return _this4.callApi("post", 'counter/expenses/update', formData, {
+                return _context7.abrupt("return", swal({
+                  title: "Required",
+                  text: "Select Cash Ledger",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 12:
+                if (!(bankPayment > 0 && !_this7.dataEdit.bank_id)) {
+                  _context7.next = 14;
+                  break;
+                }
+
+                return _context7.abrupt("return", swal({
+                  title: "Required",
+                  text: "Select Bank Ledger",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 14:
+                if (!(totalPayment != _this7.dataEdit.total)) {
+                  _context7.next = 16;
+                  break;
+                }
+
+                return _context7.abrupt("return", swal({
+                  title: "Error",
+                  text: "Cash + Bank payment must equal Total",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 16:
+                _this7.loadingEdit = true;
+                _context7.prev = 17;
+                formData = new FormData();
+                formData.append('id', _this7.dataEdit.id);
+                formData.append('total', _this7.dataEdit.total);
+                formData.append('narration', _this7.dataEdit.narration);
+                formData.append('category_id', _this7.dataEdit.category_id);
+                formData.append('cash_payment', cashPayment);
+                formData.append('bank_payment', bankPayment);
+                formData.append('cash_id', _this7.dataEdit.cash_id);
+                formData.append('bank_id', _this7.dataEdit.bank_id); // ✅ Optional bill upload
+
+                if (_this7.dataEdit.bill_post instanceof File) {
+                  formData.append('bill_post', _this7.dataEdit.bill_post);
+                }
+
+                _context7.next = 30;
+                return _this7.callApi("post", "counter/expenses/update", formData, {
                   headers: {
                     "Content-Type": "multipart/form-data"
                   }
                 });
 
-              case 16:
-                resEdit = _context4.sent;
+              case 30:
+                resEdit = _context7.sent;
 
                 if (resEdit.status === 200) {
                   $(".modal").click();
-                  swal("Success", "Expenses updated Successfully", "success");
-                  _this4.loadingEdit = false;
+                  swal({
+                    title: "Success",
+                    text: "Expenses updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
+                  _this7.loadingEdit = false;
                   $("#counter_expenses_table").DataTable().destroy();
 
-                  _this4.fetchCounterExpenses();
+                  _this7.fetchCounterExpenses();
 
                   setTimeout(function () {
                     $('#edit-modal').modal('hide');
                   }, 3000);
                 } else if (resEdit.status === 422) {
                   (function () {
-                    _this4.loadingEdit = false;
+                    _this7.loadingEdit = false;
                     var errorContent = "";
                     var count = 0;
 
                     for (var key in resEdit.data.errors) {
-                      resEdit.data.errors[key].forEach(function (el) {
-                        errorContent += ++count + " - " + el + "\n";
+                      resEdit.data.errors[key].forEach(function (msg) {
+                        errorContent += ++count + " - " + msg + "\n";
                       });
                     }
 
@@ -46366,14 +46640,41 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 18:
+                _context7.next = 38;
+                break;
+
+              case 34:
+                _context7.prev = 34;
+                _context7.t0 = _context7["catch"](17);
+                _this7.loadingEdit = false;
+                swal({
+                  title: "Error",
+                  text: "Something went wrong. Please try again.",
+                  icon: "error",
+                  timer: 3000
+                });
+
+              case 38:
               case "end":
-                return _context4.stop();
+                return _context7.stop();
             }
           }
-        }, _callee4);
+        }, _callee7, null, [[17, 34]]);
       }))();
     }
+  },
+  watch: {
+    totalPayment: function totalPayment(val) {
+      this.data.total = val;
+    },
+    totalPaymentEdit: function totalPaymentEdit(val) {
+      this.dataEdit.total = val;
+    }
+  },
+  mounted: function mounted() {
+    this.fetchBanks();
+    this.fetchCashes();
+    this.fetchData();
   }
 });
 
@@ -100457,119 +100758,225 @@ var _hoisted_14 = {
   "class": "card-body"
 };
 var _hoisted_15 = {
-  "class": "table-responsive"
+  "class": "card-body p-3"
 };
 var _hoisted_16 = {
-  "class": "table table-striped table-hover",
-  id: "counter_expenses_table"
+  "class": "row g-3"
+};
+var _hoisted_17 = {
+  "class": "col-md-4 col-sm-6"
 };
 
-var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No.", -1
+var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "form-label small fw-bold text-muted"
+}, "Cash Ledger", -1
 /* HOISTED */
 );
 
-var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Attachments", -1
+var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: ""
+}, "All Cash Ledgers", -1
 /* HOISTED */
 );
 
-var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Amount", -1
-/* HOISTED */
-);
-
-var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Payment Method", -1
-/* HOISTED */
-);
-
-var _hoisted_21 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Narration", -1
-/* HOISTED */
-);
-
-var _hoisted_22 = {
-  key: 0
+var _hoisted_20 = ["value"];
+var _hoisted_21 = {
+  "class": "col-md-4 col-sm-6"
 };
-var _hoisted_23 = {
-  key: 0
-};
-var _hoisted_24 = ["href"];
-var _hoisted_25 = ["src"];
-var _hoisted_26 = ["href"];
-var _hoisted_27 = {
-  key: 1
-};
-var _hoisted_28 = ["data-target", "onClick"];
 
-var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "far fa-edit"
+var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "form-label small fw-bold text-muted"
+}, "Bank Ledger", -1
+/* HOISTED */
+);
+
+var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: ""
+}, "All Bank Ledgers", -1
+/* HOISTED */
+);
+
+var _hoisted_24 = ["value"];
+var _hoisted_25 = {
+  "class": "col-md-4 col-sm-6"
+};
+
+var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "form-label small fw-bold text-muted"
+}, "Category", -1
+/* HOISTED */
+);
+
+var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: ""
+}, "All Categories", -1
+/* HOISTED */
+);
+
+var _hoisted_28 = ["value"];
+var _hoisted_29 = {
+  "class": "col-md-4 mt-3 col-sm-6"
+};
+
+var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "form-label small fw-bold text-muted"
+}, "Amount", -1
+/* HOISTED */
+);
+
+var _hoisted_31 = {
+  "class": "input-group input-group-sm"
+};
+
+var _hoisted_32 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "input-group-text"
+}, "Rs", -1
+/* HOISTED */
+);
+
+var _hoisted_33 = {
+  "class": "col-md-4 mt-3 col-sm-6"
+};
+
+var _hoisted_34 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "form-label small fw-bold text-muted"
+}, "Narration", -1
+/* HOISTED */
+);
+
+var _hoisted_35 = {
+  "class": "col-md-4 mt-3 col-sm-12 d-flex gap-2 align-items-end"
+};
+
+var _hoisted_36 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "bi bi-arrow-counterclockwise"
 }, null, -1
 /* HOISTED */
 );
 
-var _hoisted_30 = [_hoisted_29];
-var _hoisted_31 = {
-  "class": "row"
-};
-var _hoisted_32 = {
-  "class": "form-group col-md-4"
-};
-
-var _hoisted_33 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-  "for": "amount"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Amount "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-  "class": "text-danger ml-1"
-}, "*")], -1
+var _hoisted_37 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  type: "submit",
+  "class": "btn btn-primary flex-fill mx-1"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "bi bi-funnel"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Apply Filters ")], -1
 /* HOISTED */
 );
 
-var _hoisted_34 = {
+var _hoisted_38 = {
+  "class": "table-responsive"
+};
+var _hoisted_39 = {
+  "class": "table table-striped table-hover",
+  id: "counter_expenses_table"
+};
+
+var _hoisted_40 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sr No."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Attachments"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Category"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cash Payment"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bank Payment"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Payment"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cash Ledger"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bank Ledger"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Narration"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th v-if=\"checkForSubmenuButtons('edit-counter-expenses')\">\r\n                                                                Action</th> ")])], -1
+/* HOISTED */
+);
+
+var _hoisted_41 = ["href"];
+var _hoisted_42 = ["src"];
+var _hoisted_43 = ["href"];
+var _hoisted_44 = {
+  "class": "row"
+};
+var _hoisted_45 = {
+  "class": "form-group col-md-3"
+};
+
+var _hoisted_46 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "fw-semibold"
+}, "Expense Category", -1
+/* HOISTED */
+);
+
+var _hoisted_47 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: ""
+}, "Select Category", -1
+/* HOISTED */
+);
+
+var _hoisted_48 = ["value"];
+var _hoisted_49 = {
+  "class": "form-group col-md-3"
+};
+
+var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "fw-semibold"
+}, "Cash Payment", -1
+/* HOISTED */
+);
+
+var _hoisted_51 = {
+  "class": "form-group col-md-3"
+};
+
+var _hoisted_52 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "fw-semibold"
+}, "Bank Payment", -1
+/* HOISTED */
+);
+
+var _hoisted_53 = {
+  "class": "form-group col-md-3"
+};
+
+var _hoisted_54 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "fw-semibold"
+}, "Total Payment", -1
+/* HOISTED */
+);
+
+var _hoisted_55 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bill Posting "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+var _hoisted_56 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bill Posting "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
 }, "(Optional)")], -1
 /* HOISTED */
 );
 
-var _hoisted_36 = {
+var _hoisted_57 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_37 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Payment Method "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-  "class": "text-danger ml-1"
-}, "*")], -1
+var _hoisted_58 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "fw-semibold"
+}, "Cash Ledger", -1
 /* HOISTED */
 );
 
-var _hoisted_38 = {
-  "class": "d-flex align-items-center mt-2"
-};
-var _hoisted_39 = {
-  "class": "form-check mr-4"
-};
-
-var _hoisted_40 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-  "class": "form-check-label",
-  "for": "cash"
-}, "Cash", -1
+var _hoisted_59 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: ""
+}, "Select Cash", -1
 /* HOISTED */
 );
 
-var _hoisted_41 = {
-  "class": "form-check"
+var _hoisted_60 = ["value"];
+var _hoisted_61 = {
+  "class": "form-group col-md-4"
 };
 
-var _hoisted_42 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-  "class": "form-check-label",
-  "for": "bank"
-}, "Bank", -1
+var _hoisted_62 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "fw-semibold"
+}, "Bank Ledger", -1
 /* HOISTED */
 );
 
-var _hoisted_43 = {
+var _hoisted_63 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: ""
+}, "Select Bank", -1
+/* HOISTED */
+);
+
+var _hoisted_64 = ["value"];
+var _hoisted_65 = {
   "class": "form-group col-md-12"
 };
 
-var _hoisted_44 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_66 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "narration"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Narration "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
@@ -100577,76 +100984,115 @@ var _hoisted_44 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_45 = ["disabled"];
-var _hoisted_46 = {
+var _hoisted_67 = ["disabled"];
+var _hoisted_68 = {
   "class": "row"
 };
-var _hoisted_47 = {
+var _hoisted_69 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_48 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Amount "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-  "class": "text-danger ml-1"
-}, "*")], -1
+var _hoisted_70 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "fw-semibold"
+}, "Expense Category", -1
 /* HOISTED */
 );
 
-var _hoisted_49 = {
+var _hoisted_71 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: ""
+}, "Select Category", -1
+/* HOISTED */
+);
+
+var _hoisted_72 = ["value"];
+var _hoisted_73 = {
   "class": "form-group col-md-4"
 };
 
-var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bill Posting "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+var _hoisted_74 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "fw-semibold"
+}, "Cash Payment", -1
+/* HOISTED */
+);
+
+var _hoisted_75 = {
+  key: 0,
+  "class": "mt-2"
+};
+
+var _hoisted_76 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "fw-semibold"
+}, "Cash Ledger", -1
+/* HOISTED */
+);
+
+var _hoisted_77 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: ""
+}, "Select Cash", -1
+/* HOISTED */
+);
+
+var _hoisted_78 = ["value"];
+var _hoisted_79 = {
+  "class": "form-group col-md-4"
+};
+
+var _hoisted_80 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "fw-semibold"
+}, "Bank Payment", -1
+/* HOISTED */
+);
+
+var _hoisted_81 = {
+  key: 0,
+  "class": "mt-2"
+};
+
+var _hoisted_82 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "fw-semibold"
+}, "Bank Ledger", -1
+/* HOISTED */
+);
+
+var _hoisted_83 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: ""
+}, "Select Bank", -1
+/* HOISTED */
+);
+
+var _hoisted_84 = ["value"];
+var _hoisted_85 = {
+  "class": "form-group col-md-4"
+};
+
+var _hoisted_86 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "fw-semibold"
+}, "Total Payment", -1
+/* HOISTED */
+);
+
+var _hoisted_87 = ["value"];
+var _hoisted_88 = {
+  "class": "form-group col-md-4"
+};
+
+var _hoisted_89 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Bill Posting "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
 }, "(Optional)")], -1
 /* HOISTED */
 );
 
-var _hoisted_51 = {
-  "class": "form-group col-md-4"
-};
-
-var _hoisted_52 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Payment Method "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-  "class": "text-danger ml-1"
-}, "*")], -1
-/* HOISTED */
-);
-
-var _hoisted_53 = {
-  "class": "d-flex align-items-center mt-2"
-};
-var _hoisted_54 = {
-  "class": "form-check mr-4"
-};
-
-var _hoisted_55 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-  "class": "form-check-label",
-  "for": "edit_cash"
-}, "Cash", -1
-/* HOISTED */
-);
-
-var _hoisted_56 = {
-  "class": "form-check"
-};
-
-var _hoisted_57 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-  "class": "form-check-label",
-  "for": "edit_bank"
-}, "Bank", -1
-/* HOISTED */
-);
-
-var _hoisted_58 = {
+var _hoisted_90 = {
   "class": "form-group col-md-12"
 };
 
-var _hoisted_59 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Narration "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+var _hoisted_91 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Narration "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "text-danger ml-1"
 }, "*")], -1
 /* HOISTED */
 );
 
-var _hoisted_60 = ["disabled"];
+var _hoisted_92 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Add = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Add");
 
@@ -100663,12 +101109,96 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "btn btn-primary"
   }, " Add Counter Expenses ", 8
   /* PROPS */
-  , _hoisted_9)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_17, _hoisted_18, _hoisted_19, _hoisted_20, _hoisted_21, _ctx.checkForSubmenuButtons('edit-counter-expenses') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_22, " Action")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.counterExpenses, function (single, i) {
+  , _hoisted_9)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+    onSubmit: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.fetchCounterExpenses && $options.fetchCounterExpenses.apply($options, arguments);
+    }, ["prevent"])),
+    "class": "mb-4"
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Cash Ledger "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [_hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+      return $data.filters.cash_id = $event;
+    }),
+    "class": "form-control form-select-sm"
+  }, [_hoisted_19, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.cashes, function (cash) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      key: cash.id,
+      value: cash.id
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(cash.name), 9
+    /* TEXT, PROPS */
+    , _hoisted_20);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))], 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.cash_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Bank Ledger "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [_hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+      return $data.filters.bank_id = $event;
+    }),
+    "class": "form-control form-select-sm"
+  }, [_hoisted_23, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.banks, function (bank) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      key: bank.id,
+      value: bank.id
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bank.name), 9
+    /* TEXT, PROPS */
+    , _hoisted_24);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))], 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.bank_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Category "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [_hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
+      return $data.filters.category_id = $event;
+    }),
+    "class": "form-control form-select-sm"
+  }, [_hoisted_27, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.categories, function (cat) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      key: cat.id,
+      value: cat.id
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(cat.name), 9
+    /* TEXT, PROPS */
+    , _hoisted_28);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))], 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.category_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Amount "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [_hoisted_30, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [_hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
+      return $data.filters.amount = $event;
+    }),
+    "class": "form-control",
+    onKeypress: _cache[5] || (_cache[5] = function ($event) {
+      return $options.isNumber($event);
+    }),
+    placeholder: "0.00"
+  }, null, 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.amount]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Narration "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [_hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+      return $data.filters.narration = $event;
+    }),
+    "class": "form-control form-select-sm",
+    placeholder: "Search description..."
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.narration]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Buttons "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-danger flex-fill mx-1",
+    onClick: _cache[7] || (_cache[7] = function () {
+      return $options.resetFilters && $options.resetFilters.apply($options, arguments);
+    })
+  }, [_hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Reset ")]), _hoisted_37])])])], 32
+  /* HYDRATE_EVENTS */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_39, [_hoisted_40, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.counterExpenses, function (single, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(i + 1), 1
     /* TEXT */
-    ), single.bill_post ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_23, [$options.isImage(single.bill_post) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Attachments "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [single.bill_post ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+      key: 0
+    }, [$options.isImage(single.bill_post) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
       key: 0,
       href: $data.API_URL + 'storage/' + single.bill_post,
       target: "_blank"
@@ -100682,32 +101212,35 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       alt: "Bill Image"
     }, null, 8
     /* PROPS */
-    , _hoisted_25)], 8
+    , _hoisted_42)], 8
     /* PROPS */
-    , _hoisted_24)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
+    , _hoisted_41)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
       key: 1,
       href: $data.API_URL + 'storage/' + single.bill_post,
       target: "_blank"
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.getFileName(single.bill_post)), 9
     /* TEXT, PROPS */
-    , _hoisted_26))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.amount), 1
+    , _hoisted_43))], 64
+    /* STABLE_FRAGMENT */
+    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+      key: 1
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" - ")], 64
+    /* STABLE_FRAGMENT */
+    ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.category ? single.category.name : "-"), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.payment_method), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Payments "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.cash_payment || 0), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.narration), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.bank_payment || 0), 1
     /* TEXT */
-    ), _ctx.checkForSubmenuButtons('edit-counter-expenses') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_27, [_ctx.checkForSubmenuButtons('edit-counter-expenses') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-      key: 0,
-      title: "Edit Expenses",
-      "data-target": '#' + $data.editFormID,
-      "data-toggle": "modal",
-      onClick: function onClick($event) {
-        return $options.edit(single);
-      },
-      "class": "text-light btn btn-primary mx-1"
-    }, _hoisted_30, 8
-    /* PROPS */
-    , _hoisted_28)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.total || 0), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Ledgers "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.cash_id ? $options.getCashName(single.cash_id) : "-"), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.bank_id ? $options.getBankName(single.bank_id) : "-"), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Category & Narration "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(single.narration), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Actions "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td v-if=\"checkForSubmenuButtons('edit-counter-expenses')\">\r\n                                                                <button title=\"Edit Expenses\"\r\n                                                                    :data-target=\"'#' + editFormID\" data-toggle=\"modal\"\r\n                                                                    @click=\"edit(single)\"\r\n                                                                    class=\"btn btn-primary text-light mx-1\">\r\n                                                                    <i class=\"far fa-edit\"></i>\r\n                                                                </button>\r\n                                                            </td> ")]);
   }), 128
   /* KEYED_FRAGMENT */
   ))])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Add, {
@@ -100721,58 +101254,112 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         type: "button",
         "class": "btn btn-primary",
         disabled: $data.loading,
-        onClick: _cache[7] || (_cache[7] = function ($event) {
+        onClick: _cache[19] || (_cache[19] = function ($event) {
           return $options.add();
         })
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Add Counter Expenses'), 9
       /* TEXT, PROPS */
-      , _hoisted_45)];
+      , _hoisted_67)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Amount "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [_hoisted_33, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        type: "text",
-        "class": "form-control",
-        placeholder: "Enter Specific Amount",
-        "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
-          return $data.data.amount = $event;
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+          return $data.data.category_id = $event;
         }),
-        onKeypress: _cache[2] || (_cache[2] = function ($event) {
+        "class": "form-control"
+      }, [_hoisted_47, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.categories, function (category) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          key: category.id,
+          value: category.id
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(category.name), 9
+        /* TEXT, PROPS */
+        , _hoisted_48);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.data.category_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Amount "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [_hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+          return $data.data.cash_payment = $event;
+        }),
+        onKeypress: _cache[11] || (_cache[11] = function ($event) {
           return $options.isNumber($event);
-        })
+        }),
+        "class": "form-control text-end",
+        placeholder: "Enter cash amount"
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.data.amount]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.data.cash_payment, void 0, {
+        number: true
+      }]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [_hoisted_52, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
+          return $data.data.bank_payment = $event;
+        }),
+        onKeypress: _cache[13] || (_cache[13] = function ($event) {
+          return $options.isNumber($event);
+        }),
+        min: "0",
+        "class": "form-control text-end",
+        placeholder: "Enter bank amount"
+      }, null, 544
+      /* HYDRATE_EVENTS, NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.data.bank_payment, void 0, {
+        number: true
+      }]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Total Payment "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [_hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
+          return $options.totalPayment = $event;
+        }),
+        "class": "form-control text-end fw-bold text-success",
+        readonly: ""
+      }, null, 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.totalPayment]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_55, [_hoisted_56, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         "class": "form-control",
         type: "file",
-        onChange: _cache[3] || (_cache[3] = function () {
+        onChange: _cache[15] || (_cache[15] = function () {
           return $options.handleBillPost && $options.handleBillPost.apply($options, arguments);
         })
       }, null, 32
       /* HYDRATE_EVENTS */
-      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Cash / Bank "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [_hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        "class": "form-check-input",
-        type: "radio",
-        id: "cash",
-        value: "cash",
-        "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
-          return $data.data.payment_method = $event;
-        })
-      }, null, 512
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Cash Ledger "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_58, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
+          return $data.data.cash_id = $event;
+        }),
+        "class": "form-control"
+      }, [_hoisted_59, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.cashes, function (cash) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          key: cash.id,
+          value: cash.id
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(cash.name), 9
+        /* TEXT, PROPS */
+        , _hoisted_60);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.data.payment_method]]), _hoisted_40]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_41, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        "class": "form-check-input",
-        type: "radio",
-        id: "bank",
-        value: "bank",
-        "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
-          return $data.data.payment_method = $event;
-        })
-      }, null, 512
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.data.cash_id]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Bank Ledger "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
+          return $data.data.bank_id = $event;
+        }),
+        "class": "form-control"
+      }, [_hoisted_63, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.banks, function (bank) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          key: bank.id,
+          value: bank.id
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bank.head_bank ? bank.head_bank.name : bank.name), 9
+        /* TEXT, PROPS */
+        , _hoisted_64);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.data.payment_method]]), _hoisted_42])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Narration "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [_hoisted_44, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.data.bank_id]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Narration "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_65, [_hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
         "class": "form-control",
         placeholder: "Describe Narration",
-        "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+        "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
           return $data.data.narration = $event;
         })
       }, null, 512
@@ -100784,7 +101371,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Edit, {
+  , ["errors", "success", "formID"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Edit, {
     heading: "Edit Counter Expenses",
     errors: $data.validationErrors,
     success: $data.success,
@@ -100795,58 +101382,109 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         type: "button",
         "class": "btn btn-primary",
         disabled: $data.loadingEdit,
-        onClick: _cache[14] || (_cache[14] = function ($event) {
+        onClick: _cache[29] || (_cache[29] = function ($event) {
           return $options.update();
         })
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loadingEdit ? 'Loading...' : 'Update Counter Expenses'), 9
       /* TEXT, PROPS */
-      , _hoisted_60)];
+      , _hoisted_92)];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Amount "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [_hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        type: "text",
-        "class": "form-control",
-        placeholder: "Enter Specific Amount",
-        "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
-          return $data.dataEdit.amount = $event;
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Expense Category "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_69, [_hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
+          return $data.dataEdit.category_id = $event;
         }),
-        onKeypress: _cache[9] || (_cache[9] = function ($event) {
+        "class": "form-control"
+      }, [_hoisted_71, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.categories, function (category) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          key: category.id,
+          value: category.id
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(category.name), 9
+        /* TEXT, PROPS */
+        , _hoisted_72);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataEdit.category_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Cash Payment "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [_hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
+          return $data.dataEdit.cash_payment = $event;
+        }),
+        onKeypress: _cache[22] || (_cache[22] = function ($event) {
           return $options.isNumber($event);
-        })
+        }),
+        "class": "form-control text-end",
+        placeholder: "Enter cash amount"
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.amount]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Bill Image "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [_hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        type: "file",
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.cash_payment, void 0, {
+        number: true
+      }]]), $data.dataEdit.cash_payment > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_75, [_hoisted_76, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
+          return $data.dataEdit.cash_id = $event;
+        }),
+        "class": "form-control"
+      }, [_hoisted_77, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.cashes, function (cash) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          key: cash.id,
+          value: cash.id
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(cash.name), 9
+        /* TEXT, PROPS */
+        , _hoisted_78);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataEdit.cash_id]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Bank Payment "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_79, [_hoisted_80, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        "onUpdate:modelValue": _cache[24] || (_cache[24] = function ($event) {
+          return $data.dataEdit.bank_payment = $event;
+        }),
+        onKeypress: _cache[25] || (_cache[25] = function ($event) {
+          return $options.isNumber($event);
+        }),
+        "class": "form-control text-end",
+        placeholder: "Enter bank amount"
+      }, null, 544
+      /* HYDRATE_EVENTS, NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.bank_payment, void 0, {
+        number: true
+      }]]), $data.dataEdit.bank_payment > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_81, [_hoisted_82, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "onUpdate:modelValue": _cache[26] || (_cache[26] = function ($event) {
+          return $data.dataEdit.bank_id = $event;
+        }),
+        "class": "form-control"
+      }, [_hoisted_83, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.banks, function (bank) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          key: bank.id,
+          value: bank.id
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bank.head_bank ? bank.head_bank.name : bank.name), 9
+        /* TEXT, PROPS */
+        , _hoisted_84);
+      }), 128
+      /* KEYED_FRAGMENT */
+      ))], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataEdit.bank_id]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Total Payment "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_85, [_hoisted_86, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        value: $options.totalPaymentEdit,
+        "class": "form-control text-end fw-bold text-success",
+        readonly: ""
+      }, null, 8
+      /* PROPS */
+      , _hoisted_87)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Bill Posting "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_88, [_hoisted_89, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         "class": "form-control",
-        onChange: _cache[10] || (_cache[10] = function () {
+        type: "file",
+        onChange: _cache[27] || (_cache[27] = function () {
           return $options.handleEditBillPost && $options.handleEditBillPost.apply($options, arguments);
         })
       }, null, 32
       /* HYDRATE_EVENTS */
-      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Show current bill if exists "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div v-if=\"dataEdit.bill_post\" class=\"mt-2\">\r\n                <a :href=\"API_URL + 'storage/' + dataEdit.bill_post\" target=\"_blank\">\r\n                    <img :src=\"API_URL + 'storage/' + dataEdit.bill_post\"\r\n                         style=\"width:100px;height:100px;object-fit:cover;\" alt=\"Bill Image\">\r\n                </a>\r\n            </div> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Payment Method "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [_hoisted_52, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        type: "radio",
-        "class": "form-check-input",
-        id: "edit_cash",
-        value: "cash",
-        "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
-          return $data.dataEdit.payment_method = $event;
-        })
-      }, null, 512
-      /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.payment_method]]), _hoisted_55]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        type: "radio",
-        "class": "form-check-input",
-        id: "edit_bank",
-        value: "bank",
-        "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
-          return $data.dataEdit.payment_method = $event;
-        })
-      }, null, 512
-      /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.payment_method]]), _hoisted_57])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Narration "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_58, [_hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Narration "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_90, [_hoisted_91, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
         "class": "form-control",
         placeholder: "Describe Narration",
-        "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
+        "onUpdate:modelValue": _cache[28] || (_cache[28] = function ($event) {
           return $data.dataEdit.narration = $event;
         })
       }, null, 512
