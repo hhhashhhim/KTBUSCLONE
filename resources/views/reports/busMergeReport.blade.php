@@ -238,7 +238,7 @@
 </span>
 
 
-<span>{{ $formattedTotal }}</span>
+<span>{{ $total }}</span>
 
                 </div>
             </div>
