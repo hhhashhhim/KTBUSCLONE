@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Expense\ExpenseCategory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,7 +20,10 @@ class CounterExpense extends Model
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }
-
+public function category()
+{
+    return $this->belongsTo(ExpenseCategory::class, 'category_id');
+}
     public function company()
     {
         return $this->hasOne(Company::class, 'id', 'company_id');
