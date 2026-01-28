@@ -234,12 +234,6 @@
   {{ number_format($data['expenses']->sum('amount')) - ($data['merges']->sum('net_cash') - $data['counterExpense']) }}
 @endif
 
-
-
-
-
-
-@endphp
 </span>
 
                 </div>
