@@ -184,7 +184,7 @@ class TransactionPdfController extends BaseController
                     $pdf->MultiCell(8, $narration_length, $i + 1, 1, 'L', 0, 0, '', '', true, 0, false, true, $narration_length, 'M');
                     
                     $head_name = strtoupper($transaction->account_head->name);
-                    $group = $transaction->account_head->level_three->name;
+                    $group = $transaction->account_head->level_four->name;
                     $code = $transaction->account_head->level_one->code.'-'.$transaction->account_head->level_two->code.'-'.$transaction->account_head->level_three->code.'-'.$transaction->account_head->level_four->code.'-'.$transaction->account_head->code;
                     $pdf->MultiCell(20, $narration_length,  $code, 'TBR', 'L', 0, 0, '', '', true, 0, false, true, $narration_length, 'M');
         

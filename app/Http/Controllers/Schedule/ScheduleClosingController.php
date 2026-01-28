@@ -16,6 +16,7 @@ use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\TerminalCommission;
 use App\Models\ActivityLog;
+use App\Models\CounterExpense;
 use App\Models\Expense\TicketMergeExpense;
 use App\Models\Schedule\TicketClosing;
 use App\Models\Schedule\TicketClosingMember;
@@ -303,7 +304,7 @@ class ScheduleClosingController extends Controller
         $mergeIds = $request->mergeIds;
 
         // Get closing pairs with schedule in a single query
-          $closingPairsOne = TicketClosing::with('schedule:id,route_id')
+        $closingPairsOne = TicketClosing::with('schedule:id,route_id')
             ->where('company_id', $companyId)
             ->where('ticket_merge_id', $mergeIds[0])
             ->first();
@@ -312,8 +313,8 @@ class ScheduleClosingController extends Controller
             ->where('company_id', $companyId)
             ->where('ticket_merge_id', $mergeIds[1])
             ->first();
-        
-        $closingPairs = TicketClosing::with('schedule:id,route_id','schedule.route')
+
+        $closingPairs = TicketClosing::with('schedule:id,route_id', 'schedule.route')
             ->where('company_id', $companyId)
             ->whereIn('ticket_merge_id', $mergeIds)
             ->get();
@@ -884,7 +885,7 @@ class ScheduleClosingController extends Controller
                 $totalOnlineSale = $group->sum('total_receivable');
                 $totalOtherCommission = $group->sum('kt_commission');
                 $totalKtCommission = $group->sum('other_commission');
-                $totalExpense += $totalKtCommission + $totalOtherCommission; 
+                $totalExpense += $totalKtCommission + $totalOtherCommission;
 
                 $data = [
                     'bus_no'   => $first->bus->bus_number ?? 'N/A',
@@ -897,9 +898,9 @@ class ScheduleClosingController extends Controller
                 // Step 2: Map the online terminal names and track their total
                 foreach ($dynamicTypes as $terminalName) {
                     $amount = $onlineGroup->where('terminal.name', $terminalName)->sum('total_receivable');
-                    
+
                     $data['types'][$terminalName] = $amount;
-                    $totalOnlinePortalsAmount += $amount; 
+                    $totalOnlinePortalsAmount += $amount;
                 }
 
                 // Step 3: Calculate Net Cash
@@ -910,20 +911,24 @@ class ScheduleClosingController extends Controller
             })
             ->values();
 
-     $creditExpenses = TicketMergeExpense::with('expense_category:id,name')
-        ->whereColumn('amount', '!=', 'paid') // Compare two columns in the same row
-        ->whereIn('ticket_merge_id', $merges)
-        ->whereHas('expense_category', function($query) {
-            $query->where('include_in_closing', '1');
-        })
-        ->get();
+        $creditExpenses = TicketMergeExpense::with('expense_category:id,name')
+            ->whereColumn('amount', '!=', 'paid') // Compare two columns in the same row
+            ->whereIn('ticket_merge_id', $merges)
+            ->whereHas('expense_category', function ($query) {
+                $query->where('include_in_closing', '1');
+            })
+            ->get();
+        $merge = TicketClosingMerge::whereIn('id', $merges)->first();
+        $counterExpense = CounterExpense::whereDate('created_at', $merge->closing_date)->sum('total');
+
 
 
         $data = [
             'dynamicTypes' => $dynamicTypes,
             "merges" => $mappedResults,
             "closing_date" => $request->closing_date,
-            "expenses"      => $creditExpenses
+            "expenses"      => $creditExpenses,
+            "counterExpense"      => $counterExpense
         ];
 
         return view('reports.busMergeReport', ['data' => $data]);
