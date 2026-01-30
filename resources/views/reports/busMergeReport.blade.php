@@ -95,6 +95,9 @@
             font-size: 11pt;
             border-bottom: 1px dotted #ccc;
         }
+        .summary-row span {
+            font-size: 11px !important;
+        }
     </style>
     <title>Daily Summary Report</title>
 </head>
