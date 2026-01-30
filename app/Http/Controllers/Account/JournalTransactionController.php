@@ -25,6 +25,7 @@ class JournalTransactionController extends BaseController
 {
     public function journalTransactions(Request $request)
     {
+       
         // dropdown data
         $terminals = Terminal::where(["company_id"=>Auth::user()->company_id])->get(["id","name"]);
         $heads = AccountHead::with('level_four:id,name')
@@ -38,26 +39,36 @@ class JournalTransactionController extends BaseController
         });
        
         // main page data
-        $journalTransactions = AccountTransaction::
-        where(["company_id"=>Auth::user()->company_id])
-        ->where("type","JV")
-        ->orderBy("id",'DESC')
-        ->get()
-        ->groupBy('document_id')
-        ->map(function ($group) {
-            return [
-                'id' => $group->first()->id,
-                'document_id' => $group->first()->document_id ?? null,
-                'cash_name' => $group->first()->account_head->name ?? 'N/A',
-                'terminal' => $group->first()->terminal->name ?? 'N/A',
-                'amount' => $group->sum("debit"),
-                'added_by' => $group->first()->added_by_name->name ?? 'N/A',
-                'type' => $group->first()->type,
-                'approved' => $group->first()->approved,
-                'approved_by' => $group->first()->approved_by_name->name ?? 'N/A',
-                'posted_date' => date("H:i d/m/Y",strtotime($group->first()->created_at)),
-            ];
-        })->values();
+        $journalTransactions = AccountTransaction::with([
+        'account_head:id,name',
+        'terminal:id,name',
+        'added_by_name:id,name',
+        'approved_by_name:id,name'
+    ])
+    ->where("company_id", Auth::user()->company_id)
+    ->where("type", "JV")
+    ->orderBy("id", 'DESC')
+    ->limit(20)
+    ->get()
+    ->groupBy('document_id')
+    ->map(function ($group) {
+
+        $first = $group->first();
+
+        return [
+            'id' => $first->id,
+            'document_id' => $first->document_id ?? null,
+            'cash_name' => optional($first->account_head)->name ?? 'N/A',
+            'terminal' => optional($first->terminal)->name ?? 'N/A',
+            'amount' => $group->sum("debit"),
+            'added_by' => optional($first->added_by_name)->name ?? 'N/A',
+            'type' => $first->type,
+            'approved' => $first->approved,
+            'approved_by' => optional($first->approved_by_name)->name ?? 'N/A',
+            'posted_date' => date("H:i d/m/Y", strtotime($first->created_at)),
+        ];
+    })->values();
+
 
         return [
             "terminals" => $terminals,
