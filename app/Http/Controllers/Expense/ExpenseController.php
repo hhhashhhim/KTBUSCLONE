@@ -172,82 +172,134 @@ class ExpenseController extends Controller
     }
 
 
-    public function dailySummery(Request $request)
-    {
+    // public function dailySummery(Request $request)
+    // {
         
-        if(!checkPermissionButtons("add-expense"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
-        $closing_pair = TicketClosing::with("schedule")->where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->get();
-        $data = (object)[];
+    //     if(!checkPermissionButtons("add-expense"))
+    //     {
+    //         return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+    //     }
+    //     $closing_pair = TicketClosing::with("schedule")->where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->get();
+    //     $data = (object)[];
         
-        $data->schedule_start = Ticket::withTrashed()
-            ->where(function ($query) {
-                $query->where("type", "booked")
-                      ->orWhere("type", "over-issue");
-                })
-            ->with("elt")->with(["commission"=>function($q) use ($closing_pair){
-            $q->where("route_id",$closing_pair[0]->schedule->route_id);
-        }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[0]->id)->with('terminal:id,name')->get()->groupBy(['terminal_id']);
+    //     $data->schedule_start = Ticket::withTrashed()
+    //         ->where(function ($query) {
+    //             $query->where("type", "booked")
+    //                   ->orWhere("type", "over-issue");
+    //             })
+    //         ->with("elt")->with(["commission"=>function($q) use ($closing_pair){
+    //         $q->where("route_id",$closing_pair[0]->schedule->route_id);
+    //     }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[0]->id)->with('terminal:id,name')->get()->groupBy(['terminal_id']);
 
-        $data->schedule_return = Ticket:: withTrashed()
-            ->where(function ($query) {
-                $query->where("type", "booked")
-                      ->orWhere("type", "over-issue");
-                })
-            ->with("elt")->with(["commission"=>function($q) use ($closing_pair){
-            $q->where("route_id",$closing_pair[1]->schedule->route_id);
-        }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[1]->id)->with('terminal:id,name')->get()->groupBy(['terminal_id']);
+    //     $data->schedule_return = Ticket:: withTrashed()
+    //         ->where(function ($query) {
+    //             $query->where("type", "booked")
+    //                   ->orWhere("type", "over-issue");
+    //             })
+    //         ->with("elt")->with(["commission"=>function($q) use ($closing_pair){
+    //         $q->where("route_id",$closing_pair[1]->schedule->route_id);
+    //     }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[1]->id)->with('terminal:id,name')->get()->groupBy(['terminal_id']);
     
-        $data->expense = TicketMergeExpense::where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->with("expense_category:id,name")->get();
+    //     $data->expense = TicketMergeExpense::where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->with("expense_category:id,name")->get();
 
-        // get bus number
-        $busId = TicketClosingMerge::where("id", $request->ticket_merge_id)->first()->bus_id;
-        $singleData = (object)[];
-        $singleData->bus_number = Bus::where(["company_id" => Auth::user()->company_id, "id" => $busId])->first()->bus_number;
-        // get route both side
-        $schedule_ids = TicketClosing::where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->pluck('schedule_id');
-        $schedule = Schedule::where(["company_id" => Auth::user()->company_id])->whereIn("id", $schedule_ids)->with("route")->get();
-        $singleData->city_one = explode("-", $schedule[0]->route->name)[0];
-        $singleData->city_two = explode("-", $schedule[1]->route->name ?? $schedule[0]->route->name)[0];
+    //     // get bus number
+    //     $busId = TicketClosingMerge::where("id", $request->ticket_merge_id)->first()->bus_id;
+    //     $singleData = (object)[];
+    //     $singleData->bus_number = Bus::where(["company_id" => Auth::user()->company_id, "id" => $busId])->first()->bus_number;
+    //     // get route both side
+    //     $schedule_ids = TicketClosing::where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->pluck('schedule_id');
+    //     $schedule = Schedule::where(["company_id" => Auth::user()->company_id])->whereIn("id", $schedule_ids)->with("route")->get();
+    //     $singleData->city_one = explode("-", $schedule[0]->route->name)[0];
+    //     $singleData->city_two = explode("-", $schedule[1]->route->name ?? $schedule[0]->route->name)[0];
 
-        // refund amount
-        $cancelTicket = Ticket::
-            onlyTrashed()
-            ->where([
-                'company_id' => Auth::user()->company_id,
-                'ticket_merge_id' => $request->ticket_merge_id,
-                'type' => "canceled",
-            ])
-            ->with("cancel_ticket:id,ticket_id,percentage","terminal:id,name")
-            ->get(["id","seat_fare","discount","terminal_id"])->groupBy("terminal_id");
+    //     // refund amount
+    //     $cancelTicket = Ticket::
+    //         onlyTrashed()
+    //         ->where([
+    //             'company_id' => Auth::user()->company_id,
+    //             'ticket_merge_id' => $request->ticket_merge_id,
+    //             'type' => "canceled",
+    //         ])
+    //         ->with("cancel_ticket:id,ticket_id,percentage","terminal:id,name")
+    //         ->get(["id","seat_fare","discount","terminal_id"])->groupBy("terminal_id");
 
-        $refundTerminal = [];
-        $cancelTicket->map(function($single) use (&$refundTerminal){
+    //     $refundTerminal = [];
+    //     $cancelTicket->map(function($single) use (&$refundTerminal){
             
-            $refundAmount = 0;
-            $single->map(function($ticket) use (&$refundAmount){
+    //         $refundAmount = 0;
+    //         $single->map(function($ticket) use (&$refundAmount){
             
-                if($ticket->cancel_ticket)
-                {
-                    $refundAmount += (($ticket->seat_fare - $ticket->discount) / 100) * $ticket->cancel_ticket->percentage;
-                }
-            });
-            $singleTerminal = [];
-            $singleTerminal["terminal"] = $single[0]->terminal->name;
-            $singleTerminal["amount"] = $refundAmount;
+    //             if($ticket->cancel_ticket)
+    //             {
+    //                 $refundAmount += (($ticket->seat_fare - $ticket->discount) / 100) * $ticket->cancel_ticket->percentage;
+    //             }
+    //         });
+    //         $singleTerminal = [];
+    //         $singleTerminal["terminal"] = $single[0]->terminal->name;
+    //         $singleTerminal["amount"] = $refundAmount;
 
-            $refundTerminal[] = $singleTerminal;
-        });
+    //         $refundTerminal[] = $singleTerminal;
+    //     });
         
 
-        return view('reports.dailySaleReport', [
-            "singleData" => $singleData,
-            "data" => $data,
-            "refundTerminal" => $refundTerminal
-        ]);
+    //     return view('reports.dailySaleReport', [
+    //         "singleData" => $singleData,
+    //         "data" => $data,
+    //         "refundTerminal" => $refundTerminal
+    //     ]);
+    // }
+public function dailySummery(Request $request)
+{
+    if (!checkPermissionButtons("add-expense")) {
+        return response()->json(["Error" => ['You are not authorized to access this url']], 403);
     }
+
+    // Get closing record
+    $singleData = TicketClosingMerge::where([
+            "company_id" => Auth::user()->company_id,
+            "id" => $request->ticket_merge_id
+        ])
+        ->first();
+
+    if (!$singleData) {
+        return back()->with('error', 'Ticket Closing not found.');
+    }
+
+    // ================= START SHORTAGES =================
+    $startShortages = TicketClosingShortage::with('terminal')
+        ->where('ticket_closing_id', $singleData->id)
+        ->where('type', 'start')
+        ->get();
+        
+        // ================= RETURN SHORTAGES =================
+        $returnShortages = TicketClosingShortage::with('terminal')
+        ->where('ticket_closing_id', $singleData->id)
+        ->where('type', 'return')
+        ->get();
+        
+        // ================= EXPENSES =================
+        $expenses = TicketMergeExpense::with('expense_category')
+        ->where('ticket_merge_id', $singleData->id)
+        ->get();
+        
+        $KtCommssion = TicketClosingShortage::where('ticket_closing_id', $singleData->id)
+            ->sum('kt_commission');
+        $OtherCommssion = TicketClosingShortage::where('ticket_closing_id', $singleData->id)
+            ->sum('other_commission');
+    // Keep old $data object if needed somewhere else
+    $data = (object)[];
+
+    return view('reports.dailySaleReport', [
+        "data" => $data,
+        "singleData" => $singleData,
+        "startShortages" => $startShortages,
+        "returnShortages" => $returnShortages,
+        "expenses" => $expenses,
+        "KtCommssion" => $KtCommssion,
+        "OtherCommssion" => $OtherCommssion,
+    ]);
+}
+
 
     public function officeExpenses(Request $request)
     {
