@@ -250,12 +250,13 @@ class ExpenseController extends Controller
     // }
 public function dailySummery(Request $request)
 {
+
     if (!checkPermissionButtons("add-expense")) {
         return response()->json(["Error" => ['You are not authorized to access this url']], 403);
     }
 
     // Get closing record
-    $singleData = TicketClosingMerge::where([
+    $singleData = TicketClosingMerge::with('bus','closing.schedule.route')->where([
             "company_id" => Auth::user()->company_id,
             "id" => $request->ticket_merge_id
         ])
@@ -266,7 +267,7 @@ public function dailySummery(Request $request)
     }
 
     // ================= START SHORTAGES =================
-    $startShortages = TicketClosingShortage::with('terminal')
+    $startShortages = TicketClosingShortage::with('terminal', 'bus')
         ->where('ticket_closing_id', $singleData->id)
         ->where('type', 'start')
         ->get();

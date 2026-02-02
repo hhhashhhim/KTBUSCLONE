@@ -64,9 +64,18 @@
             <th class="centerTH">Date</th>
             <th class="fontWightTh">{{ now()->subDays(1)->format("d-M-Y") }}</th>
             <th class="centerTH">Bus No</th>
-            <th class="fontWightTh">{{ $singleData->bus_number }}</th>
+            <th class="fontWightTh">{{ $singleData->bus->bus_number }}</th>
             <th class="centerTH">Route</th>
-            <th class="fontWightTh">{{ $singleData->city_one . ' - ' . $singleData->city_two }}</th>
+@php
+    $departure = $singleData->closing->first();
+    $return = $singleData->closing->skip(1)->first();
+@endphp
+
+<th class="fontWightTh">
+    {{ $departure?->schedule?->route?->name }}
+    →
+    {{ $return?->schedule?->route?->name }}
+</th>
         </tr>
     </table>
 
