@@ -267,13 +267,13 @@ public function dailySummery(Request $request)
     }
 
     // ================= START SHORTAGES =================
-    $startShortages = TicketClosingShortage::with('terminal', 'bus')
+    $startShortages = TicketClosingShortage::with('terminal', 'bus', 'route')
         ->where('ticket_closing_id', $singleData->id)
         ->where('type', 'start')
         ->get();
         
         // ================= RETURN SHORTAGES =================
-        $returnShortages = TicketClosingShortage::with('terminal')
+        $returnShortages = TicketClosingShortage::with('terminal' , 'route')
         ->where('ticket_closing_id', $singleData->id)
         ->where('type', 'return')
         ->get();
@@ -287,6 +287,8 @@ public function dailySummery(Request $request)
             ->sum('kt_commission');
         $OtherCommssion = TicketClosingShortage::where('ticket_closing_id', $singleData->id)
             ->sum('other_commission');
+            $start = $singleData->closing->first()?->schedule?->route;
+            $return = $singleData->closing->skip(1)->first()?->schedule?->route;
     // Keep old $data object if needed somewhere else
     $data = (object)[];
 
@@ -295,6 +297,8 @@ public function dailySummery(Request $request)
         "singleData" => $singleData,
         "startShortages" => $startShortages,
         "returnShortages" => $returnShortages,
+        "start" => $start,
+        "return" => $return,
         "expenses" => $expenses,
         "KtCommssion" => $KtCommssion,
         "OtherCommssion" => $OtherCommssion,

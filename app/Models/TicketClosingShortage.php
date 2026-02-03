@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Account\Bank;
 use App\Models\Bus\Bus;
+use App\Models\Route\Route;
 use App\Models\Schedule\TicketClosing;
 use App\Models\Schedule\TicketClosingMerge;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -50,7 +51,10 @@ class TicketClosingShortage extends Model
     {
         return $this->belongsTo(Bus::class);
     }
-
+  public function route()
+    {
+        return $this->hasOne(Route::class, 'id', 'route_id');
+    }
     public function bank()
     {
         return $this->belongsTo(Bank::class);

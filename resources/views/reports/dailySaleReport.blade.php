@@ -66,15 +66,11 @@
             <th class="centerTH">Bus No</th>
             <th class="fontWightTh">{{ $singleData->bus->bus_number }}</th>
             <th class="centerTH">Route</th>
-@php
-    $departure = $singleData->closing->first();
-    $return = $singleData->closing->skip(1)->first();
-@endphp
 
 <th class="fontWightTh">
-    {{ $departure?->schedule?->route?->name }}
+    {{ $start?->name }}
     →
-    {{ $return?->schedule?->route?->name }}
+    {{ $return?->name }}
 </th>
         </tr>
     </table>
