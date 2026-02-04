@@ -171,7 +171,7 @@
           <div class="card py-2">
             <div class="card-header justify-content-between">
               <h5>Terminal Details</h5>
-              <button type="button" class="btn btn-print mr-4" @click="add">
+              <button type="button" class="btn btn-print mr-4" @click="print">
                 <span> <i class="fas fa-print mr-2"></i> Print </span>
               </button>
             </div>
@@ -835,6 +835,37 @@ export default {
       );
       this.netProfit = this.totalSale - this.totalAmount;
     },
+    async print() {
+  if (
+    !this.postData.ticket_merge_id ||
+    this.postData.category.length == 0 ||
+    this.postData.description.length == 0 ||
+    this.postData.amount.length == 0
+  ) {
+    return;
+  }
+
+  for (var i = 0; i < this.postData.category.length; i++) {
+    if (
+      !this.postData.category[i] ||
+      !this.postData.description[i] ||
+      !this.postData.amount[i]
+    ) {
+      return;
+    }
+  }
+
+  try {
+    if (this.$refs.refDailySummaryReport) {
+      this.$refs.refDailySummaryReport.submit();
+    }
+
+    // ❌ DO NOT RESET HERE for print
+
+  } catch (error) {
+    console.error("Print error:", error);
+  }
+},
     async add() {
       // validation for empty data
       if (
@@ -1310,32 +1341,56 @@ export default {
   padding: 10px 26px;
   font-weight: 600;
   font-size: 14px;
-  background: #000000;
-  color: #fff;
+  background: #000000 !important;
+  color: #fff !important;
+  border: 2px solid #000000 !important;
 
-  /* background: transparent; */
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
+/* Hover */
 .btn-print:hover:not(:disabled) {
-  color: #000000;
-  border: 2px solid #000000;
+  background: #000000 !important;
+  color: #fff !important;
+  border: 2px solid #000000 !important;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35) !important;
 }
 
+/* Focus */
+.btn-print:focus,
+.btn-print:focus-visible {
+  background: #000000 !important;
+  color: #fff !important;
+  border-color: #000000 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Active */
+.btn-print:active,
+.btn-print.active,
 .btn-print:active:not(:disabled) {
-  transform: scale(0.96);
+  background: #000000 !important;
+  color: #fff !important;
+  border-color: #000000 !important;
+  box-shadow: none !important;
+  transform: scale(0.95);
 }
 
+/* Disabled */
 .btn-print:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  box-shadow: none;
+  box-shadow: none !important;
+  transform: none;
 }
+
 
 .btn-loading {
   display: inline-flex;

@@ -47388,11 +47388,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, 0);
       this.netProfit = this.totalSale - this.totalAmount;
     },
-    add: function add() {
+    print: function print() {
       var _this7 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        var i, res;
+        var i;
         return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
@@ -47402,12 +47402,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
-                  title: "Error",
-                  text: "Please Fill All Field",
-                  icon: "error",
-                  timer: 2000
-                }));
+                return _context6.abrupt("return");
 
               case 2:
                 i = 0;
@@ -47423,7 +47418,67 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   break;
                 }
 
-                return _context6.abrupt("return", swal({
+                return _context6.abrupt("return");
+
+              case 6:
+                i++;
+                _context6.next = 3;
+                break;
+
+              case 9:
+                try {
+                  if (_this7.$refs.refDailySummaryReport) {
+                    _this7.$refs.refDailySummaryReport.submit();
+                  } // ❌ DO NOT RESET HERE for print
+
+                } catch (error) {
+                  console.error("Print error:", error);
+                }
+
+              case 10:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6);
+      }))();
+    },
+    add: function add() {
+      var _this8 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+        var i, res;
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                if (!(!_this8.postData.ticket_merge_id || _this8.postData.category.length == 0 || _this8.postData.description.length == 0 || _this8.postData.amount.length == 0)) {
+                  _context7.next = 2;
+                  break;
+                }
+
+                return _context7.abrupt("return", swal({
+                  title: "Error",
+                  text: "Please Fill All Field",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 2:
+                i = 0;
+
+              case 3:
+                if (!(i < _this8.postData.category.length)) {
+                  _context7.next = 9;
+                  break;
+                }
+
+                if (!(!_this8.postData.category[i] || !_this8.postData.description[i] || !_this8.postData.amount[i])) {
+                  _context7.next = 6;
+                  break;
+                }
+
+                return _context7.abrupt("return", swal({
                   title: "Error",
                   text: "Please Fill All Field Or Remove Extra",
                   icon: "error",
@@ -47432,26 +47487,26 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 6:
                 i++;
-                _context6.next = 3;
+                _context7.next = 3;
                 break;
 
               case 9:
-                _this7.loading = true;
-                _context6.next = 12;
-                return _this7.callApi("post", "expenses/store", _this7.postData);
+                _this8.loading = true;
+                _context7.next = 12;
+                return _this8.callApi("post", "expenses/store", _this8.postData);
 
               case 12:
-                res = _context6.sent;
+                res = _context7.sent;
 
                 if (res.status === 200) {
-                  _this7.loading = false; // $('#expense').DataTable().destroy();
+                  _this8.loading = false; // $('#expense').DataTable().destroy();
 
-                  _this7.postData.category = [];
-                  _this7.postData.description = [];
-                  _this7.postData.amount = [];
-                  _this7.postData.invoice = [];
-                  _this7.loop = 0;
-                  _this7.editAble = true;
+                  _this8.postData.category = [];
+                  _this8.postData.description = [];
+                  _this8.postData.amount = [];
+                  _this8.postData.invoice = [];
+                  _this8.loop = 0;
+                  _this8.editAble = true;
                   swal({
                     title: "Success",
                     text: "Expense Saved",
@@ -47459,15 +47514,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this7.$refs.refDailySummaryReport.submit();
+                  _this8.$refs.refDailySummaryReport.submit();
 
-                  _this7.fetchData();
+                  _this8.fetchData();
 
-                  _this7.existingExpenses();
+                  _this8.existingExpenses();
 
-                  _this7.loading = false;
+                  _this8.loading = false;
                 } else {
-                  _this7.loading = false;
+                  _this8.loading = false;
 
                   if (res.status == 422) {
                     (function () {
@@ -47493,27 +47548,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 14:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
           }
-        }, _callee6);
+        }, _callee7);
       }))();
     },
     updateAccount: function updateAccount() {
-      var _this8 = this;
+      var _this9 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
-                if (_this8.postData.ticket_merge_id) {
-                  _context7.next = 2;
+                if (_this9.postData.ticket_merge_id) {
+                  _context8.next = 2;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context8.abrupt("return", swal({
                   title: "Error",
                   text: "Something is missing please refresh page",
                   icon: "error",
@@ -47521,28 +47576,28 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 2:
-                _this8.loading = true;
-                _context7.next = 5;
-                return _this8.callApi("post", "accounts/closing/update", {
-                  ticket_merge_id: _this8.postData.ticket_merge_id
+                _this9.loading = true;
+                _context8.next = 5;
+                return _this9.callApi("post", "accounts/closing/update", {
+                  ticket_merge_id: _this9.postData.ticket_merge_id
                 });
 
               case 5:
-                res = _context7.sent;
+                res = _context8.sent;
 
                 if (res.status === 200) {
-                  _this8.loading = false;
+                  _this9.loading = false;
 
-                  _this8.closeModal();
+                  _this9.closeModal();
 
-                  _this8.postData.category = [];
-                  _this8.postData.description = [];
-                  _this8.postData.amount = [];
-                  _this8.postData.invoice = [];
-                  _this8.loop = 0;
-                  _this8.editAble = true;
+                  _this9.postData.category = [];
+                  _this9.postData.description = [];
+                  _this9.postData.amount = [];
+                  _this9.postData.invoice = [];
+                  _this9.loop = 0;
+                  _this9.editAble = true;
 
-                  _this8.existingExpenses();
+                  _this9.existingExpenses();
 
                   swal({
                     title: "Success",
@@ -47550,9 +47605,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     icon: "success",
                     timer: 2000
                   });
-                  _this8.loading = false;
+                  _this9.loading = false;
                 } else {
-                  _this8.loading = false;
+                  _this9.loading = false;
 
                   if (res.status == 422) {
                     (function () {
@@ -47578,10 +47633,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 7:
               case "end":
-                return _context7.stop();
+                return _context8.stop();
             }
           }
-        }, _callee7);
+        }, _callee8);
       }))();
     }
   },
@@ -47642,14 +47697,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, 0);
     },
     balances: function balances() {
-      var _this9 = this;
+      var _this10 = this;
 
       return this.postData.amount.map(function (amt, index) {
-        var paid = _this9.postData.paid[index] || 0; // Clamp paid so it never exceeds amount
+        var paid = _this10.postData.paid[index] || 0; // Clamp paid so it never exceeds amount
 
         if (paid > amt) {
           paid = amt;
-          _this9.postData.paid[index] = paid;
+          _this10.postData.paid[index] = paid;
         }
 
         return amt - paid;
@@ -102598,7 +102653,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     type: "button",
     "class": "btn btn-print mr-4",
     onClick: _cache[2] || (_cache[2] = function () {
-      return $options.add && $options.add.apply($options, arguments);
+      return $options.print && $options.print.apply($options, arguments);
     })
   }, _hoisted_70)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [_hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_75, [_hoisted_76, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.startShortages, function (item, index) {
     var _item$terminal, _item$bank;
@@ -146566,7 +146621,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.trip-card[data-v-8c8f9452] {\r\n  border: none;\r\n  border-radius: 16px;\r\n  background: #fff;\r\n  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);\r\n  transition: all 0.3s ease;\r\n  position: relative;\r\n  overflow: hidden;\n}\n.trip-card[data-v-8c8f9452]::before {\r\n  content: \"\";\r\n  height: 6px;\r\n  width: 100%;\r\n  position: absolute;\r\n  top: 0;\r\n  left: 0;\n}\n.trip-card.departure[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #28a745, #6fdf9f);\n}\n.trip-card.return[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #007bff, #5aa9ff);\n}\n.trip-card[data-v-8c8f9452]:hover {\r\n  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);\n}\n.trip-header[data-v-8c8f9452] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 10px;\r\n  font-size: 15px;\r\n  font-weight: 600;\r\n  color: #555;\r\n  margin-bottom: 12px;\n}\n.trip-header i[data-v-8c8f9452] {\r\n  font-size: 18px;\n}\n.bus-number[data-v-8c8f9452] {\r\n  font-size: 22px;\r\n  font-weight: 700;\r\n  color: #222;\r\n  margin-bottom: 15px;\n}\n.trip-info[data-v-8c8f9452] {\r\n  list-style: none;\r\n  padding: 0;\r\n  margin: 0;\n}\n.trip-info li[data-v-8c8f9452] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 10px;\r\n  font-size: 14px;\r\n  margin-bottom: 0px;\r\n  color: #444;\n}\n.trip-info i[data-v-8c8f9452] {\r\n  font-size: 15px;\n}\n.stat-card[data-v-8c8f9452] {\r\n  border: none;\r\n  border-radius: 14px;\r\n  background: #fff;\r\n  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);\r\n  transition: all 0.3s ease;\r\n  position: relative;\r\n  overflow: hidden;\n}\n.stat-card[data-v-8c8f9452]::before {\r\n  content: \"\";\r\n  position: absolute;\r\n  top: 0;\r\n  left: 0;\r\n  height: 6px;\r\n  width: 100%;\n}\n.stat-card.info[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #17a2b8, #6fd6e8);\n}\n.stat-card.danger[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #dc3545, #ff7b89);\n}\n.stat-card.success[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #28a745, #7be495);\n}\n.stat-card.primary[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #007bff, #6aa9ff);\n}\n.stat-card.warning[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #ffc107, #ffe083);\n}\n.stat-card[data-v-8c8f9452]:hover {\r\n  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);\n}\n.stat-header[data-v-8c8f9452] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 10px;\r\n  font-size: 14px;\r\n  font-weight: 600;\r\n  color: #666;\r\n  margin-bottom: 10px;\n}\n.stat-header i[data-v-8c8f9452] {\r\n  font-size: 18px;\n}\n.stat-value[data-v-8c8f9452] {\r\n  font-size: 22px;\r\n  font-weight: 700;\r\n  color: #222;\r\n  margin: 0;\n}\n.btn-print[data-v-8c8f9452] {\r\n  border-radius: 50px;\r\n  padding: 10px 26px;\r\n  font-weight: 600;\r\n  font-size: 14px;\r\n  background: #000000;\r\n  color: #fff;\r\n\r\n  /* background: transparent; */\r\n  transition: all 0.3s ease;\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\n}\n.btn-print[data-v-8c8f9452]:hover:not(:disabled) {\r\n  color: #000000;\r\n  border: 2px solid #000000;\r\n  transform: translateY(-2px);\r\n  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);\n}\n.btn-print[data-v-8c8f9452]:active:not(:disabled) {\r\n  transform: scale(0.96);\n}\n.btn-print[data-v-8c8f9452]:disabled {\r\n  opacity: 0.6;\r\n  cursor: not-allowed;\r\n  box-shadow: none;\n}\n.btn-loading[data-v-8c8f9452] {\r\n  display: inline-flex;\r\n  align-items: center;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.trip-card[data-v-8c8f9452] {\r\n  border: none;\r\n  border-radius: 16px;\r\n  background: #fff;\r\n  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);\r\n  transition: all 0.3s ease;\r\n  position: relative;\r\n  overflow: hidden;\n}\n.trip-card[data-v-8c8f9452]::before {\r\n  content: \"\";\r\n  height: 6px;\r\n  width: 100%;\r\n  position: absolute;\r\n  top: 0;\r\n  left: 0;\n}\n.trip-card.departure[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #28a745, #6fdf9f);\n}\n.trip-card.return[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #007bff, #5aa9ff);\n}\n.trip-card[data-v-8c8f9452]:hover {\r\n  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);\n}\n.trip-header[data-v-8c8f9452] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 10px;\r\n  font-size: 15px;\r\n  font-weight: 600;\r\n  color: #555;\r\n  margin-bottom: 12px;\n}\n.trip-header i[data-v-8c8f9452] {\r\n  font-size: 18px;\n}\n.bus-number[data-v-8c8f9452] {\r\n  font-size: 22px;\r\n  font-weight: 700;\r\n  color: #222;\r\n  margin-bottom: 15px;\n}\n.trip-info[data-v-8c8f9452] {\r\n  list-style: none;\r\n  padding: 0;\r\n  margin: 0;\n}\n.trip-info li[data-v-8c8f9452] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 10px;\r\n  font-size: 14px;\r\n  margin-bottom: 0px;\r\n  color: #444;\n}\n.trip-info i[data-v-8c8f9452] {\r\n  font-size: 15px;\n}\n.stat-card[data-v-8c8f9452] {\r\n  border: none;\r\n  border-radius: 14px;\r\n  background: #fff;\r\n  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);\r\n  transition: all 0.3s ease;\r\n  position: relative;\r\n  overflow: hidden;\n}\n.stat-card[data-v-8c8f9452]::before {\r\n  content: \"\";\r\n  position: absolute;\r\n  top: 0;\r\n  left: 0;\r\n  height: 6px;\r\n  width: 100%;\n}\n.stat-card.info[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #17a2b8, #6fd6e8);\n}\n.stat-card.danger[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #dc3545, #ff7b89);\n}\n.stat-card.success[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #28a745, #7be495);\n}\n.stat-card.primary[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #007bff, #6aa9ff);\n}\n.stat-card.warning[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #ffc107, #ffe083);\n}\n.stat-card[data-v-8c8f9452]:hover {\r\n  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);\n}\n.stat-header[data-v-8c8f9452] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 10px;\r\n  font-size: 14px;\r\n  font-weight: 600;\r\n  color: #666;\r\n  margin-bottom: 10px;\n}\n.stat-header i[data-v-8c8f9452] {\r\n  font-size: 18px;\n}\n.stat-value[data-v-8c8f9452] {\r\n  font-size: 22px;\r\n  font-weight: 700;\r\n  color: #222;\r\n  margin: 0;\n}\n.btn-print[data-v-8c8f9452] {\r\n  border-radius: 50px;\r\n  padding: 10px 26px;\r\n  font-weight: 600;\r\n  font-size: 14px;\r\n  background: #000000 !important;\r\n  color: #fff !important;\r\n  border: 2px solid #000000 !important;\r\n\r\n  transition: all 0.3s ease;\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  outline: none !important;\r\n  box-shadow: none !important;\n}\r\n\r\n/* Hover */\n.btn-print[data-v-8c8f9452]:hover:not(:disabled) {\r\n  background: #000000 !important;\r\n  color: #fff !important;\r\n  border: 2px solid #000000 !important;\r\n  transform: translateY(-2px);\r\n  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35) !important;\n}\r\n\r\n/* Focus */\n.btn-print[data-v-8c8f9452]:focus,\r\n.btn-print[data-v-8c8f9452]:focus-visible {\r\n  background: #000000 !important;\r\n  color: #fff !important;\r\n  border-color: #000000 !important;\r\n  outline: none !important;\r\n  box-shadow: none !important;\n}\r\n\r\n/* Active */\n.btn-print[data-v-8c8f9452]:active,\r\n.btn-print.active[data-v-8c8f9452],\r\n.btn-print[data-v-8c8f9452]:active:not(:disabled) {\r\n  background: #000000 !important;\r\n  color: #fff !important;\r\n  border-color: #000000 !important;\r\n  box-shadow: none !important;\r\n  transform: scale(0.95);\n}\r\n\r\n/* Disabled */\n.btn-print[data-v-8c8f9452]:disabled {\r\n  opacity: 0.6;\r\n  cursor: not-allowed;\r\n  box-shadow: none !important;\r\n  transform: none;\n}\n.btn-loading[data-v-8c8f9452] {\r\n  display: inline-flex;\r\n  align-items: center;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
