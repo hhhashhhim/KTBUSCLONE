@@ -84,27 +84,22 @@ export default {
         this function get amount and converted the amount to comma seprater,
         second peramet will be optional | by default it converted into this type of format (00,00,000)
     */
-    insertComma(value) 
-    {
-        if (!value) return '0';
-  
-        // Remove existing commas
-        let number = value.toString().replace(/,/g, '');
-        
-        // Format according to the Indian numbering system
-        let x = number.split('.');
-        let integerPart = x[0];
-        let decimalPart = x.length > 1 ? '.' + x[1] : '';
-        
-        let lastThreeDigits = integerPart.slice(-3);
-        let otherDigits = integerPart.slice(0, -3);
-        
-        if (otherDigits !== '') {
-          lastThreeDigits = ',' + lastThreeDigits;
-        }
-      
-        return otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThreeDigits + decimalPart;
-    },
+    insertComma(value) {
+    if (!value) return '0';
+
+    // Remove existing commas and decimals
+    let number = Math.floor(Number(value)).toString();
+
+    // Format according to the Indian numbering system
+    let lastThreeDigits = number.slice(-3);
+    let otherDigits = number.slice(0, -3);
+
+    if (otherDigits !== '') {
+        lastThreeDigits = ',' + lastThreeDigits;
+    }
+
+    return otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThreeDigits;
+},
 
     nomineeRelations()
     {

@@ -203,6 +203,7 @@
                         <th>Cancellation Amount</th>
                         <th>Receivable</th>
                         <th>Other Comm</th>
+                        <th>Net Sale</th>
                         <th>Received in Cash</th>
                         <th>Select Bank</th>
                         <th>Received in Bank</th>
@@ -224,6 +225,7 @@
                         <td>{{  $insertComma(item.cancellation_amount )}}</td>
                         <td>{{  $insertComma(item.total_receivable )}}</td>
                         <td>{{  $insertComma(item.other_commission )}}</td>
+                        <td>{{  $insertComma(item.total_receivable - (item.kt_commission + item.other_commission) )}}</td>
                         <td>
                           <input
                             v-if="isEditing(item)"
@@ -325,6 +327,9 @@
                           {{ $insertComma(startTotals.totalOtherCommission) }}
                         </td>
                         <td>
+                          {{ $insertComma(startTotals.totalReceivables - (startTotals.totalOtherCommission + startTotals.totalktCommission)) }}
+                        </td>
+                        <td>
                           {{ $insertComma(startTotals.totalReceivedCash) }}
                         </td>
                         <td></td>
@@ -352,6 +357,7 @@
                         <th>Cancellation Amount</th>
                         <th>Receivable</th>
                         <th>Other Comm</th>
+                        <th>Net sale</th>
                         <th>Received in Cash</th>
                         <th>Select Bank</th>
                         <th>Received in Bank</th>
@@ -373,6 +379,8 @@
                         <td>{{  $insertComma(item.cancellation_amount )}}</td>
                         <td>{{  $insertComma(item.total_receivable )}}</td>
                         <td>{{  $insertComma(item.other_commission )}}</td>
+                        <td>{{  $insertComma(item.total_receivable - (item.kt_commission + item.other_commission) )}}</td>
+
                         <td>
                           <input
                             v-if="isEditing(item)"
@@ -472,6 +480,9 @@
                         </td>
                         <td>
                           {{ $insertComma(returnTotals.totalOtherCommission) }}
+                        </td>
+                        <td>
+                          {{ $insertComma(returnTotals.totalReceivables - (returnTotals.totalOtherCommission + returnTotals.totalktCommission)) }}
                         </td>
                         <td>
                           {{ $insertComma(returnTotals.totalReceivedCash) }}
