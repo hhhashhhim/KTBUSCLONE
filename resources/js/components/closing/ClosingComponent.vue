@@ -1301,7 +1301,7 @@ const mapRows = (cashBank, schedule) =>
         const tickets = schedule[terminalId] || [];
         return {
           terminal_id: Number(terminalId),
-          passenger_count: tickets.filter(ticket => ticket.status != 'canceled').length,
+          passenger_count: tickets.filter(ticket => ticket.type != 'canceled').length,
           kt_commission: this.totalCommission(tickets),
           elt: this.totalELT(tickets),
           cancellation_amount: this.totalCancelAmount(tickets),

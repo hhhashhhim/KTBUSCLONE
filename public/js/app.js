@@ -28065,7 +28065,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                     return {
                       terminal_id: Number(terminalId),
                       passenger_count: tickets.filter(function (ticket) {
-                        return ticket.status != 'canceled';
+                        return ticket.type != 'canceled';
                       }).length,
                       kt_commission: _this15.totalCommission(tickets),
                       elt: _this15.totalELT(tickets),
