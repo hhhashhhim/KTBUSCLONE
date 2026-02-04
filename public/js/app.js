@@ -47397,45 +47397,57 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                if (!(!_this7.postData.ticket_merge_id || _this7.postData.category.length == 0 || _this7.postData.description.length == 0 || _this7.postData.amount.length == 0)) {
-                  _context6.next = 2;
+                // Show loader
+                _this7.loading = true; // Validation for empty data
+
+                if (!(!_this7.postData.ticket_merge_id || _this7.postData.category.length === 0 || _this7.postData.description.length === 0 || _this7.postData.amount.length === 0)) {
+                  _context6.next = 4;
                   break;
                 }
 
+                _this7.loading = false; // hide loader if validation fails
+
                 return _context6.abrupt("return");
 
-              case 2:
+              case 4:
                 i = 0;
 
-              case 3:
+              case 5:
                 if (!(i < _this7.postData.category.length)) {
-                  _context6.next = 9;
+                  _context6.next = 12;
                   break;
                 }
 
                 if (!(!_this7.postData.category[i] || !_this7.postData.description[i] || !_this7.postData.amount[i])) {
-                  _context6.next = 6;
+                  _context6.next = 9;
                   break;
                 }
 
+                _this7.loading = false; // hide loader if validation fails
+
                 return _context6.abrupt("return");
 
-              case 6:
+              case 9:
                 i++;
-                _context6.next = 3;
+                _context6.next = 5;
                 break;
 
-              case 9:
+              case 12:
                 try {
                   if (_this7.$refs.refDailySummaryReport) {
                     _this7.$refs.refDailySummaryReport.submit();
-                  } // ❌ DO NOT RESET HERE for print
+                  } // Optional: hide loader after a short delay if needed
 
+
+                  setTimeout(function () {
+                    _this7.loading = false;
+                  }, 1000);
                 } catch (error) {
                   console.error("Print error:", error);
+                  _this7.loading = false; // hide loader on error
                 }
 
-              case 10:
+              case 13:
               case "end":
                 return _context6.stop();
             }

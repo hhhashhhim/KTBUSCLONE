@@ -835,22 +835,29 @@ export default {
       );
       this.netProfit = this.totalSale - this.totalAmount;
     },
-    async print() {
+  async print() {
+  // Show loader
+  this.loading = true;
+
+  // Validation for empty data
   if (
     !this.postData.ticket_merge_id ||
-    this.postData.category.length == 0 ||
-    this.postData.description.length == 0 ||
-    this.postData.amount.length == 0
+    this.postData.category.length === 0 ||
+    this.postData.description.length === 0 ||
+    this.postData.amount.length === 0
   ) {
+    this.loading = false; // hide loader if validation fails
     return;
   }
 
-  for (var i = 0; i < this.postData.category.length; i++) {
+  // Check if any index is empty or null in object
+  for (let i = 0; i < this.postData.category.length; i++) {
     if (
       !this.postData.category[i] ||
       !this.postData.description[i] ||
       !this.postData.amount[i]
     ) {
+      this.loading = false; // hide loader if validation fails
       return;
     }
   }
@@ -860,10 +867,14 @@ export default {
       this.$refs.refDailySummaryReport.submit();
     }
 
-    // ❌ DO NOT RESET HERE for print
+    // Optional: hide loader after a short delay if needed
+    setTimeout(() => {
+      this.loading = false;
+    }, 1000);
 
   } catch (error) {
     console.error("Print error:", error);
+    this.loading = false; // hide loader on error
   }
 },
     async add() {
