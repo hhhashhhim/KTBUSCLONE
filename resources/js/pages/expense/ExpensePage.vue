@@ -1010,14 +1010,17 @@ export default {
     },
   },
   computed: {
-      totalAmount() {
+  totalAmount() {
     return this.postData.amount.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
   },
   totalPaid() {
     return this.postData.paid.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
   },
   totalBalance() {
-    return this.balances.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+    return this.postData.amount.reduce((sum, val, index) => {
+      let paid = parseFloat(this.postData.paid[index] || 0);
+      return sum + (parseFloat(val) - paid);
+    }, 0);
   },
     ...mapGetters(["getDeletingObj"]),
 

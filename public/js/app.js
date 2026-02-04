@@ -47664,8 +47664,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, 0);
     },
     totalBalance: function totalBalance() {
-      return this.balances.reduce(function (sum, val) {
-        return sum + (parseFloat(val) || 0);
+      var _this10 = this;
+
+      return this.postData.amount.reduce(function (sum, val, index) {
+        var paid = parseFloat(_this10.postData.paid[index] || 0);
+        return sum + (parseFloat(val) - paid);
       }, 0);
     }
   }, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(["getDeletingObj"])), {}, {
@@ -47709,14 +47712,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, 0);
     },
     balances: function balances() {
-      var _this10 = this;
+      var _this11 = this;
 
       return this.postData.amount.map(function (amt, index) {
-        var paid = _this10.postData.paid[index] || 0; // Clamp paid so it never exceeds amount
+        var paid = _this11.postData.paid[index] || 0; // Clamp paid so it never exceeds amount
 
         if (paid > amt) {
           paid = amt;
-          _this10.postData.paid[index] = paid;
+          _this11.postData.paid[index] = paid;
         }
 
         return amt - paid;
