@@ -926,7 +926,7 @@ export default {
           icon: "success",
           timer: 2000,
         });
-        this.$refs.refDailySummaryReport.submit();
+        // this.$refs.refDailySummaryReport.submit();
         this.fetchData();
         this.existingExpenses();
         this.loading = false;

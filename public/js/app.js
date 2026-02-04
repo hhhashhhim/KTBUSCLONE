@@ -47524,9 +47524,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     text: "Expense Saved",
                     icon: "success",
                     timer: 2000
-                  });
-
-                  _this8.$refs.refDailySummaryReport.submit();
+                  }); // this.$refs.refDailySummaryReport.submit();
 
                   _this8.fetchData();
 
