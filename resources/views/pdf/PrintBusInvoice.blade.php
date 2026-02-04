@@ -141,7 +141,8 @@
                     @php
                         $totalSale += $destination->sum("seat_fare")
                     @endphp
-                    <td>{{ $destination->sum("discount") }}</td>
+                    <td>{{ number_format($destination->sum('discount')) }}</td>
+
                     @php
                         $totalDiscount += ($destination->sum("discount"))
                     @endphp
@@ -173,7 +174,17 @@
                     @php
                         $totalElt += $destination->sum("elt_price")
                     @endphp
-                    <td>{{ ((($destination->sum("seat_fare") + $destination->sum("elt_price")) - ($destination->sum("discount"))) - $commission) - $adjustCommission }}</td>
+                    <td>
+    {{ number_format(
+        (
+            ($destination->sum("seat_fare") + $destination->sum("elt_price"))
+            - $destination->sum("discount")
+            - $commission
+            - $adjustCommission
+        )
+    ) }}
+</td>
+
                 </tr>
             @endforeach
         @endforeach
@@ -181,18 +192,22 @@
             <th colspan="2">Total</th>
             <th colspan="2">{{ $totalSeat }}</th>
             <th></th>
-            <th>{{ $totalSale }}</th>
-            <th>{{ $totalDiscount }}</th>
-            <th>{{ $totalCommission }}</th>
-            <th>{{ $totalAdjustCommission }}</th>
-            <th>{{ $totalElt }}</th>
-            <th>{{ ((($totalSale + $totalElt) - $totalDiscount) - $totalCommission) - $totalAdjustCommission }}</th>
+           <th>{{ number_format($totalSale) }}</th>
+<th>{{ number_format($totalDiscount) }}</th>
+<th>{{ number_format($totalCommission) }}</th>
+<th>{{ number_format($totalAdjustCommission) }}</th>
+<th>{{ number_format($totalElt) }}</th>
+<th>{{ number_format((($totalSale + $totalElt) - $totalDiscount - $totalCommission - $totalAdjustCommission)) }}</th>
+
         </tr>
         @foreach($mainData as $terminal)
             @if($terminal->first()[0]->commission && $terminal->first()[0]->commission->fix_commission != 0)
             <tr>
                 <th colspan="8">{{ $terminal->first()[0]->terminal->name }} Fix Commission</th>
-                <td colspan="3">{{ $fixCommission = $terminal->first()[0]->commission ? intVal($terminal->first()[0]->commission->fix_commission) : 0 }}</td>
+               <td colspan="3">
+    {{ number_format($fixCommission = $terminal->first()[0]->commission ? intval($terminal->first()[0]->commission->fix_commission) : 0) }}
+</td>
+
             </tr>
             @php
                 $totalFixCommission += $fixCommission;
@@ -204,14 +219,18 @@
             @if($refund['amount'] != 0)
             <tr>
                 <th colspan="8">{{ $refund['terminal'] }} cancellation charges of seats {{" (" . $refund['seats'] . ")"}}</th>
-                <th colspan="3">{{ $refund['amount'] }}</th>
+               <th colspan="3">{{ number_format($refund['amount']) }}</th>
+
                 @php $refundAmount += $refund['amount'] @endphp
             </tr>
             @endif
         @endforeach
         <tr>
             <th colspan="8">Gross Sale</th>
-            <th colspan="3">{{ (((($totalSale + $totalElt + $refundAmount) - $totalDiscount) - $totalCommission) - $totalFixCommission) - $totalAdjustCommission }}</th>
+            <th colspan="3">
+    {{ number_format((($totalSale + $totalElt + $refundAmount) - $totalDiscount - $totalCommission - $totalFixCommission - $totalAdjustCommission)) }}
+</th>
+
         </tr>
     </table>
     <br>
