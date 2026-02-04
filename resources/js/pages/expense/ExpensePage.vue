@@ -487,9 +487,10 @@
   <tfoot>
     <tr>
       <th colspan="2">Total</th>
-      <th>{{ totalAmount }}</th>
-      <th>{{ totalPaid }}</th>
-      <th>{{ totalBalance }}</th>
+    <th>{{ $insertComma(totalAmount) }}</th>
+<th>{{ $insertComma(totalPaid) }}</th>
+<th>{{ $insertComma(totalBalance) }}</th>
+
       <th></th>
     </tr>
   </tfoot>
