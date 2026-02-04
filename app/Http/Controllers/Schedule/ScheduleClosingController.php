@@ -332,13 +332,14 @@ class ScheduleClosingController extends Controller
             ->where('company_id', $companyId)
             ->whereIn('ticket_closing_id', [$closingPairsOne->id, $closingPairsTwo->id])
             ->whereIn('type', ['booked', 'over-issue', 'canceled'])
+            
             ->with([
                 'elt',
                 'cancel_ticket',
                 'terminal:id,name,recovery_method',
                 'commission' => function ($q) use ($routeIdStart, $routeIdReturn) {
                     $q->whereIn('route_id', [$routeIdStart, $routeIdReturn]);
-                },
+                },  
             ])
             ->get();
 

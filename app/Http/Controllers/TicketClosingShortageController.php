@@ -28,29 +28,30 @@ public function store(Request $request)
     ]);
 
     foreach ($request->rows as $row) {
-        TicketClosingShortage::updateOrCreate(
-            [
-                'ticket_closing_id' => $request->ticket_closing_id,
-                'terminal_id' => $row['terminal_id'],
-                'type' => $request->type,
-            ],
-            [
-                'bus_id'          => $request->busIds[0] ?? 0,
-                'route_id'        => $request->route,
-                'passenger_count' => $row['passenger_count'],
-                'kt_commission' => $row['kt_commission'],
-                'elt' => $row['elt'],
-                'cancellation_amount' => $row['cancellation_amount'],
-                'other_commission' => $row['other_commission'],
-                'total_receivable' => $row['total_receivable'],
-                'total_received_cash' => $row['total_received_cash'],
-                'bank_id' => $row['bank_id'],
-                'total_received_bank' => $row['total_received_bank'],
-                'shortage' => $row['shortage'],
-                'received' => $row['received'],
-                "company_id" => Auth::user()->company_id
-            ]
-        );
+       TicketClosingShortage::updateOrCreate(
+    [
+        'ticket_closing_id' => $request->ticket_closing_id,
+        'terminal_id' => $row['terminal_id'],
+        'type' => $request->type,
+    ],
+    [
+        'bus_id'          => $request->busIds[0] ?? 0,
+        'route_id'        => $request->route,
+        'passenger_count' => round($row['passenger_count']),
+        'kt_commission'   => round($row['kt_commission']),
+        'elt'             => round($row['elt']),
+        'cancellation_amount' => round($row['cancellation_amount']),
+        'other_commission'    => round($row['other_commission']),
+        'total_receivable'    => round($row['total_receivable']),
+        'total_received_cash' => round($row['total_received_cash']),
+        'bank_id'             => $row['bank_id'], // usually ID, no rounding
+        'total_received_bank' => round($row['total_received_bank']),
+        'shortage'            => round($row['shortage']),
+        'received'            => round($row['received']),
+        'company_id'          => Auth::user()->company_id
+    ]
+);
+
     }
     
 
