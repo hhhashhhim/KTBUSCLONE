@@ -1,15 +1,8 @@
 <template>
   <section class="section">
-    <div
-      v-if="isLoading"
-      class="d-flex flex-column align-items-center justify-content-center my-3"
-    >
-      <img
-        class="loading-spinner"
-        :src="$store.state.main_url + 'assets/img/loading-spinner.gif'"
-        alt="Loading..."
-        style="width: 20px; height: 20px"
-      />
+    <div v-if="isLoading" class="d-flex flex-column align-items-center justify-content-center my-3">
+      <img class="loading-spinner" :src="$store.state.main_url + 'assets/img/loading-spinner.gif'" alt="Loading..."
+        style="width: 20px; height: 20px" />
       <small class="text-muted mt-1">Loading bus data...</small>
     </div>
     <div class="section-body" v-else>
@@ -99,10 +92,7 @@
                   <span>Departure</span>
                 </div>
                 <div class="text-right">
-                  <button
-                    class="btn btn-print departure"
-                    @click="printInvoice('departure')"
-                  >
+                  <button class="btn btn-print departure" @click="printInvoice('departure')">
                     <i class="fas fa-print"></i>
                   </button>
                 </div>
@@ -143,10 +133,7 @@
                   <span>Return</span>
                 </div>
 
-                <button
-                  class="btn btn-print return"
-                  @click="printInvoice('return')"
-                >
+                <button class="btn btn-print return" @click="printInvoice('return')">
                   <i class="fas fa-print"></i>
                 </button>
               </div>
@@ -214,42 +201,28 @@
                     </thead>
 
                     <tbody>
-                      <tr
-                        v-for="(item, index) in startShortages"
-                        :key="'start-' + index"
-                      >
+                      <tr v-for="(item, index) in startShortages" :key="'start-' + index">
                         <td>{{ item?.terminal?.name }}</td>
-                        <td>{{  $insertComma(item.passenger_count )}}</td>
-                        <td>{{  $insertComma(item.kt_commission )}}</td>
-                        <td>{{  $insertComma(item.elt )}}</td>
-                        <td>{{  $insertComma(item.cancellation_amount )}}</td>
-                        <td>{{  $insertComma(item.total_receivable )}}</td>
-                        <td>{{  $insertComma(item.other_commission )}}</td>
-                        <td>{{  $insertComma(item.total_receivable - (item.kt_commission + item.other_commission) )}}</td>
+                        <td>{{ $insertComma(item.passenger_count) }}</td>
+                        <td>{{ $insertComma(item.kt_commission) }}</td>
+                        <td>{{ $insertComma(item.elt) }}</td>
+                        <td>{{ $insertComma(item.cancellation_amount) }}</td>
+                        <td>{{ $insertComma(item.total_receivable) }}</td>
+                        <td>{{ $insertComma(item.other_commission) }}</td>
+                        <td>{{ $insertComma(parseFloat(item.total_receivable) - (parseFloat(item.kt_commission) +
+                          parseFloat(item.other_commission)) )}}</td>
                         <td>
-                          <input
-                            v-if="isEditing(item)"
-                            type="number"
-                            class="form-control form-control-sm"
-                            v-model.number="item.total_received_cash"
-                          />
+                          <input v-if="isEditing(item)" type="number" class="form-control form-control-sm"
+                            v-model.number="item.total_received_cash" />
                           <span v-else>
                             {{ item.total_received_cash }}
                           </span>
                         </td>
 
                         <td>
-                          <select
-                            v-if="isEditing(item)"
-                            v-model="item.bank_id"
-                            class="form-control form-control-sm"
-                          >
+                          <select v-if="isEditing(item)" v-model="item.bank_id" class="form-control form-control-sm">
                             <option value="">Select Bank</option>
-                            <option
-                              v-for="bank in banks"
-                              :key="bank.id"
-                              :value="bank.id"
-                            >
+                            <option v-for="bank in banks" :key="bank.id" :value="bank.id">
                               {{ bank.name }}
                             </option>
                           </select>
@@ -260,45 +233,29 @@
                         </td>
 
                         <td>
-                          <input
-                            v-if="isEditing(item)"
-                            type="number"
-                            class="form-control form-control-sm"
-                            v-model.number="item.total_received_bank"
-                          />
+                          <input v-if="isEditing(item)" type="number" class="form-control form-control-sm"
+                            v-model.number="item.total_received_bank" />
                           <span v-else>
                             {{ item.total_received_bank }}
                           </span>
                         </td>
 
-                        <td
-                          :class="{ 'text-danger': Number(item.shortage) > 0 }"
-                        >
+                        <td :class="{ 'text-danger': Number(item.shortage) > 0 }">
                           {{ item.shortage }}
                         </td>
 
                         <td>{{ item.received }}</td>
                         <td class="text-nowrap">
-                          <button
-                            v-if="!isEditing(item)"
-                            class="btn btn-sm btn-primary"
-                            @click="startEdit(item)"
-                          >
+                          <button v-if="!isEditing(item)" class="btn btn-sm btn-primary" @click="startEdit(item)">
                             Edit
                           </button>
 
                           <template v-else>
-                            <button
-                              class="btn btn-sm btn-success mr-1"
-                              @click="saveEdit(item)"
-                            >
+                            <button class="btn btn-sm btn-success mr-1" @click="saveEdit(item)">
                               Save
                             </button>
 
-                            <button
-                              class="btn btn-sm btn-secondary"
-                              @click="cancelEdit(item)"
-                            >
+                            <button class="btn btn-sm btn-secondary" @click="cancelEdit(item)">
                               Cancel
                             </button>
                           </template>
@@ -327,7 +284,9 @@
                           {{ $insertComma(startTotals.totalOtherCommission) }}
                         </td>
                         <td>
-                          {{ $insertComma(startTotals.totalReceivables - (startTotals.totalOtherCommission + startTotals.totalktCommission)) }}
+                          {{ $insertComma(startTotals.totalReceivables - (startTotals.totalOtherCommission +
+                          startTotals.totalktCommission))
+                          }}
                         </td>
                         <td>
                           {{ $insertComma(startTotals.totalReceivedCash) }}
@@ -368,43 +327,29 @@
                     </thead>
 
                     <tbody>
-                      <tr
-                        v-for="(item, index) in returnShortages"
-                        :key="'return-' + index"
-                      >
+                      <tr v-for="(item, index) in returnShortages" :key="'return-' + index">
                         <td>{{ item?.terminal?.name }}</td>
-                        <td>{{  $insertComma(item.passenger_count )}}</td>
-                        <td>{{  $insertComma(item.kt_commission )}}</td>
-                        <td>{{  $insertComma(item.elt )}}</td>
-                        <td>{{  $insertComma(item.cancellation_amount )}}</td>
-                        <td>{{  $insertComma(item.total_receivable )}}</td>
-                        <td>{{  $insertComma(item.other_commission )}}</td>
-                        <td>{{  $insertComma(item.total_receivable - (item.kt_commission + item.other_commission) )}}</td>
+                        <td>{{ $insertComma(item.passenger_count) }}</td>
+                        <td>{{ $insertComma(item.kt_commission) }}</td>
+                        <td>{{ $insertComma(item.elt) }}</td>
+                        <td>{{ $insertComma(item.cancellation_amount) }}</td>
+                        <td>{{ $insertComma(item.total_receivable) }}</td>
+                        <td>{{ $insertComma(item.other_commission) }}</td>
+                        <td>{{ $insertComma(parseFloat(item.total_receivable) - (parseFloat(item.kt_commission) +
+                          parseFloat(item.other_commission)) )}}</td>
 
                         <td>
-                          <input
-                            v-if="isEditing(item)"
-                            type="number"
-                            class="form-control form-control-sm"
-                            v-model.number="item.total_received_cash"
-                          />
+                          <input v-if="isEditing(item)" type="number" class="form-control form-control-sm"
+                            v-model.number="item.total_received_cash" />
                           <span v-else>
                             {{ item.total_received_cash }}
                           </span>
                         </td>
 
                         <td>
-                          <select
-                            v-if="isEditing(item)"
-                            v-model="item.bank_id"
-                            class="form-control form-control-sm"
-                          >
+                          <select v-if="isEditing(item)" v-model="item.bank_id" class="form-control form-control-sm">
                             <option value="">Select Bank</option>
-                            <option
-                              v-for="bank in banks"
-                              :key="bank.id"
-                              :value="bank.id"
-                            >
+                            <option v-for="bank in banks" :key="bank.id" :value="bank.id">
                               {{ bank.name }}
                             </option>
                           </select>
@@ -415,45 +360,29 @@
                         </td>
 
                         <td>
-                          <input
-                            v-if="isEditing(item)"
-                            type="number"
-                            class="form-control form-control-sm"
-                            v-model.number="item.total_received_bank"
-                          />
+                          <input v-if="isEditing(item)" type="number" class="form-control form-control-sm"
+                            v-model.number="item.total_received_bank" />
                           <span v-else>
                             {{ item.total_received_bank }}
                           </span>
                         </td>
 
-                        <td
-                          :class="{ 'text-danger': Number(item.shortage) > 0 }"
-                        >
+                        <td :class="{ 'text-danger': Number(item.shortage) > 0 }">
                           {{ item.shortage }}
                         </td>
 
                         <td>{{ item.received }}</td>
                         <td class="text-nowrap">
-                          <button
-                            v-if="!isEditing(item)"
-                            class="btn btn-sm btn-primary"
-                            @click="startEdit(item)"
-                          >
+                          <button v-if="!isEditing(item)" class="btn btn-sm btn-primary" @click="startEdit(item)">
                             Edit
                           </button>
 
                           <template v-else>
-                            <button
-                              class="btn btn-sm btn-success mr-1"
-                              @click="saveEdit(item)"
-                            >
+                            <button class="btn btn-sm btn-success mr-1" @click="saveEdit(item)">
                               Save
                             </button>
 
-                            <button
-                              class="btn btn-sm btn-secondary"
-                              @click="cancelEdit(item)"
-                            >
+                            <button class="btn btn-sm btn-secondary" @click="cancelEdit(item)">
                               Cancel
                             </button>
                           </template>
@@ -469,7 +398,7 @@
                         <td>
                           {{ $insertComma(returnTotals.totalktCommission) }}
                         </td>
-                         <td>
+                        <td>
                           {{ $insertComma(returnTotals.totalELT) }}
                         </td>
                         <td>
@@ -482,7 +411,8 @@
                           {{ $insertComma(returnTotals.totalOtherCommission) }}
                         </td>
                         <td>
-                          {{ $insertComma(returnTotals.totalReceivables - (returnTotals.totalOtherCommission + returnTotals.totalktCommission)) }}
+                          {{ $insertComma(returnTotals.totalReceivables - (returnTotals.totalOtherCommission +
+                          returnTotals.totalktCommission)) }}
                         </td>
                         <td>
                           {{ $insertComma(returnTotals.totalReceivedCash) }}
@@ -510,132 +440,78 @@
           <div class="card p-3">
             <h5 class="text-center">Expenses</h5>
             <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Category</th>
-                  <th>Description</th>
-                  <th>Total Expense Amount</th>
-                  <th>Total Paid</th>
-                  <th>Credit Balance</th>
-                  <!-- <th>Invoice number</th> -->
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(i, index) in loop" :key="index">
-                  <td>
-                    <!-- {{ items[0] ? items[0].price : '' }} -->
-                    <select
-                      class="form-control rounded-0"
-                      @change="saveRow($event, 'first', index)"
-                      :value="postData.category[index]"
-                      :disabled="editAble"
-                    >
-                      <option value="" selected>Select Category</option>
-                      <option
-                        v-for="(category, i) in categories"
-                        :value="category.id"
-                        :key="i"
-                      >
-                        {{ category.name }}
-                      </option>
-                    </select>
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      class="form-control"
-                      @keyup="saveRow($event, 'second', index)"
-                      :value="postData.description[index]"
-                      :disabled="editAble"
-                    />
-                  </td>
-                  <td>
-                    <!-- Total Expense -->
-                    <input
-                      type="number"
-                      min="0"
-                      class="form-control rounded-0"
-                      v-model.number="postData.amount[index]"
-                      @input="syncPaid(index)"
-                    />
-                  </td>
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Description</th>
+      <th>Total Expense Amount</th>
+      <th>Total Paid</th>
+      <th>Credit Balance</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="(i, index) in loop" :key="index">
+      <td>
+        <select class="form-control rounded-0" @change="saveRow($event, 'first', index)"
+          :value="postData.category[index]" :disabled="editAble">
+          <option value="" selected>Select Category</option>
+          <option v-for="(category, i) in categories" :value="category.id" :key="i">
+            {{ category.name }}
+          </option>
+        </select>
+      </td>
+      <td>
+        <input type="text" class="form-control" @keyup="saveRow($event, 'second', index)"
+          :value="postData.description[index]" :disabled="editAble" />
+      </td>
+      <td>
+        <input type="number" min="0" class="form-control rounded-0" v-model.number="postData.amount[index]"
+          @input="syncPaid(index)" />
+      </td>
+      <td>
+        <input type="number" min="0" class="form-control rounded-0" v-model.number="postData.paid[index]" />
+      </td>
+      <td>
+        <input type="number" class="form-control rounded-0" :value="balances[index]" readonly />
+      </td>
+      <td class="add-btn" v-if="!editAble">
+        <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
+        <button class="btn btn-outline-danger" @click="removeRow($event, index)" v-if="loop != 1">Remove</button>
+      </td>
+      <td v-else></td>
+    </tr>
+  </tbody>
 
-                  <td>
-                    <!-- Total Expense Paid -->
-                    <input
-                      type="number"
-                      min="0"
-                      class="form-control rounded-0"
-                      v-model.number="postData.paid[index]"
-                    />
-                  </td>
+  <!-- Footer with sums -->
+  <tfoot>
+    <tr>
+      <th colspan="2">Total</th>
+      <th>{{ totalAmount }}</th>
+      <th>{{ totalPaid }}</th>
+      <th>{{ totalBalance }}</th>
+      <th></th>
+    </tr>
+  </tfoot>
+</table>
 
-                  <td>
-                    <!-- Balance -->
-                    <input
-                      type="number"
-                      class="form-control rounded-0"
-                      :value="balances[index]"
-                      readonly
-                    />
-                  </td>
-                  <td class="add-btn" v-if="!editAble">
-                    <button
-                      class="btn btn-outline-primary mx-2"
-                      @click="addRow"
-                    >
-                      Add
-                    </button>
-                    <button
-                      class="btn btn-outline-danger"
-                      @click="removeRow($event, index)"
-                      v-if="loop != 1"
-                    >
-                      Remove
-                    </button>
-                  </td>
-                  <td v-else></td>
-                </tr>
-              </tbody>
-            </table>
             <div class="d-flex justify-content-end">
               <div v-if="totalShortage == 0">
-                <button
-                  v-if="!checkClosing"
-                  type="button"
-                  class="text-light btn btn-danger mr-1"
-                  data-target="#accountModal"
-                  data-toggle="modal"
-                  :disabled="loading"
-                >
+                <button v-if="!checkClosing" type="button" class="text-light btn btn-danger mr-1"
+                  data-target="#accountModal" data-toggle="modal" :disabled="loading">
                   Update Account
                 </button>
               </div>
-              <button
-                type="button"
-                class="btn btn-outline-success mr-4"
-                @click="add"
-                :disabled="loading"
-                v-if="!editAble"
-              >
+              <button type="button" class="btn btn-outline-success mr-4" @click="add" :disabled="loading"
+                v-if="!editAble">
                 {{ loading ? "Loading..." : "Save" }}
               </button>
-              <button
-                type="button"
-                class="btn btn-outline-secondary mr-4"
-                @click="editAble = false"
-                :disabled="loading"
-                v-else
-              >
+              <button type="button" class="btn btn-outline-secondary mr-4" @click="editAble = false" :disabled="loading"
+                v-else>
                 Edit
               </button>
-              <button
-                type="button"
-                class="btn btn-outline-primary mr-4"
-                @click="editAble = true"
-                v-if="!editAble && postData.category.length != 0"
-              >
+              <button type="button" class="btn btn-outline-primary mr-4" @click="editAble = true"
+                v-if="!editAble && postData.category.length != 0">
                 Cancel
               </button>
             </div>
@@ -644,67 +520,29 @@
       </div>
 
       <!--Daily Summery Report Form-->
-      <form
-        :action="
-          $store.state.api_url + 'api/web/v1/print/pdf/daily/summary/report'
-        "
-        method="POST"
-        ref="refDailySummaryReport"
-        target="_blank"
-      >
+      <form :action="$store.state.api_url + 'api/web/v1/print/pdf/daily/summary/report'
+        " method="POST" ref="refDailySummaryReport" target="_blank">
         <input type="hidden" name="token" :value="this.$store.state.token" />
-        <input
-          type="hidden"
-          name="ticket_merge_id"
-          :value="this.postData.ticket_merge_id"
-        />
+        <input type="hidden" name="ticket_merge_id" :value="this.postData.ticket_merge_id" />
       </form>
 
-      <div
-        class="modal fade"
-        id="accountModal"
-        tabindex="-1"
-        role="dialog"
-        aria-labelledby="modelTitleId"
-        aria-hidden="true"
-      >
-        <div
-          class="modal-dialog modal-lg modal-dialog-centered"
-          role="document"
-        >
+      <div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-body pt-5">
               <div class="card card-danger">
                 <div class="card-header d-flex justify-content-between">
-                  <h4
-                    class="modal-title text-center text-danger"
-                    style="width: 97%"
-                  >
+                  <h4 class="modal-title text-center text-danger" style="width: 97%">
                     <i class="fas fa-exclamation-circle fa-2x"></i> Confirmation
                   </h4>
-                  <button
-                    type="button"
-                    class="close"
-                    data-dismiss="modal"
-                    aria-label="Close"
-                    @click="closeModal()"
-                  >
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="closeModal()">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="card-body text-center">
-                  <div
-                    class="alert alert-danger alert-dismissible fade show"
-                    role="alert"
-                    v-if="success"
-                  >
-                    <button
-                      type="button"
-                      class="close"
-                      data-dismiss="alert"
-                      aria-label="Close"
-                      @click="closeModal()"
-                    >
+                  <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="success">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" @click="closeModal()">
                       <span aria-hidden="true">&times;</span>
                       <span class="sr-only">Close</span>
                     </button>
@@ -717,21 +555,11 @@
               </div>
             </div>
             <div class="modal-footer d-block pt-0">
-              <button
-                type="button"
-                class="btn btn-danger btn-block"
-                data-dismiss="modal"
-                :disabled="loading"
-                @click="updateAccount"
-              >
+              <button type="button" class="btn btn-danger btn-block" data-dismiss="modal" :disabled="loading"
+                @click="updateAccount">
                 Yes
               </button>
-              <button
-                type="button"
-                class="btn btn-secondary btn-block"
-                data-dismiss="modal"
-                @click="closeModal()"
-              >
+              <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal" @click="closeModal()">
                 Close
               </button>
             </div>
@@ -739,30 +567,14 @@
         </div>
       </div>
     </div>
-    <form
-      :action="$store.state.api_url + 'api/web/v1/print/pdf/bus/invoice'"
-      method="POST"
-      ref="refBusInvoice"
-      target="_blank"
-    >
+    <form :action="$store.state.api_url + 'api/web/v1/print/pdf/bus/invoice'" method="POST" ref="refBusInvoice"
+      target="_blank">
       <input type="hidden" name="token" :value="this.$store.state.token" />
-      <input
-        type="hidden"
-        name="destination_city_id"
-        :value="addForm.destinationCity"
-      />
-      <input
-        type="hidden"
-        name="departure_city_id"
-        :value="addForm.departureCity"
-      />
+      <input type="hidden" name="destination_city_id" :value="addForm.destinationCity" />
+      <input type="hidden" name="departure_city_id" :value="addForm.departureCity" />
       <input type="hidden" name="date" :value="addForm.date" />
       <input type="hidden" name="schedule_id" :value="addForm.schedule" />
-      <input
-        type="hidden"
-        name="departure_time"
-        :value="addForm.departure_time"
-      />
+      <input type="hidden" name="departure_time" :value="addForm.departure_time" />
     </form>
   </section>
 </template>
@@ -847,6 +659,7 @@ export default {
   },
 
   methods: {
+
     printInvoice(type) {
       const invoiceType = type == "departure" ? 0 : 1; // 'departure' or 'return'
       this.addForm = {
@@ -1154,6 +967,15 @@ export default {
     },
   },
   computed: {
+      totalAmount() {
+    return this.postData.amount.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+  },
+  totalPaid() {
+    return this.postData.paid.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+  },
+  totalBalance() {
+    return this.balances.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+  },
     ...mapGetters(["getDeletingObj"]),
 
     startShortages() {
@@ -1298,7 +1120,7 @@ export default {
           (sum, i) => sum + Number(i.kt_commission ?? 0),
           0
         ),
-         totalELT: this.returnShortages.reduce(
+        totalELT: this.returnShortages.reduce(
           (sum, i) => sum + Number(i.elt ?? 0),
           0
         ),
@@ -1417,6 +1239,7 @@ export default {
 .trip-info i {
   font-size: 15px;
 }
+
 .stat-card {
   border: none;
   border-radius: 14px;
@@ -1439,15 +1262,19 @@ export default {
 .stat-card.info::before {
   background: linear-gradient(90deg, #17a2b8, #6fd6e8);
 }
+
 .stat-card.danger::before {
   background: linear-gradient(90deg, #dc3545, #ff7b89);
 }
+
 .stat-card.success::before {
   background: linear-gradient(90deg, #28a745, #7be495);
 }
+
 .stat-card.primary::before {
   background: linear-gradient(90deg, #007bff, #6aa9ff);
 }
+
 .stat-card.warning::before {
   background: linear-gradient(90deg, #ffc107, #ffe083);
 }
@@ -1476,6 +1303,7 @@ export default {
   color: #222;
   margin: 0;
 }
+
 .btn-print {
   border-radius: 50px;
   padding: 10px 26px;
