@@ -1524,6 +1524,7 @@ if (!empty($request->usageDiscount) && !empty($request->discount_otp_valid) && $
 
     function updateBusClass(Request $request)
     {
+       
         if (!checkPermissionButtons("bus-class")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
@@ -2043,7 +2044,7 @@ if (!empty($request->usageDiscount) && !empty($request->discount_otp_valid) && $
             'departure_id' => $request->departure_city_id,
             'destination_id' => $request->destination_city_id,
             'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
-        ])->first()->schedule_date;
+        ])->get();
         $scheduleTime = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->schedule_id,
