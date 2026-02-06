@@ -898,7 +898,7 @@ class ScheduleClosingController extends Controller
                 $totalOnlinePortalsAmount = 0;
                 // Step 2: Map the online terminal names and track their total
                 foreach ($dynamicTypes as $terminalName) {
-                    $amount = $onlineGroup->where('terminal.name', $terminalName)->sum('total_receivable');
+                    $amount = $onlineGroup->where('terminal.name', $terminalName)->sum('received');
 
                     $data['types'][$terminalName] = $amount;
                     $totalOnlinePortalsAmount += $amount;

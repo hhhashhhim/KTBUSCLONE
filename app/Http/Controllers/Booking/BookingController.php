@@ -1065,7 +1065,7 @@ if (!empty($request->usageDiscount) && !empty($request->discount_otp_valid) && $
     public
     function checkAssignedBus(Request $request)
     {
-        $departureTime = ScheduleDetail::where([
+       return $departureTime = ScheduleDetail::where([
             "schedule_id" => $request->scheduleId,
             "departure_id" => $request->departureCity,
             "destination_id" => $request->destinationCity,
