@@ -116,7 +116,7 @@
 
                     <li>{{$value->name}} ({{formatContact($value->contact)}})<br></li>
 
-                @endforeach 
+                @endforeach
 
             </th>
         @else

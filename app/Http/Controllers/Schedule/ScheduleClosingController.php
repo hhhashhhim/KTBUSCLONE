@@ -929,6 +929,7 @@ class ScheduleClosingController extends Controller
         $merge = TicketClosingMerge::whereIn('id', $merges)->first();
         $counterExpense = CounterExpense::whereDate('created_at', $merge->closing_date)->sum('total');
         $totalKtCommission = TicketClosingShortage::whereIn('ticket_closing_id', $merges)->sum('kt_commission');
+        $totalReceivedBank = TicketClosingShortage::whereIn('ticket_closing_id', $merges)->sum('total_received_bank');
 
 
 
@@ -938,7 +939,8 @@ class ScheduleClosingController extends Controller
             "closing_date" => $request->closing_date,
             "expenses"      => $creditExpenses,
             "counterExpense"      => $counterExpense,
-            "totalKtCommission"      => $totalKtCommission
+            "totalKtCommission"      => $totalKtCommission,
+            "totalReceivedBank"      => $totalReceivedBank
         ];
 
         return view('reports.busMergeReport', ['data' => $data]);
