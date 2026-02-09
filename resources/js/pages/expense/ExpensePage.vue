@@ -172,7 +172,7 @@
             <div class="card-header justify-content-between">
               <h5>Terminal Details</h5>
               <button type="button" class="btn btn-print mr-4" @click="print">
-                <span> <i class="fas fa-print mr-2"></i> Print </span>
+                <span> <i class="fas fa-print mr-2"></i>Eng Print </span>
               </button>
             </div>
             <div class="card-body">

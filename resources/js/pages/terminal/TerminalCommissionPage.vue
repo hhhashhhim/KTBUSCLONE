@@ -65,7 +65,7 @@
                                                                    :value="postData.percentCommission[index]"
                                                                    :disabled="editAble"/>
                                                         </td>
-                                                        <td>
+                                                        <td> 
                                                             <input type="text" class="form-control"
                                                                    @keypress="numberValidate($event,{dot:true})"
                                                                    @keyup="saveRow($event, 'fifth', index)"

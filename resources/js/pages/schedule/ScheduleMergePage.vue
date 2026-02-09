@@ -94,7 +94,26 @@
                                                                 :value="this.filterData.schedule_name_start">
                                                             <input type="hidden" name="schedule_name_end"
                                                                 :value="this.filterData.schedule_name_end">
-                                                            <input type="submit" value="Print" class="btn btn-dark">
+                                                            <input type="submit" value="Eng Print" class="btn btn-dark mx-2">
+                                                        </form>
+                                                        <form
+                                                            :action="$store.state.api_url + 'api/web/v1/booking/close/schedule/merges/urdu/pdf'"
+                                                            method="POST" ref="" target="_blank">
+                                                            <input type="hidden" name="token"
+                                                                :value="this.$store.state.token">
+                                                            <input type="hidden" name="bus_number"
+                                                                :value="this.filterData.bus_number">
+                                                            <input type="hidden" name="from_date"
+                                                                :value="this.filterData.from_date">
+                                                            <input type="hidden" name="to_date"
+                                                                :value="this.filterData.to_date">
+                                                            <input type="hidden" name="closing_date"
+                                                                :value="this.filterData.closing_date">
+                                                            <input type="hidden" name="schedule_name_start"
+                                                                :value="this.filterData.schedule_name_start">
+                                                            <input type="hidden" name="schedule_name_end"
+                                                                :value="this.filterData.schedule_name_end">
+                                                            <input type="submit" value="Urdu Print" class="btn btn-dark">
                                                         </form>
                                                     </div>
                                                     <table class="table table-striped table-hover" id="merge_table">
