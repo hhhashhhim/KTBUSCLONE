@@ -23,6 +23,7 @@ Route::group(['middleware' => ['custom.sanctum.token.verify']], function () {
     Route::post('web/v1/print/pdf/over-issue/report', [OverissueReportController::class, 'getPrintPdf']);
     Route::post('web/v1/print/pdf/reschedule/report', [RescheduleReportController::class, 'getPrintPdf']);
     Route::post('web/v1/booking/close/schedule/merges/pdf', [ScheduleClosingController::class, 'mergesPdf']);
+    Route::post('web/v1/booking/close/schedule/merges/urdu/pdf', [ScheduleClosingController::class, 'mergesUrduPdf']);
 
 
 

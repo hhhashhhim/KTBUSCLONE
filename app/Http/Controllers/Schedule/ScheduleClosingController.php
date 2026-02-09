@@ -328,7 +328,7 @@ class ScheduleClosingController extends Controller
         $routeIdReturn = $closingPairsTwo->schedule->route_id;
 
         // Fetch tickets
-        $tickets = Ticket::withTrashed()
+        $ticketsStart = Ticket::withTrashed()
             ->where('company_id', $companyId)
             ->whereIn('ticket_closing_id', [$closingPairsOne->id, $closingPairsTwo->id])
             ->whereIn('type', ['booked', 'over-issue', 'canceled'])
@@ -337,16 +337,31 @@ class ScheduleClosingController extends Controller
                 'elt',
                 'cancel_ticket',
                 'terminal:id,name,recovery_method',
-                'commission' => function ($q) use ($routeIdStart, $routeIdReturn) {
-                    $q->whereIn('route_id', [$routeIdStart, $routeIdReturn]);
+                'commission' => function ($q) use ($routeIdStart) {
+                    return $q->where("route_id", $routeIdStart);
+                },  
+            ])
+            ->get();
+
+         $ticketsReturn = Ticket::withTrashed()
+            ->where('company_id', $companyId)
+            ->whereIn('ticket_closing_id', [$closingPairsOne->id, $closingPairsTwo->id])
+            ->whereIn('type', ['booked', 'over-issue', 'canceled'])
+            
+            ->with([
+                'elt',
+                'cancel_ticket',
+                'terminal:id,name,recovery_method',
+                'commission' => function ($q) use ($routeIdReturn) {
+                    return $q->where("route_id", $routeIdReturn);
                 },  
             ])
             ->get();
 
         // Group tickets by schedule
         $data = (object)[];
-        $data->schedule_start  = $tickets->where('ticket_closing_id', $closingPairsOne->id)->groupBy('terminal_id');
-        $data->schedule_return = $tickets->where('ticket_closing_id', $closingPairsTwo->id)->groupBy('terminal_id');
+        $data->schedule_start  = $ticketsStart->where('ticket_closing_id', $closingPairsOne->id)->groupBy('terminal_id');
+        $data->schedule_return = $ticketsReturn->where('ticket_closing_id', $closingPairsTwo->id)->groupBy('terminal_id');
 
         // Expenses
         $data->expense = TicketMergeExpense::where('company_id', $companyId)
@@ -944,6 +959,132 @@ class ScheduleClosingController extends Controller
         ];
 
         return view('reports.busMergeReport', ['data' => $data]);
+    }
+    public function mergesUrduPdf(Request $request)
+    {
+        if (!checkForSubmenu("merges")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $user = Auth::user();
+        $merges = TicketClosingMerge::where(function ($q) use ($request) {
+            if ($request->bus_number) {
+                $q->where('bus_id', $request->bus_number);
+            }
+            if ($request->from_date) {
+                $q->whereDate('schedule_departure_date', '>=', $request->from_date);
+            }
+            if ($request->to_date) {
+                $q->whereDate('schedule_departure_date', '<=', $request->to_date);
+            }
+            if ($request->closing_date) {
+                $q->whereDate('closing_date', $request->closing_date);
+            }
+        })
+            // Schedule Name Start
+            ->when($request->schedule_name_start, function ($q) use ($request) {
+                $q->whereHas('closing.schedule', function ($sub) use ($request) {
+                    $sub->where('name', $request->schedule_name_start);
+                });
+            })
+            // Schedule Name End
+            ->when($request->schedule_name_end, function ($q) use ($request) {
+                $q->whereHas('closing.schedule', function ($sub) use ($request) {
+                    $sub->where('name', $request->schedule_name_end);
+                });
+            })
+            ->pluck('id');
+
+        $results = TicketClosingShortage::with([
+            'bus:id,bus_number',
+            'terminal:id,name,is_online_terminal',
+            'ticket_closing_merge.expenses'
+        ])
+            ->whereIn('ticket_closing_id', $merges)
+            ->get();
+
+        // Step 1: Get unique terminal names ONLY where is_online_terminal is 1
+        $dynamicTypes = $results->where('terminal.is_online_terminal', 1)
+            ->pluck('terminal.name')
+            ->unique()
+            ->filter()
+            ->values();
+
+        $mappedResults = $results->groupBy('ticket_closing_id')
+            ->map(function ($group) use ($dynamicTypes) {
+                $first = $group->first();
+
+                // Online group for portal sums
+                $onlineGroup = $group->where('terminal.is_online_terminal', 1);
+
+                // Calculate Total Expense for this merge (regardless of terminal type)
+                $totalExpense = $group->unique('ticket_closing_id')->sum(function ($item) {
+                    // This now runs only once per ticket_closing_id group
+                    return optional($item->ticket_closing_merge)->expenses->sum('amount') ?? 0;
+                });
+
+                // Calculate Total Online Sale
+                $totalOnlineSale = $group->sum('total_receivable');
+                $totalOtherCommission = $group->sum('kt_commission');
+                $totalKtCommission = $group->sum('other_commission');
+                $totalExpense += $totalKtCommission + $totalOtherCommission;
+
+                $data = [
+                    'bus_no'   => $first->bus->bus_number ?? 'N/A',
+                    'sale'     => $totalOnlineSale,
+                    'expense'  => $totalExpense,
+                    'net_sale' => $totalOnlineSale - $totalExpense,
+                ];
+
+                $totalOnlinePortalsAmount = 0;
+                // Step 2: Map the online terminal names and track their total
+                foreach ($dynamicTypes as $terminalName) {
+                   $amount = $onlineGroup
+    ->where('terminal.name', $terminalName)
+    ->sum(function ($item) {
+        return ($item->total_receivable ?? 0)
+             - ($item->kt_commission ?? 0)
+             - ($item->other_commission ?? 0);
+    });
+
+
+                    $data['types'][$terminalName] = $amount;
+                    $totalOnlinePortalsAmount += $amount;
+                }
+
+                // Step 3: Calculate Net Cash
+                // Net Cash = (Total Online Sale - Expenses) - Total Online Portal Amounts
+                $data['net_cash'] = $data['net_sale'] - $totalOnlinePortalsAmount;
+
+                return $data;
+            })
+            ->values();
+
+        $creditExpenses = TicketMergeExpense::with('expense_category:id,name')
+            ->whereColumn('amount', '!=', 'paid') // Compare two columns in the same row
+            ->whereIn('ticket_merge_id', $merges)
+            ->whereHas('expense_category', function ($query) {
+                $query->where('include_in_closing', '1');
+            })
+            ->get();
+        $merge = TicketClosingMerge::whereIn('id', $merges)->first();
+        $counterExpense = CounterExpense::whereDate('created_at', $merge->closing_date)->sum('total');
+        $totalKtCommission = TicketClosingShortage::whereIn('ticket_closing_id', $merges)->sum('kt_commission');
+        $totalReceivedBank = TicketClosingShortage::whereIn('ticket_closing_id', $merges)->sum('total_received_bank');
+
+
+
+        $data = [
+            'dynamicTypes' => $dynamicTypes,
+            "merges" => $mappedResults,
+            "closing_date" => $request->closing_date,
+            "expenses"      => $creditExpenses,
+            "counterExpense"      => $counterExpense,
+            "totalKtCommission"      => $totalKtCommission,
+            "totalReceivedBank"      => $totalReceivedBank
+        ];
+
+        return view('reports.busMergeReportUrdu', ['data' => $data]);
     }
 
 
