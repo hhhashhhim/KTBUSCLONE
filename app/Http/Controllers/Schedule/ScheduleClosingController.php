@@ -1040,9 +1040,7 @@ class ScheduleClosingController extends Controller
                    $amount = $onlineGroup
     ->where('terminal.name', $terminalName)
     ->sum(function ($item) {
-        return ($item->total_receivable ?? 0)
-             - ($item->kt_commission ?? 0)
-             - ($item->other_commission ?? 0);
+        return ($item->received ?? 0);
     });
 
 
