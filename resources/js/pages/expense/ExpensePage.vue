@@ -304,7 +304,7 @@
                     </tfoot>
                   </table>
 
-                  <h5 class="text-center">{{ details?.closing?.[0]?.schedule?.route?.name || "N/A" }}</h5>
+                  <h5 class="text-center my-3">{{ details?.closing?.[0]?.schedule?.route?.name || "N/A" }}</h5>
 
                   <table class="table table-bordered table-sm">
                     <thead>
