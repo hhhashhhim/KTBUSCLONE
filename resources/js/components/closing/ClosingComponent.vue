@@ -69,11 +69,11 @@
                       >
                         <td>{{ tickets[0].terminal.name }}</td>
                         <td>{{ tickets.filter(t => t.type != 'canceled').length }}</td>
-                        <td>{{ $inserComma(totalCommission(tickets) )}}</td>
-                        <td>{{ $inserComma(totalELT(tickets)) }}</td>
-                        <td>{{ $inserComma(totalCancelAmount(tickets)) }}</td>
-                        <td>{{ $inserComma(totalFare(tickets)) }}</td>
-                        <td>{{ $inserComma(totalOtherCommission(tickets)) }}</td>
+                        <td>{{ $insertComma(totalCommission(tickets) )}}</td>
+                        <td>{{ $insertComma(totalELT(tickets)) }}</td>
+                        <td>{{ $insertComma(totalCancelAmount(tickets)) }}</td>
+                        <td>{{ $insertComma(totalFare(tickets)) }}</td>
+                        <td>{{ $insertComma(totalOtherCommission(tickets)) }}</td>
                         <td>
                           <input
                             type="number"
@@ -134,41 +134,41 @@
                         </th>
 
                         <th>
-                          {{ $inserComma(totalCommissions(data.schedule_start)) }}
+                          {{ $insertComma(totalCommissions(data.schedule_start)) }}
                         </th>
                         <th>
-                          {{ $inserComma(grandTotalELT(data.schedule_start)) }}
+                          {{ $insertComma(grandTotalELT(data.schedule_start)) }}
                         </th>
                         <th>
-                          {{ $inserComma(grandTotalCancel(data.schedule_start)) }}
+                          {{ $insertComma(grandTotalCancel(data.schedule_start)) }}
                         </th>
                         
                         <th>
-                          {{ $inserComma(sumReceivable()) }}
+                          {{ $insertComma(sumReceivable()) }}
                         </th>
                         <th>
-                          {{ $inserComma(sumOtherCommissions(data.schedule_start)) }}
+                          {{ $insertComma(sumOtherCommissions(data.schedule_start)) }}
                         </th>
                         <!-- <th></th>
 <th></th> -->
 
                         <th>
-                          {{ $inserComma(sumCash()) }}
+                          {{ $insertComma(sumCash()) }}
                         </th>
 
                         <th></th>
                         <!-- Select Bank column -->
 
                         <th>
-                          {{ $inserComma(sumBank()) }}
+                          {{ $insertComma(sumBank()) }}
                         </th>
 
                         <th>
-                          {{ $inserComma(sumShortage()) }}
+                          {{ $insertComma(sumShortage()) }}
                         </th>
 
                         <th>
-                          {{ $inserComma(sumReceived()) }}
+                          {{ $insertComma(sumReceived()) }}
                         </th>
                       </tr>
                     </tfoot>
@@ -204,11 +204,11 @@
                       >
                         <td>{{ tickets[0].terminal.name }}</td>
                        <td>{{ tickets.filter(t => t.type != 'canceled').length }}</td>
-                        <td>{{ $inserComma(totalCommission(tickets)) }}</td>
-                        <td>{{ $inserComma(totalELT(tickets)) }}</td>
-                        <td>{{ $inserComma(totalCancelAmount(tickets)) }}</td>
-                        <td>{{ $inserComma(totalFare(tickets)) }}</td>
-                        <td>{{ $inserComma(totalOtherCommission(tickets)) }}</td>
+                        <td>{{ $insertComma(totalCommission(tickets)) }}</td>
+                        <td>{{ $insertComma(totalELT(tickets)) }}</td>
+                        <td>{{ $insertComma(totalCancelAmount(tickets)) }}</td>
+                        <td>{{ $insertComma(totalFare(tickets)) }}</td>
+                        <td>{{ $insertComma(totalOtherCommission(tickets)) }}</td>
 
                         <td>
                           <input
@@ -270,38 +270,38 @@
                         </th>
 
                         <th>
-                          {{ $inserComma(totalCommissions(data.schedule_return)) }}
+                          {{ $insertComma(totalCommissions(data.schedule_return)) }}
                         </th>
                         <th>
-                          {{ $inserComma(grandTotalELT(data.schedule_return)) }}
+                          {{ $insertComma(grandTotalELT(data.schedule_return)) }}
                         </th>
                         <th>
-                          {{ $inserComma(grandTotalCancel(data.schedule_return)) }}
+                          {{ $insertComma(grandTotalCancel(data.schedule_return)) }}
                         </th>
                         
                         <th>
-                          {{ $inserComma(sumReceivableReturn()) }}
+                          {{ $insertComma(sumReceivableReturn()) }}
                         </th>
                         <th>
-                          {{ $inserComma(sumOtherCommissions(data.schedule_return)) }}
+                          {{ $insertComma(sumOtherCommissions(data.schedule_return)) }}
                         </th>
                         <th>
-                          {{ $inserComma(sumCashReturn()) }}
+                          {{ $insertComma(sumCashReturn()) }}
                         </th>
 
                         <th></th>
                         <!-- Select Bank -->
 
                         <th>
-                          {{ $inserComma(sumBankReturn()) }}
+                          {{ $insertComma(sumBankReturn()) }}
                         </th>
 
                         <th>
-                          {{ $inserComma(sumShortageReturn()) }}
+                          {{ $insertComma(sumShortageReturn()) }}
                         </th>
 
                         <th>
-                          {{ $inserComma(sumReceivedReturn()) }}
+                          {{ $insertComma(sumReceivedReturn()) }}
                         </th>
                       </tr>
                     </tfoot>
