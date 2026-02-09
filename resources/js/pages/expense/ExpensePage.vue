@@ -172,13 +172,13 @@
             <div class="card-header justify-content-between">
               <h5>Terminal Details</h5>
               <button type="button" class="btn btn-print mr-4" @click="print">
-                <span> <i class="fas fa-print mr-2"></i>Eng Print </span>
+                <span> <i class="fas fa-print mr-2"></i> Print </span>
               </button>
             </div>
             <div class="card-body">
               <div class="row">
                 <div class="col-md-12">
-                  <h5 class="text-center">Departure</h5>
+                  <h5 class="text-center">{{ details?.closing?.[1]?.schedule?.route?.name || "N/A" }}</h5>
 
                   <table class="table table-bordered table-sm">
                     <thead>
@@ -304,7 +304,7 @@
                     </tfoot>
                   </table>
 
-                  <h5 class="text-center">Return</h5>
+                  <h5 class="text-center">{{ details?.closing?.[0]?.schedule?.route?.name || "N/A" }}</h5>
 
                   <table class="table table-bordered table-sm">
                     <thead>
