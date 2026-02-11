@@ -36716,7 +36716,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             switch (_context16.prev = _context16.next) {
               case 0:
                 if (!_this17.checkForSubmenuButtons('previous-date')) {
-                  _context16.next = 15;
+                  _context16.next = 14;
                   break;
                 }
 
@@ -36725,10 +36725,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 previousDate = new Date();
                 previousDate.setDate(previousDate.getDate() - previousDays);
                 formDate = new Date(_this17.addForm.date);
-                alert("abc " + formDate);
 
                 if (!(formDate < previousDate)) {
-                  _context16.next = 15;
+                  _context16.next = 14;
                   break;
                 }
 
@@ -36750,7 +36749,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 return _context16.abrupt("return");
 
-              case 15:
+              case 14:
                 _this17.getSchedule = true;
                 _this17.showBookingDiv = false;
                 _this17.allSchedules = {};
@@ -36761,10 +36760,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   date: _this17.addForm.date,
                   terminal: _this17.addForm.terminalId
                 };
-                _context16.next = 22;
+                _context16.next = 21;
                 return _this17.callApi("post", "booking/fetchSchedule", data);
 
-              case 22:
+              case 21:
                 resFetchSchedule = _context16.sent;
 
                 if (resFetchSchedule.status == 200) {
@@ -36780,7 +36779,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 _this17.fetchScheduleData();
 
-              case 25:
+              case 24:
               case "end":
                 return _context16.stop();
             }
