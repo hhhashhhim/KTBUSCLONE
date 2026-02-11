@@ -2749,8 +2749,9 @@ export default {
         },
 
         async fetchSpecificSchedules() {
-            alert("test");
+           
             if (this.checkForSubmenuButtons('previous-date')) {
+                 alert("test");
                 // number of previous days from API or fallback to 0
                 let previousDays = this.user?.previous_days || 0;
 
@@ -2763,6 +2764,7 @@ export default {
 
                 // compare the dates
                 if (formDate < previousDate) {
+                     alert("date");
                     // format previousDate to yyyy-mm-dd for input
                     let yyyy = previousDate.getFullYear();
                     let mm = String(previousDate.getMonth() + 1).padStart(2, '0');

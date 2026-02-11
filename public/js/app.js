@@ -36715,14 +36715,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           while (1) {
             switch (_context16.prev = _context16.next) {
               case 0:
-                alert("test");
-
                 if (!_this17.checkForSubmenuButtons('previous-date')) {
-                  _context16.next = 14;
+                  _context16.next = 15;
                   break;
                 }
 
-                // number of previous days from API or fallback to 0
+                alert("test"); // number of previous days from API or fallback to 0
+
                 previousDays = ((_this17$user = _this17.user) === null || _this17$user === void 0 ? void 0 : _this17$user.previous_days) || 0; // calculate the actual previous date
 
                 previousDate = new Date();
@@ -36731,11 +36730,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 formDate = new Date(_this17.addForm.date); // compare the dates
 
                 if (!(formDate < previousDate)) {
-                  _context16.next = 14;
+                  _context16.next = 15;
                   break;
                 }
 
-                // format previousDate to yyyy-mm-dd for input
+                alert("date"); // format previousDate to yyyy-mm-dd for input
+
                 yyyy = previousDate.getFullYear();
                 mm = String(previousDate.getMonth() + 1).padStart(2, '0');
                 dd = String(previousDate.getDate()).padStart(2, '0');
@@ -36751,7 +36751,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this17.addForm.date = minAllowedDate;
                 return _context16.abrupt("return");
 
-              case 14:
+              case 15:
                 _this17.getSchedule = true;
                 _this17.showBookingDiv = false;
                 _this17.allSchedules = {};
@@ -36762,10 +36762,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   date: _this17.addForm.date,
                   terminal: _this17.addForm.terminalId
                 };
-                _context16.next = 21;
+                _context16.next = 22;
                 return _this17.callApi("post", "booking/fetchSchedule", data);
 
-              case 21:
+              case 22:
                 resFetchSchedule = _context16.sent;
 
                 if (resFetchSchedule.status == 200) {
@@ -36781,7 +36781,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 _this17.fetchScheduleData();
 
-              case 24:
+              case 25:
               case "end":
                 return _context16.stop();
             }
