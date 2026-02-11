@@ -36709,11 +36709,47 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this17 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee16() {
-        var data, resFetchSchedule;
+        var _this17$user, previousDays, previousDate, formDate, yyyy, mm, dd, minAllowedDate, data, resFetchSchedule;
+
         return _regeneratorRuntime().wrap(function _callee16$(_context16) {
           while (1) {
             switch (_context16.prev = _context16.next) {
               case 0:
+                if (!_this17.checkForSubmenuButtons('previous-date')) {
+                  _context16.next = 13;
+                  break;
+                }
+
+                // number of previous days from API or fallback to 0
+                previousDays = ((_this17$user = _this17.user) === null || _this17$user === void 0 ? void 0 : _this17$user.previous_days) || 0; // calculate the actual previous date
+
+                previousDate = new Date();
+                previousDate.setDate(previousDate.getDate() - (previousDays + 1)); // convert form date to a Date object
+
+                formDate = new Date(_this17.addForm.date); // compare the dates
+
+                if (!(formDate < previousDate)) {
+                  _context16.next = 13;
+                  break;
+                }
+
+                // format previousDate to yyyy-mm-dd for input
+                yyyy = previousDate.getFullYear();
+                mm = String(previousDate.getMonth() + 1).padStart(2, '0');
+                dd = String(previousDate.getDate()).padStart(2, '0');
+                minAllowedDate = "".concat(yyyy, "-").concat(mm, "-").concat(dd); // show alert
+
+                swal({
+                  title: "Not Allowed",
+                  text: "Schedules are not available for the selected date. Please choose a valid date",
+                  icon: "error",
+                  timer: 2000
+                }); // reset input to minimum allowed date
+
+                _this17.addForm.date = minAllowedDate;
+                return _context16.abrupt("return");
+
+              case 13:
                 _this17.getSchedule = true;
                 _this17.showBookingDiv = false;
                 _this17.allSchedules = {};
@@ -36724,10 +36760,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   date: _this17.addForm.date,
                   terminal: _this17.addForm.terminalId
                 };
-                _context16.next = 7;
+                _context16.next = 20;
                 return _this17.callApi("post", "booking/fetchSchedule", data);
 
-              case 7:
+              case 20:
                 resFetchSchedule = _context16.sent;
 
                 if (resFetchSchedule.status == 200) {
@@ -36743,7 +36779,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 _this17.fetchScheduleData();
 
-              case 10:
+              case 23:
               case "end":
                 return _context16.stop();
             }
@@ -37119,8 +37155,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this24 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee23() {
-        var _this24$user, previousDays, previousDate, formDate, yyyy, mm, dd, minAllowedDate, resSelected, i, j, terminalSeats, restDiscount, resFetchDiscountSurcharge, responseEltDetails, resFetchOverIssueSeat;
-
+        var resSelected, i, j, terminalSeats, restDiscount, resFetchDiscountSurcharge, responseEltDetails, resFetchOverIssueSeat;
         return _regeneratorRuntime().wrap(function _callee23$(_context23) {
           while (1) {
             switch (_context23.prev = _context23.next) {
@@ -37138,45 +37173,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 2:
-                if (!_this24.checkForSubmenuButtons('previous-date')) {
-                  _context23.next = 16;
-                  break;
-                }
-
-                // number of previous days from API or fallback to 0
-                previousDays = ((_this24$user = _this24.user) === null || _this24$user === void 0 ? void 0 : _this24$user.previous_days) || 0; // calculate the actual previous date
-
-                previousDate = new Date();
-                previousDate.setDate(previousDate.getDate() - (previousDays + 1)); // convert form date to a Date object
-
-                formDate = new Date(_this24.addForm.date); // compare the dates
-
-                if (!(formDate < previousDate)) {
-                  _context23.next = 16;
-                  break;
-                }
-
-                // format previousDate to yyyy-mm-dd
-                yyyy = previousDate.getFullYear();
-                mm = String(previousDate.getMonth() + 1).padStart(2, '0');
-                dd = String(previousDate.getDate()).padStart(2, '0');
-                minAllowedDate = "".concat(yyyy, "-").concat(mm, "-").concat(dd);
-                swal({
-                  title: "Not Allowed",
-                  text: "Schedules are not available for the selected date. Please choose a valid date.",
-                  icon: "error",
-                  timer: 2000
-                }); // reset input to minimum allowed date
-
-                _this24.addForm.date = minAllowedDate; // optionally re-fetch schedules for corrected date
-
-                _this24.$nextTick(function () {
-                  _this24.fetchSpecificSchedules();
-                });
-
-                return _context23.abrupt("return");
-
-              case 16:
                 _this24.getSchedule = true;
 
                 _this24.resetArrays();
@@ -37214,11 +37210,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this24.checkedUsagePoints = false;
 
                 if (!(_this24.addForm.schedule != 0 && _this24.addForm.date && _this24.addForm.departureCity != 0 && _this24.addForm.destinationCity != 0)) {
-                  _context23.next = 95;
+                  _context23.next = 81;
                   break;
                 }
 
-                _context23.next = 52;
+                _context23.next = 38;
                 return _this24.callApi("post", "booking/schedule/selected", {
                   id: _this24.addForm.schedule,
                   date: _this24.addForm.date,
@@ -37228,7 +37224,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   departure_time: _this24.addForm.departure_time
                 });
 
-              case 52:
+              case 38:
                 resSelected = _context23.sent;
 
                 if (resSelected.status == 200) {
@@ -37279,14 +37275,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this24.addForm.selectedSeatsClass = [];
                 _this24.addForm.totalAmount = 0;
                 _this24.addForm.discount = '';
-                _context23.next = 74;
+                _context23.next = 60;
                 return _this24.callApi("post", "booking/terminal/seats", {
                   terminal_id: _this24.$store.state.user.terminal_id
                 });
 
-              case 74:
+              case 60:
                 terminalSeats = _context23.sent;
-                _context23.next = 77;
+                _context23.next = 63;
                 return _this24.callApi("post", "booking/schedule/terminal/discount/fetch", {
                   id: _this24.addForm.schedule,
                   date: _this24.addForm.date,
@@ -37295,16 +37291,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   dropTerminal: _this24.addForm.terminalId
                 });
 
-              case 77:
+              case 63:
                 restDiscount = _context23.sent;
-                _context23.next = 80;
+                _context23.next = 66;
                 return _this24.callApi("post", "booking/discount/surcharge/fetch", {
                   schedule_id: _this24.addForm.schedule
                 });
 
-              case 80:
+              case 66:
                 resFetchDiscountSurcharge = _context23.sent;
-                _context23.next = 83;
+                _context23.next = 69;
                 return _this24.callApi("post", "booking/booked/seats/elt/detail", {
                   id: _this24.addForm.schedule,
                   date: _this24.addForm.date,
@@ -37312,9 +37308,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   destinationCity: _this24.addForm.destinationCity
                 });
 
-              case 83:
+              case 69:
                 responseEltDetails = _context23.sent;
-                _context23.next = 86;
+                _context23.next = 72;
                 return _this24.callApi("post", "booking/fetch/over/issue/seat", {
                   id: _this24.addForm.schedule,
                   date: _this24.addForm.date,
@@ -37322,7 +37318,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   destinationCity: _this24.addForm.destinationCity
                 });
 
-              case 86:
+              case 72:
                 resFetchOverIssueSeat = _context23.sent;
 
                 if (resFetchOverIssueSeat.status == 200) {
@@ -37387,7 +37383,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 _this24.getSchedule = false;
 
-              case 95:
+              case 81:
               case "end":
                 return _context23.stop();
             }
