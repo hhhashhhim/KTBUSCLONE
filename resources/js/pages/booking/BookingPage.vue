@@ -46,9 +46,8 @@
                                                     <div class="form-group mb-0">
                                                         <label for="date" class="mb-0">Date <span
                                                                 class="text-danger ml-1">*</span></label>
-                                                        <input type="date"
-                                                            :min="checkForSubmenuButtons('previous-date') ? '' : minDateFilter()"
-                                                            class="form-control" id="dynamicDate" v-model="addForm.date"
+                                                        <input type="date" :min="minDateFilter()" class="form-control"
+                                                            id="dynamicDate" v-model="addForm.date"
                                                             @change="fetchSpecificSchedules()" />
                                                     </div>
                                                 </div>
@@ -255,11 +254,11 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6" v-if=" checkForSubmenu('jazz-cash-refund')" >
+                                            <div class="col-md-6" v-if="checkForSubmenu('jazz-cash-refund')">
                                                 <div class="form-group mb-0">
                                                     <label>Transaction No</label>
-                                                    <input 
-                                                        type="text" class="form-control" id="fullName" v-model="addForm.transaction_id" />
+                                                    <input type="text" class="form-control" id="fullName"
+                                                        v-model="addForm.transaction_id" />
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -1439,7 +1438,8 @@
                                                         innerItem.type === 'booked' &&
                                                         Number(innerItem.terminal_id) == 14 &&
                                                         innerItem.transaction_id != null
-                                                    " type="button" class="btn btn-danger ml-2" @click="passDataToCancelRefundModel(innerItem); cancelData.percentage = 0">
+                                                    " type="button" class="btn btn-danger ml-2"
+                                                        @click="passDataToCancelRefundModel(innerItem); cancelData.percentage = 0">
                                                         Cancel & Refund Ticket
                                                     </button>
 
@@ -1858,6 +1858,8 @@ export default {
             showPointsCheckbox: false,
             showDiscountCheckbox: false,
             permissions: [],
+            user: null,
+            userPreviousDays: null,
 
         };
     },
@@ -1877,6 +1879,7 @@ export default {
         }
     },
     mounted() {
+        this.fetchUser();
         const self = this;
         // assignDriver
         const assignDriver = $('#assignDriver');
@@ -1927,6 +1930,15 @@ export default {
         }, 2000);
     },
     methods: {
+        async fetchUser() {
+            const res = await this.callApi("post", "booking/users");
+            console.log("USER RESPONSE:", res);
+
+            if (res && res.status === 200) {
+                this.user = res.data;
+                console.log("Previous Days:", this.user.previous_days);
+            }
+        },
         handleCheckboxClick(e, type) {
 
             // 🚫 No seat → hard stop
@@ -2256,17 +2268,22 @@ export default {
             this.cancelLoading = false;
         },
 
-        minDateFilter: function () {
-            const dtToday = new Date();
-            let month = dtToday.getMonth() + 1;
-            let day = dtToday.getDate() - 2;
-            const year = dtToday.getFullYear();
-            if (month < 10)
-                month = '0' + month.toString();
-            if (day < 10)
-                day = '0' + day.toString();
-            return year + '-' + month + '-' + day;
-        },
+       minDateFilter: function () {
+    // get previous days from user or default to 2
+    let previousDays = this.checkForSubmenuButtons('previous-date')
+        ? (this.user?.previous_days || 0)
+        : 2;
+
+    let previousDate = new Date();
+    previousDate.setDate(previousDate.getDate() - previousDays);
+
+    // format to yyyy-mm-dd
+    let yyyy = previousDate.getFullYear();
+    let mm = String(previousDate.getMonth() + 1).padStart(2, '0');
+    let dd = String(previousDate.getDate()).padStart(2, '0');
+
+    return `${yyyy}-${mm}-${dd}`;
+},
 
         setScheduleValue(event) {
             this.addForm.departure_time = this.allSchedules[event.target.selectedIndex - 1].departure_city_time;
@@ -2988,6 +3005,28 @@ export default {
                     timer: 2000
                 });
             }
+            if (this.checkForSubmenuButtons('previous-date')) {
+                // number of previous days from API or fallback to 0
+                let previousDays = this.user?.previous_days || 0;
+
+                // calculate the actual previous date
+                let previousDate = new Date();
+                previousDate.setDate(previousDate.getDate() - previousDays);
+
+                // convert form date to a Date object
+                let formDate = new Date(this.addForm.date);
+
+                // compare the dates
+                if (formDate < previousDate) {
+                    return swal({
+                        title: "Required!",
+                        text: "nhi daikh skta",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+            }
+
             this.getSchedule = true;
             this.resetArrays();
             this.schedule = [];

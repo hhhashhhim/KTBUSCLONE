@@ -229,17 +229,29 @@
                              data-toggle="modal" data-target="#addRoleModal"> Add New Role
                         </div>
                         <select
-                            type="text"
-                            class="form-control"
-                            id="role"
-                            v-model="data.role"
-                        >
-                            <option value="0" selected>Select Role</option>
-                            <option v-for="(role, i) in roles" :value="role.id" :key="i">
-                                {{ role.name }}
-                            </option>
-                        </select>
+  class="form-control"
+  id="role"
+  v-model="data.role"
+>
+  <option value="0">Select Role</option>
+  <option v-for="(role, i) in roles" :value="role.id" :key="i">
+    {{ role.name }}
+  </option>
+</select>
+
                     </div>
+                  <div class="form-group col-md-6" v-if="hasPreviousDatePermission">
+  <label>Previous Date</label>
+  <input
+    type="number"
+    class="form-control"
+    v-model.number="data.previous_days"
+    placeholder="Enter previous date value"
+  >
+</div>
+
+
+
                     <div class="form-group col-md-6">
                         <label for="role">User Type <span class="text-danger ml-1">*</span></label>
                         <div class="custom-control custom-checkbox">
@@ -437,6 +449,16 @@
                             </option>
                         </select>
                     </div>
+                    <div class="form-group col-md-6" v-if="hasPreviousDatePermissionEdit">
+  <label>Previous Date</label>
+  <input
+    type="number"
+    class="form-control"
+    v-model.number="dataEdit.previous_days"
+    placeholder="Enter previous date value"
+  >
+</div>
+
                     <div class="form-group col-md-6">
                         <label for="role">Allowed Seats Check</label>
                         <select
@@ -551,6 +573,7 @@ export default {
                 online_user: 0,
                 destination: [],
                 departure: [],
+                previous_days: "",
             },
             dataEdit: {
                 terminal_id: 0,
@@ -582,6 +605,34 @@ export default {
         await this.fetchUsers();
         this.permissions = this.$store.state.permissions;
     },
+   computed: {
+  // ===== ADD MODE =====
+  selectedRole() {
+    return this.roles.find(r => String(r.id) === String(this.data.role));
+  },
+
+  hasPreviousDatePermission() {
+    if (!this.selectedRole || !Array.isArray(this.selectedRole.permissions)) {
+      return false;
+    }
+
+    return this.checkPreviousDatePermission(this.selectedRole);
+  },
+
+  // ===== EDIT MODE =====
+  selectedEditRole() {
+    return this.roles.find(r => String(r.id) === String(this.dataEdit.role_id));
+  },
+
+  hasPreviousDatePermissionEdit() {
+    if (!this.selectedEditRole || !Array.isArray(this.selectedEditRole.permissions)) {
+      return false;
+    }
+
+    return this.checkPreviousDatePermission(this.selectedEditRole);
+  }
+},
+
     mounted() {
         setTimeout(() => {
             const departure = $('#departure');
@@ -619,6 +670,25 @@ export default {
         }, 1000);
     },
     methods: {
+        checkPreviousDatePermission(role) {
+    for (const module of role.permissions) {
+      if (!Array.isArray(module.childs)) continue;
+
+      for (const child of module.childs) {
+        if (!Array.isArray(child.buttons)) continue;
+
+        const found = child.buttons.find(
+          btn => btn.name === 'previous-date' && btn.allow === true
+        );
+
+        if (found) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  },
         closeModal() {
             $(".modal").click();
         },
@@ -1063,5 +1133,22 @@ export default {
             }
         },
     },
+watch: {
+  // ===== ADD MODE =====
+  'data.role'(newVal, oldVal) {
+    if (newVal !== oldVal) {
+      this.data.previous_days = null;
+    }
+  },
+
+  // ===== EDIT MODE =====
+  'dataEdit.role_id'(newVal, oldVal) {
+    if (newVal !== oldVal) {
+      this.dataEdit.previous_days = null;
+    }
+  }
+}
+
+
 };
 </script>
