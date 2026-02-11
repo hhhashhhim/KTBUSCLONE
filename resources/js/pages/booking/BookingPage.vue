@@ -2751,7 +2751,7 @@ export default {
         async fetchSpecificSchedules() {
            
             if (this.checkForSubmenuButtons('previous-date')) {
-                 alert("test");
+                 alert("abc");
                 // number of previous days from API or fallback to 0
                 let previousDays = this.user?.previous_days || 0;
 

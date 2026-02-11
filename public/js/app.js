@@ -36720,7 +36720,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   break;
                 }
 
-                alert("test"); // number of previous days from API or fallback to 0
+                alert("abc"); // number of previous days from API or fallback to 0
 
                 previousDays = ((_this17$user = _this17.user) === null || _this17$user === void 0 ? void 0 : _this17$user.previous_days) || 0; // calculate the actual previous date
 
