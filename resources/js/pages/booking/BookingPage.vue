@@ -3011,7 +3011,7 @@ export default {
 
                 // calculate the actual previous date
                 let previousDate = new Date();
-                previousDate.setDate(previousDate.getDate() - previousDays);
+                previousDate.setDate(previousDate.getDate() - (previousDays + 1));
 
                 // convert form date to a Date object
                 let formDate = new Date(this.addForm.date);

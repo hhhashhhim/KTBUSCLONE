@@ -37147,7 +37147,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 previousDays = ((_this24$user = _this24.user) === null || _this24$user === void 0 ? void 0 : _this24$user.previous_days) || 0; // calculate the actual previous date
 
                 previousDate = new Date();
-                previousDate.setDate(previousDate.getDate() - previousDays); // convert form date to a Date object
+                previousDate.setDate(previousDate.getDate() - (previousDays + 1)); // convert form date to a Date object
 
                 formDate = new Date(_this24.addForm.date); // compare the dates
 
