@@ -2753,37 +2753,34 @@ export default {
             if (this.checkForSubmenuButtons('previous-date')) {
                
                 // number of previous days from API or fallback to 0
-                let previousDays = this.user?.previous_days || 0;
+               let previousDays = this.user?.previous_days || 0;
 
-                // calculate the actual previous date
-                let previousDate = new Date();
-                previousDate.setDate(previousDate.getDate() - (previousDays));
+let previousDate = new Date();
+previousDate.setDate(previousDate.getDate() - previousDays);
 
-                // convert form date to a Date object
-                let formDate = new Date(this.addForm.date);
-  alert("abc" + this.formDate);
-                // compare the dates
-                if (formDate < previousDate) {
-                     alert("date");
-                    // format previousDate to yyyy-mm-dd for input
-                    let yyyy = previousDate.getFullYear();
-                    let mm = String(previousDate.getMonth() + 1).padStart(2, '0');
-                    let dd = String(previousDate.getDate()).padStart(2, '0');
-                    let minAllowedDate = `${yyyy}-${mm}-${dd}`;
+let formDate = new Date(this.addForm.date);
+alert("abc " + formDate);
 
-                    // show alert
-                    swal({
-                        title: "Not Allowed",
-                        text: "Schedules are not available for the selected date. Please choose a valid date",
-                        icon: "error",
-                        timer: 2000
-                    });
+if (formDate < previousDate) {
+    let yyyy = previousDate.getFullYear();
+    let mm = String(previousDate.getMonth() + 1).padStart(2, '0');
+    let dd = String(previousDate.getDate()).padStart(2, '0');
+    let minAllowedDate = `${yyyy}-${mm}-${dd}`;
 
-                    // reset input to minimum allowed date
-                    this.addForm.date = minAllowedDate;
+    swal({
+        title: "Not Allowed",
+        text: "Schedules are not available for the selected date. Please choose a valid date",
+        icon: "error",
+        timer: 2000
+    });
 
-                    return;
-                }
+    this.addForm.date = minAllowedDate;
+    this.$nextTick(() => {
+        this.fetchSpecificSchedules();
+    });
+
+    return;
+}
 
             }
             this.getSchedule = true;
