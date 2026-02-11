@@ -36715,8 +36715,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           while (1) {
             switch (_context16.prev = _context16.next) {
               case 0:
+                alert("test");
+
                 if (!_this17.checkForSubmenuButtons('previous-date')) {
-                  _context16.next = 13;
+                  _context16.next = 14;
                   break;
                 }
 
@@ -36729,7 +36731,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 formDate = new Date(_this17.addForm.date); // compare the dates
 
                 if (!(formDate < previousDate)) {
-                  _context16.next = 13;
+                  _context16.next = 14;
                   break;
                 }
 
@@ -36749,7 +36751,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this17.addForm.date = minAllowedDate;
                 return _context16.abrupt("return");
 
-              case 13:
+              case 14:
                 _this17.getSchedule = true;
                 _this17.showBookingDiv = false;
                 _this17.allSchedules = {};
@@ -36760,10 +36762,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   date: _this17.addForm.date,
                   terminal: _this17.addForm.terminalId
                 };
-                _context16.next = 20;
+                _context16.next = 21;
                 return _this17.callApi("post", "booking/fetchSchedule", data);
 
-              case 20:
+              case 21:
                 resFetchSchedule = _context16.sent;
 
                 if (resFetchSchedule.status == 200) {
@@ -36779,7 +36781,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 _this17.fetchScheduleData();
 
-              case 23:
+              case 24:
               case "end":
                 return _context16.stop();
             }

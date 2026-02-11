@@ -117,10 +117,10 @@
                                             <div class="col-md-6">
                                                 <label class="py-2 text-danger" v-if="this.haveLabel">{{
                                                     this.label
-                                                }}</label>
+                                                    }}</label>
                                                 <label class="py-2 text-danger" v-if="this.haveLabel">{{
                                                     this.discountLabel
-                                                }}</label>
+                                                    }}</label>
                                             </div>
                                             <div class="col-md-6">
                                                 <!-- POINTS -->
@@ -765,7 +765,7 @@
                                                     <h4 class="mb-0 font-weight-bold mr-3">Type:</h4>
                                                     <h4 class="mb-0 text-muted text-capitalize">{{
                                                         singleSeat.type
-                                                    }}</h4>
+                                                        }}</h4>
                                                 </div>
                                             </div>
                                             <div class="row my-3 pl-3">
@@ -2749,6 +2749,7 @@ export default {
         },
 
         async fetchSpecificSchedules() {
+            alert("test");
             if (this.checkForSubmenuButtons('previous-date')) {
                 // number of previous days from API or fallback to 0
                 let previousDays = this.user?.previous_days || 0;
