@@ -37158,7 +37158,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 return _context23.abrupt("return", swal({
                   title: "Required!",
-                  text: "nhi daikh skta",
+                  text: "You are not allowed to select a date earlier than the permitted range.",
                   icon: "error",
                   timer: 2000
                 }));
