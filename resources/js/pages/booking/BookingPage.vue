@@ -2749,63 +2749,84 @@ export default {
         },
 
         async fetchSpecificSchedules() {
-           
-            if (this.checkForSubmenuButtons('previous-date')) {
-               
-                // number of previous days from API or fallback to 0
-               let previousDays = this.user?.previous_days || 0;
 
-let previousDate = new Date();
-previousDate.setDate(previousDate.getDate() - previousDays);
+    if (this.checkForSubmenuButtons('previous-date')) {
 
-let formDate = new Date(this.addForm.date);
+        // number of previous days from API or fallback to 0
+        let previousDays = parseInt(this.user?.previous_days || 0);
 
+        // calculate minimum allowed date (local, midnight)
+        let previousDate = new Date();
+        previousDate.setHours(0, 0, 0, 0);
+        previousDate.setDate(previousDate.getDate() - previousDays);
 
-if (formDate < previousDate) {
-    let yyyy = previousDate.getFullYear();
-    let mm = String(previousDate.getMonth() + 1).padStart(2, '0');
-    let dd = String(previousDate.getDate()).padStart(2, '0');
-    let minAllowedDate = `${yyyy}-${mm}-${dd}`;
+        // convert form date safely and normalize
+        let formDate = new Date(this.addForm.date + 'T00:00:00');
 
-    swal({
-        title: "Not Allowed",
-        text: "Schedules are not available for the selected date. Please choose a valid date",
-        icon: "error",
-        timer: 2000
-    });
+        // DEBUG (optional - remove later)
+        console.log('Min Allowed Date:', previousDate);
+        console.log('Form Date:', formDate);
 
-    this.addForm.date = minAllowedDate;
-    this.$nextTick(() => {
-        this.fetchSpecificSchedules();
-    });
+        // compare the dates
+        if (formDate < previousDate) {
 
-    return;
-}
+            // format previousDate to yyyy-mm-dd for input
+            let yyyy = previousDate.getFullYear();
+            let mm = String(previousDate.getMonth() + 1).padStart(2, '0');
+            let dd = String(previousDate.getDate()).padStart(2, '0');
+            let minAllowedDate = `${yyyy}-${mm}-${dd}`;
 
-            }
-            this.getSchedule = true;
-            this.showBookingDiv = false;
-            this.allSchedules = {};
+            swal({
+                title: "Not Allowed",
+                text: "Schedules are not available for the selected date. Please choose a valid date.",
+                icon: "error",
+                timer: 2000
+            });
+
+            // reset input to minimum allowed date
+            this.addForm.date = minAllowedDate;
+
+            // re-fetch with corrected date
+            this.$nextTick(() => {
+                this.fetchSpecificSchedules();
+            });
+
+            return;
+        }
+    }
+
+    // =============================
+    // Continue normal schedule fetch
+    // =============================
+
+    this.getSchedule = true;
+    this.showBookingDiv = false;
+    this.allSchedules = {};
+    this.addForm.schedule = 0;
+
+    const data = {
+        departure_city_id: this.addForm.departureCity,
+        destination_city_id: this.addForm.destinationCity,
+        date: this.addForm.date,
+        terminal: this.addForm.terminalId,
+    };
+
+    const resFetchSchedule = await this.callApi("post", "booking/fetchSchedule", data);
+
+    if (resFetchSchedule.status == 200) {
+        if (resFetchSchedule.data && resFetchSchedule.data.length != 0) {
+            this.getSchedule = false;
+            this.allSchedules = resFetchSchedule.data;
+            $('#scheduleName').select2();
+        } else {
             this.addForm.schedule = 0;
-            const data = {
-                departure_city_id: this.addForm.departureCity,
-                destination_city_id: this.addForm.destinationCity,
-                date: this.addForm.date,
-                terminal: this.addForm.terminalId,
-            }
-            const resFetchSchedule = await this.callApi("post", "booking/fetchSchedule", data);
-            if (resFetchSchedule.status == 200) {
-                if (resFetchSchedule.length != 0) {
-                    this.getSchedule = false;
-                    this.allSchedules = resFetchSchedule.data;
-                    $('#scheduleName').select2();
-                } else {
-                    this.addForm.schedule = 0;
-                    this.showBookingDiv = false;
-                }
-            }
-            this.fetchScheduleData();
-        },
+            this.showBookingDiv = false;
+        }
+    }
+
+    this.fetchScheduleData();
+},
+
 
         async fetchReSpecificSchedules() {
             this.allReSchedules = {};

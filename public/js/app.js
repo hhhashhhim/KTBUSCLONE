@@ -36716,32 +36716,40 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             switch (_context16.prev = _context16.next) {
               case 0:
                 if (!_this17.checkForSubmenuButtons('previous-date')) {
-                  _context16.next = 14;
+                  _context16.next = 17;
                   break;
                 }
 
                 // number of previous days from API or fallback to 0
-                previousDays = ((_this17$user = _this17.user) === null || _this17$user === void 0 ? void 0 : _this17$user.previous_days) || 0;
+                previousDays = parseInt(((_this17$user = _this17.user) === null || _this17$user === void 0 ? void 0 : _this17$user.previous_days) || 0); // calculate minimum allowed date (local, midnight)
+
                 previousDate = new Date();
-                previousDate.setDate(previousDate.getDate() - previousDays);
-                formDate = new Date(_this17.addForm.date);
+                previousDate.setHours(0, 0, 0, 0);
+                previousDate.setDate(previousDate.getDate() - previousDays); // convert form date safely and normalize
+
+                formDate = new Date(_this17.addForm.date + 'T00:00:00'); // DEBUG (optional - remove later)
+
+                console.log('Min Allowed Date:', previousDate);
+                console.log('Form Date:', formDate); // compare the dates
 
                 if (!(formDate < previousDate)) {
-                  _context16.next = 14;
+                  _context16.next = 17;
                   break;
                 }
 
+                // format previousDate to yyyy-mm-dd for input
                 yyyy = previousDate.getFullYear();
                 mm = String(previousDate.getMonth() + 1).padStart(2, '0');
                 dd = String(previousDate.getDate()).padStart(2, '0');
                 minAllowedDate = "".concat(yyyy, "-").concat(mm, "-").concat(dd);
                 swal({
                   title: "Not Allowed",
-                  text: "Schedules are not available for the selected date. Please choose a valid date",
+                  text: "Schedules are not available for the selected date. Please choose a valid date.",
                   icon: "error",
                   timer: 2000
-                });
-                _this17.addForm.date = minAllowedDate;
+                }); // reset input to minimum allowed date
+
+                _this17.addForm.date = minAllowedDate; // re-fetch with corrected date
 
                 _this17.$nextTick(function () {
                   _this17.fetchSpecificSchedules();
@@ -36749,7 +36757,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 return _context16.abrupt("return");
 
-              case 14:
+              case 17:
+                // =============================
+                // Continue normal schedule fetch
+                // =============================
                 _this17.getSchedule = true;
                 _this17.showBookingDiv = false;
                 _this17.allSchedules = {};
@@ -36760,14 +36771,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   date: _this17.addForm.date,
                   terminal: _this17.addForm.terminalId
                 };
-                _context16.next = 21;
+                _context16.next = 24;
                 return _this17.callApi("post", "booking/fetchSchedule", data);
 
-              case 21:
+              case 24:
                 resFetchSchedule = _context16.sent;
 
                 if (resFetchSchedule.status == 200) {
-                  if (resFetchSchedule.length != 0) {
+                  if (resFetchSchedule.data && resFetchSchedule.data.length != 0) {
                     _this17.getSchedule = false;
                     _this17.allSchedules = resFetchSchedule.data;
                     $('#scheduleName').select2();
@@ -36779,7 +36790,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 _this17.fetchScheduleData();
 
-              case 24:
+              case 27:
               case "end":
                 return _context16.stop();
             }
