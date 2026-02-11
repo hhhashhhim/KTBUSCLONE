@@ -36721,34 +36721,33 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }
 
                 // number of previous days from API or fallback to 0
-                previousDays = ((_this17$user = _this17.user) === null || _this17$user === void 0 ? void 0 : _this17$user.previous_days) || 0; // calculate the actual previous date
-
+                previousDays = ((_this17$user = _this17.user) === null || _this17$user === void 0 ? void 0 : _this17$user.previous_days) || 0;
                 previousDate = new Date();
-                previousDate.setDate(previousDate.getDate() - previousDays); // convert form date to a Date object
-
+                previousDate.setDate(previousDate.getDate() - previousDays);
                 formDate = new Date(_this17.addForm.date);
-                alert("abc" + _this17.formDate); // compare the dates
+                alert("abc " + formDate);
 
                 if (!(formDate < previousDate)) {
                   _context16.next = 15;
                   break;
                 }
 
-                alert("date"); // format previousDate to yyyy-mm-dd for input
-
                 yyyy = previousDate.getFullYear();
                 mm = String(previousDate.getMonth() + 1).padStart(2, '0');
                 dd = String(previousDate.getDate()).padStart(2, '0');
-                minAllowedDate = "".concat(yyyy, "-").concat(mm, "-").concat(dd); // show alert
-
+                minAllowedDate = "".concat(yyyy, "-").concat(mm, "-").concat(dd);
                 swal({
                   title: "Not Allowed",
                   text: "Schedules are not available for the selected date. Please choose a valid date",
                   icon: "error",
                   timer: 2000
-                }); // reset input to minimum allowed date
-
+                });
                 _this17.addForm.date = minAllowedDate;
+
+                _this17.$nextTick(function () {
+                  _this17.fetchSpecificSchedules();
+                });
+
                 return _context16.abrupt("return");
 
               case 15:

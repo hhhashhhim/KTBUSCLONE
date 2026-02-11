@@ -2759,7 +2759,7 @@ let previousDate = new Date();
 previousDate.setDate(previousDate.getDate() - previousDays);
 
 let formDate = new Date(this.addForm.date);
-alert("abc " + formDate);
+alert("abc " + formDate); 
 
 if (formDate < previousDate) {
     let yyyy = previousDate.getFullYear();
