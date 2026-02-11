@@ -2751,17 +2751,17 @@ export default {
         async fetchSpecificSchedules() {
            
             if (this.checkForSubmenuButtons('previous-date')) {
-                 alert("abc");
+               
                 // number of previous days from API or fallback to 0
                 let previousDays = this.user?.previous_days || 0;
 
                 // calculate the actual previous date
                 let previousDate = new Date();
-                previousDate.setDate(previousDate.getDate() - (previousDays + 1));
+                previousDate.setDate(previousDate.getDate() - (previousDays));
 
                 // convert form date to a Date object
                 let formDate = new Date(this.addForm.date);
-
+  alert("abc" + this.formDate);
                 // compare the dates
                 if (formDate < previousDate) {
                      alert("date");

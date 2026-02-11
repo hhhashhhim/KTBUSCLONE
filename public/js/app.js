@@ -36720,14 +36720,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   break;
                 }
 
-                alert("abc"); // number of previous days from API or fallback to 0
-
+                // number of previous days from API or fallback to 0
                 previousDays = ((_this17$user = _this17.user) === null || _this17$user === void 0 ? void 0 : _this17$user.previous_days) || 0; // calculate the actual previous date
 
                 previousDate = new Date();
-                previousDate.setDate(previousDate.getDate() - (previousDays + 1)); // convert form date to a Date object
+                previousDate.setDate(previousDate.getDate() - previousDays); // convert form date to a Date object
 
-                formDate = new Date(_this17.addForm.date); // compare the dates
+                formDate = new Date(_this17.addForm.date);
+                alert("abc" + _this17.formDate); // compare the dates
 
                 if (!(formDate < previousDate)) {
                   _context16.next = 15;
