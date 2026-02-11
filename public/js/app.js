@@ -37119,7 +37119,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this24 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee23() {
-        var _this24$user, previousDays, previousDate, formDate, resSelected, i, j, terminalSeats, restDiscount, resFetchDiscountSurcharge, responseEltDetails, resFetchOverIssueSeat;
+        var _this24$user, previousDays, previousDate, formDate, yyyy, mm, dd, minAllowedDate, resSelected, i, j, terminalSeats, restDiscount, resFetchDiscountSurcharge, responseEltDetails, resFetchOverIssueSeat;
 
         return _regeneratorRuntime().wrap(function _callee23$(_context23) {
           while (1) {
@@ -37139,7 +37139,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 2:
                 if (!_this24.checkForSubmenuButtons('previous-date')) {
-                  _context23.next = 9;
+                  _context23.next = 15;
                   break;
                 }
 
@@ -37152,18 +37152,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 formDate = new Date(_this24.addForm.date); // compare the dates
 
                 if (!(formDate < previousDate)) {
-                  _context23.next = 9;
+                  _context23.next = 15;
                   break;
                 }
 
-                return _context23.abrupt("return", swal({
-                  title: "Required!",
+                // format previousDate to yyyy-mm-dd for input
+                yyyy = previousDate.getFullYear();
+                mm = String(previousDate.getMonth() + 1).padStart(2, '0');
+                dd = String(previousDate.getDate()).padStart(2, '0');
+                minAllowedDate = "".concat(yyyy, "-").concat(mm, "-").concat(dd); // show alert
+
+                swal({
+                  title: "Not Allowed",
                   text: "You are not allowed to select a date earlier than the permitted range.",
                   icon: "error",
                   timer: 2000
-                }));
+                }); // reset input to minimum allowed date
 
-              case 9:
+                _this24.addForm.date = minAllowedDate;
+                return _context23.abrupt("return");
+
+              case 15:
                 _this24.getSchedule = true;
 
                 _this24.resetArrays();
@@ -37201,11 +37210,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this24.checkedUsagePoints = false;
 
                 if (!(_this24.addForm.schedule != 0 && _this24.addForm.date && _this24.addForm.departureCity != 0 && _this24.addForm.destinationCity != 0)) {
-                  _context23.next = 88;
+                  _context23.next = 94;
                   break;
                 }
 
-                _context23.next = 45;
+                _context23.next = 51;
                 return _this24.callApi("post", "booking/schedule/selected", {
                   id: _this24.addForm.schedule,
                   date: _this24.addForm.date,
@@ -37215,7 +37224,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   departure_time: _this24.addForm.departure_time
                 });
 
-              case 45:
+              case 51:
                 resSelected = _context23.sent;
 
                 if (resSelected.status == 200) {
@@ -37266,14 +37275,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this24.addForm.selectedSeatsClass = [];
                 _this24.addForm.totalAmount = 0;
                 _this24.addForm.discount = '';
-                _context23.next = 67;
+                _context23.next = 73;
                 return _this24.callApi("post", "booking/terminal/seats", {
                   terminal_id: _this24.$store.state.user.terminal_id
                 });
 
-              case 67:
+              case 73:
                 terminalSeats = _context23.sent;
-                _context23.next = 70;
+                _context23.next = 76;
                 return _this24.callApi("post", "booking/schedule/terminal/discount/fetch", {
                   id: _this24.addForm.schedule,
                   date: _this24.addForm.date,
@@ -37282,16 +37291,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   dropTerminal: _this24.addForm.terminalId
                 });
 
-              case 70:
+              case 76:
                 restDiscount = _context23.sent;
-                _context23.next = 73;
+                _context23.next = 79;
                 return _this24.callApi("post", "booking/discount/surcharge/fetch", {
                   schedule_id: _this24.addForm.schedule
                 });
 
-              case 73:
+              case 79:
                 resFetchDiscountSurcharge = _context23.sent;
-                _context23.next = 76;
+                _context23.next = 82;
                 return _this24.callApi("post", "booking/booked/seats/elt/detail", {
                   id: _this24.addForm.schedule,
                   date: _this24.addForm.date,
@@ -37299,9 +37308,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   destinationCity: _this24.addForm.destinationCity
                 });
 
-              case 76:
+              case 82:
                 responseEltDetails = _context23.sent;
-                _context23.next = 79;
+                _context23.next = 85;
                 return _this24.callApi("post", "booking/fetch/over/issue/seat", {
                   id: _this24.addForm.schedule,
                   date: _this24.addForm.date,
@@ -37309,7 +37318,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   destinationCity: _this24.addForm.destinationCity
                 });
 
-              case 79:
+              case 85:
                 resFetchOverIssueSeat = _context23.sent;
 
                 if (resFetchOverIssueSeat.status == 200) {
@@ -37374,7 +37383,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 _this24.getSchedule = false;
 
-              case 88:
+              case 94:
               case "end":
                 return _context23.stop();
             }

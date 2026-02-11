@@ -3018,13 +3018,26 @@ export default {
 
                 // compare the dates
                 if (formDate < previousDate) {
-                    return swal({
-                        title: "Required!",
-                        text: "You are not allowed to select a date earlier than the permitted range.",
-                        icon: "error",
-                        timer: 2000
-                    });
-                }
+    // format previousDate to yyyy-mm-dd for input
+    let yyyy = previousDate.getFullYear();
+    let mm = String(previousDate.getMonth() + 1).padStart(2, '0');
+    let dd = String(previousDate.getDate()).padStart(2, '0');
+    let minAllowedDate = `${yyyy}-${mm}-${dd}`;
+
+    // show alert
+    swal({
+        title: "Not Allowed",
+        text: "You are not allowed to select a date earlier than the permitted range.",
+        icon: "error",
+        timer: 2000
+    });
+
+    // reset input to minimum allowed date
+    this.addForm.date = minAllowedDate;
+
+    return;
+}
+
             }
 
             this.getSchedule = true;
