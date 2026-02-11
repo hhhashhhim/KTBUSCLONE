@@ -117,10 +117,10 @@
                                             <div class="col-md-6">
                                                 <label class="py-2 text-danger" v-if="this.haveLabel">{{
                                                     this.label
-                                                    }}</label>
+                                                }}</label>
                                                 <label class="py-2 text-danger" v-if="this.haveLabel">{{
                                                     this.discountLabel
-                                                    }}</label>
+                                                }}</label>
                                             </div>
                                             <div class="col-md-6">
                                                 <!-- POINTS -->
@@ -765,7 +765,7 @@
                                                     <h4 class="mb-0 font-weight-bold mr-3">Type:</h4>
                                                     <h4 class="mb-0 text-muted text-capitalize">{{
                                                         singleSeat.type
-                                                        }}</h4>
+                                                    }}</h4>
                                                 </div>
                                             </div>
                                             <div class="row my-3 pl-3">
@@ -2268,22 +2268,22 @@ export default {
             this.cancelLoading = false;
         },
 
-       minDateFilter: function () {
-    // get previous days from user or default to 2
-    let previousDays = this.checkForSubmenuButtons('previous-date')
-        ? (this.user?.previous_days || 0)
-        : 2;
+        minDateFilter: function () {
+            // get previous days from user or default to 2
+            let previousDays = this.checkForSubmenuButtons('previous-date')
+                ? (this.user?.previous_days || 0)
+                : 2;
 
-    let previousDate = new Date();
-    previousDate.setDate(previousDate.getDate() - previousDays);
+            let previousDate = new Date();
+            previousDate.setDate(previousDate.getDate() - previousDays);
 
-    // format to yyyy-mm-dd
-    let yyyy = previousDate.getFullYear();
-    let mm = String(previousDate.getMonth() + 1).padStart(2, '0');
-    let dd = String(previousDate.getDate()).padStart(2, '0');
+            // format to yyyy-mm-dd
+            let yyyy = previousDate.getFullYear();
+            let mm = String(previousDate.getMonth() + 1).padStart(2, '0');
+            let dd = String(previousDate.getDate()).padStart(2, '0');
 
-    return `${yyyy}-${mm}-${dd}`;
-},
+            return `${yyyy}-${mm}-${dd}`;
+        },
 
         setScheduleValue(event) {
             this.addForm.departure_time = this.allSchedules[event.target.selectedIndex - 1].departure_city_time;
@@ -3017,17 +3017,16 @@ export default {
                 let formDate = new Date(this.addForm.date);
 
                 // compare the dates
-                if (formDate < previousDate) {
-    // format previousDate to yyyy-mm-dd for input
+               if (formDate < previousDate) {
+    // format previousDate to yyyy-mm-dd
     let yyyy = previousDate.getFullYear();
     let mm = String(previousDate.getMonth() + 1).padStart(2, '0');
     let dd = String(previousDate.getDate()).padStart(2, '0');
     let minAllowedDate = `${yyyy}-${mm}-${dd}`;
 
-    // show alert
     swal({
         title: "Not Allowed",
-        text: "You are not allowed to select a date earlier than the permitted range.",
+        text: "Schedules are not available for the selected date. Please choose a valid date.",
         icon: "error",
         timer: 2000
     });
@@ -3035,8 +3034,14 @@ export default {
     // reset input to minimum allowed date
     this.addForm.date = minAllowedDate;
 
+    // optionally re-fetch schedules for corrected date
+    this.$nextTick(() => {
+        this.fetchSpecificSchedules();
+    });
+
     return;
 }
+
 
             }
 
