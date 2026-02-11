@@ -10,4 +10,5 @@ Route::group(['prefix' => 'web/v1/cities','middleware' => ['auth:sanctum']], fun
     Route::post('update', [CityController::class, 'update']);
     Route::post('hide', [CityController::class, 'hideCity']);
     Route::post('/terminals', [CityController::class, 'cityTerminals']);
+    Route::post('/users', [CityController::class, 'users']);
 });

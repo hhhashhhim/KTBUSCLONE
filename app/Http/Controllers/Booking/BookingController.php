@@ -45,6 +45,7 @@ use App\Models\Ticket;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 use App\Models\Invoice;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -85,7 +86,11 @@ class BookingController extends Controller
         }
         return City::with('addedBy')->where(['company_id' => Auth::user()->company_id, "hide" => 0])->whereIn('id', $ids)->get();
     }
+    public function users(Request $request)
+    {
 
+        return User::where('id', Auth::user()->id)->first();
+    }
     public function store(Request $request)
     {
 
@@ -211,59 +216,59 @@ class BookingController extends Controller
                     }
                 }
                 // -----------------------------
-// Discount Card application (after OTP verification)
-// -----------------------------
-if (!empty($request->usageDiscount) && !empty($request->discount_otp_valid) && $request->discount_otp_valid == true) {
-    // Find assigned card (you must pass discountCardId from frontend)
-    $discountAssign = CardAssign::where([
-        'id' => $request->discountCardId ?? 0,
-        'company_id' => Auth::user()->company_id
-    ])->first();
+                // Discount Card application (after OTP verification)
+                // -----------------------------
+                if (!empty($request->usageDiscount) && !empty($request->discount_otp_valid) && $request->discount_otp_valid == true) {
+                    // Find assigned card (you must pass discountCardId from frontend)
+                    $discountAssign = CardAssign::where([
+                        'id' => $request->discountCardId ?? 0,
+                        'company_id' => Auth::user()->company_id
+                    ])->first();
 
-    if (!$discountAssign) {
-        return response()->json(["errors" => ["Error" => ["Discount card not found"]]], 422);
-    }
+                    if (!$discountAssign) {
+                        return response()->json(["errors" => ["Error" => ["Discount card not found"]]], 422);
+                    }
 
-    $discountCard = CardCategory::where([
-        'id' => $discountAssign->card_category_id,
-        'company_id' => Auth::user()->company_id
-    ])->first();
+                    $discountCard = CardCategory::where([
+                        'id' => $discountAssign->card_category_id,
+                        'company_id' => Auth::user()->company_id
+                    ])->first();
 
-    if (!$discountCard) {
-        return response()->json(["errors" => ["Error" => ["Discount card category not found"]]], 422);
-    }
+                    if (!$discountCard) {
+                        return response()->json(["errors" => ["Error" => ["Discount card category not found"]]], 422);
+                    }
 
-    // Apply discount according to card type
-    if ($discountCard->discount_type === 'flat') {
-        // flat_discount is amount per ticket (assumption)
-        $perSeatFlat = (float)$discountCard->flat_discount;
-        $seatCount = max(1, count($request->selectedSeats ?? []));
-        $discountFromCard = $perSeatFlat * $seatCount;
+                    // Apply discount according to card type
+                    if ($discountCard->discount_type === 'flat') {
+                        // flat_discount is amount per ticket (assumption)
+                        $perSeatFlat = (float)$discountCard->flat_discount;
+                        $seatCount = max(1, count($request->selectedSeats ?? []));
+                        $discountFromCard = $perSeatFlat * $seatCount;
 
-        // If discount exceeds total fare -> error (prevents "booking more discount")
-        if ($discountFromCard > (float)$request->totalFare) {
-            return response()->json(["errors" => ["Error" => ["Flat discount (Rs {$discountFromCard}) exceeds total fare. Cannot apply."]]], 422);
-        }
+                        // If discount exceeds total fare -> error (prevents "booking more discount")
+                        if ($discountFromCard > (float)$request->totalFare) {
+                            return response()->json(["errors" => ["Error" => ["Flat discount (Rs {$discountFromCard}) exceeds total fare. Cannot apply."]]], 422);
+                        }
 
-        // add to finalAmountDiscount (combine with any points discount)
-        $finalAmountDiscount += $discountFromCard;
+                        // add to finalAmountDiscount (combine with any points discount)
+                        $finalAmountDiscount += $discountFromCard;
 
-        // Optionally: mark this assignment as used or decrement usage if you track counts
-        // $discountAssign->decrement('starting_points', $someValue); // if needed
+                        // Optionally: mark this assignment as used or decrement usage if you track counts
+                        // $discountAssign->decrement('starting_points', $someValue); // if needed
 
-    } elseif ($discountCard->discount_type === 'percentage') {
-        // percentage_discount is percentage to apply on totalFare
-        $percent = (float)$discountCard->percentage_discount;
-        // Apply percentage on total fare (if you want percentage on fare-after-points you can change source)
-        $discountFromCard = (($percent / 100) * (float)$request->totalFare);
+                    } elseif ($discountCard->discount_type === 'percentage') {
+                        // percentage_discount is percentage to apply on totalFare
+                        $percent = (float)$discountCard->percentage_discount;
+                        // Apply percentage on total fare (if you want percentage on fare-after-points you can change source)
+                        $discountFromCard = (($percent / 100) * (float)$request->totalFare);
 
-        // add to finalAmountDiscount (combine with any points discount)
-        $finalAmountDiscount += $discountFromCard;
-    } else {
-        // Unknown discount type - fail safe
-        return response()->json(["errors" => ["Error" => ["Unknown discount type on card"]]], 422);
-    }
-}
+                        // add to finalAmountDiscount (combine with any points discount)
+                        $finalAmountDiscount += $discountFromCard;
+                    } else {
+                        // Unknown discount type - fail safe
+                        return response()->json(["errors" => ["Error" => ["Unknown discount type on card"]]], 422);
+                    }
+                }
 
                 /*
                 *   Validation
@@ -490,7 +495,7 @@ if (!empty($request->usageDiscount) && !empty($request->discount_otp_valid) && $
 
     public function whatsappMessage(Request $request)
     {
-      
+
         return ticketConfirmedMessage($request->invoice_id);
     }
 

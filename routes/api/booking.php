@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Booking\BookingController;
 use App\Http\Controllers\Booking\CounterExpensesController;
+use App\Http\Controllers\CityController;
 use App\Http\Controllers\Schedule\ScheduleClosingController;
 use App\Http\Controllers\TicketClosingShortageController;
 use App\Http\Middleware\CustomMiddleware;
@@ -15,6 +16,7 @@ Route::group(['prefix' => 'web/v1/counter/expenses','middleware' => ['auth:sanct
 Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], function () {
     Route::post('/', [BookingController::class, 'index']);
     Route::post('/cities', [BookingController::class, 'cities']);
+    Route::post('/users', [BookingController::class, 'users']);
     Route::post('/store', [BookingController::class, 'store']);
     Route::post('/send-otp', [BookingController::class, 'sendOtp']);
     Route::post('/send-discount-otp', [BookingController::class, 'sendDiscountOtp']);

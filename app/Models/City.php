@@ -25,6 +25,7 @@ class City extends Model
     public function terminal(){
         return $this->hasMany(Terminal::class, 'city_id', 'id');
     }
+   
     public function addedBy()
     {
         return $this->hasOne(User::class, 'id', 'added_by');

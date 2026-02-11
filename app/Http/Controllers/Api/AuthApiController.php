@@ -33,8 +33,7 @@ class AuthApiController extends Controller
             ], 404);
         }
     
-        $token = $user->createToken('my-app-token')->plainTextToken;
-        
+$token = $user->createToken('postman-token')->plainTextToken;        
         // ActivityLog::create([
         //     "activity_by" => $user->id,
         //     "message" => $user->name." | login",

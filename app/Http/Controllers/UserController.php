@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ActivityLog;
+use App\Models\admin\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -98,6 +99,7 @@ class UserController extends Controller
                     'destination_city_ids' => json_encode($destination),
                     'departure_city_ids' => json_encode($departure),
                     'company_id' => Auth::user()->company_id,
+                    'previous_days' => $request->previous_days
                 ]);
 
                 UserPassword::create([
@@ -164,6 +166,7 @@ class UserController extends Controller
                     'departure_city_ids' => json_encode($departure),
                     'check_allowed_seats' => $request->check_allowed_seats,
                     'company_id' => Auth::user()->company_id,
+                    'previous_days' => $request->previous_days
                 ]);
                 if ($request->password != "") {
                     User::find($request->id)->update([
