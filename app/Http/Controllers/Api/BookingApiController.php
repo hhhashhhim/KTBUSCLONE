@@ -362,6 +362,10 @@ class BookingApiController extends Controller
                 'destination_id' => $request->destination_city_id,
                 'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
             ])->first();
+
+            if ($terminalId == 14){
+                return $scheduleDetail;
+            }
             // Getting Already Booked Tickets
             $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
                 ->where('company_id', $companyId)->where('schedule_id', $request->schedule_id)
