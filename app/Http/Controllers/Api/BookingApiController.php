@@ -367,6 +367,7 @@ class BookingApiController extends Controller
               $scheduleDetail = ScheduleDetail::with("bus_class:id,front_icons,seat_map")->where([
                 'company_id' => $companyId,
                 'schedule_id' => $request->schedule_id,
+                'departure_date' => $request->date,
                 'departure_id' => $request->departure_city_id,
                 'destination_id' => $request->destination_city_id,
                 'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
