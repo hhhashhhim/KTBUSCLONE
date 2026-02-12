@@ -374,6 +374,7 @@ class BookingApiController extends Controller
             ])->first();
             return [
                 'testtttt' => $scheduleDetail,
+                're' => $request,
             ];
             }
             // Getting Already Booked Tickets
