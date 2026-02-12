@@ -364,7 +364,7 @@ class BookingApiController extends Controller
             ])->first();
 
             if ($terminalId == 14){
-                return $scheduleDetail;
+                return $request;
             }
             // Getting Already Booked Tickets
             $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
