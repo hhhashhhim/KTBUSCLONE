@@ -364,13 +364,16 @@ class BookingApiController extends Controller
             ])->first();
 
             if ($terminalId == 14){
-             return $scheduleDetail = ScheduleDetail::with("bus_class:id,front_icons,seat_map")->where([
+              $scheduleDetail = ScheduleDetail::with("bus_class:id,front_icons,seat_map")->where([
                 'company_id' => $companyId,
                 'schedule_id' => $request->schedule_id,
                 'departure_id' => $request->departure_city_id,
                 'destination_id' => $request->destination_city_id,
                 'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
             ])->first();
+            return [
+                'testtttt' => $scheduleDetail,
+            ];
             }
             // Getting Already Booked Tickets
             $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
