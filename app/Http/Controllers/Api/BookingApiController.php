@@ -362,8 +362,9 @@ class BookingApiController extends Controller
                 'destination_id' => $request->destination_city_id,
                 'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
             ])->first();
-
             if ($terminalId == 14){
+
+                return $request;
               $scheduleDetail = ScheduleDetail::with("bus_class:id,front_icons,seat_map")->where([
                 'company_id' => $companyId,
                 'schedule_id' => $request->schedule_id,
