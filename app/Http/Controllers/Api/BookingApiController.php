@@ -161,7 +161,7 @@ class BookingApiController extends Controller
                 })
                 ->with("departure_city:id,name", "destination_city:id,name", "bus_class:id,name,front_icons", "bus_class_map:id,name,seat_map")
                 ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id')
-                ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date, 'company_id' => $companyId])
+                ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => date('Y-m-d', strtotime($request->date)), 'company_id' => $companyId])
                 ->when($advanceBookingDays != null, function ($q) use ($advanceBookingDays) {
                     $q->where("departure_date", '<', now()->addDays($advanceBookingDays)->format("Y-m-d"));
                 })
@@ -845,11 +845,11 @@ class BookingApiController extends Controller
                 }
 
                 // Getting Already Booked Tickets
-                if ($request->date == date('Y-m-d')) {
-                    $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
+                if (date('Y-m-d', strtotime($request->date)) == date('Y-m-d')) {
+                    $bookingNo = Ticket::where('date', date('Y-m-d', strtotime($request->date)))->latest()->first()->booking_no ?? 0;
                     ++$bookingNo;
                 } else {
-                    $bookingNo = Ticket::where('date', $request->date)->latest()->first()->booking_no ?? 0;
+                    $bookingNo = Ticket::where('date', date('Y-m-d', strtotime($request->date)))->latest()->first()->booking_no ?? 0;
                     ++$bookingNo;
                 }
                 $invoice = Invoice::create([
