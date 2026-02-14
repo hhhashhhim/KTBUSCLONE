@@ -308,8 +308,8 @@ if (!function_exists('seatFareIsWrong')) {
                     $q->where("terminal_id", Auth::user()->terminal_id);
                 })
                 ->first();
-            $terminalDiscount = TerminalDiscount::where(["terminal_id" => Auth::user()->terminal_id, "route_id" => $schedule->route_id])->where('start_date', '<=', $request->date)
-                ->where('end_date', '>=', $request->date)->first();
+            $terminalDiscount = TerminalDiscount::where(["terminal_id" => Auth::user()->terminal_id, "route_id" => $schedule->route_id])->where('start_date', '<=', date('Y-m-d', strtotime($request->date)))
+                ->where('end_date', '>=', date('Y-m-d', strtotime($request->date)))->first();
             $scheduleSurcharge = Surcharge::where('id', $schedule->surcharge_id)->where('is_active', 1)->first();
 
             $data = $fareForAllClasses->where('fare_class', $request->selected_seats_class[$i])->first();
@@ -414,7 +414,7 @@ if (!function_exists('updateAdvancedSeat')) {
         $detail = ScheduleDetail::where("departure_id", $request->departureCity)
             ->where("destination_id", $request->destinationCity)
             ->where('schedule_id', $request->schedule)
-            ->where('departure_date', $request->date)
+            ->where('departure_date', date('Y-m-d', strtotime($request->date)))
             ->where('company_id', Auth::user()->company_id)
             ->where('departure_time', date("H:i:s", strtotime($request->departure_time)))
             ->first();
@@ -959,7 +959,7 @@ if (!function_exists('sendMessageToAllBus')) {
         $scheduleDetail = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->scheduleId,
-            'departure_date' => $request->date,
+            'departure_date' => date('Y-m-d', strtotime($request->date)),
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
             'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
@@ -1629,7 +1629,7 @@ if (!function_exists('updateCloseSchedule')) {
             "schedule_id" => $request->schedule,
             "departure_id" => $departure->departure_city_id,
             "destination_id" => $departure->destination_city_id,
-            "departure_date" => $request->date,
+            "departure_date" => date('Y-m-d', strtotime($request->date)),
             "company_id" => Auth::user()->company_id
         ])->first();
         $bookingAvailable = Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, 'schedule_date' => $depTime->schedule_date])->get();
@@ -1659,7 +1659,7 @@ if (!function_exists('updateCloseSchedule')) {
         foreach ($members as $key => $singleMember) {
             $singleMember->delete();
         }
-        Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, "schedule_date" => $request->date])->update([
+        Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, "schedule_date" => date('Y-m-d', strtotime($request->date))])->update([
             "bus_id" => null,
             "ticket_closing_id" => null,
             "ticket_merge_id" => null,

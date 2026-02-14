@@ -637,8 +637,6 @@ class BookingApiController extends Controller
     }
     public function bookSeat(Request $request)
     {
-
-return $request;
         $scheduleId = $request->schedule_id;
         $lockName = "stayLock:" . $scheduleId;  // Dynamic lock based on schedule ID
         try {
@@ -751,7 +749,7 @@ return $request;
                 DB::beginTransaction();
 
                 // this is for get actual schedule date
-              return  $detail = ScheduleDetail::where("departure_id", $request->departure_city_id)
+                $detail = ScheduleDetail::where("departure_id", $request->departure_city_id)
                     ->where("destination_id", $request->destination_city_id)
                     ->where('schedule_id', $request->schedule_id)
                     ->where('departure_date', date('Y-m-d', strtotime($request->date)))
