@@ -764,7 +764,7 @@ class BookingApiController extends Controller
                 $detail = ScheduleDetail::where("departure_id", $request->departure_city_id)
                     ->where("destination_id", $request->destination_city_id)
                     ->where('schedule_id', $request->schedule_id)
-                    ->where('departure_date', $request->date)
+                    ->where('departure_date', date('Y-m-d', strtotime($request->date)))
                     ->where('company_id', $companyId)
                     ->where('departure_time', date("H:i:s", strtotime($request->departure_time)))
                     ->first();
