@@ -965,7 +965,17 @@ class BookingApiController extends Controller
                 optional($lock)->release();
             }
         } catch (\Exception $e) {
-            return new BreakResource($e->getMessage());
+             Log::error('Break error', [
+        'message' => $e->getMessage(),
+        'file'    => $e->getFile(),
+        'line'    => $e->getLine(),
+        'trace'   => $e->getTraceAsString(),
+    ]);
+
+    return new BreakResource([
+        'message' => $e->getMessage(),
+        'line'    => $e->getLine(),
+    ]);
         }
     }
 }
