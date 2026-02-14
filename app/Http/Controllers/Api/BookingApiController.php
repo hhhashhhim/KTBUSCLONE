@@ -362,22 +362,22 @@ class BookingApiController extends Controller
                 'destination_id' => $request->destination_city_id,
                 'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
             ])->first();
-            // if ($terminalId == 14){
+            if ($terminalId == 14){
 
                 
-            //   $scheduleDetail = ScheduleDetail::with("bus_class:id,front_icons,seat_map")->where([
-            //     'company_id' => $companyId,
-            //     'schedule_id' => $request->schedule_id,
-            //     'departure_date' => date('Y-m-d', strtotime($request->date)),
-            //     'departure_id' => $request->departure_city_id,
-            //     'destination_id' => $request->destination_city_id,
-            //     'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
-            // ])->first();
-            // return [
-            //     'testtttt' => $scheduleDetail,
-            //     're' => $request->all(),
-            // ];
-            // }
+              $scheduleDetail = ScheduleDetail::with("bus_class:id,front_icons,seat_map")->where([
+                'company_id' => $companyId,
+                'schedule_id' => $request->schedule_id,
+                'departure_date' => date('Y-m-d', strtotime($request->date)),
+                'departure_id' => $request->departure_city_id,
+                'destination_id' => $request->destination_city_id,
+                'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
+            ])->first();
+            return [
+                'testtttt' => $scheduleDetail,
+                're' => $request->all(),
+            ];
+            }
             // Getting Already Booked Tickets
             $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
                 ->where('company_id', $companyId)->where('schedule_id', $request->schedule_id)
