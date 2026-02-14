@@ -638,7 +638,7 @@ class BookingApiController extends Controller
     public function bookSeat(Request $request)
     {
 
-
+return $request;
         $scheduleId = $request->schedule_id;
         $lockName = "stayLock:" . $scheduleId;  // Dynamic lock based on schedule ID
         try {
