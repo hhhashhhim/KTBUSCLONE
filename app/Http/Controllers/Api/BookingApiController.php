@@ -751,7 +751,7 @@ class BookingApiController extends Controller
                 DB::beginTransaction();
 
                 // this is for get actual schedule date
-                $detail = ScheduleDetail::where("departure_id", $request->departure_city_id)
+              return  $detail = ScheduleDetail::where("departure_id", $request->departure_city_id)
                     ->where("destination_id", $request->destination_city_id)
                     ->where('schedule_id', $request->schedule_id)
                     ->where('departure_date', date('Y-m-d', strtotime($request->date)))
