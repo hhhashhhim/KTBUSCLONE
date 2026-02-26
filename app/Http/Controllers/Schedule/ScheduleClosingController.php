@@ -940,9 +940,13 @@ class ScheduleClosingController extends Controller
             })
             ->get();
         $merge = TicketClosingMerge::whereIn('id', $merges)->first();
-        $counterExpense = CounterExpense::whereDate('created_at', $merge->closing_date)->sum('total');
+        $counterExpense = CounterExpense::whereDate('date', $merge->closing_date)->sum('total');
         $totalKtCommission = TicketClosingShortage::whereIn('ticket_closing_id', $merges)->sum('kt_commission');
-        $totalReceivedBank = TicketClosingShortage::whereIn('ticket_closing_id', $merges)->sum('total_received_bank');
+        $totalReceivedBank = TicketClosingShortage::whereIn('ticket_closing_id', $merges)
+    ->whereHas('terminal', function ($query) {
+        $query->where('is_online_terminal', 0);
+    })
+    ->sum('total_received_bank');
 
 
 

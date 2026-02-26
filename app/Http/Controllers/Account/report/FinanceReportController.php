@@ -420,9 +420,9 @@ class FinanceReportController extends BaseController
 
     public function dailyReport(Request $request)
     {
-        $terminal = Terminal::where("id",$request->terminal)->first();
+        $terminal = Terminal::where("id",$request->terminal == '0' ? '' : $request->terminal)->first();
         // main record
-        $record = AccountTransaction::where(["company_id"=>Auth::user()->company_id,"approved"=>1])
+        $record = AccountTransaction::where(["company_id"=>Auth::user()->company_id, 'approved' => '1'])
         ->when($request->terminal, function ($q) use ($request) {
             $q->where('terminal_id',$request->terminal);
         })
@@ -447,7 +447,7 @@ class FinanceReportController extends BaseController
                 $temp['amount'] = $document->sum('credit');
                 $temp['narration'] = $document[0]->narration;
                 $temp['account'] = $document[0]->account_head->name;
-                $temp['parent_account'] = $document[0]->level_four->name;
+                $temp['parent_account'] = $document[0]->level_four->name ?? '-';
                 $temp['created_at'] = $document[0]->created_at;
                 $single[] = (object)$temp;
             }
