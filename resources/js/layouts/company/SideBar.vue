@@ -308,7 +308,7 @@
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('counter-expenses')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'counter-expenses-page' }">
-                                <i class="fas fa-bookmark"></i> Counter Income / Expenses
+                                <i class="fas fa-bookmark"></i> Counter Inc / Exp
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('jazz-cash-refund')">
