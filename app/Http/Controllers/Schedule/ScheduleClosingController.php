@@ -332,29 +332,29 @@ class ScheduleClosingController extends Controller
             ->where('company_id', $companyId)
             ->whereIn('ticket_closing_id', [$closingPairsOne->id, $closingPairsTwo->id])
             ->whereIn('type', ['booked', 'over-issue', 'canceled'])
-            
+
             ->with([
                 'elt',
                 'cancel_ticket',
                 'terminal:id,name,recovery_method',
                 'commission' => function ($q) use ($routeIdStart) {
                     return $q->where("route_id", $routeIdStart);
-                },  
+                },
             ])
             ->get();
 
-         $ticketsReturn = Ticket::withTrashed()
+        $ticketsReturn = Ticket::withTrashed()
             ->where('company_id', $companyId)
             ->whereIn('ticket_closing_id', [$closingPairsOne->id, $closingPairsTwo->id])
             ->whereIn('type', ['booked', 'over-issue', 'canceled'])
-            
+
             ->with([
                 'elt',
                 'cancel_ticket',
                 'terminal:id,name,recovery_method',
                 'commission' => function ($q) use ($routeIdReturn) {
                     return $q->where("route_id", $routeIdReturn);
-                },  
+                },
             ])
             ->get();
 
@@ -872,7 +872,8 @@ class ScheduleClosingController extends Controller
         $results = TicketClosingShortage::with([
             'bus:id,bus_number',
             'terminal:id,name,is_online_terminal',
-            'ticket_closing_merge.expenses'
+            'ticket_closing_merge.expenses',
+            'route'
         ])
             ->whereIn('ticket_closing_id', $merges)
             ->get();
@@ -905,6 +906,7 @@ class ScheduleClosingController extends Controller
 
                 $data = [
                     'bus_no'   => $first->bus->bus_number ?? 'N/A',
+                    'route'   => $first->route->name ?? 'N/A',
                     'sale'     => $totalOnlineSale,
                     'expense'  => $totalExpense,
                     'net_sale' => $totalOnlineSale - $totalExpense,
@@ -913,11 +915,11 @@ class ScheduleClosingController extends Controller
                 $totalOnlinePortalsAmount = 0;
                 // Step 2: Map the online terminal names and track their total
                 foreach ($dynamicTypes as $terminalName) {
-                   $amount = $onlineGroup
-    ->where('terminal.name', $terminalName)
-    ->sum(function ($item) {
-        return ($item->received ?? 0);
-    });
+                    $amount = $onlineGroup
+                        ->where('terminal.name', $terminalName)
+                        ->sum(function ($item) {
+                            return ($item->received ?? 0);
+                        });
 
 
                     $data['types'][$terminalName] = $amount;
@@ -940,24 +942,31 @@ class ScheduleClosingController extends Controller
             })
             ->get();
         $merge = TicketClosingMerge::whereIn('id', $merges)->first();
-        $counterExpense = CounterExpense::whereDate('date', $merge->closing_date)->sum('total');
+        $totalCounterExpense = CounterExpense::whereDate('date', $merge->closing_date)
+            ->where('type', 'expense')
+            ->sum('total');
+        $totalCounterIncome = CounterExpense::whereDate('date', $merge->closing_date)
+            ->where('type', 'income')
+            ->sum('total');
+
         $totalKtCommission = TicketClosingShortage::whereIn('ticket_closing_id', $merges)->sum('kt_commission');
         $totalReceivedBank = TicketClosingShortage::whereIn('ticket_closing_id', $merges)
-    ->whereHas('terminal', function ($query) {
-        $query->where('is_online_terminal', 0);
-    })
-    ->sum('total_received_bank');
+            ->whereHas('terminal', function ($query) {
+                $query->where('is_online_terminal', 0);
+            })
+            ->sum('total_received_bank');
 
 
 
         $data = [
-            'dynamicTypes' => $dynamicTypes,
-            "merges" => $mappedResults,
-            "closing_date" => $request->closing_date,
-            "expenses"      => $creditExpenses,
-            "counterExpense"      => $counterExpense,
-            "totalKtCommission"      => $totalKtCommission,
-            "totalReceivedBank"      => $totalReceivedBank
+            'dynamicTypes'          =>      $dynamicTypes,
+            "merges"                =>      $mappedResults,
+            "closing_date"          =>      $request->closing_date,
+            "expenses"              =>      $creditExpenses,
+            "totalCounterExpense"   =>      $totalCounterExpense,
+            "totalCounterIncome"    =>      $totalCounterIncome,
+            "totalKtCommission"     =>      $totalKtCommission,
+            "totalReceivedBank"     =>      $totalReceivedBank
         ];
 
         return view('reports.busMergeReport', ['data' => $data]);
@@ -1000,7 +1009,8 @@ class ScheduleClosingController extends Controller
         $results = TicketClosingShortage::with([
             'bus:id,bus_number',
             'terminal:id,name,is_online_terminal',
-            'ticket_closing_merge.expenses'
+            'ticket_closing_merge.expenses',
+            'route'
         ])
             ->whereIn('ticket_closing_id', $merges)
             ->get();
@@ -1033,6 +1043,7 @@ class ScheduleClosingController extends Controller
 
                 $data = [
                     'bus_no'   => $first->bus->bus_number ?? 'N/A',
+                    'route'   => $first->route->name ?? 'N/A',
                     'sale'     => $totalOnlineSale,
                     'expense'  => $totalExpense,
                     'net_sale' => $totalOnlineSale - $totalExpense,
@@ -1041,11 +1052,11 @@ class ScheduleClosingController extends Controller
                 $totalOnlinePortalsAmount = 0;
                 // Step 2: Map the online terminal names and track their total
                 foreach ($dynamicTypes as $terminalName) {
-                   $amount = $onlineGroup
-    ->where('terminal.name', $terminalName)
-    ->sum(function ($item) {
-        return ($item->received ?? 0);
-    });
+                    $amount = $onlineGroup
+                        ->where('terminal.name', $terminalName)
+                        ->sum(function ($item) {
+                            return ($item->received ?? 0);
+                        });
 
 
                     $data['types'][$terminalName] = $amount;
@@ -1068,21 +1079,33 @@ class ScheduleClosingController extends Controller
             })
             ->get();
         $merge = TicketClosingMerge::whereIn('id', $merges)->first();
-        $counterExpense = CounterExpense::whereDate('created_at', $merge->closing_date)->sum('total');
+        $totalCounterExpense = CounterExpense::whereDate('date', $merge->closing_date)
+            ->where('type', 'expense')
+            ->sum('total');
+        $totalCounterIncome = CounterExpense::whereDate('date', $merge->closing_date)
+            ->where('type', 'income')
+            ->sum('total');
+
         $totalKtCommission = TicketClosingShortage::whereIn('ticket_closing_id', $merges)->sum('kt_commission');
-        $totalReceivedBank = TicketClosingShortage::whereIn('ticket_closing_id', $merges)->sum('total_received_bank');
+        $totalReceivedBank = TicketClosingShortage::whereIn('ticket_closing_id', $merges)
+            ->whereHas('terminal', function ($query) {
+                $query->where('is_online_terminal', 0);
+            })
+            ->sum('total_received_bank');
 
 
 
         $data = [
-            'dynamicTypes' => $dynamicTypes,
-            "merges" => $mappedResults,
-            "closing_date" => $request->closing_date,
-            "expenses"      => $creditExpenses,
-            "counterExpense"      => $counterExpense,
-            "totalKtCommission"      => $totalKtCommission,
-            "totalReceivedBank"      => $totalReceivedBank
+            'dynamicTypes'          =>      $dynamicTypes,
+            "merges"                =>      $mappedResults,
+            "closing_date"          =>      $request->closing_date,
+            "expenses"              =>      $creditExpenses,
+            "totalCounterExpense"   =>      $totalCounterExpense,
+            "totalCounterIncome"    =>      $totalCounterIncome,
+            "totalKtCommission"     =>      $totalKtCommission,
+            "totalReceivedBank"     =>      $totalReceivedBank
         ];
+
 
         return view('reports.busMergeReportUrdu', ['data' => $data]);
     }

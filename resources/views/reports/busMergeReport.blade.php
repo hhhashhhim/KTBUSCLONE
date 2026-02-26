@@ -117,6 +117,7 @@
                 <tr>
                     <th>Sr NO</th>
                     <th>Bus NO</th>
+                    <th>Route</th>
                     <th>Sale</th>
                     <th>Expense</th>
                     <th>Net Sale</th>
@@ -132,6 +133,7 @@
                     <tr>
                         <td class="text-center">{{ $key + 1 }}</td>
                         <td>{{ $item['bus_no'] }}</td>
+                        <td>{{ $item['route'] }}</td>
 
                         <td>{{ number_format($item['sale']) }}</td>
                         <td>{{ number_format($item['expense']) }}</td>
@@ -149,6 +151,7 @@
             <tfoot>
                 <tr style="font-weight: bold;">
                     <td colspan="2" class="text-center">Total</td>
+                    <td></td>
 
                     <td>{{ number_format($data['merges']->sum('sale')) }}</td>
                     <td>{{ number_format($data['merges']->sum('expense')) }}</td>
@@ -212,8 +215,9 @@
                 </div>
                 <div class="summary-row">
                     <span>General Expenses:</span>
-                    <span>{{ number_format($data['counterExpense']) }}</span>
+                    <span style="color: red;">- {{ number_format($data['totalCounterExpense']) }}</span>
                 </div>
+              
                 @foreach ($data['dynamicTypes'] as $type)
                     <div class="summary-row">
                         <span>Total {{ $type }}:</span>
@@ -232,18 +236,22 @@
                 </div>
                 <div class="summary-row" style="background-color: #eee;">
                     <span>NET CASH:</span>
-                    <span>{{ number_format($data['merges']->sum('net_cash') - $data['counterExpense'] - $data['totalReceivedBank']) }}</span>
+                    <span>{{ number_format($data['merges']->sum('net_cash') - ($data['totalCounterExpense'] + $data['totalReceivedBank'])) }}</span>
                 </div>
                
                 <div class="summary-row" style="background-color: #eee;">
                     <span>KT Commission:</span>
                     <span>{{ number_format($data['totalKtCommission']) }}</span>
                 </div>
+                  <div class="summary-row" style="background-color: #eee;">
+                    <span>Other Commission:</span>
+                    <span> {{ number_format($data['totalCounterIncome']) }}</span>
+                </div>
                 <div class="summary-row" style="background-color: #eee;">
                     <span>Net Payable:</span>
                     @php
                         $expenses = $data['expenses']->sum('amount');
-                        $mergesMinusCounter = $data['merges']->sum('net_cash') - $data['counterExpense'] - $data['totalReceivedBank'];
+                        $mergesMinusCounter = ($data['merges']->sum('net_cash') + $data['totalCounterIncome']) - $data['totalCounterExpense'] - $data['totalReceivedBank'];
 
                         $total =
                             $mergesMinusCounter >= 0
