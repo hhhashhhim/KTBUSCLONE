@@ -5,11 +5,11 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary ">
                         <div class="card-header">
-                            <h4>Counter Expenses</h4>
+                            <h4>Counter Income / Expenses</h4>
                             <div class="card-header-action">
                                 <a href="#" data-toggle="modal" :data-target="'#' + formID" @click="clearForm()"
                                     class="btn btn-primary" v-if="checkForSubmenuButtons('add-counter-expenses')">
-                                    Add Counter Expenses
+                                    Add Counter Income / Expenses
                                 </a>
                             </div>
                         </div>
@@ -103,15 +103,16 @@
                                                         <tr>
                                                             <th>Sr No.</th>
                                                             <th>Attachments</th>
-                                                            <th>Category</th>
+                                                            <th>expen Cate / Income</th>
                                                             <th>Cash Payment</th>
                                                             <th>Bank Payment</th>
                                                             <th>Total Payment</th>
                                                             <th>Cash Ledger</th>
                                                             <th>Bank Ledger</th>
+                                                            <th>Date</th>
                                                             <th>Narration</th>
-                                                            <!-- <th v-if="checkForSubmenuButtons('edit-counter-expenses')">
-                                                                Action</th> -->
+                                                            <th v-if="checkForSubmenuButtons('edit-counter-expenses')">
+                                                                Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -140,7 +141,11 @@
                                                                     -
                                                                 </template>
                                                             </td>
-                                                            <td>{{ single.category ? single.category.name : "-" }}</td>
+                                                            <td>
+                                                                {{ single.type === 'expense' ? (single.category ?
+                                                                    single.category.name : '-') : (single.other_income ??
+                                                                        '-') }}
+                                                            </td>
 
                                                             <!-- Payments -->
                                                             <td>{{ single.cash_payment || 0 }}</td>
@@ -155,17 +160,18 @@
 
                                                             <!-- Category & Narration -->
 
+                                                            <td>{{ single.date }}</td>
                                                             <td>{{ single.narration }}</td>
 
                                                             <!-- Actions -->
-                                                            <!-- <td v-if="checkForSubmenuButtons('edit-counter-expenses')">
+                                                            <td v-if="checkForSubmenuButtons('edit-counter-expenses')">
                                                                 <button title="Edit Expenses"
                                                                     :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(single)"
                                                                     class="btn btn-primary text-light mx-1">
                                                                     <i class="far fa-edit"></i>
                                                                 </button>
-                                                            </td> -->
+                                                            </td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -182,19 +188,46 @@
             </div>
 
             <!-- Add Modal -->
-            <Add heading="Add Counter Expenses" :errors="validationErrors" :success="success" :formID="formID">
+            <Add heading="Add Counter Income / Expenses" :errors="validationErrors" :success="success" :formID="formID">
                 <div class="row">
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-12 mb-3">
+                        <label class="fw-semibold d-block mb-2">Type</label>
+
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="type" id="type_category"
+                                    value="expense" v-model="data.type">
+                                <label class="form-check-label fw-normal" for="type_category">
+                                    Expense
+                                </label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="type" id="type_other" value="income"
+                                    v-model="data.type">
+                                <label class="form-check-label fw-normal" for="type_other">
+                                    Income
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Category dropdown -->
+                    <div class="form-group col-md-3" v-if="data.type === 'expense'">
                         <label class="fw-semibold">Expense Category</label>
                         <select v-model="data.category_id" class="form-control">
                             <option value="">Select Category</option>
-
                             <option v-for="category in categories" :key="category.id" :value="category.id">
                                 {{ category.name }}
                             </option>
                         </select>
                     </div>
 
+                    <!-- Other expense input -->
+                    <div class="form-group col-md-3" v-if="data.type === 'income'">
+                        <label class="fw-semibold">Other Income Name</label>
+                        <input type="text" v-model="data.other_income" class="form-control"
+                            placeholder="Enter income name">
+                    </div>
                     <!-- Amount -->
                     <div class="form-group col-md-3">
                         <label class="fw-semibold">Cash Payment</label>
@@ -245,7 +278,10 @@
                         </div>
 
                     </div>
-
+                    <div class="form-group col-md-3">
+                        <label class="fw-semibold">Date</label>
+                        <input type="date" v-model="data.date" class="form-control text-end fw-bold text-success">
+                    </div>
 
                     <!-- Narration -->
                     <div class="form-group col-md-12">
@@ -263,11 +299,41 @@
             </Add>
 
 
-            <Edit heading="Edit Counter Expenses" :errors="validationErrors" :success="success" :editForm="editFormID">
+            <Edit heading="Edit Counter Income / Expenses" :errors="validationErrors" :success="success"
+                :editForm="editFormID">
                 <div class="row">
+                    <div class="form-group col-md-12 mb-3">
+                        <label class="fw-semibold d-block mb-2">Type</label>
+
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1"
+                                    value="expense" v-model="dataEdit.type" checked>
+                                <label class="form-check-label" for="exampleRadios1">
+                                    Expense
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="exampleRadios" value="income"
+                                    v-model="dataEdit.type" id="exampleRadios2">
+                                <label class="form-check-label" for="exampleRadios2">
+                                    Income
+                                </label>
+                            </div>
+                            <!-- <div class="form-check">
+                                <input id="type_category" class="form-check-input" type="radio" value="expense" v-model="dataEdit.type">
+                                <label for="type_category" class="form-check-label">Expense</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input id="type_other" class="form-check-input" type="radio" value="income" v-model="dataEdit.type">
+                                <label for="type_other" class="form-check-label">Income</label>
+                            </div> -->
+                        </div>
+                    </div>
 
                     <!-- Expense Category -->
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-4" v-if="dataEdit.type == 'expense'">
                         <label class="fw-semibold">Expense Category</label>
                         <select v-model="dataEdit.category_id" class="form-control">
                             <option value="">Select Category</option>
@@ -277,6 +343,12 @@
                         </select>
                     </div>
 
+                    <!-- Other Income Name -->
+                    <div class="form-group col-md-4" v-if="dataEdit.type == 'income'">
+                        <label class="fw-semibold">Other Income Name</label>
+                        <input type="text" v-model="dataEdit.other_income" class="form-control"
+                            placeholder="Enter income name">
+                    </div>
                     <!-- Cash Payment -->
                     <div class="form-group col-md-4">
                         <label class="fw-semibold">Cash Payment</label>
@@ -321,7 +393,10 @@
                         <label>Bill Posting <span class="text-danger ml-1">(Optional)</span></label>
                         <input class="form-control" type="file" @change="handleEditBillPost">
                     </div>
-
+                    <div class="form-group col-md-3">
+                        <label class="fw-semibold">Date</label>
+                        <input type="date" v-model="dataEdit.date" class="form-control text-end fw-bold text-success">
+                    </div>
                     <!-- Narration -->
                     <div class="form-group col-md-12">
                         <label>Narration <span class="text-danger ml-1">*</span></label>
@@ -366,17 +441,21 @@ export default {
             formID: 'counter_expenses',
             editFormID: 'edit_counter_expenses',
             deleteFormID: 'delete_counter_expenses',
+
             data: {
+                type: 'expense', // default selected
+                other_income: "",
+                category_id: "",
                 bill_post: null,
-                amount: 0,             // <-- add this
+                amount: 0,
                 narration: "",
-                payment_method: "",    // <-- add this
+                payment_method: "",
                 total: 0,
                 cash_payment: 0,
                 bank_payment: 0,
                 cash_id: "",
                 bank_id: "",
-                category_id: ""
+                date: new Date().toISOString().split('T')[0]
             },
             dataEdit: {
                 id: null,
@@ -389,7 +468,10 @@ export default {
                 cash_id: "",
                 bank_id: "",
                 category_id: "",
-                bill_post: null
+                bill_post: null,
+                date: "",
+                type: "expense",   // ✅ ADD THIS
+                other_income: "",  // ✅ ADD THIS
             },
             filters: {
                 cash_id: '',
@@ -541,7 +623,8 @@ export default {
                 });
             }
 
-            if (!this.data.category_id) {
+            // ✅ Category validation
+            if (this.data.type == 'expense' && !this.data.category_id) {
                 return swal({
                     title: "Required",
                     text: "Expense Category is Required",
@@ -550,6 +633,15 @@ export default {
                 });
             }
 
+            // ✅ Other expense validation
+            if (this.data.type == 'income' && !this.data.other_income) {
+                return swal({
+                    title: "Required",
+                    text: "Other Expense Name is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             // ✅ Payment validation
             const cashPayment = Number(this.data.cash_payment) || 0;
             const bankPayment = Number(this.data.bank_payment) || 0;
@@ -590,7 +682,14 @@ export default {
 
                 formData.append('total', this.data.total || totalPayment); // total fallback
                 formData.append('narration', this.data.narration);
-                formData.append('category_id', this.data.category_id);
+                formData.append('type', this.data.type);
+
+                if (this.data.type === 'expense') {
+                    formData.append('category_id', this.data.category_id);
+                } else {
+                    formData.append('other_income', this.data.other_income);
+                }
+                formData.append('date', this.data.date);
 
                 // Only append cash/bank fields if values exist
                 if (cashPayment > 0) {
@@ -681,10 +780,19 @@ export default {
                 });
             }
 
-            if (!this.dataEdit.category_id) {
+            if (this.dataEdit.type == 'expense' && !this.dataEdit.category_id) {
                 return swal({
                     title: "Required",
                     text: "Expense Category is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
+            if (this.dataEdit.type == 'income' && !this.dataEdit.other_income) {
+                return swal({
+                    title: "Required",
+                    text: "Income Name is Required",
                     icon: "error",
                     timer: 2000
                 });
@@ -723,15 +831,7 @@ export default {
                 });
             }
 
-            // ✅ Ensure total matches sum
-            if (totalPayment != this.dataEdit.total) {
-                return swal({
-                    title: "Error",
-                    text: "Cash + Bank payment must equal Total",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+            
 
             this.loadingEdit = true;
 
@@ -741,11 +841,18 @@ export default {
                 formData.append('total', this.dataEdit.total);
                 formData.append('narration', this.dataEdit.narration);
                 formData.append('category_id', this.dataEdit.category_id);
+formData.append('type', this.dataEdit.type);
 
+                if (this.dataEdit.type === 'expense') {
+                    formData.append('category_id', this.dataEdit.category_id);
+                } else {
+                    formData.append('other_income', this.dataEdit.other_income);
+                }
                 formData.append('cash_payment', cashPayment);
                 formData.append('bank_payment', bankPayment);
                 formData.append('cash_id', this.dataEdit.cash_id);
                 formData.append('bank_id', this.dataEdit.bank_id);
+                formData.append('date', this.dataEdit.date);
 
                 // ✅ Optional bill upload
                 if (this.dataEdit.bill_post instanceof File) {
@@ -810,6 +917,26 @@ export default {
         this.fetchBanks();
         this.fetchCashes();
         this.fetchData();
+    },
+    watch: {
+        watch: {
+            'dataEdit.type'(newValue) {
+                if (newValue == 'expense') {
+                    // Clear income field
+                    this.dataEdit.other_income = "";
+                } else if (newValue == 'income') {
+                    // Clear category field
+                    this.dataEdit.category_id = "";
+                }
+            }
+        },
+        'data.type'(newValue) {
+            if (newValue == 'expense') {
+                this.data.other_income = "";
+            } else if (newValue == 'income') {
+                this.data.category_id = "";
+            }
+        }
     }
 
 }

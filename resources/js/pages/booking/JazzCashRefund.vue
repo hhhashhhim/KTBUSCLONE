@@ -17,55 +17,31 @@
                         <div class="col-md-3">
                           <div class="form-group">
                             <label for="CNIC">CNIC</label>
-                            <vue-mask
-                              id="CNIC"
-                              class="form-control"
-                              v-model="filterForm.cnicFilter"
-                              mask="00000-0000000-0"
-                              @keyup="filterFunction()"
-                              :raw="false"
-                              :options="options"
-                            >
+                            <vue-mask id="CNIC" class="form-control" v-model="filterForm.cnicFilter"
+                              mask="00000-0000000-0" @keyup="filterFunction()" :raw="false" :options="options">
                             </vue-mask>
                           </div>
                         </div>
                         <div class="col-md-3">
                           <div class="form-group">
                             <label for="phone">Cell #</label>
-                            <vue-mask
-                              id="phone"
-                              class="form-control"
-                              v-model="filterForm.phoneFilter"
-                              mask="0000-0000000"
-                              :raw="false"
-                              @keyup="filterFunction()"
-                              :options="optionsContact"
-                            >
+                            <vue-mask id="phone" class="form-control" v-model="filterForm.phoneFilter"
+                              mask="0000-0000000" :raw="false" @keyup="filterFunction()" :options="optionsContact">
                             </vue-mask>
                           </div>
                         </div>
                         <div class="col-md-3">
                           <div class="form-group">
                             <label for="name">Name</label>
-                            <input
-                              id="name"
-                              type="text"
-                              class="form-control"
-                              v-model="filterForm.nameFilter"
-                              @keyup="filterFunction()"
-                            />
+                            <input id="name" type="text" class="form-control" v-model="filterForm.nameFilter"
+                              @keyup="filterFunction()" />
                           </div>
                         </div>
                         <div class="col-md-3">
                           <div class="form-group">
                             <label for="name">Invoice</label>
-                            <input
-                              id="name"
-                              type="text"
-                              class="form-control"
-                              v-model="filterForm.invoiceFilter"
-                              @keyup="filterFunction()"
-                            />
+                            <input id="name" type="text" class="form-control" v-model="filterForm.invoiceFilter"
+                              @keyup="filterFunction()" />
                           </div>
                         </div>
                       </div>
@@ -73,18 +49,10 @@
                         <div class="col-md-4">
                           <div class="form-group">
                             <label for="routeFilter">Route</label>
-                            <select
-                              id="routeFilter"
-                              class="form-control"
-                              v-model="filterForm.routeFilter"
-                              @change="filterFunction()"
-                            >
+                            <select id="routeFilter" class="form-control" v-model="filterForm.routeFilter"
+                              @change="filterFunction()">
                               <option value="">---Select Route---</option>
-                              <option
-                                v-for="(route, i) in routes"
-                                :key="i"
-                                :value="route.id"
-                              >
+                              <option v-for="(route, i) in routes" :key="i" :value="route.id">
                                 {{ route.name }} ({{ route.via ?? "n/a" }})
                               </option>
                             </select>
@@ -93,18 +61,10 @@
                         <div class="col-md-4">
                           <div class="form-group">
                             <label for="terminalsFilter">Terminals</label>
-                            <select
-                              id="terminalsFilter"
-                              class="form-control"
-                              v-model="filterForm.terminalFilter"
-                              @change="filterFunction()"
-                            >
+                            <select id="terminalsFilter" class="form-control" v-model="filterForm.terminalFilter"
+                              @change="filterFunction()">
                               <option value="">---Select Terminal---</option>
-                              <option
-                                v-for="(terminal, i) in terminals"
-                                :key="i"
-                                :value="terminal.id"
-                              >
+                              <option v-for="(terminal, i) in terminals" :key="i" :value="terminal.id">
                                 {{ terminal.name }}
                               </option>
                             </select>
@@ -113,18 +73,10 @@
                         <div class="col-md-4">
                           <div class="form-group">
                             <label for="busFilter">Bus #</label>
-                            <select
-                              id="busFilter"
-                              class="form-control"
-                              v-model="filterForm.busFilter"
-                              @change="filterFunction()"
-                            >
+                            <select id="busFilter" class="form-control" v-model="filterForm.busFilter"
+                              @change="filterFunction()">
                               <option value="">---Select Bus #---</option>
-                              <option
-                                v-for="(bus, i) in buses"
-                                :key="i"
-                                :value="bus.id"
-                              >
+                              <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
                                 {{ bus.bus_number }}
                               </option>
                             </select>
@@ -135,12 +87,8 @@
                         <div class="col-md-4 d-none">
                           <div class="form-group">
                             <label for="statusFilter">Status</label>
-                            <select
-                              id="statusFilter"
-                              class="form-control"
-                              v-model="filterForm.statusFilter"
-                              @change="filterFunction()"
-                            >
+                            <select id="statusFilter" class="form-control" v-model="filterForm.statusFilter"
+                              @change="filterFunction()">
                               <option value="">---Select Status---</option>
                               <option value="booked">
                                 Booked / Confirm Booked
@@ -158,50 +106,31 @@
                         <div class="col-md-4">
                           <div class="form-group">
                             <label for="dateFilter">Departure Date From</label>
-                            <input
-                              type="date"
-                              class="form-control"
-                              id="dateFilter"
-                              v-model="filterForm.fromDateFilter"
-                              @change="filterFunction()"
-                            />
+                            <input type="date" class="form-control" id="dateFilter" v-model="filterForm.fromDateFilter"
+                              @change="filterFunction()" />
                           </div>
                         </div>
                         <div class="col-md-4">
                           <div class="form-group">
                             <label for="dateFilter">Departure Date To</label>
-                            <input
-                              type="date"
-                              class="form-control"
-                              id="dateFilter"
-                              v-model="filterForm.toDateFilter"
-                              @change="filterFunction()"
-                            />
+                            <input type="date" class="form-control" id="dateFilter" v-model="filterForm.toDateFilter"
+                              @change="filterFunction()" />
                           </div>
                         </div>
                       </div>
                       <div>
                         <div class="table-responsive">
                           <div v-if="tableLoading">
-                            <img
-                              class="loading-spinner"
-                              :src="
-                                $store.state.main_url +
-                                'assets/img/loading-spinner.gif'
-                              "
-                            />
+                            <img class="loading-spinner" :src="$store.state.main_url +
+                              'assets/img/loading-spinner.gif'
+                              " />
                           </div>
-                          <table
-                            v-else
-                            style="
+                          <table v-else style="
                               width: 100%;
                               margin: 0;
                               overflow: auto;
                               font-size: 12px;
-                            "
-                            class="table table-striped table-hover"
-                            id="filterTable"
-                          >
+                            " class="table table-striped table-hover" id="filterTable">
                             <thead>
                               <tr>
                                 <th>Sr No.</th>
@@ -265,7 +194,7 @@
                                     record.type == "canceled"
                                       ? record.cancel_ticket.added_by_name
                                         ? record.cancel_ticket.added_by_name
-                                            .name
+                                          .name
                                         : "Auto"
                                       : "N/A"
                                   }}
@@ -274,8 +203,8 @@
                                   {{
                                     record.type == "canceled"
                                       ? formatDate(
-                                          record.cancel_ticket.created_at
-                                        )
+                                        record.cancel_ticket.created_at
+                                      )
                                       : "N/A"
                                   }}
                                 </td>
@@ -283,7 +212,7 @@
                                   {{
                                     record.type == "over-issue"
                                       ? record.over_issue_seats.overissue_by
-                                          .name
+                                        .name
                                       : "N/A"
                                   }}
                                 </td>
@@ -291,8 +220,8 @@
                                   {{
                                     record.type == "over-issue"
                                       ? formatDate(
-                                          record.over_issue_seats.created_at
-                                        )
+                                        record.over_issue_seats.created_at
+                                      )
                                       : "N/A"
                                   }}
                                 </td>
@@ -313,19 +242,13 @@
 
                                 <td>
                                   <div class="d-flex gap-1">
-                                    <button
-                                      v-if="record.refund_amount === null"
-                                      class="btn btn-sm btn-warning"
-                                      @click="openRefundModal(record)"
-                                    >
+                                    <button v-if="record.refund_amount === null" class="btn btn-sm btn-warning"
+                                      @click="openRefundModal(record)">
                                       Refund
                                     </button>
 
-                                    <button
-                                      v-if="record.refund_amount"
-                                      class="btn btn-sm btn-info mx-2"
-                                      @click="viewRefundDetails(record)"
-                                    >
+                                    <button v-if="record.refund_amount" class="btn btn-sm btn-info mx-2"
+                                      @click="viewRefundDetails(record)">
                                       View
                                     </button>
                                   </div>
@@ -369,25 +292,14 @@
       </div>
     </div>
     <!-- Refund Modal -->
-    <div
-      class="modal fade"
-      id="refundModal"
-      tabindex="-1"
-      aria-labelledby="refundModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="refundModal" tabindex="-1" aria-labelledby="refundModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg rounded-3">
           <div class="modal-header bg-warning text-white">
             <h5 class="modal-title fw-semibold" id="refundModalLabel">
               Refund Booking
             </h5>
-            <button
-              type="button"
-              class="close"
-              @click="closeRefundModal()"
-              aria-label="Close"
-            >
+            <button type="button" class="close" @click="closeRefundModal()" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -410,62 +322,34 @@
 
             <!-- Refund Percentage -->
             <div class="mb-3">
-              <label for="refundPercentage" class="form-label fw-semibold"
-                >Cancellation Charges</label
-              >
-              <select
-                v-model="refundPercentage"
-                id="refundPercentage"
-                class="form-control"
-              >
+              <label for="refundPercentage" class="form-label fw-semibold">Cancellation Charges</label>
+              <select v-model="refundPercentage" id="refundPercentage" class="form-control">
                 <option disabled value="">Select percentage</option>
-                <option
-                  v-for="p in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]"
-                  :key="p"
-                  :value="p"
-                >
+                <option v-for="p in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]" :key="p" :value="p">
                   {{ p }}%
                 </option>
               </select>
             </div>
 
             <!-- Calculated Refund -->
-            <div
-              v-if="selectedRecord && refundPercentage"
-              class="alert alert-info py-2 mb-3"
-            >
+            <div v-if="selectedRecord && refundPercentage" class="alert alert-info py-2 mb-3">
               <i class="bi bi-cash-coin me-1"></i>
               Cancellation Amount: <strong>{{ calculatedRefundAmount }}</strong>
             </div>
 
             <!-- Refund Reason -->
             <div class="mb-3">
-              <label for="refundReason" class="form-label fw-semibold"
-                >Refund Reason</label
-              >
-              <textarea
-                v-model="refundReason"
-                id="refundReason"
-                class="form-control"
-                rows="3"
-                placeholder="Enter refund reason"
-              ></textarea>
+              <label for="refundReason" class="form-label fw-semibold">Refund Reason</label>
+              <textarea v-model="refundReason" id="refundReason" class="form-control" rows="3"
+                placeholder="Enter refund reason"></textarea>
             </div>
           </div>
 
           <div class="modal-footer border-0">
-            <button
-              type="button"
-              class="btn btn-outline-secondary btn-sm px-3"
-              @click="closeRefundModal()"
-            >
+            <button type="button" class="btn btn-outline-secondary btn-sm px-3" @click="closeRefundModal()">
               Close
             </button>
-            <button
-              type="button"
-              class="btn btn-success btn-sm px-3"
-              @click="confirmRefund"
-            >
+            <button type="button" class="btn btn-success btn-sm px-3" @click="confirmRefund">
               Confirm Refund
             </button>
           </div>
@@ -474,25 +358,15 @@
     </div>
 
     <!-- Refund Details Modal -->
-    <div
-      class="modal fade"
-      id="refundDetailsModal"
-      tabindex="-1"
-      aria-labelledby="refundDetailsModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="refundDetailsModal" tabindex="-1" aria-labelledby="refundDetailsModalLabel"
+      aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header bg-info text-white">
             <h5 class="modal-title" id="refundDetailsModalLabel">
               Refund Details
             </h5>
-            <button
-              type="button"
-              class="close"
-              @click="closeRefundViewModal()"
-              aria-label="Close"
-            >
+            <button type="button" class="close" @click="closeRefundViewModal()" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -501,21 +375,21 @@
               <strong>Refund Amount:</strong>
               {{ selectedRefund.refund_amount }} PKR
             </p>
-           <p>
-  <strong>Cancellation Amount:</strong>
-  {{
-    Math.max(
-      0,
-      parseFloat(selectedRefund?.seat_fare || 0)
-      - parseFloat(selectedRefund?.discount || 0)
-      - parseFloat(selectedRefund?.refund_amount || 0)
-    )
-  }} PKR
-</p>
+            <p>
+              <strong>Cancellation Amount:</strong>
+              {{
+                Math.max(
+                  0,
+                  parseFloat(selectedRefund?.seat_fare || 0)
+                  - parseFloat(selectedRefund?.discount || 0)
+                  - parseFloat(selectedRefund?.refund_amount || 0)
+              )
+              }} PKR
+            </p>
 
             <p>
               <strong>Refund Percentage:</strong>
-              {{ 100 - ( selectedRefund.refund_percentage )}}%
+              {{ 100 - (selectedRefund.refund_percentage) }}%
             </p>
             <p><strong>Refund Reason:</strong></p>
             <p class="border p-2 rounded bg-light">
@@ -523,11 +397,7 @@
             </p>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="closeRefundViewModal()"
-            >
+            <button type="button" class="btn btn-secondary" @click="closeRefundViewModal()">
               Close
             </button>
           </div>
@@ -668,14 +538,14 @@ export default {
     },
 
     async confirmRefund() {
-     if (this.refundPercentage === null || this.refundPercentage === '') {
-  Swal.fire({
-    icon: "warning",
-    title: "Missing Information",
-    text: "Please select a refund percentage.",
-  });
-  return;
-}
+      if (this.refundPercentage === null || this.refundPercentage === '') {
+        Swal.fire({
+          icon: "warning",
+          title: "Missing Information",
+          text: "Please select a refund percentage.",
+        });
+        return;
+      }
 
 
       if (!this.refundReason.trim()) {
@@ -771,15 +641,15 @@ export default {
   computed: {
     ...mapGetters(["getDeletingObj"]),
     calculatedRefundAmount() {
-       if (!this.selectedRecord || !this.refundPercentage) return 0;
+      if (!this.selectedRecord || !this.refundPercentage) return 0;
 
-    const fare = parseFloat(this.selectedRecord.seat_fare || 0);
-    const discount = parseFloat(this.selectedRecord.discount || 0);
+      const fare = parseFloat(this.selectedRecord.seat_fare || 0);
+      const discount = parseFloat(this.selectedRecord.discount || 0);
 
-    const netAmount = fare - discount; // seat fare minus discount
-    const refundAmount = (netAmount * this.refundPercentage) / 100;
+      const netAmount = fare - discount; // seat fare minus discount
+      const refundAmount = (netAmount * this.refundPercentage) / 100;
 
-    return refundAmount.toFixed(2);
+      return refundAmount.toFixed(2);
     },
   },
   watch: {
