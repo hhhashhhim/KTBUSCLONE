@@ -14,7 +14,7 @@ class AddOtherExpenseToCounterExpenses extends Migration
     public function up()
     {
         Schema::table('counter_expenses', function (Blueprint $table) {
-            $table->string('type')->default('category')->after('category_id');
+            $table->string('type')->default('expense')->after('category_id');
             $table->string('other_income')->nullable()->after('type');
         });
     }
