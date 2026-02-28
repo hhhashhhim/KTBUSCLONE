@@ -107,7 +107,7 @@
                     <th>اخراجات</th>
                     <th>خالص سیل</th>
                     {{-- Dynamic Headers for Portals --}}
-                      @foreach ($data['dynamicTypes'] as $type)
+                    @foreach ($data['dynamicTypes'] as $type)
                         <th>{{ $type }}</th>
                     @endforeach
                     <th>خالص نقدی</th>
@@ -205,7 +205,7 @@
                     <span style="color: red;">- {{ number_format($data['totalCounterExpense']) }}</span>
                 </div>
 
-                    @foreach ($data['dynamicTypes'] as $type)
+                @foreach ($data['dynamicTypes'] as $type)
                     <div class="summary-row">
                         <span>Total {{ $type }}:</span>
                         <span style="color: red;">-
@@ -239,7 +239,8 @@
                     <span>{{ number_format($data['totalCounterIncome']) }}</span>
                 </div>
 
-                <div class="summary-row" style="border-top: 2px solid black; font-weight: bold; margin-top: 5px; background-color: #f2f2f2;">
+                <div class="summary-row"
+                    style="border-top: 2px solid black; font-weight: bold; margin-top: 5px; background-color: #f2f2f2;">
                     <span>خالص قابل ادائیگی:</span>
                     @php
                         $expenses = $data['expenses']->sum('amount');

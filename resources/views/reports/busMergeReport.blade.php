@@ -95,6 +95,7 @@
             font-size: 11pt;
             border-bottom: 1px dotted #ccc;
         }
+
         .summary-row span {
             font-size: 12px !important;
         }
@@ -121,9 +122,10 @@
                     <th>Sale</th>
                     <th>Expense</th>
                     <th>Net Sale</th>
+                    <th>Received Bank</th>
                     {{-- Dynamic Headers for Portals --}}
                     @foreach ($data['dynamicTypes'] as $type)
-                        <th>{{ $type }}</th>
+                    <th>{{ $type }}</th>
                     @endforeach
                     <th>Net Cash</th>
                 </tr>
@@ -138,11 +140,12 @@
                         <td>{{ number_format($item['sale']) }}</td>
                         <td>{{ number_format($item['expense']) }}</td>
                         <td>{{ number_format($item['net_sale']) }}</td>
+                        <td>{{ number_format($item['total_received_bank']) }}</td>
                         {{-- Dynamic Values for Portals --}}
                         @foreach ($data['dynamicTypes'] as $type)
-                            <td class="text-center">
-                                {{ number_format($item['types'][$type] ?? 0) }}
-                            </td>
+                        <td class="text-center">
+                            {{ number_format($item['types'][$type] ?? 0) }}
+                        </td>
                         @endforeach
                         <td>{{ number_format($item['net_cash']) }}</td>
                     </tr>
@@ -156,6 +159,7 @@
                     <td>{{ number_format($data['merges']->sum('sale')) }}</td>
                     <td>{{ number_format($data['merges']->sum('expense')) }}</td>
                     <td>{{ number_format($data['merges']->sum('net_sale')) }}</td>
+                    <td>{{ number_format($data['merges']->sum('total_received_bank')) }}</td>
                     {{-- Dynamic Totals for Portals --}}
                     @foreach ($data['dynamicTypes'] as $type)
                         <td>
@@ -172,18 +176,18 @@
                     TOTAL CREDIT EXPENSES
                 </div>
 
-              @php
-    $groupedExpenses = collect($data['expenses'])
-        ->groupBy(fn ($e) => $e['expense_category']['name'])
-        ->map(fn ($items) => $items->sum('amount'));
-@endphp
+                @php
+                    $groupedExpenses = collect($data['expenses'])
+                        ->groupBy(fn($e) => $e['expense_category']['name'])
+                        ->map(fn($items) => $items->sum('amount'));
+                @endphp
 
-@foreach ($groupedExpenses as $name => $totalAmount)
-    <div class="summary-row">
-        <span>{{ $name }}</span>
-        <span>{{ number_format($totalAmount) }}</span>
-    </div>
-@endforeach
+                @foreach ($groupedExpenses as $name => $totalAmount)
+                    <div class="summary-row">
+                        <span>{{ $name }}</span>
+                        <span>{{ number_format($totalAmount) }}</span>
+                    </div>
+                @endforeach
 
 
                 {{-- Total Row --}}
@@ -217,7 +221,7 @@
                     <span>General Expenses:</span>
                     <span style="color: red;">- {{ number_format($data['totalCounterExpense']) }}</span>
                 </div>
-              
+
                 @foreach ($data['dynamicTypes'] as $type)
                     <div class="summary-row">
                         <span>Total {{ $type }}:</span>
@@ -225,9 +229,9 @@
                             {{ number_format($data['merges']->sum(fn($m) => $m['types'][$type] ?? 0)) }}</span>
                     </div>
                 @endforeach
- <div class="summary-row" style="background-color: #eee;">
+                <div class="summary-row" style="background-color: #eee;">
                     <span>BANK CASH:</span>
-                    <span  style="color: red;">- {{ number_format($data['totalReceivedBank']) }}</span>
+                    <span style="color: red;">- {{ number_format($data['totalReceivedBank']) }}</span>
                 </div>
                 <div class="summary-row"
                     style="border-top: 2px solid black; font-weight: bold; margin-top: 5px; background-color: #f2f2f2;">
@@ -238,12 +242,12 @@
                     <span>NET CASH:</span>
                     <span>{{ number_format($data['merges']->sum('net_cash') - ($data['totalCounterExpense'] + $data['totalReceivedBank'])) }}</span>
                 </div>
-               
+
                 <div class="summary-row" style="background-color: #eee;">
                     <span>KT Commission:</span>
                     <span>{{ number_format($data['totalKtCommission']) }}</span>
                 </div>
-                  <div class="summary-row" style="background-color: #eee;">
+                <div class="summary-row" style="background-color: #eee;">
                     <span>Other Commission:</span>
                     <span> {{ number_format($data['totalCounterIncome']) }}</span>
                 </div>
@@ -251,7 +255,11 @@
                     <span>Net Payable:</span>
                     @php
                         $expenses = $data['expenses']->sum('amount');
-                        $mergesMinusCounter = ($data['merges']->sum('net_cash') + $data['totalCounterIncome']) - $data['totalCounterExpense'] - $data['totalReceivedBank'];
+                        $mergesMinusCounter =
+                            $data['merges']->sum('net_cash') +
+                            $data['totalCounterIncome'] -
+                            $data['totalCounterExpense'] -
+                            $data['totalReceivedBank'];
 
                         $total =
                             $mergesMinusCounter >= 0
