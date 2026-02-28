@@ -284,7 +284,7 @@
                         </th>
                         <th>
                           {{ $insertComma(sumOtherCommissions(data.schedule_return)) }}
-                        </th>
+                        </th> 
                         <th>
                           {{ $insertComma(sumCashReturn()) }}
                         </th>

@@ -36,7 +36,7 @@
                             :settings="{ settingOption: value, settingOption: value, width: '100%' }" 
                                 />
                         </div>
-                        <div class="form-group col-md-3">
+                        <div class="form-group col-md-3"> 
                             <label>Tier 3 <span class="text-danger">*</span></label>
                             <select2 v-model="addData.third_level" :options="thirdLevel" @select="getFourthLevel(addData.third_level)"
                             :settings="{ settingOption: value, settingOption: value, width: '100%' }" 
