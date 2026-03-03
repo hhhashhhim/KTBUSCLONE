@@ -836,6 +836,8 @@ class ScheduleClosingController extends Controller
 
     public function mergesPdf(Request $request)
     {
+      
+        
         if (!checkForSubmenu("merges")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
@@ -920,7 +922,7 @@ class ScheduleClosingController extends Controller
                     $amount = $onlineGroup
                         ->where('terminal.name', $terminalName)
                         ->sum(function ($item) {
-                            return ($item->total_receivable ?? 0);
+                            return ($item->received ?? 0);
                         });
 
 
