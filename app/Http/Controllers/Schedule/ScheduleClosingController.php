@@ -891,7 +891,7 @@ class ScheduleClosingController extends Controller
 
                 // Online group for portal sums
                 $onlineGroup = $group->where('terminal.is_online_terminal', 1);
-$offlineGroup = $group->where('terminal.is_online_terminal', 0);
+                $offlineGroup = $group->where('terminal.is_online_terminal', 0);
                 // Calculate Total Expense for this merge (regardless of terminal type)
                 $totalExpense = $group->unique('ticket_closing_id')->sum(function ($item) {
                     // This now runs only once per ticket_closing_id group
@@ -930,7 +930,7 @@ $offlineGroup = $group->where('terminal.is_online_terminal', 0);
 
                 // Step 3: Calculate Net Cash
                 // Net Cash = (Total Online Sale - Expenses) - Total Online Portal Amounts
-$data['net_cash'] = $data['net_sale'] - ($totalOnlinePortalsAmount + $totalReceivedBank);
+                $data['net_cash'] = $data['net_sale'] - ($totalOnlinePortalsAmount + $totalReceivedBank);
 
                 return $data;
             })
@@ -975,6 +975,7 @@ $data['net_cash'] = $data['net_sale'] - ($totalOnlinePortalsAmount + $totalRecei
     }
     public function mergesUrduPdf(Request $request)
     {
+        
         if (!checkForSubmenu("merges")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
@@ -1030,7 +1031,7 @@ $data['net_cash'] = $data['net_sale'] - ($totalOnlinePortalsAmount + $totalRecei
 
                 // Online group for portal sums
                 $onlineGroup = $group->where('terminal.is_online_terminal', 1);
-
+                $offlineGroup = $group->where('terminal.is_online_terminal', 0);
                 // Calculate Total Expense for this merge (regardless of terminal type)
                 $totalExpense = $group->unique('ticket_closing_id')->sum(function ($item) {
                     // This now runs only once per ticket_closing_id group
@@ -1039,16 +1040,18 @@ $data['net_cash'] = $data['net_sale'] - ($totalOnlinePortalsAmount + $totalRecei
 
                 // Calculate Total Online Sale
                 $totalOnlineSale = $group->sum('total_receivable');
+                $totalReceivedBank = $offlineGroup->sum('total_received_bank');
                 $totalOtherCommission = $group->sum('kt_commission');
                 $totalKtCommission = $group->sum('other_commission');
                 $totalExpense += $totalKtCommission + $totalOtherCommission;
 
                 $data = [
-                    'bus_no'   => $first->bus->bus_number ?? 'N/A',
-                    'route'   => $first->route->name ?? 'N/A',
-                    'sale'     => $totalOnlineSale,
-                    'expense'  => $totalExpense,
-                    'net_sale' => $totalOnlineSale - $totalExpense,
+                    'bus_no'                  => $first->bus->bus_number ?? 'N/A',
+                    'route'                   => $first->route->name ?? 'N/A',
+                    'total_received_bank'     => $totalReceivedBank,
+                    'sale'                    => $totalOnlineSale,
+                    'expense'                 => $totalExpense,
+                    'net_sale'                => $totalOnlineSale - $totalExpense,
                 ];
 
                 $totalOnlinePortalsAmount = 0;
@@ -1067,7 +1070,7 @@ $data['net_cash'] = $data['net_sale'] - ($totalOnlinePortalsAmount + $totalRecei
 
                 // Step 3: Calculate Net Cash
                 // Net Cash = (Total Online Sale - Expenses) - Total Online Portal Amounts
-                $data['net_cash'] = $data['net_sale'] - $totalOnlinePortalsAmount;
+                $data['net_cash'] = $data['net_sale'] - ($totalOnlinePortalsAmount + $totalReceivedBank);
 
                 return $data;
             })
@@ -1107,7 +1110,6 @@ $data['net_cash'] = $data['net_sale'] - ($totalOnlinePortalsAmount + $totalRecei
             "totalKtCommission"     =>      $totalKtCommission,
             "totalReceivedBank"     =>      $totalReceivedBank
         ];
-
 
         return view('reports.busMergeReportUrdu', ['data' => $data]);
     }
