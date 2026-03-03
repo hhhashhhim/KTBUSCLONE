@@ -932,7 +932,7 @@ class ScheduleClosingController extends Controller
 
                 // Step 3: Calculate Net Cash
                 // Net Cash = (Total Online Sale - Expenses) - Total Online Portal Amounts
-                $data['net_cash'] = $data['net_sale'] - ($totalOnlinePortalsAmount + $totalReceivedBank);
+                $data['net_cash'] = $data['net_sale'] - $totalOnlinePortalsAmount;
 
                 return $data;
             })
@@ -1072,7 +1072,7 @@ class ScheduleClosingController extends Controller
 
                 // Step 3: Calculate Net Cash
                 // Net Cash = (Total Online Sale - Expenses) - Total Online Portal Amounts
-                $data['net_cash'] = $data['net_sale'] - ($totalOnlinePortalsAmount + $totalReceivedBank);
+                $data['net_cash'] = $data['net_sale'] - $totalOnlinePortalsAmount;
 
                 return $data;
             })
