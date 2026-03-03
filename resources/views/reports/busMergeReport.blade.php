@@ -235,7 +235,7 @@
                 </div>
                 <div class="summary-row"
                     style="border-top: 2px solid black; font-weight: bold; margin-top: 5px; background-color: #f2f2f2;">
-                    <span>Total Credit:</span>
+                    <span>Total Credit:</span> 
                     <span>{{ number_format($data['expenses']->sum('amount')) }}</span>
                 </div>
                 <div class="summary-row" style="background-color: #eee;">
