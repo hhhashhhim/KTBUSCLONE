@@ -609,15 +609,20 @@ class ScheduleClosingController extends Controller
         ])
             ->with([
                 'bus:id,bus_number',
-                'shortage:id,ticket_closing_id,terminal_id,shortage,total_receivable', // belongsTo relation
+                'shortage:id,ticket_closing_id,terminal_id,shortage,total_receivable',
                 'closing:id,ticket_merge_id,schedule_id',
                 'closing.schedule:id,name'
             ]);
+
         $buses = Bus::where('company_id', $user->company_id)
             ->orderBy('id')
             ->get();
-        // Filters
-        if ($request->bus_number) $query->where('bus_id', $request->bus_number);
+
+        // Bus Filter
+        if ($request->bus_number) {
+            $query->where('bus_id', $request->bus_number);
+        }
+
         // Schedule Name Start
         if ($request->schedule_name_start) {
             $query->whereHas('closing.schedule', function ($q) use ($request) {
@@ -632,9 +637,23 @@ class ScheduleClosingController extends Controller
             });
         }
 
-        if ($request->from_date) $query->whereDate('schedule_departure_date', '>=', $request->from_date);
-        if ($request->to_date) $query->whereDate('schedule_departure_date', '<=', $request->to_date);
-        if ($request->closing_date) $query->whereDate('closing_date', $request->closing_date);
+        // Departure Date Filters
+        if ($request->from_date) {
+            $query->whereDate('schedule_departure_date', '>=', $request->from_date);
+        }
+
+        if ($request->to_date) {
+            $query->whereDate('schedule_departure_date', '<=', $request->to_date);
+        }
+
+        // ✅ Closing Date Range Filter
+        if ($request->closing_from_date) {
+            $query->whereDate('closing_date', '>=', $request->closing_from_date);
+        }
+
+        if ($request->closing_to_date) {
+            $query->whereDate('closing_date', '<=', $request->closing_to_date);
+        }
 
         $limit = (!$request->from_date && !$request->to_date) ? 20 : 2000;
 
@@ -645,11 +664,14 @@ class ScheduleClosingController extends Controller
             ->withSum('expenses', 'amount')
             ->get()
             ->map(function ($item) {
-                // Calculate the difference and add it as a new attribute
-                $item->expenses_sum_amount = $item->shortage_sum_kt_commission + $item->shortage_sum_other_commission + $item->expenses_sum_amount;
+
+                $item->expenses_sum_amount =
+                    $item->shortage_sum_kt_commission +
+                    $item->shortage_sum_other_commission +
+                    $item->expenses_sum_amount;
+
                 return $item;
             });
-
 
         return [
             'merges' => $merges,
@@ -836,14 +858,17 @@ class ScheduleClosingController extends Controller
 
     public function mergesPdf(Request $request)
     {
-      
-        
+
+
         if (!checkForSubmenu("merges")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
 
         $user = Auth::user();
-        $merges = TicketClosingMerge::where(function ($q) use ($request) {
+        $merges = TicketClosingMerge::where([
+            'company_id' => $user->company_id,
+            'schedule_complete' => 1
+        ])->where(function ($q) use ($request) {
             if ($request->bus_number) {
                 $q->where('bus_id', $request->bus_number);
             }
@@ -853,8 +878,12 @@ class ScheduleClosingController extends Controller
             if ($request->to_date) {
                 $q->whereDate('schedule_departure_date', '<=', $request->to_date);
             }
-            if ($request->closing_date) {
-                $q->whereDate('closing_date', $request->closing_date);
+            if ($request->closing_from_date) {
+                $q->whereDate('closing_date', '>=', $request->closing_from_date);
+            }
+
+            if ($request->closing_to_date) {
+                $q->whereDate('closing_date', '<=', $request->closing_to_date);
             }
         })
             // Schedule Name Start
@@ -946,10 +975,30 @@ class ScheduleClosingController extends Controller
             })
             ->get();
         $merge = TicketClosingMerge::whereIn('id', $merges)->first();
-        $totalCounterExpense = CounterExpense::whereDate('date', $merge->closing_date)
+        $totalCounterExpense = CounterExpense::where(function ($q) use ($request) {
+
+            if ($request->closing_from_date) {
+                $q->whereDate('date', '>=', $request->closing_from_date);
+            }
+
+            if ($request->closing_to_date) {
+                $q->whereDate('date', '<=', $request->closing_to_date);
+            }
+        })
             ->where('type', 'expense')
             ->sum('total');
-        $totalCounterIncome = CounterExpense::whereDate('date', $merge->closing_date)
+
+
+        $totalCounterIncome = CounterExpense::where(function ($q) use ($request) {
+
+            if ($request->closing_from_date) {
+                $q->whereDate('date', '>=', $request->closing_from_date);
+            }
+
+            if ($request->closing_to_date) {
+                $q->whereDate('date', '<=', $request->closing_to_date);
+            }
+        })
             ->where('type', 'income')
             ->sum('total');
 
@@ -965,7 +1014,8 @@ class ScheduleClosingController extends Controller
         $data = [
             'dynamicTypes'          =>      $dynamicTypes,
             "merges"                =>      $mappedResults,
-            "closing_date"          =>      $request->closing_date,
+            "closing_from_date"     => $request->closing_from_date,
+            "closing_to_date"       => $request->closing_to_date,
             "expenses"              =>      $creditExpenses,
             "totalCounterExpense"   =>      $totalCounterExpense,
             "totalCounterIncome"    =>      $totalCounterIncome,
@@ -977,7 +1027,7 @@ class ScheduleClosingController extends Controller
     }
     public function mergesUrduPdf(Request $request)
     {
-        
+
         if (!checkForSubmenu("merges")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }

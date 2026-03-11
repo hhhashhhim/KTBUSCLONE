@@ -108,7 +108,12 @@
     <div style="border: 2px solid black; padding: 15px 3px 5px 3px !important;">
         <div id="info">
             <div class="companyName">
-                <span>CLOSING SUMMARY FOR {{ date('d-M-Y', strtotime($data['closing_date'])) }}</span>
+                <span>
+CLOSING SUMMARY 
+({{ date('d M Y', strtotime($data['closing_from_date'])) }}
+- 
+{{ date('d M Y', strtotime($data['closing_to_date'])) }})
+</span>
             </div>
         </div>
         <br>
