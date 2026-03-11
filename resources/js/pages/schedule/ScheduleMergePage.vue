@@ -48,9 +48,13 @@
                                             v-model="filterData.to_date">
                                     </div>
                                     <div class="col-md-3 mt-3">
-                                        <label for="toDate">Closing Date</label>
-                                        <input id="toDate" type="date" class="form-control"
-                                            v-model="filterData.closing_date">
+                                        <label>Closing From Date</label>
+                                        <input type="date" class="form-control" v-model="filterData.closing_from_date">
+                                    </div>
+
+                                    <div class="col-md-3 mt-3">
+                                        <label>Closing To Date</label>
+                                        <input type="date" class="form-control" v-model="filterData.closing_to_date">
                                     </div>
 
                                     <div class="col-md-6 d-flex justify-content-center mt-3">
@@ -88,13 +92,18 @@
                                                                 :value="this.filterData.from_date">
                                                             <input type="hidden" name="to_date"
                                                                 :value="this.filterData.to_date">
-                                                            <input type="hidden" name="closing_date"
-                                                                :value="this.filterData.closing_date">
+                                                            <input type="hidden" name="closing_from_date"
+                                                                :value="this.filterData.closing_from_date">
+
+                                                            <input type="hidden" name="closing_to_date"
+                                                                :value="this.filterData.closing_to_date">
                                                             <input type="hidden" name="schedule_name_start"
                                                                 :value="this.filterData.schedule_name_start">
                                                             <input type="hidden" name="schedule_name_end"
                                                                 :value="this.filterData.schedule_name_end">
-                                                            <input type="submit" value="Eng Print" class="btn btn-dark mx-2">
+
+                                                            <input type="submit" value="Eng Print"
+                                                                class="btn btn-dark mx-2">
                                                         </form>
                                                         <form
                                                             :action="$store.state.api_url + 'api/web/v1/booking/close/schedule/merges/urdu/pdf'"
@@ -107,13 +116,17 @@
                                                                 :value="this.filterData.from_date">
                                                             <input type="hidden" name="to_date"
                                                                 :value="this.filterData.to_date">
-                                                            <input type="hidden" name="closing_date"
-                                                                :value="this.filterData.closing_date">
+                                                            <input type="hidden" name="closing_from_date"
+                                                                :value="this.filterData.closing_from_date">
+
+                                                            <input type="hidden" name="closing_to_date"
+                                                                :value="this.filterData.closing_to_date">
                                                             <input type="hidden" name="schedule_name_start"
                                                                 :value="this.filterData.schedule_name_start">
                                                             <input type="hidden" name="schedule_name_end"
                                                                 :value="this.filterData.schedule_name_end">
-                                                            <input type="submit" value="Urdu Print" class="btn btn-dark">
+                                                            <input type="submit" value="Urdu Print"
+                                                                class="btn btn-dark">
                                                         </form>
                                                     </div>
                                                     <table class="table table-striped table-hover" id="merge_table">
@@ -325,7 +338,8 @@ export default {
                 bus_number: "",
                 from_date: new Date().toISOString().split('T')[0],
                 to_date: new Date().toISOString().split('T')[0],
-                closing_date: new Date().toISOString().split('T')[0],
+                closing_from_date: new Date().toISOString().split('T')[0],
+                closing_to_date: new Date().toISOString().split('T')[0],
                 schedule_name_start: '',  // new
                 schedule_name_end: ''     // new
             },
@@ -395,7 +409,7 @@ export default {
                     this.filterData
                 );
                 // console.log("test", this.filterData);
-                
+
                 if (res.status === 200) {
                     this.merges = res.data.merges;
                 } else {
@@ -413,7 +427,8 @@ export default {
                 bus_number: '',
                 from_date: new Date().toISOString().split('T')[0],
                 to_date: new Date().toISOString().split('T')[0],
-                closing_date: new Date().toISOString().split('T')[0],
+                closing_from_date: new Date().toISOString().split('T')[0],
+                closing_to_date: new Date().toISOString().split('T')[0],
             };
             this.fetchMerges(); // optional: refresh table after reset
         },
