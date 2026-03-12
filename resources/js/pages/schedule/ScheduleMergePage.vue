@@ -128,6 +128,25 @@
                                                             <input type="submit" value="Urdu Print"
                                                                 class="btn btn-dark">
                                                         </form>
+                                                        <form
+                                                            :action="$store.state.api_url + 'api/web/v1/reportExport/pdf'"
+                                                            target="_blank" method="POST" ref="refSummeryReport">
+
+                                                            <input type="hidden" name="token"
+                                                                :value="$store.state.token">
+
+                                                            <input type="hidden" name="closing_from_date"
+                                                                :value="filterData.closing_from_date">
+
+                                                            <input type="hidden" name="closing_to_date"
+                                                                :value="filterData.closing_to_date">
+
+                                                            <!-- IMPORTANT: type="button" -->
+                                                            <button type="button" class="btn btn-primary mr-2"
+                                                                @click="getSummeryReport('english')">
+                                                                Export Report
+                                                            </button>
+                                                        </form>
                                                     </div>
                                                     <table class="table table-striped table-hover" id="merge_table">
                                                         <thead>
@@ -367,6 +386,18 @@ export default {
     },
 
     methods: {
+        async getSummeryReport(value) {
+
+            if (!this.filterData.closing_from_date || !this.filterData.closing_to_date) {
+                return swal({
+                    title: "Required",
+                    text: "Enter Closing Date Range",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            this.$refs.refSummeryReport.submit();
+        },
         clearForm: function () {
             this.data = {};
         },

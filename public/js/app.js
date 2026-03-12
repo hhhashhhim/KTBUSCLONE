@@ -67270,6 +67270,37 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     this.permissions = this.$store.state.permissions;
   },
   methods: {
+    getSummeryReport: function getSummeryReport(value) {
+      var _this = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                if (!(!_this.filterData.closing_from_date || !_this.filterData.closing_to_date)) {
+                  _context.next = 2;
+                  break;
+                }
+
+                return _context.abrupt("return", swal({
+                  title: "Required",
+                  text: "Enter Closing Date Range",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 2:
+                _this.$refs.refSummeryReport.submit();
+
+              case 3:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }))();
+    },
     clearForm: function clearForm() {
       this.data = {};
     },
@@ -67277,44 +67308,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       $("#date-modal").click();
     },
     fetchBuses: function fetchBuses() {
-      var _this = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var res;
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _context.prev = 0;
-                _context.next = 3;
-                return _this.callApi("post", "booking/close/schedule/merges/buses");
-
-              case 3:
-                res = _context.sent;
-                console.log("Buses API response:", res); // check the structure
-
-                if (res.status === 200) {
-                  // adjust based on actual path
-                  _this.buses = res.data.buses || res.data;
-                }
-
-                _context.next = 11;
-                break;
-
-              case 8:
-                _context.prev = 8;
-                _context.t0 = _context["catch"](0);
-                console.error("Error fetching buses:", _context.t0);
-
-              case 11:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee, null, [[0, 8]]);
-      }))();
-    },
-    fetchSchedule: function fetchSchedule() {
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
@@ -67325,32 +67318,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 0:
                 _context2.prev = 0;
                 _context2.next = 3;
-                return _this2.callApi("post", "booking/close/schedule/merges/schedule");
+                return _this2.callApi("post", "booking/close/schedule/merges/buses");
 
               case 3:
                 res = _context2.sent;
+                console.log("Buses API response:", res); // check the structure
 
                 if (res.status === 200) {
-                  _this2.schedules = res.data.schedules;
+                  // adjust based on actual path
+                  _this2.buses = res.data.buses || res.data;
                 }
 
-                _context2.next = 10;
+                _context2.next = 11;
                 break;
 
-              case 7:
-                _context2.prev = 7;
+              case 8:
+                _context2.prev = 8;
                 _context2.t0 = _context2["catch"](0);
-                console.error("Error fetching schedule:", _context2.t0);
+                console.error("Error fetching buses:", _context2.t0);
 
-              case 10:
+              case 11:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2, null, [[0, 7]]);
+        }, _callee2, null, [[0, 8]]);
       }))();
     },
-    fetchMerges: function fetchMerges() {
+    fetchSchedule: function fetchSchedule() {
       var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
@@ -67360,40 +67355,76 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.prev = 0;
-                _this3.tableLoading = true;
-                _context3.next = 4;
-                return _this3.callApi("post", "booking/close/schedule/merges", _this3.filterData);
+                _context3.next = 3;
+                return _this3.callApi("post", "booking/close/schedule/merges/schedule");
 
-              case 4:
+              case 3:
                 res = _context3.sent;
 
-                // console.log("test", this.filterData);
                 if (res.status === 200) {
-                  _this3.merges = res.data.merges;
-                } else {
-                  console.error("API returned error:", res);
+                  _this3.schedules = res.data.schedules;
                 }
 
-                _context3.next = 11;
+                _context3.next = 10;
                 break;
 
-              case 8:
-                _context3.prev = 8;
+              case 7:
+                _context3.prev = 7;
                 _context3.t0 = _context3["catch"](0);
-                console.error("Error fetching merges:", _context3.t0);
+                console.error("Error fetching schedule:", _context3.t0);
 
-              case 11:
-                _context3.prev = 11;
-                _this3.tableLoading = false; // ensures loader stops even on error
-
-                return _context3.finish(11);
-
-              case 14:
+              case 10:
               case "end":
                 return _context3.stop();
             }
           }
-        }, _callee3, null, [[0, 8, 11, 14]]);
+        }, _callee3, null, [[0, 7]]);
+      }))();
+    },
+    fetchMerges: function fetchMerges() {
+      var _this4 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _context4.prev = 0;
+                _this4.tableLoading = true;
+                _context4.next = 4;
+                return _this4.callApi("post", "booking/close/schedule/merges", _this4.filterData);
+
+              case 4:
+                res = _context4.sent;
+
+                // console.log("test", this.filterData);
+                if (res.status === 200) {
+                  _this4.merges = res.data.merges;
+                } else {
+                  console.error("API returned error:", res);
+                }
+
+                _context4.next = 11;
+                break;
+
+              case 8:
+                _context4.prev = 8;
+                _context4.t0 = _context4["catch"](0);
+                console.error("Error fetching merges:", _context4.t0);
+
+              case 11:
+                _context4.prev = 11;
+                _this4.tableLoading = false; // ensures loader stops even on error
+
+                return _context4.finish(11);
+
+              case 14:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, null, [[0, 8, 11, 14]]);
       }))();
     },
     resetFilters: function resetFilters() {
@@ -67407,20 +67438,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.fetchMerges(); // optional: refresh table after reset
     },
     updateClosingDate: function updateClosingDate() {
-      var _this4 = this;
+      var _this5 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                if (!(_this4.closingData.closingDate == "")) {
-                  _context4.next = 2;
+                if (!(_this5.closingData.closingDate == "")) {
+                  _context5.next = 2;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "Required!",
                   text: "Date Field is Required ",
                   icon: "error",
@@ -67428,15 +67459,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 2:
-                _this4.loading = true;
-                _context4.next = 5;
-                return _this4.callApi("post", "booking/close/schedule/closing/date/update", _this4.closingData);
+                _this5.loading = true;
+                _context5.next = 5;
+                return _this5.callApi("post", "booking/close/schedule/closing/date/update", _this5.closingData);
 
               case 5:
-                res = _context4.sent;
+                res = _context5.sent;
 
                 if (res.status == 200) {
-                  _this4.close();
+                  _this5.close();
 
                   swal({
                     title: "Success",
@@ -67444,13 +67475,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     icon: "success",
                     timer: 2000
                   });
-                  _this4.loading = false;
+                  _this5.loading = false;
 
-                  _this4.fetchMerges();
+                  _this5.fetchMerges();
                 } else {
                   if (res.status == 422) {
                     (function () {
-                      _this4.loading = false;
+                      _this5.loading = false;
                       var errorContent = "";
                       var count = 0;
 
@@ -67474,10 +67505,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 7:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4);
+        }, _callee5);
       }))();
     }
   },
@@ -67506,26 +67537,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   mounted: function mounted() {
-    var _this5 = this;
+    var _this6 = this;
 
-    return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-      return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+    return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+      return _regeneratorRuntime().wrap(function _callee6$(_context6) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context6.prev = _context6.next) {
             case 0:
-              _context5.next = 2;
-              return _this5.fetchBuses();
+              _context6.next = 2;
+              return _this6.fetchBuses();
 
             case 2:
-              _context5.next = 4;
-              return _this5.fetchSchedule();
+              _context6.next = 4;
+              return _this6.fetchSchedule();
 
             case 4:
             case "end":
-              return _context5.stop();
+              return _context6.stop();
           }
         }
-      }, _callee5);
+      }, _callee6);
     }))();
   }
 });
@@ -131760,95 +131791,99 @@ var _hoisted_53 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_54 = {
+var _hoisted_54 = ["action"];
+var _hoisted_55 = ["value"];
+var _hoisted_56 = ["value"];
+var _hoisted_57 = ["value"];
+var _hoisted_58 = {
   "class": "table table-striped table-hover",
   id: "merge_table"
 };
 
-var _hoisted_55 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_59 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Number", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_56 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_60 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Departure Schedule", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_57 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_61 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Departure Date", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_58 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_62 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Return Schedule", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_59 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_63 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Return Date", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_60 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Closing Date", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_61 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_65 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Merge Sale", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_62 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_66 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Merge Expense", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_63 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_67 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Net Sale", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_64 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_68 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Shortage", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_65 = {
+var _hoisted_69 = {
   key: 0,
   width: "200px"
 };
-var _hoisted_66 = {
-  "class": "bg-blue-grey"
-};
-var _hoisted_67 = {
-  "class": "bg-blue-grey"
-};
-var _hoisted_68 = {
-  "class": "bg-dark-gray"
-};
-var _hoisted_69 = {
-  "class": "bg-dark-gray"
-};
 var _hoisted_70 = {
-  "class": "bg-danger"
+  "class": "bg-blue-grey"
 };
 var _hoisted_71 = {
+  "class": "bg-blue-grey"
+};
+var _hoisted_72 = {
+  "class": "bg-dark-gray"
+};
+var _hoisted_73 = {
+  "class": "bg-dark-gray"
+};
+var _hoisted_74 = {
+  "class": "bg-danger"
+};
+var _hoisted_75 = {
   key: 0
 };
 
-var _hoisted_72 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_76 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "fas fa-plus"
   }, null, -1
@@ -131856,9 +131891,9 @@ var _hoisted_72 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_73 = ["onClick"];
+var _hoisted_77 = ["onClick"];
 
-var _hoisted_74 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_78 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "far fa-clock"
   }, null, -1
@@ -131866,9 +131901,9 @@ var _hoisted_74 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_75 = [_hoisted_74];
+var _hoisted_79 = [_hoisted_78];
 
-var _hoisted_76 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_80 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
     colspan: "6"
   }, null, -1
@@ -131876,24 +131911,24 @@ var _hoisted_76 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_77 = {
+var _hoisted_81 = {
   "class": "modal fade",
   id: "date-modal",
   tabindex: "-1",
   "aria-labelledby": "addDaysModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_78 = {
+var _hoisted_82 = {
   "class": "modal-dialog modal-dialog-centered"
 };
-var _hoisted_79 = {
+var _hoisted_83 = {
   "class": "modal-content"
 };
-var _hoisted_80 = {
+var _hoisted_84 = {
   "class": "modal-header"
 };
 
-var _hoisted_81 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_85 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
     "class": "modal-title",
     id: ""
@@ -131902,7 +131937,7 @@ var _hoisted_81 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_82 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_86 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "aria-hidden": "true"
   }, "×", -1
@@ -131910,18 +131945,18 @@ var _hoisted_82 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_83 = [_hoisted_82];
-var _hoisted_84 = {
+var _hoisted_87 = [_hoisted_86];
+var _hoisted_88 = {
   "class": "modal-body"
 };
-var _hoisted_85 = {
+var _hoisted_89 = {
   "class": "row"
 };
-var _hoisted_86 = {
+var _hoisted_90 = {
   "class": "col-md-12 class form-group"
 };
 
-var _hoisted_87 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_91 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "start"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Closing Date "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -131931,10 +131966,10 @@ var _hoisted_87 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_88 = {
+var _hoisted_92 = {
   "class": "modal-footer"
 };
-var _hoisted_89 = ["disabled"];
+var _hoisted_93 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _settings;
 
@@ -132136,20 +132171,51 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* PROPS */
   , _hoisted_52), _hoisted_53], 8
   /* PROPS */
-  , _hoisted_44)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_55, _hoisted_56, _hoisted_57, _hoisted_58, _hoisted_59, _hoisted_60, _hoisted_61, _hoisted_62, _hoisted_63, _hoisted_64, _ctx.checkForSubmenuButtons('add-expense') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_65, "Action ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.merges, function (merge, i) {
+  , _hoisted_44), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+    action: _ctx.$store.state.api_url + 'api/web/v1/reportExport/pdf',
+    target: "_blank",
+    method: "POST",
+    ref: "refSummeryReport"
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "token",
+    value: _ctx.$store.state.token
+  }, null, 8
+  /* PROPS */
+  , _hoisted_55), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "closing_from_date",
+    value: $data.filterData.closing_from_date
+  }, null, 8
+  /* PROPS */
+  , _hoisted_56), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "closing_to_date",
+    value: $data.filterData.closing_to_date
+  }, null, 8
+  /* PROPS */
+  , _hoisted_57), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" IMPORTANT: type=\"button\" "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-primary mr-2",
+    onClick: _cache[9] || (_cache[9] = function ($event) {
+      return $options.getSummeryReport('english');
+    })
+  }, " Export Report ")], 8
+  /* PROPS */
+  , _hoisted_54)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_59, _hoisted_60, _hoisted_61, _hoisted_62, _hoisted_63, _hoisted_64, _hoisted_65, _hoisted_66, _hoisted_67, _hoisted_68, _ctx.checkForSubmenuButtons('add-expense') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_69, "Action ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.merges, function (merge, i) {
     var _merge$bus, _merge$closing$, _merge$closing$$sched, _merge$closing$2, _merge$closing$2$sche, _merge$closing_date;
 
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(((_merge$bus = merge.bus) === null || _merge$bus === void 0 ? void 0 : _merge$bus.bus_number) || "-"), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Departure Schedule "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(merge.closing && merge.closing.length > 0 ? (_merge$closing$ = merge.closing[0]) === null || _merge$closing$ === void 0 ? void 0 : (_merge$closing$$sched = _merge$closing$.schedule) === null || _merge$closing$$sched === void 0 ? void 0 : _merge$closing$$sched.name : "-"), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Departure Schedule "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(merge.closing && merge.closing.length > 0 ? (_merge$closing$ = merge.closing[0]) === null || _merge$closing$ === void 0 ? void 0 : (_merge$closing$$sched = _merge$closing$.schedule) === null || _merge$closing$$sched === void 0 ? void 0 : _merge$closing$$sched.name : "-"), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_67, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(merge.schedule_departure_date || "-"), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_71, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(merge.schedule_departure_date || "-"), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Return Schedule "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_68, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(merge.closing && merge.closing.length > 1 ? (_merge$closing$2 = merge.closing[1]) === null || _merge$closing$2 === void 0 ? void 0 : (_merge$closing$2$sche = _merge$closing$2.schedule) === null || _merge$closing$2$sche === void 0 ? void 0 : _merge$closing$2$sche.name : "-"), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Return Schedule "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_72, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(merge.closing && merge.closing.length > 1 ? (_merge$closing$2 = merge.closing[1]) === null || _merge$closing$2 === void 0 ? void 0 : (_merge$closing$2$sche = _merge$closing$2.schedule) === null || _merge$closing$2$sche === void 0 ? void 0 : _merge$closing$2$sche.name : "-"), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_69, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(merge.schedule_return_date || "-"), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_73, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(merge.schedule_return_date || "-"), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_merge$closing_date = merge.closing_date) !== null && _merge$closing_date !== void 0 ? _merge$closing_date : "N/A"), 1
     /* TEXT */
@@ -132157,7 +132223,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(parseInt(merge.expenses_sum_amount || 0)), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma(merge.shortage_sum_total_receivable - merge.expenses_sum_amount || 0)), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma(merge.shortage_sum_total_receivable - merge.expenses_sum_amount || 0)), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({
@@ -132171,7 +132237,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       title: "Shortage Status"
     }, null, 2
     /* CLASS */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" {{ parseInt(merge.shortage.reduce((sum, s) => sum + parseFloat(s.shortage || 0), 0)) }} ")]), _ctx.checkForSubmenuButtons('add-expense') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" {{ parseInt(merge.shortage.reduce((sum, s) => sum + parseFloat(s.shortage || 0), 0)) }} ")]), _ctx.checkForSubmenuButtons('add-expense') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_75, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
       target: "_blank",
       "class": "btn btn-success mx-1",
       to: {
@@ -132183,7 +132249,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       title: "Add Expense"
     }, {
       "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-        return [_hoisted_72];
+        return [_hoisted_76];
       }),
       _: 2
       /* DYNAMIC */
@@ -132219,46 +132285,46 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         $data.closingData.closingDate = merge.closing_date;
       },
       "class": "btn btn-info mx-1"
-    }, _hoisted_75, 8
+    }, _hoisted_79, 8
     /* PROPS */
-    , _hoisted_73)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Shortage Dot ")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+    , _hoisted_77)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Shortage Dot ")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
   }), 128
   /* KEYED_FRAGMENT */
-  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Totals "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_76, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("b", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($data.totalSale)), 1
+  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Totals "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_80, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("b", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($data.totalSale)), 1
   /* TEXT */
   )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("b", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($data.totalExpense)), 1
   /* TEXT */
   )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("b", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($data.totalSale - $data.totalExpense)), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Shortage status dot "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td>\r\n    <span \r\n      :class=\"{\r\n        'dot-green': !hasShortage,\r\n        'dot-red': hasShortage\r\n      }\"\r\n    ></span>\r\n  </td> ")])])])]))])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" closing date "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_77, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_78, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_79, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_80, [_hoisted_81, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Shortage status dot "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td>\r\n    <span \r\n      :class=\"{\r\n        'dot-green': !hasShortage,\r\n        'dot-red': hasShortage\r\n      }\"\r\n    ></span>\r\n  </td> ")])])])]))])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" closing date "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_81, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_82, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_83, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_84, [_hoisted_85, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "close",
-    onClick: _cache[9] || (_cache[9] = function ($event) {
+    onClick: _cache[10] || (_cache[10] = function ($event) {
       return $options.close();
     }),
     "data-dismiss": "modal",
     "aria-label": "Close"
-  }, _hoisted_83)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_84, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_85, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_86, [_hoisted_87, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, _hoisted_87)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_88, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_89, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_90, [_hoisted_91, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "date",
     id: "start",
     "class": "form-control",
-    "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+    "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
       return $data.closingData.closingDate = $event;
     })
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.closingData.closingDate]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_88, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.closingData.closingDate]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_92, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-primary",
-    onClick: _cache[11] || (_cache[11] = function ($event) {
+    onClick: _cache[12] || (_cache[12] = function ($event) {
       return $options.updateClosingDate();
     }),
     disabled: $data.loading
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading... ' : 'Update Date'), 9
   /* TEXT, PROPS */
-  , _hoisted_89), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  , _hoisted_93), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
-    onClick: _cache[12] || (_cache[12] = function ($event) {
+    onClick: _cache[13] || (_cache[13] = function ($event) {
       return $options.close();
     }),
     "class": "btn btn-secondary",
