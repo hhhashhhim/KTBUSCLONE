@@ -82,7 +82,6 @@
             @endphp
         @endforeach
         @foreach($data as $key => $single)
-      
             @php
                 $singleRowNet = 0;
             @endphp
