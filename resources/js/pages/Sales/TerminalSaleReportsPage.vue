@@ -14,55 +14,53 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-md-2" v-if="checkForSubmenuButtons('terminal-sale-terminal-filter')">
+                                                <div class="col-md-2"
+                                                    v-if="checkForSubmenuButtons('terminal-sale-terminal-filter')">
                                                     <label for="terminalFilter">Terminals</label>
                                                     <select id="terminalFilter" class="form-control"
-                                                            v-model="filterSales.terminal"
-                                                        >
+                                                        v-model="filterSales.terminal">
                                                         <option value="0">Select Terminals</option>
                                                         <option v-for="(terminal, i) in terminals" :key="i"
-                                                                :value="terminal.id">
+                                                            :value="terminal.id">
                                                             {{ terminal.name }}
                                                         </option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-2" v-if="checkForSubmenuButtons('terminal-sale-user-filter')">
+                                                <div class="col-md-2"
+                                                    v-if="checkForSubmenuButtons('terminal-sale-user-filter')">
                                                     <label for="usernameFilter">Users</label>
                                                     <select id="usernameFilter" class="form-control"
-                                                            v-model="filterSales.user"
-                                                        >
+                                                        v-model="filterSales.user">
                                                         <option value="0">Select Users</option>
-                                                        <option v-for="(user, i) in users" :key="i"
-                                                                :value="user.id">
+                                                        <option v-for="(user, i) in users" :key="i" :value="user.id">
                                                             {{ user.name }}
                                                         </option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-2" v-if="checkForSubmenuButtons('terminal-sale-route-filter')">
+                                                <div class="col-md-2"
+                                                    v-if="checkForSubmenuButtons('terminal-sale-route-filter')">
                                                     <label for="routeIds">Routes</label>
                                                     <select id="routeIds" class="form-control" multiple
-                                                            v-model="filterSales.route"
-                                                        >
+                                                        v-model="filterSales.route">
                                                         <option value="0">Select Route</option>
-                                                        <option v-for="(route, i) in routes" :key="i"
-                                                                :value="route.id">
-                                                            {{ route.name }}  ({{ route.via??'n/a' }})
+                                                        <option v-for="(route, i) in routes" :key="i" :value="route.id">
+                                                            {{ route.name }} ({{ route.via ?? 'n/a' }})
                                                         </option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label for="fromDate">From Date Time</label>
                                                     <input id="fromDate" type="datetime-local" class="form-control"
-                                                           v-model="filterSales.fromDateTime">
+                                                        v-model="filterSales.fromDateTime">
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label for="toDate">To Date Time</label>
                                                     <input id="toDate" type="datetime-local" class="form-control"
-                                                           v-model="filterSales.toDateTime">
+                                                        v-model="filterSales.toDateTime">
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <button class="btn btn-primary mt-4" type="button" @click="salesFilter()"
-                                                            :disabled="loadingTable">
+                                                    <button class="btn btn-primary mt-4" type="button"
+                                                        @click="salesFilter()" :disabled="loadingTable">
                                                         {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
                                                     </button>
                                                 </div>
@@ -86,52 +84,68 @@
                                                 <div class="col-md-12">
                                                     <div class="table-responsive">
                                                         <table class="table table-striped table-hover text-center"
-                                                               id="saleReportTable">
+                                                            id="saleReportTable">
                                                             <thead>
-                                                            <tr>
-                                                                <th>Bus Time</th>
-                                                                <th>Bus No</th>
-                                                                <th>Bus Class</th>
-                                                                <th>Route</th>
-                                                                <th>Name</th>
-                                                                <th>Cnic</th>
-                                                                <th>Contact</th>
-                                                                <th>Seat No</th>
-                                                                <th>Invoice</th>
-                                                                <th>Terminal Name</th>
-                                                                <th>Status</th>
-                                                                <th>Action By</th>
-                                                                <th>Sale</th>
-                                                                <th>Refund</th>
-                                                                <th>Commission</th>
-                                                            </tr>
+                                                                <tr>
+                                                                    <th>Bus Time</th>
+                                                                    <th>Bus No</th>
+                                                                    <th>Bus Class</th>
+                                                                    <th>Route</th>
+                                                                    <th>Name</th>
+                                                                    <th>Cnic</th>
+                                                                    <th>Contact</th>
+                                                                    <th>Seat No</th>
+                                                                    <th>Invoice</th>
+                                                                    <th>Transaction id </th>
+                                                                    <th>Terminal Name</th>
+                                                                    <th>Status</th>
+                                                                    <th>Action By</th>
+                                                                    <th>Sale</th>
+                                                                    <th>Refund</th>
+                                                                    <th>Commission</th>
+                                                                    <th>Net Cash</th>
+                                                                </tr>
                                                             </thead>
 
                                                             <tbody>
-                                                            <tr v-for="(data,i) in filters.record" :key="i">
-                                                                <td>{{ data.schedule_date }}<br>{{ data.schedule_time }}</td>
-                                                                <td>{{ data.bus ? data.bus.bus_number : 'N/A' }}</td>
-                                                                <td>{{ data.bus_class.name }}</td>
-                                                                <td>{{ data.route.name }}  ({{ data.route.via??'n/a' }})</td>
-                                                                <td>{{ data.customer.name }}</td>
-                                                                <td>{{ data.customer.cnic }}</td>
-                                                                <td>{{ data.customer.contact }}</td>
-                                                                <td>{{ data.seat_no }}</td>
-                                                                <td>{{ data.invoice_id }}</td>
-                                                                <td>{{ data.terminal.name }}</td>
-                                                                <td>{{ data.type }}</td>
-                                                                <td>{{ data.updated_name.name }}</td>
-                                                                <td>{{ data.type != 'canceled' ? (data.seat_fare - data.discount) : 0 }}</td>
-                                                                <td>{{ data.type == 'canceled' ? data.refund : 0 }}</td>
-                                                                <td>{{ data.type == 'canceled' ? 0 : data.comsn }}</td>
-                                                            </tr>
-                                                            <tr v-if="filters.record.length > 0">
-                                                                <th colspan="7"></th>
-                                                                <th>{{ filters.record.length }}</th>
-                                                                <th colspan="4"></th>
-                                                                <th>{{ totalSaleAmount() }}</th>
-                                                                <th>{{ totalRefundAmount() }}</th>
-                                                            </tr>
+                                                                <tr v-for="(data, i) in filters.record" :key="i">
+                                                                    <td>{{ data.schedule_date }}<br>{{
+                                                                        data.schedule_time }}</td>
+                                                                    <td>{{ data.bus ? data.bus.bus_number : 'N/A' }}
+                                                                    </td>
+                                                                    <td>{{ data.bus_class.name }}</td>
+                                                                    <td>{{ data.route.name }} ({{ data.route.via ?? 'n/a'
+                                                                        }})</td>
+                                                                    <td>{{ data.customer.name }}</td>
+                                                                    <td>{{ data.customer.cnic }}</td>
+                                                                    <td>{{ data.customer.contact }}</td>
+                                                                    <td>{{ data.seat_no }}</td>
+                                                                    <td>{{ data.invoice_id }}</td>
+                                                                    <td>{{ data.transaction_id ?? 0 }}</td>
+                                                                    <td>{{ data.terminal.name }}</td>
+                                                                    <td>{{ data.type }}</td>
+                                                                    <td>{{ data.updated_name.name }}</td>
+                                                                    <td>{{ data.type != 'canceled' ? (data.seat_fare -
+                                                                        data.discount) : 0 }}</td>
+                                                                    <td>{{ data.type == 'canceled' ? data.refund : 0 }}
+                                                                    </td>
+                                                                    <td>{{ data.type == 'canceled' ? 0 : data.comsn }}
+                                                                    </td>
+                                                                    <td>
+                                                                        <!-- Net Cash -->
+                                                                        {{ (data.seat_fare - data.discount) +
+                                                                        (data.refund ?? 0) - (data.comsn ?? 0) }}
+                                                                    </td>
+                                                                </tr>
+                                                                <tr v-if="filters.record.length > 0">
+                                                                    <th colspan="7"></th>
+                                                                    <th>{{ filters.record.length }}</th>
+                                                                    <th colspan="4"></th>
+                                                                    <th>{{ totalSaleAmount() }}</th>
+                                                                    <th>{{ totalRefundAmount() }}</th>
+                                                                    <th>{{ totalCommission() }}</th>
+                                                                    <th>{{ totalNetCash() }}</th>
+                                                                </tr>
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -194,11 +208,11 @@ export default {
         const self = this;
         // route
         const routeIds = $('#routeIds');
-        routeIds.on('change', function() {
+        routeIds.on('change', function () {
             const selectedValues = $(this).val();
             self.filterSales.route = selectedValues;
         });
-       
+
     },
     methods: {
         async fetchFilters() {
@@ -228,7 +242,7 @@ export default {
                     timer: 2000
                 });
             this.loadingTable = true;
-           
+
             const resFetchData = await this.callApi("post", 'terminals/sales/fetchFilterData', this.filterSales);
             if (resFetchData.status == 200) {
                 this.filters.record = Object.values(resFetchData.data.record);
@@ -287,6 +301,14 @@ export default {
             }
             return 0;
         },
+        totalNetCash() {
+            return this.filters.record.reduce((sum, data) => {
+                let sale = data.type != 'canceled' ? (data.seat_fare - data.discount) : 0;
+                let refund = data.type == 'canceled' ? data.refund : 0;
+                let comsn = data.type == 'canceled' ? 0 : data.comsn ?? 0;
+                return sum + sale + refund - comsn;
+            }, 0);
+        },
         totalCommission: function () {
             if (this.filters.record && Array.isArray(this.filters.record)) {
                 return this.filters.record.reduce((sum, data) => {
@@ -294,13 +316,11 @@ export default {
                     const comsn = Number(data.comsn) || 0;
 
                     // Add the difference to the sum
-                    
-                    if(data.type == 'canceled')
-                    {
+
+                    if (data.type == 'canceled') {
                         return sum + 0;
                     }
-                    else
-                    {
+                    else {
                         return sum + comsn;
                     }
                 }, 0);
@@ -314,7 +334,9 @@ export default {
 }
 </script>
 <style scoped>
-table, th, td {
+table,
+th,
+td {
     border: 1px solid #b9b9b9;
     border-collapse: collapse;
 }

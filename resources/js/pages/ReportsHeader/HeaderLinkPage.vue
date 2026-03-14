@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary ">
                         <div class="card-header">
-                            <h4>Report Headers Link</h4>
+                            <h4>Report expenseHeader Link</h4>
                         </div>
                         <div class="card-body">
                             <!-- Table -->
@@ -23,12 +23,12 @@
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(item,index) in headers" :key="index">
+                                                    <tr v-for="(item,index) in expenseHeader" :key="index">
                                                         <td>
-                                                            {{ saveRow(item.id, "first", index) }}
+                                                            {{ expenseSaveRow(item.id, "first", index) }}
                                                             <select class="form-control rounded-0"
-                                                                    :disabled="editAble"
-                                                                    :value="postData.headIds[index]">
+                                                                    :disabled="expenseEditAble"
+                                                                    :value="expensePostData.expenseHeadIds[index]">
                                                                 <option :value="item.id" :key="i"
                                                                 >
                                                                     {{ item.name }}
@@ -36,23 +36,23 @@
                                                             </select>
                                                         </td>
                                                         <td>
-                                                            {{ saveRow(postData.values[index] ?? 0, "second", index) }}
+                                                            {{ expenseSaveRow(expensePostData.values[index] ?? 0, "second", index) }}
                                                             <input type="number" min="0" class="form-control"
-                                                                   :value="postData.values[index]"
-                                                                   :disabled="editAble"
-                                                                   @keyup="saveRow($event,'third',index)"/>
+                                                                   :value="expensePostData.values[index]"
+                                                                   :disabled="expenseEditAble"
+                                                                   @keyup="expenseSaveRow($event,'third',index)"/>
                                                         </td>
                                                     </tr>
                                                     </tbody>
-                                                </table>
+                                                </table> 
 
                                                 <div class="d-flex justify-content-end">
                                                     <button type="button" class="btn btn-outline-success mr-4"
-                                                            @click="add" :disabled="loading" v-if="!editAble">
+                                                            @click="expenseAdd" :disabled="loading" v-if="!expenseEditAble">
                                                         {{ loading ? 'Loading...' : 'Save' }}
                                                     </button>
                                                     <button type="button" class="btn btn-outline-secondary mr-4"
-                                                            @click="editAble=false" :disabled="loading" v-else>Edit
+                                                            @click="expenseEditAble=false" :disabled="loading" v-else>Edit
                                                     </button>
                                                 </div>
                                             </div>
@@ -71,14 +71,14 @@
                   ref="refDailySummaryReport"
                   target="_blank">
                 <input type="hidden" name="token" :value="this.$store.state.token">
-                <input type="hidden" name="ticket_merge_id" :value="this.postData.ticket_merge_id">
+                <input type="hidden" name="ticket_merge_id" :value="this.expensePostData.ticket_merge_id">
             </form>
         </div>
     </section>
 </template>
 
 <script>
-// import Add from '../../components/Add.vue';
+// import expenseAdd from '../../components/expenseAdd.vue';
 // import Edit from '../../components/Edit.vue';
 // import Delete from '../../components/Delete.vue';
 import {mapGetters} from 'vuex';
@@ -86,23 +86,23 @@ import {mapGetters} from 'vuex';
 export default {
     name: "HeaderLink",
     components: {
-        // Add,
+        // expenseAdd,
         // Edit,
         // Delete,
     },
     data() {
         return {
             validationErrors: [],
-            editAble: true,
-            headers: [],
+            expenseEditAble: true,
+            expenseHeader: [],
             loading: false,
             formID: 'expense_form',
             editFormID: 'edit_expense_form',
             // deleteFormID:'delete_city_form',
             totalAmount: 0,
-            postData: {
+            expensePostData: {
                 ticket_merge_id: "",
-                headIds: [],
+                expenseHeadIds: [],
                 values: [],
             },
             // dataEdit:{
@@ -125,8 +125,8 @@ export default {
             window.removeEventListener('keydown', this.enterKey);
             window.removeEventListener('keydown', this.altM);
         }
-        this.postData.ticket_merge_id = this.$route.params.id;
-        this.fetchData();
+        this.expensePostData.ticket_merge_id = this.$route.params.id;
+        this.fetchExpenseData();
         setTimeout(function () {
             $("#header_table").DataTable();
         }, 300);
@@ -136,49 +136,49 @@ export default {
         clearForm: function () {
             this.data = {};
         },
-        async fetchData() {
-            const res = await this.callApi("post", 'reportsHeader/link/get', {ticket_merge_id: this.postData.ticket_merge_id});
+        async fetchExpenseData() {
+            const res = await this.callApi("post", 'reportsHeader/link/get', {ticket_merge_id: this.expensePostData.ticket_merge_id});
             if (res.status == 200) {
-                this.headers = res.data.headers;
+                this.expenseHeader = res.data.expenseHeader;
 
                 if (res.data.links != null) {
-                    this.postData.values = [];
+                    this.expensePostData.values = [];
                     for (var i = 0; i < res.data.links.length; i++) {
-                        this.postData.values.push(res.data.links[i].value);
+                        this.expensePostData.values.push(res.data.links[i].value);
                     }
                 }
             }
 
-            this.postData.ticket_merge_id = this.$route.params.id;
+            this.expensePostData.ticket_merge_id = this.$route.params.id;
         },
-        saveRow(value, fieldName, index) {
+        expenseSaveRow(value, fieldName, index) {
 
             if (fieldName == "first") {
-                this.postData.headIds[index] = value;
+                this.expensePostData.expenseHeadIds[index] = value;
             }
             if (fieldName == "second") {
-                this.postData.values[index] = parseFloat(value != "" ? value : 0);
+                this.expensePostData.values[index] = parseFloat(value != "" ? value : 0);
             }
             if (fieldName == "third") {
-                this.postData.values[index] = parseFloat(event.target.value != "" ? value.target.value : 0);
+                this.expensePostData.values[index] = parseFloat(event.target.value != "" ? value.target.value : 0);
             }
         },
-        async add() {
+        async expenseAdd() {
             this.loading = true;
-            const res = await this.callApi("post", "reportsHeader/link", this.postData);
+            const res = await this.callApi("post", "reportsHeader/link", this.expensePostData);
             if (res.status === 200) {
                 this.loading = false;
                 // $('#expense').DataTable().destroy();
-                this.postData.headIds = [];
-                this.postData.values = [];
-                this.editAble = true;
+                this.expensePostData.expenseHeadIds = [];
+                this.expensePostData.values = [];
+                this.expenseEditAble = true;
                 swal({
                     title: "Success",
                     text: "Header Saved",
                     icon: "success",
                     timer: 2000
                 });
-                this.fetchData();
+                this.fetchExpenseData();
                 this.loading = false;
                 setTimeout(() => {
                     window.close();
@@ -217,7 +217,7 @@ export default {
             if (obj.isDeleted) {
                 this.cities.splice(obj.index, 1)
                 $("#header_table").DataTable().destroy();
-                this.fetchData();
+                this.fetchExpenseData();
                 this.existingExpenses();
             }
         }

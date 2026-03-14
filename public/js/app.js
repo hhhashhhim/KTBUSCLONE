@@ -27413,7 +27413,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         amount: [],
         paid: [],
         ledger: [],
-        invoice: []
+        invoice: [],
+        showExtra: [],
+        extraCategory: []
       },
       addData: {
         busIds: [],
@@ -27426,7 +27428,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       // 'cash' | 'bank'
       cashBankStart: {},
       cashBankReturn: {},
-      mergedData: {}
+      mergedData: {},
+      reportsHeaders: []
     };
   },
   watch: {
@@ -27514,7 +27517,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
             case 0:
               _this3.fetchData();
 
-            case 1:
+              _this3.fetchReportsHeaders();
+
+            case 2:
             case "end":
               return _context.stop();
           }
@@ -27864,6 +27869,33 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         }, _callee2);
       }))();
     },
+    fetchReportsHeaders: function fetchReportsHeaders() {
+      var _this14 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return _this14.callApi("post", "reportsHeader");
+
+              case 2:
+                res = _context3.sent;
+
+                if (res.status == 200) {
+                  _this14.reportsHeaders = res.data;
+                }
+
+              case 4:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }))();
+    },
     totalCommission: function totalCommission(list) {
       return list.reduce(function (sum, t) {
         var _t$commission;
@@ -27948,6 +27980,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       this.postData.amount.splice(index, 1);
       this.postData.paid.splice(index, 1);
       this.postData.invoice.splice(index, 1);
+      this.postData.showExtra.splice(index, 1);
+      this.postData.extraCategory.splice(index, 1);
       this.loop--; // total amount sum only for show
 
       this.totalAmount = this.postData.amount.reduce(function (a, b) {
@@ -27955,30 +27989,72 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       }, 0);
       this.netProfit = this.totalSale - this.totalAmount;
     },
+    saveHeaderLinks: function saveHeaderLinks(ticketMergeId) {
+      var _this15 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var headIds, values;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                headIds = [];
+                values = [];
+
+                _this15.postData.showExtra.forEach(function (checked, index) {
+                  if (checked && _this15.postData.extraCategory[index]) {
+                    headIds.push(_this15.postData.extraCategory[index]);
+                    values.push(_this15.postData.amount[index] || 0);
+                  }
+                });
+
+                if (headIds.length) {
+                  _context4.next = 5;
+                  break;
+                }
+
+                return _context4.abrupt("return");
+
+              case 5:
+                _context4.next = 7;
+                return _this15.callApi("post", "reportsHeader/header/link", {
+                  ticket_merge_id: ticketMergeId,
+                  headIds: headIds,
+                  values: values
+                });
+
+              case 7:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      }))();
+    },
     //  // ===== Merge Schedule API =====
     mergeScheduleApi: function mergeScheduleApi() {
       var _arguments = arguments,
-          _this14 = this;
+          _this16 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var _addData$busIds, _addData$mergeIds;
 
         var addData, payload, res, _mergedData$busIds, _mergedData$mergeIds, mergedData, _error$response, _error$response$data, _error$response$data$, errMsg;
 
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 addData = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : {};
                 payload = _objectSpread(_objectSpread({}, addData), {}, {
-                  routes: _this14.routes,
-                  expenses: _this14.postData,
-                  busIds: (_addData$busIds = addData.busIds) !== null && _addData$busIds !== void 0 && _addData$busIds.length ? addData.busIds : _this14.busIds || [],
-                  mergeIds: (_addData$mergeIds = addData.mergeIds) !== null && _addData$mergeIds !== void 0 && _addData$mergeIds.length ? addData.mergeIds : _this14.mergeIds || []
+                  routes: _this16.routes,
+                  expenses: _this16.postData,
+                  busIds: (_addData$busIds = addData.busIds) !== null && _addData$busIds !== void 0 && _addData$busIds.length ? addData.busIds : _this16.busIds || [],
+                  mergeIds: (_addData$mergeIds = addData.mergeIds) !== null && _addData$mergeIds !== void 0 && _addData$mergeIds.length ? addData.mergeIds : _this16.mergeIds || []
                 });
 
                 if (!(!payload.busIds.length || !payload.mergeIds.length)) {
-                  _context3.next = 5;
+                  _context5.next = 5;
                   break;
                 }
 
@@ -27987,39 +28063,39 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                   title: "Cannot merge",
                   text: "Bus IDs or Merge IDs are empty. Fetch unclosing data first."
                 });
-                return _context3.abrupt("return", null);
+                return _context5.abrupt("return", null);
 
               case 5:
-                _context3.prev = 5;
-                _context3.next = 8;
-                return _this14.callApi("post", "booking/close/schedule/closing/merge", payload);
+                _context5.prev = 5;
+                _context5.next = 8;
+                return _this16.callApi("post", "booking/close/schedule/closing/merge", payload);
 
               case 8:
-                res = _context3.sent;
+                res = _context5.sent;
 
                 if (!(res.status === 200 || res.status === 201)) {
-                  _context3.next = 17;
+                  _context5.next = 17;
                   break;
                 }
 
                 mergedData = res.data || {};
-                _this14.mergedData = mergedData; // Update stored IDs if returned
+                _this16.mergedData = mergedData; // Update stored IDs if returned
 
-                if ((_mergedData$busIds = mergedData.busIds) !== null && _mergedData$busIds !== void 0 && _mergedData$busIds.length) _this14.busIds = mergedData.busIds;
-                if ((_mergedData$mergeIds = mergedData.mergeIds) !== null && _mergedData$mergeIds !== void 0 && _mergedData$mergeIds.length) _this14.mergeIds = mergedData.mergeIds;
-                return _context3.abrupt("return", mergedData);
+                if ((_mergedData$busIds = mergedData.busIds) !== null && _mergedData$busIds !== void 0 && _mergedData$busIds.length) _this16.busIds = mergedData.busIds;
+                if ((_mergedData$mergeIds = mergedData.mergeIds) !== null && _mergedData$mergeIds !== void 0 && _mergedData$mergeIds.length) _this16.mergeIds = mergedData.mergeIds;
+                return _context5.abrupt("return", mergedData);
 
               case 17:
                 throw new Error("Merge failed with status ".concat(res.status));
 
               case 18:
-                _context3.next = 25;
+                _context5.next = 25;
                 break;
 
               case 20:
-                _context3.prev = 20;
-                _context3.t0 = _context3["catch"](5);
-                errMsg = (_context3.t0 === null || _context3.t0 === void 0 ? void 0 : (_error$response = _context3.t0.response) === null || _error$response === void 0 ? void 0 : (_error$response$data = _error$response.data) === null || _error$response$data === void 0 ? void 0 : (_error$response$data$ = _error$response$data.Error) === null || _error$response$data$ === void 0 ? void 0 : _error$response$data$.join("\n")) || _context3.t0.message || "Merge failed";
+                _context5.prev = 20;
+                _context5.t0 = _context5["catch"](5);
+                errMsg = (_context5.t0 === null || _context5.t0 === void 0 ? void 0 : (_error$response = _context5.t0.response) === null || _error$response === void 0 ? void 0 : (_error$response$data = _error$response.data) === null || _error$response$data === void 0 ? void 0 : (_error$response$data$ = _error$response$data.Error) === null || _error$response$data$ === void 0 ? void 0 : _error$response$data$.join("\n")) || _context5.t0.message || "Merge failed";
                 Swal.fire({
                   icon: "error",
                   title: "Merge Error",
@@ -28029,32 +28105,37 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
               case 25:
               case "end":
-                return _context3.stop();
+                return _context5.stop();
             }
           }
-        }, _callee3, null, [[5, 20]]);
+        }, _callee5, null, [[5, 20]]);
       }))();
     },
     // ===== Save Ticket Closing Shortage =====
     saveTicketClosingShortage: function saveTicketClosingShortage() {
-      var _this15 = this;
+      var _this17 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var mergedResult, mapRows;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                _this15.loading = true;
-                _context4.prev = 1;
-                _context4.next = 4;
-                return _this15.mergeScheduleApi(_this15.addData);
+                _this17.loading = true;
+                _context6.prev = 1;
+                _context6.next = 4;
+                return _this17.mergeScheduleApi(_this17.addData);
 
               case 4:
-                mergedResult = _context4.sent;
+                mergedResult = _context6.sent;
                 // Step 2: Store merged data for the component
-                _this15.closingData = mergedResult; // Step 4: Save Start
+                _this17.closingData = mergedResult; // save header links
 
+                _context6.next = 8;
+                return _this17.saveHeaderLinks(mergedResult.id);
+
+              case 8:
+                // Step 4: Save Start
                 mapRows = function mapRows(cashBank, schedule) {
                   return Object.entries(cashBank).map(function (_ref5) {
                     var _ref6 = _slicedToArray(_ref5, 2),
@@ -28067,9 +28148,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                       passenger_count: tickets.filter(function (ticket) {
                         return ticket.type != 'canceled';
                       }).length,
-                      kt_commission: _this15.totalCommission(tickets),
-                      elt: _this15.totalELT(tickets),
-                      cancellation_amount: _this15.totalCancelAmount(tickets),
+                      kt_commission: _this17.totalCommission(tickets),
+                      elt: _this17.totalELT(tickets),
+                      cancellation_amount: _this17.totalCancelAmount(tickets),
                       total_receivable: row.total + row.commission,
                       other_commission: row.commission || 0,
                       total_received_cash: row.cash,
@@ -28082,26 +28163,26 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                   });
                 };
 
-                _context4.next = 9;
-                return _this15.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
+                _context6.next = 11;
+                return _this17.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
                   ticket_closing_id: mergedResult.id,
                   type: "start",
-                  route: _this15.routes.start,
-                  busIds: _this15.busIds,
-                  rows: mapRows(_this15.cashBankStart, _this15.data.schedule_start)
-                });
-
-              case 9:
-                _context4.next = 11;
-                return _this15.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
-                  ticket_closing_id: mergedResult.id,
-                  type: "return",
-                  route: _this15.routes["return"],
-                  busIds: _this15.busIds,
-                  rows: mapRows(_this15.cashBankReturn, _this15.data.schedule_return)
+                  route: _this17.routes.start,
+                  busIds: _this17.busIds,
+                  rows: mapRows(_this17.cashBankStart, _this17.data.schedule_start)
                 });
 
               case 11:
+                _context6.next = 13;
+                return _this17.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
+                  ticket_closing_id: mergedResult.id,
+                  type: "return",
+                  route: _this17.routes["return"],
+                  busIds: _this17.busIds,
+                  rows: mapRows(_this17.cashBankReturn, _this17.data.schedule_return)
+                });
+
+              case 13:
                 Swal.fire({
                   icon: "success",
                   title: "Saved!",
@@ -28110,34 +28191,34 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                   showConfirmButton: false
                 });
 
-                _this15.$emit('fetchData');
+                _this17.$emit('fetchData');
 
-                _this15.closeexampleModal();
+                _this17.closeexampleModal();
 
-                _context4.next = 20;
+                _context6.next = 22;
                 break;
 
-              case 16:
-                _context4.prev = 16;
-                _context4.t0 = _context4["catch"](1);
-                console.error(_context4.t0);
+              case 18:
+                _context6.prev = 18;
+                _context6.t0 = _context6["catch"](1);
+                console.error(_context6.t0);
                 Swal.fire({
                   icon: "error",
                   title: "Error",
-                  text: _context4.t0.message || "Failed to save ticket closing"
+                  text: _context6.t0.message || "Failed to save ticket closing"
                 });
 
-              case 20:
-                _context4.prev = 20;
-                _this15.loading = false;
-                return _context4.finish(20);
+              case 22:
+                _context6.prev = 22;
+                _this17.loading = false;
+                return _context6.finish(22);
 
-              case 23:
+              case 25:
               case "end":
-                return _context4.stop();
+                return _context6.stop();
             }
           }
-        }, _callee4, null, [[1, 16, 20, 23]]);
+        }, _callee6, null, [[1, 18, 22, 25]]);
       }))();
     },
     // async saveTicketClosingShortage() {
@@ -29047,29 +29128,29 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-// import Add from '../../components/Add.vue';
+// import expenseAdd from '../../components/expenseAdd.vue';
 // import Edit from '../../components/Edit.vue';
 // import Delete from '../../components/Delete.vue';
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "HeaderLink",
-  components: {// Add,
+  components: {// expenseAdd,
     // Edit,
     // Delete,
   },
   data: function data() {
     return {
       validationErrors: [],
-      editAble: true,
-      headers: [],
+      expenseEditAble: true,
+      expenseHeader: [],
       loading: false,
       formID: 'expense_form',
       editFormID: 'edit_expense_form',
       // deleteFormID:'delete_city_form',
       totalAmount: 0,
-      postData: {
+      expensePostData: {
         ticket_merge_id: "",
-        headIds: [],
+        expenseHeadIds: [],
         values: []
       },
       // dataEdit:{
@@ -29102,9 +29183,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 window.removeEventListener('keydown', _this.altM);
               }
 
-              _this.postData.ticket_merge_id = _this.$route.params.id;
+              _this.expensePostData.ticket_merge_id = _this.$route.params.id;
 
-              _this.fetchData();
+              _this.fetchExpenseData();
 
               setTimeout(function () {
                 $("#header_table").DataTable();
@@ -29122,7 +29203,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     clearForm: function clearForm() {
       this.data = {};
     },
-    fetchData: function fetchData() {
+    fetchExpenseData: function fetchExpenseData() {
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
@@ -29133,25 +29214,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 0:
                 _context2.next = 2;
                 return _this2.callApi("post", 'reportsHeader/link/get', {
-                  ticket_merge_id: _this2.postData.ticket_merge_id
+                  ticket_merge_id: _this2.expensePostData.ticket_merge_id
                 });
 
               case 2:
                 res = _context2.sent;
 
                 if (res.status == 200) {
-                  _this2.headers = res.data.headers;
+                  _this2.expenseHeader = res.data.expenseHeader;
 
                   if (res.data.links != null) {
-                    _this2.postData.values = [];
+                    _this2.expensePostData.values = [];
 
                     for (i = 0; i < res.data.links.length; i++) {
-                      _this2.postData.values.push(res.data.links[i].value);
+                      _this2.expensePostData.values.push(res.data.links[i].value);
                     }
                   }
                 }
 
-                _this2.postData.ticket_merge_id = _this2.$route.params.id;
+                _this2.expensePostData.ticket_merge_id = _this2.$route.params.id;
 
               case 5:
               case "end":
@@ -29161,20 +29242,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee2);
       }))();
     },
-    saveRow: function saveRow(value, fieldName, index) {
+    expenseSaveRow: function expenseSaveRow(value, fieldName, index) {
       if (fieldName == "first") {
-        this.postData.headIds[index] = value;
+        this.expensePostData.expenseHeadIds[index] = value;
       }
 
       if (fieldName == "second") {
-        this.postData.values[index] = parseFloat(value != "" ? value : 0);
+        this.expensePostData.values[index] = parseFloat(value != "" ? value : 0);
       }
 
       if (fieldName == "third") {
-        this.postData.values[index] = parseFloat(event.target.value != "" ? value.target.value : 0);
+        this.expensePostData.values[index] = parseFloat(event.target.value != "" ? value.target.value : 0);
       }
     },
-    add: function add() {
+    expenseAdd: function expenseAdd() {
       var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
@@ -29185,7 +29266,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 0:
                 _this3.loading = true;
                 _context3.next = 3;
-                return _this3.callApi("post", "reportsHeader/link", _this3.postData);
+                return _this3.callApi("post", "reportsHeader/link", _this3.expensePostData);
 
               case 3:
                 res = _context3.sent;
@@ -29193,9 +29274,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 if (res.status === 200) {
                   _this3.loading = false; // $('#expense').DataTable().destroy();
 
-                  _this3.postData.headIds = [];
-                  _this3.postData.values = [];
-                  _this3.editAble = true;
+                  _this3.expensePostData.expenseHeadIds = [];
+                  _this3.expensePostData.values = [];
+                  _this3.expenseEditAble = true;
                   swal({
                     title: "Success",
                     text: "Header Saved",
@@ -29203,7 +29284,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     timer: 2000
                   });
 
-                  _this3.fetchData();
+                  _this3.fetchExpenseData();
 
                   _this3.loading = false;
                   setTimeout(function () {
@@ -29250,7 +29331,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (obj.isDeleted) {
         this.cities.splice(obj.index, 1);
         $("#header_table").DataTable().destroy();
-        this.fetchData();
+        this.fetchExpenseData();
         this.existingExpenses();
       }
     }
@@ -30553,6 +30634,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
 
       return 0;
+    },
+    totalNetCash: function totalNetCash() {
+      return this.filters.record.reduce(function (sum, data) {
+        var _data$comsn;
+
+        var sale = data.type != 'canceled' ? data.seat_fare - data.discount : 0;
+        var refund = data.type == 'canceled' ? data.refund : 0;
+        var comsn = data.type == 'canceled' ? 0 : (_data$comsn = data.comsn) !== null && _data$comsn !== void 0 ? _data$comsn : 0;
+        return sum + sale + refund - comsn;
+      }, 0);
     },
     totalCommission: function totalCommission() {
       if (this.filters.record && Array.isArray(this.filters.record)) {
@@ -47221,6 +47312,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       date: "",
       schedule: "",
       departure_time: ""
+    }), _defineProperty(_ref, "expenseEditAble", true), _defineProperty(_ref, "expenseHeader", []), _defineProperty(_ref, "loading", false), _defineProperty(_ref, "totalAmount", 0), _defineProperty(_ref, "expensePostData", {
+      ticket_merge_id: this.$route.params.id,
+      expenseHeadIds: [],
+      values: []
     }), _ref;
   },
   created: function created() {
@@ -47244,20 +47339,28 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               }
 
               _this.postData.ticket_merge_id = _this.$route.params.id;
+              _this.expensePostData.ticket_merge_id = _this.$route.params.id;
+              _context.next = 7;
+              return _this.fetchExpenseData();
+
+            case 7:
+              // Initialize DataTable after DOM renders
+              setTimeout(function () {
+                if ($("#expense_table").length) {
+                  $("#expense_table").DataTable();
+                }
+              }, 300);
 
               _this.fetchData();
 
-              _this.existingExpenses();
+              _this.existingExpenses(); // total amount sum only for show
 
-              setTimeout(function () {
-                $("#expense_table").DataTable();
-              }, 300); // total amount sum only for show
 
               _this.totalAmount = _this.postData.amount.reduce(function (a, b) {
                 return parseFloat(a) + parseFloat(b);
               }, 0);
 
-            case 8:
+            case 11:
             case "end":
               return _context.stop();
           }
@@ -47266,8 +47369,148 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }))();
   },
   methods: {
-    printInvoice: function printInvoice(type) {
+    initDataTable: function initDataTable() {
+      this.$nextTick(function () {
+        // Ensure jQuery and DataTable plugin are available
+        if (window.$ && $.fn.DataTable) {
+          if ($.fn.DataTable.isDataTable("#expense_table")) {
+            $("#expense_table").DataTable().destroy();
+          }
+
+          $("#expense_table").DataTable({
+            paging: false,
+            searching: false,
+            info: false
+          });
+        }
+      });
+    },
+    fetchExpenseData: function fetchExpenseData() {
       var _this2 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var res, headIds, values;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _this2.isLoading = true; // Start loading
+
+                _context2.prev = 1;
+                _context2.next = 4;
+                return _this2.callApi("post", "reportsHeader/link/get", {
+                  ticket_merge_id: _this2.expensePostData.ticket_merge_id
+                });
+
+              case 4:
+                res = _context2.sent;
+
+                if (res.status === 200 && res.data) {
+                  _this2.allHeaderOptions = res.data.headers || [];
+                  _this2.expenseHeader = res.data.headers || [];
+                  headIds = [];
+                  values = [];
+
+                  _this2.expenseHeader.forEach(function (header, index) {
+                    headIds[index] = header.id;
+                    var matchingLink = res.data.links.find(function (link) {
+                      return link.header_id === header.id;
+                    });
+                    values[index] = matchingLink ? parseFloat(matchingLink.value) : 0;
+                  });
+
+                  _this2.expensePostData.headIds = headIds;
+                  _this2.expensePostData.values = values;
+
+                  _this2.initDataTable();
+                }
+
+                _context2.next = 11;
+                break;
+
+              case 8:
+                _context2.prev = 8;
+                _context2.t0 = _context2["catch"](1);
+                console.error("Failed to fetch expense data", _context2.t0);
+
+              case 11:
+                _context2.prev = 11;
+                _this2.isLoading = false; // Stop loading
+
+                return _context2.finish(11);
+
+              case 14:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, null, [[1, 8, 11, 14]]);
+      }))();
+    },
+    expenseAdd: function expenseAdd() {
+      var _this3 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _this3.isLoading = true; // Trigger loader after clicking save
+
+                _context3.prev = 1;
+                _context3.next = 4;
+                return _this3.callApi("post", "reportsHeader/link", _this3.expensePostData);
+
+              case 4:
+                res = _context3.sent;
+
+                if (!(res.status === 200)) {
+                  _context3.next = 10;
+                  break;
+                }
+
+                swal({
+                  title: "Success",
+                  text: "Header Saved",
+                  icon: "success",
+                  timer: 2000
+                });
+                _this3.expenseEditAble = true; // fetchExpenseData also sets isLoading, providing a smooth transition
+
+                _context3.next = 10;
+                return _this3.fetchExpenseData();
+
+              case 10:
+                _context3.next = 16;
+                break;
+
+              case 12:
+                _context3.prev = 12;
+                _context3.t0 = _context3["catch"](1);
+                console.error("Save error", _context3.t0);
+                _this3.isLoading = false;
+
+              case 16:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, null, [[1, 12]]);
+      }))();
+    },
+    expenseSaveRow: function expenseSaveRow(value, fieldName, index) {
+      if (fieldName == "first") {
+        // Adjusted to use headIds to match your Laravel controller
+        this.expensePostData.headIds[index] = value;
+      }
+
+      if (fieldName == "second") {
+        this.expensePostData.values[index] = parseFloat(value != "" ? value : 0);
+      }
+    },
+    printInvoice: function printInvoice(type) {
+      var _this4 = this;
 
       var invoiceType = type == "departure" ? 0 : 1; // 'departure' or 'return'
 
@@ -47279,39 +47522,39 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         departure_time: this.details.closing[invoiceType].schedule_time
       };
       this.$nextTick(function () {
-        _this2.$refs.refBusInvoice.submit();
+        _this4.$refs.refBusInvoice.submit();
       });
     },
     getBusInvoice: function getBusInvoice() {
-      var _this3 = this;
+      var _this5 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var resCheckedBus;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _context2.next = 2;
-                return _this3.callApi("post", "booking/check/bus/assigned", {
-                  scheduleId: _this3.details.closing[0].schedule_id,
-                  date: _this3.details.closing[0].schedule_date,
-                  departureCity: _this3.details.closing[0].schedule_start,
-                  destinationCity: _this3.details.closing[0].schedule_end
+                _context4.next = 2;
+                return _this5.callApi("post", "booking/check/bus/assigned", {
+                  scheduleId: _this5.details.closing[0].schedule_id,
+                  date: _this5.details.closing[0].schedule_date,
+                  departureCity: _this5.details.closing[0].schedule_start,
+                  destinationCity: _this5.details.closing[0].schedule_end
                 });
 
               case 2:
-                resCheckedBus = _context2.sent;
+                resCheckedBus = _context4.sent;
 
                 if (!(resCheckedBus.status == 200)) {
-                  _context2.next = 6;
+                  _context4.next = 6;
                   break;
                 }
 
-                _context2.next = 7;
+                _context4.next = 7;
                 break;
 
               case 6:
-                return _context2.abrupt("return", swal({
+                return _context4.abrupt("return", swal({
                   title: "OOPS!!",
                   text: "Please Assign Bus First!",
                   icon: "error",
@@ -47320,10 +47563,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 7:
               case "end":
-                return _context2.stop();
+                return _context4.stop();
             }
           }
-        }, _callee2);
+        }, _callee4);
       }))();
     },
     startEdit: function startEdit(item) {
@@ -47344,22 +47587,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       delete this.editCache[item.id];
     },
     saveEdit: function saveEdit(item) {
-      var _this4 = this;
+      var _this6 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                _context3.next = 2;
-                return _this4.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage/update", item);
+                _context5.next = 2;
+                return _this6.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage/update", item);
 
               case 2:
-                res = _context3.sent;
+                res = _context5.sent;
 
                 if (res.status == 200) {
-                  _this4.existingExpenses();
+                  _this6.existingExpenses();
 
                   swal({
                     title: "Success",
@@ -47369,15 +47612,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   });
                 }
 
-                _this4.editingRowId = null;
-                delete _this4.editCache[item.id];
+                _this6.editingRowId = null;
+                delete _this6.editCache[item.id];
 
               case 6:
               case "end":
-                return _context3.stop();
+                return _context5.stop();
             }
           }
-        }, _callee3);
+        }, _callee5);
       }))();
     },
     isEditing: function isEditing(item) {
@@ -47390,93 +47633,93 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.data = {};
     },
     fetchData: function fetchData() {
-      var _this5 = this;
+      var _this7 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                _context4.next = 2;
-                return _this5.callApi("post", "expenses/categories");
+                _context6.next = 2;
+                return _this7.callApi("post", "expenses/categories");
 
               case 2:
-                res = _context4.sent;
+                res = _context6.sent;
 
                 if (res.status == 200) {
-                  _this5.categories = res.data;
+                  _this7.categories = res.data;
                 }
 
               case 4:
               case "end":
-                return _context4.stop();
+                return _context6.stop();
             }
           }
-        }, _callee4);
+        }, _callee6);
       }))();
     },
     existingExpenses: function existingExpenses() {
-      var _this6 = this;
+      var _this8 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         var res, expenses, i;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
-                _this6.isLoading = true;
-                _context5.next = 3;
-                return _this6.callApi("post", "expenses", {
-                  ticket_merge_id: _this6.postData.ticket_merge_id
+                _this8.isLoading = true;
+                _context7.next = 3;
+                return _this8.callApi("post", "expenses", {
+                  ticket_merge_id: _this8.postData.ticket_merge_id
                 });
 
               case 3:
-                res = _context5.sent;
+                res = _context7.sent;
 
                 if (res.status == 200) {
                   expenses = res.data.expenses;
-                  _this6.expenses = expenses;
-                  _this6.totalSale = res.data.sale;
-                  _this6.checkClosing = res.data.closing;
-                  _this6.shortages = res.data.shortage;
-                  _this6.details = res.data.details;
+                  _this8.expenses = expenses;
+                  _this8.totalSale = res.data.sale;
+                  _this8.checkClosing = res.data.closing;
+                  _this8.shortages = res.data.shortage;
+                  _this8.details = res.data.details;
 
                   if (expenses != "") {
-                    _this6.loop = expenses.length;
+                    _this8.loop = expenses.length;
 
                     for (i = 0; i < expenses.length; i++) {
-                      _this6.postData.category.push(expenses[i].expense_category_id);
+                      _this8.postData.category.push(expenses[i].expense_category_id);
 
-                      _this6.postData.description.push(expenses[i].description);
+                      _this8.postData.description.push(expenses[i].description);
 
-                      _this6.postData.amount.push(expenses[i].amount);
+                      _this8.postData.amount.push(expenses[i].amount);
 
-                      _this6.postData.paid.push(expenses[i].paid);
+                      _this8.postData.paid.push(expenses[i].paid);
 
-                      _this6.postData.ledger.push(expenses[i].ledger == 1 ? true : false);
+                      _this8.postData.ledger.push(expenses[i].ledger == 1 ? true : false);
 
-                      _this6.postData.invoice.push(expenses[i].invoice);
+                      _this8.postData.invoice.push(expenses[i].invoice);
                     }
 
-                    _this6.totalAmount = _this6.postData.amount.reduce(function (a, b) {
+                    _this8.totalAmount = _this8.postData.amount.reduce(function (a, b) {
                       return parseFloat(a) + parseFloat(b);
                     }, 0);
-                    _this6.netProfit = _this6.totalSale - _this6.totalAmount;
+                    _this8.netProfit = _this8.totalSale - _this8.totalAmount;
                   } else {
-                    _this6.loop = 1;
-                    _this6.editAble = false;
+                    _this8.loop = 1;
+                    _this8.editAble = false;
                   }
                 }
 
-                _this6.isLoading = false;
+                _this8.isLoading = false;
 
               case 6:
               case "end":
-                return _context5.stop();
+                return _context7.stop();
             }
           }
-        }, _callee5);
+        }, _callee7);
       }))();
     },
     saveRow: function saveRow(event, fieldName, index) {
@@ -47528,87 +47771,87 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.netProfit = this.totalSale - this.totalAmount;
     },
     print: function print() {
-      var _this7 = this;
+      var _this9 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
         var i;
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
                 // Show loader
-                _this7.loading = true; // Validation for empty data
+                _this9.loading = true; // Validation for empty data
 
-                if (!(!_this7.postData.ticket_merge_id || _this7.postData.category.length === 0 || _this7.postData.description.length === 0 || _this7.postData.amount.length === 0)) {
-                  _context6.next = 4;
+                if (!(!_this9.postData.ticket_merge_id || _this9.postData.category.length === 0 || _this9.postData.description.length === 0 || _this9.postData.amount.length === 0)) {
+                  _context8.next = 4;
                   break;
                 }
 
-                _this7.loading = false; // hide loader if validation fails
+                _this9.loading = false; // hide loader if validation fails
 
-                return _context6.abrupt("return");
+                return _context8.abrupt("return");
 
               case 4:
                 i = 0;
 
               case 5:
-                if (!(i < _this7.postData.category.length)) {
-                  _context6.next = 12;
+                if (!(i < _this9.postData.category.length)) {
+                  _context8.next = 12;
                   break;
                 }
 
-                if (!(!_this7.postData.category[i] || !_this7.postData.description[i] || !_this7.postData.amount[i])) {
-                  _context6.next = 9;
+                if (!(!_this9.postData.category[i] || !_this9.postData.description[i] || !_this9.postData.amount[i])) {
+                  _context8.next = 9;
                   break;
                 }
 
-                _this7.loading = false; // hide loader if validation fails
+                _this9.loading = false; // hide loader if validation fails
 
-                return _context6.abrupt("return");
+                return _context8.abrupt("return");
 
               case 9:
                 i++;
-                _context6.next = 5;
+                _context8.next = 5;
                 break;
 
               case 12:
                 try {
-                  if (_this7.$refs.refDailySummaryReport) {
-                    _this7.$refs.refDailySummaryReport.submit();
+                  if (_this9.$refs.refDailySummaryReport) {
+                    _this9.$refs.refDailySummaryReport.submit();
                   } // Optional: hide loader after a short delay if needed
 
 
                   setTimeout(function () {
-                    _this7.loading = false;
+                    _this9.loading = false;
                   }, 1000);
                 } catch (error) {
                   console.error("Print error:", error);
-                  _this7.loading = false; // hide loader on error
+                  _this9.loading = false; // hide loader on error
                 }
 
               case 13:
               case "end":
-                return _context6.stop();
+                return _context8.stop();
             }
           }
-        }, _callee6);
+        }, _callee8);
       }))();
     },
     add: function add() {
-      var _this8 = this;
+      var _this10 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
         var i, res;
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context9.prev = _context9.next) {
               case 0:
-                if (!(!_this8.postData.ticket_merge_id || _this8.postData.category.length == 0 || _this8.postData.description.length == 0 || _this8.postData.amount.length == 0)) {
-                  _context7.next = 2;
+                if (!(!_this10.postData.ticket_merge_id || _this10.postData.category.length == 0 || _this10.postData.description.length == 0 || _this10.postData.amount.length == 0)) {
+                  _context9.next = 2;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context9.abrupt("return", swal({
                   title: "Error",
                   text: "Please Fill All Field",
                   icon: "error",
@@ -47619,17 +47862,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 i = 0;
 
               case 3:
-                if (!(i < _this8.postData.category.length)) {
-                  _context7.next = 9;
+                if (!(i < _this10.postData.category.length)) {
+                  _context9.next = 9;
                   break;
                 }
 
-                if (!(!_this8.postData.category[i] || !_this8.postData.description[i] || !_this8.postData.amount[i])) {
-                  _context7.next = 6;
+                if (!(!_this10.postData.category[i] || !_this10.postData.description[i] || !_this10.postData.amount[i])) {
+                  _context9.next = 6;
                   break;
                 }
 
-                return _context7.abrupt("return", swal({
+                return _context9.abrupt("return", swal({
                   title: "Error",
                   text: "Please Fill All Field Or Remove Extra",
                   icon: "error",
@@ -47638,26 +47881,26 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 6:
                 i++;
-                _context7.next = 3;
+                _context9.next = 3;
                 break;
 
               case 9:
-                _this8.loading = true;
-                _context7.next = 12;
-                return _this8.callApi("post", "expenses/store", _this8.postData);
+                _this10.loading = true;
+                _context9.next = 12;
+                return _this10.callApi("post", "expenses/store", _this10.postData);
 
               case 12:
-                res = _context7.sent;
+                res = _context9.sent;
 
                 if (res.status === 200) {
-                  _this8.loading = false; // $('#expense').DataTable().destroy();
+                  _this10.loading = false; // $('#expense').DataTable().destroy();
 
-                  _this8.postData.category = [];
-                  _this8.postData.description = [];
-                  _this8.postData.amount = [];
-                  _this8.postData.invoice = [];
-                  _this8.loop = 0;
-                  _this8.editAble = true;
+                  _this10.postData.category = [];
+                  _this10.postData.description = [];
+                  _this10.postData.amount = [];
+                  _this10.postData.invoice = [];
+                  _this10.loop = 0;
+                  _this10.editAble = true;
                   swal({
                     title: "Success",
                     text: "Expense Saved",
@@ -47665,13 +47908,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   }); // this.$refs.refDailySummaryReport.submit();
 
-                  _this8.fetchData();
+                  _this10.fetchData();
 
-                  _this8.existingExpenses();
+                  _this10.existingExpenses();
 
-                  _this8.loading = false;
+                  _this10.loading = false;
                 } else {
-                  _this8.loading = false;
+                  _this10.loading = false;
 
                   if (res.status == 422) {
                     (function () {
@@ -47697,27 +47940,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 14:
               case "end":
-                return _context7.stop();
+                return _context9.stop();
             }
           }
-        }, _callee7);
+        }, _callee9);
       }))();
     },
     updateAccount: function updateAccount() {
-      var _this9 = this;
+      var _this11 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+        return _regeneratorRuntime().wrap(function _callee10$(_context10) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context10.prev = _context10.next) {
               case 0:
-                if (_this9.postData.ticket_merge_id) {
-                  _context8.next = 2;
+                if (_this11.postData.ticket_merge_id) {
+                  _context10.next = 2;
                   break;
                 }
 
-                return _context8.abrupt("return", swal({
+                return _context10.abrupt("return", swal({
                   title: "Error",
                   text: "Something is missing please refresh page",
                   icon: "error",
@@ -47725,28 +47968,28 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 2:
-                _this9.loading = true;
-                _context8.next = 5;
-                return _this9.callApi("post", "accounts/closing/update", {
-                  ticket_merge_id: _this9.postData.ticket_merge_id
+                _this11.loading = true;
+                _context10.next = 5;
+                return _this11.callApi("post", "accounts/closing/update", {
+                  ticket_merge_id: _this11.postData.ticket_merge_id
                 });
 
               case 5:
-                res = _context8.sent;
+                res = _context10.sent;
 
                 if (res.status === 200) {
-                  _this9.loading = false;
+                  _this11.loading = false;
 
-                  _this9.closeModal();
+                  _this11.closeModal();
 
-                  _this9.postData.category = [];
-                  _this9.postData.description = [];
-                  _this9.postData.amount = [];
-                  _this9.postData.invoice = [];
-                  _this9.loop = 0;
-                  _this9.editAble = true;
+                  _this11.postData.category = [];
+                  _this11.postData.description = [];
+                  _this11.postData.amount = [];
+                  _this11.postData.invoice = [];
+                  _this11.loop = 0;
+                  _this11.editAble = true;
 
-                  _this9.existingExpenses();
+                  _this11.existingExpenses();
 
                   swal({
                     title: "Success",
@@ -47754,9 +47997,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     icon: "success",
                     timer: 2000
                   });
-                  _this9.loading = false;
+                  _this11.loading = false;
                 } else {
-                  _this9.loading = false;
+                  _this11.loading = false;
 
                   if (res.status == 422) {
                     (function () {
@@ -47782,10 +48025,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 7:
               case "end":
-                return _context8.stop();
+                return _context10.stop();
             }
           }
-        }, _callee8);
+        }, _callee10);
       }))();
     }
   },
@@ -47801,10 +48044,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, 0);
     },
     totalBalance: function totalBalance() {
-      var _this10 = this;
+      var _this12 = this;
 
       return this.postData.amount.reduce(function (sum, val, index) {
-        var paid = parseFloat(_this10.postData.paid[index] || 0);
+        var paid = parseFloat(_this12.postData.paid[index] || 0);
         return sum + (parseFloat(val) - paid);
       }, 0);
     }
@@ -47849,14 +48092,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, 0);
     },
     balances: function balances() {
-      var _this11 = this;
+      var _this13 = this;
 
       return this.postData.amount.map(function (amt, index) {
-        var paid = _this11.postData.paid[index] || 0; // Clamp paid so it never exceeds amount
+        var paid = _this13.postData.paid[index] || 0; // Clamp paid so it never exceeds amount
 
         if (paid > amt) {
           paid = amt;
-          _this11.postData.paid[index] = paid;
+          _this13.postData.paid[index] = paid;
         }
 
         return amt - paid;
@@ -47997,9 +48240,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           return sum + Number((_i$shortage2 = i.shortage) !== null && _i$shortage2 !== void 0 ? _i$shortage2 : 0);
         }, 0)
       };
+    },
+    calculatedTotalAmount: function calculatedTotalAmount() {
+      return this.expensePostData.values.reduce(function (acc, val) {
+        var num = parseFloat(val) || 0;
+        return acc + num;
+      }, 0);
     }
   }),
-  watch: {
+  watch: _defineProperty({
     getDeletingObj: function getDeletingObj(obj) {
       if (obj.isDeleted) {
         this.cities.splice(obj.index, 1);
@@ -48008,7 +48257,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.existingExpenses();
       }
     }
-  }
+  }, "getDeletingObj", function getDeletingObj(obj) {
+    if (obj.isDeleted) {
+      this.cities.splice(obj.index, 1);
+      $("#header_table").DataTable().destroy();
+      this.fetchExpenseData();
+      this.existingExpenses();
+    }
+  })
 });
 
 /***/ }),
@@ -78928,8 +79184,7 @@ var _hoisted_20 = ["onUpdate:modelValue", "disabled"];
 var _hoisted_21 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
-    selected: "",
-    disabled: ""
+    selected: ""
   }, " Select Bank ", -1
   /* HOISTED */
   );
@@ -78978,8 +79233,7 @@ var _hoisted_33 = ["onUpdate:modelValue", "disabled"];
 var _hoisted_34 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
-    selected: "",
-    disabled: ""
+    selected: ""
   }, " Select Bank ", -1
   /* HOISTED */
   );
@@ -79021,7 +79275,7 @@ var _hoisted_43 = {
 };
 
 var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Category"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Description"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Expense Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Paid"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Credit Balance"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th>Invoice number</th> "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action")])], -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Category"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Description"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Expense Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Paid"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Credit Balance"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Expense Header")])], -1
   /* HOISTED */
   );
 });
@@ -79046,18 +79300,53 @@ var _hoisted_52 = {
   key: 0,
   "class": "add-btn"
 };
-var _hoisted_53 = ["onClick"];
-var _hoisted_54 = {
+
+var _hoisted_53 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "fas fa-plus"
+  }, null, -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_54 = [_hoisted_53];
+var _hoisted_55 = ["onClick"];
+
+var _hoisted_56 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "fas fa-trash"
+  }, null, -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_57 = [_hoisted_56];
+var _hoisted_58 = ["onUpdate:modelValue"];
+var _hoisted_59 = {
   key: 1
 };
-var _hoisted_55 = {
+var _hoisted_60 = {
+  "class": "header-td"
+};
+var _hoisted_61 = ["onUpdate:modelValue"];
+
+var _hoisted_62 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: ""
+  }, "Select Option", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_63 = ["value"];
+var _hoisted_64 = {
   "class": "col-6 col-md-6"
 };
-var _hoisted_56 = {
+var _hoisted_65 = {
   "class": "table table-sm table-hover"
 };
 
-var _hoisted_57 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_66 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     colspan: "2",
     "class": "text-center"
@@ -79066,23 +79355,23 @@ var _hoisted_57 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_58 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_67 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Receivable in Cash", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_59 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_68 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Receivable in Bank", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_60 = {
+var _hoisted_69 = {
   "class": "table table-sm table-hover mt-3"
 };
 
-var _hoisted_61 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_70 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     colspan: "2",
     "class": "text-center"
@@ -79091,23 +79380,23 @@ var _hoisted_61 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_62 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_71 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Received in Cash", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_63 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_72 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Received in Bank", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_64 = {
+var _hoisted_73 = {
   "class": "table table-sm table-hover mt-3"
 };
 
-var _hoisted_65 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_74 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     colspan: "2",
     "class": "text-center"
@@ -79116,70 +79405,20 @@ var _hoisted_65 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_66 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_75 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Receivable", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_67 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Other Commission", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_68 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Shortage", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_69 = {
-  "class": "border-r"
-};
-
-var _hoisted_70 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Received", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_71 = {
-  "class": "col-6 col-md-6"
-};
-var _hoisted_72 = {
-  "class": "table table-sm table-hover"
-};
-
-var _hoisted_73 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    colspan: "2",
-    "class": "text-center"
-  }, "Expenses")])], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_74 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total KT Commission", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_75 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Other Commission", -1
-  /* HOISTED */
-  );
-});
-
 var _hoisted_76 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Paid Expenses", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Other Commission", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_77 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Credit Expenses", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Shortage", -1
   /* HOISTED */
   );
 });
@@ -79189,16 +79428,66 @@ var _hoisted_78 = {
 };
 
 var _hoisted_79 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Expense", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Received", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_80 = {
+  "class": "col-6 col-md-6"
+};
+var _hoisted_81 = {
+  "class": "table table-sm table-hover"
+};
+
+var _hoisted_82 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    colspan: "2",
+    "class": "text-center"
+  }, "Expenses")])], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_83 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total KT Commission", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_84 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Other Commission", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_85 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Paid Expenses", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_86 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Credit Expenses", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_87 = {
+  "class": "border-r"
+};
+
+var _hoisted_88 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Expense", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_89 = {
   "class": "table table-sm table-hover mt-3"
 };
 
-var _hoisted_81 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_90 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     colspan: "2",
     "class": "text-center"
@@ -79207,33 +79496,33 @@ var _hoisted_81 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_82 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_91 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Receivable", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_83 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_92 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Expenses", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_84 = {
+var _hoisted_93 = {
   "class": "border-r"
 };
 
-var _hoisted_85 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_94 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_86 = {
+var _hoisted_95 = {
   "class": "table table-sm table-hover mt-3"
 };
 
-var _hoisted_87 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_96 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     colspan: "2",
     "class": "text-center"
@@ -79242,33 +79531,33 @@ var _hoisted_87 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_88 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_97 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Received in Cash", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_89 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_98 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Paid Expenses", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_90 = {
+var _hoisted_99 = {
   "class": "border-r"
 };
 
-var _hoisted_91 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_100 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Cash in Hand", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_92 = {
+var _hoisted_101 = {
   "class": "modal-footer"
 };
-var _hoisted_93 = ["disabled"];
-var _hoisted_94 = {
+var _hoisted_102 = ["disabled"];
+var _hoisted_103 = {
   key: 0,
   "class": "spinner-border spinner-border-sm mr-2",
   role: "status",
@@ -79327,7 +79616,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onInput: function onInput($event) {
         return $options.updateCash(terminalId, tickets);
       },
-      disabled: $options.totalFare(tickets) == 0
+      disabled: $options.totalFare(tickets) == 0,
+      onKeypress: _cache[1] || (_cache[1] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      })
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_19), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.cashBankStart[terminalId].cash]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
@@ -79357,7 +79651,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onInput: function onInput($event) {
         return $options.updateBank(terminalId, tickets);
       },
-      disabled: $options.totalFare(tickets) == 0
+      disabled: $options.totalFare(tickets) == 0,
+      onKeypress: _cache[2] || (_cache[2] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      })
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_23), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.cashBankStart[terminalId].bank, void 0, {
@@ -79426,10 +79725,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return $data.cashBankReturn[terminalId].cash = $event;
       },
-      onInput: _cache[1] || (_cache[1] = function ($event) {
+      onInput: _cache[3] || (_cache[3] = function ($event) {
         return $data.editingField = 'cash';
       }),
-      disabled: $options.totalFare(tickets) == 0
+      disabled: $options.totalFare(tickets) == 0,
+      onKeypress: _cache[4] || (_cache[4] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      })
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_32), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.cashBankReturn[terminalId].cash, void 0, {
@@ -79458,10 +79762,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return $data.cashBankReturn[terminalId].bank = $event;
       },
-      onInput: _cache[2] || (_cache[2] = function ($event) {
+      onInput: _cache[5] || (_cache[5] = function ($event) {
         return $data.editingField = 'bank';
       }),
-      disabled: $options.totalFare(tickets) == 0
+      disabled: $options.totalFare(tickets) == 0,
+      onKeypress: _cache[6] || (_cache[6] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      })
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_36), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.cashBankReturn[terminalId].bank, void 0, {
@@ -79530,7 +79839,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return $options.saveRow($event, 'second', index);
       },
       value: $data.postData.description[index],
-      disabled: _ctx.editAble
+      disabled: _ctx.editAble,
+      onKeypress: _cache[7] || (_cache[7] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      })
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_48)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Total Expense "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -79542,7 +79856,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       },
       onInput: function onInput($event) {
         return $options.syncPaid(index);
-      }
+      },
+      onKeypress: _cache[8] || (_cache[8] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      })
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_49), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.postData.amount[index], void 0, {
@@ -79553,9 +79872,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": "form-control rounded-0",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return $data.postData.paid[index] = $event;
-      }
-    }, null, 8
-    /* PROPS */
+      },
+      onKeypress: _cache[9] || (_cache[9] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      })
+    }, null, 40
+    /* PROPS, HYDRATE_EVENTS */
     , _hoisted_50), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.postData.paid[index], void 0, {
       number: true
     }]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Balance "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -79565,79 +79889,104 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       readonly: ""
     }, null, 8
     /* PROPS */
-    , _hoisted_51)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td>\r\n                          <input\r\n                            type=\"text\"\r\n                            class=\"form-control\"\r\n                            @keyup=\"saveRow($event, 'fourth', index)\"\r\n                            :value=\"postData.invoice[index]\"\r\n                            disabled\r\n                          />\r\n                        </td> "), !_ctx.editAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    , _hoisted_51)]), !_ctx.editAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
       "class": "btn btn-outline-primary mx-2",
-      onClick: _cache[3] || (_cache[3] = function () {
+      onClick: _cache[10] || (_cache[10] = function () {
         return $options.addRow && $options.addRow.apply($options, arguments);
       })
-    }, " Add "), $data.loop != 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    }, _hoisted_54), $data.loop != 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 0,
       "class": "btn btn-outline-danger",
       onClick: function onClick($event) {
         return $options.removeRow($event, index);
       }
-    }, " Remove ", 8
+    }, _hoisted_57, 8
     /* PROPS */
-    , _hoisted_53)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_54))]);
+    , _hoisted_55)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Checkbox "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      type: "checkbox",
+      "class": "ml-2",
+      "onUpdate:modelValue": function onUpdateModelValue($event) {
+        return $data.postData.showExtra[index] = $event;
+      }
+    }, null, 8
+    /* PROPS */
+    , _hoisted_58), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.postData.showExtra[index]]])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_59)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Dropdown after checkbox "), $data.postData.showExtra[index] ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
+      key: 0,
+      "class": "form-control mt-1",
+      "onUpdate:modelValue": function onUpdateModelValue($event) {
+        return $data.postData.extraCategory[index] = $event;
+      }
+    }, [_hoisted_62, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.reportsHeaders, function (item, i) {
+      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+        key: i,
+        value: item.id
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.name), 9
+      /* TEXT, PROPS */
+      , _hoisted_63);
+    }), 128
+    /* KEYED_FRAGMENT */
+    ))], 8
+    /* PROPS */
+    , _hoisted_61)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.postData.extraCategory[index]]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]);
   }), 128
   /* KEYED_FRAGMENT */
-  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <tr class=\"mt-1\">\r\n                        <td></td>\r\n                        <td>\r\n                          <div class=\"form-group\">\r\n                            <label for=\"totalNums\">Total Sale</label>\r\n                            <input\r\n                              id=\"totalSale\"\r\n                              type=\"text\"\r\n                              class=\"form-control mr-4\"\r\n                              disabled\r\n                              :value=\"totalSale\"\r\n                            />\r\n                          </div>\r\n                        </td> \r\n                        <td>\r\n                          <div class=\"form-group\">\r\n                            <label for=\"totalNums\">Total Amount</label>\r\n                            <input\r\n                              id=\"totalNums\"\r\n                              type=\"text\"\r\n                              class=\"form-control mr-4\"\r\n                              disabled\r\n                              :value=\"totalAmount\"\r\n                            />\r\n                          </div>\r\n                        </td>\r\n                        <td>\r\n                          <div class=\"form-group\">\r\n                            <label for=\"netProfit\">Net Profit</label>\r\n                            <input\r\n                              id=\"netProfit\"\r\n                              type=\"text\"\r\n                              class=\"form-control mr-4\"\r\n                              disabled\r\n                              :value=\"netProfit\"\r\n                            />\r\n                          </div>\r\n                        </td>\r\n                        <td></td>\r\n                      </tr> ")])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Total Receivable Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_56, [_hoisted_57, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_58, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumStartCash() + $options.sumReturnCash())), 1
+  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_64, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Total Receivable Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_65, [_hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_67, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumStartCash() + $options.sumReturnCash())), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumStartBank() + $options.sumReturnBank())), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_68, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumStartBank() + $options.sumReturnBank())), 1
   /* TEXT */
-  )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Total Received Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_60, [_hoisted_61, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumCash() + $options.sumCashReturn())), 1
+  )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Total Received Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_69, [_hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_71, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumCash() + $options.sumCashReturn())), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumBank() + $options.sumBankReturn())), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_72, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumBank() + $options.sumBankReturn())), 1
   /* TEXT */
-  )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_64, [_hoisted_65, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumReceivable() + $options.sumReceivableReturn())), 1
+  )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_73, [_hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_75, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumReceivable() + $options.sumReceivableReturn())), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_67, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumOtherCommissions($props.data.schedule_return) + $options.sumOtherCommissions($props.data.schedule_start))), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_76, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumOtherCommissions($props.data.schedule_return) + $options.sumOtherCommissions($props.data.schedule_start))), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_68, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumShortage() + $options.sumShortageReturn())), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_77, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumShortage() + $options.sumShortageReturn())), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", _hoisted_69, [_hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.grandTotal)), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", _hoisted_78, [_hoisted_79, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.grandTotal)), 1
   /* TEXT */
-  )])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Expenses Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_72, [_hoisted_73, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.totalCommissions($props.data.schedule_return) + $options.totalCommissions($props.data.schedule_start))), 1
+  )])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_80, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Expenses Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_81, [_hoisted_82, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_83, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.totalCommissions($props.data.schedule_return) + $options.totalCommissions($props.data.schedule_start))), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_75, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumOtherCommissions($props.data.schedule_return) + $options.sumOtherCommissions($props.data.schedule_start))), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_84, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumOtherCommissions($props.data.schedule_return) + $options.sumOtherCommissions($props.data.schedule_start))), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_76, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma(Math.round($options.totalAmount - $options.totalExpenses))), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_85, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma(Math.round($options.totalAmount - $options.totalExpenses))), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_77, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.totalExpenses)), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_86, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.totalExpenses)), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", _hoisted_78, [_hoisted_79, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.grandTotalexpense)), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", _hoisted_87, [_hoisted_88, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.grandTotalexpense)), 1
   /* TEXT */
-  )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Profit and Loss Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_80, [_hoisted_81, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_82, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumReceivable() + $options.sumReceivableReturn())), 1
+  )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Profit and Loss Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_89, [_hoisted_90, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_91, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumReceivable() + $options.sumReceivableReturn())), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_83, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.grandTotalexpense)), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_92, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.grandTotalexpense)), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", _hoisted_84, [_hoisted_85, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumReceivable() + $options.sumReceivableReturn() - $options.grandTotalexpense)), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", _hoisted_93, [_hoisted_94, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumReceivable() + $options.sumReceivableReturn() - $options.grandTotalexpense)), 1
   /* TEXT */
-  )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Cash in Hand Summary Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_86, [_hoisted_87, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_88, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumCash() + $options.sumCashReturn())), 1
+  )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Cash in Hand Summary Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_95, [_hoisted_96, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_97, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumCash() + $options.sumCashReturn())), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_89, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.totalPaid)), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_98, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.totalPaid)), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", _hoisted_90, [_hoisted_91, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumCash() + $options.sumCashReturn() - $options.totalPaid)), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", _hoisted_99, [_hoisted_100, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumCash() + $options.sumCashReturn() - $options.totalPaid)), 1
   /* TEXT */
-  )])])])])])]))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_92, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  )])])])])])]))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_101, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-secondary",
     "data-bs-dismiss": "modal",
-    onClick: _cache[4] || (_cache[4] = function ($event) {
+    onClick: _cache[11] || (_cache[11] = function ($event) {
       return $options.close();
     })
   }, " Close "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-primary d-flex align-items-center",
-    onClick: _cache[5] || (_cache[5] = function () {
+    onClick: _cache[12] || (_cache[12] = function () {
       return $options.saveTicketClosingShortage && $options.saveTicketClosingShortage.apply($options, arguments);
     }),
     disabled: $data.loading
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Loader "), $data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_94)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Text "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? "Saving..." : "Save changes"), 1
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Loader "), $data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_103)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Text "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? "Saving..." : "Save changes"), 1
   /* TEXT */
   )], 8
   /* PROPS */
-  , _hoisted_93)])])])])]);
+  , _hoisted_102)])])])])]);
 }
 
 /***/ }),
@@ -83109,7 +83458,7 @@ var _hoisted_5 = {
 
 var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "card-header"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Report Headers Link")], -1
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Report expenseHeader Link")], -1
 /* HOISTED */
 );
 
@@ -83151,17 +83500,17 @@ var _hoisted_21 = ["action"];
 var _hoisted_22 = ["value"];
 var _hoisted_23 = ["value"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.headers, function (item, index) {
-    var _$data$postData$value;
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.expenseHeader, function (item, index) {
+    var _$data$expensePostDat;
 
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: index
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.saveRow(item.id, "first", index)) + " ", 1
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.expenseSaveRow(item.id, "first", index)) + " ", 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
       "class": "form-control rounded-0",
-      disabled: $data.editAble,
-      value: $data.postData.headIds[index]
+      disabled: $data.expenseEditAble,
+      value: $data.expensePostData.expenseHeadIds[index]
     }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       value: item.id,
       key: _ctx.i
@@ -83169,28 +83518,28 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT, PROPS */
     , _hoisted_16))], 8
     /* PROPS */
-    , _hoisted_15)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.saveRow((_$data$postData$value = $data.postData.values[index]) !== null && _$data$postData$value !== void 0 ? _$data$postData$value : 0, "second", index)) + " ", 1
+    , _hoisted_15)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.expenseSaveRow((_$data$expensePostDat = $data.expensePostData.values[index]) !== null && _$data$expensePostDat !== void 0 ? _$data$expensePostDat : 0, "second", index)) + " ", 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "number",
       min: "0",
       "class": "form-control",
-      value: $data.postData.values[index],
-      disabled: $data.editAble,
+      value: $data.expensePostData.values[index],
+      disabled: $data.expenseEditAble,
       onKeyup: function onKeyup($event) {
-        return $options.saveRow($event, 'third', index);
+        return $options.expenseSaveRow($event, 'third', index);
       }
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_17)])]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [!$data.editAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+  ))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [!$data.expenseEditAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 0,
     type: "button",
     "class": "btn btn-outline-success mr-4",
     onClick: _cache[0] || (_cache[0] = function () {
-      return $options.add && $options.add.apply($options, arguments);
+      return $options.expenseAdd && $options.expenseAdd.apply($options, arguments);
     }),
     disabled: $data.loading
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading...' : 'Save'), 9
@@ -83200,7 +83549,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     type: "button",
     "class": "btn btn-outline-secondary mr-4",
     onClick: _cache[1] || (_cache[1] = function ($event) {
-      return $data.editAble = false;
+      return $data.expenseEditAble = false;
     }),
     disabled: $data.loading
   }, "Edit ", 8
@@ -83219,7 +83568,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "ticket_merge_id",
-    value: this.postData.ticket_merge_id
+    value: this.expensePostData.ticket_merge_id
   }, null, 8
   /* PROPS */
   , _hoisted_23)], 8
@@ -84050,7 +84399,7 @@ var _hoisted_41 = {
 };
 
 var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Class"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "No of Seat"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sale Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "ELT Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Commission"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fixed Commission"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Commission")])], -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Class"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "No of Seat"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sale Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "ELT Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Commission"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fixed Commission"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Commission"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Net Cash")])], -1
   /* HOISTED */
   );
 });
@@ -84226,6 +84575,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.fix_commission), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(parseInt(data.terminal_commission) + parseInt(data.fix_commission)), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.net_cash), 1
     /* TEXT */
     )]);
   }), 128
@@ -84710,7 +85061,7 @@ var _hoisted_34 = {
 };
 
 var _hoisted_35 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Class"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Route"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cnic"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Contact"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Seat No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Invoice"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sale"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Refund"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Commission")])], -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Class"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Route"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cnic"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Contact"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Seat No"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Invoice"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Transaction id "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Action By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Sale"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Refund"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Commission"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Net Cash")])], -1
   /* HOISTED */
   );
 });
@@ -84824,7 +85175,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loadingTable ? 'Loading...' : 'Fetch Record'), 9
   /* TEXT, PROPS */
   , _hoisted_30)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"d-flex justify-content-end\" v-if=\"filters.record != null\">\r\n                                                <button class=\"btn btn-dark mt-4\" type=\"button\" @click=\"salesPrint()\"\r\n                                                        :disabled=\"loadingTable\">\r\n                                                    {{ loadingTable ? 'Loading...' : 'Print Record' }}\r\n                                                </button>\r\n                                            </div>\r\n                                            <form :action=\"$store.state.api_url + 'api/web/v1/advance/sales/pdf'\" method=\"POST\" ref=\"salePrint\"\r\n                                                target=\"_blank\">\r\n                                                <input type=\"hidden\" name=\"token\" :value=\"this.$store.state.token\">\r\n                                                <input type=\"hidden\" name=\"terminal\" :value=\"filterSales.terminal\">\r\n                                                <input type=\"hidden\" name=\"user\" :value=\"filterSales.user\">\r\n                                                <input type=\"hidden\" name=\"route\" :value=\"filterSales.route\">\r\n                                                <input type=\"hidden\" name=\"fromDateTime\" :value=\"filterSales.fromDateTime\">\r\n                                                <input type=\"hidden\" name=\"toDateTime\" :value=\"filterSales.toDateTime\">\r\n                                            </form> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters.record, function (data, i) {
-    var _data$route$via;
+    var _data$route$via, _data$transaction_id, _data$refund, _data$comsn;
 
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
@@ -84848,6 +85199,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.invoice_id), 1
     /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_data$transaction_id = data.transaction_id) !== null && _data$transaction_id !== void 0 ? _data$transaction_id : 0), 1
+    /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.terminal.name), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.type), 1
@@ -84860,7 +85213,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.type == 'canceled' ? 0 : data.comsn), 1
     /* TEXT */
-    )]);
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Net Cash "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.seat_fare - data.discount + ((_data$refund = data.refund) !== null && _data$refund !== void 0 ? _data$refund : 0) - ((_data$comsn = data.comsn) !== null && _data$comsn !== void 0 ? _data$comsn : 0)), 1
+    /* TEXT */
+    )])]);
   }), 128
   /* KEYED_FRAGMENT */
   )), $data.filters.record.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_37, [_hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.filters.record.length), 1
@@ -84868,6 +85223,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   ), _hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.totalSaleAmount()), 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.totalRefundAmount()), 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.totalCommission()), 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.totalNetCash()), 1
   /* TEXT */
   )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])])])]);
 }
@@ -103027,10 +103386,50 @@ var _hoisted_131 = {
 var _hoisted_132 = ["disabled"];
 var _hoisted_133 = ["disabled"];
 var _hoisted_134 = ["disabled"];
-var _hoisted_135 = ["action"];
-var _hoisted_136 = ["value"];
-var _hoisted_137 = ["value"];
+var _hoisted_135 = {
+  "class": "card"
+};
+var _hoisted_136 = {
+  "class": "card-body"
+};
+var _hoisted_137 = {
+  "class": "table-responsive"
+};
 var _hoisted_138 = {
+  "class": "table table-striped",
+  id: "expense_table"
+};
+
+var _hoisted_139 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Header"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Value")])], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_140 = ["onUpdate:modelValue", "onChange"];
+var _hoisted_141 = ["value"];
+var _hoisted_142 = ["onUpdate:modelValue", "disabled", "onInput"];
+
+var _hoisted_143 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    "class": "text-right"
+  }, "Total Amount:", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_144 = {
+  "class": "d-flex justify-content-end mt-3"
+};
+var _hoisted_145 = ["disabled"];
+var _hoisted_146 = ["disabled"];
+var _hoisted_147 = ["action"];
+var _hoisted_148 = ["value"];
+var _hoisted_149 = ["value"];
+var _hoisted_150 = ["action"];
+var _hoisted_151 = ["value"];
+var _hoisted_152 = ["value"];
+var _hoisted_153 = {
   "class": "modal fade",
   id: "accountModal",
   tabindex: "-1",
@@ -103038,24 +103437,24 @@ var _hoisted_138 = {
   "aria-labelledby": "modelTitleId",
   "aria-hidden": "true"
 };
-var _hoisted_139 = {
+var _hoisted_154 = {
   "class": "modal-dialog modal-lg modal-dialog-centered",
   role: "document"
 };
-var _hoisted_140 = {
+var _hoisted_155 = {
   "class": "modal-content"
 };
-var _hoisted_141 = {
+var _hoisted_156 = {
   "class": "modal-body pt-5"
 };
-var _hoisted_142 = {
+var _hoisted_157 = {
   "class": "card card-danger"
 };
-var _hoisted_143 = {
+var _hoisted_158 = {
   "class": "card-header d-flex justify-content-between"
 };
 
-var _hoisted_144 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_159 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
     "class": "modal-title text-center text-danger",
     style: {
@@ -103068,7 +103467,7 @@ var _hoisted_144 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_145 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_160 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "aria-hidden": "true"
   }, "×", -1
@@ -103076,17 +103475,17 @@ var _hoisted_145 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_146 = [_hoisted_145];
-var _hoisted_147 = {
+var _hoisted_161 = [_hoisted_160];
+var _hoisted_162 = {
   "class": "card-body text-center"
 };
-var _hoisted_148 = {
+var _hoisted_163 = {
   key: 0,
   "class": "alert alert-danger alert-dismissible fade show",
   role: "alert"
 };
 
-var _hoisted_149 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_164 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "aria-hidden": "true"
   }, "×", -1
@@ -103094,7 +103493,7 @@ var _hoisted_149 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_150 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_165 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "sr-only"
   }, "Close", -1
@@ -103102,9 +103501,9 @@ var _hoisted_150 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_151 = [_hoisted_149, _hoisted_150];
+var _hoisted_166 = [_hoisted_164, _hoisted_165];
 
-var _hoisted_152 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_167 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "font-weight-bold"
   }, " You can't edit this once you close the summary. Do you want to procceed ? ", -1
@@ -103112,17 +103511,17 @@ var _hoisted_152 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_153 = {
+var _hoisted_168 = {
   "class": "modal-footer d-block pt-0"
 };
-var _hoisted_154 = ["disabled"];
-var _hoisted_155 = ["action"];
-var _hoisted_156 = ["value"];
-var _hoisted_157 = ["value"];
-var _hoisted_158 = ["value"];
-var _hoisted_159 = ["value"];
-var _hoisted_160 = ["value"];
-var _hoisted_161 = ["value"];
+var _hoisted_169 = ["disabled"];
+var _hoisted_170 = ["action"];
+var _hoisted_171 = ["value"];
+var _hoisted_172 = ["value"];
+var _hoisted_173 = ["value"];
+var _hoisted_174 = ["value"];
+var _hoisted_175 = ["value"];
+var _hoisted_176 = ["value"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _$data$details, _$data$details2, _$data$details2$bus, _$data$details3, _$data$details4, _$data$details4$closi, _$data$details4$closi2, _$data$details4$closi3, _$data$details5, _$data$details5$closi, _$data$details5$closi2, _$data$details5$closi3, _$data$details5$closi4, _$data$details6, _$data$details6$bus, _$data$details7, _$data$details8, _$data$details8$closi, _$data$details8$closi2, _$data$details8$closi3, _$data$details9, _$data$details9$closi, _$data$details9$closi2, _$data$details9$closi3, _$data$details9$closi4, _$data$details10, _$data$details10$clos, _$data$details10$clos2, _$data$details10$clos3, _$data$details10$clos4, _$data$details11, _$data$details11$clos, _$data$details11$clos2, _$data$details11$clos3, _$data$details11$clos4;
 
@@ -103203,13 +103602,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [$options.isEditing(item) ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
       key: 0,
-      type: "number",
+      type: "text",
       "class": "form-control form-control-sm",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return item.total_received_cash = $event;
-      }
-    }, null, 8
-    /* PROPS */
+      },
+      onKeypress: _cache[3] || (_cache[3] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      })
+    }, null, 40
+    /* PROPS, HYDRATE_EVENTS */
     , _hoisted_77)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, item.total_received_cash, void 0, {
       number: true
     }]]) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_78, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.total_received_cash), 1
@@ -103235,13 +103639,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [$options.isEditing(item) ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
       key: 0,
-      type: "number",
+      type: "text",
+      onKeypress: _cache[4] || (_cache[4] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      }),
       "class": "form-control form-control-sm",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return item.total_received_bank = $event;
       }
-    }, null, 8
-    /* PROPS */
+    }, null, 40
+    /* PROPS, HYDRATE_EVENTS */
     , _hoisted_83)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, item.total_received_bank, void 0, {
       number: true
     }]]) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_84, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.total_received_bank), 1
@@ -103330,13 +103739,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [$options.isEditing(item) ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
       key: 0,
-      type: "number",
+      type: "text",
+      onKeypress: _cache[5] || (_cache[5] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      }),
       "class": "form-control form-control-sm",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return item.total_received_cash = $event;
       }
-    }, null, 8
-    /* PROPS */
+    }, null, 40
+    /* PROPS, HYDRATE_EVENTS */
     , _hoisted_96)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, item.total_received_cash, void 0, {
       number: true
     }]]) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_97, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.total_received_cash), 1
@@ -103362,13 +103776,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [$options.isEditing(item) ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
       key: 0,
-      type: "number",
+      type: "text",
+      onKeypress: _cache[6] || (_cache[6] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      }),
       "class": "form-control form-control-sm",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return item.total_received_bank = $event;
       }
-    }, null, 8
-    /* PROPS */
+    }, null, 40
+    /* PROPS, HYDRATE_EVENTS */
     , _hoisted_102)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, item.total_received_bank, void 0, {
       number: true
     }]]) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_103, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.total_received_bank), 1
@@ -103464,7 +103883,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_121)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-      type: "number",
+      type: "text",
+      onKeypress: _cache[7] || (_cache[7] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      }),
       min: "0",
       "class": "form-control rounded-0",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
@@ -103478,35 +103902,45 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_122), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.postData.amount[index], void 0, {
       number: true
     }]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-      type: "number",
+      type: "text",
+      onKeypress: _cache[8] || (_cache[8] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      }),
       min: "0",
       "class": "form-control rounded-0",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return $data.postData.paid[index] = $event;
       }
-    }, null, 8
-    /* PROPS */
+    }, null, 40
+    /* PROPS, HYDRATE_EVENTS */
     , _hoisted_123), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.postData.paid[index], void 0, {
       number: true
     }]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-      type: "number",
+      type: "text",
+      onKeypress: _cache[9] || (_cache[9] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      }),
       "class": "form-control rounded-0",
       value: $options.balances[index],
       readonly: ""
-    }, null, 8
-    /* PROPS */
+    }, null, 40
+    /* PROPS, HYDRATE_EVENTS */
     , _hoisted_124)]), !$data.editAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_125, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
       "class": "btn btn-outline-primary mx-2",
-      onClick: _cache[3] || (_cache[3] = function () {
+      onClick: _cache[10] || (_cache[10] = function () {
         return $options.addRow && $options.addRow.apply($options, arguments);
       })
-    }, "Add"), $data.loop != 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    }, " Add "), $data.loop != 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 0,
       "class": "btn btn-outline-danger",
       onClick: function onClick($event) {
         return $options.removeRow($event, index);
       }
-    }, "Remove", 8
+    }, " Remove ", 8
     /* PROPS */
     , _hoisted_126)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_127))]);
   }), 128
@@ -103523,37 +103957,103 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "text-light btn btn-danger mr-1",
     "data-target": "#accountModal",
     "data-toggle": "modal",
-    disabled: _ctx.loading
+    disabled: $data.loading
   }, " Update Account ", 8
   /* PROPS */
   , _hoisted_132)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$data.editAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 1,
     type: "button",
     "class": "btn btn-outline-success mr-4",
-    onClick: _cache[4] || (_cache[4] = function () {
+    onClick: _cache[11] || (_cache[11] = function () {
       return $options.add && $options.add.apply($options, arguments);
     }),
-    disabled: _ctx.loading
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.loading ? "Loading..." : "Save"), 9
+    disabled: $data.loading
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? "Loading..." : "Save"), 9
   /* TEXT, PROPS */
   , _hoisted_133)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 2,
     type: "button",
     "class": "btn btn-outline-secondary mr-4",
-    onClick: _cache[5] || (_cache[5] = function ($event) {
+    onClick: _cache[12] || (_cache[12] = function ($event) {
       return $data.editAble = false;
     }),
-    disabled: _ctx.loading
+    disabled: $data.loading
   }, " Edit ", 8
   /* PROPS */
   , _hoisted_134)), !$data.editAble && $data.postData.category.length != 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 3,
     type: "button",
     "class": "btn btn-outline-primary mr-4",
-    onClick: _cache[6] || (_cache[6] = function ($event) {
+    onClick: _cache[13] || (_cache[13] = function ($event) {
       return $data.editAble = true;
     })
-  }, " Cancel ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Daily Summery Report Form"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+  }, " Cancel ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_135, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_136, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_137, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_138, [_hoisted_139, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.expenseHeader, function (item, index) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
+      key: index
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      "class": "form-control",
+      "onUpdate:modelValue": function onUpdateModelValue($event) {
+        return $data.expensePostData.headIds[index] = $event;
+      },
+      onChange: function onChange($event) {
+        return $options.expenseSaveRow($event.target.value, 'first', index);
+      }
+    }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.allHeaderOptions, function (opt) {
+      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+        key: opt.id,
+        value: opt.id
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(opt.name), 9
+      /* TEXT, PROPS */
+      , _hoisted_141);
+    }), 128
+    /* KEYED_FRAGMENT */
+    ))], 40
+    /* PROPS, HYDRATE_EVENTS */
+    , _hoisted_140), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.expensePostData.headIds[index]]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      type: "text",
+      onKeypress: _cache[14] || (_cache[14] = function ($event) {
+        return _ctx.$numberValidate($event, {
+          dot: true
+        });
+      }),
+      "class": "form-control",
+      "onUpdate:modelValue": function onUpdateModelValue($event) {
+        return $data.expensePostData.values[index] = $event;
+      },
+      disabled: $data.expenseEditAble,
+      onInput: function onInput($event) {
+        return $options.expenseSaveRow($event.target.value, 'second', index);
+      }
+    }, null, 40
+    /* PROPS, HYDRATE_EVENTS */
+    , _hoisted_142), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.expensePostData.values[index], void 0, {
+      number: true
+    }]])])]);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tfoot", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_143, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.calculatedTotalAmount), 1
+  /* TEXT */
+  )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_144, [!$data.expenseEditAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 0,
+    type: "button",
+    "class": "btn btn-outline-success mr-4",
+    onClick: _cache[15] || (_cache[15] = function () {
+      return $options.expenseAdd && $options.expenseAdd.apply($options, arguments);
+    }),
+    disabled: $data.loading
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? "Saving..." : "Save"), 9
+  /* TEXT, PROPS */
+  , _hoisted_145)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 1,
+    type: "button",
+    "class": "btn btn-outline-secondary mr-4",
+    onClick: _cache[16] || (_cache[16] = function ($event) {
+      return $data.expenseEditAble = false;
+    }),
+    disabled: $data.loading
+  }, " Edit ", 8
+  /* PROPS */
+  , _hoisted_146))])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/daily/summary/report',
     method: "POST",
     ref: "refDailySummaryReport",
@@ -103564,45 +104064,64 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: this.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_136), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_148), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "ticket_merge_id",
+    value: this.expensePostData.ticket_merge_id
+  }, null, 8
+  /* PROPS */
+  , _hoisted_149)], 8
+  /* PROPS */
+  , _hoisted_147), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("Daily Summery Report Form"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+    action: _ctx.$store.state.api_url + 'api/web/v1/print/pdf/daily/summary/report',
+    method: "POST",
+    ref: "refDailySummaryReport",
+    target: "_blank"
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "hidden",
+    name: "token",
+    value: this.$store.state.token
+  }, null, 8
+  /* PROPS */
+  , _hoisted_151), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "ticket_merge_id",
     value: this.postData.ticket_merge_id
   }, null, 8
   /* PROPS */
-  , _hoisted_137)], 8
+  , _hoisted_152)], 8
   /* PROPS */
-  , _hoisted_135), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_138, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_139, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_140, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_141, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_142, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_143, [_hoisted_144, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  , _hoisted_150), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_153, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_154, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_155, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_156, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_157, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_158, [_hoisted_159, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "close",
     "data-dismiss": "modal",
     "aria-label": "Close",
-    onClick: _cache[7] || (_cache[7] = function ($event) {
+    onClick: _cache[17] || (_cache[17] = function ($event) {
       return $options.closeModal();
     })
-  }, _hoisted_146)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_147, [$data.success ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_148, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, _hoisted_161)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_162, [$data.success ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_163, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "close",
     "data-dismiss": "alert",
     "aria-label": "Close",
-    onClick: _cache[8] || (_cache[8] = function ($event) {
+    onClick: _cache[18] || (_cache[18] = function ($event) {
       return $options.closeModal();
     })
-  }, _hoisted_151)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_152])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_153, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, _hoisted_166)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_167])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_168, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-danger btn-block",
     "data-dismiss": "modal",
-    disabled: _ctx.loading,
-    onClick: _cache[9] || (_cache[9] = function () {
+    disabled: $data.loading,
+    onClick: _cache[19] || (_cache[19] = function () {
       return $options.updateAccount && $options.updateAccount.apply($options, arguments);
     })
   }, " Yes ", 8
   /* PROPS */
-  , _hoisted_154), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  , _hoisted_169), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-secondary btn-block",
     "data-dismiss": "modal",
-    onClick: _cache[10] || (_cache[10] = function ($event) {
+    onClick: _cache[20] || (_cache[20] = function ($event) {
       return $options.closeModal();
     })
   }, " Close ")])])])])])), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
@@ -103616,39 +104135,39 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: this.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_156), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_171), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "destination_city_id",
     value: $data.addForm.destinationCity
   }, null, 8
   /* PROPS */
-  , _hoisted_157), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_172), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "departure_city_id",
     value: $data.addForm.departureCity
   }, null, 8
   /* PROPS */
-  , _hoisted_158), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_173), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "date",
     value: $data.addForm.date
   }, null, 8
   /* PROPS */
-  , _hoisted_159), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_174), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "schedule_id",
     value: $data.addForm.schedule
   }, null, 8
   /* PROPS */
-  , _hoisted_160), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_175), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "hidden",
     name: "departure_time",
     value: $data.addForm.departure_time
   }, null, 8
   /* PROPS */
-  , _hoisted_161)], 8
+  , _hoisted_176)], 8
   /* PROPS */
-  , _hoisted_155)]);
+  , _hoisted_170)]);
 }
 
 /***/ }),
@@ -146862,7 +147381,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.add-btn[data-v-56d6df66] {\r\n  width: 164px;\n}\n.totals tr td[data-v-56d6df66] {\r\n  font-size: 18px;\r\n  font-weight: 700;\n}\n.totals tr th[data-v-56d6df66] {\r\n  font-size: 18px;\r\n  font-weight: 700;\n}\n.border-r[data-v-56d6df66] {\r\n  border-top: 1px solid gray;\r\n  border-bottom: 1px solid gray;\r\n  font-weight: bold;\n}\r\n/* Chrome, Safari, Edge, Opera */\ninput[type=\"number\"][data-v-56d6df66]::-webkit-outer-spin-button,\r\ninput[type=\"number\"][data-v-56d6df66]::-webkit-inner-spin-button {\r\n  -webkit-appearance: none;\r\n  margin: 0;\n}\r\n\r\n/* Firefox */\ninput[type=\"number\"][data-v-56d6df66] {\r\n  -moz-appearance: textfield;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.add-btn[data-v-56d6df66] {\r\n  width: 138px;\n}\n.header-td[data-v-56d6df66]{\r\n      width: 200px;\n}\n.totals tr td[data-v-56d6df66] {\r\n  font-size: 18px;\r\n  font-weight: 700;\n}\n.totals tr th[data-v-56d6df66] {\r\n  font-size: 18px;\r\n  font-weight: 700;\n}\n.border-r[data-v-56d6df66] {\r\n  border-top: 1px solid gray;\r\n  border-bottom: 1px solid gray;\r\n  font-weight: bold;\n}\r\n\r\n/* Chrome, Safari, Edge, Opera */\ninput[type=\"number\"][data-v-56d6df66]::-webkit-outer-spin-button,\r\ninput[type=\"number\"][data-v-56d6df66]::-webkit-inner-spin-button {\r\n  -webkit-appearance: none;\r\n  margin: 0;\n}\r\n\r\n/* Firefox */\ninput[type=\"number\"][data-v-56d6df66] {\r\n  -moz-appearance: textfield;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -147030,7 +147549,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-1940f9a2], th[data-v-1940f9a2], td[data-v-1940f9a2] {\r\n    border: 1px solid #b9b9b9;\r\n    border-collapse: collapse;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-1940f9a2],\r\nth[data-v-1940f9a2],\r\ntd[data-v-1940f9a2] {\r\n    border: 1px solid #b9b9b9;\r\n    border-collapse: collapse;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

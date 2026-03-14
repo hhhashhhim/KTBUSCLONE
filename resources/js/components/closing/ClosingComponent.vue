@@ -1,34 +1,21 @@
 <template>
   <div>
-    <div
-      class="modal fade"
-      id="exampleModal"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
       <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="text-center" id="busModalLabel">
               Merge Schedule Details
             </h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close()">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close()">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
           <div class="modal-body">
-            <div
-              v-if="isLoading"
-              class="d-flex flex-column align-items-center justify-content-center my-3"
-            >
-              <img
-                class="loading-spinner"
-                :src="$store.state.main_url + 'assets/img/loading-spinner.gif'"
-                alt="Loading..."
-                style="width: 20px; height: 20px"
-              />
+            <div v-if="isLoading" class="d-flex flex-column align-items-center justify-content-center my-3">
+              <img class="loading-spinner" :src="$store.state.main_url + 'assets/img/loading-spinner.gif'"
+                alt="Loading..." style="width: 20px; height: 20px" />
               <small class="text-muted mt-1">Loading bus data...</small>
             </div>
 
@@ -37,7 +24,7 @@
                 Bus No: {{ data?.singleData?.bus_number || "" }}
               </h5>
               <div class="row">
-            
+
                 <!-- Rawalpindi Table -->
                 <div class="col-md-12 mb-3">
                   <h5 class="text-center">
@@ -63,62 +50,38 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr
-                        v-for="(tickets, terminalId) in data.schedule_start"
-                        :key="'start-' + terminalId"
-                      >
+                      <tr v-for="(tickets, terminalId) in data.schedule_start" :key="'start-' + terminalId">
                         <td>{{ tickets[0].terminal.name }}</td>
-                        <td>{{ tickets.filter(t => t.type != 'canceled').length }}</td>
-                        <td>{{ $insertComma(totalCommission(tickets) )}}</td>
+                        <td>{{tickets.filter(t => t.type != 'canceled').length}}</td>
+                        <td>{{ $insertComma(totalCommission(tickets)) }}</td>
                         <td>{{ $insertComma(totalELT(tickets)) }}</td>
                         <td>{{ $insertComma(totalCancelAmount(tickets)) }}</td>
                         <td>{{ $insertComma(totalFare(tickets)) }}</td>
                         <td>{{ $insertComma(totalOtherCommission(tickets)) }}</td>
                         <td>
-                          <input
-                            type="number"
-                            class="form-control"
-                            v-model="cashBankStart[terminalId].cash"
-                            @input="updateCash(terminalId, tickets)"
-                            :disabled="totalFare(tickets) == 0"
-                          />
+                          <input type="number" class="form-control" v-model="cashBankStart[terminalId].cash"
+                            @input="updateCash(terminalId, tickets)" :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, {dot:true})" />
                         </td>
                         <td>
-                          <select
-                            class="form-control rounded-0"
-                            v-model="cashBankStart[terminalId].selectedBankId"
-                            :disabled="totalFare(tickets) == 0"
-                          >
-                            <option value="" selected disabled>
+                          <select class="form-control rounded-0" v-model="cashBankStart[terminalId].selectedBankId"
+                            :disabled="totalFare(tickets) == 0">
+                            <option value="" selected>
                               Select Bank
                             </option>
-                            <option
-                              v-for="bank in banks"
-                              :key="bank.id"
-                              :value="bank.id"
-                            >
+                            <option v-for="bank in banks" :key="bank.id" :value="bank.id">
                               {{ bank.text }}
                             </option>
                           </select>
                         </td>
                         <td>
-                          <input
-                            type="number"
-                            min="0"
-                            class="form-control"
-                            v-model.number="cashBankStart[terminalId].bank"
-                            @input="updateBank(terminalId, tickets)"
-                            :disabled="totalFare(tickets) == 0"
-                          />
+                          <input type="number" min="0" class="form-control"
+                            v-model.number="cashBankStart[terminalId].bank" @input="updateBank(terminalId, tickets)"
+                            :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, {dot:true})" />
                         </td>
 
                         <td>
-                          <input
-                            type="number"
-                            class="form-control"
-                            v-model.number="cashBankStart[terminalId].shortage"
-                            readonly
-                          />
+                          <input type="number" class="form-control" v-model.number="cashBankStart[terminalId].shortage"
+                            readonly />
                         </td>
 
                         <td>{{ netAmountStart(terminalId) }}</td>
@@ -142,7 +105,7 @@
                         <th>
                           {{ $insertComma(grandTotalCancel(data.schedule_start)) }}
                         </th>
-                        
+
                         <th>
                           {{ $insertComma(sumReceivable()) }}
                         </th>
@@ -186,8 +149,8 @@
                         <th>Terminal Name</th>
                         <th>Passenger Count</th>
                         <th>KT Commission</th>
-                         <th>ELT</th>
-                         <th>Cancellation Amount</th>
+                        <th>ELT</th>
+                        <th>Cancellation Amount</th>
                         <th>Total Receivable</th>
                         <th>Other Commission</th>
                         <th>Total Received in Cash</th>
@@ -198,12 +161,9 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr
-                        v-for="(tickets, terminalId) in data.schedule_return"
-                        :key="'return-' + terminalId"
-                      >
+                      <tr v-for="(tickets, terminalId) in data.schedule_return" :key="'return-' + terminalId">
                         <td>{{ tickets[0].terminal.name }}</td>
-                       <td>{{ tickets.filter(t => t.type != 'canceled').length }}</td>
+                        <td>{{tickets.filter(t => t.type != 'canceled').length}}</td>
                         <td>{{ $insertComma(totalCommission(tickets)) }}</td>
                         <td>{{ $insertComma(totalELT(tickets)) }}</td>
                         <td>{{ $insertComma(totalCancelAmount(tickets)) }}</td>
@@ -211,51 +171,30 @@
                         <td>{{ $insertComma(totalOtherCommission(tickets)) }}</td>
 
                         <td>
-                          <input
-                            type="number"
-                            min="0"
-                            class="form-control"
-                            v-model.number="cashBankReturn[terminalId].cash"
-                            @input="editingField = 'cash'"
-                             :disabled="totalFare(tickets) == 0"
-                          />
+                          <input type="number" min="0" class="form-control"
+                            v-model.number="cashBankReturn[terminalId].cash" @input="editingField = 'cash'"
+                            :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, {dot:true})" />
                         </td>
                         <td>
-                          <select
-                            class="form-control rounded-0"
-                            v-model="cashBankReturn[terminalId].selectedBankId"
-                             :disabled="totalFare(tickets) == 0"
-                          >
-                            <option value="" selected disabled>
+                          <select class="form-control rounded-0" v-model="cashBankReturn[terminalId].selectedBankId"
+                            :disabled="totalFare(tickets) == 0">
+                            <option value="" selected >
                               Select Bank
                             </option>
-                            <option
-                              v-for="bank in banks"
-                              :key="bank.id"
-                              :value="bank.id"
-                            >
+                            <option v-for="bank in banks" :key="bank.id" :value="bank.id">
                               {{ bank.text }}
                             </option>
                           </select>
                         </td>
                         <td>
-                          <input
-                            type="number"
-                            min="0"
-                            class="form-control"
-                            v-model.number="cashBankReturn[terminalId].bank"
-                            @input="editingField = 'bank'"
-                             :disabled="totalFare(tickets) == 0"
-                          />
+                          <input type="number" min="0" class="form-control"
+                            v-model.number="cashBankReturn[terminalId].bank" @input="editingField = 'bank'"
+                            :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, {dot:true})" />
                         </td>
 
                         <td>
-                          <input
-                            type="number"
-                            class="form-control"
-                            v-model.number="cashBankReturn[terminalId].shortage"
-                            readonly
-                          />
+                          <input type="number" class="form-control" v-model.number="cashBankReturn[terminalId].shortage"
+                            readonly />
                         </td>
 
                         <td>{{ netAmountReturn(terminalId) }}</td>
@@ -278,13 +217,13 @@
                         <th>
                           {{ $insertComma(grandTotalCancel(data.schedule_return)) }}
                         </th>
-                        
+
                         <th>
                           {{ $insertComma(sumReceivableReturn()) }}
                         </th>
                         <th>
                           {{ $insertComma(sumOtherCommissions(data.schedule_return)) }}
-                        </th> 
+                        </th>
                         <th>
                           {{ $insertComma(sumCashReturn()) }}
                         </th>
@@ -307,6 +246,7 @@
                     </tfoot>
                   </table>
                 </div>
+
                 <div class="col-12 col-md-12">
                   <h5 class="text-center">Expenses</h5>
                   <table class="table table-striped">
@@ -317,136 +257,67 @@
                         <th>Total Expense Amount</th>
                         <th>Total Paid</th>
                         <th>Credit Balance</th>
-                        <!-- <th>Invoice number</th> -->
                         <th>Action</th>
+                        <th>Expense Header</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr v-for="(i, index) in loop" :key="index">
                         <td>
                           <!-- {{ items[0] ? items[0].price : '' }} -->
-                          <select
-                            class="form-control rounded-0"
-                            @change="saveRow($event, 'first', index)"
-                            :value="postData.category[index]"
-                            :disabled="editAble"
-                          >
+                          <select class="form-control rounded-0" @change="saveRow($event, 'first', index)"
+                            :value="postData.category[index]" :disabled="editAble">
                             <option value="" selected>Select Category</option>
-                            <option
-                              v-for="(category, i) in categories"
-                              :value="category.id"
-                              :key="i"
-                            >
+                            <option v-for="(category, i) in categories" :value="category.id" :key="i">
                               {{ category.name }}
                             </option>
                           </select>
                         </td>
                         <td>
-                          <input
-                            type="text"
-                            class="form-control"
-                            @keyup="saveRow($event, 'second', index)"
-                            :value="postData.description[index]"
-                            :disabled="editAble"
-                          />
+                          <input type="text" class="form-control" @keyup="saveRow($event, 'second', index)"
+                            :value="postData.description[index]" :disabled="editAble" @keypress="$numberValidate($event, {dot:true})" />
                         </td>
                         <td>
                           <!-- Total Expense -->
-                          <input
-                            type="number"
-                            min="0"
-                            class="form-control rounded-0"
-                            v-model.number="postData.amount[index]"
-                            @input="syncPaid(index)"
-                          />
+                          <input type="number" min="0" class="form-control rounded-0"
+                            v-model.number="postData.amount[index]" @input="syncPaid(index)" @keypress="$numberValidate($event, {dot:true})" />
                         </td>
 
                         <td>
                           <!-- Total Expense Paid -->
-                          <input
-                            type="number"
-                            min="0"
-                            class="form-control rounded-0"
-                            v-model.number="postData.paid[index]"
-                          />
+                          <input type="number" min="0" class="form-control rounded-0"
+                            v-model.number="postData.paid[index]" @keypress="$numberValidate($event, {dot:true})" />
                         </td>
 
                         <td>
                           <!-- Balance -->
-                          <input
-                            type="number"
-                            class="form-control rounded-0"
-                            :value="balances[index]"
-                            readonly
-                          />
+                          <input type="number" class="form-control rounded-0" :value="balances[index]" readonly />
                         </td>
-
-                        <!-- <td>
-                          <input
-                            type="text"
-                            class="form-control"
-                            @keyup="saveRow($event, 'fourth', index)"
-                            :value="postData.invoice[index]"
-                            disabled
-                          />
-                        </td> -->
                         <td class="add-btn" v-if="!editAble">
-                          <button
-                            class="btn btn-outline-primary mx-2"
-                            @click="addRow"
-                          >
-                            Add
+                          <button class="btn btn-outline-primary mx-2" @click="addRow">
+                            <i class="fas fa-plus"></i>
                           </button>
-                          <button
-                            class="btn btn-outline-danger"
-                            @click="removeRow($event, index)"
-                            v-if="loop != 1"
-                          >
-                            Remove
+                          <button class="btn btn-outline-danger" @click="removeRow($event, index)" v-if="loop != 1">
+                            <i class="fas fa-trash"></i>
                           </button>
+
+                          <!-- Checkbox -->
+                          <input type="checkbox" class="ml-2" v-model="postData.showExtra[index]" />
                         </td>
                         <td v-else></td>
+                        <td class="header-td">
+                          <!-- Dropdown after checkbox -->
+                          <select class="form-control mt-1" v-if="postData.showExtra[index]"
+                            v-model="postData.extraCategory[index]">
+                            <option value="">Select Option</option>
+
+                            <option v-for="(item, i) in reportsHeaders" :key="i" :value="item.id">
+                              {{ item.name }}
+                            </option>
+
+                          </select>
+                        </td>
                       </tr>
-                      <!-- <tr class="mt-1">
-                        <td></td>
-                        <td>
-                          <div class="form-group">
-                            <label for="totalNums">Total Sale</label>
-                            <input
-                              id="totalSale"
-                              type="text"
-                              class="form-control mr-4"
-                              disabled
-                              :value="totalSale"
-                            />
-                          </div>
-                        </td> 
-                        <td>
-                          <div class="form-group">
-                            <label for="totalNums">Total Amount</label>
-                            <input
-                              id="totalNums"
-                              type="text"
-                              class="form-control mr-4"
-                              disabled
-                              :value="totalAmount"
-                            />
-                          </div>
-                        </td>
-                        <td>
-                          <div class="form-group">
-                            <label for="netProfit">Net Profit</label>
-                            <input
-                              id="netProfit"
-                              type="text"
-                              class="form-control mr-4"
-                              disabled
-                              :value="netProfit"
-                            />
-                          </div>
-                        </td>
-                        <td></td>
-                      </tr> -->
                     </tbody>
                   </table>
                 </div>
@@ -517,7 +388,7 @@
                           {{
                             $insertComma(
                               sumOtherCommissions(data.schedule_return) +
-                                sumOtherCommissions(data.schedule_start)
+                              sumOtherCommissions(data.schedule_start)
                             )
                           }}
                         </td>
@@ -554,7 +425,7 @@
                           {{
                             $insertComma(
                               totalCommissions(data.schedule_return) +
-                                totalCommissions(data.schedule_start)
+                              totalCommissions(data.schedule_start)
                             )
                           }}
                         </td>
@@ -565,7 +436,7 @@
                           {{
                             $insertComma(
                               sumOtherCommissions(data.schedule_return) +
-                                sumOtherCommissions(data.schedule_start)
+                              sumOtherCommissions(data.schedule_start)
                             )
                           }}
                         </td>
@@ -619,8 +490,8 @@
                           {{
                             $insertComma(
                               sumReceivable() +
-                                sumReceivableReturn() -
-                                grandTotalexpense
+                              sumReceivableReturn() -
+                              grandTotalexpense
                             )
                           }}
                         </td>
@@ -663,27 +534,14 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-              @click="close()"
-            >
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="close()">
               Close
             </button>
-            <button
-              type="button"
-              class="btn btn-primary d-flex align-items-center"
-              @click="saveTicketClosingShortage"
-              :disabled="loading"
-            >
+            <button type="button" class="btn btn-primary d-flex align-items-center" @click="saveTicketClosingShortage"
+              :disabled="loading">
               <!-- Loader -->
-              <span
-                v-if="loading"
-                class="spinner-border spinner-border-sm mr-2"
-                role="status"
-                aria-hidden="true"
-              ></span>
+              <span v-if="loading" class="spinner-border spinner-border-sm mr-2" role="status"
+                aria-hidden="true"></span>
 
               <!-- Text -->
               <span>
@@ -711,18 +569,21 @@ export default {
         paid: [],
         ledger: [],
         invoice: [],
+        showExtra: [],
+        extraCategory: []
       },
       addData: {
-      busIds: [],
-      mergeIds: [],
-    },
+        busIds: [],
+        mergeIds: [],
+      },
       loop: 1,
       loading: false,
       cashBank: {},
       editingField: null, // 'cash' | 'bank'
       cashBankStart: {},
       cashBankReturn: {},
-      mergedData: {}
+      mergedData: {},
+      reportsHeaders: [],
     };
   },
   watch: {
@@ -749,9 +610,9 @@ export default {
         Object.entries(val).forEach(([terminalId, tickets]) => {
           if (this.cashBankStart[terminalId]) return;
 
-          const rawTotal = this.totalFare(tickets) - this.totalOtherCommission(tickets) ;
-        
-          
+          const rawTotal = this.totalFare(tickets) - this.totalOtherCommission(tickets);
+
+
           const commission = this.totalOtherCommission(tickets);
           const total = Math.round(rawTotal);
           const method = tickets[0].terminal.recovery_method;
@@ -793,6 +654,7 @@ export default {
   },
   async created() {
     this.fetchData();
+    this.fetchReportsHeaders();
   },
   computed: {
     totalCash() {
@@ -851,11 +713,11 @@ export default {
     },
 
     totalPaid() {
-       const paid = this.postData.paid.reduce(
-    (sum, val) => sum + (Number(val) || 0),
-    0
-  );
-  return paid;
+      const paid = this.postData.paid.reduce(
+        (sum, val) => sum + (Number(val) || 0),
+        0
+      );
+      return paid;
     },
     totalExpenses() {
       return this.postData.amount.reduce((sum, val, index) => {
@@ -935,44 +797,44 @@ export default {
     },
 
     totalFare(tickets) {
-  return tickets.reduce((sum, t) => {
-    if(t.type != 'canceled'){
-      const fare = parseFloat(t.seat_fare) || 0;
-      const discount = parseFloat(t.discount) || 0;
-       const ticketELT = parseFloat(t?.elt?.elt_price) || 0;
-            // console.log("test", t.discount);
-            return sum + ( (fare + ticketELT) - discount );
-    }else{
-      const percentage = parseFloat(t?.cancel_ticket?.percentage) || 0;
-      
-          const seatFare   = parseFloat(t?.seat_fare) || 0;
+      return tickets.reduce((sum, t) => {
+        if (t.type != 'canceled') {
+          const fare = parseFloat(t.seat_fare) || 0;
+          const discount = parseFloat(t.discount) || 0;
+          const ticketELT = parseFloat(t?.elt?.elt_price) || 0;
+          // console.log("test", t.discount);
+          return sum + ((fare + ticketELT) - discount);
+        } else {
+          const percentage = parseFloat(t?.cancel_ticket?.percentage) || 0;
+
+          const seatFare = parseFloat(t?.seat_fare) || 0;
 
           const cancelAmount = (seatFare * percentage) / 100;
-           return sum + cancelAmount ;
-    } 
-  }, 0);
+          return sum + cancelAmount;
+        }
+      }, 0);
 
-},
-  totalELT(tickets) {
-  return tickets.reduce((sum, t) => {
-    // Skip canceled tickets
-    if (t.type == 'canceled') return sum;
+    },
+    totalELT(tickets) {
+      return tickets.reduce((sum, t) => {
+        // Skip canceled tickets
+        if (t.type == 'canceled') return sum;
 
-    const ticketELT = parseFloat(t?.elt?.elt_price) || 0;
-    return sum + ticketELT;
-  }, 0);
-},
+        const ticketELT = parseFloat(t?.elt?.elt_price) || 0;
+        return sum + ticketELT;
+      }, 0);
+    },
 
-  totalCancelAmount(tickets) {
-  return tickets.reduce((sum, t) => {
-    const percentage = parseFloat(t?.cancel_ticket?.percentage) || 0;
-    const seatFare   = parseFloat(t?.seat_fare) || 0;
+    totalCancelAmount(tickets) {
+      return tickets.reduce((sum, t) => {
+        const percentage = parseFloat(t?.cancel_ticket?.percentage) || 0;
+        const seatFare = parseFloat(t?.seat_fare) || 0;
 
-    const cancelAmount = (seatFare * percentage) / 100;
+        const cancelAmount = (seatFare * percentage) / 100;
 
-    return sum + cancelAmount;
-  }, 0);
-},
+        return sum + cancelAmount;
+      }, 0);
+    },
 
 
 
@@ -1002,43 +864,43 @@ export default {
     sumReturnBank() {
       return this.sumByRecovery(this.data?.schedule_return, "bank");
     },
-   sumReceivable() {
-  return Object.values(this.cashBankStart).reduce((sum, row) => {
-    if (row.type == 'canceled') return sum; // skip canceled rows
-    return sum + (Number(row.total) + Number(row.commission) || 0);
-  }, 0);
-},
+    sumReceivable() {
+      return Object.values(this.cashBankStart).reduce((sum, row) => {
+        if (row.type == 'canceled') return sum; // skip canceled rows
+        return sum + (Number(row.total) + Number(row.commission) || 0);
+      }, 0);
+    },
 
-sumCash() {
-  return Object.values(this.cashBankStart).reduce((sum, row) => {
-    if (row.type == 'canceled') return sum;
-    return sum + (Number(row.cash) || 0);
-  }, 0);
-},
+    sumCash() {
+      return Object.values(this.cashBankStart).reduce((sum, row) => {
+        if (row.type == 'canceled') return sum;
+        return sum + (Number(row.cash) || 0);
+      }, 0);
+    },
 
-sumBank() {
-  return Object.values(this.cashBankStart).reduce((sum, row) => {
-    if (row.type == 'canceled') return sum;
-    return sum + (Number(row.bank) || 0);
-  }, 0);
-},
+    sumBank() {
+      return Object.values(this.cashBankStart).reduce((sum, row) => {
+        if (row.type == 'canceled') return sum;
+        return sum + (Number(row.bank) || 0);
+      }, 0);
+    },
 
-sumShortage() {
-  return Object.values(this.cashBankStart).reduce((sum, row) => {
-    if (row.type == 'canceled') return sum;
-    return sum + (Number(row.shortage) || 0);
-  }, 0);
-},
+    sumShortage() {
+      return Object.values(this.cashBankStart).reduce((sum, row) => {
+        if (row.type == 'canceled') return sum;
+        return sum + (Number(row.shortage) || 0);
+      }, 0);
+    },
 
- close(){
-            $('#exampleModal').click();
-        },
-   sumReceived() {
-  return Object.values(this.cashBankStart).reduce((sum, row) => {
-    if (row.type == 'canceled') return sum; // skip canceled rows
-    return sum + (Number(row.cash) || 0) + (Number(row.bank) || 0);
-  }, 0);
-},
+    close() {
+      $('#exampleModal').click();
+    },
+    sumReceived() {
+      return Object.values(this.cashBankStart).reduce((sum, row) => {
+        if (row.type == 'canceled') return sum; // skip canceled rows
+        return sum + (Number(row.cash) || 0) + (Number(row.bank) || 0);
+      }, 0);
+    },
 
     netAmount(id) {
       const row = this.cashBank[id];
@@ -1088,32 +950,32 @@ sumShortage() {
       );
     },
 
-  totalPassengers(data) {
-  const groups = data || {};
-  return Object.values(groups).reduce((sum, tickets) => {
-    // Count only tickets that are not canceled
-    const validTickets = tickets.filter(t => t.type != 'canceled');
-    return sum + validTickets.length;
-  }, 0); 
-},
+    totalPassengers(data) {
+      const groups = data || {};
+      return Object.values(groups).reduce((sum, tickets) => {
+        // Count only tickets that are not canceled
+        const validTickets = tickets.filter(t => t.type != 'canceled');
+        return sum + validTickets.length;
+      }, 0);
+    },
 
-totalCommissions(data) {
-  const groups = data || {};
-  return Object.values(groups).reduce((sum, tickets) => {
-    // Only include tickets that are not canceled
-    const validTickets = tickets.filter(t => t.type != 'canceled');
-    return sum + this.totalCommission(validTickets);
-  }, 0);
-},
+    totalCommissions(data) {
+      const groups = data || {};
+      return Object.values(groups).reduce((sum, tickets) => {
+        // Only include tickets that are not canceled
+        const validTickets = tickets.filter(t => t.type != 'canceled');
+        return sum + this.totalCommission(validTickets);
+      }, 0);
+    },
 
-grandTotalELT(data) {
-  const groups = data || {};
-  return Object.values(groups).reduce((sum, tickets) => {
-    // Only include tickets that are not canceled
-    const validTickets = tickets.filter(t => t.type != 'canceled');
-    return sum + this.totalELT(validTickets);
-  }, 0);
-},
+    grandTotalELT(data) {
+      const groups = data || {};
+      return Object.values(groups).reduce((sum, tickets) => {
+        // Only include tickets that are not canceled
+        const validTickets = tickets.filter(t => t.type != 'canceled');
+        return sum + this.totalELT(validTickets);
+      }, 0);
+    },
 
     grandTotalCancel(data) {
       const groups = data || {};
@@ -1122,14 +984,14 @@ grandTotalELT(data) {
         0
       );
     },
-sumOtherCommissions(data) {
-  const groups = data || {};
-  return Object.values(groups).reduce((sum, tickets) => {
-    // Only include tickets that are not canceled
-    const validTickets = tickets.filter(t => t.type != 'canceled');
-    return sum + this.totalOtherCommission(validTickets);
-  }, 0);
-},
+    sumOtherCommissions(data) {
+      const groups = data || {};
+      return Object.values(groups).reduce((sum, tickets) => {
+        // Only include tickets that are not canceled
+        const validTickets = tickets.filter(t => t.type != 'canceled');
+        return sum + this.totalOtherCommission(validTickets);
+      }, 0);
+    },
     totalAmounts(data) {
       const groups = data || {};
       return Object.values(groups).reduce(
@@ -1143,54 +1005,61 @@ sumOtherCommissions(data) {
         this.categories = res.data;
       }
     },
-   
-   totalCommission(list) {
-  return list.reduce((sum, t) => {
-    // 1. Check if the ticket is canceled. 
-    // If it is, skip the calculation and return the current sum.
-    if (t.type == 'canceled') {
-      return sum;
-    }
+    async fetchReportsHeaders() {
+      const res = await this.callApi("post", "reportsHeader");
 
-    // 2. Otherwise, proceed with the calculation
-    const adjPercent = Number(t.commission?.adjustment_commission || 0);
+      if (res.status == 200) {
+        this.reportsHeaders = res.data;
+      }
+    },
 
-    // Adjustment % always on seat fare (after discount)
-    const adjustment = (adjPercent / 100) * Number(t.seat_fare - t.discount);
+    totalCommission(list) {
+      return list.reduce((sum, t) => {
+        // 1. Check if the ticket is canceled. 
+        // If it is, skip the calculation and return the current sum.
+        if (t.type == 'canceled') {
+          return sum;
+        }
 
-    return sum + adjustment;
-  }, 0);
-},
+        // 2. Otherwise, proceed with the calculation
+        const adjPercent = Number(t.commission?.adjustment_commission || 0);
+
+        // Adjustment % always on seat fare (after discount)
+        const adjustment = (adjPercent / 100) * Number(t.seat_fare - t.discount);
+
+        return sum + adjustment;
+      }, 0);
+    },
     receivable(terminalId, tickets) {
       return this.totalFare(tickets) - this.totalOtherCommission(tickets);
     },
     totalOtherCommission(list) {
-  let fixCommission = 0;
+      let fixCommission = 0;
 
-  const value = list.reduce((sum, t) => {
-    // 1. Skip if ticket is canceled
-    if (t.type == 'canceled') {
-      return sum;
-    }
+      const value = list.reduce((sum, t) => {
+        // 1. Skip if ticket is canceled
+        if (t.type == 'canceled') {
+          return sum;
+        }
 
-    const fare = parseFloat(t.seat_fare || 0);
-    const discount = parseFloat(t.discount) || 0;
-    const afterDiscount = fare - discount;
+        const fare = parseFloat(t.seat_fare || 0);
+        const discount = parseFloat(t.discount) || 0;
+        const afterDiscount = fare - discount;
 
-    // Update fixCommission (only from active tickets)
-    fixCommission = parseFloat(t.commission?.fix_commission || 0);
+        // Update fixCommission (only from active tickets)
+        fixCommission = parseFloat(t.commission?.fix_commission || 0);
 
-    const flat = parseFloat(t.commission?.flat_commission || 0);
-    const percent = parseFloat(t.commission?.percentage_commission || 0);
-    
-    const flatOrPercentage = flat > 0 ? flat : (percent / 100) * afterDiscount;
+        const flat = parseFloat(t.commission?.flat_commission || 0);
+        const percent = parseFloat(t.commission?.percentage_commission || 0);
 
-    return sum + flatOrPercentage;
-  }, 0);
+        const flatOrPercentage = flat > 0 ? flat : (percent / 100) * afterDiscount;
 
-  // Round the final result
-  return Math.round(value + fixCommission);
-},
+        return sum + flatOrPercentage;
+      }, 0);
+
+      // Round the final result
+      return Math.round(value + fixCommission);
+    },
     saveRow(event, fieldName, index) {
       // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
       if (fieldName == "first") {
@@ -1228,6 +1097,8 @@ sumOtherCommissions(data) {
       this.postData.amount.splice(index, 1);
       this.postData.paid.splice(index, 1);
       this.postData.invoice.splice(index, 1);
+      this.postData.showExtra.splice(index, 1);
+      this.postData.extraCategory.splice(index, 1);
       this.loop--;
 
       // total amount sum only for show
@@ -1237,182 +1108,203 @@ sumOtherCommissions(data) {
       );
       this.netProfit = this.totalSale - this.totalAmount;
     },
+async saveHeaderLinks(ticketMergeId) {
 
-//  // ===== Merge Schedule API =====
- async mergeScheduleApi(addData = {}) {
-  const payload = {
-    ...addData,
-    routes : this.routes,
-    expenses:this.postData,
-    busIds: addData.busIds?.length ? addData.busIds : this.busIds || [],
-    mergeIds: addData.mergeIds?.length ? addData.mergeIds : this.mergeIds || [],
-  };
+  let headIds = [];
+  let values = [];
 
-
-  if (!payload.busIds.length || !payload.mergeIds.length) {
-    Swal.fire({
-      icon: "error",
-      title: "Cannot merge",
-      text: "Bus IDs or Merge IDs are empty. Fetch unclosing data first.",
-    });
-    return null;
-  }
-
-  try {
-    const res = await this.callApi(
-      "post",
-      "booking/close/schedule/closing/merge",
-      payload
-    );
-
-    if (res.status === 200 || res.status === 201) {
-      const mergedData = res.data || {};
-      this.mergedData = mergedData;
-
-      // Update stored IDs if returned
-      if (mergedData.busIds?.length) this.busIds = mergedData.busIds;
-      if (mergedData.mergeIds?.length) this.mergeIds = mergedData.mergeIds;
-
-      return mergedData;
-    } else {
-      throw new Error(`Merge failed with status ${res.status}`);
+  this.postData.showExtra.forEach((checked, index) => {
+    if (checked && this.postData.extraCategory[index]) {
+      headIds.push(this.postData.extraCategory[index]);
+      values.push(this.postData.amount[index] || 0);
     }
-  } catch (error) {
-    const errMsg =
-      error?.response?.data?.Error?.join("\n") || error.message || "Merge failed";
-    Swal.fire({ icon: "error", title: "Merge Error", text: errMsg });
-    throw new Error(errMsg);
-  }
+  });
+
+  if (!headIds.length) return;
+
+  await this.callApi("post", "reportsHeader/header/link", {
+    ticket_merge_id: ticketMergeId,
+    headIds: headIds,
+    values: values
+  });
+
 },
-
-// ===== Save Ticket Closing Shortage =====
-async saveTicketClosingShortage() {
-  this.loading = true;
-
-  try {
-    // Step 1: Merge schedules
-    const mergedResult = await this.mergeScheduleApi(this.addData);
-    // Step 2: Store merged data for the component
-    this.closingData = mergedResult;
-    
-    // Step 4: Save Start
-const mapRows = (cashBank, schedule) =>
-      Object.entries(cashBank).map(([terminalId, row]) => {
-        const tickets = schedule[terminalId] || [];
-        return {
-          terminal_id: Number(terminalId),
-          passenger_count: tickets.filter(ticket => ticket.type != 'canceled').length,
-          kt_commission: this.totalCommission(tickets),
-          elt: this.totalELT(tickets),
-          cancellation_amount: this.totalCancelAmount(tickets),
-          total_receivable: row.total + row.commission,
-          other_commission: row.commission || 0,
-          total_received_cash: row.cash,
-          bank_id: row.selectedBankId || null,
-          total_received_bank: row.bank,
-          shortage: row.shortage,
-          received: row.cash + row.bank,
-          mergeId: mergedResult.id
-        };
-      });
-
-    await this.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
-      ticket_closing_id: mergedResult.id,
-      type: "start",
-      route : this.routes.start,
-      busIds: this.busIds,
-      rows: mapRows(this.cashBankStart, this.data.schedule_start),
-    });
-
-    
-    await this.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
-      ticket_closing_id: mergedResult.id,
-      type: "return",
-      route : this.routes.return,
-      busIds: this.busIds,
-      rows: mapRows(this.cashBankReturn, this.data.schedule_return),
-    });
-
-    
-    
+    //  // ===== Merge Schedule API =====
+    async mergeScheduleApi(addData = {}) {
+      const payload = {
+        ...addData,
+        routes: this.routes,
+        expenses: this.postData,
+        busIds: addData.busIds?.length ? addData.busIds : this.busIds || [],
+        mergeIds: addData.mergeIds?.length ? addData.mergeIds : this.mergeIds || [],
+      };
 
 
-    Swal.fire({
-      icon: "success",
-      title: "Saved!",
-      text: "Ticket closing saved successfully",
-      timer: 1500,
-      showConfirmButton: false,
-    });
+      if (!payload.busIds.length || !payload.mergeIds.length) {
+        Swal.fire({
+          icon: "error",
+          title: "Cannot merge",
+          text: "Bus IDs or Merge IDs are empty. Fetch unclosing data first.",
+        });
+        return null;
+      }
 
-    this.$emit('fetchData');
+      try {
+        const res = await this.callApi(
+          "post",
+          "booking/close/schedule/closing/merge",
+          payload
+        );
 
-    this.closeexampleModal();
-  } catch (error) {
-    console.error(error);
-    Swal.fire({ icon: "error", title: "Error", text: error.message || "Failed to save ticket closing" });
-  } finally {
-    this.loading = false;
-  }
-},
+        if (res.status === 200 || res.status === 201) {
+          const mergedData = res.data || {};
+          this.mergedData = mergedData;
 
-// async saveTicketClosingShortage() {
-//   this.loading = true;
+          // Update stored IDs if returned
+          if (mergedData.busIds?.length) this.busIds = mergedData.busIds;
+          if (mergedData.mergeIds?.length) this.mergeIds = mergedData.mergeIds;
 
-//   try {
-//     // Step 1 & 2: SKIP MERGE API
-//     // We create a dummy ID so the code doesn't break
-//     const dummyId = 999; 
+          return mergedData;
+        } else {
+          throw new Error(`Merge failed with status ${res.status}`);
+        }
+      } catch (error) {
+        const errMsg =
+          error?.response?.data?.Error?.join("\n") || error.message || "Merge failed";
+        Swal.fire({ icon: "error", title: "Merge Error", text: errMsg });
+        throw new Error(errMsg);
+      }
+    },
 
-//     // Step 3: Calculation Logic
-//     const mapRows = (cashBank, schedule) =>
-//       Object.entries(cashBank).map(([terminalId, row]) => {
-//         // Filter tickets to exclude canceled ones for accuracy
-//         const allTickets = schedule[terminalId] || [];
-//         const activeTickets = allTickets.filter(t => t.type !== 'canceled');
-        
-//         return {
-//           terminal_id: Number(terminalId),
-//           passenger_count: activeTickets.length,
-//           kt_commission: this.totalCommission(allTickets), 
-//           elt: this.totalELT(allTickets),
-//           cancellation_amount: this.totalCancelAmount(allTickets),
-//           // Calculation check
-//           total_receivable: row.total + row.commission,
-//           other_commission: row.commission || 0,
-//           total_received_cash: row.cash,
-//           bank_id: row.selectedBankId || null,
-//           total_received_bank: row.bank,
-//           shortage: row.shortage,
-//           received: row.cash + row.bank,
-//           mergeId: dummyId // Using dummy ID instead of mergedResult.id
-//         };
-//       });
+    // ===== Save Ticket Closing Shortage =====
+    async saveTicketClosingShortage() {
+      this.loading = true;
 
-//     // Step 4: Prepare Payloads
-//     const startPayload = mapRows(this.cashBankStart, this.data.schedule_start);
-//     const returnPayload = mapRows(this.cashBankReturn, this.data.schedule_return);
+      try {
+        // Step 1: Merge schedules
+        const mergedResult = await this.mergeScheduleApi(this.addData);
+        // Step 2: Store merged data for the component
+        this.closingData = mergedResult;
+// save header links
+await this.saveHeaderLinks(mergedResult.id);
+        // Step 4: Save Start
+        const mapRows = (cashBank, schedule) =>
+          Object.entries(cashBank).map(([terminalId, row]) => {
+            const tickets = schedule[terminalId] || [];
+            return {
+              terminal_id: Number(terminalId),
+              passenger_count: tickets.filter(ticket => ticket.type != 'canceled').length,
+              kt_commission: this.totalCommission(tickets),
+              elt: this.totalELT(tickets),
+              cancellation_amount: this.totalCancelAmount(tickets),
+              total_receivable: row.total + row.commission,
+              other_commission: row.commission || 0,
+              total_received_cash: row.cash,
+              bank_id: row.selectedBankId || null,
+              total_received_bank: row.bank,
+              shortage: row.shortage,
+              received: row.cash + row.bank,
+              mergeId: mergedResult.id
+            };
+          });
 
-//     // LOG TO CONSOLE AS A TABLE (Easier to read than a list)
-//     console.log("--- START DATA CHECK ---");
-//     console.table(startPayload);
-    
-//     console.log("--- RETURN DATA CHECK ---");
-//     console.table(returnPayload);
+        await this.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
+          ticket_closing_id: mergedResult.id,
+          type: "start",
+          route: this.routes.start,
+          busIds: this.busIds,
+          rows: mapRows(this.cashBankStart, this.data.schedule_start),
+        });
 
-//     // Show a message to confirm it's just a check
-//     Swal.fire({
-//       icon: "info",
-//       title: "Check Mode",
-//       text: "Check the browser console (F12) to see the calculated values.",
-//     });
 
-//   } catch (error) {
-//     console.error("Error during calculation check:", error);
-//   } finally {
-//     this.loading = false;
-//   }
-// },
+        await this.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
+          ticket_closing_id: mergedResult.id,
+          type: "return",
+          route: this.routes.return,
+          busIds: this.busIds,
+          rows: mapRows(this.cashBankReturn, this.data.schedule_return),
+        });
+
+
+
+
+
+        Swal.fire({
+          icon: "success",
+          title: "Saved!",
+          text: "Ticket closing saved successfully",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+
+        this.$emit('fetchData');
+
+        this.closeexampleModal();
+      } catch (error) {
+        console.error(error);
+        Swal.fire({ icon: "error", title: "Error", text: error.message || "Failed to save ticket closing" });
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // async saveTicketClosingShortage() {
+    //   this.loading = true;
+
+    //   try {
+    //     // Step 1 & 2: SKIP MERGE API
+    //     // We create a dummy ID so the code doesn't break
+    //     const dummyId = 999; 
+
+    //     // Step 3: Calculation Logic
+    //     const mapRows = (cashBank, schedule) =>
+    //       Object.entries(cashBank).map(([terminalId, row]) => {
+    //         // Filter tickets to exclude canceled ones for accuracy
+    //         const allTickets = schedule[terminalId] || [];
+    //         const activeTickets = allTickets.filter(t => t.type !== 'canceled');
+
+    //         return {
+    //           terminal_id: Number(terminalId),
+    //           passenger_count: activeTickets.length,
+    //           kt_commission: this.totalCommission(allTickets), 
+    //           elt: this.totalELT(allTickets),
+    //           cancellation_amount: this.totalCancelAmount(allTickets),
+    //           // Calculation check
+    //           total_receivable: row.total + row.commission,
+    //           other_commission: row.commission || 0,
+    //           total_received_cash: row.cash,
+    //           bank_id: row.selectedBankId || null,
+    //           total_received_bank: row.bank,
+    //           shortage: row.shortage,
+    //           received: row.cash + row.bank,
+    //           mergeId: dummyId // Using dummy ID instead of mergedResult.id
+    //         };
+    //       });
+
+    //     // Step 4: Prepare Payloads
+    //     const startPayload = mapRows(this.cashBankStart, this.data.schedule_start);
+    //     const returnPayload = mapRows(this.cashBankReturn, this.data.schedule_return);
+
+    //     // LOG TO CONSOLE AS A TABLE (Easier to read than a list)
+    //     console.log("--- START DATA CHECK ---");
+    //     console.table(startPayload);
+
+    //     console.log("--- RETURN DATA CHECK ---");
+    //     console.table(returnPayload);
+
+    //     // Show a message to confirm it's just a check
+    //     Swal.fire({
+    //       icon: "info",
+    //       title: "Check Mode",
+    //       text: "Check the browser console (F12) to see the calculated values.",
+    //     });
+
+    //   } catch (error) {
+    //     console.error("Error during calculation check:", error);
+    //   } finally {
+    //     this.loading = false;
+    //   }
+    // },
     closeexampleModal() {
       $("#exampleModal").click();
     },
@@ -1421,21 +1313,28 @@ const mapRows = (cashBank, schedule) =>
 </script>
 <style scoped>
 .add-btn {
-  width: 164px;
+  width: 138px;
 }
+.header-td{
+      width: 200px;
+}
+
 .totals tr td {
   font-size: 18px;
   font-weight: 700;
 }
+
 .totals tr th {
   font-size: 18px;
   font-weight: 700;
 }
+
 .border-r {
   border-top: 1px solid gray;
   border-bottom: 1px solid gray;
   font-weight: bold;
 }
+
 /* Chrome, Safari, Edge, Opera */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {

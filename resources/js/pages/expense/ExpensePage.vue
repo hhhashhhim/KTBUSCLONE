@@ -178,7 +178,9 @@
             <div class="card-body">
               <div class="row">
                 <div class="col-md-12">
-                  <h5 class="text-center">{{ details?.closing?.[1]?.schedule?.route?.name || "N/A" }}</h5>
+                  <h5 class="text-center">
+                    {{ details?.closing?.[1]?.schedule?.route?.name || "N/A" }}
+                  </h5>
 
                   <table class="table table-bordered table-sm">
                     <thead>
@@ -209,11 +211,18 @@
                         <td>{{ $insertComma(item.cancellation_amount) }}</td>
                         <td>{{ $insertComma(item.total_receivable) }}</td>
                         <td>{{ $insertComma(item.other_commission) }}</td>
-                        <td>{{ $insertComma(parseFloat(item.total_receivable) - (parseFloat(item.kt_commission) +
-                          parseFloat(item.other_commission)) )}}</td>
                         <td>
-                          <input v-if="isEditing(item)" type="number" class="form-control form-control-sm"
-                            v-model.number="item.total_received_cash" />
+                          {{
+                            $insertComma(
+                              parseFloat(item.total_receivable) -
+                              (parseFloat(item.kt_commission) +
+                                parseFloat(item.other_commission))
+                            )
+                          }}
+                        </td>
+                        <td>
+                          <input v-if="isEditing(item)" type="text"  class="form-control form-control-sm"
+                            v-model.number="item.total_received_cash" @keypress="$numberValidate($event, {dot:true})" />
                           <span v-else>
                             {{ item.total_received_cash }}
                           </span>
@@ -233,7 +242,7 @@
                         </td>
 
                         <td>
-                          <input v-if="isEditing(item)" type="number" class="form-control form-control-sm"
+                          <input v-if="isEditing(item)" type="text" @keypress="$numberValidate($event, {dot:true})" class="form-control form-control-sm"
                             v-model.number="item.total_received_bank" />
                           <span v-else>
                             {{ item.total_received_bank }}
@@ -284,8 +293,12 @@
                           {{ $insertComma(startTotals.totalOtherCommission) }}
                         </td>
                         <td>
-                          {{ $insertComma(startTotals.totalReceivables - (startTotals.totalOtherCommission +
-                          startTotals.totalktCommission))
+                          {{
+                            $insertComma(
+                              startTotals.totalReceivables -
+                              (startTotals.totalOtherCommission +
+                                startTotals.totalktCommission)
+                            )
                           }}
                         </td>
                         <td>
@@ -304,7 +317,9 @@
                     </tfoot>
                   </table>
 
-                  <h5 class="text-center my-3">{{ details?.closing?.[0]?.schedule?.route?.name || "N/A" }}</h5>
+                  <h5 class="text-center my-3">
+                    {{ details?.closing?.[0]?.schedule?.route?.name || "N/A" }}
+                  </h5>
 
                   <table class="table table-bordered table-sm">
                     <thead>
@@ -335,11 +350,18 @@
                         <td>{{ $insertComma(item.cancellation_amount) }}</td>
                         <td>{{ $insertComma(item.total_receivable) }}</td>
                         <td>{{ $insertComma(item.other_commission) }}</td>
-                        <td>{{ $insertComma(parseFloat(item.total_receivable) - (parseFloat(item.kt_commission) +
-                          parseFloat(item.other_commission)) )}}</td>
+                        <td>
+                          {{
+                            $insertComma(
+                              parseFloat(item.total_receivable) -
+                              (parseFloat(item.kt_commission) +
+                                parseFloat(item.other_commission))
+                            )
+                          }}
+                        </td>
 
                         <td>
-                          <input v-if="isEditing(item)" type="number" class="form-control form-control-sm"
+                          <input v-if="isEditing(item)" type="text" @keypress="$numberValidate($event, {dot:true})" class="form-control form-control-sm"
                             v-model.number="item.total_received_cash" />
                           <span v-else>
                             {{ item.total_received_cash }}
@@ -360,7 +382,7 @@
                         </td>
 
                         <td>
-                          <input v-if="isEditing(item)" type="number" class="form-control form-control-sm"
+                          <input v-if="isEditing(item)" type="text" @keypress="$numberValidate($event, {dot:true})" class="form-control form-control-sm"
                             v-model.number="item.total_received_bank" />
                           <span v-else>
                             {{ item.total_received_bank }}
@@ -411,8 +433,13 @@
                           {{ $insertComma(returnTotals.totalOtherCommission) }}
                         </td>
                         <td>
-                          {{ $insertComma(returnTotals.totalReceivables - (returnTotals.totalOtherCommission +
-                          returnTotals.totalktCommission)) }}
+                          {{
+                            $insertComma(
+                              returnTotals.totalReceivables -
+                              (returnTotals.totalOtherCommission +
+                                returnTotals.totalktCommission)
+                            )
+                          }}
                         </td>
                         <td>
                           {{ $insertComma(returnTotals.totalReceivedCash) }}
@@ -440,61 +467,65 @@
           <div class="card p-3">
             <h5 class="text-center">Expenses</h5>
             <table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Category</th>
-      <th>Description</th>
-      <th>Total Expense Amount</th>
-      <th>Total Paid</th>
-      <th>Credit Balance</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr v-for="(i, index) in loop" :key="index">
-      <td>
-        <select class="form-control rounded-0" @change="saveRow($event, 'first', index)"
-          :value="postData.category[index]" :disabled="editAble">
-          <option value="" selected>Select Category</option>
-          <option v-for="(category, i) in categories" :value="category.id" :key="i">
-            {{ category.name }}
-          </option>
-        </select>
-      </td>
-      <td>
-        <input type="text" class="form-control" @keyup="saveRow($event, 'second', index)"
-          :value="postData.description[index]" :disabled="editAble" />
-      </td>
-      <td>
-        <input type="number" min="0" class="form-control rounded-0" v-model.number="postData.amount[index]"
-          @input="syncPaid(index)" />
-      </td>
-      <td>
-        <input type="number" min="0" class="form-control rounded-0" v-model.number="postData.paid[index]" />
-      </td>
-      <td>
-        <input type="number" class="form-control rounded-0" :value="balances[index]" readonly />
-      </td>
-      <td class="add-btn" v-if="!editAble">
-        <button class="btn btn-outline-primary mx-2" @click="addRow">Add</button>
-        <button class="btn btn-outline-danger" @click="removeRow($event, index)" v-if="loop != 1">Remove</button>
-      </td>
-      <td v-else></td>
-    </tr>
-  </tbody>
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Total Expense Amount</th>
+                  <th>Total Paid</th>
+                  <th>Credit Balance</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(i, index) in loop" :key="index">
+                  <td>
+                    <select class="form-control rounded-0" @change="saveRow($event, 'first', index)"
+                      :value="postData.category[index]" :disabled="editAble">
+                      <option value="" selected>Select Category</option>
+                      <option v-for="(category, i) in categories" :value="category.id" :key="i">
+                        {{ category.name }}
+                      </option>
+                    </select>
+                  </td>
+                  <td>
+                    <input type="text" class="form-control" @keyup="saveRow($event, 'second', index)"
+                      :value="postData.description[index]" :disabled="editAble" />
+                  </td>
+                  <td>
+                    <input type="text" @keypress="$numberValidate($event, {dot:true})" min="0" class="form-control rounded-0" v-model.number="postData.amount[index]"
+                      @input="syncPaid(index)" />
+                  </td>
+                  <td>
+                    <input type="text" @keypress="$numberValidate($event, {dot:true})" min="0" class="form-control rounded-0" v-model.number="postData.paid[index]" />
+                  </td>
+                  <td>
+                    <input type="text" @keypress="$numberValidate($event, {dot:true})" class="form-control rounded-0" :value="balances[index]" readonly />
+                  </td>
+                  <td class="add-btn" v-if="!editAble">
+                    <button class="btn btn-outline-primary mx-2" @click="addRow">
+                      Add
+                    </button>
+                    <button class="btn btn-outline-danger" @click="removeRow($event, index)" v-if="loop != 1">
+                      Remove
+                    </button>
+                  </td>
+                  <td v-else></td>
+                </tr>
+              </tbody>
 
-  <!-- Footer with sums -->
-  <tfoot>
-    <tr>
-      <th colspan="2">Total</th>
-    <th>{{ $insertComma(totalAmount) }}</th>
-<th>{{ $insertComma(totalPaid) }}</th>
-<th>{{ $insertComma(totalBalance) }}</th>
+              <!-- Footer with sums -->
+              <tfoot>
+                <tr>
+                  <th colspan="2">Total</th>
+                  <th>{{ $insertComma(totalAmount) }}</th>
+                  <th>{{ $insertComma(totalPaid) }}</th>
+                  <th>{{ $insertComma(totalBalance) }}</th>
 
-      <th></th>
-    </tr>
-  </tfoot>
-</table>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
 
             <div class="d-flex justify-content-end">
               <div v-if="totalShortage == 0">
@@ -517,12 +548,63 @@
               </button>
             </div>
           </div>
+          <div class="card">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped" id="expense_table">
+                  <thead>
+                    <tr>
+                      <th>Header</th>
+                      <th>Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, index) in expenseHeader" :key="index">
+                      <td>
+                        <select class="form-control" v-model="expensePostData.headIds[index]"
+                          @change="expenseSaveRow($event.target.value, 'first', index)">
+                          <option v-for="opt in allHeaderOptions" :key="opt.id" :value="opt.id">
+                            {{ opt.name }}
+                          </option>
+                        </select>
+                      </td>
+                      <td>
+                        <input type="text" @keypress="$numberValidate($event, {dot:true})" class="form-control" v-model.number="expensePostData.values[index]"
+                          :disabled="expenseEditAble" @input="expenseSaveRow($event.target.value, 'second', index)" />
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th class="text-right">Total Amount:</th>
+                      <th>{{ calculatedTotalAmount }}</th>
+                    </tr>
+                  </tfoot>
+                </table>
+
+                <div class="d-flex justify-content-end mt-3">
+                  <button v-if="!expenseEditAble" type="button" class="btn btn-outline-success mr-4" @click="expenseAdd"
+                    :disabled="loading">
+                    {{ loading ? "Saving..." : "Save" }}
+                  </button>
+                  <button v-else type="button" class="btn btn-outline-secondary mr-4" @click="expenseEditAble = false"
+                    :disabled="loading">
+                    Edit
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
+      <form :action="$store.state.api_url + 'api/web/v1/print/pdf/daily/summary/report'" method="POST"
+        ref="refDailySummaryReport" target="_blank">
+        <input type="hidden" name="token" :value="this.$store.state.token" />
+        <input type="hidden" name="ticket_merge_id" :value="this.expensePostData.ticket_merge_id" />
+      </form>
       <!--Daily Summery Report Form-->
-      <form :action="$store.state.api_url + 'api/web/v1/print/pdf/daily/summary/report'
-        " method="POST" ref="refDailySummaryReport" target="_blank">
+      <form :action="$store.state.api_url + 'api/web/v1/print/pdf/daily/summary/report'" method="POST"
+        ref="refDailySummaryReport" target="_blank">
         <input type="hidden" name="token" :value="this.$store.state.token" />
         <input type="hidden" name="ticket_merge_id" :value="this.postData.ticket_merge_id" />
       </form>
@@ -549,8 +631,8 @@
                     </button>
                   </div>
                   <p class="font-weight-bold">
-                    You can't edit this once you close the summary. Do you want
-                    to procceed ?
+                    You can't edit this once you close the summary. Do you want to
+                    procceed ?
                   </p>
                 </div>
               </div>
@@ -595,9 +677,7 @@ export default {
   },
   data() {
     return {
-      csrf: document
-        .querySelector('meta[name="csrf-token"]')
-        .getAttribute("content"),
+      csrf: document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
       validationErrors: [],
       editAble: true,
       categories: [],
@@ -634,6 +714,15 @@ export default {
         schedule: "",
         departure_time: "",
       },
+      expenseEditAble: true,
+      expenseHeader: [],
+      loading: false,
+      totalAmount: 0,
+      expensePostData: {
+        ticket_merge_id: this.$route.params.id,
+        expenseHeadIds: [],
+        values: [],
+      },
     };
   },
   async created() {
@@ -647,11 +736,18 @@ export default {
       window.removeEventListener("keydown", this.altM);
     }
     this.postData.ticket_merge_id = this.$route.params.id;
+    this.expensePostData.ticket_merge_id = this.$route.params.id;
+    await this.fetchExpenseData();
+
+    // Initialize DataTable after DOM renders
+    setTimeout(() => {
+      if ($("#expense_table").length) {
+        $("#expense_table").DataTable();
+      }
+    }, 300);
     this.fetchData();
     this.existingExpenses();
-    setTimeout(function () {
-      $("#expense_table").DataTable();
-    }, 300);
+
     // total amount sum only for show
     this.totalAmount = this.postData.amount.reduce(
       (a, b) => parseFloat(a) + parseFloat(b),
@@ -660,6 +756,93 @@ export default {
   },
 
   methods: {
+    initDataTable() {
+      this.$nextTick(() => {
+        // Ensure jQuery and DataTable plugin are available
+        if (window.$ && $.fn.DataTable) {
+          if ($.fn.DataTable.isDataTable("#expense_table")) {
+            $("#expense_table").DataTable().destroy();
+          }
+          $("#expense_table").DataTable({
+            paging: false,
+            searching: false,
+            info: false,
+          });
+        }
+      });
+    },
+
+    async fetchExpenseData() {
+      this.isLoading = true; // Start loading
+      try {
+        const res = await this.callApi("post", "reportsHeader/link/get", {
+          ticket_merge_id: this.expensePostData.ticket_merge_id,
+        });
+
+        if (res.status === 200 && res.data) {
+          this.allHeaderOptions = res.data.headers || [];
+          this.expenseHeader = res.data.headers || [];
+
+          const headIds = [];
+          const values = [];
+
+          this.expenseHeader.forEach((header, index) => {
+            headIds[index] = header.id;
+            const matchingLink = res.data.links.find(
+              (link) => link.header_id === header.id
+            );
+            values[index] = matchingLink ? parseFloat(matchingLink.value) : 0;
+          });
+
+          this.expensePostData.headIds = headIds;
+          this.expensePostData.values = values;
+
+          this.initDataTable();
+        }
+      } catch (error) {
+        console.error("Failed to fetch expense data", error);
+      } finally {
+        this.isLoading = false; // Stop loading
+      }
+    },
+
+    async expenseAdd() {
+      this.isLoading = true; // Trigger loader after clicking save
+      try {
+        const res = await this.callApi(
+          "post",
+          "reportsHeader/link",
+          this.expensePostData
+        );
+
+        if (res.status === 200) {
+          swal({
+            title: "Success",
+            text: "Header Saved",
+            icon: "success",
+            timer: 2000,
+          });
+
+          this.expenseEditAble = true;
+          // fetchExpenseData also sets isLoading, providing a smooth transition
+          await this.fetchExpenseData();
+        }
+      } catch (err) {
+        console.error("Save error", err);
+        this.isLoading = false;
+      }
+      // No window.close() here as requested
+    },
+
+    expenseSaveRow(value, fieldName, index) {
+      if (fieldName == "first") {
+        // Adjusted to use headIds to match your Laravel controller
+        this.expensePostData.headIds[index] = value;
+      }
+      if (fieldName == "second") {
+        this.expensePostData.values[index] = parseFloat(value != "" ? value : 0);
+      }
+    },
 
     printInvoice(type) {
       const invoiceType = type == "departure" ? 0 : 1; // 'departure' or 'return'
@@ -675,16 +858,12 @@ export default {
       });
     },
     async getBusInvoice() {
-      const resCheckedBus = await this.callApi(
-        "post",
-        "booking/check/bus/assigned",
-        {
-          scheduleId: this.details.closing[0].schedule_id,
-          date: this.details.closing[0].schedule_date,
-          departureCity: this.details.closing[0].schedule_start,
-          destinationCity: this.details.closing[0].schedule_end,
-        }
-      );
+      const resCheckedBus = await this.callApi("post", "booking/check/bus/assigned", {
+        scheduleId: this.details.closing[0].schedule_id,
+        date: this.details.closing[0].schedule_date,
+        departureCity: this.details.closing[0].schedule_start,
+        destinationCity: this.details.closing[0].schedule_end,
+      });
 
       if (resCheckedBus.status == 200) {
       } else {
@@ -835,48 +1014,47 @@ export default {
       );
       this.netProfit = this.totalSale - this.totalAmount;
     },
-  async print() {
-  // Show loader
-  this.loading = true;
+    async print() {
+      // Show loader
+      this.loading = true;
 
-  // Validation for empty data
-  if (
-    !this.postData.ticket_merge_id ||
-    this.postData.category.length === 0 ||
-    this.postData.description.length === 0 ||
-    this.postData.amount.length === 0
-  ) {
-    this.loading = false; // hide loader if validation fails
-    return;
-  }
+      // Validation for empty data
+      if (
+        !this.postData.ticket_merge_id ||
+        this.postData.category.length === 0 ||
+        this.postData.description.length === 0 ||
+        this.postData.amount.length === 0
+      ) {
+        this.loading = false; // hide loader if validation fails
+        return;
+      }
 
-  // Check if any index is empty or null in object
-  for (let i = 0; i < this.postData.category.length; i++) {
-    if (
-      !this.postData.category[i] ||
-      !this.postData.description[i] ||
-      !this.postData.amount[i]
-    ) {
-      this.loading = false; // hide loader if validation fails
-      return;
-    }
-  }
+      // Check if any index is empty or null in object
+      for (let i = 0; i < this.postData.category.length; i++) {
+        if (
+          !this.postData.category[i] ||
+          !this.postData.description[i] ||
+          !this.postData.amount[i]
+        ) {
+          this.loading = false; // hide loader if validation fails
+          return;
+        }
+      }
 
-  try {
-    if (this.$refs.refDailySummaryReport) {
-      this.$refs.refDailySummaryReport.submit();
-    }
+      try {
+        if (this.$refs.refDailySummaryReport) {
+          this.$refs.refDailySummaryReport.submit();
+        }
 
-    // Optional: hide loader after a short delay if needed
-    setTimeout(() => {
-      this.loading = false;
-    }, 1000);
-
-  } catch (error) {
-    console.error("Print error:", error);
-    this.loading = false; // hide loader on error
-  }
-},
+        // Optional: hide loader after a short delay if needed
+        setTimeout(() => {
+          this.loading = false;
+        }, 1000);
+      } catch (error) {
+        console.error("Print error:", error);
+        this.loading = false; // hide loader on error
+      }
+    },
     async add() {
       // validation for empty data
       if (
@@ -1010,18 +1188,18 @@ export default {
     },
   },
   computed: {
-  totalAmount() {
-    return this.postData.amount.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
-  },
-  totalPaid() {
-    return this.postData.paid.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
-  },
-  totalBalance() {
-    return this.postData.amount.reduce((sum, val, index) => {
-      let paid = parseFloat(this.postData.paid[index] || 0);
-      return sum + (parseFloat(val) - paid);
-    }, 0);
-  },
+    totalAmount() {
+      return this.postData.amount.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+    },
+    totalPaid() {
+      return this.postData.paid.reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+    },
+    totalBalance() {
+      return this.postData.amount.reduce((sum, val, index) => {
+        let paid = parseFloat(this.postData.paid[index] || 0);
+        return sum + (parseFloat(val) - paid);
+      }, 0);
+    },
     ...mapGetters(["getDeletingObj"]),
 
     startShortages() {
@@ -1058,10 +1236,7 @@ export default {
       const shortages = this.shortages || [];
       if (shortages.length === 0) return 0;
 
-      return shortages.reduce(
-        (sum, item) => sum + Number(item.shortage ?? 0),
-        0
-      );
+      return shortages.reduce((sum, item) => sum + Number(item.shortage ?? 0), 0);
     },
     balances() {
       return this.postData.amount.map((amt, index) => {
@@ -1105,10 +1280,7 @@ export default {
       );
       // console.log(totalExpenses);
 
-      return (
-        totalReceivable -
-        (totalKtCommission + totalOtherCommission + totalExpenses)
-      );
+      return totalReceivable - (totalKtCommission + totalOtherCommission + totalExpenses);
     },
 
     startTotals() {
@@ -1121,10 +1293,7 @@ export default {
           (sum, i) => sum + Number(i.kt_commission ?? 0),
           0
         ),
-        totalELT: this.startShortages.reduce(
-          (sum, i) => sum + Number(i.elt ?? 0),
-          0
-        ),
+        totalELT: this.startShortages.reduce((sum, i) => sum + Number(i.elt ?? 0), 0),
         totalCancellationAmount: this.startShortages.reduce(
           (sum, i) => sum + Number(i.cancellation_amount ?? 0),
           0
@@ -1166,10 +1335,7 @@ export default {
           (sum, i) => sum + Number(i.kt_commission ?? 0),
           0
         ),
-        totalELT: this.returnShortages.reduce(
-          (sum, i) => sum + Number(i.elt ?? 0),
-          0
-        ),
+        totalELT: this.returnShortages.reduce((sum, i) => sum + Number(i.elt ?? 0), 0),
         totalCancellationAmount: this.returnShortages.reduce(
           (sum, i) => sum + Number(i.cancellation_amount ?? 0),
           0
@@ -1200,6 +1366,12 @@ export default {
         ),
       };
     },
+    calculatedTotalAmount() {
+      return this.expensePostData.values.reduce((acc, val) => {
+        const num = parseFloat(val) || 0;
+        return acc + num;
+      }, 0);
+    },
   },
 
   watch: {
@@ -1208,6 +1380,14 @@ export default {
         this.cities.splice(obj.index, 1);
         $("#expense_table").DataTable().destroy();
         this.fetchData();
+        this.existingExpenses();
+      }
+    },
+    getDeletingObj(obj) {
+      if (obj.isDeleted) {
+        this.cities.splice(obj.index, 1);
+        $("#header_table").DataTable().destroy();
+        this.fetchExpenseData();
         this.existingExpenses();
       }
     },
@@ -1404,7 +1584,6 @@ export default {
   box-shadow: none !important;
   transform: none;
 }
-
 
 .btn-loading {
   display: inline-flex;

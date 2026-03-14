@@ -99,6 +99,7 @@
                                                                 <th>Terminal Commission</th>
                                                                 <th>Fixed Commission</th>
                                                                 <th>Total Commission</th>
+                                                                <th>Net Cash</th>
                                                             </tr>
                                                             </thead>
 
@@ -114,6 +115,7 @@
                                                                 <td>{{ data.terminal_commission }}</td>
                                                                 <td>{{ data.fix_commission }}</td>
                                                                 <td>{{ parseInt(data.terminal_commission) + parseInt(data.fix_commission) }}</td>
+                                                                <td>{{ data.net_cash }}</td>
                                                             </tr>
                                                             <tr>
                                                                 <th colspan="3"></th>
