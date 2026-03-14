@@ -79842,12 +79842,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return $options.saveRow($event, 'second', index);
       },
       value: $data.postData.description[index],
-      disabled: _ctx.editAble,
-      onKeypress: _cache[7] || (_cache[7] = function ($event) {
-        return _ctx.$numberValidate($event, {
-          dot: true
-        });
-      })
+      disabled: _ctx.editAble
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
     , _hoisted_48)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Total Expense "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -79860,7 +79855,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onInput: function onInput($event) {
         return $options.syncPaid(index);
       },
-      onKeypress: _cache[8] || (_cache[8] = function ($event) {
+      onKeypress: _cache[7] || (_cache[7] = function ($event) {
         return _ctx.$numberValidate($event, {
           dot: true
         });
@@ -79876,7 +79871,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return $data.postData.paid[index] = $event;
       },
-      onKeypress: _cache[9] || (_cache[9] = function ($event) {
+      onKeypress: _cache[8] || (_cache[8] = function ($event) {
         return _ctx.$numberValidate($event, {
           dot: true
         });
@@ -79894,7 +79889,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* PROPS */
     , _hoisted_51)]), !_ctx.editAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
       "class": "btn btn-outline-primary mx-2",
-      onClick: _cache[10] || (_cache[10] = function () {
+      onClick: _cache[9] || (_cache[9] = function () {
         return $options.addRow && $options.addRow.apply($options, arguments);
       })
     }, _hoisted_54), $data.loop != 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
@@ -79975,13 +79970,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     type: "button",
     "class": "btn btn-secondary",
     "data-bs-dismiss": "modal",
-    onClick: _cache[11] || (_cache[11] = function ($event) {
+    onClick: _cache[10] || (_cache[10] = function ($event) {
       return $options.close();
     })
   }, " Close "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-primary d-flex align-items-center",
-    onClick: _cache[12] || (_cache[12] = function () {
+    onClick: _cache[11] || (_cache[11] = function () {
       return $options.saveTicketClosingShortage && $options.saveTicketClosingShortage.apply($options, arguments);
     }),
     disabled: $data.loading

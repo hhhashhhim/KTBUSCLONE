@@ -275,7 +275,7 @@
                         </td>
                         <td>
                           <input type="text" class="form-control" @keyup="saveRow($event, 'second', index)"
-                            :value="postData.description[index]" :disabled="editAble" @keypress="$numberValidate($event, {dot:true})" />
+                            :value="postData.description[index]" :disabled="editAble"  />
                         </td>
                         <td>
                           <!-- Total Expense -->
