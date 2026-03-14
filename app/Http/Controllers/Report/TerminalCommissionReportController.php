@@ -74,46 +74,60 @@ class TerminalCommissionReportController extends Controller
         $tickets = $tickets->whereBetween('schedule_date_time', [date("Y-m-d H:i:s",strtotime($request->fromDateTime)), date("Y-m-d H:i:s",strtotime($request->toDateTime))])->groupBy(['schedule_date_time','terminal_id']); 
 
         $sortData = [];
-        foreach ($tickets as $time) {
-            foreach ($time as $inner) {
-                $terminalComm = 0;
-                $fixedComm = 0;
-                $terminalCommission = TerminalCommission::where(["terminal_id"=>$inner[0]->terminal_id,"route_id"=>$inner[0]->route_id,"company_id"=>Auth::user()->company_id])->first();
-                if($terminalCommission)
-                {   
-                    if($terminalCommission->flat_commission == 0)
-                        $terminalComm = (($inner->sum('seat_fare') - $inner->sum('discount'))/100)*$terminalCommission->percentage_commission;
-                    else
-                    {
-                        $terminalComm = $inner->count()*$terminalCommission->flat_commission;
-                    }
+       foreach ($tickets as $time) {
+    foreach ($time as $inner) {
+        $terminalComm = 0;
+        $fixedComm = 0;
 
-                    $fixedComm = $terminalCommission->fix_commission??0;
-                }
-                
-                $single = [];
-                $single['bus_number'] = $inner[0]->bus->bus_number??'N/A';
-                $single['bus_class'] = $inner[0]->busClass->name;
-                $single['seats'] = $inner->count();
-                $single['terminal'] = $inner[0]->terminal->name;
-                $single['fix_commission'] = intVal($fixedComm);
-                $single['terminal_commission'] = intVal($terminalComm);
-                $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
-                $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
-                $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
-                $eltSum = 0;
-                foreach ($inner as $tkt) {
-                    if ($tkt->ticketElt) {
-                        $eltSum += $tkt->ticketElt->elt_price;
-                    } else {
-                        $eltSum += 0;
-                    }
+        $terminalCommission = TerminalCommission::where([
+            "terminal_id" => $inner[0]->terminal_id,
+            "route_id" => $inner[0]->route_id,
+            "company_id" => Auth::user()->company_id
+        ])->first();
 
-                }
-                $single['elt'] = $eltSum;
-                array_push($sortData, $single);
+        if ($terminalCommission) {   
+            if ($terminalCommission->flat_commission == 0) {
+                $terminalComm = (($inner->sum('seat_fare') - $inner->sum('discount')) / 100) * $terminalCommission->percentage_commission;
+            } else {
+                $terminalComm = $inner->count() * $terminalCommission->flat_commission;
+            }
+
+            $fixedComm = $terminalCommission->fix_commission ?? 0;
+        }
+
+        $sales = $inner->sum('seat_fare') - $inner->sum('discount');
+
+        // Calculate total refund for this group (if you have refund field in Ticket model)
+        $refund = $inner->sum('refund_amount') ?? 0;
+
+        $single = [];
+        $single['bus_number'] = $inner[0]->bus->bus_number ?? 'N/A';
+        $single['bus_class'] = $inner[0]->busClass->name;
+        $single['seats'] = $inner->count();
+        $single['terminal'] = $inner[0]->terminal->name;
+        $single['fix_commission'] = intVal($fixedComm);
+        $single['terminal_commission'] = intVal($terminalComm);
+        $single['sales'] = $sales;
+        $single['refund'] = $refund;
+
+        // Net Cash = Sale + Refund - (Terminal Commission + Fix Commission)
+        $single['net_cash'] = $sales  - ($terminalComm + $fixedComm);
+
+        $single['date'] = date("Y-m-d", strtotime($inner[0]->schedule_date_time));
+        $single['time'] = date("h:i A", strtotime($inner[0]->schedule_date_time));
+
+        // ELT sum
+        $eltSum = 0;
+        foreach ($inner as $tkt) {
+            if ($tkt->ticketElt) {
+                $eltSum += $tkt->ticketElt->elt_price;
             }
         }
+        $single['elt'] = $eltSum;
+
+        array_push($sortData, $single);
+    }
+}
             
         return [
             'record' => $sortData,

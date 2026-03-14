@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ur">
+<html lang="ur" dir="rtl">
 
 <head>
     <style>
@@ -10,11 +10,12 @@
         }
 
         body {
+            direction: rtl; /* Added for Urdu alignment */
             height: 10%;
             overflow: scroll;
             margin: 40px 30px 40px 30px;
             font-size: 6pt;
-            font-family: Verdana, Arial, sans-serif;
+            font-family: 'Noori Nastaleeq', Verdana, Arial, sans-serif; /* Added common Urdu font hint */
         }
 
         .companyName {
@@ -23,7 +24,6 @@
             text-transform: uppercase;
             margin-top: -15px;
             text-align: center;
-            font-family: sans-serif, Verdana, Arial;
         }
 
         table {
@@ -31,6 +31,7 @@
             font-size: 10pt !important;
             border-collapse: collapse;
             width: 100% !important;
+            text-align: center;
         }
 
         .text-center {
@@ -49,11 +50,19 @@
         }
 
         .summary-box {
-            float: left; /* Adjusted for RTL layout flow */
+            float: left; /* Swapped for RTL */
             width: 250px;
             border: 2px solid black;
             padding: 10px;
             background-color: #f9f9f9;
+        }
+
+        .summary-box-left {
+            float: right; /* Swapped for RTL */
+            width: 250px;
+            border: 2px solid black;
+            padding: 10px;
+            background-color: #ffffff;
         }
 
         .summary-row {
@@ -62,6 +71,7 @@
             padding: 3px 0;
             font-size: 11pt;
             border-bottom: 1px dotted #ccc;
+            flex-direction: row-reverse; /* Ensures numbers stay right and text left in RTL flex */
         }
 
         .summary-row:last-child {
@@ -72,35 +82,17 @@
             border-top: 2px solid black;
         }
 
-        /* Clearfix for the float */
         .clearfix::after {
             content: "";
             clear: both;
             display: table;
         }
 
-        .summary-box-left {
-            float: right; /* Adjusted for RTL layout flow */
-            width: 250px;
-            border: 2px solid black;
-            padding: 10px;
-            background-color: #ffffff;
-        }
-
-        /* Maintain the existing summary-row styles for consistency */
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 3px 0;
-            font-size: 11pt;
-            border-bottom: 1px dotted #ccc;
-        }
-
         .summary-row span {
             font-size: 12px !important;
         }
     </style>
-    <title>ڈیلی سمری رپورٹ</title>
+    <title>روزانہ سمری رپورٹ</title>
 </head>
 
 <body>
@@ -108,7 +100,12 @@
     <div style="border: 2px solid black; padding: 15px 3px 5px 3px !important;">
         <div id="info">
             <div class="companyName">
-                <span>کلوزنگ سمری برائے {{ date('d-M-Y', strtotime($data['closing_date'])) }}</span>
+                <span>
+                    کلوزنگ سمری 
+                    ({{ date('d M Y', strtotime($data['closing_from_date'])) }}
+                    تا 
+                    {{ date('d M Y', strtotime($data['closing_to_date'])) }})
+                </span>
             </div>
         </div>
         <br>
@@ -119,15 +116,15 @@
                     <th>سیریل نمبر</th>
                     <th>بس نمبر</th>
                     <th>روٹ</th>
-                    <th>فروخت</th>
+                    <th>سیل (فروخت)</th>
                     <th>اخراجات</th>
-                    <th>خالص فروخت</th>
+                    <th>نیٹ سیل</th>
                     <th>بینک وصولی</th>
-                    {{-- Dynamic Headers for Portals --}}
+                    {{-- Dynamic Headers --}}
                     @foreach ($data['dynamicTypes'] as $type)
                     <th>{{ $type }}</th>
                     @endforeach
-                    <th>خالص کیش</th>
+                    <th>نیٹ کیش</th>
                 </tr>
             </thead>
             <tbody>
@@ -136,12 +133,10 @@
                         <td class="text-center">{{ $key + 1 }}</td>
                         <td>{{ $item['bus_no'] }}</td>
                         <td>{{ $item['route'] }}</td>
-
                         <td>{{ number_format($item['sale']) }}</td>
                         <td>{{ number_format($item['expense']) }}</td>
                         <td>{{ number_format($item['net_sale']) }}</td>
                         <td>{{ number_format($item['total_received_bank']) }}</td>
-                        {{-- Dynamic Values for Portals --}}
                         @foreach ($data['dynamicTypes'] as $type)
                         <td class="text-center">
                             {{ number_format($item['types'][$type] ?? 0) }}
@@ -153,14 +148,12 @@
             </tbody>
             <tfoot>
                 <tr style="font-weight: bold;">
-                    <td colspan="2" class="text-center">ٹوٹل</td>
+                    <td colspan="2" class="text-center">کل ٹوٹل</td>
                     <td></td>
-
                     <td>{{ number_format($data['merges']->sum('sale')) }}</td>
                     <td>{{ number_format($data['merges']->sum('expense')) }}</td>
                     <td>{{ number_format($data['merges']->sum('net_sale')) }}</td>
                     <td>{{ number_format($data['merges']->sum('total_received_bank')) }}</td>
-                    {{-- Dynamic Totals for Portals --}}
                     @foreach ($data['dynamicTypes'] as $type)
                         <td>
                             {{ number_format($data['merges']->sum(fn($m) => $m['types'][$type] ?? 0)) }}
@@ -170,10 +163,11 @@
                 </tr>
             </tfoot>
         </table>
+
         <div class="summary-wrapper clearfix">
             <div class="summary-box-left">
                 <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
-                    کل کریڈٹ اخراجات
+                    کل ادھار اخراجات (Credit)
                 </div>
 
                 @php
@@ -189,22 +183,20 @@
                     </div>
                 @endforeach
 
-
-                {{-- Total Row --}}
                 <div class="summary-row"
                     style="border-top: 2px solid black; font-weight: bold; margin-top: 5px; background-color: #f2f2f2;">
-                    <span>ٹوٹل کریڈٹ:</span>
+                    <span>ٹوٹل ادھار:</span>
                     <span>{{ number_format($data['expenses']->sum('amount')) }}</span>
                 </div>
-
             </div>
+
             <div class="summary-box">
                 <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
                     گرینڈ سمری
                 </div>
 
                 <div class="summary-row">
-                    <span>ٹوٹل گراس فروخت:</span>
+                    <span>ٹوٹل گراس سیل:</span>
                     <span>{{ number_format($data['merges']->sum('sale')) }}</span>
                 </div>
 
@@ -214,9 +206,10 @@
                 </div>
 
                 <div class="summary-row">
-                    <span>خالص فروخت:</span>
+                    <span>نیٹ سیل:</span>
                     <span>{{ number_format($data['merges']->sum('net_sale')) }}</span>
                 </div>
+
                 <div class="summary-row">
                     <span>جنرل اخراجات:</span>
                     <span style="color: red;">- {{ number_format($data['totalCounterExpense']) }}</span>
@@ -229,30 +222,35 @@
                             {{ number_format($data['merges']->sum(fn($m) => $m['types'][$type] ?? 0)) }}</span>
                     </div>
                 @endforeach
+
                 <div class="summary-row" style="background-color: #eee;">
                     <span>بینک کیش:</span>
                     <span style="color: red;">- {{ number_format($data['totalReceivedBank']) }}</span>
                 </div>
+
                 <div class="summary-row"
                     style="border-top: 2px solid black; font-weight: bold; margin-top: 5px; background-color: #f2f2f2;">
-                    <span>ٹوٹل کریڈٹ:</span> 
+                    <span>ٹوٹل ادھار:</span> 
                     <span>{{ number_format($data['expenses']->sum('amount')) }}</span>
                 </div>
+
                 <div class="summary-row" style="background-color: #eee;">
                     <span>نیٹ کیش:</span>
                     <span>{{ number_format($data['merges']->sum('net_cash') - ($data['totalCounterExpense'] + $data['totalReceivedBank'])) }}</span>
                 </div>
 
                 <div class="summary-row" style="background-color: #eee;">
-                    <span>KT کمیشن:</span>
+                    <span>کمیشن (KT):</span>
                     <span>{{ number_format($data['totalKtCommission']) }}</span>
                 </div>
+
                 <div class="summary-row" style="background-color: #eee;">
                     <span>دیگر کمیشن:</span>
                     <span> {{ number_format($data['totalCounterIncome']) }}</span>
                 </div>
+
                 <div class="summary-row" style="background-color: #eee;">
-                    <span>خالص واجب الادا:</span>
+                    <span>نیٹ واجب الادا (Payable):</span>
                     @php
                         $expenses = $data['expenses']->sum('amount');
                         $mergesMinusCounter =
@@ -261,22 +259,16 @@
                             $data['totalCounterExpense'] -
                             $data['totalReceivedBank'];
 
-                        $total =
-                            $mergesMinusCounter >= 0
+                        $total = $mergesMinusCounter >= 0
                                 ? $expenses + $mergesMinusCounter
                                 : $expenses - abs($mergesMinusCounter);
                     @endphp
-
-
                     <span>
                         {{ number_format($total + $data['totalKtCommission']) }}
                     </span>
-
                 </div>
             </div>
         </div>
     </div>
-
 </body>
-
 </html>

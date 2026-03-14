@@ -21,7 +21,7 @@ class ReportsHeaderController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         return ReportsHeader::with('addedBy')->where('company_id', Auth::user()->company_id)->get();
-    }
+    } 
 
     public function store(Request $request)
     {
@@ -124,6 +124,39 @@ class ReportsHeaderController extends Controller
     }
 
     public function headerLink(Request $request)
+    {
+        if(!checkForSubmenu("report-header"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        // try {
+           DB::beginTransaction();
+    ReportHeaderLink::where("ticket_merge_id", $request->ticket_merge_id)->delete();
+    $headIds = $request->headIds ?? []; 
+    $values = $request->values ?? [];
+               foreach ($headIds as $key => $value) {
+        ReportHeaderLink::create([
+            'ticket_merge_id' => $request->ticket_merge_id,
+            'header_id' => $value, // Use $value directly from the foreach
+            'value' => $values[$key] ?? 0, // Safety fallback to 0
+            'company_id' => Auth::user()->company_id,
+            'added_by' => Auth::user()->id,
+        ]);
+    }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | linked report header",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
+                DB::commit();
+            // } catch (\Exception $e) {
+            //     DB::rollBack();
+            //     Log::error('Database transaction error: ' . $e->getMessage());
+            //     return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            // }
+    }
+    public function headerMergeLink(Request $request)
     {
         if(!checkForSubmenu("report-header"))
         {

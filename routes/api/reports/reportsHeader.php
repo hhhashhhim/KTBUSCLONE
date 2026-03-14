@@ -9,5 +9,6 @@ Route::group(['prefix' => 'web/v1/reportsHeader','middleware' => ['auth:sanctum'
     Route::post('/store', [ReportsHeaderController::class, 'store']);
     Route::post('/update', [ReportsHeaderController::class, 'update']);
     Route::post('/link', [ReportsHeaderController::class, 'headerLink']);
+    Route::post('/header/link', [ReportsHeaderController::class, 'headerMergeLink']);
     Route::post('/link/get', [ReportsHeaderController::class, 'linkGet']);
 });

@@ -436,8 +436,9 @@ if (is_array($request->send_message)) {
                 'discount',
                 'seat_no',
                 'customer_id',
-                'route_id',
-                'type'
+                'route_id',  
+                'type',
+                'transaction_id', 
             ])
             ->where('company_id', Auth::user()->company_id)
             ->where(function ($query) {

@@ -1030,12 +1030,16 @@ class ScheduleClosingController extends Controller
     public function mergesUrduPdf(Request $request)
     {
 
+
         if (!checkForSubmenu("merges")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
 
         $user = Auth::user();
-        $merges = TicketClosingMerge::where(function ($q) use ($request) {
+        $merges = TicketClosingMerge::where([
+            'company_id' => $user->company_id,
+            'schedule_complete' => 1
+        ])->where(function ($q) use ($request) {
             if ($request->bus_number) {
                 $q->where('bus_id', $request->bus_number);
             }
@@ -1045,8 +1049,12 @@ class ScheduleClosingController extends Controller
             if ($request->to_date) {
                 $q->whereDate('schedule_departure_date', '<=', $request->to_date);
             }
-            if ($request->closing_date) {
-                $q->whereDate('closing_date', $request->closing_date);
+            if ($request->closing_from_date) {
+                $q->whereDate('closing_date', '>=', $request->closing_from_date);
+            }
+
+            if ($request->closing_to_date) {
+                $q->whereDate('closing_date', '<=', $request->closing_to_date);
             }
         })
             // Schedule Name Start
@@ -1138,10 +1146,30 @@ class ScheduleClosingController extends Controller
             })
             ->get();
         $merge = TicketClosingMerge::whereIn('id', $merges)->first();
-        $totalCounterExpense = CounterExpense::whereDate('date', $merge->closing_date)
+        $totalCounterExpense = CounterExpense::where(function ($q) use ($request) {
+
+            if ($request->closing_from_date) {
+                $q->whereDate('date', '>=', $request->closing_from_date);
+            }
+
+            if ($request->closing_to_date) {
+                $q->whereDate('date', '<=', $request->closing_to_date);
+            }
+        })
             ->where('type', 'expense')
             ->sum('total');
-        $totalCounterIncome = CounterExpense::whereDate('date', $merge->closing_date)
+
+
+        $totalCounterIncome = CounterExpense::where(function ($q) use ($request) {
+
+            if ($request->closing_from_date) {
+                $q->whereDate('date', '>=', $request->closing_from_date);
+            }
+
+            if ($request->closing_to_date) {
+                $q->whereDate('date', '<=', $request->closing_to_date);
+            }
+        })
             ->where('type', 'income')
             ->sum('total');
 
@@ -1157,7 +1185,8 @@ class ScheduleClosingController extends Controller
         $data = [
             'dynamicTypes'          =>      $dynamicTypes,
             "merges"                =>      $mappedResults,
-            "closing_date"          =>      $request->closing_date,
+            "closing_from_date"     => $request->closing_from_date,
+            "closing_to_date"       => $request->closing_to_date,
             "expenses"              =>      $creditExpenses,
             "totalCounterExpense"   =>      $totalCounterExpense,
             "totalCounterIncome"    =>      $totalCounterIncome,
