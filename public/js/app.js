@@ -47389,7 +47389,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var res, headIds, values;
+        var res, headIds, values, links;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
@@ -47409,14 +47409,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   _this2.allHeaderOptions = res.data.headers || [];
                   _this2.expenseHeader = res.data.headers || [];
                   headIds = [];
-                  values = [];
+                  values = []; // Ensure links array exists
+
+                  links = res.data.links || [];
 
                   _this2.expenseHeader.forEach(function (header, index) {
-                    headIds[index] = header.id;
-                    var matchingLink = res.data.links.find(function (link) {
+                    headIds[index] = header.id; // find matching link safely
+
+                    var matchingLink = links.find(function (link) {
                       return link.header_id === header.id;
                     });
-                    values[index] = matchingLink ? parseFloat(matchingLink.value) : 0;
+                    values[index] = matchingLink && matchingLink.value != null ? parseFloat(matchingLink.value) : 0;
                   });
 
                   _this2.expensePostData.headIds = headIds;

@@ -773,38 +773,44 @@ export default {
     },
 
     async fetchExpenseData() {
-      this.isLoading = true; // Start loading
-      try {
-        const res = await this.callApi("post", "reportsHeader/link/get", {
-          ticket_merge_id: this.expensePostData.ticket_merge_id,
-        });
+  this.isLoading = true; // Start loading
+  try {
+    const res = await this.callApi("post", "reportsHeader/link/get", {
+      ticket_merge_id: this.expensePostData.ticket_merge_id,
+    });
 
-        if (res.status === 200 && res.data) {
-          this.allHeaderOptions = res.data.headers || [];
-          this.expenseHeader = res.data.headers || [];
+    if (res.status === 200 && res.data) {
+      this.allHeaderOptions = res.data.headers || [];
+      this.expenseHeader = res.data.headers || [];
 
-          const headIds = [];
-          const values = [];
+      const headIds = [];
+      const values = [];
 
-          this.expenseHeader.forEach((header, index) => {
-            headIds[index] = header.id;
-            const matchingLink = res.data.links.find(
-              (link) => link.header_id === header.id
-            );
-            values[index] = matchingLink ? parseFloat(matchingLink.value) : 0;
-          });
+      // Ensure links array exists
+      const links = res.data.links || [];
 
-          this.expensePostData.headIds = headIds;
-          this.expensePostData.values = values;
+      this.expenseHeader.forEach((header, index) => {
+        headIds[index] = header.id;
 
-          this.initDataTable();
-        }
-      } catch (error) {
-        console.error("Failed to fetch expense data", error);
-      } finally {
-        this.isLoading = false; // Stop loading
-      }
-    },
+        // find matching link safely
+        const matchingLink = links.find((link) => link.header_id === header.id);
+
+        values[index] = matchingLink && matchingLink.value != null
+          ? parseFloat(matchingLink.value)
+          : 0;
+      });
+
+      this.expensePostData.headIds = headIds;
+      this.expensePostData.values = values;
+
+      this.initDataTable();
+    }
+  } catch (error) {
+    console.error("Failed to fetch expense data", error);
+  } finally {
+    this.isLoading = false; // Stop loading
+  }
+},
 
     async expenseAdd() {
       this.isLoading = true; // Trigger loader after clicking save
