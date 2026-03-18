@@ -60,7 +60,8 @@
                         <td>{{ $insertComma(totalOtherCommission(tickets)) }}</td>
                         <td>
                           <input type="number" class="form-control" v-model="cashBankStart[terminalId].cash"
-                            @input="updateCash(terminalId, tickets)" :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, {dot:true})" />
+                            @input="updateCash(terminalId, tickets)" :disabled="totalFare(tickets) == 0"
+                            @keypress="$numberValidate($event, { dot: true })" />
                         </td>
                         <td>
                           <select class="form-control rounded-0" v-model="cashBankStart[terminalId].selectedBankId"
@@ -76,7 +77,7 @@
                         <td>
                           <input type="number" min="0" class="form-control"
                             v-model.number="cashBankStart[terminalId].bank" @input="updateBank(terminalId, tickets)"
-                            :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, {dot:true})" />
+                            :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, { dot: true })" />
                         </td>
 
                         <td>
@@ -173,12 +174,12 @@
                         <td>
                           <input type="number" min="0" class="form-control"
                             v-model.number="cashBankReturn[terminalId].cash" @input="editingField = 'cash'"
-                            :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, {dot:true})" />
+                            :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, { dot: true })" />
                         </td>
                         <td>
                           <select class="form-control rounded-0" v-model="cashBankReturn[terminalId].selectedBankId"
                             :disabled="totalFare(tickets) == 0">
-                            <option value="" selected >
+                            <option value="" selected>
                               Select Bank
                             </option>
                             <option v-for="bank in banks" :key="bank.id" :value="bank.id">
@@ -189,7 +190,7 @@
                         <td>
                           <input type="number" min="0" class="form-control"
                             v-model.number="cashBankReturn[terminalId].bank" @input="editingField = 'bank'"
-                            :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, {dot:true})" />
+                            :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, { dot: true })" />
                         </td>
 
                         <td>
@@ -264,7 +265,6 @@
                     <tbody>
                       <tr v-for="(i, index) in loop" :key="index">
                         <td>
-                          <!-- {{ items[0] ? items[0].price : '' }} -->
                           <select class="form-control rounded-0" @change="saveRow($event, 'first', index)"
                             :value="postData.category[index]" :disabled="editAble">
                             <option value="" selected>Select Category</option>
@@ -273,48 +273,49 @@
                             </option>
                           </select>
                         </td>
+
                         <td>
                           <input type="text" class="form-control" @keyup="saveRow($event, 'second', index)"
-                            :value="postData.description[index]" :disabled="editAble"  />
-                        </td>
-                        <td>
-                          <!-- Total Expense -->
-                          <input type="number" min="0" class="form-control rounded-0"
-                            v-model.number="postData.amount[index]" @input="syncPaid(index)" @keypress="$numberValidate($event, {dot:true})" />
+                            :value="postData.description[index]" :disabled="editAble" />
                         </td>
 
                         <td>
-                          <!-- Total Expense Paid -->
                           <input type="number" min="0" class="form-control rounded-0"
-                            v-model.number="postData.paid[index]" @keypress="$numberValidate($event, {dot:true})" />
+                            v-model.number="postData.amount[index]" @input="syncPaid(index)"
+                            @keypress="$numberValidate($event, { dot: true })" />
                         </td>
 
                         <td>
-                          <!-- Balance -->
+                          <input type="number" min="0" class="form-control rounded-0"
+                            v-model.number="postData.paid[index]" @keypress="$numberValidate($event, { dot: true })" />
+                        </td>
+
+                        <td>
                           <input type="number" class="form-control rounded-0" :value="balances[index]" readonly />
                         </td>
+
                         <td class="add-btn" v-if="!editAble">
                           <button class="btn btn-outline-primary mx-2" @click="addRow">
                             <i class="fas fa-plus"></i>
                           </button>
+
                           <button class="btn btn-outline-danger" @click="removeRow($event, index)" v-if="loop != 1">
                             <i class="fas fa-trash"></i>
                           </button>
 
-                          <!-- Checkbox -->
-                          <input type="checkbox" class="ml-2" v-model="postData.showExtra[index]" />
+                          <input type="checkbox" class="ml-2" v-model="postData.showExtra[index]"
+                            @change="toggleHeader(index)" />
                         </td>
+
                         <td v-else></td>
+
                         <td class="header-td">
-                          <!-- Dropdown after checkbox -->
                           <select class="form-control mt-1" v-if="postData.showExtra[index]"
                             v-model="postData.extraCategory[index]">
                             <option value="">Select Option</option>
-
                             <option v-for="(item, i) in reportsHeaders" :key="i" :value="item.id">
                               {{ item.name }}
                             </option>
-
                           </select>
                         </td>
                       </tr>
@@ -740,6 +741,11 @@ export default {
     },
   },
   methods: {
+    toggleHeader(index) {
+      if (!this.postData.showExtra[index]) {
+        this.postData.extraCategory[index] = "";
+      }
+    },
     updateCash(terminalId, tickets) {
       const row = this.cashBankStart[terminalId];
       const receivable = this.receivable(terminalId, tickets);
@@ -1061,31 +1067,48 @@ export default {
       return Math.round(value + fixCommission);
     },
     saveRow(event, fieldName, index) {
-      // const getRowNumber = event.target.parentElement.parentElement.rowIndex;
       if (fieldName == "first") {
         this.postData.category[index] = event.target.value;
+
+        const selectedCategory = this.categories.find(
+          (cat) => Number(cat.id) === Number(event.target.value)
+        );
+
+        if (selectedCategory && selectedCategory.report_header_id) {
+          this.postData.showExtra[index] = true;
+          this.postData.extraCategory[index] = selectedCategory.report_header_id;
+        } else {
+          this.postData.showExtra[index] = false;
+          this.postData.extraCategory[index] = "";
+        }
       }
+
       if (fieldName == "second") {
         this.postData.description[index] = event.target.value;
       }
+
       if (fieldName == "third") {
         this.postData.amount[index] = event.target.value;
       }
+
       if (fieldName == "fourth") {
         this.postData.invoice[index] = event.target.value;
       }
+
       if (fieldName == "five") {
         this.postData.paid[index] = event.target.value;
       }
+
       if (fieldName == "six") {
         this.postData.ledger[index] = event.target.checked;
       }
 
       // total amount sum only for show
       this.totalAmount = this.postData.amount.reduce(
-        (a, b) => parseFloat(a) + parseFloat(b),
+        (a, b) => parseFloat(a || 0) + parseFloat(b || 0),
         0
       );
+
       this.netProfit = this.totalSale - this.totalAmount;
     },
     addRow() {
@@ -1108,27 +1131,27 @@ export default {
       );
       this.netProfit = this.totalSale - this.totalAmount;
     },
-async saveHeaderLinks(ticketMergeId) {
+    async saveHeaderLinks(ticketMergeId) {
 
-  let headIds = [];
-  let values = [];
+      let headIds = [];
+      let values = [];
 
-  this.postData.showExtra.forEach((checked, index) => {
-    if (checked && this.postData.extraCategory[index]) {
-      headIds.push(this.postData.extraCategory[index]);
-      values.push(this.postData.amount[index] || 0);
-    }
-  });
+      this.postData.showExtra.forEach((checked, index) => {
+        if (checked && this.postData.extraCategory[index]) {
+          headIds.push(this.postData.extraCategory[index]);
+          values.push(this.postData.amount[index] || 0);
+        }
+      });
 
-  if (!headIds.length) return;
+      if (!headIds.length) return;
 
-  await this.callApi("post", "reportsHeader/header/link", {
-    ticket_merge_id: ticketMergeId,
-    headIds: headIds,
-    values: values
-  });
+      await this.callApi("post", "reportsHeader/header/link", {
+        ticket_merge_id: ticketMergeId,
+        headIds: headIds,
+        values: values
+      });
 
-},
+    },
     //  // ===== Merge Schedule API =====
     async mergeScheduleApi(addData = {}) {
       const payload = {
@@ -1185,8 +1208,8 @@ async saveHeaderLinks(ticketMergeId) {
         const mergedResult = await this.mergeScheduleApi(this.addData);
         // Step 2: Store merged data for the component
         this.closingData = mergedResult;
-// save header links
-await this.saveHeaderLinks(mergedResult.id);
+        // save header links
+        await this.saveHeaderLinks(mergedResult.id);
         // Step 4: Save Start
         const mapRows = (cashBank, schedule) =>
           Object.entries(cashBank).map(([terminalId, row]) => {
@@ -1315,8 +1338,9 @@ await this.saveHeaderLinks(mergedResult.id);
 .add-btn {
   width: 138px;
 }
-.header-td{
-      width: 200px;
+
+.header-td {
+  width: 200px;
 }
 
 .totals tr td {

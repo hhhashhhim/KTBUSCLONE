@@ -19,22 +19,25 @@
                                     <div class="col-md-3">
                                         <label for="terminalFilter">Select Bus</label>
                                         <select2 v-model="filterData.bus_number" :options="buses"
-                                            :settings="{ settingOption: value, settingOption: value, width: '100%' }" />
+                                            :settings="{ multiple: true, width: '100%' }" />
                                     </div>
 
                                     <!-- Schedule Name Start -->
                                     <div class="col-md-3">
-                                        <label>Schedule Name Start</label>
-                                        <select2 v-model="filterData.schedule_name_start" :options="schedules"
-                                            :settings="{ width: '100%' }" />
+                                        <label>Route</label>
+                                        <select2 v-model="filterData.route" :options="route"
+                                            :settings="{ multiple: true, width: '100%', placeholder: 'Select Route', allowClear: true }" />
                                     </div>
 
                                     <!-- Schedule Name End -->
-                                    <div class="col-md-3">
-                                        <label>Schedule Name End</label>
-                                        <select2 v-model="filterData.schedule_name_end" :options="schedules"
-                                            :settings="{ width: '100%' }" />
-                                    </div>
+                                    <!-- <div class="col-md-3">
+    <label>Schedule Name End</label>
+    <select2 
+        v-model="filterData.schedule_name_end"
+        :options="schedules"
+        :settings="{ multiple: true, width: '100%' }"
+    />
+</div> -->
 
                                     <div class="col-md-3">
                                         <label for="fromDate">Departure Date</label>
@@ -349,18 +352,18 @@ export default {
             merges: [],
             buses: [],
             schedules: [],
+            route: [],
             closingData: {
                 closingDate: "",
                 mergeId: "",
             },
             filterData: {
-                bus_number: "",
+                bus_number: [],
+                route: [],
                 from_date: new Date().toISOString().split('T')[0],
                 to_date: new Date().toISOString().split('T')[0],
                 closing_from_date: new Date().toISOString().split('T')[0],
                 closing_to_date: new Date().toISOString().split('T')[0],
-                schedule_name_start: '',  // new
-                schedule_name_end: ''     // new
             },
 
             // formID: "schedule_closing_form",
@@ -416,6 +419,21 @@ export default {
                 console.error("Error fetching buses:", error);
             }
         },
+        async fetchRoute() {
+    try {
+        const res = await this.callApi("post", "booking/close/schedule/merges/route");
+
+        let routes = res.data?.data?.routes || res.data?.routes || [];
+
+        this.route = routes.map(item => ({
+            id: item.id,
+            text: item.name
+        }));
+
+    } catch (error) {
+        console.error("Error fetching route:", error);
+    }
+},
         async fetchSchedule() {
             try {
                 const res = await this.callApi(
@@ -538,6 +556,7 @@ export default {
     },
     async mounted() {
         await this.fetchBuses();  // load buses on component mount
+        await this.fetchRoute();  // load route on component mount
         await this.fetchSchedule();  // load fetchSchedule on component mount
 
     },

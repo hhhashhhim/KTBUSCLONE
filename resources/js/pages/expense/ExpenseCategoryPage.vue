@@ -26,6 +26,7 @@
                                                         <tr>
                                                             <th>Sr No.</th>
                                                             <th>Name</th>
+                                                             <th>Header Name</th>
                                                             <th>Added By</th>
                                                             <th v-if="checkForSubmenuButtons('edit-category')">Action
                                                             </th>
@@ -35,6 +36,7 @@
                                                         <tr v-for="(category, i) in categories" :key="i">
                                                             <td>{{ i + 1 }}</td>
                                                             <td>{{ category.name }}</td>
+                                                              <td>{{ category.report_header ? category.report_header.name : '-' }}</td>
                                                             <td>{{ category.added_by.name }}</td>
                                                             <td>
                                                                 <button v-if="checkForSubmenuButtons('edit-category')"
@@ -67,36 +69,76 @@
 
             <!-- Add Modal -->
             <Add heading="Add New Category" :errors="validationErrors" :success="success" :formID="formID">
-                <!-- Category Name -->
-                <div class="form-group">
-                    <label for="name">
-                        Name <span class="text-danger ml-1">*</span>
-                    </label>
-                    <input type="text" class="form-control" placeholder="Enter Category Name" v-model="data.name">
-                </div>
 
-                <!-- Include in Closing Summary -->
-                <div class="form-group">
-                    <label>
-                        Include in Closing Summary
-                        <span class="text-danger ml-1">*</span>
-                    </label>
+                <div class="row">
 
-                    <div class="d-flex align-items-center mt-2">
-                        <div class="form-check mr-4">
-                            <input class="form-check-input" type="radio" id="closing_yes" :value="1"
-                                v-model.number="data.include_in_closing_summary">
-                            <label class="form-check-label" for="closing_yes">
-                                Yes
+                    <!-- Category Name -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>
+                                Name <span class="text-danger ml-1">*</span>
                             </label>
+                            <input type="text" class="form-control" placeholder="Enter Category Name"
+                                v-model="data.name">
                         </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <!-- Checkbox -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <div class="form-check mt-4">
+                                        <input class="form-check-input" type="checkbox" id="enable_dropdown"
+                                            v-model="data.show_dropdown">
+                                        <label class="form-check-label" for="enable_dropdown">
+                                            Header Link
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" id="closing_no" :value="0"
-                                v-model="data.include_in_closing_summary">
-                            <label class="form-check-label" for="closing_no">
-                                No
+                            <!-- Conditional Dropdown -->
+                          <div class="col-md-9" v-if="data.show_dropdown">
+    <div class="form-group">
+        <label>
+            Select Option <span class="text-danger ml-1">*</span>
+        </label>
+
+        <select class="form-control" v-model="data.report_header_id">
+            <option value="">Select Option</option>
+            <option v-for="header in reportsHeaders" :key="header.id" :value="header.id">
+                {{ header.name }}
+            </option>
+        </select>
+    </div>
+</div>
+                        </div>
+                    </div>
+                    <!-- Include in Closing Summary -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>
+                                Include in Closing Summary
+                                <span class="text-danger ml-1">*</span>
                             </label>
+
+                            <div class="d-flex align-items-center mt-2">
+                                <div class="form-check mr-4">
+                                    <input class="form-check-input" type="radio" id="closing_yes" :value="1"
+                                        v-model.number="data.include_in_closing_summary">
+                                    <label class="form-check-label" for="closing_yes">
+                                        Yes
+                                    </label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" id="closing_no" :value="0"
+                                        v-model.number="data.include_in_closing_summary">
+                                    <label class="form-check-label" for="closing_no">
+                                        No
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -107,44 +149,111 @@
                         {{ loading ? 'Loading...' : 'Add New Category' }}
                     </button>
                 </template>
+
             </Add>
 
 
-            <Edit heading="Edit Category Name" :errors="validationErrors" :success="success" :editForm="editFormID">
+         <Edit heading="Edit Category Name" :errors="validationErrors" :success="success" :editForm="editFormID">
 
-                <div class="form-group">
-                    <label for="name">Name <span class="text-danger ml-1">*</span></label>
-                    <input type="text" class="form-control" placeholder="Enter Category Name" v-model="dataEdit.name">
-                </div>
+    <div class="row">
 
-                <!-- Include in Closing Summary -->
-                <div class="form-group">
-                    <label>
-                        Include in Closing Summary
-                        <span class="text-danger ml-1">*</span>
-                    </label>
+        <!-- Name -->
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>
+                    Name <span class="text-danger ml-1">*</span>
+                </label>
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter Category Name"
+                    v-model="dataEdit.name"
+                >
+            </div>
+        </div>
 
-                    <div class="d-flex align-items-center mt-2">
-                        <div class="form-check mr-4">
-                            <input class="form-check-input" type="radio" id="closing_summary_yes" :value="1"
-                                v-model.number="dataEdit.include_in_closing_summary">
-                            <label class="form-check-label" for="closing_summary_yes">Yes</label>
-                        </div>
-
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" id="closing_summary_no" :value="0"
-                                v-model.number="dataEdit.include_in_closing_summary">
-                            <label class="form-check-label" for="closing_summary_no">No</label>
+        <!-- Header Link -->
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <div class="form-check mt-4">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="edit_enable_dropdown"
+                                v-model="dataEdit.show_dropdown"
+                            >
+                            <label class="form-check-label" for="edit_enable_dropdown">
+                                Header Link
+                            </label>
                         </div>
                     </div>
                 </div>
 
-                <template v-slot:button>
-                    <button type="button" class="btn btn-primary" :disabled="loading" @click="update">
-                        {{ loading ? 'Loading...' : 'Update Category' }}
-                    </button>
-                </template>
-            </Edit>
+                <div class="col-md-9" v-if="dataEdit.show_dropdown">
+                    <div class="form-group">
+                        <label>
+                            Select Option <span class="text-danger ml-1">*</span>
+                        </label>
+
+                        <select class="form-control" v-model="dataEdit.report_header_id">
+                            <option value="">Select Option</option>
+                            <option
+                                v-for="header in reportsHeaders"
+                                :key="header.id"
+                                :value="header.id"
+                            >
+                                {{ header.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Include in Closing Summary -->
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>
+                    Include in Closing Summary
+                    <span class="text-danger ml-1">*</span>
+                </label>
+
+                <div class="d-flex align-items-center mt-2">
+                    <div class="form-check mr-4">
+                        <input
+                            class="form-check-input"
+                            type="radio"
+                            id="closing_summary_yes"
+                            :value="1"
+                            v-model.number="dataEdit.include_in_closing_summary"
+                        >
+                        <label class="form-check-label" for="closing_summary_yes">Yes</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input
+                            class="form-check-input"
+                            type="radio"
+                            id="closing_summary_no"
+                            :value="0"
+                            v-model.number="dataEdit.include_in_closing_summary"
+                        >
+                        <label class="form-check-label" for="closing_summary_no">No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <template v-slot:button>
+        <button type="button" class="btn btn-primary" :disabled="loading" @click="update">
+            {{ loading ? 'Loading...' : 'Update Category' }}
+        </button>
+    </template>
+</Edit>
 
 
             <!-- Add Modal -->
@@ -178,14 +287,19 @@ export default {
             data: {
                 name: "",
                 include_in_closing_summary: 1, // default Yes
+                show_dropdown: false,
+                report_header_id: ''
             },
             dataEdit: {
                 id: "",
                 name: "",
                 include_in_closing_summary: 1, // default Yes
+                   show_dropdown: false,
+    report_header_id: ""
             },
             success: false,
             errors: false,
+            reportsHeaders: [],
         }
     },
     mounted() {
@@ -205,6 +319,7 @@ export default {
         });
     },
     async created() {
+        this.fetchReportsHeaders();
         $('.modal').remove();
         this.permissions = this.$store.state.permissions;
         await this.fetchData();
@@ -218,10 +333,19 @@ export default {
         }
     },
     methods: {
+        async fetchReportsHeaders() {
+            const res = await this.callApi("post", "reportsHeader");
+
+            if (res.status == 200) {
+                this.reportsHeaders = res.data;
+            }
+        },
         clearForm() {
             this.data = {
                 name: "",
-                include_in_closing_summary: 1
+                include_in_closing_summary: 1,
+                  show_dropdown: false,
+        report_header_id: ''
             };
         },
 
@@ -236,53 +360,76 @@ export default {
         },
 
         async add() {
-            this.validationErrors = []
-            if (!this.data.name) return swal({
-                title: "Required",
-                text: "Category Name is required",
-                icon: "error",
-                timer: 2000
+    this.validationErrors = [];
+
+    if (!this.data.name) {
+        return swal({
+            title: "Required",
+            text: "Category Name is required",
+            icon: "error",
+            timer: 2000
+        });
+    }
+
+    if (this.data.show_dropdown && !this.data.report_header_id) {
+        return swal({
+            title: "Required",
+            text: "Please select header",
+            icon: "error",
+            timer: 2000
+        });
+    }
+
+    this.loading = true;
+
+    const payload = {
+        name: this.data.name,
+        include_in_closing_summary: this.data.include_in_closing_summary,
+        report_header_id: this.data.show_dropdown ? this.data.report_header_id : null,
+    };
+
+    const res = await this.callApi("post", "expenses/categories/store", payload);
+
+    if (res.status == 201) {
+        $(".modal").click();
+        swal({
+            title: "Success",
+            text: "Category Created Successfully Named as " + res.data.name,
+            icon: "success",
+            timer: 2000
+        });
+
+        $("#category_table").DataTable().destroy();
+        this.loading = false;
+        await this.fetchData();
+        this.clearForm();
+    } else if (res.status == 422) {
+        this.loading = false;
+        for (const key in res.data.errors) {
+            res.data.errors[key].forEach((element) => {
+                this.errorsArray(element, key);
             });
+        }
+    } else {
+        this.loading = false;
+    }
+},
 
-            this.loading = true
-            const res = await this.callApi("post", 'expenses/categories/store', this.data);
+       edit(category) {
+    this.dataEdit = {
+        id: category.id,
+        name: category.name,
+        include_in_closing_summary:
+            category.include_in_closing == null || category.include_in_closing == undefined
+                ? 1
+                : Number(category.include_in_closing),
 
-            if (res.status == 201) {
-                $(".modal").click();
-                swal({
-                    title: "Success",
-                    text: "Category Created Successfully Named as " + res.data.name,
-                    icon: "success",
-                    timer: 2000
-                });
-                $("#category_table").DataTable().destroy();
-                this.loading = false;
-                await this.fetchData();
-                this.clearForm();
-            } else if (res.status == 422) {
-                this.loading = false;
-                for (const key in res.data.errors) {
-                    res.data.errors[key].forEach((element) => {
-                        this.errorsArray(element, key);
-                    });
-                }
-            }
-        },
+        show_dropdown: !!category.report_header_id,
+        report_header_id: category.report_header_id ? Number(category.report_header_id) : ""
+    };
 
-        edit(category) {
-            this.dataEdit = {
-                id: category.id,
-                name: category.name,
-                include_in_closing_summary:
-                    category.include_in_closing == null || category.include_in_closing == undefined
-                        ? 1 // default Yes if NULL
-                        : Number(category.include_in_closing) // 0 or 1
-            };
-
-
-            // Open Edit modal after setting data
-            $(`#${this.editFormID}`).modal('show');
-        },
+    $(`#${this.editFormID}`).modal('show');
+},
 
         async update() {
             this.validationErrors = []
@@ -331,7 +478,12 @@ export default {
                 $("#category_table").DataTable().destroy();
                 this.fetchData();
             }
+        },
+        'dataEdit.show_dropdown'(val) {
+        if (!val) {
+            this.dataEdit.report_header_id = "";
         }
+    }
     }
 }
 </script>

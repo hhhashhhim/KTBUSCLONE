@@ -7,19 +7,14 @@
                         <div class="card-header">
                             <h4>Users</h4>
                             <div class="card-header-action">
-                                <a v-if="checkForSubmenuButtons('assign-terminal-admin')"
-                                   data-toggle="modal" @click="getAuthTerminal()"
-                                   data-target="#assignTerminalUser"
-                                   class="btn text-light mr-2"
-                                   :class="$store.state.user.terminal_id == null ? 'btn-danger' :'btn-primary'"
-                                >
+                                <a v-if="checkForSubmenuButtons('assign-terminal-admin')" data-toggle="modal"
+                                    @click="getAuthTerminal()" data-target="#assignTerminalUser"
+                                    class="btn text-light mr-2"
+                                    :class="$store.state.user.terminal_id == null ? 'btn-danger' : 'btn-primary'">
                                     Assign Terminal To Company Admin (Yourself)
                                 </a>
-                                <a v-if="checkForSubmenuButtons('add-users')" title="Add User"
-                                   data-toggle="modal"
-                                   :data-target="'#'+formID"
-                                   class="btn btn-primary text-light" @click="clearForm()"
-                                >
+                                <a v-if="checkForSubmenuButtons('add-users')" title="Add User" data-toggle="modal"
+                                    :data-target="'#' + formID" class="btn btn-primary text-light" @click="clearForm()">
                                     Add New
                                 </a>
                             </div>
@@ -28,29 +23,25 @@
                             <div class="row px-2 mb-4">
                                 <div class="col-md-4">
                                     <label for="fromDate">Name</label>
-                                    <input type="text" class="form-control" name="name"
-                                            v-model="filterData.name" @keyup="fetchUsers()" readonly onfocus="this.removeAttribute('readonly');" />
+                                    <input type="text" class="form-control" name="name" v-model="filterData.name"
+                                        @keyup="fetchUsers()" readonly onfocus="this.removeAttribute('readonly');" />
                                 </div>
                                 <div class="col-md-4">
                                     <label for="terminalFilter">Select Terminal</label>
-                                    <select id="terminalFilter" class="form-control"
-                                            v-model="filterData.terminal"
-                                            @change="fetchUsers()">
+                                    <select id="terminalFilter" class="form-control" v-model="filterData.terminal"
+                                        @change="fetchUsers()">
                                         <option value="">Select Terminal</option>
-                                        <option v-for="(item, i) in terminals" :key="i"
-                                                :value="item.id">
+                                        <option v-for="(item, i) in terminals" :key="i" :value="item.id">
                                             {{ item.name }}
                                         </option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <label for="routeFilter">Select Role</label>
-                                    <select id="routeFilter" class="form-control"
-                                            v-model="filterData.role"
-                                            @change="fetchUsers()">
+                                    <select id="routeFilter" class="form-control" v-model="filterData.role"
+                                        @change="fetchUsers()">
                                         <option value="">Select Role</option>
-                                        <option v-for="(role, i) in roles" :key="i"
-                                                :value="role.id">
+                                        <option v-for="(role, i) in roles" :key="i" :value="role.id">
                                             {{ role.name }}
                                         </option>
                                     </select>
@@ -65,57 +56,54 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table
-                                                    class="table table-striped table-hover"
-                                                    id="users_table"
-                                                >
+                                                <table class="table table-striped table-hover" id="users_table">
                                                     <thead>
-                                                    <tr>
-                                                        <th>Sr No.</th>
-                                                        <th>Name</th>
-                                                        <th>Email</th>
-                                                        <th>Contact</th>
-                                                        <th>Terminal Name</th>
-                                                        <th>Role</th>
-                                                        <th v-if="checkForSubmenuButtons('edit-users') || checkForSubmenuButtons('delete-user')">
-                                                            Action
-                                                        </th>
-                                                    </tr>
+                                                        <tr>
+                                                            <th>Sr No.</th>
+                                                            <th>Name</th>
+                                                            <th>Email</th>
+                                                            <th>Contact</th>
+                                                            <th>Terminal Name</th>
+                                                            <th>Role</th>
+                                                            <th
+                                                                v-if="checkForSubmenuButtons('edit-users') || checkForSubmenuButtons('delete-user')">
+                                                                Action
+                                                            </th>
+                                                        </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr v-for="(user, i) in users" :key="i">
-                                                        <td>{{ i + 1 }}</td>
-                                                        <td>{{ user.name }}</td>
-                                                        <td>{{ user.email }}</td>
-                                                        <td>{{ phoneFormat(user.contact) }}</td>
-                                                        <td v-if="user.terminal_id !=  0 && user.terminal_id != null">
-                                                            {{ user.terminal.city.name }} - {{ user.terminal.name }}
-                                                        </td>
-                                                        <td v-else>N/A</td>
-                                                        <th>{{ user.role ? user.role.name : "Not Found" }}</th>
-                                                        <td v-if="checkForSubmenuButtons('edit-users') || checkForSubmenuButtons('delete-user')">
-                                                            <a v-if="checkForSubmenuButtons('edit-users')"
-                                                               :data-target="'#'+editFormID"
-                                                               data-toggle="modal"
-                                                               @click="edit(user)"
-                                                               class="btn btn-primary text-light mx-1"
-                                                               title="Edit User"
-                                                            >
-                                                                <i class="far fa-edit"></i>
-                                                            </a>
-                                                            <a
-                                                               v-if="checkForSubmenuButtons('delete-user')"
-                                                               :data-target="'#' + hideFormID" @click="delId = user.id" data-toggle="modal"
-                                                               title="Delete User"
-                                                               class="btn btn-danger text-light"
-                                                            >
-                                                                <i class="far fas fa-trash"></i>
-                                                            </a>
-                                                            <!--                                                            href="#delete-modal"-->
-                                                            <!--                                                            data-toggle="modal"-->
-                                                            <!--                                                            @click="deleteModal(user, i)"-->
-                                                        </td>
-                                                    </tr>
+                                                        <tr v-for="(user, i) in users" :key="i">
+                                                            <td>{{ i + 1 }}</td>
+                                                            <td>{{ user.name }}</td>
+                                                            <td>{{ user.email }}</td>
+                                                            <td>{{ phoneFormat(user.contact) }}</td>
+                                                            <td
+                                                                v-if="user.terminal_id != 0 && user.terminal_id != null">
+                                                                {{ user.terminal.city.name }} - {{ user.terminal.name }}
+                                                            </td>
+                                                            <td v-else>N/A</td>
+                                                            <th>{{ user.role ? user.role.name : "Not Found" }}</th>
+                                                            <td
+                                                                v-if="checkForSubmenuButtons('edit-users') || checkForSubmenuButtons('delete-user')">
+                                                                <a v-if="checkForSubmenuButtons('edit-users')"
+                                                                    :data-target="'#' + editFormID" data-toggle="modal"
+                                                                    @click="edit(user)"
+                                                                    class="btn btn-primary text-light mx-1"
+                                                                    title="Edit User">
+                                                                    <i class="far fa-edit"></i>
+                                                                </a>
+                                                                <a v-if="checkForSubmenuButtons('delete-user')"
+                                                                    :data-target="'#' + hideFormID"
+                                                                    @click="delId = user.id" data-toggle="modal"
+                                                                    title="Delete User"
+                                                                    class="btn btn-danger text-light">
+                                                                    <i class="far fas fa-trash"></i>
+                                                                </a>
+                                                                <!--                                                            href="#delete-modal"-->
+                                                                <!--                                                            data-toggle="modal"-->
+                                                                <!--                                                            @click="deleteModal(user, i)"-->
+                                                            </td>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -130,69 +118,36 @@
             </div>
 
             <!-- Add Modal -->
-            <Add
-                heading="New User"
-                :errors="this.validationErrors"
-                :success="success"
-                :formID="formID"
-
-            >
+            <Add heading="New User" :errors="this.validationErrors" :success="success" :formID="formID">
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label for="name">Name <span class="text-danger ml-1">*</span></label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Name"
-                            id="name"
-                            autocomplete="off"
-                            v-model="data.name"
-                        />
+                        <input type="text" class="form-control" placeholder="Enter Name" id="name" autocomplete="off"
+                            v-model="data.name" />
                     </div>
                     <div class="form-group col-md-6">
                         <label for="email">Email <span class="text-danger ml-1">*</span></label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Email"
-                            id="email"
-                            autocomplete="off"
-                            v-model="data.email"
-                        />
+                        <input type="text" class="form-control" placeholder="Enter Email" id="email" autocomplete="off"
+                            v-model="data.email" />
                     </div>
                     <div class="form-group col-md-6">
                         <label for="contact">Contact <span class="text-danger ml-1">*</span></label>
-                        <vue-mask id="phone"
-                                  class="form-control"
-                                  v-model="data.contact"
-                                  mask="0000-0000000"
-                                  :raw="false"
-                                  :options="optionsContact"
-                        >
+                        <vue-mask id="phone" class="form-control" v-model="data.contact" mask="0000-0000000"
+                            :raw="false" :options="optionsContact">
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="password">Password <span class="text-danger ml-1">*</span></label>
-                        <input
-                            type="password"
-                            class="form-control"
-                            placeholder="Enter Password"
-                            id="password"
-                            autocomplete="off"
-                            v-model="data.password"
-                        />
+                        <input type="password" class="form-control" placeholder="Enter Password" id="password"
+                            autocomplete="off" v-model="data.password" />
                     </div>
                     <div class="form-group col-md-6">
                         <label for="departure">Departure City <span class="text-danger ml-1">*</span></label>
                         <button class="btn btn-success btn-sm m-1" @click="selectAllDepartures">Select All</button>
                         <button class="btn btn-danger btn-sm " @click="deselectAllDepartures">Deselect All</button>
-                        <select class="form-control" id="departure" multiple
-                                v-model="data.departure">
-                            <option
-                                v-for="(singleDeparture, i) in departureCities"
-                                :value="singleDeparture.id"
-                                :key="i"
-                            >{{ singleDeparture.name }}
+                        <select class="form-control" id="departure" multiple v-model="data.departure">
+                            <option v-for="(singleDeparture, i) in departureCities" :value="singleDeparture.id"
+                                :key="i">{{ singleDeparture.name }}
                             </option>
                         </select>
                     </div>
@@ -200,68 +155,58 @@
                         <label for="destinations">Destination City <span class="text-danger ml-1">*</span></label>
                         <button class="btn btn-success btn-sm m-1" @click="selectAllDestination">Select All</button>
                         <button class="btn btn-danger btn-sm " @click="deselectAllDestination">Deselect All</button>
-                        <select class="form-control" id="destinations" multiple
-                                v-model="data.destination">
-                            <option
-                                v-for="(singleDestination, i) in destinationCities"
-                                :value="singleDestination.id"
-                                :key="i"
-                            >{{ singleDestination.name }}
+                        <select class="form-control" id="destinations" multiple v-model="data.destination">
+                            <option v-for="(singleDestination, i) in destinationCities" :value="singleDestination.id"
+                                :key="i">{{ singleDestination.name }}
                             </option>
                         </select>
                     </div>
+                    <!-- <div class="form-group col-md-6">
+                        <label for="routes">Routes <span class="text-danger ml-1">Options</span></label>
+                        <button class="btn btn-success btn-sm m-1" @click="selectAllRoute">Select All</button>
+                        <button class="btn btn-danger btn-sm " @click="deselectAllRoute">Deselect All</button>
+                        <select class="form-control" id="routes" multiple v-model="data.route">
+                            <option v-for="(singleRoute, i) in routes" :value="singleRoute.id"
+                                :key="i">{{ singleRoute.name }}
+                            </option>
+                        </select>
+                    </div> -->
                     <div class="form-group col-md-6">
                         <label for="terminals">Terminal <span class="text-danger ml-1">*</span></label>
-                        <select class="form-control" id="terminals"
-                                v-model="data.terminal_id">
+                        <select class="form-control" id="terminals" v-model="data.terminal_id">
                             <option value="0">Select Terminal</option>
-                            <option
-                                v-for="(terminal, i) in terminals"
-                                :value="terminal.id"
-                                :key="i"
-                            >{{ terminal.name }} ({{ terminal.city.name }})
+                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{ terminal.name }}
+                                ({{ terminal.city.name }})
                             </option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="role">Role <span class="text-danger ml-1">*</span></label>
                         <div class="float-right badge badge-primary mx-0 mb-1" style="cursor: pointer"
-                             data-toggle="modal" data-target="#addRoleModal"> Add New Role
+                            data-toggle="modal" data-target="#addRoleModal"> Add New Role
                         </div>
-                        <select
-  class="form-control"
-  id="role"
-  v-model="data.role"
->
-  <option value="0">Select Role</option>
-  <option v-for="(role, i) in roles" :value="role.id" :key="i">
-    {{ role.name }}
-  </option>
-</select>
+                        <select class="form-control" id="role" v-model="data.role">
+                            <option value="0">Select Role</option>
+                            <option v-for="(role, i) in roles" :value="role.id" :key="i">
+                                {{ role.name }}
+                            </option>
+                        </select>
 
                     </div>
-                  <div class="form-group col-md-6" v-if="hasPreviousDatePermission">
-  <label>Previous Date</label>
-  <input
-    type="number"
-    class="form-control"
-    v-model.number="data.previous_days"
-    placeholder="Enter previous date value"
-  >
-</div>
+                    <div class="form-group col-md-6" v-if="hasPreviousDatePermission">
+                        <label>Previous Date</label>
+                        <input type="number" class="form-control" v-model.number="data.previous_days"
+                            placeholder="Enter previous date value">
+                    </div>
 
 
 
                     <div class="form-group col-md-6">
                         <label for="role">User Type <span class="text-danger ml-1">*</span></label>
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input"
-                                    id="femaleCheckBox"
-                                    v-bind:checked="data.online_user == 1"
-                                    @click="changeUser($event)"
-                                    name="">
-                            <label class="custom-control-label"
-                                    for="femaleCheckBox">Online User</label>
+                            <input type="checkbox" class="custom-control-input" id="femaleCheckBox"
+                                v-bind:checked="data.online_user == 1" @click="changeUser($event)" name="">
+                            <label class="custom-control-label" for="femaleCheckBox">Online User</label>
                         </div>
                     </div>
                 </div>
@@ -274,27 +219,26 @@
             <!-- Add Modal -->
             <!--Add Roles New-->
             <div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-                 aria-hidden="true">
+                aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Add Role</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                                
-                            </button>
-                        </div>
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add Role</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+
+                        </button>
+                    </div>
                     <div class="modal-content">
                         <div class="modal-body">
                             <div class="row mt-3">
                                 <div class="form-group col-md-12">
                                     <label for="name">Name<span class="text-danger ml-1">*</span></label>
-                                    <input type="text" id="name" class="form-control" v-model="roleName"/>
+                                    <input type="text" id="name" class="form-control" v-model="roleName" />
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-primary" @click="addNewRole()"
-                                    :disabled="loadingRole">
+                            <button type="button" class="btn btn-primary" @click="addNewRole()" :disabled="loadingRole">
                                 {{ loadingRole ? 'Loading...' : 'Add Role' }}
                             </button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -305,13 +249,13 @@
 
             <!--Update Terminal id To your self-->
             <div class="modal fade" id="assignTerminalUser" tabindex="-1" aria-labelledby="exampleModalLabel"
-                 aria-hidden="true">
+                aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Update Terminal </h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                                    @click="closeModal()">
+                                @click="closeModal()">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -319,14 +263,10 @@
                             <div class="row mt-3">
                                 <div class="form-group col-md-12">
                                     <label for="terminal">Terminal<span class="text-danger ml-1">*</span></label>
-                                    <select class="form-control" id="terminals"
-                                            v-model="updateTerminal">
+                                    <select class="form-control" id="terminals" v-model="updateTerminal">
                                         <option value="0" selected>Select Terminal</option>
-                                        <option
-                                            v-for="(terminal, i) in terminals"
-                                            :value="terminal.id"
-                                            :key="i"
-                                        >{{ terminal.city.name }} - {{ terminal.name }}
+                                        <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{
+                                            terminal.city.name }} - {{ terminal.name }}
                                         </option>
                                     </select>
                                 </div>
@@ -334,7 +274,7 @@
                         </div>
                         <div class="modal-footer bg-whitesmoke br">
                             <button type="button" class="btn btn-primary" @click="updateTerminalUser()"
-                                    :disabled="loadingTerminal">
+                                :disabled="loadingTerminal">
                                 {{ loadingTerminal ? 'Loading...' : 'Update Terminal' }}
                             </button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="closeModal()">
@@ -345,66 +285,38 @@
                 </div>
             </div>
             <!--End MOdal-->
-            <Edit
-                heading="Edit User"
-                :errors="this.validationErrors"
-                :success="success"
-                :editForm="editFormID"
-            >
+            <Edit heading="Edit User" :errors="this.validationErrors" :success="success" :editForm="editFormID">
                 <div class="row">
                     <div class="form-group col-md-6">
                         <label for="name">Name<span class="text-danger ml-1">*</span></label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Name"
-                            id="name"
-                            v-model="dataEdit.name"
-                        />
+                        <input type="text" class="form-control" placeholder="Enter Name" id="name"
+                            v-model="dataEdit.name" />
                     </div>
                     <div class="form-group col-md-6">
                         <label for="email">Email<span class="text-danger ml-1">*</span></label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Enter Email"
-                            id="email"
-                            v-model="dataEdit.email"
-                        />
+                        <input type="text" class="form-control" placeholder="Enter Email" id="email"
+                            v-model="dataEdit.email" />
                     </div>
                     <div class="form-group col-md-6">
                         <label for="contact">Contact<span class="text-danger ml-1">*</span></label>
-                        <vue-mask id="phone"
-                                  class="form-control"
-                                  v-model="dataEdit.contact"
-                                  mask="0000-0000000"
-                                  :raw="false"
-                                  :options="optionsContact"
-                        >
+                        <vue-mask id="phone" class="form-control" v-model="dataEdit.contact" mask="0000-0000000"
+                            :raw="false" :options="optionsContact">
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="password">Password<span class="text-danger ml-1">*</span></label>
                         <i class="ml-2 far fa-eye" :title="userPass"></i>
-                        <input
-                            type="password"
-                            class="form-control"
-                            placeholder="Enter Password"
-                            id="password"
-                            v-model="dataEdit.password"
-                        />
+                        <input type="password" class="form-control" placeholder="Enter Password" id="password"
+                            v-model="dataEdit.password" />
                     </div>
                     <div class="form-group col-md-6">
                         <label for="departure">Departure City <span class="text-danger ml-1">*</span></label>
                         <button class="btn btn-success btn-sm m-1" @click="selectAllEditDepartures">Select All</button>
                         <button class="btn btn-danger btn-sm " @click="deselectAllEditDepartures">Deselect All</button>
-                        <select class="form-control" id="editDeparture" multiple
-                                v-model="dataEdit.departure_city_ids">
-                            <option
-                                v-for="(singleDeparture, i) in departureCities"
-                                :value="singleDeparture.id"
-                                :key="i"
-                            >{{ singleDeparture.name }}
+                        <select class="form-control" id="editDeparture" multiple v-model="dataEdit.departure_city_ids">
+                            <option v-for="(singleDeparture, i) in departureCities" :value="singleDeparture.id"
+                                :key="i">{{
+                                singleDeparture.name }}
                             </option>
                         </select>
                     </div>
@@ -413,36 +325,26 @@
                         <button class="btn btn-success btn-sm m-1" @click="selectAllEditDestination">Select All</button>
                         <button class="btn btn-danger btn-sm " @click="deselectAllEditDestination">Deselect All</button>
                         <select class="form-control" id="editDestinations" multiple
-                                v-model="dataEdit.destination_city_ids">
-                            <option
-                                v-for="(singleDestination, i) in destinationCities"
-                                :value="singleDestination.id"
-                                :key="i"
-                            >{{ singleDestination.name }}
+                            v-model="dataEdit.destination_city_ids">
+                            <option v-for="(singleDestination, i) in destinationCities" :value="singleDestination.id"
+                                :key="i">{{
+                                singleDestination.name }}
                             </option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="terminals">Terminal <span class="text-danger ml-1">*</span></label>
-                        <select class="form-control" id="terminals"
-                                v-model="dataEdit.terminal_id">
+                        <select class="form-control" id="terminals" v-model="dataEdit.terminal_id">
                             <option value="0">Select Terminal</option>
-                            <option
-                                v-for="(terminal, i) in terminals"
-                                :value="terminal.id"
-                                :key="i"
-                            >{{ terminal.name }} ({{ terminal.city.name }})
+                            <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{ terminal.name }}
+                                ({{
+                                terminal.city.name }})
                             </option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="role">Role<span class="text-danger ml-1">*</span></label>
-                        <select
-                            type="text"
-                            class="form-control"
-                            id="role"
-                            v-model="dataEdit.role_id"
-                        >
+                        <select type="text" class="form-control" id="role" v-model="dataEdit.role_id">
                             <option value="0">Select Role</option>
                             <option v-for="(role, i) in roles" :value="role.id" :key="i">
                                 {{ role.name }}
@@ -450,23 +352,14 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6" v-if="hasPreviousDatePermissionEdit">
-  <label>Previous Date</label>
-  <input
-    type="number"
-    class="form-control"
-    v-model.number="dataEdit.previous_days"
-    placeholder="Enter previous date value"
-  >
-</div>
+                        <label>Previous Date</label>
+                        <input type="number" class="form-control" v-model.number="dataEdit.previous_days"
+                            placeholder="Enter previous date value">
+                    </div>
 
                     <div class="form-group col-md-6">
                         <label for="role">Allowed Seats Check</label>
-                        <select
-                            type="text"
-                            class="form-control"
-                            id="role"
-                            v-model="dataEdit.check_allowed_seats"
-                        >
+                        <select type="text" class="form-control" id="role" v-model="dataEdit.check_allowed_seats">
                             <option value="0">Not Checked</option>
                             <option value="1">Checked</option>
                         </select>
@@ -474,35 +367,23 @@
                     <div class="form-group col-md-3">
                         <label for="role">User Type</label>
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input"
-                                    id="femaleCheckBoxEdit"
-                                    v-bind:checked="dataEdit.online_user == 1"
-                                    @click="changeEditUser($event)"
-                                    name="">
-                            <label class="custom-control-label"
-                                    for="femaleCheckBoxEdit">Online User</label>
+                            <input type="checkbox" class="custom-control-input" id="femaleCheckBoxEdit"
+                                v-bind:checked="dataEdit.online_user == 1" @click="changeEditUser($event)" name="">
+                            <label class="custom-control-label" for="femaleCheckBoxEdit">Online User</label>
                         </div>
                     </div>
                     <div class="form-group col-md-3">
                         <label for="role">Apply Time Validation</label>
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input"
-                                    id="bookinMinute"
-                                    v-bind:checked="dataEdit.check_booking_minutes == 1"
-                                    @click="changeEditMinute($event)"
-                                    name="">
-                            <label class="custom-control-label"
-                                    for="bookinMinute">Yes</label>
+                            <input type="checkbox" class="custom-control-input" id="bookinMinute"
+                                v-bind:checked="dataEdit.check_booking_minutes == 1" @click="changeEditMinute($event)"
+                                name="">
+                            <label class="custom-control-label" for="bookinMinute">Yes</label>
                         </div>
                     </div>
                 </div>
                 <template v-slot:button>
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        @click="update()"
-                        :disabled="this.loadingUpdate"
-                    >
+                    <button type="button" class="btn btn-primary" @click="update()" :disabled="this.loadingUpdate">
                         {{ this.loadingUpdate ? "Loading..." : "Update User" }}
                     </button>
                 </template>
@@ -510,12 +391,8 @@
 
             <Hide :hideForm="hideFormID" confirmationMessage="Are You Sure You want To Delete This City ???">
                 <template v-slot:button>
-                    <button
-                        type="button"
-                        class="btn btn-danger btn-block"
-                       :disabled="loading" @click="hideUser"
-                    >
-                    {{ loading ? 'Loading...' : 'Yes, I want to Delete' }}
+                    <button type="button" class="btn btn-danger btn-block" :disabled="loading" @click="hideUser">
+                        {{ loading ? 'Loading...' : 'Yes, I want to Delete' }}
                     </button>
                 </template>
             </Hide>
@@ -528,7 +405,7 @@
 import Add from "../../components/Add.vue";
 import Edit from "../../components/Edit.vue";
 import Hide from "../../components/Hide.vue";
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 import vueMask from "vue-jquery-mask";
 import script from "@vueform/multiselect";
 
@@ -552,15 +429,16 @@ export default {
             permissions: [],
             departureCities: [],
             destinationCities: [],
+            route: [],
             formID: 'user_form',
             editFormID: 'edit_user_form',
             hideFormID: 'hide_user_form',
             roleName: '',
             updateTerminal: 0,
             filterData: {
-                name : "",
-                terminal : "",
-                role : "",
+                name: "",
+                terminal: "",
+                role: "",
             },
             data: {
                 name: "",
@@ -605,43 +483,47 @@ export default {
         await this.fetchUsers();
         this.permissions = this.$store.state.permissions;
     },
-   computed: {
-  // ===== ADD MODE =====
-  selectedRole() {
-    return this.roles.find(r => String(r.id) === String(this.data.role));
-  },
+    computed: {
+        // ===== ADD MODE =====
+        selectedRole() {
+            return this.roles.find(r => String(r.id) === String(this.data.role));
+        },
 
-  hasPreviousDatePermission() {
-    if (!this.selectedRole || !Array.isArray(this.selectedRole.permissions)) {
-      return false;
-    }
+        hasPreviousDatePermission() {
+            if (!this.selectedRole || !Array.isArray(this.selectedRole.permissions)) {
+                return false;
+            }
 
-    return this.checkPreviousDatePermission(this.selectedRole);
-  },
+            return this.checkPreviousDatePermission(this.selectedRole);
+        },
 
-  // ===== EDIT MODE =====
-  selectedEditRole() {
-    return this.roles.find(r => String(r.id) === String(this.dataEdit.role_id));
-  },
+        // ===== EDIT MODE =====
+        selectedEditRole() {
+            return this.roles.find(r => String(r.id) === String(this.dataEdit.role_id));
+        },
 
-  hasPreviousDatePermissionEdit() {
-    if (!this.selectedEditRole || !Array.isArray(this.selectedEditRole.permissions)) {
-      return false;
-    }
+        hasPreviousDatePermissionEdit() {
+            if (!this.selectedEditRole || !Array.isArray(this.selectedEditRole.permissions)) {
+                return false;
+            }
 
-    return this.checkPreviousDatePermission(this.selectedEditRole);
-  }
-},
+            return this.checkPreviousDatePermission(this.selectedEditRole);
+        }
+    },
 
     mounted() {
         setTimeout(() => {
             const departure = $('#departure');
+            const route = $('#routes');
             const destinations = $('#destinations');
             const editDeparture = $('#editDeparture');
             const editDestinations = $('#editDestinations');
 
             // Initialize Select2
             departure.select2({
+                closeOnSelect: false
+            });
+            route.select2({
                 closeOnSelect: false
             });
             destinations.select2({
@@ -651,19 +533,23 @@ export default {
             // Handle Select2 change event
             const self = this;
 
-            departure.on('change', function() {
+            departure.on('change', function () {
                 const selectedValues = $(this).val();
                 self.data.departure = selectedValues;
             });
-            destinations.on('change', function() {
+            route.on('change', function () {
+                const selectedValues = $(this).val();
+                self.data.routes = selectedValues;
+            });
+            destinations.on('change', function () {
                 const selectedValues = $(this).val();
                 self.data.destination = selectedValues;
             });
-            editDeparture.on('change', function() {
+            editDeparture.on('change', function () {
                 const selectedValues = $(this).val();
                 self.dataEdit.departure_city_ids = selectedValues;
             });
-            editDestinations.on('change', function() {
+            editDestinations.on('change', function () {
                 const selectedValues = $(this).val();
                 self.dataEdit.destination_city_ids = selectedValues;
             });
@@ -671,24 +557,24 @@ export default {
     },
     methods: {
         checkPreviousDatePermission(role) {
-    for (const module of role.permissions) {
-      if (!Array.isArray(module.childs)) continue;
+            for (const module of role.permissions) {
+                if (!Array.isArray(module.childs)) continue;
 
-      for (const child of module.childs) {
-        if (!Array.isArray(child.buttons)) continue;
+                for (const child of module.childs) {
+                    if (!Array.isArray(child.buttons)) continue;
 
-        const found = child.buttons.find(
-          btn => btn.name === 'previous-date' && btn.allow === true
-        );
+                    const found = child.buttons.find(
+                        btn => btn.name === 'previous-date' && btn.allow === true
+                    );
 
-        if (found) {
-          return true;
-        }
-      }
-    }
+                    if (found) {
+                        return true;
+                    }
+                }
+            }
 
-    return false;
-  },
+            return false;
+        },
         closeModal() {
             $(".modal").click();
         },
@@ -718,43 +604,53 @@ export default {
             this.data.password = "";
             this.data.role = 0;
             this.data.departure = 0;
+            this.data.route = 0;
             this.data.destination = 0;
             this.roleName = '';
         },
 
         selectAllDepartures() {
             $("#departure > option").prop("selected", true);
-            $("#departure").trigger("change"); 
+            $("#departure").trigger("change");
         },
 
         deselectAllDepartures() {
             $("#departure > option").prop("selected", false);
             $("#departure").trigger("change");
         },
-        
+
         selectAllDestination() {
             $("#destinations > option").prop("selected", true);
-            $("#destinations").trigger("change"); 
+            $("#destinations").trigger("change");
         },
 
         deselectAllDestination() {
             $("#destinations > option").prop("selected", false);
             $("#destinations").trigger("change");
         },
-        
+        selectAllRoute() {
+            $("#routes > option").prop("selected", true);
+            $("#routes").trigger("change");
+        },
+
+        deselectAllRoute() {
+            $("#routes > option").prop("selected", false);
+            $("#routes").trigger("change");
+        },
+
         selectAllEditDepartures() {
             $("#editDeparture > option").prop("selected", true);
-            $("#editDeparture").trigger("change"); 
+            $("#editDeparture").trigger("change");
         },
 
         deselectAllEditDepartures() {
             $("#editDeparture > option").prop("selected", false);
             $("#editDeparture").trigger("change");
         },
-        
+
         selectAllEditDestination() {
             $("#editDestinations > option").prop("selected", true);
-            $("#editDestinations").trigger("change"); 
+            $("#editDestinations").trigger("change");
         },
 
         deselectAllEditDestination() {
@@ -763,8 +659,9 @@ export default {
         },
 
         async fetchUsers() {
-            const userRes = await this.callApi("post", "user",this.filterData);
+            const userRes = await this.callApi("post", "user", this.filterData);
             const resCities = await this.callApi("post", "user/cities");
+          
             if (userRes.status == 200 && resCities.status == 200) {
                 this.users = userRes.data.users;
                 this.authCheck = userRes.data.authCheck;
@@ -774,9 +671,15 @@ export default {
                 console.log(userRes);
                 console.log(resCities);
             }
-            const roleRes = await this.callApi("post", "company/roles", {id: this.data.company_id});
+            const roleRes = await this.callApi("post", "company/roles", { id: this.data.company_id });
             if (roleRes.status == 200) {
                 this.roles = roleRes.data;
+            } else {
+                console.log(roleRes)
+            }
+            const routeRes = await this.callApi("post", "booking/close/schedule/merges/route", { id: this.data.company_id });
+            if (routeRes.status == 200) {
+                this.routes = routeRes.data.routes;
             } else {
                 console.log(roleRes)
             }
@@ -800,7 +703,7 @@ export default {
                 this.data.online_user = 0;
             }
         },
-        
+
         changeEditUser: function (e) {
             if (e.target.checked) {
                 this.dataEdit.online_user = 1;
@@ -808,7 +711,7 @@ export default {
                 this.dataEdit.online_user = 0;
             }
         },
-        
+
         changeEditMinute: function (e) {
             if (e.target.checked) {
                 this.dataEdit.check_booking_minutes = 1;
@@ -920,7 +823,7 @@ export default {
                 });
             }
             this.loadingTerminal = true;
-            const resTerminalUpdate = await this.callApi("post", "user/update/terminal", {terminal_id: this.updateTerminal});
+            const resTerminalUpdate = await this.callApi("post", "user/update/terminal", { terminal_id: this.updateTerminal });
             if (resTerminalUpdate.status == 200) {
                 this.loadingTerminal = false;
                 this.updateTerminal = resTerminalUpdate.data.terminal_id;
@@ -961,7 +864,7 @@ export default {
                 });
             }
             this.loadingRole = true;
-            const resAddRole = await this.callApi("post", "role/store", {name: this.roleName});
+            const resAddRole = await this.callApi("post", "role/store", { name: this.roleName });
             if (resAddRole.status == 200) {
                 this.loadingRole = false;
                 this.roles.push(resAddRole.data);
@@ -994,7 +897,7 @@ export default {
         },
 
         async edit(user) {
-            const resEditUser = await this.callApi("post", "user/edit", {'id': user.id});
+            const resEditUser = await this.callApi("post", "user/edit", { 'id': user.id });
             if (resEditUser.status == 200) {
                 this.dataEdit = resEditUser.data;
                 this.userPass = resEditUser.data.userpass ? resEditUser.data.userpass.user_password : 'N/A';
@@ -1103,7 +1006,7 @@ export default {
         },
         async hideUser() {
             this.loading = true;
-            const resHide = await this.callApi("post", 'user/hide', {id:this.delId});
+            const resHide = await this.callApi("post", 'user/hide', { id: this.delId });
             if (resHide.status == 200) {
                 $(".modal").click();
                 swal({
@@ -1133,21 +1036,21 @@ export default {
             }
         },
     },
-watch: {
-  // ===== ADD MODE =====
-  'data.role'(newVal, oldVal) {
-    if (newVal !== oldVal) {
-      this.data.previous_days = null;
-    }
-  },
+    watch: {
+        // ===== ADD MODE =====
+        'data.role'(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.data.previous_days = null;
+            }
+        },
 
-  // ===== EDIT MODE =====
-  'dataEdit.role_id'(newVal, oldVal) {
-    if (newVal !== oldVal) {
-      this.dataEdit.previous_days = null;
+        // ===== EDIT MODE =====
+        'dataEdit.role_id'(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.dataEdit.previous_days = null;
+            }
+        }
     }
-  }
-}
 
 
 };
