@@ -27,87 +27,141 @@ class ExpenseCategoryController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return ExpenseCategory::with('addedBy')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
+        return ExpenseCategory::with('addedBy', 'reportHeader')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
     }
 
     public function store(Request $request)
-    {
-        $rules = [
-            'name' => ['required'=> Rule::unique('expense_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')],
+{
+    $rules = [
+        'name' => [
+            'required',
+            Rule::unique('expense_categories', 'name')
+                ->where('company_id', Auth::user()->company_id)
+                ->whereNull('deleted_at'),
+        ],
+        'include_in_closing_summary' => ['nullable', 'in:0,1'],
+        'report_header_id' => ['nullable', 'exists:reports_headers,id'],
+    ];
 
+    $customMessages = [
+        'name.required' => 'Name Field is Required!',
+        'name.unique' => 'Category Name is Already Exist',
+        'report_header_id.exists' => 'Selected header is invalid',
+    ];
+
+    $this->validate($request, $rules, $customMessages);
+
+    if (!checkPermissionButtons("add-category")) {
+        return response()->json([
+            "Error" => ['You are not authorized to access this url']
+        ], 403);
+    }
+
+    try {
+        DB::beginTransaction();
+
+        $category = ExpenseCategory::create([
+            'name' => $request->name,
+            'include_in_closing' => $request->include_in_closing_summary,
+            'report_header_id' => $request->report_header_id,
+            'company_id' => Auth::user()->company_id,
+            'added_by' => Auth::user()->id,
+        ]);
+
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name . " | added expense category (" . $request->name . ")",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
+
+        DB::commit();
+
+        return response()->json($category, 201);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Database transaction error: ' . $e->getMessage());
+
+        return response()->json([
+            "errors" => [
+                "Error" => ['An error occurred during the database transaction.']
+            ]
+        ], 422);
+    }
+}
+
+   public function update(Request $request)
+{
+    if (!checkPermissionButtons("edit-category")) {
+        return response()->json([
+            "Error" => ['You are not authorized to access this url']
+        ], 403);
+    }
+
+    try {
+        DB::beginTransaction();
+
+        $rules = [
+            'id' => ['required', 'exists:expense_categories,id'],
+            'name' => [
+                'required',
+                Rule::unique('account_categories', 'name')
+                    ->where('company_id', Auth::user()->company_id)
+                    ->where("first_level_id", 5)
+                    ->where("second_level_id", 18)
+                    ->whereNull('deleted_at')
+                    ->ignore($request->id),
+
+                Rule::unique('expense_categories', 'name')
+                    ->where('company_id', Auth::user()->company_id)
+                    ->whereNull('deleted_at')
+                    ->ignore($request->id),
+            ],
+            'include_in_closing_summary' => ['nullable', 'in:0,1'],
+            'report_header_id' => ['nullable', 'exists:reports_headers,id'],
         ];
 
         $customMessages = [
             'name.required' => 'Name Field is Required!',
             'name.unique' => 'Category Name is Already Exist',
+            'report_header_id.exists' => 'Selected header is invalid',
         ];
+
         $this->validate($request, $rules, $customMessages);
-        if(!checkPermissionButtons("add-category"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
-        try {
-                DB::beginTransaction();
-                
 
-                $category = ExpenseCategory::create([
-                    'name' => $request->name,
-                    'include_in_closing' => $request->include_in_closing_summary,
-                    'company_id' => Auth::user()->company_id,
-                    'added_by' => Auth::user()->id,
-                ]);
+        $expCtg = ExpenseCategory::where('company_id', Auth::user()->company_id)
+            ->findOrFail($request->id);
 
-                ActivityLog::create([
-                    "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | added expense category (".$request->name.")",
-                    "requested_host" => $request->ip(),
-                    "company_id" => Auth::user()->company_id
-                ]);
-                DB::commit();
-                return $category;
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            }
+        $data = $expCtg->update([
+            'name' => $request->name,
+            'include_in_closing' => $request->include_in_closing_summary,
+            'report_header_id' => $request->report_header_id,
+            'updated_by' => Auth::user()->id,
+        ]);
+
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name . " | updated expense category (" . $request->name . ")",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
+
+        DB::commit();
+
+        return response()->json([
+            'message' => 'Category updated successfully',
+            'data' => $expCtg->fresh(['addedBy', 'reportHeader'])
+        ], 200);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Database transaction error: ' . $e->getMessage());
+
+        return response()->json([
+            "errors" => [
+                "Error" => ['An error occurred during the database transaction.']
+            ]
+        ], 422);
     }
-
-    public function update(Request $request)
-    {
-        if(!checkPermissionButtons("edit-category"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
-        try {
-                DB::beginTransaction();
-                $rules = [
-                    'name' => ['required'=> Rule::unique('account_categories', 'name')->where('company_id', Auth::user()->company_id)->where("first_level_id",5)->where("second_level_id",18)->whereNull('deleted_at')->ignore($request->id),'required', Rule::unique('expense_categories', 'name')->where('company_id', Auth::user()->company_id)->whereNull('deleted_at')->ignore($request->id)],
-
-                ];
-
-                $customMessages = [
-                    'name.required' => 'Name Field is Required!',
-                    'name.unique' => 'Category Name is Already Exist',
-                ];
-                $this->validate($request, $rules, $customMessages);
-                $expCtg = ExpenseCategory::find($request->id);
-
-                $data =  $expCtg->update([
-                    'name' => $request->name,
-                    'include_in_closing' => $request->include_in_closing_summary,
-                ]);
-                ActivityLog::create([
-                    "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | updated expense category (".$request->name.")",
-                    "requested_host" => $request->ip(),
-                    "company_id" => Auth::user()->company_id
-                ]);
-                DB::commit();
-                return $data;
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            }
-    }
+}
 }

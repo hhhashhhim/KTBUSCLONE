@@ -18,6 +18,7 @@ use App\Models\TerminalCommission;
 use App\Models\ActivityLog;
 use App\Models\CounterExpense;
 use App\Models\Expense\TicketMergeExpense;
+use App\Models\FareTable;
 use App\Models\OfficeExpense;
 use App\Models\ReportHeaderLink;
 use App\Models\Schedule\TicketClosing;
@@ -610,6 +611,7 @@ class ScheduleClosingController extends Controller
             'schedule_complete' => 1
         ])
             ->with([
+                'tickets:route_id,ticket_merge_id',
                 'bus:id,bus_number',
                 'shortage:id,ticket_closing_id,terminal_id,shortage,total_receivable',
                 'closing:id,ticket_merge_id,schedule_id',
@@ -621,24 +623,28 @@ class ScheduleClosingController extends Controller
             ->get();
 
         // Bus Filter
-        if ($request->bus_number) {
-            $query->where('bus_id', $request->bus_number);
+        if ($request->bus_number && count($request->bus_number) > 0) {
+            $query->whereIn('bus_id', $request->bus_number);
         }
+      if ($request->route && count($request->route) > 0) {
+    $query->whereHas('tickets', function ($q) use ($request) {
+        $q->whereIn('route_id', $request->route);
+    });
+}
 
         // Schedule Name Start
-        if ($request->schedule_name_start) {
+        if ($request->schedule_name_start && count($request->schedule_name_start) > 0) {
             $query->whereHas('closing.schedule', function ($q) use ($request) {
-                $q->where('name', $request->schedule_name_start);
+                $q->whereIn('name', $request->schedule_name_start);
             });
         }
 
         // Schedule Name End
-        if ($request->schedule_name_end) {
+        if ($request->schedule_name_end && count($request->schedule_name_end) > 0) {
             $query->whereHas('closing.schedule', function ($q) use ($request) {
-                $q->where('name', $request->schedule_name_end);
+                $q->whereIn('name', $request->schedule_name_end);
             });
         }
-
         // Departure Date Filters
         if ($request->from_date) {
             $query->whereDate('schedule_departure_date', '>=', $request->from_date);
@@ -690,6 +696,15 @@ class ScheduleClosingController extends Controller
             'buses'  => $buses
         ];
     }
+
+    public function route()
+    {
+
+        return [
+            'routes' => Route::with('addedBy')->where(['company_id' => Auth::user()->company_id, "hide" => 0])->get()
+        ];
+    }
+
     public function schedule()
     {
         $user = Auth::user();
@@ -1196,19 +1211,17 @@ class ScheduleClosingController extends Controller
 
         return view('reports.busMergeReportUrdu', ['data' => $data]);
     }
-public function summaryReport(Request $request)
+    public function summaryReport(Request $request)
     {
-    
-      
-        if(!checkForSubmenu("close-trip"))
-        {
+
+
+        if (!checkForSubmenu("close-trip")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $closings = TicketClosingMerge::
-        with(['closing:id,ticket_merge_id,bus_id', 'closing.tickets.elt:id,elt_price,ticket_id','closing.tickets'=>function($q){
-                    $q->where("type","booked");
-                    $q->select(["id","ticket_closing_id","seat_fare","discount","terminal_id"]);
-                }])
+        $closings = TicketClosingMerge::with(['closing:id,ticket_merge_id,bus_id', 'closing.tickets.elt:id,elt_price,ticket_id', 'closing.tickets' => function ($q) {
+                $q->where("type", "booked");
+                $q->select(["id", "ticket_closing_id", "seat_fare", "discount", "terminal_id"]);
+            }])
             ->where('schedule_complete', 1)
             ->where('company_id', Auth::user()->company_id)
             ->where(function ($q) use ($request) {
@@ -1239,8 +1252,8 @@ public function summaryReport(Request $request)
                 }
             })->pluck('id');
         $headerLink = ReportHeaderLink::where('company_id', Auth::user()->company_id)->whereIn('ticket_merge_id', $mergeIds)->get(['id', 'header_id', 'ticket_merge_id', 'value'])->groupBy(['ticket_merge_id', 'header_id']);
-        $onlineTerminalData = Ticket::whereIn('ticket_merge_id', $mergeIds)->where('company_id', Auth::user()->company_id)->where(['online_terminal'=>1,'type'=>"booked"])->get(['id', 'terminal_id', 'seat_fare', 'ticket_merge_id', 'discount',"schedule_id","route_id"])->groupBy(['ticket_merge_id', 'terminal_id']);
-        $physicalTerminalData = Ticket::whereIn('ticket_merge_id', $mergeIds)->where('company_id', Auth::user()->company_id)->where(['online_terminal'=>0,'type'=>"booked"])->get(['id', 'terminal_id', 'seat_fare', 'ticket_merge_id', 'discount',"schedule_id","route_id"])->groupBy(['ticket_merge_id','schedule_id', 'terminal_id']);
+        $onlineTerminalData = Ticket::whereIn('ticket_merge_id', $mergeIds)->where('company_id', Auth::user()->company_id)->where(['online_terminal' => 1, 'type' => "booked"])->get(['id', 'terminal_id', 'seat_fare', 'ticket_merge_id', 'discount', "schedule_id", "route_id"])->groupBy(['ticket_merge_id', 'terminal_id']);
+        $physicalTerminalData = Ticket::whereIn('ticket_merge_id', $mergeIds)->where('company_id', Auth::user()->company_id)->where(['online_terminal' => 0, 'type' => "booked"])->get(['id', 'terminal_id', 'seat_fare', 'ticket_merge_id', 'discount', "schedule_id", "route_id"])->groupBy(['ticket_merge_id', 'schedule_id', 'terminal_id']);
         //Map function for single iteration
         $closings->map(function ($closing) {
             //            get data from single iteration with relation
@@ -1256,33 +1269,27 @@ public function summaryReport(Request $request)
             });
             $closing->total_expenses = (int)TicketMergeExpense::where('ticket_merge_id', $closing->id)->sum('amount');
             $closing->mod = ($closing->closing[0]->tickets->count() + $closing->closing[1]->tickets->count()) * 20;
-            
+
             return $closing;
         });
-        
-        
+
+
         // for applying terminal commission only online terminal
         $onlineTerminalData->map(function ($merge) {
             $merge->map(function ($terminal) {
                 $terminal->map(function ($ticket) {
                     $commission = TerminalCommission::where(["company_id" => Auth::user()->company_id, 'terminal_id' => $ticket->terminal_id, "route_id" => $ticket->route_id])->first();
-                    if($commission)
-                    {
-                        if($commission->flat_commission == 0)
-                        {
+                    if ($commission) {
+                        if ($commission->flat_commission == 0) {
                             $amount = (($ticket->seat_fare - $ticket->discount) / 100) * $commission->percentage_commission;
-                        }
-                        else
-                        {
+                        } else {
                             $amount = $commission->flat_commission;
                         }
                         $ticket->commission_amount = intVal($amount);
-                    }
-                    else
-                    {
+                    } else {
                         $ticket->commission_amount = 0;
                     }
-                });  
+                });
             });
         });
         // for applying terminal commission only physical terminal
@@ -1291,38 +1298,32 @@ public function summaryReport(Request $request)
                 $schedule->map(function ($terminal) {
                     $terminal->map(function ($ticket) {
                         $commission = TerminalCommission::where(["company_id" => Auth::user()->company_id, 'terminal_id' => $ticket->terminal_id, "route_id" => $ticket->route_id])->first();
-                        if($commission)
-                        {
-                            if($commission->flat_commission == 0)
-                            {
+                        if ($commission) {
+                            if ($commission->flat_commission == 0) {
                                 $amount = (($ticket->seat_fare - $ticket->discount) / 100) * $commission->percentage_commission;
-                            }
-                            else
-                            {
+                            } else {
                                 $amount = $commission->flat_commission;
                             }
                             $ticket->commission_amount = intVal($amount);
                             $ticket->kt_commission = (($ticket->seat_fare - $ticket->discount) / 100) * $commission->adjustment_commission;
                             $ticket->fix_commission = intVal($commission->fix_commission);
-                        }
-                        else
-                        {
+                        } else {
                             $ticket->commission_amount = 0;
                             $ticket->fix_commission = 0;
                             $ticket->kt_commission = 0;
                         }
-                    });  
+                    });
                 });
             });
         });
-           
-            // return $onlineTerminalData;
+
+        // return $onlineTerminalData;
         return view('reports.SummeryReportEng', [
-                "data" => $closings,
-                "online_terminals" => $onlineTerminalData,
-                "physical_terminals" => $physicalTerminalData,
-                "headers_link" => $headerLink,
-            ]);
+            "data" => $closings,
+            "online_terminals" => $onlineTerminalData,
+            "physical_terminals" => $physicalTerminalData,
+            "headers_link" => $headerLink,
+        ]);
     }
 
     public function getMembers(Request $request)

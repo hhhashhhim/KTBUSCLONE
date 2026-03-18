@@ -94,6 +94,7 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
             Route::post('/', [ScheduleClosingController::class, 'merges']);
             Route::post('/buses', [ScheduleClosingController::class, 'buses']);
             Route::post('/schedule', [ScheduleClosingController::class, 'schedule']);
+            Route::post('/route', [ScheduleClosingController::class, 'route']);
         });
     });
 

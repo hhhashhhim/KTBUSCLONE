@@ -2,6 +2,7 @@
 
 namespace App\Models\Expense;
 
+use App\Models\ReportsHeader;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
@@ -18,5 +19,9 @@ class ExpenseCategory extends Model
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }
+    public function reportHeader()
+{
+    return $this->belongsTo(ReportsHeader::class, 'report_header_id');
+}
 
 }
