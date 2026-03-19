@@ -71,59 +71,81 @@ class UserController extends Controller
 
 
     public function store(Request $request)
-    {
-        if(!checkPermissionButtons("add-users"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
-        try {
-                DB::beginTransaction();
-
-                $departure = array_map('intval', $request->departure);
-                $destination = array_map('intval', $request->destination);
-                $this->validate($request, [
-                    'name' => 'required',
-                    'email' => 'bail|required|email|unique:users',
-                    'password' => 'required',
-                    'role' => 'required',
-                    'contact' => 'required',
-                ]);
-                $user = User::create([
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'contact' => formatContact($request->contact),
-                    'password' => Hash::make($request->password),
-                    'role_id' => $request->role,
-                    'online_user' => $request->online_user,
-                    'terminal_id' => $request->terminal_id,
-                    'destination_city_ids' => json_encode($destination),
-                    'departure_city_ids' => json_encode($departure),
-                    'company_id' => Auth::user()->company_id,
-                    'previous_days' => $request->previous_days
-                ]);
-
-                UserPassword::create([
-                    'user_id' => $user->id,
-                    'user_password' => $request->password,
-                    'added_by' => Auth::user()->id,
-                    'company_id' => Auth::user()->company_id,
-                ]);
-                ActivityLog::create([
-                    "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | added user ($request->email)",
-                    "requested_host" => $request->ip(),
-                    "company_id" => Auth::user()->company_id
-                ]);
-                DB::commit();
-                
-
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            }
-
+{
+    if (!checkPermissionButtons("add-users")) {
+        return response()->json([
+            "Error" => ['You are not authorized to access this url']
+        ], 403);
     }
+
+    try {
+        DB::beginTransaction();
+
+        $this->validate($request, [
+            'name' => 'required',
+            'email' => 'bail|required|email|unique:users',
+            'password' => 'required',
+            'role' => 'required',
+            'contact' => 'required',
+            'departure' => 'required|array',
+            'departure.*' => 'integer',
+            'destination' => 'required|array',
+            'destination.*' => 'integer',
+            'routes' => 'required|array',
+            'routes.*' => 'integer',
+        ]);
+
+        $departure = array_map('intval', $request->departure ?? []);
+        $destination = array_map('intval', $request->destination ?? []);
+        $routes = array_map('intval', $request->routes ?? []);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'contact' => formatContact($request->contact),
+            'password' => Hash::make($request->password),
+            'role_id' => $request->role,
+            'online_user' => $request->online_user,
+            'terminal_id' => $request->terminal_id,
+            'destination_city_ids' => json_encode($destination),
+            'departure_city_ids' => json_encode($departure),
+            'route_ids' => json_encode($routes),
+            'company_id' => Auth::user()->company_id,
+            'previous_days' => $request->previous_days
+        ]);
+
+        UserPassword::create([
+            'user_id' => $user->id,
+            'user_password' => $request->password,
+            'added_by' => Auth::user()->id,
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        ActivityLog::create([
+            "activity_by" => Auth::user()->id,
+            "message" => Auth::user()->name . " | added user ($request->email)",
+            "requested_host" => $request->ip(),
+            "company_id" => Auth::user()->company_id
+        ]);
+
+        DB::commit();
+
+        return response()->json([
+            'message' => 'User created successfully',
+            'data' => $user
+        ], 200);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Database transaction error: ' . $e->getMessage());
+
+        return response()->json([
+            "errors" => [
+                "Error" => ['An error occurred during the database transaction.']
+            ]
+        ], 422);
+    }
+}
 
     public function edit(Request $request)
     {
@@ -134,6 +156,7 @@ class UserController extends Controller
         $user = User::with('userpass')->find($request->id);
         $user->departure_city_ids = json_decode($user->departure_city_ids);
         $user->destination_city_ids = json_decode($user->destination_city_ids);
+         $user->route_ids = json_decode($user->route_ids, true) ?? [];
         return $user;
     }
 
@@ -148,6 +171,7 @@ class UserController extends Controller
 
                 $departure = array_map('intval',$request->departure_city_ids);
                 $destination = array_map('intval', $request->destination_city_ids);
+                 $routes = array_map('intval', $request->routes ?? []);
                 $this->validate($request, [
                     'name' => 'required',
                     'email' => 'bail|required|email|unique:users,email,' . $request->id,
@@ -164,6 +188,7 @@ class UserController extends Controller
                     'terminal_id' => $request->terminal_id,
                     'destination_city_ids' => json_encode($destination),
                     'departure_city_ids' => json_encode($departure),
+                    'route_ids' => json_encode($routes),
                     'check_allowed_seats' => $request->check_allowed_seats,
                     'company_id' => Auth::user()->company_id,
                     'previous_days' => $request->previous_days

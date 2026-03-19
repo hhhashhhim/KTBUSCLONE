@@ -100,58 +100,97 @@ class ScheduleClosingController extends Controller
 
 
     public function unclosing(Request $request)
-    {
-        if (!checkForSubmenu("closing")) {
-            return response()->json([
-                "Error" => ['You are not authorized to access this url']
-            ], 403);
-        }
-
-        $query = TicketClosing::where('company_id', Auth::user()->company_id)
-            ->with(
-                "bus:id,bus_number",
-                "schedule:id,name,route_id",
-                "schedule.route:id,name"
-            )
-            ->where([
-                "hide" => 0,
-                "commission_route" => 0
-            ]);
-        $buses = Bus::where('company_id', Auth::user()->company_id)
-            ->select('id', 'bus_number')
-            ->orderBy('bus_number')
-            ->get();
-        $buses = Bus::where('company_id', Auth::user()->company_id)
-            ->select('id', 'bus_number')
-            ->orderBy('bus_number')
-            ->get();
-        // ✅ Bus filter
-        if ($request->bus_number) {
-            $query->where('bus_id', $request->bus_number);
-        }
-
-        // ✅ Date range filter
-        if ($request->from_date) {
-            $query->whereDate('schedule_date', '>=', $request->from_date);
-        }
-
-        if ($request->to_date) {
-            $query->whereDate('schedule_date', '<=', $request->to_date);
-        }
-
-        $closings = $query
-            ->orderBy('bus_id')
-            ->get()
-            ->groupBy('ticket_merge_id')
-            ->filter(function ($group) {
-                return $group->count() == 1;
-            });
-
+{
+    if (!checkForSubmenu("closing")) {
         return response()->json([
-            "closings" => $closings,
-            "buses" => $buses
-        ]);
+            "Error" => ['You are not authorized to access this url']
+        ], 403);
     }
+
+    $user = Auth::user();
+
+    // User allowed route ids
+    $allowedRouteIds = $user->route_ids;
+
+    if (is_string($allowedRouteIds)) {
+        $allowedRouteIds = json_decode($allowedRouteIds, true);
+    }
+
+    $allowedRouteIds = is_array($allowedRouteIds) ? $allowedRouteIds : [];
+
+    // Final route ids = user allowed routes
+    $finalRouteIds = $allowedRouteIds;
+
+    // If dropdownRoute exists then intersect with allowed routes
+    if ($request->filled('dropdownRoute')) {
+        $requestedRoute = (int) $request->dropdownRoute;
+
+        if (!$user->is_super_admin) {
+            $finalRouteIds = in_array($requestedRoute, $allowedRouteIds) ? [$requestedRoute] : [];
+        } else {
+            $finalRouteIds = [$requestedRoute];
+        }
+    }
+
+    $query = TicketClosing::where('company_id', $user->company_id)
+        ->with([
+            "bus:id,bus_number",
+            "schedule:id,name,route_id",
+            "schedule.route:id,name"
+        ])
+        ->where([
+            "hide" => 0,
+            "commission_route" => 0
+        ]);
+
+    // Always apply allowed route filter
+    if (!$user->is_super_admin) {
+        if (empty($finalRouteIds)) {
+            $query->whereRaw('1 = 0');
+        } else {
+            $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
+                $q->whereIn('route_id', $finalRouteIds);
+            });
+        }
+    } elseif (!empty($finalRouteIds)) {
+        // Super admin + dropdownRoute filter
+        $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
+            $q->whereIn('route_id', $finalRouteIds);
+        });
+    }
+
+    $buses = Bus::where('company_id', $user->company_id)
+        ->select('id', 'bus_number')
+        ->orderBy('bus_number')
+        ->get();
+
+    // Bus filter
+    if ($request->filled('bus_number')) {
+        $query->where('bus_id', $request->bus_number);
+    }
+
+    // Date range filter
+    if ($request->filled('from_date')) {
+        $query->whereDate('schedule_date', '>=', $request->from_date);
+    }
+
+    if ($request->filled('to_date')) {
+        $query->whereDate('schedule_date', '<=', $request->to_date);
+    }
+
+    $closings = $query
+        ->orderBy('bus_id')
+        ->get()
+        ->groupBy('ticket_merge_id')
+        ->filter(function ($group) {
+            return $group->count() == 1;
+        });
+
+    return response()->json([
+        "closings" => $closings,
+        "buses" => $buses
+    ]);
+}
 
 
     public function commissionClosing(Request $request)
@@ -596,96 +635,120 @@ class ScheduleClosingController extends Controller
     }
 
     public function merges(Request $request)
-    {
-        if (!checkForSubmenu("merges")) {
-            return response()->json([
-                "Error" => ['You are not authorized to access this url']
-            ], 403);
-        }
-
-        $user = Auth::user();
-
-        // Base query
-        $query = TicketClosingMerge::where([
-            'company_id' => $user->company_id,
-            'schedule_complete' => 1
-        ])
-            ->with([
-                'tickets:route_id,ticket_merge_id',
-                'bus:id,bus_number',
-                'shortage:id,ticket_closing_id,terminal_id,shortage,total_receivable',
-                'closing:id,ticket_merge_id,schedule_id',
-                'closing.schedule:id,name'
-            ]);
-
-        $buses = Bus::where('company_id', $user->company_id)
-            ->orderBy('id')
-            ->get();
-
-        // Bus Filter
-        if ($request->bus_number && count($request->bus_number) > 0) {
-            $query->whereIn('bus_id', $request->bus_number);
-        }
-      if ($request->route && count($request->route) > 0) {
-    $query->whereHas('tickets', function ($q) use ($request) {
-        $q->whereIn('route_id', $request->route);
-    });
-}
-
-        // Schedule Name Start
-        if ($request->schedule_name_start && count($request->schedule_name_start) > 0) {
-            $query->whereHas('closing.schedule', function ($q) use ($request) {
-                $q->whereIn('name', $request->schedule_name_start);
-            });
-        }
-
-        // Schedule Name End
-        if ($request->schedule_name_end && count($request->schedule_name_end) > 0) {
-            $query->whereHas('closing.schedule', function ($q) use ($request) {
-                $q->whereIn('name', $request->schedule_name_end);
-            });
-        }
-        // Departure Date Filters
-        if ($request->from_date) {
-            $query->whereDate('schedule_departure_date', '>=', $request->from_date);
-        }
-
-        if ($request->to_date) {
-            $query->whereDate('schedule_departure_date', '<=', $request->to_date);
-        }
-
-        // ✅ Closing Date Range Filter
-        if ($request->closing_from_date) {
-            $query->whereDate('closing_date', '>=', $request->closing_from_date);
-        }
-
-        if ($request->closing_to_date) {
-            $query->whereDate('closing_date', '<=', $request->closing_to_date);
-        }
-
-        $limit = (!$request->from_date && !$request->to_date) ? 20 : 2000;
-
-        $merges = $query
-            ->withSum('shortage', 'total_receivable')
-            ->withSum('shortage', 'other_commission')
-            ->withSum('shortage', 'kt_commission')
-            ->withSum('expenses', 'amount')
-            ->get()
-            ->map(function ($item) {
-
-                $item->expenses_sum_amount =
-                    $item->shortage_sum_kt_commission +
-                    $item->shortage_sum_other_commission +
-                    $item->expenses_sum_amount;
-
-                return $item;
-            });
-
-        return [
-            'merges' => $merges,
-            'buses'  => $buses
-        ];
+{
+    if (!checkForSubmenu("merges")) {
+        return response()->json([
+            "Error" => ['You are not authorized to access this url']
+        ], 403);
     }
+
+    $user = Auth::user();
+
+    $allowedRouteIds = $user->route_ids;
+
+    if (is_string($allowedRouteIds)) {
+        $allowedRouteIds = json_decode($allowedRouteIds, true);
+    }
+
+    $allowedRouteIds = is_array($allowedRouteIds) ? $allowedRouteIds : [];
+
+    // Request route filter + allowed routes
+    $finalRouteIds = $allowedRouteIds;
+
+    if ($request->route && count($request->route) > 0) {
+        $requestedRoutes = $request->route;
+
+        if (!$user->is_super_admin) {
+            $finalRouteIds = array_values(array_intersect($allowedRouteIds, $requestedRoutes));
+        } else {
+            $finalRouteIds = $requestedRoutes;
+        }
+    }
+
+    $query = TicketClosingMerge::where([
+        'company_id' => $user->company_id,
+        'schedule_complete' => 1
+    ])
+    ->with([
+        'tickets' => function ($q) use ($user, $finalRouteIds) {
+            $q->select('route_id', 'ticket_merge_id');
+
+            if (!$user->is_super_admin) {
+                if (empty($finalRouteIds)) {
+                    $q->whereRaw('1 = 0');
+                } else {
+                    $q->whereIn('route_id', $finalRouteIds);
+                }
+            }
+        },
+        'bus:id,bus_number',
+        'shortage:id,ticket_closing_id,terminal_id,shortage,total_receivable',
+        'closing:id,ticket_merge_id,schedule_id',
+        'closing.schedule:id,name'
+    ]);
+
+    // Always restrict merges by allowed routes
+    if (!$user->is_super_admin) {
+        if (empty($finalRouteIds)) {
+            $query->whereRaw('1 = 0');
+        } else {
+            $query->whereHas('tickets', function ($q) use ($finalRouteIds) {
+                $q->whereIn('route_id', $finalRouteIds);
+            });
+        }
+    }
+
+    if ($request->bus_number && count($request->bus_number) > 0) {
+        $query->whereIn('bus_id', $request->bus_number);
+    }
+
+    if ($request->schedule_name_start && count($request->schedule_name_start) > 0) {
+        $query->whereHas('closing.schedule', function ($q) use ($request) {
+            $q->whereIn('name', $request->schedule_name_start);
+        });
+    }
+
+    if ($request->schedule_name_end && count($request->schedule_name_end) > 0) {
+        $query->whereHas('closing.schedule', function ($q) use ($request) {
+            $q->whereIn('name', $request->schedule_name_end);
+        });
+    }
+
+    if ($request->from_date) {
+        $query->whereDate('schedule_departure_date', '>=', $request->from_date);
+    }
+
+    if ($request->to_date) {
+        $query->whereDate('schedule_departure_date', '<=', $request->to_date);
+    }
+
+    if ($request->closing_from_date) {
+        $query->whereDate('closing_date', '>=', $request->closing_from_date);
+    }
+
+    if ($request->closing_to_date) {
+        $query->whereDate('closing_date', '<=', $request->closing_to_date);
+    }
+
+    $merges = $query
+        ->withSum('shortage', 'total_receivable')
+        ->withSum('shortage', 'other_commission')
+        ->withSum('shortage', 'kt_commission')
+        ->withSum('expenses', 'amount')
+        ->get()
+        ->map(function ($item) {
+            $item->expenses_sum_amount =
+                $item->shortage_sum_kt_commission +
+                $item->shortage_sum_other_commission +
+                $item->expenses_sum_amount;
+
+            return $item;
+        });
+
+    return [
+        'merges' => $merges
+    ];
+}
     public function buses()
     {
         $user = Auth::user();
@@ -699,9 +762,24 @@ class ScheduleClosingController extends Controller
 
     public function route()
     {
+        $user = Auth::user();
+
+        $allowedRouteIds = $user->route_ids;
+
+        // Agar JSON string ho to decode kar lo
+        if (is_string($allowedRouteIds)) {
+            $allowedRouteIds = json_decode($allowedRouteIds, true);
+        }
+
+        // Safety: agar null ho to empty array bana do
+        $allowedRouteIds = is_array($allowedRouteIds) ? $allowedRouteIds : [];
 
         return [
-            'routes' => Route::with('addedBy')->where(['company_id' => Auth::user()->company_id, "hide" => 0])->get()
+            'routes' => Route::with('addedBy')
+                ->where('company_id', $user->company_id)
+                ->where('hide', 0)
+                ->whereIn('id', $allowedRouteIds)
+                ->get()
         ];
     }
 
@@ -1219,9 +1297,9 @@ class ScheduleClosingController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $closings = TicketClosingMerge::with(['closing:id,ticket_merge_id,bus_id', 'closing.tickets.elt:id,elt_price,ticket_id', 'closing.tickets' => function ($q) {
-                $q->where("type", "booked");
-                $q->select(["id", "ticket_closing_id", "seat_fare", "discount", "terminal_id"]);
-            }])
+            $q->where("type", "booked");
+            $q->select(["id", "ticket_closing_id", "seat_fare", "discount", "terminal_id"]);
+        }])
             ->where('schedule_complete', 1)
             ->where('company_id', Auth::user()->company_id)
             ->where(function ($q) use ($request) {
