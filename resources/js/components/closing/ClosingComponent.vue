@@ -59,7 +59,7 @@
                         <td>{{ $insertComma(totalFare(tickets)) }}</td>
                         <td>{{ $insertComma(totalOtherCommission(tickets)) }}</td>
                         <td>
-                          <input type="number" class="form-control" v-model="cashBankStart[terminalId].cash"
+                          <input type="text" class="form-control" v-model="cashBankStart[terminalId].cash"
                             @input="updateCash(terminalId, tickets)" :disabled="totalFare(tickets) == 0"
                             @keypress="$numberValidate($event, { dot: true })" />
                         </td>
@@ -75,7 +75,7 @@
                           </select>
                         </td>
                         <td>
-                          <input type="number" min="0" class="form-control"
+                          <input type="text" min="0" class="form-control"
                             v-model.number="cashBankStart[terminalId].bank" @input="updateBank(terminalId, tickets)"
                             :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, { dot: true })" />
                         </td>
@@ -172,7 +172,7 @@
                         <td>{{ $insertComma(totalOtherCommission(tickets)) }}</td>
 
                         <td>
-                          <input type="number" min="0" class="form-control"
+                          <input type="text" min="0" class="form-control"
                             v-model.number="cashBankReturn[terminalId].cash" @input="editingField = 'cash'"
                             :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, { dot: true })" />
                         </td>
@@ -188,7 +188,7 @@
                           </select>
                         </td>
                         <td>
-                          <input type="number" min="0" class="form-control"
+                          <input type="text" min="0" class="form-control"
                             v-model.number="cashBankReturn[terminalId].bank" @input="editingField = 'bank'"
                             :disabled="totalFare(tickets) == 0" @keypress="$numberValidate($event, { dot: true })" />
                         </td>
@@ -280,13 +280,13 @@
                         </td>
 
                         <td>
-                          <input type="number" min="0" class="form-control rounded-0"
+                          <input type="text" min="0" class="form-control rounded-0"
                             v-model.number="postData.amount[index]" @input="syncPaid(index)"
                             @keypress="$numberValidate($event, { dot: true })" />
                         </td>
 
                         <td>
-                          <input type="number" min="0" class="form-control rounded-0"
+                          <input type="text" min="0" class="form-control rounded-0"
                             v-model.number="postData.paid[index]" @keypress="$numberValidate($event, { dot: true })" />
                         </td>
 

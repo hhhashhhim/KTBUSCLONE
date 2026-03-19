@@ -161,16 +161,16 @@
                             </option>
                         </select>
                     </div>
-                    <!-- <div class="form-group col-md-6">
+                    <div class="form-group col-md-6">
                         <label for="routes">Routes <span class="text-danger ml-1">Options</span></label>
                         <button class="btn btn-success btn-sm m-1" @click="selectAllRoute">Select All</button>
                         <button class="btn btn-danger btn-sm " @click="deselectAllRoute">Deselect All</button>
-                        <select class="form-control" id="routes" multiple v-model="data.route">
-                            <option v-for="(singleRoute, i) in routes" :value="singleRoute.id"
-                                :key="i">{{ singleRoute.name }}
+                        <select class="form-control" id="routes" multiple v-model="data.routes">
+                            <option v-for="(singleRoute, i) in routes" :value="singleRoute.id" :key="i">{{
+                                singleRoute.name }}
                             </option>
                         </select>
-                    </div> -->
+                    </div>
                     <div class="form-group col-md-6">
                         <label for="terminals">Terminal <span class="text-danger ml-1">*</span></label>
                         <select class="form-control" id="terminals" v-model="data.terminal_id">
@@ -316,7 +316,7 @@
                         <select class="form-control" id="editDeparture" multiple v-model="dataEdit.departure_city_ids">
                             <option v-for="(singleDeparture, i) in departureCities" :value="singleDeparture.id"
                                 :key="i">{{
-                                singleDeparture.name }}
+                                    singleDeparture.name }}
                             </option>
                         </select>
                     </div>
@@ -328,7 +328,20 @@
                             v-model="dataEdit.destination_city_ids">
                             <option v-for="(singleDestination, i) in destinationCities" :value="singleDestination.id"
                                 :key="i">{{
-                                singleDestination.name }}
+                                    singleDestination.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="editRoutes">Routes <span class="text-danger ml-1">*</span></label>
+                        <button type="button" class="btn btn-success btn-sm m-1" @click="selectAllEditRoute">Select
+                            All</button>
+                        <button type="button" class="btn btn-danger btn-sm" @click="deselectAllEditRoute">Deselect
+                            All</button>
+
+                        <select class="form-control" id="editRoutes" multiple v-model="dataEdit.route_ids">
+                            <option v-for="(singleRoute, i) in routes" :value="singleRoute.id" :key="i">
+                                {{ singleRoute.name }}
                             </option>
                         </select>
                     </div>
@@ -338,7 +351,7 @@
                             <option value="0">Select Terminal</option>
                             <option v-for="(terminal, i) in terminals" :value="terminal.id" :key="i">{{ terminal.name }}
                                 ({{
-                                terminal.city.name }})
+                                    terminal.city.name }})
                             </option>
                         </select>
                     </div>
@@ -429,7 +442,7 @@ export default {
             permissions: [],
             departureCities: [],
             destinationCities: [],
-            route: [],
+            routes: [],
             formID: 'user_form',
             editFormID: 'edit_user_form',
             hideFormID: 'hide_user_form',
@@ -451,6 +464,7 @@ export default {
                 online_user: 0,
                 destination: [],
                 departure: [],
+                routes: [],
                 previous_days: "",
             },
             dataEdit: {
@@ -458,7 +472,9 @@ export default {
                 departure_city_ids: [],
                 destination_city_ids: [],
                 role_id: 0,
+                routes: [],
             },
+
             terminals: [],
             delId: "",
             success: false,
@@ -471,14 +487,14 @@ export default {
     },
     async created() {
         $('.modal').remove();
-        const currentRouteName = this.$route.name;
-        if (currentRouteName == 'booking-page') {
-            window.addEventListener('keydown', this.enterKey);
-            window.addEventListener('keydown', this.altM);
-        } else {
-            window.removeEventListener('keydown', this.enterKey);
-            window.removeEventListener('keydown', this.altM);
-        }
+        // const currentRouteName = this.$route.name;
+        // if (currentRouteName == 'booking-page') {
+        //     window.addEventListener('keydown', this.enterKey);
+        //     window.addEventListener('keydown', this.altM);
+        // } else {
+        //     window.removeEventListener('keydown', this.enterKey);
+        //     window.removeEventListener('keydown', this.altM);
+        // }
 
         await this.fetchUsers();
         this.permissions = this.$store.state.permissions;
@@ -515,6 +531,7 @@ export default {
         setTimeout(() => {
             const departure = $('#departure');
             const route = $('#routes');
+            const editRoutes = $('#editRoutes');
             const destinations = $('#destinations');
             const editDeparture = $('#editDeparture');
             const editDestinations = $('#editDestinations');
@@ -552,6 +569,10 @@ export default {
             editDestinations.on('change', function () {
                 const selectedValues = $(this).val();
                 self.dataEdit.destination_city_ids = selectedValues;
+            });
+            editRoutes.on('change', function () {
+                const selectedValues = $(this).val();
+                self.dataEdit.routes = selectedValues;
             });
         }, 1000);
     },
@@ -604,7 +625,7 @@ export default {
             this.data.password = "";
             this.data.role = 0;
             this.data.departure = 0;
-            this.data.route = 0;
+            this.data.routes = 0;
             this.data.destination = 0;
             this.roleName = '';
         },
@@ -647,6 +668,15 @@ export default {
             $("#editDeparture > option").prop("selected", false);
             $("#editDeparture").trigger("change");
         },
+        selectAllEditRoute() {
+            $("#editRoutes > option").prop("selected", true);
+            $("#editRoutes").trigger("change");
+        },
+
+        deselectAllEditRoute() {
+            $("#editRoutes > option").prop("selected", false);
+            $("#editRoutes").trigger("change");
+        },
 
         selectAllEditDestination() {
             $("#editDestinations > option").prop("selected", true);
@@ -661,7 +691,7 @@ export default {
         async fetchUsers() {
             const userRes = await this.callApi("post", "user", this.filterData);
             const resCities = await this.callApi("post", "user/cities");
-          
+
             if (userRes.status == 200 && resCities.status == 200) {
                 this.users = userRes.data.users;
                 this.authCheck = userRes.data.authCheck;
@@ -760,6 +790,13 @@ export default {
                 return swal({
                     title: "Required!!",
                     text: "Destination City is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (!this.data.routes || this.data.routes.length === 0)
+                return swal({
+                    title: "Required!!",
+                    text: "Route is Required",
                     icon: "error",
                     timer: 2000
                 });
@@ -900,12 +937,15 @@ export default {
             const resEditUser = await this.callApi("post", "user/edit", { 'id': user.id });
             if (resEditUser.status == 200) {
                 this.dataEdit = resEditUser.data;
-                this.userPass = resEditUser.data.userpass ? resEditUser.data.userpass.user_password : 'N/A';
+                    this.userPass = resEditUser.data.userpass ? resEditUser.data.userpass.user_password : 'N/A';
                 setTimeout(() => {
                     $("#editDeparture").select2({
                         closeOnSelect: false
                     });
                     $("#editDestinations").select2({
+                        closeOnSelect: false
+                    });
+                    $("#editRoutes").select2({
                         closeOnSelect: false
                     });
                 }, 200);
@@ -953,6 +993,14 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
+            if (!this.dataEdit.routes || this.dataEdit.routes.length === 0) {
+                return swal({
+                    title: "Required!!",
+                    text: "Route is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             if (this.dataEdit.terminal_id == "0") {
                 return swal({
                     title: "Required!!!",

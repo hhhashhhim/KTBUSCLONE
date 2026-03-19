@@ -553,7 +553,7 @@ export default {
                 // $('#merge_table').DataTable().destroy();
             }
         },
-    },
+    }, 
     async mounted() {
         await this.fetchBuses();  // load buses on component mount
         await this.fetchRoute();  // load route on component mount

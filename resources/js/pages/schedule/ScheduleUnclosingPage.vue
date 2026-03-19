@@ -14,66 +14,72 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <form @submit.prevent="fetchData">
-    <div class="row px-2 mb-4 align-items-end">
-        <div class="col-md-3">
-            <label for="terminalFilter">Select Bus</label>
-            <select id="terminalFilter" class="form-control"
-                    v-model="filterData.bus_number">
-                <option value="">Select Bus</option>
-                <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
-                    {{ bus.bus_number }}
-                </option>
-            </select>
-        </div>
+                                                <div class="row px-2 mb-4 align-items-end">
+                                                    <div class="col-md-3">
+                                                        <label for="terminalFilter">Select Bus</label>
+                                                        <select id="terminalFilter" class="form-control"
+                                                            v-model="filterData.bus_number">
+                                                            <option value="">Select Bus</option>
+                                                            <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
+                                                                {{ bus.bus_number }}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label for="terminalFilter">Select Route</label>
+                                                        <select id="terminalFilter" class="form-control"
+                                                           v-model="filterData.dropdownRoute">
+                                                            <option value="">Select Route</option>
+                                                            <option v-for="(singleRoute, i) in dropdownRoute" :key="i" :value="singleRoute.id">
+                                                                {{ singleRoute.name }}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <!-- <div class="col-md-3">
+                                                        <label>Route</label>
+                                                        <select2 v-model="filterData.route" :options="route"
+                                                            :settings="{ multiple: true, width: '100%', placeholder: 'Select Route', allowClear: true }" />
+                                                    </div> -->
+                                                    <div class="col-md-3">
+                                                        <label for="fromDate">Schedule Date</label>
+                                                        <input id="fromDate" type="date" class="form-control"
+                                                            v-model="filterData.from_date">
+                                                    </div>
 
-        <div class="col-md-3">
-            <label for="fromDate">Schedule Date</label>
-            <input id="fromDate" type="date" class="form-control"
-                   v-model="filterData.from_date">
-        </div>
+                                                    <div class="col-md-3">
+                                                        <label for="toDate">Return Date</label>
+                                                        <input id="toDate" type="date" class="form-control"
+                                                            v-model="filterData.to_date">
+                                                    </div>
 
-        <div class="col-md-3">
-            <label for="toDate">Return Date</label>
-            <input id="toDate" type="date" class="form-control"
-                   v-model="filterData.to_date">
-        </div>
+                                                    <div class="col-md-3">
+                                                        <div class="row">
+                                                            <div class="col-6 pr-1">
+                                                                <button type="submit" class="btn btn-primary w-100">
+                                                                    Filter
+                                                                </button>
+                                                            </div>
+                                                            <div class="col-6 pl-1">
+                                                                <button type="button" class="btn btn-danger w-100"
+                                                                    @click="resetFilters">
+                                                                    Reset
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
-       <div class="col-md-3">
-  <div class="row">
-    <div class="col-6 pr-1">
-      <button type="submit" class="btn btn-primary w-100">
-        Filter
-      </button>
-    </div>
-    <div class="col-6 pl-1">
-      <button type="button" class="btn btn-danger w-100" @click="resetFilters">
-        Reset
-      </button>
-    </div>
-  </div>
-</div>
+                                                </div>
+                                            </form>
+                                            <div class="d-flex justify-content-end">
+                                                <button class="btn btn-primary d-flex align-items-center"
+                                                    :disabled="loading" @click="fetchMergedData">
+                                                    <span v-if="loading" class="spinner-border spinner-border-sm mr-2"
+                                                        role="status" aria-hidden="true"></span>
 
-    </div>
-</form>
-                                            <div
-                                                class="d-flex justify-content-end"
-                                            >
-                                              <button
-  class="btn btn-primary d-flex align-items-center"
-  :disabled="loading"
-  @click="fetchMergedData"
->
-  <span
-    v-if="loading"
-    class="spinner-border spinner-border-sm mr-2"
-    role="status"
-    aria-hidden="true"
-  ></span>
-
-  <span>
-    {{ loading ? 'Merging...' : 'Merge Schedule' }}
-  </span>
-</button>
+                                                    <span>
+                                                        {{ loading ? 'Merging...' : 'Merge Schedule' }}
+                                                    </span>
+                                                </button>
 
 
                                                 <!-- <button class="btn btn-primary" :disabled="loading" @click="mergeSchedule()">
@@ -81,14 +87,10 @@
                                                 </button> -->
                                             </div>
                                             <div class="table-responsive">
-                                                <table
-                                                    class="table table-striped table-hover"
-                                                    id="closing_table"
-                                                    style="
+                                                <table class="table table-striped table-hover" id="closing_table" style="
                                                         border-collapse: separate;
                                                         border-spacing: 0 10px;
-                                                    "
-                                                >
+                                                    ">
                                                     <thead>
                                                         <tr>
                                                             <th>Bus Number</th>
@@ -101,78 +103,58 @@
                                                                 Schedule Time
                                                             </th>
                                                             <th>٘Merge</th>
-                                                            <th
-                                                                v-if="
-                                                                    checkForSubmenuButtons(
-                                                                        'edit-close-booking'
-                                                                    )
-                                                                "
-                                                            >
+                                                            <th v-if="
+                                                                checkForSubmenuButtons(
+                                                                    'edit-close-booking'
+                                                                )
+                                                            ">
                                                                 Action
                                                             </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <template
-                                                            v-for="(
-                                                                data, i
-                                                            ) in closings"
-                                                            :key="i"
-                                                        >
-                                                            <tr
-                                                                v-for="(
-                                                                    close, j
-                                                                ) in data"
-                                                                :key="j"
-                                                            >
-                                                                <td
-                                                                    class="h5"
-                                                                    :class="
-                                                                        data.length ==
-                                                                        2
-                                                                            ? j ==
-                                                                              1
-                                                                                ? 'border-left border-bottom border-success'
-                                                                                : 'border-left border-top border-success'
-                                                                            : 'border-left border-bottom border-top border-danger'
-                                                                    "
-                                                                >
+                                                        <template v-for="(
+data, i
+                                                            ) in closings" :key="i">
+                                                            <tr v-for="(
+close, j
+                                                                ) in data" :key="j">
+                                                                <td class="h5" :class="data.length ==
+                                                                    2
+                                                                    ? j ==
+                                                                        1
+                                                                        ? 'border-left border-bottom border-success'
+                                                                        : 'border-left border-top border-success'
+                                                                    : 'border-left border-bottom border-top border-danger'
+                                                                    ">
                                                                     {{
                                                                         close
                                                                             .bus
                                                                             .bus_number
                                                                     }}
                                                                 </td>
-                                                                <td
-                                                                    class="h5"
-                                                                    :class="
-                                                                        data.length ==
-                                                                        2
-                                                                            ? j ==
-                                                                              1
-                                                                                ? 'border-bottom border-success'
-                                                                                : 'border-top border-success'
-                                                                            : 'border-bottom border-top border-danger'
-                                                                    "
-                                                                >
+                                                                <td class="h5" :class="data.length ==
+                                                                    2
+                                                                    ? j ==
+                                                                        1
+                                                                        ? 'border-bottom border-success'
+                                                                        : 'border-top border-success'
+                                                                    : 'border-bottom border-top border-danger'
+                                                                    ">
                                                                     {{
                                                                         close
                                                                             .schedule
                                                                             .name
                                                                     }}
                                                                 </td>
-                                                                <td
-                                                                    class="h5"
-                                                                    :class="
-                                                                        data.length ==
-                                                                        2
-                                                                            ? j ==
-                                                                              1
-                                                                                ? 'border-bottom border-success'
-                                                                                : 'border-top border-success'
-                                                                            : 'border-bottom border-top border-danger'
-                                                                    "
-                                                                >
+                                                                <td class="h5" :class="data.length ==
+                                                                    2
+                                                                    ? j ==
+                                                                        1
+                                                                        ? 'border-bottom border-success'
+                                                                        : 'border-top border-success'
+                                                                    : 'border-bottom border-top border-danger'
+                                                                    ">
                                                                     {{
                                                                         close
                                                                             .schedule
@@ -180,107 +162,72 @@
                                                                             .name
                                                                     }}
                                                                 </td>
-                                                                <td
-                                                                    class="h5"
-                                                                    :class="
-                                                                        data.length ==
-                                                                        2
-                                                                            ? j ==
-                                                                              1
-                                                                                ? 'border-bottom border-success'
-                                                                                : 'border-top border-success'
-                                                                            : 'border-bottom border-top border-danger'
-                                                                    "
-                                                                >
+                                                                <td class="h5" :class="data.length ==
+                                                                    2
+                                                                    ? j ==
+                                                                        1
+                                                                        ? 'border-bottom border-success'
+                                                                        : 'border-top border-success'
+                                                                    : 'border-bottom border-top border-danger'
+                                                                    ">
                                                                     {{
                                                                         close.schedule_date
                                                                     }}
                                                                 </td>
-                                                                <td
-                                                                    class="h5"
-                                                                    :class="
-                                                                        data.length ==
-                                                                        2
-                                                                            ? j ==
-                                                                              1
-                                                                                ? 'border-bottom border-success'
-                                                                                : 'border-top border-success'
-                                                                            : 'border-bottom border-top border-danger'
-                                                                    "
-                                                                >
+                                                                <td class="h5" :class="data.length ==
+                                                                    2
+                                                                    ? j ==
+                                                                        1
+                                                                        ? 'border-bottom border-success'
+                                                                        : 'border-top border-success'
+                                                                    : 'border-bottom border-top border-danger'
+                                                                    ">
                                                                     {{
                                                                         close.schedule_time
                                                                     }}
                                                                 </td>
-                                                                <td
-                                                                    class="h5"
-                                                                    :class="
-                                                                        data.length ==
-                                                                        2
-                                                                            ? j ==
-                                                                              1
-                                                                                ? 'border-bottom border-success'
-                                                                                : 'border-top border-success'
-                                                                            : 'border-bottom border-top border-danger'
-                                                                    "
-                                                                >
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        id="femaleCheckBox"
-                                                                        :checked="
-                                                                            addData.mergeIds.includes(
-                                                                                close.ticket_merge_id
-                                                                            )
-                                                                        "
-                                                                        @click="
+                                                                <td class="h5" :class="data.length ==
+                                                                    2
+                                                                    ? j ==
+                                                                        1
+                                                                        ? 'border-bottom border-success'
+                                                                        : 'border-top border-success'
+                                                                    : 'border-bottom border-top border-danger'
+                                                                    ">
+                                                                    <input type="checkbox" id="femaleCheckBox" :checked="addData.mergeIds.includes(
+                                                                        close.ticket_merge_id
+                                                                    )
+                                                                        " @click="
                                                                             changeClosingId(
                                                                                 close
                                                                             )
-                                                                        "
-                                                                        name=""
-                                                                    />
+                                                                            " name="" />
                                                                 </td>
-                                                                <td
-                                                                    :class="
-                                                                        data.length ==
-                                                                        2
-                                                                            ? j ==
-                                                                              1
-                                                                                ? 'border-bottom border-right border-success'
-                                                                                : 'border-right border-top border-success'
-                                                                            : 'border-bottom border-right border-top border-danger'
-                                                                    "
-                                                                >
-                                                                    <button
-                                                                        title="Delete Unclosing"
-                                                                        :data-target="
-                                                                            '#' +
-                                                                            hideFormID
-                                                                        "
-                                                                        @click="
+                                                                <td :class="data.length ==
+                                                                    2
+                                                                    ? j ==
+                                                                        1
+                                                                        ? 'border-bottom border-right border-success'
+                                                                        : 'border-right border-top border-success'
+                                                                    : 'border-bottom border-right border-top border-danger'
+                                                                    ">
+                                                                    <button title="Delete Unclosing" :data-target="'#' +
+                                                                        hideFormID
+                                                                        " @click="
                                                                             delId =
-                                                                                close.id
-                                                                        "
-                                                                        data-toggle="modal"
-                                                                        class="btn btn-danger btn-sm mx-2"
-                                                                    >
-                                                                        <i
-                                                                            class="far fas fa-trash"
-                                                                        ></i>
+                                                                            close.id
+                                                                            " data-toggle="modal"
+                                                                        class="btn btn-danger btn-sm mx-2">
+                                                                        <i class="far fas fa-trash"></i>
                                                                     </button>
                                                                 </td>
                                                             </tr>
                                                         </template>
-                                                        <tr
-                                                            v-if="
-                                                                closings.length ==
-                                                                0
-                                                            "
-                                                        >
-                                                            <td
-                                                                class="text-center"
-                                                                colspan="6"
-                                                            >
+                                                        <tr v-if="
+                                                            closings.length ==
+                                                            0
+                                                        ">
+                                                            <td class="text-center" colspan="6">
                                                                 No data found
                                                             </td>
                                                         </tr>
@@ -296,24 +243,17 @@
                     </div>
                 </div>
             </div>
-            <Hide
-                :hideForm="hideFormID"
-                confirmationMessage="Are You Sure You want To Delete This Closing ???"
-            >
+            <Hide :hideForm="hideFormID" confirmationMessage="Are You Sure You want To Delete This Closing ???">
                 <template v-slot:button>
-                    <button
-                        type="button"
-                        class="btn btn-danger btn-block"
-                        :disabled="loading"
-                        @click="hideUnclosing"
-                    >
+                    <button type="button" class="btn btn-danger btn-block" :disabled="loading" @click="hideUnclosing">
                         {{ loading ? "Loading..." : "Yes, I want to Delete" }}
                     </button>
                 </template>
             </Hide>
         </div>
     </section>
-    <Closing :data="closingData" :routes="routes" :banks="banks" :busIds="busIds" :mergeIds="mergeIds" :addData="addData" @fetchData="fetchData($event)"/>
+    <Closing :data="closingData" :routes="routes" :banks="banks" :busIds="busIds" :mergeIds="mergeIds"
+        :addData="addData" @fetchData="fetchData($event)" />
 </template>
 
 <script>
@@ -329,11 +269,13 @@ export default {
     data() {
         return {
             loading: false,
-             filterData: {
-      bus_number: "",
-      from_date: "",
-      to_date: ""
-    },
+            filterData: {
+                bus_number: "",
+                from_date: "",
+                to_date: "",
+                dropdownRoute: [],
+            },
+            dropdownRoute: [],
             closings: [],
             permissions: [],
             validationErrors: "",
@@ -347,12 +289,12 @@ export default {
             },
             success: false,
             errors: false,
-            closingData : {},
-             buses: [],
-             routes  : {
-                start : "",
-                return : ""
-             }
+            closingData: {},
+            buses: [],
+            routes: {
+                start: "",
+                return: ""
+            }
         };
     },
     async created() {
@@ -367,69 +309,80 @@ export default {
         }
 
         this.fetchData();
+        this.fetchRoute();  // load route on component mount
         this.permissions = this.$store.state.permissions;
     },
     methods: {
+        async fetchRoute() {
+            try {
+                const res = await this.callApi("post", "booking/close/schedule/merges/route");
+
+                this.dropdownRoute = res.data?.routes || res.data?.routes || [];
+
+            } catch (error) {
+                console.error("Error fetching route:", error);
+            }
+        },
         async fetchMergedData() {
-  if (this.loading) return;
+            if (this.loading) return;
 
-  this.loading = true;
-  this.validationErrors = [];
+            this.loading = true;
+            this.validationErrors = [];
 
-  // ❌ Validation: same buses
-  if (this.addData.busIds[0] !== this.addData.busIds[1]) {
-    swal({
-      title: "Required",
-      text: "Please select same buses",
-      icon: "error",
-      timer: 2000,
-    });
-    this.loading = false;
-    return;
-  }
+            // ❌ Validation: same buses
+            if (this.addData.busIds[0] !== this.addData.busIds[1]) {
+                swal({
+                    title: "Required",
+                    text: "Please select same buses",
+                    icon: "error",
+                    timer: 2000,
+                });
+                this.loading = false;
+                return;
+            }
 
-  // ❌ Validation: two schedules
-  if (this.addData.mergeIds.length !== 2) {
-    swal({
-      title: "Required",
-      text: "Please select two schedules",
-      icon: "error",
-      timer: 2000,
-    });
-    this.loading = false;
-    return;
-  }
+            // ❌ Validation: two schedules
+            if (this.addData.mergeIds.length !== 2) {
+                swal({
+                    title: "Required",
+                    text: "Please select two schedules",
+                    icon: "error",
+                    timer: 2000,
+                });
+                this.loading = false;
+                return;
+            }
 
-  try {
-    const res = await this.callApi(
-      "post",
-      "booking/close/schedule/unclosing/data",
-      this.addData
-    );
+            try {
+                const res = await this.callApi(
+                    "post",
+                    "booking/close/schedule/unclosing/data",
+                    this.addData
+                );
 
-    if (res.status === 200) {
-      this.closingData = res.data.data;
-      this.banks = res.data.banks;
-      this.busIds = res.data.busIds;
-      this.mergeIds = res.data.mergeIds;
-      this.routes = {
-        start : res.data.startRoute,
-        return : res.data.returnRoute,
-      };
+                if (res.status === 200) {
+                    this.closingData = res.data.data;
+                    this.banks = res.data.banks;
+                    this.busIds = res.data.busIds;
+                    this.mergeIds = res.data.mergeIds;
+                    this.routes = {
+                        start: res.data.startRoute,
+                        return: res.data.returnRoute,
+                    };
 
 
-      // ✅ Open modal after success
-      $("#exampleModal").modal("show");
-    } else {
-      console.log(res);
-    }
-  } catch (err) {
-    console.error(err);
-  } finally {
-    // ✅ Always stop loader
-    this.loading = false;
-  }
-},
+                    // ✅ Open modal after success
+                    $("#exampleModal").modal("show");
+                } else {
+                    console.log(res);
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                // ✅ Always stop loader
+                this.loading = false;
+            }
+        },
         clearForm: function () {
             this.data = {};
         },
@@ -460,31 +413,31 @@ export default {
             console.log(this.addData);
         },
         async fetchData() {
-  try {
-    const res = await this.callApi(
-      "post",
-      "booking/close/schedule/unclosing",
-      this.filterData // ✅ send filters
-    );
+            try {
+                const res = await this.callApi(
+                    "post",
+                    "booking/close/schedule/unclosing",
+                    this.filterData // ✅ send filters
+                );
 
-    if (res.status === 200) {
-      this.closings = res.data.closings;
-      this.buses = res.data.buses;
-    } else {
-      console.log(res);
-    }
-  } catch (e) {
-    console.error(e);
-  }
-},
-resetFilters() {
-  this.filterData = {
-    bus_number: "",
-    from_date: "",
-    to_date: ""
-  };
-  this.fetchData();
-},
+                if (res.status === 200) {
+                    this.closings = res.data.closings;
+                    this.buses = res.data.buses;
+                } else {
+                    console.log(res);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        resetFilters() {
+            this.filterData = {
+                bus_number: "",
+                from_date: "",
+                to_date: ""
+            };
+            this.fetchData();
+        },
 
         async hideUnclosing() {
             this.loading = true;
@@ -575,7 +528,7 @@ resetFilters() {
                 }
             }
         },
-        editSchedule(schedule) {},
+        editSchedule(schedule) { },
     },
     computed: {
         ...mapGetters(["getDeletingObj"]),
