@@ -11,6 +11,8 @@ use App\Models\Route\Route;
 use App\Models\Account\AccountCategory;
 use App\Models\ActivityLog;
 use App\Models\Expense\ExpenseCategory;
+use App\Models\ReportHeaderLink;
+use App\Models\ReportsHeader;
 use App\Models\Route\RouteFare;
 use App\Models\Terminal;
 use Illuminate\Http\Request;
@@ -89,7 +91,57 @@ class ExpenseCategoryController extends Controller
         ], 422);
     }
 }
+ public function reportHeader()
+    {
 
+        return ReportsHeader::with('addedBy')->where('company_id', Auth::user()->company_id)->get();
+    }
+ public function reportHeaderLinkGet(Request $request)
+    {
+        $links = ReportHeaderLink::where(['company_id'=> Auth::user()->company_id,'ticket_merge_id'=>$request->ticket_merge_id])->get();
+        $headers = ReportsHeader::with('addedBy')->where('company_id', Auth::user()->company_id)->get();
+        if($links->count() > 0)
+        {
+            return [
+                "headers" => $headers,
+                "links" => $links
+            ];
+        }
+        else
+        {
+            return [
+                "headers" => $headers,
+                "links" => null
+            ];
+        }
+    }
+    public function expenseHeaderLink(Request $request)
+    {
+       try {
+                DB::beginTransaction();
+                ReportHeaderLink::where("ticket_merge_id", $request->ticket_merge_id)->delete();
+                foreach ($request->headIds as $key => $value) {
+                    ReportHeaderLink::create([
+                        'ticket_merge_id' => $request->ticket_merge_id,
+                        'header_id' => $request->headIds[$key],
+                        'value' => $request->values[$key],
+                        'company_id' => Auth::user()->company_id,
+                        'added_by' => Auth::user()->id,
+                    ]);
+                }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name." | linked report header",
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database transaction error: ' . $e->getMessage());
+                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            }
+    }
    public function update(Request $request)
 {
     if (!checkPermissionButtons("edit-category")) {

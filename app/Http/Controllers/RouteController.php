@@ -120,7 +120,7 @@ class RouteController extends Controller
                     }
                 }
             }
-            
+
             if ($request['revereRoute'] == 1) {
                 // Reverse Route
                 $route = Route::create([
@@ -198,140 +198,243 @@ class RouteController extends Controller
         ];
     }
     public function update(Request $request)
-    {
-        if(!checkPermissionButtons("edit-routes"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
-        try {
-                DB::beginTransaction();
-                $request->validate([
-                    'routeStartName' => 'required',
-                    'routeEndName' => 'required',
-                ]);
-                Route::where([
-                    'company_id' => Auth::user()->company_id,
-                    'id' => $request->id,
-                ])->update([
-                    'name' => $request['routeStartName'] . '-' . $request['routeEndName'],
-                    'via' => $request['routeVia'],
-                    'online_seats' => $request['routeSeat']??0,
-                    'commission_route' => $request['commissionRoute'],
-                    'online_seat_choices' => $request['online_seat_choices'],
-                ]);
-                // now we will delete all route detail and will insert new one
-                RouteFare::where("route_id",$request->id)->delete();
-                
-                $used_cities = [];//key can't be same
-                foreach ($request->cityIds as $index => $city) {
-                    $used_cities[] = $city;
-                    foreach ($request->cityIds as $innerIndex => $innerCity) {
-                        if (in_array($innerCity, $used_cities)) {
-                            continue;
-                        } else {
-                            $fare = FareTable::where('from_city_id', $used_cities[$index])->where('to_city_id', $innerCity)->get();
-
-                            if ($fare->count() > 0) {
-                                foreach ($fare as $detail) {
-                                    RouteFare::create([
-                                        'route_id' => $request->id,
-                                        'fare_id' => $detail->id,
-                                        'fare_class_id' => $detail->fare_class,
-                                        'departure_city_id' => $used_cities[$index],
-                                        'destination_city_id' => $innerCity,
-                                        'company_id' => Auth::user()->company_id,
-                                        'added_by' => auth()->user()->id
-                                    ]);
-                                }
-                            }
-                            
-                            
-                            $TerminalVisibility = TerminalVisibility::where(["route_id"=>$request->id,"departure_city_id"=> $used_cities[$index],"destination_city_id"=>$innerCity,"company_id" => Auth::user()->company_id])->first();
-                            TerminalVisibility::create([
-                                'route_id' => $request->id,
-                                'departure_city_id' => $used_cities[$index],
-                                'destination_city_id' => $innerCity,
-                                'online_visibilty' => isset($TerminalVisibility) ? $TerminalVisibility->online_visibilty : 0,
-                                'company_id' => Auth::user()->company_id,
-                                'added_by' => auth()->user()->id
-                            ]);
-                            if(isset($TerminalVisibility))
-                            {
-                                $TerminalVisibility->delete();
-                            }
-                        }
-                    }
-                }
-
-                // and after addition route detail we will update schedule detail also so that it will implent all schedules
-                $schedules = Schedule::where(["company_id"=>Auth::user()->company_id,"route_id"=>$request->id])->get();
-                
-    
-                foreach($schedules as $schedule)
-                {
-                    // getting schedule detail from today or upcoming schedule to get schedule start date
-                    $start_date = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$schedule->id])->where("schedule_date", '>=' , date("Y-m-d"))->orderBy("id","ASC")->first();
-                    // getting schedule detail from today or upcoming schedule to get schedule end date
-                    $end_date = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$schedule->id])->where("schedule_date", '>=' , date("Y-m-d"))->orderBy("id",'DESC')->first();
-                    if($start_date && $end_date)
-                    {
-                        // getting route detail like fsd -> mltn -> kch
-                        $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
-                        // how many days schedule exist
-                        $days = $this->getDays($start_date->schedule_date, $end_date->schedule_date);
-      
-                        // to run loop equal to schedule existing days
-                        for ($i = 0; $i <= $days; $i++) {
-                            $date_wise_departure = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$schedule->id,"schedule_date"=>date("Y-m-d",strtotime(date("$start_date->schedule_date"))+($i * 86400))])->orderBy("id","ASC")->first();
-                            ScheduleDetail::where("schedule_id",$schedule->id)->where("schedule_date", date("Y-m-d",strtotime(date("$start_date->schedule_date"))+($i * 86400)))->delete();
-                            $lastDepId = $routeDetails[0]->departure_city_id;
-                            $totalTime = strtotime(date("$start_date->schedule_date $date_wise_departure->departure_time")) + ($i * 86400);
-                            $scheduleStartDate = date("Y-m-d", $totalTime);
-                            
-                            
-                            foreach ($routeDetails as $detail) {
-                                if ($lastDepId == $detail->departure_city_id) {
-                                    $departureTime = date("Y-m-d H:i", $totalTime);
-                                } else {
-                                    // getting time difference between two cities in a route
-                                    $fareTableTime = FareTable::where(['from_city_id' => $lastDepId, 'to_city_id' => $detail->departure_city_id])->first()->time_difference??"00:00";
-                                    $timeDiff = explode(':', $fareTableTime);
-                                    $totalTime = $totalTime + (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
-                                    $departureTime = date("Y-m-d H:i", $totalTime);
-                                    $lastDepId = $detail->departure_city_id;
-                                }
-                              
-                                ScheduleDetail::create([
-                                    'company_id' => Auth::user()->company_id,
-                                    'added_by' => Auth::user()->id,
-                                    'schedule_id' => $schedule->id,
-                                    'departure_id' => $detail->departure_city_id,
-                                    'bus_class_id' => $schedule->bus_class_id,
-                                    'destination_id' => $detail->destination_city_id,
-                                    'departure_time' => date('H:i', strtotime($departureTime)),
-                                    'departure_date' => date('Y-m-d', strtotime($departureTime)),
-                                    'schedule_date' => $scheduleStartDate, // schedule departure date
-                                ]);
-                            }
-                        }
-                    }
-                }
-             
-                ActivityLog::create([
-                    "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | updated route (".$request['routeStartName'] . '-' . $request['routeEndName'].")",
-                    "requested_host" => $request->ip(),
-                    "company_id" => Auth::user()->company_id
-                ]);
-                DB::commit();
-                return ['message' => 'success'];
-            
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            }
+{
+    if (!checkPermissionButtons("edit-routes")) {
+        return response()->json(["Error" => ['You are not authorized to access this url']], 403);
     }
+
+    try {
+        
+
+        DB::beginTransaction();
+
+        $request->validate([
+            'routeStartName' => 'required',
+            'routeEndName' => 'required',
+        ]);
+
+        $user = Auth::user();
+        $companyId = $user->company_id;
+        $userId = $user->id;
+        $routeId = $request->id;
+        $today = now()->format('Y-m-d');
+        $cityIds = $request->cityIds ?? [];
+
+        Route::where([
+            'company_id' => $companyId,
+            'id' => $routeId,
+        ])->update([
+            'name' => $request->routeStartName . '-' . $request->routeEndName,
+            'via' => $request->routeVia,
+            'online_seats' => $request->routeSeat ?? 0,
+            'commission_route' => $request->commissionRoute,
+            'online_seat_choices' => $request->online_seat_choices,
+        ]);
+
+        RouteFare::where('route_id', $routeId)->delete();
+
+        $fareTables = FareTable::whereIn('from_city_id', $cityIds)
+            ->whereIn('to_city_id', $cityIds)
+            ->get();
+
+        $fareTablesGrouped = $fareTables->groupBy(function ($item) {
+            return $item->from_city_id . '_' . $item->to_city_id;
+        });
+
+        $timeDifferences = $fareTables->keyBy(function ($item) {
+            return $item->from_city_id . '_' . $item->to_city_id;
+        });
+
+        $oldTerminalVisibilities = TerminalVisibility::where([
+            'route_id' => $routeId,
+            'company_id' => $companyId,
+        ])->get()->keyBy(function ($item) {
+            return $item->departure_city_id . '_' . $item->destination_city_id;
+        });
+
+        $routeFareData = [];
+        $terminalVisibilityData = [];
+        $usedCities = [];
+
+        foreach ($cityIds as $index => $city) {
+            $usedCities[] = $city;
+
+            foreach ($cityIds as $innerCity) {
+                if (in_array($innerCity, $usedCities)) {
+                    continue;
+                }
+
+                $fromCity = $usedCities[$index];
+                $fareKey = $fromCity . '_' . $innerCity;
+
+                if (isset($fareTablesGrouped[$fareKey])) {
+                    foreach ($fareTablesGrouped[$fareKey] as $detail) {
+                        $routeFareData[] = [
+                            'route_id' => $routeId,
+                            'fare_id' => $detail->id,
+                            'fare_class_id' => $detail->fare_class,
+                            'departure_city_id' => $fromCity,
+                            'destination_city_id' => $innerCity,
+                            'company_id' => $companyId,
+                            'added_by' => $userId,
+                        ];
+                    }
+                }
+
+                $terminalKey = $fromCity . '_' . $innerCity;
+                $oldVisibility = $oldTerminalVisibilities[$terminalKey] ?? null;
+
+                $terminalVisibilityData[] = [
+                    'route_id' => $routeId,
+                    'departure_city_id' => $fromCity,
+                    'destination_city_id' => $innerCity,
+                    'online_visibilty' => $oldVisibility ? $oldVisibility->online_visibilty : 0,
+                    'company_id' => $companyId,
+                    'added_by' => $userId,
+                ];
+            }
+        }
+
+        if (!empty($routeFareData)) {
+            foreach (array_chunk($routeFareData, 1000) as $chunk) {
+                RouteFare::insert($chunk);
+            }
+        }
+
+        TerminalVisibility::where([
+            'route_id' => $routeId,
+            'company_id' => $companyId,
+        ])->delete();
+
+        if (!empty($terminalVisibilityData)) {
+            foreach (array_chunk($terminalVisibilityData, 1000) as $chunk) {
+                TerminalVisibility::insert($chunk);
+            }
+        }
+
+        // original logic jaisa: first fare_class group
+        $routeDetailsGrouped = collect($routeFareData)->groupBy('fare_class_id');
+        $routeDetails = $routeDetailsGrouped->first();
+
+        if ($routeDetails && count($routeDetails) > 0) {
+            $routeDetails = collect($routeDetails)->sortBy('departure_city_id')->values();
+
+            $schedules = Schedule::where([
+                'company_id' => $companyId,
+                'route_id' => $routeId,
+            ])->get();
+
+            foreach ($schedules as $schedule) {
+                // Sirf har date ki first row nikalo, full details nahi
+                $firstRows = DB::table('schedule_details as sd')
+                    ->join(
+                        DB::raw('(SELECT MIN(id) as id FROM schedule_details WHERE company_id = ' . (int)$companyId . ' AND schedule_id = ' . (int)$schedule->id . ' AND schedule_date >= "' . $today . '" GROUP BY schedule_date) as x'),
+                        'sd.id',
+                        '=',
+                        'x.id'
+                    )
+                    ->select('sd.schedule_date', 'sd.departure_time')
+                    ->orderBy('sd.schedule_date', 'ASC')
+                    ->get();
+
+                if ($firstRows->isEmpty()) {
+                    continue;
+                }
+
+                $startDate = $firstRows->first()->schedule_date;
+                $endDate = $firstRows->last()->schedule_date;
+
+                if (!$startDate || !$endDate) {
+                    continue;
+                }
+
+                $firstRowsByDate = $firstRows->keyBy('schedule_date');
+                $days = $this->getDays($startDate, $endDate);
+
+                // Purane saare future records ek dafa delete
+                ScheduleDetail::where('company_id', $companyId)
+                    ->where('schedule_id', $schedule->id)
+                    ->where('schedule_date', '>=', $today)
+                    ->delete();
+
+                $insertScheduleDetails = [];
+
+                for ($i = 0; $i <= $days; $i++) {
+                    $currentDate = date('Y-m-d', strtotime($startDate . " +{$i} days"));
+
+                    if (!isset($firstRowsByDate[$currentDate])) {
+                        continue;
+                    }
+
+                    $dateWiseDeparture = $firstRowsByDate[$currentDate];
+                    $lastDepId = $routeDetails->first()['departure_city_id'];
+
+                    $totalTime = strtotime($startDate . ' ' . $dateWiseDeparture->departure_time) + ($i * 86400);
+                    $scheduleStartDate = date('Y-m-d', $totalTime);
+
+                    foreach ($routeDetails as $detail) {
+                        $departureCityId = $detail['departure_city_id'];
+                        $destinationCityId = $detail['destination_city_id'];
+
+                        if ($lastDepId == $departureCityId) {
+                            $departureTime = date('Y-m-d H:i', $totalTime);
+                        } else {
+                            $timeKey = $lastDepId . '_' . $departureCityId;
+                            $fareTime = isset($timeDifferences[$timeKey]) ? $timeDifferences[$timeKey]->time_difference : "00:00";
+
+                            $timeDiff = explode(':', $fareTime);
+                            $hours = (int)($timeDiff[0] ?? 0);
+                            $minutes = (int)($timeDiff[1] ?? 0);
+
+                            $totalTime += (($hours * 3600) + ($minutes * 60));
+                            $departureTime = date('Y-m-d H:i', $totalTime);
+                            $lastDepId = $departureCityId;
+                        }
+
+                        $insertScheduleDetails[] = [
+                            'company_id' => $companyId,
+                            'added_by' => $userId,
+                            'schedule_id' => $schedule->id,
+                            'departure_id' => $departureCityId,
+                            'bus_class_id' => $schedule->bus_class_id,
+                            'destination_id' => $destinationCityId,
+                            'departure_time' => date('H:i', strtotime($departureTime)),
+                            'departure_date' => date('Y-m-d', strtotime($departureTime)),
+                            'schedule_date' => $scheduleStartDate,
+                        ];
+                    }
+                }
+
+                if (!empty($insertScheduleDetails)) {
+                    foreach (array_chunk($insertScheduleDetails, 1000) as $chunk) {
+                        ScheduleDetail::insert($chunk);
+                    }
+                }
+            }
+        }
+
+        ActivityLog::create([
+            "activity_by" => $userId,
+            "message" => $user->name . " | updated route (" . $request->routeStartName . '-' . $request->routeEndName . ")",
+            "requested_host" => $request->ip(),
+            "company_id" => $companyId
+        ]);
+
+        DB::commit();
+
+        return ['message' => 'success'];
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Database transaction error: ' . $e->getMessage());
+        return response()->json([
+            "errors" => [
+                "Error" => ['An error occurred during the database transaction.'],
+                "debug" => [$e->getMessage()]
+            ]
+        ], 422);
+    }
+}
     public function hideRoute(Request $request)
     {
         if(!checkPermissionButtons("delete-routes"))
@@ -391,10 +494,10 @@ class RouteController extends Controller
                         "online_visibilty" => $single['visibility'],
                         "booking_minutes" => $single['booking_minutes']==null ? null : abs($single['booking_minutes'])
                     ]);
-                    
+
                 }
                 DB::commit();
-            
+
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Database transaction error: ' . $e->getMessage());
