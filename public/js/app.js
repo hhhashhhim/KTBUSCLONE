@@ -48186,8 +48186,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     profitLoss: function profitLoss() {
       // Ensure shortages and expenses are arrays
       var shortages = this.shortages || [];
-      var expenses = this.expenses || []; // If no shortages, return 0
-
+      var expenses = this.expenses || [];
       var totalReceivable = shortages.reduce(function (sum, item) {
         var _item$total_receivabl;
 
@@ -48207,9 +48206,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         var _item$amount;
 
         return sum + Number((_item$amount = item.amount) !== null && _item$amount !== void 0 ? _item$amount : 0);
-      }, 0); // console.log(totalExpenses);
+      }, 0); // 🔥 NEW: Start + Return ELT
 
-      return totalReceivable - (totalKtCommission + totalOtherCommission + totalExpenses);
+      var totalStartELT = (this.startShortages || []).reduce(function (sum, i) {
+        var _i$elt;
+
+        return sum + Number((_i$elt = i.elt) !== null && _i$elt !== void 0 ? _i$elt : 0);
+      }, 0);
+      var totalReturnELT = (this.returnShortages || []).reduce(function (sum, i) {
+        var _i$elt2;
+
+        return sum + Number((_i$elt2 = i.elt) !== null && _i$elt2 !== void 0 ? _i$elt2 : 0);
+      }, 0);
+      var totalELT = totalStartELT + totalReturnELT;
+      return totalReceivable - (totalKtCommission + totalOtherCommission + totalExpenses + totalELT);
     },
     startTotals: function startTotals() {
       return {
@@ -48224,9 +48234,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           return sum + Number((_i$kt_commission = i.kt_commission) !== null && _i$kt_commission !== void 0 ? _i$kt_commission : 0);
         }, 0),
         totalELT: this.startShortages.reduce(function (sum, i) {
-          var _i$elt;
+          var _i$elt3;
 
-          return sum + Number((_i$elt = i.elt) !== null && _i$elt !== void 0 ? _i$elt : 0);
+          return sum + Number((_i$elt3 = i.elt) !== null && _i$elt3 !== void 0 ? _i$elt3 : 0);
         }, 0),
         totalCancellationAmount: this.startShortages.reduce(function (sum, i) {
           var _i$cancellation_amoun;
@@ -48278,9 +48288,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           return sum + Number((_i$kt_commission2 = i.kt_commission) !== null && _i$kt_commission2 !== void 0 ? _i$kt_commission2 : 0);
         }, 0),
         totalELT: this.returnShortages.reduce(function (sum, i) {
-          var _i$elt2;
+          var _i$elt4;
 
-          return sum + Number((_i$elt2 = i.elt) !== null && _i$elt2 !== void 0 ? _i$elt2 : 0);
+          return sum + Number((_i$elt4 = i.elt) !== null && _i$elt4 !== void 0 ? _i$elt4 : 0);
         }, 0),
         totalCancellationAmount: this.returnShortages.reduce(function (sum, i) {
           var _i$cancellation_amoun2;
@@ -69089,7 +69099,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         bus_number: "",
         from_date: "",
         to_date: "",
-        dropdownRoute: []
+        dropdownRoute: ""
       },
       dropdownRoute: [],
       closings: [],
@@ -134934,7 +134944,8 @@ var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-  value: ""
+  value: "",
+  selected: ""
 }, "Select Route", -1
 /* HOISTED */
 );
@@ -135094,7 +135105,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* KEYED_FRAGMENT */
   ))], 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filterData.dropdownRoute]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"col-md-3\">\r\n                                                        <label>Route</label>\r\n                                                        <select2 v-model=\"filterData.route\" :options=\"route\"\r\n                                                            :settings=\"{ multiple: true, width: '100%', placeholder: 'Select Route', allowClear: true }\" />\r\n                                                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [_hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filterData.dropdownRoute]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"col-md-3\">\n                                                        <label>Route</label>\n                                                        <select2 v-model=\"filterData.route\" :options=\"route\"\n                                                            :settings=\"{ multiple: true, width: '100%', placeholder: 'Select Route', allowClear: true }\" />\n                                                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [_hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     id: "fromDate",
     type: "date",
     "class": "form-control",
@@ -135130,7 +135141,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   )], 8
   /* PROPS */
-  , _hoisted_30), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <button class=\"btn btn-primary\" :disabled=\"loading\" @click=\"mergeSchedule()\">\r\n                                                    Merge Schedule\r\n                                                </button> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_34, _hoisted_35, _hoisted_36, _hoisted_37, _hoisted_38, _hoisted_39, _ctx.checkForSubmenuButtons('edit-close-booking') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_40, " Action ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.closings, function (data, i) {
+  , _hoisted_30), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <button class=\"btn btn-primary\" :disabled=\"loading\" @click=\"mergeSchedule()\">\n                                                    Merge Schedule\n                                                </button> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [_hoisted_34, _hoisted_35, _hoisted_36, _hoisted_37, _hoisted_38, _hoisted_39, _ctx.checkForSubmenuButtons('edit-close-booking') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_40, " Action ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.closings, function (data, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: i
     }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(data, function (close, j) {
@@ -148322,7 +148333,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.trip-card[data-v-8c8f9452] {\r\n  border: none;\r\n  border-radius: 16px;\r\n  background: #fff;\r\n  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);\r\n  transition: all 0.3s ease;\r\n  position: relative;\r\n  overflow: hidden;\n}\n.trip-card[data-v-8c8f9452]::before {\r\n  content: \"\";\r\n  height: 6px;\r\n  width: 100%;\r\n  position: absolute;\r\n  top: 0;\r\n  left: 0;\n}\n.trip-card.departure[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #28a745, #6fdf9f);\n}\n.trip-card.return[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #007bff, #5aa9ff);\n}\n.trip-card[data-v-8c8f9452]:hover {\r\n  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);\n}\n.trip-header[data-v-8c8f9452] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 10px;\r\n  font-size: 15px;\r\n  font-weight: 600;\r\n  color: #555;\r\n  margin-bottom: 12px;\n}\n.trip-header i[data-v-8c8f9452] {\r\n  font-size: 18px;\n}\n.bus-number[data-v-8c8f9452] {\r\n  font-size: 22px;\r\n  font-weight: 700;\r\n  color: #222;\r\n  margin-bottom: 15px;\n}\n.trip-info[data-v-8c8f9452] {\r\n  list-style: none;\r\n  padding: 0;\r\n  margin: 0;\n}\n.trip-info li[data-v-8c8f9452] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 10px;\r\n  font-size: 14px;\r\n  margin-bottom: 0px;\r\n  color: #444;\n}\n.trip-info i[data-v-8c8f9452] {\r\n  font-size: 15px;\n}\n.stat-card[data-v-8c8f9452] {\r\n  border: none;\r\n  border-radius: 14px;\r\n  background: #fff;\r\n  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);\r\n  transition: all 0.3s ease;\r\n  position: relative;\r\n  overflow: hidden;\n}\n.stat-card[data-v-8c8f9452]::before {\r\n  content: \"\";\r\n  position: absolute;\r\n  top: 0;\r\n  left: 0;\r\n  height: 6px;\r\n  width: 100%;\n}\n.stat-card.info[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #17a2b8, #6fd6e8);\n}\n.stat-card.danger[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #dc3545, #ff7b89);\n}\n.stat-card.success[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #28a745, #7be495);\n}\n.stat-card.primary[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #007bff, #6aa9ff);\n}\n.stat-card.warning[data-v-8c8f9452]::before {\r\n  background: linear-gradient(90deg, #ffc107, #ffe083);\n}\n.stat-card[data-v-8c8f9452]:hover {\r\n  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);\n}\n.stat-header[data-v-8c8f9452] {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 10px;\r\n  font-size: 14px;\r\n  font-weight: 600;\r\n  color: #666;\r\n  margin-bottom: 10px;\n}\n.stat-header i[data-v-8c8f9452] {\r\n  font-size: 18px;\n}\n.stat-value[data-v-8c8f9452] {\r\n  font-size: 22px;\r\n  font-weight: 700;\r\n  color: #222;\r\n  margin: 0;\n}\n.btn-print[data-v-8c8f9452] {\r\n  border-radius: 50px;\r\n  padding: 10px 26px;\r\n  font-weight: 600;\r\n  font-size: 14px;\r\n  background: #000000 !important;\r\n  color: #fff !important;\r\n  border: 2px solid #000000 !important;\r\n\r\n  transition: all 0.3s ease;\r\n  display: inline-flex;\r\n  align-items: center;\r\n  justify-content: center;\r\n  outline: none !important;\r\n  box-shadow: none !important;\n}\r\n\r\n/* Hover */\n.btn-print[data-v-8c8f9452]:hover:not(:disabled) {\r\n  background: #000000 !important;\r\n  color: #fff !important;\r\n  border: 2px solid #000000 !important;\r\n  transform: translateY(-2px);\r\n  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35) !important;\n}\r\n\r\n/* Focus */\n.btn-print[data-v-8c8f9452]:focus,\r\n.btn-print[data-v-8c8f9452]:focus-visible {\r\n  background: #000000 !important;\r\n  color: #fff !important;\r\n  border-color: #000000 !important;\r\n  outline: none !important;\r\n  box-shadow: none !important;\n}\r\n\r\n/* Active */\n.btn-print[data-v-8c8f9452]:active,\r\n.btn-print.active[data-v-8c8f9452],\r\n.btn-print[data-v-8c8f9452]:active:not(:disabled) {\r\n  background: #000000 !important;\r\n  color: #fff !important;\r\n  border-color: #000000 !important;\r\n  box-shadow: none !important;\r\n  transform: scale(0.95);\n}\r\n\r\n/* Disabled */\n.btn-print[data-v-8c8f9452]:disabled {\r\n  opacity: 0.6;\r\n  cursor: not-allowed;\r\n  box-shadow: none !important;\r\n  transform: none;\n}\n.btn-loading[data-v-8c8f9452] {\r\n  display: inline-flex;\r\n  align-items: center;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.trip-card[data-v-8c8f9452] {\n    border: none;\n    border-radius: 16px;\n    background: #fff;\n    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);\n    transition: all 0.3s ease;\n    position: relative;\n    overflow: hidden;\n}\n.trip-card[data-v-8c8f9452]::before {\n    content: \"\";\n    height: 6px;\n    width: 100%;\n    position: absolute;\n    top: 0;\n    left: 0;\n}\n.trip-card.departure[data-v-8c8f9452]::before {\n    background: linear-gradient(90deg, #28a745, #6fdf9f);\n}\n.trip-card.return[data-v-8c8f9452]::before {\n    background: linear-gradient(90deg, #007bff, #5aa9ff);\n}\n.trip-card[data-v-8c8f9452]:hover {\n    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);\n}\n.trip-header[data-v-8c8f9452] {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    font-size: 15px;\n    font-weight: 600;\n    color: #555;\n    margin-bottom: 12px;\n}\n.trip-header i[data-v-8c8f9452] {\n    font-size: 18px;\n}\n.bus-number[data-v-8c8f9452] {\n    font-size: 22px;\n    font-weight: 700;\n    color: #222;\n    margin-bottom: 15px;\n}\n.trip-info[data-v-8c8f9452] {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n}\n.trip-info li[data-v-8c8f9452] {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    font-size: 14px;\n    margin-bottom: 0px;\n    color: #444;\n}\n.trip-info i[data-v-8c8f9452] {\n    font-size: 15px;\n}\n.stat-card[data-v-8c8f9452] {\n    border: none;\n    border-radius: 14px;\n    background: #fff;\n    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);\n    transition: all 0.3s ease;\n    position: relative;\n    overflow: hidden;\n}\n.stat-card[data-v-8c8f9452]::before {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    left: 0;\n    height: 6px;\n    width: 100%;\n}\n.stat-card.info[data-v-8c8f9452]::before {\n    background: linear-gradient(90deg, #17a2b8, #6fd6e8);\n}\n.stat-card.danger[data-v-8c8f9452]::before {\n    background: linear-gradient(90deg, #dc3545, #ff7b89);\n}\n.stat-card.success[data-v-8c8f9452]::before {\n    background: linear-gradient(90deg, #28a745, #7be495);\n}\n.stat-card.primary[data-v-8c8f9452]::before {\n    background: linear-gradient(90deg, #007bff, #6aa9ff);\n}\n.stat-card.warning[data-v-8c8f9452]::before {\n    background: linear-gradient(90deg, #ffc107, #ffe083);\n}\n.stat-card[data-v-8c8f9452]:hover {\n    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);\n}\n.stat-header[data-v-8c8f9452] {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    font-size: 14px;\n    font-weight: 600;\n    color: #666;\n    margin-bottom: 10px;\n}\n.stat-header i[data-v-8c8f9452] {\n    font-size: 18px;\n}\n.stat-value[data-v-8c8f9452] {\n    font-size: 22px;\n    font-weight: 700;\n    color: #222;\n    margin: 0;\n}\n.btn-print[data-v-8c8f9452] {\n    border-radius: 50px;\n    padding: 10px 26px;\n    font-weight: 600;\n    font-size: 14px;\n    background: #000000 !important;\n    color: #fff !important;\n    border: 2px solid #000000 !important;\n\n    transition: all 0.3s ease;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    outline: none !important;\n    box-shadow: none !important;\n}\n\n/* Hover */\n.btn-print[data-v-8c8f9452]:hover:not(:disabled) {\n    background: #000000 !important;\n    color: #fff !important;\n    border: 2px solid #000000 !important;\n    transform: translateY(-2px);\n    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35) !important;\n}\n\n/* Focus */\n.btn-print[data-v-8c8f9452]:focus,\n.btn-print[data-v-8c8f9452]:focus-visible {\n    background: #000000 !important;\n    color: #fff !important;\n    border-color: #000000 !important;\n    outline: none !important;\n    box-shadow: none !important;\n}\n\n/* Active */\n.btn-print[data-v-8c8f9452]:active,\n.btn-print.active[data-v-8c8f9452],\n.btn-print[data-v-8c8f9452]:active:not(:disabled) {\n    background: #000000 !important;\n    color: #fff !important;\n    border-color: #000000 !important;\n    box-shadow: none !important;\n    transform: scale(0.95);\n}\n\n/* Disabled */\n.btn-print[data-v-8c8f9452]:disabled {\n    opacity: 0.6;\n    cursor: not-allowed;\n    box-shadow: none !important;\n    transform: none;\n}\n.btn-loading[data-v-8c8f9452] {\n    display: inline-flex;\n    align-items: center;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

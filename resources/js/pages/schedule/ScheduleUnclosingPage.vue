@@ -29,7 +29,7 @@
                                                         <label for="terminalFilter">Select Route</label>
                                                         <select id="terminalFilter" class="form-control"
                                                            v-model="filterData.dropdownRoute">
-                                                            <option value="">Select Route</option>
+                                                            <option value="" selected>Select Route</option>
                                                             <option v-for="(singleRoute, i) in dropdownRoute" :key="i" :value="singleRoute.id">
                                                                 {{ singleRoute.name }}
                                                             </option>
@@ -273,7 +273,7 @@ export default {
                 bus_number: "",
                 from_date: "",
                 to_date: "",
-                dropdownRoute: [],
+                dropdownRoute: "",
             },
             dropdownRoute: [],
             closings: [],
