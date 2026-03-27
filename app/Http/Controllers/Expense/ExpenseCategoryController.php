@@ -25,10 +25,6 @@ class ExpenseCategoryController extends Controller
 {
     public function index()
     {
-        if(!checkForSubmenu("categories"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
         return ExpenseCategory::with('addedBy', 'reportHeader')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
     }
 
