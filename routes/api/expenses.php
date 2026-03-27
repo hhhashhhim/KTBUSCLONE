@@ -18,6 +18,7 @@ Route::group(['prefix' => 'web/v1/expenses','middleware' => ['auth:sanctum']], f
         Route::post('reportsHeaderExpense', [ExpenseCategoryController::class, 'reportHeader']);
         Route::post('reportHeaderLinkGet', [ExpenseCategoryController::class, 'reportHeaderLinkGet']);
         Route::post('expenseHeaderLink', [ExpenseCategoryController::class, 'expenseHeaderLink']);
+        Route::post('getCategory', [ExpenseCategoryController::class, 'getCategory']);
         // Route::post('delete', [CityController::class, 'delete']);
     });
 });

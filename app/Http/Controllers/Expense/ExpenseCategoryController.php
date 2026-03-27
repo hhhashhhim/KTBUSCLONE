@@ -25,6 +25,10 @@ class ExpenseCategoryController extends Controller
 {
     public function index()
     {
+        if(!checkForSubmenu("categories"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
         return ExpenseCategory::with('addedBy', 'reportHeader')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
     }
 
@@ -91,6 +95,10 @@ class ExpenseCategoryController extends Controller
     {
 
         return ReportsHeader::with('addedBy')->where('company_id', Auth::user()->company_id)->get();
+    }
+     public function getCategory()
+    {
+        return ExpenseCategory::with('addedBy', 'reportHeader')->where('company_id', Auth::user()->company_id)->orderBy('id')->get();
     }
  public function reportHeaderLinkGet(Request $request)
     {
