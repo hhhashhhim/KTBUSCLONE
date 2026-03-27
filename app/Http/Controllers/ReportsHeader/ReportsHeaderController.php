@@ -21,14 +21,14 @@ class ReportsHeaderController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         return ReportsHeader::with('addedBy')->where('company_id', Auth::user()->company_id)->get();
-    } 
+    }
 
     public function store(Request $request)
     {
-        if(!checkForSubmenu("report-header"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
+        // if(!checkForSubmenu("report-header"))
+        // {
+        //     return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        // }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -63,10 +63,10 @@ class ReportsHeaderController extends Controller
 
     public function update(Request $request)
     {
-        if(!checkForSubmenu("report-header"))
-        {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
+        // if(!checkForSubmenu("report-header"))
+        // {
+        //     return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        // }
         try {
                 DB::beginTransaction();
                 $rules = [
@@ -132,7 +132,7 @@ class ReportsHeaderController extends Controller
         // try {
            DB::beginTransaction();
     ReportHeaderLink::where("ticket_merge_id", $request->ticket_merge_id)->delete();
-    $headIds = $request->headIds ?? []; 
+    $headIds = $request->headIds ?? [];
     $values = $request->values ?? [];
                foreach ($headIds as $key => $value) {
         ReportHeaderLink::create([
