@@ -1324,11 +1324,11 @@ export default {
 
             const totalELT = totalStartELT + totalReturnELT;
 
-            return totalReceivable - (
+            return (totalReceivable + totalELT) - (
                 totalKtCommission +
                 totalOtherCommission +
-                totalExpenses +
-                totalELT
+                totalExpenses 
+
             );
         },
 

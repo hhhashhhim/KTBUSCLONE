@@ -48219,7 +48219,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         return sum + Number((_i$elt2 = i.elt) !== null && _i$elt2 !== void 0 ? _i$elt2 : 0);
       }, 0);
       var totalELT = totalStartELT + totalReturnELT;
-      return totalReceivable - (totalKtCommission + totalOtherCommission + totalExpenses + totalELT);
+      return totalReceivable + totalELT - (totalKtCommission + totalOtherCommission + totalExpenses);
     },
     startTotals: function startTotals() {
       return {
