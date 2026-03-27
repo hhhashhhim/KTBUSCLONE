@@ -27857,7 +27857,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this13.callApi("post", "expenses/categories");
+                return _this13.callApi("post", "expenses/categories/getCategory");
 
               case 2:
                 res = _context2.sent;
@@ -47720,7 +47720,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             switch (_context6.prev = _context6.next) {
               case 0:
                 _context6.next = 2;
-                return _this7.callApi("post", "expenses/categories");
+                return _this7.callApi("post", "expenses/categories/getCategory");
 
               case 2:
                 res = _context6.sent;

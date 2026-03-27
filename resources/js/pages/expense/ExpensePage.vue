@@ -962,7 +962,7 @@ export default {
             this.data = {};
         },
         async fetchData() {
-            const res = await this.callApi("post", "expenses/categories");
+            const res = await this.callApi("post", "expenses/categories/getCategory");
             if (res.status == 200) {
                 this.categories = res.data;
             }
