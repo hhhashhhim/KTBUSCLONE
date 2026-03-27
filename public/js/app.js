@@ -27884,7 +27884,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return _this14.callApi("post", "reportsHeader");
+                return _this14.callApi("post", "expenses/categories/reportHeaderLinkGet");
 
               case 2:
                 res = _context3.sent;
@@ -27905,7 +27905,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       return list.reduce(function (sum, t) {
         var _t$commission;
 
-        // 1. Check if the ticket is canceled. 
+        // 1. Check if the ticket is canceled.
         // If it is, skip the calculation and return the current sum.
         if (t.type == 'canceled') {
           return sum;
@@ -28032,7 +28032,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
               case 5:
                 _context4.next = 7;
-                return _this15.callApi("post", "reportsHeader/header/link", {
+                return _this15.callApi("post", "expenses/categories/expenseHeaderLink", {
                   ticket_merge_id: ticketMergeId,
                   headIds: headIds,
                   values: values
@@ -28241,7 +28241,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
     //   try {
     //     // Step 1 & 2: SKIP MERGE API
     //     // We create a dummy ID so the code doesn't break
-    //     const dummyId = 999; 
+    //     const dummyId = 999;
     //     // Step 3: Calculation Logic
     //     const mapRows = (cashBank, schedule) =>
     //       Object.entries(cashBank).map(([terminalId, row]) => {
@@ -28251,7 +28251,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
     //         return {
     //           terminal_id: Number(terminalId),
     //           passenger_count: activeTickets.length,
-    //           kt_commission: this.totalCommission(allTickets), 
+    //           kt_commission: this.totalCommission(allTickets),
     //           elt: this.totalELT(allTickets),
     //           cancellation_amount: this.totalCancelAmount(allTickets),
     //           // Calculation check
@@ -47050,7 +47050,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this3.callApi("post", "reportsHeader");
+                return _this3.callApi("post", "expenses/categories/reportsHeaderExpense");
 
               case 2:
                 res = _context2.sent;
@@ -47473,7 +47473,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 _context2.prev = 1;
                 _context2.next = 4;
-                return _this2.callApi("post", "reportsHeader/link/get", {
+                return _this2.callApi("post", "expenses/categories/reportHeaderLinkGet", {
                   ticket_merge_id: _this2.expensePostData.ticket_merge_id
                 });
 
@@ -79413,7 +79413,7 @@ var _hoisted_17 = {
 var _hoisted_18 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", {
     "class": "table-light"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Passenger Count"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "KT Commission"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "ELT"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cancellation Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Receivable"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Other Commission"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th>Receivable Cash</th>\r\n                        <th>Receivable Bank</th> "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Received in Cash"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Select Bank"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Received in Bank"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Shortage"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Received")])], -1
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Terminal Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Passenger Count"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "KT Commission"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "ELT"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cancellation Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Receivable"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Other Commission"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th>Receivable Cash</th>\n                        <th>Receivable Bank</th> "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Received in Cash"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Select Bank"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Total Received in Bank"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Shortage"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Received")])], -1
   /* HOISTED */
   );
 });
@@ -79929,7 +79929,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumOtherCommissions($props.data.schedule_start))), 1
   /* TEXT */
-  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th></th>\r\n<th></th> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumCash())), 1
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <th></th>\n<th></th> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumCash())), 1
   /* TEXT */
   ), _hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Select Bank column "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumBank())), 1
   /* TEXT */
@@ -147877,7 +147877,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.add-btn[data-v-56d6df66] {\r\n  width: 138px;\n}\n.header-td[data-v-56d6df66] {\r\n  width: 200px;\n}\n.totals tr td[data-v-56d6df66] {\r\n  font-size: 18px;\r\n  font-weight: 700;\n}\n.totals tr th[data-v-56d6df66] {\r\n  font-size: 18px;\r\n  font-weight: 700;\n}\n.border-r[data-v-56d6df66] {\r\n  border-top: 1px solid gray;\r\n  border-bottom: 1px solid gray;\r\n  font-weight: bold;\n}\r\n\r\n/* Chrome, Safari, Edge, Opera */\ninput[type=\"number\"][data-v-56d6df66]::-webkit-outer-spin-button,\r\ninput[type=\"number\"][data-v-56d6df66]::-webkit-inner-spin-button {\r\n  -webkit-appearance: none;\r\n  margin: 0;\n}\r\n\r\n/* Firefox */\ninput[type=\"number\"][data-v-56d6df66] {\r\n  -moz-appearance: textfield;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.add-btn[data-v-56d6df66] {\n  width: 138px;\n}\n.header-td[data-v-56d6df66] {\n  width: 200px;\n}\n.totals tr td[data-v-56d6df66] {\n  font-size: 18px;\n  font-weight: 700;\n}\n.totals tr th[data-v-56d6df66] {\n  font-size: 18px;\n  font-weight: 700;\n}\n.border-r[data-v-56d6df66] {\n  border-top: 1px solid gray;\n  border-bottom: 1px solid gray;\n  font-weight: bold;\n}\n\n/* Chrome, Safari, Edge, Opera */\ninput[type=\"number\"][data-v-56d6df66]::-webkit-outer-spin-button,\ninput[type=\"number\"][data-v-56d6df66]::-webkit-inner-spin-button {\n  -webkit-appearance: none;\n  margin: 0;\n}\n\n/* Firefox */\ninput[type=\"number\"][data-v-56d6df66] {\n  -moz-appearance: textfield;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

@@ -1012,7 +1012,7 @@ export default {
       }
     },
     async fetchReportsHeaders() {
-      const res = await this.callApi("post", "reportsHeader");
+      const res = await this.callApi("post", "expenses/categories/reportHeaderLinkGet");
 
       if (res.status == 200) {
         this.reportsHeaders = res.data;
@@ -1021,7 +1021,7 @@ export default {
 
     totalCommission(list) {
       return list.reduce((sum, t) => {
-        // 1. Check if the ticket is canceled. 
+        // 1. Check if the ticket is canceled.
         // If it is, skip the calculation and return the current sum.
         if (t.type == 'canceled') {
           return sum;
@@ -1145,7 +1145,7 @@ export default {
 
       if (!headIds.length) return;
 
-      await this.callApi("post", "reportsHeader/header/link", {
+      await this.callApi("post", "expenses/categories/expenseHeaderLink", {
         ticket_merge_id: ticketMergeId,
         headIds: headIds,
         values: values
@@ -1277,7 +1277,7 @@ export default {
     //   try {
     //     // Step 1 & 2: SKIP MERGE API
     //     // We create a dummy ID so the code doesn't break
-    //     const dummyId = 999; 
+    //     const dummyId = 999;
 
     //     // Step 3: Calculation Logic
     //     const mapRows = (cashBank, schedule) =>
@@ -1289,7 +1289,7 @@ export default {
     //         return {
     //           terminal_id: Number(terminalId),
     //           passenger_count: activeTickets.length,
-    //           kt_commission: this.totalCommission(allTickets), 
+    //           kt_commission: this.totalCommission(allTickets),
     //           elt: this.totalELT(allTickets),
     //           cancellation_amount: this.totalCancelAmount(allTickets),
     //           // Calculation check

@@ -334,7 +334,7 @@ export default {
     },
     methods: {
         async fetchReportsHeaders() {
-            const res = await this.callApi("post", "reportsHeader");
+            const res = await this.callApi("post", "expenses/categories/reportsHeaderExpense");
 
             if (res.status == 200) {
                 this.reportsHeaders = res.data;

@@ -803,7 +803,7 @@ export default {
         async fetchExpenseData() {
             this.isLoading = true; // Start loading
             try {
-                const res = await this.callApi("post", "reportsHeader/link/get", {
+                const res = await this.callApi("post", "expenses/categories/reportHeaderLinkGet", {
                     ticket_merge_id: this.expensePostData.ticket_merge_id,
                 });
 
@@ -1327,7 +1327,7 @@ export default {
             return (totalReceivable + totalELT) - (
                 totalKtCommission +
                 totalOtherCommission +
-                totalExpenses 
+                totalExpenses
 
             );
         },
