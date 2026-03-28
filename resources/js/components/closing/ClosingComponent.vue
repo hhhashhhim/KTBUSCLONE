@@ -336,7 +336,7 @@
   v-model="postData.showExtra[index]"
 />
     </td>
-
+ 
     <td v-else></td>
 
     <td class="header-td">
