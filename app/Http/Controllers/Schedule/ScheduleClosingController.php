@@ -994,7 +994,10 @@ class ScheduleClosingController extends Controller
 
         $finalRouteIds = $requestedRoutes;
     }
-
+return response()->json([
+    'requestedRoutes' => $requestedRoutes,
+    'finalRouteIds' => $finalRouteIds
+]);
     $mergesQuery = TicketClosingMerge::where([
         'company_id' => $user->company_id,
         'schedule_complete' => 1
