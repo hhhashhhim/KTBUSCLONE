@@ -32,7 +32,7 @@
                                     <!-- Schedule Name End -->
                                     <!-- <div class="col-md-3">
     <label>Schedule Name End</label>
-    <select2 
+    <select2
         v-model="filterData.schedule_name_end"
         :options="schedules"
         :settings="{ multiple: true, width: '100%' }"
@@ -84,50 +84,61 @@
                                                 </div>
                                                 <div v-else>
                                                     <div class="d-flex justify-content-end">
-                                                        <form
-                                                            :action="$store.state.api_url + 'api/web/v1/booking/close/schedule/merges/pdf'"
-                                                            method="POST" ref="" target="_blank">
-                                                            <input type="hidden" name="token"
-                                                                :value="this.$store.state.token">
-                                                            <input type="hidden" name="bus_number"
-                                                                :value="this.filterData.bus_number">
-                                                            <input type="hidden" name="from_date"
-                                                                :value="this.filterData.from_date">
-                                                            <input type="hidden" name="to_date"
-                                                                :value="this.filterData.to_date">
-                                                            <input type="hidden" name="closing_from_date"
-                                                                :value="this.filterData.closing_from_date">
+                                                      <form
+    :action="$store.state.api_url + 'api/web/v1/booking/close/schedule/merges/pdf'"
+    method="POST"
+    target="_blank"
+>
+    <input type="hidden" name="token" :value="$store.state.token">
 
-                                                            <input type="hidden" name="closing_to_date"
-                                                                :value="this.filterData.closing_to_date">
-                                                            <input type="hidden" name="schedule_name_start"
-                                                                :value="this.filterData.schedule_name_start">
-                                                            <input type="hidden" name="schedule_name_end"
-                                                                :value="this.filterData.schedule_name_end">
+    <template v-for="(bus, i) in filterData.bus_number" :key="'bus-' + i">
+        <input type="hidden" name="bus_number[]" :value="bus">
+    </template>
 
-                                                            <input type="submit" value="Eng Print"
-                                                                class="btn btn-dark mx-2">
-                                                        </form>
+    <template v-for="(route, i) in filterData.route" :key="'route-' + i">
+        <input type="hidden" name="route[]" :value="route">
+    </template>
+
+    <template v-for="(item, i) in filterData.schedule_name_start" :key="'start-' + i">
+        <input type="hidden" name="schedule_name_start[]" :value="item">
+    </template>
+
+    <template v-for="(item, i) in filterData.schedule_name_end" :key="'end-' + i">
+        <input type="hidden" name="schedule_name_end[]" :value="item">
+    </template>
+
+    <input type="hidden" name="from_date" :value="filterData.from_date">
+    <input type="hidden" name="to_date" :value="filterData.to_date">
+    <input type="hidden" name="closing_from_date" :value="filterData.closing_from_date">
+    <input type="hidden" name="closing_to_date" :value="filterData.closing_to_date">
+
+    <input type="submit" value="Eng Print" class="btn btn-dark mx-2">
+</form>
                                                         <form
                                                             :action="$store.state.api_url + 'api/web/v1/booking/close/schedule/merges/urdu/pdf'"
                                                             method="POST" ref="" target="_blank">
-                                                            <input type="hidden" name="token"
-                                                                :value="this.$store.state.token">
-                                                            <input type="hidden" name="bus_number"
-                                                                :value="this.filterData.bus_number">
-                                                            <input type="hidden" name="from_date"
-                                                                :value="this.filterData.from_date">
-                                                            <input type="hidden" name="to_date"
-                                                                :value="this.filterData.to_date">
-                                                            <input type="hidden" name="closing_from_date"
-                                                                :value="this.filterData.closing_from_date">
+                                                            <input type="hidden" name="token" :value="$store.state.token">
 
-                                                            <input type="hidden" name="closing_to_date"
-                                                                :value="this.filterData.closing_to_date">
-                                                            <input type="hidden" name="schedule_name_start"
-                                                                :value="this.filterData.schedule_name_start">
-                                                            <input type="hidden" name="schedule_name_end"
-                                                                :value="this.filterData.schedule_name_end">
+    <template v-for="(bus, i) in filterData.bus_number" :key="'bus-' + i">
+        <input type="hidden" name="bus_number[]" :value="bus">
+    </template>
+
+    <template v-for="(route, i) in filterData.route" :key="'route-' + i">
+        <input type="hidden" name="route[]" :value="route">
+    </template>
+
+    <template v-for="(item, i) in filterData.schedule_name_start" :key="'start-' + i">
+        <input type="hidden" name="schedule_name_start[]" :value="item">
+    </template>
+
+    <template v-for="(item, i) in filterData.schedule_name_end" :key="'end-' + i">
+        <input type="hidden" name="schedule_name_end[]" :value="item">
+    </template>
+
+    <input type="hidden" name="from_date" :value="filterData.from_date">
+    <input type="hidden" name="to_date" :value="filterData.to_date">
+    <input type="hidden" name="closing_from_date" :value="filterData.closing_from_date">
+    <input type="hidden" name="closing_to_date" :value="filterData.closing_to_date">
                                                             <input type="submit" value="Urdu Print"
                                                                 class="btn btn-dark">
                                                         </form>
@@ -268,7 +279,7 @@
                                                                 </td>
                                                                 <!-- Shortage status dot -->
                                                                 <!-- <td>
-    <span 
+    <span
       :class="{
         'dot-green': !hasShortage,
         'dot-red': hasShortage
@@ -553,7 +564,7 @@ export default {
                 // $('#merge_table').DataTable().destroy();
             }
         },
-    }, 
+    },
     async mounted() {
         await this.fetchBuses();  // load buses on component mount
         await this.fetchRoute();  // load route on component mount
