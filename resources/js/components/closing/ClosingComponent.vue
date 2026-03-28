@@ -330,11 +330,11 @@
   <i class="fas fa-trash"></i>
 </button>
 
-      <input
-        type="checkbox"
-        class="ml-2"
-        v-model="postData.showExtra[index]"
-      />
+<input
+  type="checkbox"
+  class="ml-2"
+  v-model="postData.showExtra[index]"
+/>
     </td>
 
     <td v-else></td>
