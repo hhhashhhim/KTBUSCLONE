@@ -27988,8 +27988,21 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
     },
     addRow: function addRow() {
       this.loop++;
+      this.postData.category.push('');
+      this.postData.description.push('');
+      this.postData.amount.push(0);
+      this.postData.paid.push(0);
+      this.postData.invoice.push('');
+      this.postData.showExtra.push(false);
+      this.postData.extraCategory.push(''); // optional recalculation
+
+      this.totalAmount = this.postData.amount.reduce(function (a, b) {
+        return parseFloat(a || 0) + parseFloat(b || 0);
+      }, 0);
+      this.netProfit = this.totalSale - this.totalAmount;
     },
-    removeRow: function removeRow(event, index) {
+    removeRow: function removeRow(index) {
+      if (this.loop <= 1) return;
       this.postData.category.splice(index, 1);
       this.postData.description.splice(index, 1);
       this.postData.amount.splice(index, 1);
@@ -27997,10 +28010,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       this.postData.invoice.splice(index, 1);
       this.postData.showExtra.splice(index, 1);
       this.postData.extraCategory.splice(index, 1);
-      this.loop--; // total amount sum only for show
-
+      this.loop--;
       this.totalAmount = this.postData.amount.reduce(function (a, b) {
-        return parseFloat(a) + parseFloat(b);
+        return parseFloat(a || 0) + parseFloat(b || 0);
       }, 0);
       this.netProfit = this.totalSale - this.totalAmount;
     },
@@ -28019,7 +28031,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                 _this15.postData.showExtra.forEach(function (checked, index) {
                   if (checked && _this15.postData.extraCategory[index]) {
                     headIds.push(_this15.postData.extraCategory[index]);
-                    values.push(_this15.postData.amount[index] || 0);
+                    values.push(parseFloat(_this15.postData.amount[index] || 0));
                   }
                 });
 
@@ -46209,7 +46221,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   data: function data() {
     return {
-      API_URL: "https://api.kainattravels.net/",
+      API_URL: "http://localhost/kt-api/",
       validationErrors: [],
       counterExpenses: [],
       permissions: [],
@@ -79520,19 +79532,18 @@ var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_45 = ["onChange", "value", "disabled"];
+var _hoisted_45 = ["onUpdate:modelValue", "disabled"];
 
 var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-    value: "",
-    selected: ""
+    value: ""
   }, "Select Category", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_47 = ["value"];
-var _hoisted_48 = ["onKeyup", "value", "disabled"];
+var _hoisted_48 = ["onUpdate:modelValue", "disabled"];
 var _hoisted_49 = ["onUpdate:modelValue", "onInput"];
 var _hoisted_50 = ["onUpdate:modelValue"];
 var _hoisted_51 = ["value"];
@@ -79561,7 +79572,7 @@ var _hoisted_56 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_57 = [_hoisted_56];
-var _hoisted_58 = ["onUpdate:modelValue", "onChange"];
+var _hoisted_58 = ["onUpdate:modelValue"];
 var _hoisted_59 = {
   key: 1
 };
@@ -80051,15 +80062,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.sumReceivedReturn())), 1
   /* TEXT */
-  )])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_41, [_hoisted_42, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_43, [_hoisted_44, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loop, function (i, index) {
+  )])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_41, [_hoisted_42, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_43, [_hoisted_44, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loop, function (item, index) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: index
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
       "class": "form-control rounded-0",
-      onChange: function onChange($event) {
-        return $options.saveRow($event, 'first', index);
+      "onUpdate:modelValue": function onUpdateModelValue($event) {
+        return $data.postData.category[index] = $event;
       },
-      value: $data.postData.category[index],
       disabled: _ctx.editAble
     }, [_hoisted_46, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.categories, function (category, i) {
       return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
@@ -80070,19 +80080,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       , _hoisted_47);
     }), 128
     /* KEYED_FRAGMENT */
-    ))], 40
-    /* PROPS, HYDRATE_EVENTS */
-    , _hoisted_45)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    ))], 8
+    /* PROPS */
+    , _hoisted_45), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.postData.category[index]]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "text",
       "class": "form-control",
-      onKeyup: function onKeyup($event) {
-        return $options.saveRow($event, 'second', index);
+      "onUpdate:modelValue": function onUpdateModelValue($event) {
+        return $data.postData.description[index] = $event;
       },
-      value: $data.postData.description[index],
       disabled: _ctx.editAble
-    }, null, 40
-    /* PROPS, HYDRATE_EVENTS */
-    , _hoisted_48)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    }, null, 8
+    /* PROPS */
+    , _hoisted_48), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.postData.description[index]]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "text",
       min: "0",
       "class": "form-control rounded-0",
@@ -80120,20 +80129,22 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "number",
       "class": "form-control rounded-0",
-      value: $options.balances[index],
+      value: $options.balances[index] || 0,
       readonly: ""
     }, null, 8
     /* PROPS */
     , _hoisted_51)]), !_ctx.editAble ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      type: "button",
       "class": "btn btn-outline-primary mx-2",
       onClick: _cache[9] || (_cache[9] = function () {
         return $options.addRow && $options.addRow.apply($options, arguments);
       })
-    }, _hoisted_54), $data.loop != 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    }, _hoisted_54), $data.loop > 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 0,
+      type: "button",
       "class": "btn btn-outline-danger",
       onClick: function onClick($event) {
-        return $options.removeRow($event, index);
+        return $options.removeRow(index);
       }
     }, _hoisted_57, 8
     /* PROPS */
@@ -80142,12 +80153,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": "ml-2",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return $data.postData.showExtra[index] = $event;
-      },
-      onChange: function onChange($event) {
-        return $options.toggleHeader(index);
       }
-    }, null, 40
-    /* PROPS, HYDRATE_EVENTS */
+    }, null, 8
+    /* PROPS */
     , _hoisted_58), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.postData.showExtra[index]]])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_59)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_60, [$data.postData.showExtra[index] ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
       key: 0,
       "class": "form-control mt-1",
@@ -142027,7 +142035,7 @@ __webpack_require__.r(__webpack_exports__);
 
  // const url = "/kt-dev/";
 
-var url = "/";
+var url = "/kt-dev/";
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
@@ -142422,8 +142430,8 @@ var store = (0,vuex__WEBPACK_IMPORTED_MODULE_0__.createStore)({
       },
       user: JSON.parse(localStorage.getItem("user")),
       token: localStorage.getItem("token"),
-      main_url: "https://portal.kainattravels.net/",
-      api_url: "https://api.kainattravels.net/",
+      main_url: "http://localhost/kt-dev/",
+      api_url: "http://localhost/kt-api/",
       permissions: JSON.parse(localStorage.getItem("user")) && JSON.parse(localStorage.getItem("user")).role ? JSON.parse(localStorage.getItem("user")).role.permissions : [],
       companyModules: false
     };

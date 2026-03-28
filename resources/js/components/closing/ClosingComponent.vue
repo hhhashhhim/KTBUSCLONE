@@ -262,64 +262,97 @@
                         <th>Expense Header</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr v-for="(i, index) in loop" :key="index">
-                        <td>
-                          <select class="form-control rounded-0" @change="saveRow($event, 'first', index)"
-                            :value="postData.category[index]" :disabled="editAble">
-                            <option value="" selected>Select Category</option>
-                            <option v-for="(category, i) in categories" :value="category.id" :key="i">
-                              {{ category.name }}
-                            </option>
-                          </select>
-                        </td>
+                   <tbody>
+  <tr v-for="(item, index) in loop" :key="index">
+    <td>
+      <select
+        class="form-control rounded-0"
+        v-model="postData.category[index]"
+        :disabled="editAble"
+      >
+        <option value="">Select Category</option>
+        <option v-for="(category, i) in categories" :value="category.id" :key="i">
+          {{ category.name }}
+        </option>
+      </select>
+    </td>
 
-                        <td>
-                          <input type="text" class="form-control" @keyup="saveRow($event, 'second', index)"
-                            :value="postData.description[index]" :disabled="editAble" />
-                        </td>
+    <td>
+      <input
+        type="text"
+        class="form-control"
+        v-model="postData.description[index]"
+        :disabled="editAble"
+      />
+    </td>
 
-                        <td>
-                          <input type="text" min="0" class="form-control rounded-0"
-                            v-model.number="postData.amount[index]" @input="syncPaid(index)"
-                            @keypress="$numberValidate($event, { dot: true })" />
-                        </td>
+    <td>
+      <input
+        type="text"
+        min="0"
+        class="form-control rounded-0"
+        v-model.number="postData.amount[index]"
+        @input="syncPaid(index)"
+        @keypress="$numberValidate($event, { dot: true })"
+      />
+    </td>
 
-                        <td>
-                          <input type="text" min="0" class="form-control rounded-0"
-                            v-model.number="postData.paid[index]" @keypress="$numberValidate($event, { dot: true })" />
-                        </td>
+    <td>
+      <input
+        type="text"
+        min="0"
+        class="form-control rounded-0"
+        v-model.number="postData.paid[index]"
+        @keypress="$numberValidate($event, { dot: true })"
+      />
+    </td>
 
-                        <td>
-                          <input type="number" class="form-control rounded-0" :value="balances[index]" readonly />
-                        </td>
+    <td>
+      <input
+        type="number"
+        class="form-control rounded-0"
+        :value="balances[index] || 0"
+        readonly
+      />
+    </td>
 
-                        <td class="add-btn" v-if="!editAble">
-                          <button class="btn btn-outline-primary mx-2" @click="addRow">
-                            <i class="fas fa-plus"></i>
-                          </button>
+    <td class="add-btn" v-if="!editAble">
+    <button type="button" class="btn btn-outline-primary mx-2" @click="addRow">
+  <i class="fas fa-plus"></i>
+</button>
 
-                          <button class="btn btn-outline-danger" @click="removeRow($event, index)" v-if="loop != 1">
-                            <i class="fas fa-trash"></i>
-                          </button>
+   <button
+  type="button"
+  class="btn btn-outline-danger"
+  @click="removeRow(index)"
+  v-if="loop > 1"
+>
+  <i class="fas fa-trash"></i>
+</button>
 
-                          <input type="checkbox" class="ml-2" v-model="postData.showExtra[index]"
-                            @change="toggleHeader(index)" />
-                        </td>
+      <input
+        type="checkbox"
+        class="ml-2"
+        v-model="postData.showExtra[index]"
+      />
+    </td>
 
-                        <td v-else></td>
+    <td v-else></td>
 
-                        <td class="header-td">
-                          <select class="form-control mt-1" v-if="postData.showExtra[index]"
-                            v-model="postData.extraCategory[index]">
-                            <option value="">Select Option</option>
-                            <option v-for="(item, i) in reportsHeaders" :key="i" :value="item.id">
-                              {{ item.name }}
-                            </option>
-                          </select>
-                        </td>
-                      </tr>
-                    </tbody>
+    <td class="header-td">
+      <select
+        class="form-control mt-1"
+        v-if="postData.showExtra[index]"
+        v-model="postData.extraCategory[index]"
+      >
+        <option value="">Select Option</option>
+        <option v-for="(item, i) in reportsHeaders" :key="i" :value="item.id">
+          {{ item.name }}
+        </option>
+      </select>
+    </td>
+  </tr>
+</tbody>
                   </table>
                 </div>
                 <div class="col-6 col-md-6">
@@ -1111,47 +1144,63 @@ export default {
 
       this.netProfit = this.totalSale - this.totalAmount;
     },
-    addRow() {
-      this.loop++;
-    },
-    removeRow(event, index) {
-      this.postData.category.splice(index, 1);
-      this.postData.description.splice(index, 1);
-      this.postData.amount.splice(index, 1);
-      this.postData.paid.splice(index, 1);
-      this.postData.invoice.splice(index, 1);
-      this.postData.showExtra.splice(index, 1);
-      this.postData.extraCategory.splice(index, 1);
-      this.loop--;
+   addRow() {
+  this.loop++;
 
-      // total amount sum only for show
-      this.totalAmount = this.postData.amount.reduce(
-        (a, b) => parseFloat(a) + parseFloat(b),
-        0
-      );
-      this.netProfit = this.totalSale - this.totalAmount;
-    },
+  this.postData.category.push('');
+  this.postData.description.push('');
+  this.postData.amount.push(0);
+  this.postData.paid.push(0);
+  this.postData.invoice.push('');
+  this.postData.showExtra.push(false);
+  this.postData.extraCategory.push('');
+
+  // optional recalculation
+  this.totalAmount = this.postData.amount.reduce(
+    (a, b) => parseFloat(a || 0) + parseFloat(b || 0),
+    0
+  );
+  this.netProfit = this.totalSale - this.totalAmount;
+},
+
+removeRow(index) {
+  if (this.loop <= 1) return;
+
+  this.postData.category.splice(index, 1);
+  this.postData.description.splice(index, 1);
+  this.postData.amount.splice(index, 1);
+  this.postData.paid.splice(index, 1);
+  this.postData.invoice.splice(index, 1);
+  this.postData.showExtra.splice(index, 1);
+  this.postData.extraCategory.splice(index, 1);
+
+  this.loop--;
+
+  this.totalAmount = this.postData.amount.reduce(
+    (a, b) => parseFloat(a || 0) + parseFloat(b || 0),
+    0
+  );
+  this.netProfit = this.totalSale - this.totalAmount;
+},
     async saveHeaderLinks(ticketMergeId) {
+  let headIds = [];
+  let values = [];
 
-      let headIds = [];
-      let values = [];
+  this.postData.showExtra.forEach((checked, index) => {
+    if (checked && this.postData.extraCategory[index]) {
+      headIds.push(this.postData.extraCategory[index]);
+      values.push(parseFloat(this.postData.amount[index] || 0));
+    }
+  });
 
-      this.postData.showExtra.forEach((checked, index) => {
-        if (checked && this.postData.extraCategory[index]) {
-          headIds.push(this.postData.extraCategory[index]);
-          values.push(this.postData.amount[index] || 0);
-        }
-      });
+  if (!headIds.length) return;
 
-      if (!headIds.length) return;
-
-      await this.callApi("post", "expenses/categories/expenseHeaderLink", {
-        ticket_merge_id: ticketMergeId,
-        headIds: headIds,
-        values: values
-      });
-
-    },
+  await this.callApi("post", "expenses/categories/expenseHeaderLink", {
+    ticket_merge_id: ticketMergeId,
+    headIds,
+    values
+  });
+},
     //  // ===== Merge Schedule API =====
     async mergeScheduleApi(addData = {}) {
       const payload = {
