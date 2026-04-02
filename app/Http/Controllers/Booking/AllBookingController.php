@@ -180,10 +180,10 @@ class AllBookingController extends Controller
     }
 
     $totalAmount    = (float) $ticket->seat_fare - $ticket->discount;          // original paid amount
-    $companyPercent = (float) $request->refund_amount;   // company share %
+    $companyPercent = (float) $request->refund_percentage;   // company share %
 
-
-    $customerRefundAmount = $totalAmount - $companyPercent;
+    $companyAmount         = ($totalAmount * $companyPercent) / 100;
+    $customerRefundAmount = $totalAmount - $companyAmount;
 
 
     if ($customerRefundAmount < 0) {
@@ -229,10 +229,11 @@ class AllBookingController extends Controller
     $isSuccess = stripos($ppMessage, 'successful') !== false;
 
     if ($isSuccess) {
-    $ticket->update([
-    'refund_amount' => $customerRefundAmount,
-    'refund_reason' => $request->refund_reason,
-]);
+        $ticket->update([
+            'refund_amount'     => $customerRefundAmount,
+            'refund_percentage' => 0,
+            'refund_reason'     => $request->refund_reason,
+        ]);
     }
 
     return response()->json([
