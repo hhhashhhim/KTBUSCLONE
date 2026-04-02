@@ -162,13 +162,13 @@ class AllBookingController extends Controller
             "total_fare" => $data->sum("seat_fare")
         ];
     }
-   public function refund(Request $request)
+  public function refund(Request $request)
 {
+    // return "test";
     $validated = $request->validate([
-        'ticket_id'         => 'required|integer|exists:tickets,id',
-        'refund_reason'     => 'required|string',
-        'refund_percentage' => 'required|numeric|min:0|max:100', // company %
-        'refund_amount'     => 'required|numeric|min:0',         // ignored for calculation
+        'ticket_id'      => 'required|integer|exists:tickets,id',
+        'refund_reason'  => 'required|string',
+        'refund_amount'  => 'required|numeric|min:0',
     ]);
 
     $ticket = Ticket::withTrashed()->find($request->ticket_id);
@@ -180,22 +180,27 @@ class AllBookingController extends Controller
         ], 404);
     }
 
-    $totalAmount    = (float) $ticket->seat_fare - $ticket->discount;          // original paid amount
-    $companyPercent = (float) $request->refund_percentage;   // company share %
+    $totalAmount = (float) $ticket->seat_fare - (float) $ticket->discount;
+    $customerRefundAmount = (float) $request->refund_amount;
 
-    $companyAmount         = ($totalAmount * $companyPercent) / 100;
-    $customerRefundAmount = $totalAmount - $companyAmount;
-
- 
-    if ($customerRefundAmount < 0) {
+    if ($customerRefundAmount > $totalAmount) {
         return response()->json([
             'success' => false,
-            'message' => 'No refundable amount for customer.',
+            'message' => 'Refund amount cannot be greater than paid fare.',
         ], 422);
     }
 
-  
+    if ($customerRefundAmount < 0) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid refund amount.',
+        ], 422);
+    }
+
+    $companyAmount = $totalAmount - $customerRefundAmount;
+
     $refundAmount = $customerRefundAmount * 100;
+
     $merchantID    = '00151726';
     $password      = 'vs8z12syy0';
     $merchantMPIN  = '7863';
@@ -220,6 +225,7 @@ class AllBookingController extends Controller
     }
 
     $data['pp_SecureHash'] = hash_hmac('sha256', $hashString, $integritySalt);
+
     $response = Http::asForm()->post(
         'https://payments.jazzcash.com.pk/ApplicationAPI/API/Purchase/domwalletrefundtransaction',
         $data
@@ -230,9 +236,11 @@ class AllBookingController extends Controller
     $isSuccess = stripos($ppMessage, 'successful') !== false;
 
     if ($isSuccess) {
+        $refundPercentage = $totalAmount > 0 ? (($companyAmount / $totalAmount) * 100) : 0;
+
         $ticket->update([
-            'refund_amount'     => $customerRefundAmount, 
-            'refund_percentage' => $companyPercent,
+            'refund_amount'     => $customerRefundAmount,
+            'refund_percentage' => $refundPercentage,
             'refund_reason'     => $request->refund_reason,
         ]);
     }
