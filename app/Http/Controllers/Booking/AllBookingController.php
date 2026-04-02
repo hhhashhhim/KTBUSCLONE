@@ -167,7 +167,6 @@ class AllBookingController extends Controller
     $validated = $request->validate([
         'ticket_id'         => 'required|integer|exists:tickets,id',
         'refund_reason'     => 'required|string',
-        'refund_percentage' => 'required|numeric|min:0|max:100', // company %
         'refund_amount'     => 'required|numeric|min:0',         // ignored for calculation
     ]);
 
@@ -183,7 +182,7 @@ class AllBookingController extends Controller
     $totalAmount    = (float) $ticket->seat_fare - $ticket->discount;          // original paid amount
     $companyPercent = (float) $request->refund_amount;   // company share %
 
-   
+
     $customerRefundAmount = $totalAmount - $companyPercent;
 
 
@@ -230,11 +229,10 @@ class AllBookingController extends Controller
     $isSuccess = stripos($ppMessage, 'successful') !== false;
 
     if ($isSuccess) {
-        $ticket->update([
-            'refund_amount'     => $customerRefundAmount,
-            'refund_percentage' => $companyPercent,
-            'refund_reason'     => $request->refund_reason,
-        ]);
+    $ticket->update([
+    'refund_amount' => $customerRefundAmount,
+    'refund_reason' => $request->refund_reason,
+]);
     }
 
     return response()->json([
