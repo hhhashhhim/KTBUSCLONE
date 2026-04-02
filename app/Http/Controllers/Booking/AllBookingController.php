@@ -162,13 +162,12 @@ class AllBookingController extends Controller
             "total_fare" => $data->sum("seat_fare")
         ];
     }
-  public function refund(Request $request)
+ public function refund(Request $request)
 {
-    // return "test";
     $validated = $request->validate([
-        'ticket_id'      => 'required|integer|exists:tickets,id',
-        'refund_reason'  => 'required|string',
-        'refund_amount'  => 'required|numeric|min:0',
+        'ticket_id'     => 'required|integer|exists:tickets,id',
+        'refund_reason' => 'required|string',
+        'refund_amount' => 'required|numeric|min:0',
     ]);
 
     $ticket = Ticket::withTrashed()->find($request->ticket_id);
@@ -197,14 +196,13 @@ class AllBookingController extends Controller
         ], 422);
     }
 
-    $companyAmount = $totalAmount - $customerRefundAmount;
+    // JazzCash amount in paisa, no decimal places
+    $refundAmount = (string) ((int) round($customerRefundAmount * 100));
 
-    $refundAmount = $customerRefundAmount * 100;
-
-    $merchantID    = '00151726';
-    $password      = 'vs8z12syy0';
-    $merchantMPIN  = '7863';
-    $integritySalt = '8335zz8zuu';
+    $merchantID    = env('JAZZCASH_MERCHANT_ID', '00151726');
+    $password      = env('JAZZCASH_PASSWORD', 'vs8z12syy0');
+    $merchantMPIN  = env('JAZZCASH_MERCHANT_MPIN', '7863');
+    $integritySalt = env('JAZZCASH_INTEGRITY_SALT', '8335zz8zuu');
 
     $data = [
         'pp_MerchantID'   => $merchantID,
@@ -212,45 +210,94 @@ class AllBookingController extends Controller
         'pp_MerchantMPIN' => $merchantMPIN,
         'pp_TxnCurrency'  => 'PKR',
         'pp_TxnRefNo'     => $ticket->transaction_id,
-        'pp_Amount'       => (string) $refundAmount,
+        'pp_Amount'       => $refundAmount,
     ];
 
     ksort($data);
-    $hashString = $integritySalt;
 
+    $hashString = $integritySalt;
     foreach ($data as $value) {
-        if (!empty($value)) {
+        if ($value !== null && $value !== '') {
             $hashString .= '&' . $value;
         }
     }
 
     $data['pp_SecureHash'] = hash_hmac('sha256', $hashString, $integritySalt);
 
-    $response = Http::asForm()->post(
-        'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v1/rest/payments/m-wallet/refund',
-        $data
-    );
+    try {
+        $response = Http::asForm()
+            ->timeout(60)
+            ->withHeaders([
+                'Accept' => 'application/json',
+            ])
+            ->post(
+                'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v1/rest/payments/m-wallet/refund',
+                $data
+            );
 
-    $responseData = $response->json();
-    $ppMessage = $responseData['pp_ResponseMessage'] ?? '';
-    $isSuccess = stripos($ppMessage, 'successful') !== false;
+        $statusCode   = $response->status();
+        $rawResponse  = $response->body();
+        $responseData = $response->json();
 
-    if ($isSuccess) {
-        $refundPercentage = $totalAmount > 0 ? (($companyAmount / $totalAmount) * 100) : 0;
-
-        $ticket->update([
-            'refund_amount'     => $customerRefundAmount,
-            'refund_percentage' => $refundPercentage,
-            'refund_reason'     => $request->refund_reason,
+        Log::info('JazzCash refund request', [
+            'ticket_id' => $ticket->id,
+            'txn_ref_no' => $ticket->transaction_id,
+            'payload' => $data,
         ]);
-    }
 
-    return response()->json([
-        'success'  => $isSuccess,
-        'request'  => $data,
-        'response' => $responseData,
-        'message'  => $isSuccess ? 'Refund Successful' : 'Refund Failed',
-    ]);
+        Log::info('JazzCash refund response', [
+            'status_code' => $statusCode,
+            'raw_response' => $rawResponse,
+            'json_response' => $responseData,
+        ]);
+
+        if (!is_array($responseData)) {
+            return response()->json([
+                'success' => false,
+                'request' => $data,
+                'status_code' => $statusCode,
+                'response' => null,
+                'raw_response' => $rawResponse,
+                'message' => 'Refund failed. JazzCash did not return valid JSON.',
+            ], 422);
+        }
+
+        $ppCode    = $responseData['pp_ResponseCode'] ?? '';
+        $ppMessage = $responseData['pp_ResponseMessage'] ?? '';
+
+        $isSuccess = ((string) $ppCode === '000')
+            || (stripos((string) $ppMessage, 'successful') !== false);
+
+        if ($isSuccess) {
+            $ticket->update([
+                'refund_amount' => $customerRefundAmount,
+                'refund_reason' => $request->refund_reason,
+            ]);
+        }
+
+        return response()->json([
+            'success' => $isSuccess,
+            'request' => $data,
+            'status_code' => $statusCode,
+            'response' => $responseData,
+            'raw_response' => $rawResponse,
+            'message' => $isSuccess ? 'Refund Successful' : ($ppMessage ?: 'Refund Failed'),
+        ], $isSuccess ? 200 : 422);
+
+    } catch (\Throwable $e) {
+        Log::error('JazzCash refund exception', [
+            'ticket_id' => $ticket->id,
+            'txn_ref_no' => $ticket->transaction_id,
+            'message' => $e->getMessage(),
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'request' => $data,
+            'response' => null,
+            'message' => 'Refund failed due to server error: ' . $e->getMessage(),
+        ], 500);
+    }
 }
 
 
