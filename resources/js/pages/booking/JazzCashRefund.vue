@@ -293,69 +293,78 @@
     </div>
     <!-- Refund Modal -->
     <div class="modal fade" id="refundModal" tabindex="-1" aria-labelledby="refundModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg rounded-3">
-          <div class="modal-header bg-warning text-white">
-            <h5 class="modal-title fw-semibold" id="refundModalLabel">
-              Refund Booking
-            </h5>
-            <button type="button" class="close" @click="closeRefundModal()" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-3">
+      <div class="modal-header bg-warning text-white">
+        <h5 class="modal-title fw-semibold" id="refundModalLabel">
+          Refund Booking
+        </h5>
+        <button type="button" class="close" @click="closeRefundModal()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
 
-          <div class="modal-body">
-            <div class="mb-2">
-              <p class="mb-1">
-                <strong>Passenger Name:</strong> {{ selectedRecord?.name }}
-              </p>
-              <p class="mb-1">
-                <strong>Invoice ID:</strong> {{ selectedRecord?.invoice_id }}
-              </p>
-              <p class="mb-1">
-                <strong>Seat No:</strong> {{ selectedRecord?.seat_no }}
-              </p>
-              <p class="mb-3">
-                <strong>Fare:</strong> {{ selectedRecord?.seat_fare - selectedRecord?.discount }}
-              </p>
-            </div>
+      <div class="modal-body">
+        <div class="mb-2">
+          <p class="mb-1">
+            <strong>Passenger Name:</strong> {{ selectedRecord?.name }}
+          </p>
+          <p class="mb-1">
+            <strong>Invoice ID:</strong> {{ selectedRecord?.invoice_id }}
+          </p>
+          <p class="mb-1">
+            <strong>Seat No:</strong> {{ selectedRecord?.seat_no }}
+          </p>
+          <p class="mb-1">
+            <strong>Fare:</strong> {{ totalFare }}
+          </p>
+        </div>
 
-            <!-- Refund Percentage -->
-            <div class="mb-3">
-              <label for="refundPercentage" class="form-label fw-semibold">Cancellation Charges</label>
-              <select v-model="refundPercentage" id="refundPercentage" class="form-control">
-                <option disabled value="">Select percentage</option>
-                <option v-for="p in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]" :key="p" :value="p">
-                  {{ p }}%
-                </option>
-              </select>
-            </div>
+        <!-- Manual Refund Amount -->
+        <div class="mb-3">
+          <label for="refundAmount" class="form-label fw-semibold">Refund Amount</label>
+          <input
+            v-model="refundAmount"
+            id="refundAmount"
+            type="text"
+            min="0"
+            step="0.01"
+            class="form-control"
+            placeholder="Enter refund amount"
+            @keypress="$numberValidate($event, { dot: true })"
+          />
+          <small class="text-muted">Maximum refundable amount: {{ totalFare }}</small>
+        </div>
 
-            <!-- Calculated Refund -->
-            <div v-if="selectedRecord && refundPercentage" class="alert alert-info py-2 mb-3">
-              <i class="bi bi-cash-coin me-1"></i>
-              Cancellation Amount: <strong>{{ calculatedRefundAmount }}</strong>
-            </div>
+        <div v-if="selectedRecord && refundAmount !== ''" class="alert alert-info py-2 mb-3">
+          <i class="bi bi-cash-coin me-1"></i>
+          Customer Refund Amount: <strong>{{ refundAmount }}</strong>
+        </div>
 
-            <!-- Refund Reason -->
-            <div class="mb-3">
-              <label for="refundReason" class="form-label fw-semibold">Refund Reason</label>
-              <textarea v-model="refundReason" id="refundReason" class="form-control" rows="3"
-                placeholder="Enter refund reason"></textarea>
-            </div>
-          </div>
-
-          <div class="modal-footer border-0">
-            <button type="button" class="btn btn-outline-secondary btn-sm px-3" @click="closeRefundModal()">
-              Close
-            </button>
-            <button type="button" class="btn btn-success btn-sm px-3" @click="confirmRefund">
-              Confirm Refund
-            </button>
-          </div>
+        <!-- Refund Reason -->
+        <div class="mb-3">
+          <label for="refundReason" class="form-label fw-semibold">Refund Reason</label>
+          <textarea
+            v-model="refundReason"
+            id="refundReason"
+            class="form-control"
+            rows="3"
+            placeholder="Enter refund reason"
+          ></textarea>
         </div>
       </div>
+
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-secondary btn-sm px-3" @click="closeRefundModal()">
+          Close
+        </button>
+        <button type="button" class="btn btn-success btn-sm px-3" @click="confirmRefund">
+          Confirm Refund
+        </button>
+      </div>
     </div>
+  </div>
+</div>
 
     <!-- Refund Details Modal -->
     <div class="modal fade" id="refundDetailsModal" tabindex="-1" aria-labelledby="refundDetailsModalLabel"
@@ -453,7 +462,7 @@ export default {
       },
       selectedRecord: null,
       refundReason: "",
-      refundPercentage: "",
+       refundAmount: "",   // ✅ new
       selectedRefund: {},
     };
   },
@@ -538,88 +547,107 @@ export default {
     },
 
     async confirmRefund() {
-      if (this.refundPercentage === null || this.refundPercentage === '') {
-        Swal.fire({
-          icon: "warning",
-          title: "Missing Information",
-          text: "Please select a refund percentage.",
-        });
-        return;
-      }
+  const totalFare = parseFloat(this.totalFare);
+  const enteredRefundAmount = parseFloat(this.refundAmount);
 
+  if (this.refundAmount === null || this.refundAmount === '') {
+    Swal.fire({
+      icon: "warning",
+      title: "Missing Information",
+      text: "Please enter refund amount.",
+    });
+    return;
+  }
 
-      if (!this.refundReason.trim()) {
-        Swal.fire({
-          icon: "warning",
-          title: "Missing Information",
-          text: "Please enter a refund reason.",
-        });
-        return;
-      }
+  if (isNaN(enteredRefundAmount) || enteredRefundAmount < 0) {
+    Swal.fire({
+      icon: "warning",
+      title: "Invalid Amount",
+      text: "Please enter a valid refund amount.",
+    });
+    return;
+  }
 
-      const payload = {
-        ticket_id: this.selectedRecord.id,
-        refund_reason: this.refundReason,
-        refund_percentage: this.refundPercentage,
-        refund_amount: this.calculatedRefundAmount,
-      };
+  if (enteredRefundAmount > totalFare) {
+    Swal.fire({
+      icon: "warning",
+      title: "Invalid Amount",
+      text: `Refund amount cannot be greater than paid fare.`,
+    });
+    return;
+  }
 
-      console.log("📦 Refund Payload:", payload);
+  if (!this.refundReason.trim()) {
+    Swal.fire({
+      icon: "warning",
+      title: "Missing Information",
+      text: "Please enter a refund reason.",
+    });
+    return;
+  }
 
-      // 🌀 Loader while processing
+  const payload = {
+    ticket_id: this.selectedRecord.id,
+    refund_reason: this.refundReason,
+    refund_amount: enteredRefundAmount,
+  };
+
+  console.log("📦 Refund Payload:", payload);
+
+  Swal.fire({
+    title: "Processing Refund...",
+    text: "Please wait while we process your request.",
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    },
+  });
+
+  try {
+    const res = await this.callApi("post", "allBooking/refund", payload);
+
+    const data = res?.data;
+    const ppMessage = data?.response?.pp_ResponseMessage || "";
+    const genericMsg = data?.message || "";
+    const combinedMsg = ppMessage || genericMsg || "Refund response received.";
+
+    const isSuccess =
+      ppMessage.toLowerCase().includes("successful") ||
+      genericMsg.toLowerCase().includes("successful");
+
+    if (isSuccess) {
       Swal.fire({
-        title: "Processing Refund...",
-        text: "Please wait while we process your request.",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
+        icon: "success",
+        title: "Refund Successful",
+        text: combinedMsg,
+        timer: 2500,
+        showConfirmButton: true,
       });
 
-      try {
-        const res = await this.callApi("post", "allBooking/refund", payload);
-        // console.log("📥 Refund API Response:", res);
-
-        const data = res?.data;
-        const ppMessage = data?.response?.pp_ResponseMessage || "";
-        const genericMsg = data?.message || "";
-        const combinedMsg =
-          ppMessage || genericMsg || "Refund response received.";
-
-        // 🧩 Detect success or failure by pp_ResponseMessage
-        const isSuccess =
-          ppMessage.toLowerCase().includes("successful") ||
-          genericMsg.toLowerCase().includes("successful");
-
-        if (isSuccess) {
-          Swal.fire({
-            icon: "success",
-            title: "Refund Successful",
-            text: combinedMsg,
-            timer: 2500,
-            showConfirmButton: true,
-          });
-          this.selectedRecord.refunded = true;
-          this.closeRefundModal();
-          this.filterFunction();
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Refund Failed",
-            text: combinedMsg,
-          });
-        }
-      } catch (err) {
-        console.error("Refund Error:", err);
-        Swal.fire({
-          icon: "error",
-          title: "Server or Network Error",
-          text: "Refund failed due to a network or server issue.",
-        });
-      }
-    },
+      this.selectedRecord.refunded = true;
+      this.closeRefundModal();
+      this.filterFunction();
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Refund Failed",
+        text: combinedMsg,
+      });
+    }
+  } catch (err) {
+    console.error("Refund Error:", err);
+    Swal.fire({
+      icon: "error",
+      title: "Server or Network Error",
+      text: "Refund failed due to a network or server issue.",
+    });
+  }
+},
 
     closeRefundModal() {
+          this.refundAmount = '';
+  this.refundReason = '';
+  this.selectedRecord = null;
       $("#refundModal").click();
     },
     closeRefundViewModal() {
@@ -639,19 +667,26 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["getDeletingObj"]),
-    calculatedRefundAmount() {
-      if (!this.selectedRecord || !this.refundPercentage) return 0;
+  totalFare() {
+    if (!this.selectedRecord) return 0;
 
-      const fare = parseFloat(this.selectedRecord.seat_fare || 0);
-      const discount = parseFloat(this.selectedRecord.discount || 0);
+    const fare = parseFloat(this.selectedRecord.seat_fare || 0);
+    const discount = parseFloat(this.selectedRecord.discount || 0);
 
-      const netAmount = fare - discount; // seat fare minus discount
-      const refundAmount = (netAmount * this.refundPercentage) / 100;
-
-      return refundAmount.toFixed(2);
-    },
+    return fare - discount; // ✅ ALWAYS use this
   },
+
+  calculatedRefundAmount() {
+    if (!this.selectedRecord || this.refundAmount === "") return 0;
+
+    const enteredAmount = parseFloat(this.refundAmount);
+    const totalFare = parseFloat(this.totalFare);
+
+    if (isNaN(enteredAmount) || enteredAmount < 0) return 0;
+
+    return Math.min(enteredAmount, totalFare).toFixed(2); // ✅ safe cap
+  }
+},
   watch: {
     getDeletingObj(obj) {
       if (obj.isDeleted) {
