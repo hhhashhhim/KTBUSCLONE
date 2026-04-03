@@ -220,7 +220,7 @@ class AllBookingController extends Controller
 
     $data['pp_SecureHash'] = hash_hmac('sha256', $hashString, $integritySalt);
     $response = Http::asForm()->post(
-        'https://payments.jazzcash.com.pk/ApplicationAPI/API/Purchase/domwalletrefundtransaction',
+        'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v1/rest/payments/m-wallet/refund',
         $data
     );
 // https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v1/rest/payments/m-wallet/refund
