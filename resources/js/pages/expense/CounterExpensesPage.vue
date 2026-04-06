@@ -768,141 +768,139 @@ export default {
             this.dataEdit = singleRecord;
         },
         async update() {
-            this.validationErrors = [];
+    this.validationErrors = [];
 
-            // ✅ Basic validations
-            if (!this.dataEdit.narration) {
-                return swal({
-                    title: "Required",
-                    text: "Expenses Narration is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+    if (!this.dataEdit.narration) {
+        return swal({
+            title: "Required",
+            text: "Expenses Narration is Required",
+            icon: "error",
+            timer: 2000
+        });
+    }
 
-            if (this.dataEdit.type == 'expense' && !this.dataEdit.category_id) {
-                return swal({
-                    title: "Required",
-                    text: "Expense Category is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+    if (this.dataEdit.type === 'expense' && !this.dataEdit.category_id) {
+        return swal({
+            title: "Required",
+            text: "Expense Category is Required",
+            icon: "error",
+            timer: 2000
+        });
+    }
 
-            if (this.dataEdit.type == 'income' && !this.dataEdit.other_income) {
-                return swal({
-                    title: "Required",
-                    text: "Income Name is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+    if (this.dataEdit.type === 'income' && !this.dataEdit.other_income) {
+        return swal({
+            title: "Required",
+            text: "Income Name is Required",
+            icon: "error",
+            timer: 2000
+        });
+    }
 
-            const cashPayment = Number(this.dataEdit.cash_payment) || 0;
-            const bankPayment = Number(this.dataEdit.bank_payment) || 0;
-            const totalPayment = cashPayment + bankPayment;
+    const cashPayment = Number(this.dataEdit.cash_payment) || 0;
+    const bankPayment = Number(this.dataEdit.bank_payment) || 0;
+    const totalPayment = cashPayment + bankPayment;
 
-            // ✅ Ensure at least one payment is provided
-            if (totalPayment <= 0) {
-                return swal({
-                    title: "Required",
-                    text: "Enter either Cash or Bank Payment",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+    if (totalPayment <= 0) {
+        return swal({
+            title: "Required",
+            text: "Enter either Cash or Bank Payment",
+            icon: "error",
+            timer: 2000
+        });
+    }
 
-            // ✅ Ensure ledger is selected if payment > 0
-            if (cashPayment > 0 && !this.dataEdit.cash_id) {
-                return swal({
-                    title: "Required",
-                    text: "Select Cash Ledger",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+    if (cashPayment > 0 && !this.dataEdit.cash_id) {
+        return swal({
+            title: "Required",
+            text: "Select Cash Ledger",
+            icon: "error",
+            timer: 2000
+        });
+    }
 
-            if (bankPayment > 0 && !this.dataEdit.bank_id) {
-                return swal({
-                    title: "Required",
-                    text: "Select Bank Ledger",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
+    if (bankPayment > 0 && !this.dataEdit.bank_id) {
+        return swal({
+            title: "Required",
+            text: "Select Bank Ledger",
+            icon: "error",
+            timer: 2000
+        });
+    }
 
+    this.loadingEdit = true;
 
+    try {
+        const formData = new FormData();
 
-            this.loadingEdit = true;
+        formData.append('id', this.dataEdit.id);
+        formData.append('total', totalPayment);
+        formData.append('narration', this.dataEdit.narration);
+        formData.append('type', this.dataEdit.type);
 
-            try {
-
-                const formData = new FormData();
-                formData.append('id', this.dataEdit.id);
-               formData.append('total', totalPayment)
-                formData.append('narration', this.dataEdit.narration);
-                formData.append('category_id', this.dataEdit.category_id);
-formData.append('type', this.dataEdit.type);
-
-                if (this.dataEdit.type === 'expense') {
-                    formData.append('category_id', this.dataEdit.category_id);
-                } else {
-                    formData.append('other_income', this.dataEdit.other_income);
-                }
-                formData.append('cash_payment', cashPayment);
-                formData.append('bank_payment', bankPayment);
-                formData.append('cash_id', this.dataEdit.cash_id);
-                formData.append('bank_id', this.dataEdit.bank_id);
-                formData.append('date', this.dataEdit.date);
-
-                // ✅ Optional bill upload
-                if (this.dataEdit.bill_post instanceof File) {
-                    formData.append('bill_post', this.dataEdit.bill_post);
-                }
-
-                const resEdit = await this.callApi(
-                    "post",
-                    "counter/expenses/update",
-                    formData,
-                    { headers: { "Content-Type": "multipart/form-data" } }
-                );
-
-                if (resEdit.status === 200) {
-                    $(".modal").click();
-                    swal({
-                        title: "Success",
-                        text: "Expenses updated Successfully",
-                        icon: "success",
-                        timer: 2000
-                    });
-
-                    this.loadingEdit = false;
-                    $("#counter_expenses_table").DataTable().destroy();
-                    this.fetchCounterExpenses();
-                    setTimeout(() => { $('#edit-modal').modal('hide'); }, 3000);
-
-                } else if (resEdit.status === 422) {
-                    this.loadingEdit = false;
-                    let errorContent = "";
-                    let count = 0;
-                    for (const key in resEdit.data.errors) {
-                        resEdit.data.errors[key].forEach(msg => {
-                            errorContent += (++count) + " - " + msg + "\n";
-                        });
-                    }
-                    swal("Error", errorContent, "error");
-                }
-
-            } catch (error) {
-                this.loadingEdit = false;
-                swal({
-                    title: "Error",
-                    text: "Something went wrong. Please try again.",
-                    icon: "error",
-                    timer: 3000
-                });
-            }
+        if (this.dataEdit.type === 'expense') {
+            formData.append('category_id', Number(this.dataEdit.category_id));
+        } else {
+            formData.append('other_income', this.dataEdit.other_income || '');
         }
+
+        formData.append('cash_payment', cashPayment);
+        formData.append('bank_payment', bankPayment);
+        formData.append('cash_id', this.dataEdit.cash_id || '');
+        formData.append('bank_id', this.dataEdit.bank_id || '');
+        formData.append('date', this.dataEdit.date || '');
+
+        if (this.dataEdit.bill_post instanceof File) {
+            formData.append('bill_post', this.dataEdit.bill_post);
+        }
+
+        const resEdit = await this.callApi(
+            "post",
+            "counter/expenses/update",
+            formData,
+            { headers: { "Content-Type": "multipart/form-data" } }
+        );
+
+        if (resEdit.status === 200) {
+            $(".modal").click();
+            swal({
+                title: "Success",
+                text: "Expenses updated Successfully",
+                icon: "success",
+                timer: 2000
+            });
+
+            this.loadingEdit = false;
+            $("#counter_expenses_table").DataTable().destroy();
+            this.fetchCounterExpenses();
+            setTimeout(() => {
+                $('#edit-modal').modal('hide');
+            }, 3000);
+
+        } else if (resEdit.status === 422) {
+            this.loadingEdit = false;
+            let errorContent = "";
+            let count = 0;
+
+            for (const key in resEdit.data.errors) {
+                resEdit.data.errors[key].forEach(msg => {
+                    errorContent += (++count) + " - " + msg + "\n";
+                });
+            }
+
+            swal("Error", errorContent, "error");
+        }
+
+    } catch (error) {
+        this.loadingEdit = false;
+        swal({
+            title: "Error",
+            text: "Something went wrong. Please try again.",
+            icon: "error",
+            timer: 3000
+        });
+    }
+}
 
 
     },

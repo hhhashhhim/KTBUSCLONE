@@ -46819,7 +46819,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                _this7.validationErrors = []; // ✅ Basic validations
+                _this7.validationErrors = [];
 
                 if (_this7.dataEdit.narration) {
                   _context7.next = 3;
@@ -46834,7 +46834,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 3:
-                if (!(_this7.dataEdit.type == 'expense' && !_this7.dataEdit.category_id)) {
+                if (!(_this7.dataEdit.type === 'expense' && !_this7.dataEdit.category_id)) {
                   _context7.next = 5;
                   break;
                 }
@@ -46847,7 +46847,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 5:
-                if (!(_this7.dataEdit.type == 'income' && !_this7.dataEdit.other_income)) {
+                if (!(_this7.dataEdit.type === 'income' && !_this7.dataEdit.other_income)) {
                   _context7.next = 7;
                   break;
                 }
@@ -46862,7 +46862,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 7:
                 cashPayment = Number(_this7.dataEdit.cash_payment) || 0;
                 bankPayment = Number(_this7.dataEdit.bank_payment) || 0;
-                totalPayment = cashPayment + bankPayment; // ✅ Ensure at least one payment is provided
+                totalPayment = cashPayment + bankPayment;
 
                 if (!(totalPayment <= 0)) {
                   _context7.next = 12;
@@ -46909,33 +46909,32 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 formData.append('id', _this7.dataEdit.id);
                 formData.append('total', totalPayment);
                 formData.append('narration', _this7.dataEdit.narration);
-                formData.append('category_id', _this7.dataEdit.category_id);
                 formData.append('type', _this7.dataEdit.type);
 
                 if (_this7.dataEdit.type === 'expense') {
-                  formData.append('category_id', _this7.dataEdit.category_id);
+                  formData.append('category_id', Number(_this7.dataEdit.category_id));
                 } else {
-                  formData.append('other_income', _this7.dataEdit.other_income);
+                  formData.append('other_income', _this7.dataEdit.other_income || '');
                 }
 
                 formData.append('cash_payment', cashPayment);
                 formData.append('bank_payment', bankPayment);
-                formData.append('cash_id', _this7.dataEdit.cash_id);
-                formData.append('bank_id', _this7.dataEdit.bank_id);
-                formData.append('date', _this7.dataEdit.date); // ✅ Optional bill upload
+                formData.append('cash_id', _this7.dataEdit.cash_id || '');
+                formData.append('bank_id', _this7.dataEdit.bank_id || '');
+                formData.append('date', _this7.dataEdit.date || '');
 
                 if (_this7.dataEdit.bill_post instanceof File) {
                   formData.append('bill_post', _this7.dataEdit.bill_post);
                 }
 
-                _context7.next = 33;
+                _context7.next = 32;
                 return _this7.callApi("post", "counter/expenses/update", formData, {
                   headers: {
                     "Content-Type": "multipart/form-data"
                   }
                 });
 
-              case 33:
+              case 32:
                 resEdit = _context7.sent;
 
                 if (resEdit.status === 200) {
@@ -46970,11 +46969,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-                _context7.next = 41;
+                _context7.next = 40;
                 break;
 
-              case 37:
-                _context7.prev = 37;
+              case 36:
+                _context7.prev = 36;
                 _context7.t0 = _context7["catch"](17);
                 _this7.loadingEdit = false;
                 swal({
@@ -46984,12 +46983,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 3000
                 });
 
-              case 41:
+              case 40:
               case "end":
                 return _context7.stop();
             }
           }
-        }, _callee7, null, [[17, 37]]);
+        }, _callee7, null, [[17, 36]]);
       }))();
     }
   },
