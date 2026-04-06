@@ -27603,8 +27603,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       if (!Array.isArray(this.postData.extraCategory)) this.postData.extraCategory = [];
       if (typeof this.postData.category[index] === "undefined") this.postData.category[index] = '';
       if (typeof this.postData.description[index] === "undefined") this.postData.description[index] = '';
-      if (typeof this.postData.amount[index] === "undefined") this.postData.amount[index] = 0;
-      if (typeof this.postData.paid[index] === "undefined") this.postData.paid[index] = 0;
+      if (typeof this.postData.amount[index] === "undefined") this.postData.amount[index] = "";
+      if (typeof this.postData.paid[index] === "undefined") this.postData.paid[index] = "";
       if (typeof this.postData.invoice[index] === "undefined") this.postData.invoice[index] = '';
       if (typeof this.postData.showExtra[index] === "undefined") this.postData.showExtra[index] = false;
       if (typeof this.postData.extraCategory[index] === "undefined") this.postData.extraCategory[index] = '';
