@@ -47573,8 +47573,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _this2.isLoading = true; // Start loading
-
+                _this2.isLoading = true;
                 _context2.prev = 1;
                 _context2.next = 4;
                 return _this2.callApi("post", "expenses/categories/reportHeaderLinkGet", {
@@ -47588,15 +47587,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   _this2.allHeaderOptions = res.data.headers || [];
                   _this2.expenseHeader = res.data.headers || [];
                   headIds = [];
-                  values = []; // Ensure links array exists
-
+                  values = [];
                   links = res.data.links || [];
 
                   _this2.expenseHeader.forEach(function (header, index) {
-                    headIds[index] = header.id; // find matching link safely
-
+                    headIds[index] = Number(header.id);
                     var matchingLink = links.find(function (link) {
-                      return link.header_id === header.id;
+                      return Number(link.header_id) === Number(header.id);
                     });
                     values[index] = matchingLink && matchingLink.value != null ? parseFloat(matchingLink.value) : 0;
                   });
@@ -47617,8 +47614,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 11:
                 _context2.prev = 11;
-                _this2.isLoading = false; // Stop loading
-
+                _this2.isLoading = false;
                 return _context2.finish(11);
 
               case 14:

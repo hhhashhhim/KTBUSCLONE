@@ -801,44 +801,44 @@ export default {
         },
 
         async fetchExpenseData() {
-            this.isLoading = true; // Start loading
-            try {
-                const res = await this.callApi("post", "expenses/categories/reportHeaderLinkGet", {
-                    ticket_merge_id: this.expensePostData.ticket_merge_id,
-                });
+    this.isLoading = true;
 
-                if (res.status === 200 && res.data) {
-                    this.allHeaderOptions = res.data.headers || [];
-                    this.expenseHeader = res.data.headers || [];
+    try {
+        const res = await this.callApi("post", "expenses/categories/reportHeaderLinkGet", {
+            ticket_merge_id: this.expensePostData.ticket_merge_id,
+        });
 
-                    const headIds = [];
-                    const values = [];
+        if (res.status === 200 && res.data) {
+            this.allHeaderOptions = res.data.headers || [];
+            this.expenseHeader = res.data.headers || [];
 
-                    // Ensure links array exists
-                    const links = res.data.links || [];
+            const headIds = [];
+            const values = [];
+            const links = res.data.links || [];
 
-                    this.expenseHeader.forEach((header, index) => {
-                        headIds[index] = header.id;
+            this.expenseHeader.forEach((header, index) => {
+                headIds[index] = Number(header.id);
 
-                        // find matching link safely
-                        const matchingLink = links.find((link) => link.header_id === header.id);
+                const matchingLink = links.find(
+                    (link) => Number(link.header_id) === Number(header.id)
+                );
 
-                        values[index] = matchingLink && matchingLink.value != null
-                            ? parseFloat(matchingLink.value)
-                            : 0;
-                    });
+                values[index] = matchingLink && matchingLink.value != null
+                    ? parseFloat(matchingLink.value)
+                    : 0;
+            });
 
-                    this.expensePostData.headIds = headIds;
-                    this.expensePostData.values = values;
+            this.expensePostData.headIds = headIds;
+            this.expensePostData.values = values;
 
-                    this.initDataTable();
-                }
-            } catch (error) {
-                console.error("Failed to fetch expense data", error);
-            } finally {
-                this.isLoading = false; // Stop loading
-            }
-        },
+            this.initDataTable();
+        }
+    } catch (error) {
+        console.error("Failed to fetch expense data", error);
+    } finally {
+        this.isLoading = false;
+    }
+},
 
         async expenseAdd() {
             this.isLoading = true; // Trigger loader after clicking save
