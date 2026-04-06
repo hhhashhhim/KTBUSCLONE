@@ -343,7 +343,7 @@ class CounterExpensesController extends Controller
 
         DB::beginTransaction();
 
-        // try {
+        try {
 
             // ✅ Validation
             $request->validate([
@@ -397,8 +397,8 @@ class CounterExpensesController extends Controller
                 'cash_payment' => $cashPayment,
                 'bank_payment' => $bankPayment,
                 'type'         => $request->type,
-                'category_id'  => $request->type == 'expense' ? $request->category_id : null,
-                'other_income' => $request->type == 'income' ? $request->other_income : null,
+                'category_id'    => $request->type == 'expense' ? $request->category_id : null,
+                'other_income'  => $request->type == 'income' ? $request->other_income : null,
                 'cash_id'      => $cashPayment > 0 ? $request->cash_id : null,
                 'bank_id'      => $bankPayment > 0 ? $request->bank_id : null,
                 'date'         => $request->date,
@@ -606,13 +606,13 @@ class CounterExpensesController extends Controller
             DB::commit();
 
             return response()->json($expense, 200);
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     Log::error($e->getMessage());
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
 
-        //     return response()->json([
-        //         "errors" => ["Error" => ['An error occurred during the update']]
-        //     ], 422);
-        // }
+            return response()->json([
+                "errors" => ["Error" => ['An error occurred during the update']]
+            ], 422);
+        }
     }
 }
