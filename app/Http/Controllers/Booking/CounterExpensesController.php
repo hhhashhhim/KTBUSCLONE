@@ -343,7 +343,7 @@ class CounterExpensesController extends Controller
 
         DB::beginTransaction();
 
-        try {
+        // try {
 
             // ✅ Validation
             $request->validate([
@@ -369,11 +369,6 @@ class CounterExpensesController extends Controller
                 ], 422);
             }
 
-            // if (($cashPayment + $bankPayment) != $request->total) {
-            //     return response()->json([
-            //         "errors" => ["Error" => ['Cash + Bank payment must equal Total']]
-            //     ], 422);
-            // }
 
             // ================= REMOVE OLD TRANSACTIONS =================
             AccountTransaction::where([
@@ -606,13 +601,13 @@ class CounterExpensesController extends Controller
             DB::commit();
 
             return response()->json($expense, 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error($e->getMessage());
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     Log::error($e->getMessage());
 
-            return response()->json([
-                "errors" => ["Error" => ['An error occurred during the update']]
-            ], 422);
-        }
+        //     return response()->json([
+        //         "errors" => ["Error" => ['An error occurred during the update']]
+        //     ], 422);
+        // }
     }
 }
