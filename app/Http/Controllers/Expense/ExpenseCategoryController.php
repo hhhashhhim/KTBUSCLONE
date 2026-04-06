@@ -119,33 +119,70 @@ class ExpenseCategoryController extends Controller
             ];
         }
     }
-    public function expenseHeaderLink(Request $request)
-    {
-       try {
-                DB::beginTransaction();
-                ReportHeaderLink::where("ticket_merge_id", $request->ticket_merge_id)->delete();
-                foreach ($request->headIds as $key => $value) {
-                    ReportHeaderLink::create([
-                        'ticket_merge_id' => $request->ticket_merge_id,
-                        'header_id' => $request->headIds[$key],
-                        'value' => $request->values[$key],
-                        'company_id' => Auth::user()->company_id,
-                        'added_by' => Auth::user()->id,
-                    ]);
-                }
-                ActivityLog::create([
-                    "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | linked report header",
-                    "requested_host" => $request->ip(),
-                    "company_id" => Auth::user()->company_id
-                ]);
-                DB::commit();
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            }
+   public function expenseHeaderLink(Request $request)
+{
+    $request->validate([
+        'ticket_merge_id' => 'required|integer',
+        'headIds' => 'required|array|min:1',
+        'headIds.*' => 'required|integer',
+        'values' => 'required|array|min:1',
+        'values.*' => 'nullable|numeric',
+    ]);
+
+    if (count($request->headIds) !== count($request->values)) {
+        return response()->json([
+            'errors' => [
+                'Error' => ['headIds and values count mismatch']
+            ]
+        ], 422);
     }
+
+    try {
+        DB::beginTransaction();
+
+        ReportHeaderLink::where('ticket_merge_id', $request->ticket_merge_id)->delete();
+
+        foreach ($request->headIds as $key => $headId) {
+            ReportHeaderLink::create([
+                'ticket_merge_id' => $request->ticket_merge_id,
+                'header_id'       => $headId,
+                'value'           => $request->values[$key] ?? 0,
+                'company_id'      => Auth::user()->company_id,
+                'added_by'        => Auth::user()->id,
+            ]);
+        }
+
+        ActivityLog::create([
+            'activity_by'    => Auth::user()->id,
+            'message'        => Auth::user()->name . ' | linked report header',
+            'requested_host' => $request->ip(),
+            'company_id'     => Auth::user()->company_id,
+        ]);
+
+        DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Report header links saved successfully'
+        ], 200);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        Log::error('expenseHeaderLink error: ' . $e->getMessage(), [
+            'ticket_merge_id' => $request->ticket_merge_id,
+            'headIds' => $request->headIds,
+            'values' => $request->values,
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'errors' => [
+                'Error' => [$e->getMessage()]
+            ]
+        ], 422);
+    }
+}
    public function update(Request $request)
 {
     if (!checkPermissionButtons("edit-category")) {
