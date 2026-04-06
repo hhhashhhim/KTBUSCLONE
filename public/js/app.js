@@ -28175,7 +28175,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       var _this17 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        var mergedResult, mapRows;
+        var mergedResult, mapRows, payload, startRows, returnRows;
         return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
@@ -28187,14 +28187,23 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
               case 4:
                 mergedResult = _context6.sent;
-                // Step 2: Store merged data for the component
-                _this17.closingData = mergedResult; // save header links
 
-                _context6.next = 8;
+                if (!(!mergedResult || !mergedResult.id)) {
+                  _context6.next = 7;
+                  break;
+                }
+
+                throw new Error("Merge failed: Invalid response");
+
+              case 7:
+                _this17.closingData = mergedResult; // ✅ STEP 2: Header Links
+
+                _context6.next = 10;
                 return _this17.saveHeaderLinks(mergedResult.id);
 
-              case 8:
-                // Step 4: Save Start
+              case 10:
+                // if this fails → it will automatically jump to catch
+                // ✅ STEP 3: Prepare Data
                 mapRows = function mapRows(cashBank, schedule) {
                   return Object.entries(cashBank).map(function (_ref5) {
                     var _ref6 = _slicedToArray(_ref5, 2),
@@ -28216,32 +28225,51 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                       bank_id: row.selectedBankId || null,
                       total_received_bank: row.bank,
                       shortage: row.shortage,
-                      received: row.cash + row.bank,
-                      mergeId: mergedResult.id
+                      received: row.cash + row.bank
                     };
                   });
                 };
 
-                _context6.next = 11;
-                return _this17.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
+                payload = {
                   ticket_closing_id: mergedResult.id,
-                  type: "start",
-                  route: _this17.routes.start,
-                  busIds: _this17.busIds,
-                  rows: mapRows(_this17.cashBankStart, _this17.data.schedule_start)
-                });
+                  records: []
+                };
+                startRows = mapRows(_this17.cashBankStart, _this17.data.schedule_start);
 
-              case 11:
-                _context6.next = 13;
-                return _this17.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
-                  ticket_closing_id: mergedResult.id,
-                  type: "return",
-                  route: _this17.routes["return"],
-                  busIds: _this17.busIds,
-                  rows: mapRows(_this17.cashBankReturn, _this17.data.schedule_return)
-                });
+                if (startRows.length) {
+                  payload.records.push({
+                    type: "start",
+                    route: _this17.routes.start,
+                    bus_id: _this17.busIds[0] || 0,
+                    rows: startRows
+                  });
+                }
 
-              case 13:
+                returnRows = mapRows(_this17.cashBankReturn, _this17.data.schedule_return);
+
+                if (returnRows.length) {
+                  payload.records.push({
+                    type: "return",
+                    route: _this17.routes["return"],
+                    bus_id: _this17.busIds[0] || 0,
+                    rows: returnRows
+                  });
+                } // ❗ EXTRA SAFETY (don’t hit API with empty data)
+
+
+                if (payload.records.length) {
+                  _context6.next = 18;
+                  break;
+                }
+
+                throw new Error("No records to save");
+
+              case 18:
+                _context6.next = 20;
+                return _this17.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", payload);
+
+              case 20:
+                // ✅ SUCCESS
                 Swal.fire({
                   icon: "success",
                   title: "Saved!",
@@ -28254,30 +28282,32 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
                 _this17.closeexampleModal();
 
-                _context6.next = 22;
+                _context6.next = 30;
                 break;
 
-              case 18:
-                _context6.prev = 18;
+              case 25:
+                _context6.prev = 25;
                 _context6.t0 = _context6["catch"](1);
                 console.error(_context6.t0);
                 Swal.fire({
                   icon: "error",
                   title: "Error",
                   text: _context6.t0.message || "Failed to save ticket closing"
-                });
+                }); // ❗ IMPORTANT: stop everything
 
-              case 22:
-                _context6.prev = 22;
+                return _context6.abrupt("return");
+
+              case 30:
+                _context6.prev = 30;
                 _this17.loading = false;
-                return _context6.finish(22);
+                return _context6.finish(30);
 
-              case 25:
+              case 33:
               case "end":
                 return _context6.stop();
             }
           }
-        }, _callee6, null, [[1, 18, 22, 25]]);
+        }, _callee6, null, [[1, 25, 30, 33]]);
       }))();
     },
     // async saveTicketClosingShortage() {
@@ -46877,7 +46907,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _context7.prev = 17;
                 formData = new FormData();
                 formData.append('id', _this7.dataEdit.id);
-                formData.append('total', _this7.dataEdit.total);
+                formData.append('total', totalPayment);
                 formData.append('narration', _this7.dataEdit.narration);
                 formData.append('category_id', _this7.dataEdit.category_id);
                 formData.append('type', _this7.dataEdit.type);
@@ -102643,7 +102673,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         id: "exampleRadios2"
       }, null, 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.type]]), _hoisted_100]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"form-check\">\r\n                                <input id=\"type_category\" class=\"form-check-input\" type=\"radio\" value=\"expense\" v-model=\"dataEdit.type\">\r\n                                <label for=\"type_category\" class=\"form-check-label\">Expense</label>\r\n                            </div>\r\n\r\n                            <div class=\"form-check\">\r\n                                <input id=\"type_other\" class=\"form-check-input\" type=\"radio\" value=\"income\" v-model=\"dataEdit.type\">\r\n                                <label for=\"type_other\" class=\"form-check-label\">Income</label>\r\n                            </div> ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Expense Category "), $data.dataEdit.type == 'expense' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_101, [_hoisted_102, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.dataEdit.type]]), _hoisted_100]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"form-check\">\n                                <input id=\"type_category\" class=\"form-check-input\" type=\"radio\" value=\"expense\" v-model=\"dataEdit.type\">\n                                <label for=\"type_category\" class=\"form-check-label\">Expense</label>\n                            </div>\n\n                            <div class=\"form-check\">\n                                <input id=\"type_other\" class=\"form-check-input\" type=\"radio\" value=\"income\" v-model=\"dataEdit.type\">\n                                <label for=\"type_other\" class=\"form-check-label\">Income</label>\n                            </div> ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Expense Category "), $data.dataEdit.type == 'expense' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_101, [_hoisted_102, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "onUpdate:modelValue": _cache[26] || (_cache[26] = function ($event) {
           return $data.dataEdit.category_id = $event;
         }),

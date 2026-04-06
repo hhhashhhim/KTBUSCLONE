@@ -1315,76 +1315,108 @@ export default {
         },
 
         // ===== Save Ticket Closing Shortage =====
-        async saveTicketClosingShortage() {
-            this.loading = true;
+      async saveTicketClosingShortage() {
+    this.loading = true;
 
-            try {
-                // Step 1: Merge schedules
-                const mergedResult = await this.mergeScheduleApi(this.addData);
-                // Step 2: Store merged data for the component
-                this.closingData = mergedResult;
-                // save header links
-                await this.saveHeaderLinks(mergedResult.id);
-                // Step 4: Save Start
-                const mapRows = (cashBank, schedule) =>
-                    Object.entries(cashBank).map(([terminalId, row]) => {
-                        const tickets = schedule[terminalId] || [];
-                        return {
-                            terminal_id: Number(terminalId),
-                            passenger_count: tickets.filter(ticket => ticket.type != 'canceled').length,
-                            kt_commission: this.totalCommission(tickets),
-                            elt: this.totalELT(tickets),
-                            cancellation_amount: this.totalCancelAmount(tickets),
-                            total_receivable: row.total + row.commission,
-                            other_commission: row.commission || 0,
-                            total_received_cash: row.cash,
-                            bank_id: row.selectedBankId || null,
-                            total_received_bank: row.bank,
-                            shortage: row.shortage,
-                            received: row.cash + row.bank,
-                            mergeId: mergedResult.id
-                        };
-                    });
+    try {
+        // ✅ STEP 1: Merge
+        const mergedResult = await this.mergeScheduleApi(this.addData);
 
-                await this.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
-                    ticket_closing_id: mergedResult.id,
-                    type: "start",
-                    route: this.routes.start,
-                    busIds: this.busIds,
-                    rows: mapRows(this.cashBankStart, this.data.schedule_start),
-                });
+        if (!mergedResult || !mergedResult.id) {
+            throw new Error("Merge failed: Invalid response");
+        }
 
+        this.closingData = mergedResult;
 
-                await this.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", {
-                    ticket_closing_id: mergedResult.id,
-                    type: "return",
-                    route: this.routes.return,
-                    busIds: this.busIds,
-                    rows: mapRows(this.cashBankReturn, this.data.schedule_return),
-                });
+        // ✅ STEP 2: Header Links
+        await this.saveHeaderLinks(mergedResult.id);
+        // if this fails → it will automatically jump to catch
 
+        // ✅ STEP 3: Prepare Data
+        const mapRows = (cashBank, schedule) =>
+            Object.entries(cashBank).map(([terminalId, row]) => {
+                const tickets = schedule[terminalId] || [];
 
+                return {
+                    terminal_id: Number(terminalId),
+                    passenger_count: tickets.filter(ticket => ticket.type != 'canceled').length,
+                    kt_commission: this.totalCommission(tickets),
+                    elt: this.totalELT(tickets),
+                    cancellation_amount: this.totalCancelAmount(tickets),
+                    total_receivable: row.total + row.commission,
+                    other_commission: row.commission || 0,
+                    total_received_cash: row.cash,
+                    bank_id: row.selectedBankId || null,
+                    total_received_bank: row.bank,
+                    shortage: row.shortage,
+                    received: row.cash + row.bank,
+                };
+            });
 
+        const payload = {
+            ticket_closing_id: mergedResult.id,
+            records: []
+        };
 
+        const startRows = mapRows(this.cashBankStart, this.data.schedule_start);
+        if (startRows.length) {
+            payload.records.push({
+                type: "start",
+                route: this.routes.start,
+                bus_id: this.busIds[0] || 0,
+                rows: startRows,
+            });
+        }
 
-                Swal.fire({
-                    icon: "success",
-                    title: "Saved!",
-                    text: "Ticket closing saved successfully",
-                    timer: 1500,
-                    showConfirmButton: false,
-                });
+        const returnRows = mapRows(this.cashBankReturn, this.data.schedule_return);
+        if (returnRows.length) {
+            payload.records.push({
+                type: "return",
+                route: this.routes.return,
+                bus_id: this.busIds[0] || 0,
+                rows: returnRows,
+            });
+        }
 
-                this.$emit('fetchData');
+        // ❗ EXTRA SAFETY (don’t hit API with empty data)
+        if (!payload.records.length) {
+            throw new Error("No records to save");
+        }
 
-                this.closeexampleModal();
-            } catch (error) {
-                console.error(error);
-                Swal.fire({ icon: "error", title: "Error", text: error.message || "Failed to save ticket closing" });
-            } finally {
-                this.loading = false;
-            }
-        },
+        // ✅ STEP 4: Final API
+        await this.callApi(
+            "post",
+            "booking/close/schedule/closing/ticket-closing-shortage",
+            payload
+        );
+
+        // ✅ SUCCESS
+        Swal.fire({
+            icon: "success",
+            title: "Saved!",
+            text: "Ticket closing saved successfully",
+            timer: 1500,
+            showConfirmButton: false,
+        });
+
+        this.$emit('fetchData');
+        this.closeexampleModal();
+
+    } catch (error) {
+        console.error(error);
+
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.message || "Failed to save ticket closing"
+        });
+
+        // ❗ IMPORTANT: stop everything
+        return;
+    } finally {
+        this.loading = false;
+    }
+},
 
         // async saveTicketClosingShortage() {
         //   this.loading = true;

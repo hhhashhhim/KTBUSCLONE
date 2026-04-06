@@ -831,14 +831,15 @@ export default {
                 });
             }
 
-            
+
 
             this.loadingEdit = true;
 
             try {
+
                 const formData = new FormData();
                 formData.append('id', this.dataEdit.id);
-                formData.append('total', this.dataEdit.total);
+               formData.append('total', totalPayment)
                 formData.append('narration', this.dataEdit.narration);
                 formData.append('category_id', this.dataEdit.category_id);
 formData.append('type', this.dataEdit.type);
