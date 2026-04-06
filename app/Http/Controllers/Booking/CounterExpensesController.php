@@ -369,11 +369,11 @@ class CounterExpensesController extends Controller
                 ], 422);
             }
 
-            if (($cashPayment + $bankPayment) != $request->total) {
-                return response()->json([
-                    "errors" => ["Error" => ['Cash + Bank payment must equal Total']]
-                ], 422);
-            }
+            // if (($cashPayment + $bankPayment) != $request->total) {
+            //     return response()->json([
+            //         "errors" => ["Error" => ['Cash + Bank payment must equal Total']]
+            //     ], 422);
+            // }
 
             // ================= REMOVE OLD TRANSACTIONS =================
             AccountTransaction::where([

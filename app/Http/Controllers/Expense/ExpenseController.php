@@ -29,7 +29,7 @@ class ExpenseController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $expenses = TicketMergeExpense::where(["ticket_merge_id" => $request->ticket_merge_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
-        
+
         // for sale show at front
         $merge = TicketClosingMerge::where(['company_id' => Auth::user()->company_id, 'schedule_complete' => 1,"id" => $request->ticket_merge_id])
             ->with("closing:id,ticket_merge_id,schedule_id", "closing.schedule:id,name")
@@ -59,7 +59,7 @@ class ExpenseController extends Controller
             // commission
             $terminalCommission = TerminalCommission::where(["terminal_id"=>$ticket->terminal_id,"route_id"=>$ticket->schedule->route_id,"company_id"=>Auth::user()->company_id])->first();
             if($terminalCommission)
-            {    
+            {
                 if($merge->closing[0]->id == $ticket->ticket_closing_id)
                 {
                     $closingOne[] = $terminalCommission->id;
@@ -68,7 +68,7 @@ class ExpenseController extends Controller
                 {
                     $closingTwo[] = $terminalCommission->id;
                 }
-                
+
                 if($terminalCommission->flat_commission == 0)
                     $commission += (($ticket->seat_fare - ($ticket->discount))/100)*$terminalCommission->percentage_commission;
                 else
@@ -82,12 +82,12 @@ class ExpenseController extends Controller
             {
                 $commission += 0;
             }
-                
+
         }
-        
+
         $commission += TerminalCommission::whereIn("id",array_unique($closingOne))->get()->sum("fix_commission");
         $commission += TerminalCommission::whereIn("id",array_unique($closingTwo))->get()->sum("fix_commission");
-        
+
         $merge->elt += $eltAmount;
         $merge->commission += (int)$commission;
 
@@ -102,7 +102,7 @@ class ExpenseController extends Controller
             ->with("cancel_ticket:id,ticket_id,percentage")
             ->get(["id","seat_fare","discount"]);
 
-    
+
         $refundAmount = 0;
         $cancelTicket->map(function($item) use (&$refundAmount){
             if($item->cancel_ticket)
@@ -119,7 +119,7 @@ class ExpenseController extends Controller
             "sale"     => $merge->seat_fare - $merge->discount - $merge->commission + $merge->elt + $merge->refund,
             "closing"  => $checkClosing ? true : false,
             'shortage' => $shortage,
-            'details'  => TicketClosingMerge::with('bus','closing.schedule.route')->where('id', $request->ticket_merge_id)->first() 
+            'details'  => TicketClosingMerge::with('bus','closing.schedule.route')->where('id', $request->ticket_merge_id)->first()
         ];
     }
 
@@ -174,14 +174,14 @@ class ExpenseController extends Controller
 
     // public function dailySummery(Request $request)
     // {
-        
+
     //     if(!checkPermissionButtons("add-expense"))
     //     {
     //         return response()->json(["Error" => ['You are not authorized to access this url']], 403);
     //     }
     //     $closing_pair = TicketClosing::with("schedule")->where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->get();
     //     $data = (object)[];
-        
+
     //     $data->schedule_start = Ticket::withTrashed()
     //         ->where(function ($query) {
     //             $query->where("type", "booked")
@@ -199,7 +199,7 @@ class ExpenseController extends Controller
     //         ->with("elt")->with(["commission"=>function($q) use ($closing_pair){
     //         $q->where("route_id",$closing_pair[1]->schedule->route_id);
     //     }])->where(["company_id" => Auth::user()->company_id])->where("ticket_closing_id", $closing_pair[1]->id)->with('terminal:id,name')->get()->groupBy(['terminal_id']);
-    
+
     //     $data->expense = TicketMergeExpense::where(["company_id" => Auth::user()->company_id, "ticket_merge_id" => $request->ticket_merge_id])->with("expense_category:id,name")->get();
 
     //     // get bus number
@@ -225,10 +225,10 @@ class ExpenseController extends Controller
 
     //     $refundTerminal = [];
     //     $cancelTicket->map(function($single) use (&$refundTerminal){
-            
+
     //         $refundAmount = 0;
     //         $single->map(function($ticket) use (&$refundAmount){
-            
+
     //             if($ticket->cancel_ticket)
     //             {
     //                 $refundAmount += (($ticket->seat_fare - $ticket->discount) / 100) * $ticket->cancel_ticket->percentage;
@@ -240,7 +240,7 @@ class ExpenseController extends Controller
 
     //         $refundTerminal[] = $singleTerminal;
     //     });
-        
+
 
     //     return view('reports.dailySaleReport', [
     //         "singleData" => $singleData,
@@ -250,6 +250,7 @@ class ExpenseController extends Controller
     // }
 public function dailySummery(Request $request)
 {
+
 
     if (!checkPermissionButtons("add-expense")) {
         return response()->json(["Error" => ['You are not authorized to access this url']], 403);
@@ -271,18 +272,18 @@ public function dailySummery(Request $request)
         ->where('ticket_closing_id', $singleData->id)
         ->where('type', 'start')
         ->get();
-        
+
         // ================= RETURN SHORTAGES =================
         $returnShortages = TicketClosingShortage::with('terminal' , 'route')
         ->where('ticket_closing_id', $singleData->id)
         ->where('type', 'return')
         ->get();
-        
+
         // ================= EXPENSES =================
         $expenses = TicketMergeExpense::with('expense_category')
         ->where('ticket_merge_id', $singleData->id)
         ->get();
-        
+
         $KtCommssion = TicketClosingShortage::where('ticket_closing_id', $singleData->id)
             ->sum('kt_commission');
         $OtherCommssion = TicketClosingShortage::where('ticket_closing_id', $singleData->id)
@@ -335,7 +336,7 @@ public function dailySummery(Request $request)
                 'narration.required' => 'Expenses Narration is Required!',
             ];
             $this->validate($request, $rules, $customMessages);
-            
+
             OfficeExpense::create([
                 'closing_date' => $request->date,
                 'amount' => $request->amount,
@@ -350,14 +351,14 @@ public function dailySummery(Request $request)
                 "company_id" => Auth::user()->company_id
             ]);
             DB::commit();
-        
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Database transaction error: ' . $e->getMessage());
             return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
         }
     }
-    
+
     public function officeExpenUpdate(Request $request)
     {
         if(!checkForSubmenu("expenses"))
@@ -379,7 +380,7 @@ public function dailySummery(Request $request)
             ];
 
             $this->validate($request, $rules, $customMessages);
-            
+
             OfficeExpense::where("id",$request->id)->update([
                 'closing_date' => $request->closing_date,
                 'amount' => $request->amount,
@@ -393,7 +394,7 @@ public function dailySummery(Request $request)
                 "company_id" => Auth::user()->company_id
             ]);
             DB::commit();
-        
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Database transaction error: ' . $e->getMessage());

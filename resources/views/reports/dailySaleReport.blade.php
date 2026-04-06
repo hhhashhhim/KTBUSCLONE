@@ -8,7 +8,7 @@
             margin: 10px;
         }
 
-        body { 
+        body {
             height: 10%;
             overflow: scroll;
             margin: 40px 30px 40px 30px;
@@ -62,7 +62,7 @@
     <table style="border: none;">
         <tr>
             <th class="centerTH">Date</th>
-            <th class="fontWightTh">{{ now()->subDays(1)->format("d-M-Y") }}</th>
+            <th class="fontWightTh">{{ $singleData->closing_date ? \Carbon\Carbon::parse($singleData->closing_date)->format('d-m-Y') : '' }}</th>
             <th class="centerTH">Bus No</th>
             <th class="fontWightTh">{{ $singleData->bus->bus_number }}</th>
             <th class="centerTH">Route</th>
