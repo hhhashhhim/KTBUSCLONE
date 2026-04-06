@@ -1207,8 +1207,8 @@ export default {
 
             this.postData.category.push('');
             this.postData.description.push('');
-            this.postData.amount.push(0);
-            this.postData.paid.push(0);
+            this.postData.amount.push('');
+            this.postData.paid.push('');
             this.postData.invoice.push('');
             this.postData.showExtra.push(false);
             this.postData.extraCategory.push('');
