@@ -280,19 +280,20 @@
             <tr v-for="(row, index) in loop" :key="'expense-row-' + index">
                 <td>
                     <select
-                        class="form-control rounded-0"
-                        v-model="postData.category[index]"
-                        :disabled="editAble"
-                    >
-                        <option value="">Select Category</option>
-                        <option
-                            v-for="(category, i) in categories"
-                            :key="'cat-' + i"
-                            :value="category.id"
-                        >
-                            {{ category.name }}
-                        </option>
-                    </select>
+    class="form-control rounded-0"
+    v-model="postData.category[index]"
+    :disabled="editAble"
+    @change="handleCategoryChange(index)"
+>
+    <option value="">Select Category</option>
+    <option
+        v-for="(category, i) in categories"
+        :key="'cat-' + i"
+        :value="category.id"
+    >
+        {{ category.name }}
+    </option>
+</select>
                 </td>
 
                 <td>
@@ -353,31 +354,31 @@
                     </button>
 
                     <input
-                        type="checkbox"
-                        class="ml-2"
-                        v-model="postData.showExtra[index]"
-                        @change="handleExtraChange(index)"
-                    />
+    type="checkbox"
+    class="ml-2"
+    v-model="postData.showExtra[index]"
+    @change="handleExtraChange(index)"
+/>
                 </td>
 
                 <td v-else></td>
 
-                <td class="header-td">
-                    <select
-                        v-if="postData.showExtra[index] === true"
-                        class="form-control mt-1"
-                        v-model="postData.extraCategory[index]"
-                    >
-                        <option value="">Select Option</option>
-                        <option
-                            v-for="(header, i) in safeReportsHeaders"
-                            :key="'header-' + i"
-                            :value="header.id"
-                        >
-                            {{ header.name }}
-                        </option>
-                    </select>
-                </td>
+               <td class="header-td">
+    <select
+        v-if="postData.showExtra[index] === true"
+        class="form-control mt-1"
+        v-model="postData.extraCategory[index]"
+    >
+        <option value="">Select Option</option>
+        <option
+            v-for="(header, i) in safeReportsHeaders"
+            :key="'header-' + i"
+            :value="header.id"
+        >
+            {{ header.name }}
+        </option>
+    </select>
+</td>
             </tr>
         </tbody>
     </table>
@@ -825,12 +826,23 @@ export default {
         },
 
          handleExtraChange(index) {
-            this.ensureRowIndexes(index);
+    // if unchecked manually, clear selected header
+    if (!this.postData.showExtra[index]) {
+        this.postData.extraCategory.splice(index, 1, "");
+        return;
+    }
 
-            if (this.postData.showExtra[index] !== true) {
-                this.postData.extraCategory[index] = '';
-            }
-        },
+    // if checked manually and category has linked header, auto assign it
+    const selectedCategoryId = this.postData.category[index];
+
+    const selectedCategory = this.categories.find(
+        category => Number(category.id) === Number(selectedCategoryId)
+    );
+
+    if (selectedCategory && selectedCategory.report_header_id) {
+        this.postData.extraCategory.splice(index, 1, selectedCategory.report_header_id);
+    }
+},
         toggleHeader(index) {
             if (!this.postData.showExtra[index]) {
                 this.postData.extraCategory[index] = "";
@@ -1109,7 +1121,21 @@ export default {
                 console.log("reportsHeaders loaded:", this.reportsHeaders);
             }
         },
+ handleCategoryChange(index) {
+    const selectedCategoryId = this.postData.category[index];
 
+    const selectedCategory = this.categories.find(
+        category => Number(category.id) === Number(selectedCategoryId)
+    );
+
+    if (selectedCategory && selectedCategory.report_header_id) {
+        this.postData.showExtra.splice(index, 1, true);
+        this.postData.extraCategory.splice(index, 1, selectedCategory.report_header_id);
+    } else {
+        this.postData.showExtra.splice(index, 1, false);
+        this.postData.extraCategory.splice(index, 1, "");
+    }
+},
         totalCommission(list) {
             return list.reduce((sum, t) => {
                 // 1. Check if the ticket is canceled.

@@ -27610,10 +27610,20 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       if (typeof this.postData.extraCategory[index] === "undefined") this.postData.extraCategory[index] = '';
     },
     handleExtraChange: function handleExtraChange(index) {
-      this.ensureRowIndexes(index);
+      // if unchecked manually, clear selected header
+      if (!this.postData.showExtra[index]) {
+        this.postData.extraCategory.splice(index, 1, "");
+        return;
+      } // if checked manually and category has linked header, auto assign it
 
-      if (this.postData.showExtra[index] !== true) {
-        this.postData.extraCategory[index] = '';
+
+      var selectedCategoryId = this.postData.category[index];
+      var selectedCategory = this.categories.find(function (category) {
+        return Number(category.id) === Number(selectedCategoryId);
+      });
+
+      if (selectedCategory && selectedCategory.report_header_id) {
+        this.postData.extraCategory.splice(index, 1, selectedCategory.report_header_id);
       }
     },
     toggleHeader: function toggleHeader(index) {
@@ -27929,6 +27939,20 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
           }
         }, _callee3);
       }))();
+    },
+    handleCategoryChange: function handleCategoryChange(index) {
+      var selectedCategoryId = this.postData.category[index];
+      var selectedCategory = this.categories.find(function (category) {
+        return Number(category.id) === Number(selectedCategoryId);
+      });
+
+      if (selectedCategory && selectedCategory.report_header_id) {
+        this.postData.showExtra.splice(index, 1, true);
+        this.postData.extraCategory.splice(index, 1, selectedCategory.report_header_id);
+      } else {
+        this.postData.showExtra.splice(index, 1, false);
+        this.postData.extraCategory.splice(index, 1, "");
+      }
     },
     totalCommission: function totalCommission(list) {
       return list.reduce(function (sum, t) {
@@ -79619,7 +79643,7 @@ var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_45 = ["onUpdate:modelValue", "disabled"];
+var _hoisted_45 = ["onUpdate:modelValue", "disabled", "onChange"];
 
 var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
@@ -80157,7 +80181,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return $data.postData.category[index] = $event;
       },
-      disabled: _ctx.editAble
+      disabled: _ctx.editAble,
+      onChange: function onChange($event) {
+        return $options.handleCategoryChange(index);
+      }
     }, [_hoisted_46, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.categories, function (category, i) {
       return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
         key: 'cat-' + i,
@@ -80167,8 +80194,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       , _hoisted_47);
     }), 128
     /* KEYED_FRAGMENT */
-    ))], 8
-    /* PROPS */
+    ))], 40
+    /* PROPS, HYDRATE_EVENTS */
     , _hoisted_45), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.postData.category[index]]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "text",
       "class": "form-control",
