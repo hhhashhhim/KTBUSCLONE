@@ -59,7 +59,7 @@ class ExpenseCategoryController extends Controller
         ], 403);
     }
 
-    try {
+    // try {
         DB::beginTransaction();
 
         $category = ExpenseCategory::create([
@@ -80,16 +80,16 @@ class ExpenseCategoryController extends Controller
         DB::commit();
 
         return response()->json($category, 201);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Database transaction error: ' . $e->getMessage());
+    // } catch (\Exception $e) {
+    //     DB::rollBack();
+    //     Log::error('Database transaction error: ' . $e->getMessage());
 
-        return response()->json([
-            "errors" => [
-                "Error" => ['An error occurred during the database transaction.']
-            ]
-        ], 422);
-    }
+    //     return response()->json([
+    //         "errors" => [
+    //             "Error" => ['An error occurred during the database transaction.']
+    //         ]
+    //     ], 422);
+    // }
 }
  public function reportHeader()
     {
