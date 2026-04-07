@@ -70024,6 +70024,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       optionsUan: {
         placeholder: "xx-xxx-xxx-xxx"
       },
+      dynamicLabel: "Phone Number",
+      // default label
       permissions: [],
       optionsPhone: {
         placeholder: "03xx-xxxxxxx"
@@ -70036,7 +70038,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         terminals: [],
         footerText: 0,
         show_phone: true,
-        show_coupen: true
+        show_coupen: true,
+        dynamicLabel: "Phone Number"
       },
       dataEdit: {},
       loading: false,
@@ -70188,6 +70191,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.addForm.termsCondition = '';
       this.addForm.address = '';
       this.addForm.phoneNumber = '';
+      this.addForm.dynamicLabel = '';
       this.addForm.uanNumber = '';
       this.countWordsLength = 0;
       this.countAddressLength = 0;
@@ -136046,13 +136050,9 @@ var _hoisted_67 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_68 = {
   "class": "form-group col-md-4"
 };
-
-var _hoisted_69 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_69 = {
   "for": "phoneNumber"
-}, "Phone Number", -1
-/* HOISTED */
-);
-
+};
 var _hoisted_70 = {
   "class": "form-group col-md-4"
 };
@@ -136159,13 +136159,9 @@ var _hoisted_90 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_91 = {
   "class": "form-group col-md-3"
 };
-
-var _hoisted_92 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_92 = {
   "for": "phoneNumber"
-}, "Phone Number", -1
-/* HOISTED */
-);
-
+};
 var _hoisted_93 = {
   "class": "form-group col-md-3"
 };
@@ -136319,7 +136315,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[15] || (_cache[15] = function ($event) {
+        onClick: _cache[16] || (_cache[16] = function ($event) {
           return $options.addTemplate();
         }),
         disabled: $data.loading
@@ -136375,21 +136371,30 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         options: $data.optionsUan
       }, null, 8
       /* PROPS */
-      , ["modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [_hoisted_69, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
+      , ["modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_69, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.addForm.dynamicLabel), 1
+      /* TEXT */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         id: "phoneNumber",
+        type: "text",
         "class": "form-control",
-        modelValue: $data.addForm.phoneNumber,
         "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
           return $data.addForm.phoneNumber = $event;
         }),
-        mask: "0000-0000000",
-        raw: false,
-        options: $data.optionsPhone
-      }, null, 8
-      /* PROPS */
-      , ["modelValue", "options"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        type: "checkbox",
+        placeholder: "0300-0000000"
+      }, null, 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addForm.phoneNumber]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" User input to change label "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        "class": "form-control mt-2",
+        placeholder: "Enter Label Name",
         "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
+          return $data.addForm.dynamicLabel = $event;
+        })
+      }, null, 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addForm.dynamicLabel]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "checkbox",
+        "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
           return $data.addForm.show_phone = $event;
         })
       }, null, 512
@@ -136405,7 +136410,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
       })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_70, [_hoisted_71, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "checkbox",
-        "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
+        "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
           return $data.addForm.show_coupen = $event;
         })
       }, null, 512
@@ -136419,11 +136424,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         _: 1
         /* STABLE */
 
-      })])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"form-group col-md-12\">\r\n                        <label for=\"address\">Address<span class=\"text-danger ml-1\">*</span></label>\r\n                        <textarea class=\"form-control\" id=\"address\" spellcheck=\"false\" maxlength=\"45\"\r\n                            @keypress=\"countWords(this.addForm.address.length, 'address', 45)\"\r\n                            v-model=\"addForm.address\"></textarea>\r\n                        <span class=\"text-danger\">Length : {{ this.countAddressLength }}/45</span>\r\n                    </div> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [_hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+      })])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"form-group col-md-12\">\n                        <label for=\"address\">Address<span class=\"text-danger ml-1\">*</span></label>\n                        <textarea class=\"form-control\" id=\"address\" spellcheck=\"false\" maxlength=\"45\"\n                            @keypress=\"countWords(this.addForm.address.length, 'address', 45)\"\n                            v-model=\"addForm.address\"></textarea>\n                        <span class=\"text-danger\">Length : {{ this.countAddressLength }}/45</span>\n                    </div> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [_hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
         id: "refOfHiring",
         "class": "form-control",
         spellcheck: "false",
-        "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
+        "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
           return $data.addForm.termsCondition = $event;
         })
       }, null, 512
@@ -136445,7 +136450,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
         "class": "btn btn-primary",
-        onClick: _cache[25] || (_cache[25] = function ($event) {
+        onClick: _cache[27] || (_cache[27] = function ($event) {
           return $options.updateTemplate();
         }),
         disabled: $data.loadingEdit
@@ -136457,7 +136462,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_76, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_77, [_hoisted_78, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
         id: "editTerminals",
-        "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
+        "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
           return $data.dataEdit.terminal_ids = $event;
         }),
         multiple: ""
@@ -136476,7 +136481,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         type: "text",
         "class": "form-control",
         placeholder: "Enter Name",
-        "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
+        "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
           return $data.dataEdit.name = $event;
         })
       }, null, 512
@@ -136484,7 +136489,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_83, [_hoisted_84, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
         id: "",
-        "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
+        "onUpdate:modelValue": _cache[19] || (_cache[19] = function ($event) {
           return $data.dataEdit.footer_text = $event;
         })
       }, _hoisted_88, 512
@@ -136493,7 +136498,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         id: "",
         "class": "form-control",
         modelValue: $data.dataEdit.uan,
-        "onUpdate:modelValue": _cache[19] || (_cache[19] = function ($event) {
+        "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
           return $data.dataEdit.uan = $event;
         }),
         mask: "00-000-000-000",
@@ -136501,21 +136506,30 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         options: $data.optionsUan
       }, null, 8
       /* PROPS */
-      , ["modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_91, [_hoisted_92, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
+      , ["modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_91, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_92, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.dataEdit.dynamic_label || 'Phone Number'), 1
+      /* TEXT */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         id: "phoneNumber",
+        type: "text",
         "class": "form-control",
-        modelValue: $data.dataEdit.phone,
-        "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
+        "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
           return $data.dataEdit.phone = $event;
         }),
-        mask: "0000-0000000",
-        raw: false,
-        options: $data.optionsPhone
-      }, null, 8
-      /* PROPS */
-      , ["modelValue", "options"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        placeholder: "0300-0000000"
+      }, null, 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.phone]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "text",
+        "class": "form-control mt-2",
+        placeholder: "Enter Label Name",
+        "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
+          return $data.dataEdit.dynamic_label = $event;
+        })
+      }, null, 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.dynamic_label]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <vue-mask id=\"phoneNumber\" class=\"form-control\" v-model=\"dataEdit.phone\" mask=\"0000-0000000\"\n                            :raw=\"false\" :options=\"optionsPhone\">\n                        </vue-mask> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "checkbox",
-        "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
+        "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
           return $data.dataEdit.show_phone = $event;
         })
       }, null, 512
@@ -136532,14 +136546,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_93, [_hoisted_94, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "class": "form-control",
         id: "status",
-        "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
+        "onUpdate:modelValue": _cache[24] || (_cache[24] = function ($event) {
           return $data.dataEdit.status = $event;
         })
       }, _hoisted_97, 512
       /* NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataEdit.status]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_98, [_hoisted_99, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "checkbox",
-        "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
+        "onUpdate:modelValue": _cache[25] || (_cache[25] = function ($event) {
           return $data.dataEdit.show_coupen = $event;
         })
       }, null, 512
@@ -136557,7 +136571,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         id: "refOfHiring",
         "class": "form-control",
         spellcheck: "false",
-        "onUpdate:modelValue": _cache[24] || (_cache[24] = function ($event) {
+        "onUpdate:modelValue": _cache[26] || (_cache[26] = function ($event) {
           return $data.dataEdit.terms_condition = $event;
         })
       }, null, 512

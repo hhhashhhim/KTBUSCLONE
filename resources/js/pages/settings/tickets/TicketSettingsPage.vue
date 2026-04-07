@@ -150,11 +150,22 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="phoneNumber">Phone Number</label>
+                        <label for="phoneNumber">{{ addForm.dynamicLabel }}</label>
 
-                        <vue-mask id="phoneNumber" class="form-control" v-model="addForm.phoneNumber"
-                            mask="0000-0000000" :raw="false" :options="optionsPhone">
-                        </vue-mask>
+                     <input
+    id="phoneNumber"
+    type="text"
+    class="form-control"
+    v-model="addForm.phoneNumber"
+    placeholder="0300-0000000"
+/>
+                        <!-- User input to change label -->
+<input
+    type="text"
+    class="form-control mt-2"
+    placeholder="Enter Label Name"
+    v-model="addForm.dynamicLabel"
+/>
                         <input type="checkbox" v-model="addForm.show_phone">
                         <lable class="mx-1">Show phone on ticket</lable>
                     </div>
@@ -217,11 +228,27 @@
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-3">
-                        <label for="phoneNumber">Phone Number</label>
+                        <label for="phoneNumber">
+    {{ dataEdit.dynamic_label || 'Phone Number' }}
+</label>
 
-                        <vue-mask id="phoneNumber" class="form-control" v-model="dataEdit.phone" mask="0000-0000000"
+<input
+    id="phoneNumber"
+    type="text"
+    class="form-control"
+    v-model="dataEdit.phone"
+    placeholder="0300-0000000"
+/>
+
+<input
+    type="text"
+    class="form-control mt-2"
+    placeholder="Enter Label Name"
+    v-model="dataEdit.dynamic_label"
+/>
+                        <!-- <vue-mask id="phoneNumber" class="form-control" v-model="dataEdit.phone" mask="0000-0000000"
                             :raw="false" :options="optionsPhone">
-                        </vue-mask>
+                        </vue-mask> -->
                         <input type="checkbox" v-model="dataEdit.show_phone">
                         <lable class="mx-1">Show phone on ticket</lable>
                     </div>
@@ -277,6 +304,7 @@ export default {
             optionsUan: {
                 placeholder: "xx-xxx-xxx-xxx",
             },
+            dynamicLabel: "Phone Number", // default label
             permissions: [],
             optionsPhone: {
                 placeholder: "03xx-xxxxxxx",
@@ -290,6 +318,7 @@ export default {
                 footerText: 0,
                 show_phone: true,
                 show_coupen: true,
+                dynamicLabel: "Phone Number",
             },
             dataEdit: {},
             loading: false,
@@ -355,7 +384,7 @@ export default {
                     icon: "error",
                     timer: 2000,
                 });
-               
+
             }
 
             try {
@@ -399,6 +428,7 @@ export default {
             this.addForm.termsCondition = '';
             this.addForm.address = '';
             this.addForm.phoneNumber = '';
+            this.addForm.dynamicLabel = '';
             this.addForm.uanNumber = '';
             this.countWordsLength = 0;
             this.countAddressLength = 0
