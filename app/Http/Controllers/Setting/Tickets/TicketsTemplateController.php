@@ -65,9 +65,10 @@ class TicketsTemplateController extends Controller
 
                 $template = TicketsTemplate::create([
                     'company_id' => Auth::user()->company_id,
-                    'name' => $request->name, 
+                    'name' => $request->name,
                     'uan' => $request->uanNumber,
                     'phone' => $request->phoneNumber,
+                    'dynamic_label' => $request->dynamicLabel,
                     'show_phone' => $request->show_phone,
                     'show_coupen' => $request->show_coupen,
                     'footer_text' => $request->footerText,
@@ -136,11 +137,12 @@ class TicketsTemplateController extends Controller
                     'footer_text.required' => 'Footer Text is required',
                 ];
                 $this->validate($request, $rules, $customMessages);
-                
+
                 $template = TicketsTemplate::where('id', $request->id)->update([
                     'name' => $request->name,
                     'uan' => $request->uan,
                     'phone' => $request->phone,
+                    'dynamic_label' => $request->dynamic_label,
                     'show_phone' => $request->show_phone,
                     'show_coupen' => $request->show_coupen,
                     'footer_text' => $request->footer_text,
@@ -185,7 +187,7 @@ class TicketsTemplateController extends Controller
         }
         return ActivityLog::with("activity")
             ->where("created_at" , '>', now()->subDays(3))
-            ->where("company_id",Auth::user()->company_id) 
+            ->where("company_id",Auth::user()->company_id)
             ->select(['*', DB::raw('DATE_FORMAT(created_at, "%h:%i %p | %Y-%m-%d") as formatted_created_at')])
             ->orderBy("created_at","DESC")
             ->get();
@@ -195,7 +197,7 @@ class TicketsTemplateController extends Controller
 
     public function sendMessage(Request $request)
     {
-        
+
 
         $customerIds =  Ticket::where(["date"=>$request->date,"type"=>"booked"])
         ->distinct("invoice_no")->pluck("customer_id")->toArray();
@@ -203,7 +205,7 @@ class TicketsTemplateController extends Controller
         $customers = Customer::whereIn("id",$customerIds)->get();
 
         $auth_key = Company::where("id",Auth::user()->company_id)->first()->whatsapp_auth_key;
-        
+
         foreach($customers as $key=>$customer)
         {
             // to choose random device
@@ -218,13 +220,13 @@ class TicketsTemplateController extends Controller
             $randomNumber = rand(1, 5);
 
 
-            
-            
+
+
             $url = "https://whatsapp.sarzone.com/api/send-messages";
             $mobile = "92".substr($customer->contact, -10);
             $session = $names[$randomNumber];
             $messageConfirmed = "*$request->title*
-            
+
 $request->body";
 
 
@@ -235,7 +237,7 @@ $request->body";
                     ->timeout(1)
                     ->post($url, [
                         "session" => $session,
-                        "receiver_number" => $mobile, 
+                        "receiver_number" => $mobile,
                         "message_body" => $messageConfirmed,
                         "message_type" => 'text'
                     ]);
@@ -243,7 +245,7 @@ $request->body";
             } catch (\Exception $e) {
 
             }
-            
+
         }
     }
 }
