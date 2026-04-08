@@ -28,17 +28,6 @@
                                         <select2 v-model="filterData.route" :options="route"
                                             :settings="{ multiple: true, width: '100%', placeholder: 'Select Route', allowClear: true }" />
                                     </div>
-
-                                    <!-- Schedule Name End -->
-                                    <!-- <div class="col-md-3">
-    <label>Schedule Name End</label>
-    <select2
-        v-model="filterData.schedule_name_end"
-        :options="schedules"
-        :settings="{ multiple: true, width: '100%' }"
-    />
-</div> -->
-
                                     <div class="col-md-3">
                                         <label for="fromDate">Departure Date</label>
                                         <input id="fromDate" type="date" class="form-control"
@@ -84,61 +73,84 @@
                                                 </div>
                                                 <div v-else>
                                                     <div class="d-flex justify-content-end">
-                                                      <form
-    :action="$store.state.api_url + 'api/web/v1/booking/close/schedule/merges/pdf'"
-    method="POST"
-    target="_blank"
->
-    <input type="hidden" name="token" :value="$store.state.token">
+                                                        <form
+                                                            :action="$store.state.api_url + 'api/web/v1/booking/close/schedule/merges/pdf'"
+                                                            method="POST" target="_blank">
+                                                            <input type="hidden" name="token"
+                                                                :value="$store.state.token">
 
-    <template v-for="(bus, i) in filterData.bus_number" :key="'bus-' + i">
-        <input type="hidden" name="bus_number[]" :value="bus">
-    </template>
+                                                            <template v-for="(bus, i) in filterData.bus_number"
+                                                                :key="'bus-' + i">
+                                                                <input type="hidden" name="bus_number[]" :value="bus">
+                                                            </template>
 
-    <template v-for="(route, i) in filterData.route" :key="'route-' + i">
-        <input type="hidden" name="route[]" :value="route">
-    </template>
+                                                            <template v-for="(route, i) in filterData.route"
+                                                                :key="'route-' + i">
+                                                                <input type="hidden" name="route[]" :value="route">
+                                                            </template>
 
-    <template v-for="(item, i) in filterData.schedule_name_start" :key="'start-' + i">
-        <input type="hidden" name="schedule_name_start[]" :value="item">
-    </template>
+                                                            <template
+                                                                v-for="(item, i) in filterData.schedule_name_start"
+                                                                :key="'start-' + i">
+                                                                <input type="hidden" name="schedule_name_start[]"
+                                                                    :value="item">
+                                                            </template>
 
-    <template v-for="(item, i) in filterData.schedule_name_end" :key="'end-' + i">
-        <input type="hidden" name="schedule_name_end[]" :value="item">
-    </template>
+                                                            <template v-for="(item, i) in filterData.schedule_name_end"
+                                                                :key="'end-' + i">
+                                                                <input type="hidden" name="schedule_name_end[]"
+                                                                    :value="item">
+                                                            </template>
 
-    <input type="hidden" name="from_date" :value="filterData.from_date">
-    <input type="hidden" name="to_date" :value="filterData.to_date">
-    <input type="hidden" name="closing_from_date" :value="filterData.closing_from_date">
-    <input type="hidden" name="closing_to_date" :value="filterData.closing_to_date">
+                                                            <input type="hidden" name="from_date"
+                                                                :value="filterData.from_date">
+                                                            <input type="hidden" name="to_date"
+                                                                :value="filterData.to_date">
+                                                            <input type="hidden" name="closing_from_date"
+                                                                :value="filterData.closing_from_date">
+                                                            <input type="hidden" name="closing_to_date"
+                                                                :value="filterData.closing_to_date">
 
-    <input type="submit" value="Eng Print" class="btn btn-dark mx-2">
-</form>
+                                                            <input type="submit" value="Eng Print"
+                                                                class="btn btn-dark mx-2">
+                                                        </form>
                                                         <form
                                                             :action="$store.state.api_url + 'api/web/v1/booking/close/schedule/merges/urdu/pdf'"
                                                             method="POST" ref="" target="_blank">
-                                                            <input type="hidden" name="token" :value="$store.state.token">
+                                                            <input type="hidden" name="token"
+                                                                :value="$store.state.token">
 
-    <template v-for="(bus, i) in filterData.bus_number" :key="'bus-' + i">
-        <input type="hidden" name="bus_number[]" :value="bus">
-    </template>
+                                                            <template v-for="(bus, i) in filterData.bus_number"
+                                                                :key="'bus-' + i">
+                                                                <input type="hidden" name="bus_number[]" :value="bus">
+                                                            </template>
 
-    <template v-for="(route, i) in filterData.route" :key="'route-' + i">
-        <input type="hidden" name="route[]" :value="route">
-    </template>
+                                                            <template v-for="(route, i) in filterData.route"
+                                                                :key="'route-' + i">
+                                                                <input type="hidden" name="route[]" :value="route">
+                                                            </template>
 
-    <template v-for="(item, i) in filterData.schedule_name_start" :key="'start-' + i">
-        <input type="hidden" name="schedule_name_start[]" :value="item">
-    </template>
+                                                            <template
+                                                                v-for="(item, i) in filterData.schedule_name_start"
+                                                                :key="'start-' + i">
+                                                                <input type="hidden" name="schedule_name_start[]"
+                                                                    :value="item">
+                                                            </template>
 
-    <template v-for="(item, i) in filterData.schedule_name_end" :key="'end-' + i">
-        <input type="hidden" name="schedule_name_end[]" :value="item">
-    </template>
+                                                            <template v-for="(item, i) in filterData.schedule_name_end"
+                                                                :key="'end-' + i">
+                                                                <input type="hidden" name="schedule_name_end[]"
+                                                                    :value="item">
+                                                            </template>
 
-    <input type="hidden" name="from_date" :value="filterData.from_date">
-    <input type="hidden" name="to_date" :value="filterData.to_date">
-    <input type="hidden" name="closing_from_date" :value="filterData.closing_from_date">
-    <input type="hidden" name="closing_to_date" :value="filterData.closing_to_date">
+                                                            <input type="hidden" name="from_date"
+                                                                :value="filterData.from_date">
+                                                            <input type="hidden" name="to_date"
+                                                                :value="filterData.to_date">
+                                                            <input type="hidden" name="closing_from_date"
+                                                                :value="filterData.closing_from_date">
+                                                            <input type="hidden" name="closing_to_date"
+                                                                :value="filterData.closing_to_date">
                                                             <input type="submit" value="Urdu Print"
                                                                 class="btn btn-dark">
                                                         </form>
@@ -148,7 +160,9 @@
 
                                                             <input type="hidden" name="token"
                                                                 :value="$store.state.token">
-
+                                                            <input v-for="(bus, index) in filterData.bus_number"
+                                                                :key="'bus-' + index" type="hidden" name="busNO[]"
+                                                                :value="bus" />
                                                             <input type="hidden" name="closing_from_date"
                                                                 :value="filterData.closing_from_date">
 
@@ -431,20 +445,20 @@ export default {
             }
         },
         async fetchRoute() {
-    try {
-        const res = await this.callApi("post", "booking/close/schedule/merges/route");
+            try {
+                const res = await this.callApi("post", "booking/close/schedule/merges/route");
 
-        let routes = res.data?.data?.routes || res.data?.routes || [];
+                let routes = res.data?.data?.routes || res.data?.routes || [];
 
-        this.route = routes.map(item => ({
-            id: item.id,
-            text: item.name
-        }));
+                this.route = routes.map(item => ({
+                    id: item.id,
+                    text: item.name
+                }));
 
-    } catch (error) {
-        console.error("Error fetching route:", error);
-    }
-},
+            } catch (error) {
+                console.error("Error fetching route:", error);
+            }
+        },
         async fetchSchedule() {
             try {
                 const res = await this.callApi(
