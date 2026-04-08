@@ -1419,9 +1419,16 @@ class ScheduleClosingController extends Controller
                 //     $closing_ids = TicketClosing::whereIn('schedule_id', $schedules)->where('schedule_return', 1)->where('company_id', Auth::user()->company_id)->pluck('ticket_merge_id');
                 //     $q->whereIn('id', $closing_ids);
                 // }
-                if ($request->busNO != 0) {
-                    $q->where('bus_id', $request->busNO);
-                }
+              if ($request->filled('busNO')) {
+    $busIds = is_array($request->busNO) ? $request->busNO : [$request->busNO];
+    $busIds = array_filter($busIds, function ($id) {
+        return !empty($id) && $id != 0;
+    });
+
+    if (!empty($busIds)) {
+        $q->whereIn('bus_id', $busIds);
+    }
+}
                 if ($request->closing_from_date != null) {
                     $q->where('closing_date', '>=', $request->closing_from_date);
                 }
