@@ -42,7 +42,6 @@
 
         .desc-row td {
             font-size: 9pt;
-            font-style: italic;
         }
     </style>
 
