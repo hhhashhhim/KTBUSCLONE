@@ -40,8 +40,9 @@
             text-align: center;
         }
 
-        .text-left {
-            text-align: left;
+        .desc-row td {
+            font-size: 9pt;
+            font-style: italic;
         }
     </style>
 
@@ -57,25 +58,24 @@
         </div>
         <br>
 
+        @php
+            $dynamicHeaders = getDynamicHeaders();
+        @endphp
+
         <table border="2">
             <tr>
                 <th>Sr NO</th>
                 <th>Bus NO</th>
-
-                @foreach (getDynamicHeaders() as $header)
+                @foreach ($dynamicHeaders as $header)
                     <th>{{ $header->name }}</th>
                 @endforeach
-
-                <th>Description</th>
-                {{-- <th>Amount</th> --}}
             </tr>
 
             @php
                 $totalHeaders = [];
-                $totalExpenseAmount = 0;
             @endphp
 
-            @foreach (getDynamicHeaders() as $singleHeader)
+            @foreach ($dynamicHeaders as $singleHeader)
                 @php
                     $totalHeaders[] = 0;
                 @endphp
@@ -84,23 +84,20 @@
             @foreach ($data as $key => $single)
                 @php
                     $expenseDescriptions = [];
-                    $expenseAmount = 0;
 
                     if (isset($headers_link[$single->id]['expenses'])) {
                         foreach ($headers_link[$single->id]['expenses'] as $exp) {
                             $expenseDescriptions[] = $exp['description'];
-                            $expenseAmount += (int) $exp['amount'];
                         }
                     }
-
-                    $totalExpenseAmount += $expenseAmount;
                 @endphp
 
+                {{-- Main values row --}}
                 <tr>
                     <td>{{ $key + 1 }}</td>
                     <td>{{ getBusName($single->closing[0]->bus_id) }}</td>
 
-                    @foreach (getDynamicHeaders() as $keyHeader => $singleHeader)
+                    @foreach ($dynamicHeaders as $keyHeader => $singleHeader)
                         @php
                             $headerValue = 0;
 
@@ -113,29 +110,32 @@
 
                         <td>{{ $headerValue }}</td>
                     @endforeach
+                </tr>
 
-                    <td class="text-left">
-                        @if (count($expenseDescriptions) > 0)
-                            {!! implode('<br>', $expenseDescriptions) !!}
-                        @else
-                            -
-                        @endif
-                    </td>
+                {{-- Description row --}}
+                <tr class="desc-row">
+                    <td></td>
+                    <td></td>
 
-                    {{-- <td>{{ $expenseAmount }}</td> --}}
+                    @foreach ($dynamicHeaders as $descIndex => $singleHeader)
+                        <td>
+                            @if (isset($expenseDescriptions[$descIndex]) && $expenseDescriptions[$descIndex] != '')
+                                ( {{ $expenseDescriptions[$descIndex] }} )
+                            @else
+                                ( - )
+                            @endif
+                        </td>
+                    @endforeach
                 </tr>
             @endforeach
 
+            {{-- Total row --}}
             <tr>
                 <th></th>
                 <th>Total</th>
-
                 @foreach ($totalHeaders as $j)
                     <th>{{ $j }}</th>
                 @endforeach
-
-                <th></th>
-                {{-- <th>{{ $totalExpenseAmount }}</th> --}}
             </tr>
         </table>
     </div>
