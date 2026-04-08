@@ -100,97 +100,103 @@ class ScheduleClosingController extends Controller
 
 
     public function unclosing(Request $request)
-{
-    if (!checkForSubmenu("closing")) {
-        return response()->json([
-            "Error" => ['You are not authorized to access this url']
-        ], 403);
-    }
-
-    $user = Auth::user();
-
-    // User allowed route ids
-    $allowedRouteIds = $user->route_ids;
-
-    if (is_string($allowedRouteIds)) {
-        $allowedRouteIds = json_decode($allowedRouteIds, true);
-    }
-
-    $allowedRouteIds = is_array($allowedRouteIds) ? $allowedRouteIds : [];
-
-    // Final route ids = user allowed routes
-    $finalRouteIds = $allowedRouteIds;
-
-    // If dropdownRoute exists then intersect with allowed routes
-    if ($request->filled('dropdownRoute')) {
-        $requestedRoute = (int) $request->dropdownRoute;
-
-        if (!$user->is_super_admin) {
-            $finalRouteIds = in_array($requestedRoute, $allowedRouteIds) ? [$requestedRoute] : [];
-        } else {
-            $finalRouteIds = [$requestedRoute];
+    {
+        if (!checkForSubmenu("closing")) {
+            return response()->json([
+                "Error" => ['You are not authorized to access this url']
+            ], 403);
         }
-    }
 
-    $query = TicketClosing::where('company_id', $user->company_id)
-        ->with([
-            "bus:id,bus_number",
-            "schedule:id,name,route_id",
-            "schedule.route:id,name"
-        ])
-        ->where([
-            "hide" => 0,
-            "commission_route" => 0
-        ]);
+        $user = Auth::user();
 
-    // Always apply allowed route filter
-    if (!$user->is_super_admin) {
-        if (empty($finalRouteIds)) {
-            $query->whereRaw('1 = 0');
-        } else {
+        // User allowed route ids
+        $allowedRouteIds = $user->route_ids;
+
+        if (is_string($allowedRouteIds)) {
+            $allowedRouteIds = json_decode($allowedRouteIds, true);
+        }
+
+        $allowedRouteIds = is_array($allowedRouteIds) ? $allowedRouteIds : [];
+
+        // Final route ids = user allowed routes
+        $finalRouteIds = $allowedRouteIds;
+
+        // If dropdownRoute exists then intersect with allowed routes
+        if ($request->filled('dropdownRoute')) {
+            $requestedRoute = (int) $request->dropdownRoute;
+
+            if (!$user->is_super_admin) {
+                $finalRouteIds = in_array($requestedRoute, $allowedRouteIds) ? [$requestedRoute] : [];
+            } else {
+                $finalRouteIds = [$requestedRoute];
+            }
+        }
+
+        $query = TicketClosing::where('company_id', $user->company_id)
+            ->with([
+                "bus:id,bus_number",
+                "schedule:id,name,route_id",
+                "schedule.route:id,name"
+            ])
+            ->where([
+                "hide" => 0,
+                "commission_route" => 0
+            ])
+            ->whereIn('ticket_merge_id', function ($q) use ($user) {
+                $q->select('ticket_merge_id')
+                    ->from('ticket_closings')
+                    ->where('company_id', $user->company_id)
+                    ->where('hide', 0)
+                    ->where('commission_route', 0)
+                    ->groupBy('ticket_merge_id')
+                    ->havingRaw('COUNT(*) = 1');
+            });
+
+        // Always apply allowed route filter
+        if (!$user->is_super_admin) {
+            if (empty($finalRouteIds)) {
+                $query->whereRaw('1 = 0');
+            } else {
+                $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
+                    $q->whereIn('route_id', $finalRouteIds);
+                });
+            }
+        } elseif (!empty($finalRouteIds)) {
+            // Super admin + dropdownRoute filter
             $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
                 $q->whereIn('route_id', $finalRouteIds);
             });
         }
-    } elseif (!empty($finalRouteIds)) {
-        // Super admin + dropdownRoute filter
-        $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
-            $q->whereIn('route_id', $finalRouteIds);
-        });
+
+        $buses = Bus::where('company_id', $user->company_id)
+            ->select('id', 'bus_number')
+            ->orderBy('bus_number')
+            ->get();
+
+        // Bus filter
+        if ($request->filled('bus_number')) {
+            $query->where('bus_id', $request->bus_number);
+        }
+
+        // Date range filter
+        if ($request->filled('from_date')) {
+            $query->whereDate('schedule_date', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('schedule_date', '<=', $request->to_date);
+        }
+
+        $closings = $query
+            ->orderBy('bus_id')
+            ->get()
+            ->groupBy('ticket_merge_id');
+
+        return response()->json([
+            "closings" => $closings,
+            "buses" => $buses
+        ]);
     }
-
-    $buses = Bus::where('company_id', $user->company_id)
-        ->select('id', 'bus_number')
-        ->orderBy('bus_number')
-        ->get();
-
-    // Bus filter
-    if ($request->filled('bus_number')) {
-        $query->where('bus_id', $request->bus_number);
-    }
-
-    // Date range filter
-    if ($request->filled('from_date')) {
-        $query->whereDate('schedule_date', '>=', $request->from_date);
-    }
-
-    if ($request->filled('to_date')) {
-        $query->whereDate('schedule_date', '<=', $request->to_date);
-    }
-
-    $closings = $query
-        ->orderBy('bus_id')
-        ->get()
-        ->groupBy('ticket_merge_id')
-        ->filter(function ($group) {
-            return $group->count() == 1;
-        });
-
-    return response()->json([
-        "closings" => $closings,
-        "buses" => $buses
-    ]);
-}
 
 
     public function commissionClosing(Request $request)
@@ -634,125 +640,125 @@ class ScheduleClosingController extends Controller
         }
     }
 
-   public function merges(Request $request)
-{
-    if (!checkForSubmenu("merges")) {
-        return response()->json([
-            "Error" => ['You are not authorized to access this url']
-        ], 403);
-    }
-
-    $user = Auth::user();
-
-    $allowedRouteIds = $user->route_ids;
-
-    if (is_string($allowedRouteIds)) {
-        $allowedRouteIds = json_decode($allowedRouteIds, true);
-    }
-
-    $allowedRouteIds = is_array($allowedRouteIds) ? array_map('intval', $allowedRouteIds) : [];
-
-    // Default
-    $finalRouteIds = $allowedRouteIds;
-
-    // Check requested routes
-    if ($request->route && count($request->route) > 0) {
-        $requestedRoutes = array_map('intval', $request->route);
-
-        if (!$user->is_super_admin) {
-            $invalidRoutes = array_diff($requestedRoutes, $allowedRouteIds);
-
-            if (!empty($invalidRoutes)) {
-                return response()->json([
-                    'Error' => ['You are not allowed to access these route ids'],
-                    'invalid_route_ids' => array_values($invalidRoutes)
-                ], 403);
-            }
+    public function merges(Request $request)
+    {
+        if (!checkForSubmenu("merges")) {
+            return response()->json([
+                "Error" => ['You are not authorized to access this url']
+            ], 403);
         }
 
-        $finalRouteIds = $requestedRoutes;
-    }
+        $user = Auth::user();
 
-    $query = TicketClosingMerge::where([
-        'company_id' => $user->company_id,
-        'schedule_complete' => 1
-    ])
-    ->with([
-        'tickets' => function ($q) use ($user, $finalRouteIds) {
-            $q->select('route_id', 'ticket_merge_id');
+        $allowedRouteIds = $user->route_ids;
 
-            if (!empty($finalRouteIds)) {
-                $q->whereIn('route_id', $finalRouteIds);
-            } elseif (!$user->is_super_admin) {
-                $q->whereRaw('1 = 0');
+        if (is_string($allowedRouteIds)) {
+            $allowedRouteIds = json_decode($allowedRouteIds, true);
+        }
+
+        $allowedRouteIds = is_array($allowedRouteIds) ? array_map('intval', $allowedRouteIds) : [];
+
+        // Default
+        $finalRouteIds = $allowedRouteIds;
+
+        // Check requested routes
+        if ($request->route && count($request->route) > 0) {
+            $requestedRoutes = array_map('intval', $request->route);
+
+            if (!$user->is_super_admin) {
+                $invalidRoutes = array_diff($requestedRoutes, $allowedRouteIds);
+
+                if (!empty($invalidRoutes)) {
+                    return response()->json([
+                        'Error' => ['You are not allowed to access these route ids'],
+                        'invalid_route_ids' => array_values($invalidRoutes)
+                    ], 403);
+                }
             }
-        },
-        'bus:id,bus_number',
-        'shortage:id,ticket_closing_id,terminal_id,shortage,total_receivable',
-        'closing:id,ticket_merge_id,schedule_id',
-        'closing.schedule:id,name'
-    ]);
 
-    // Restrict merges by requested/allowed routes
-    if (!empty($finalRouteIds)) {
-        $query->whereHas('tickets', function ($q) use ($finalRouteIds) {
-            $q->whereIn('route_id', $finalRouteIds);
-        });
-    } elseif (!$user->is_super_admin) {
-        $query->whereRaw('1 = 0');
+            $finalRouteIds = $requestedRoutes;
+        }
+
+        $query = TicketClosingMerge::where([
+            'company_id' => $user->company_id,
+            'schedule_complete' => 1
+        ])
+            ->with([
+                'tickets' => function ($q) use ($user, $finalRouteIds) {
+                    $q->select('route_id', 'ticket_merge_id');
+
+                    if (!empty($finalRouteIds)) {
+                        $q->whereIn('route_id', $finalRouteIds);
+                    } elseif (!$user->is_super_admin) {
+                        $q->whereRaw('1 = 0');
+                    }
+                },
+                'bus:id,bus_number',
+                'shortage:id,ticket_closing_id,terminal_id,shortage,total_receivable',
+                'closing:id,ticket_merge_id,schedule_id',
+                'closing.schedule:id,name'
+            ]);
+
+        // Restrict merges by requested/allowed routes
+        if (!empty($finalRouteIds)) {
+            $query->whereHas('tickets', function ($q) use ($finalRouteIds) {
+                $q->whereIn('route_id', $finalRouteIds);
+            });
+        } elseif (!$user->is_super_admin) {
+            $query->whereRaw('1 = 0');
+        }
+
+        if ($request->bus_number && count($request->bus_number) > 0) {
+            $query->whereIn('bus_id', $request->bus_number);
+        }
+
+        if ($request->schedule_name_start && count($request->schedule_name_start) > 0) {
+            $query->whereHas('closing.schedule', function ($q) use ($request) {
+                $q->whereIn('name', $request->schedule_name_start);
+            });
+        }
+
+        if ($request->schedule_name_end && count($request->schedule_name_end) > 0) {
+            $query->whereHas('closing.schedule', function ($q) use ($request) {
+                $q->whereIn('name', $request->schedule_name_end);
+            });
+        }
+
+        if ($request->from_date) {
+            $query->whereDate('schedule_departure_date', '>=', $request->from_date);
+        }
+
+        if ($request->to_date) {
+            $query->whereDate('schedule_departure_date', '<=', $request->to_date);
+        }
+
+        if ($request->closing_from_date) {
+            $query->whereDate('closing_date', '>=', $request->closing_from_date);
+        }
+
+        if ($request->closing_to_date) {
+            $query->whereDate('closing_date', '<=', $request->closing_to_date);
+        }
+
+        $merges = $query
+            ->withSum('shortage', 'total_receivable')
+            ->withSum('shortage', 'other_commission')
+            ->withSum('shortage', 'kt_commission')
+            ->withSum('expenses', 'amount')
+            ->get()
+            ->map(function ($item) {
+                $item->expenses_sum_amount =
+                    $item->shortage_sum_kt_commission +
+                    $item->shortage_sum_other_commission +
+                    $item->expenses_sum_amount;
+
+                return $item;
+            });
+
+        return [
+            'merges' => $merges
+        ];
     }
-
-    if ($request->bus_number && count($request->bus_number) > 0) {
-        $query->whereIn('bus_id', $request->bus_number);
-    }
-
-    if ($request->schedule_name_start && count($request->schedule_name_start) > 0) {
-        $query->whereHas('closing.schedule', function ($q) use ($request) {
-            $q->whereIn('name', $request->schedule_name_start);
-        });
-    }
-
-    if ($request->schedule_name_end && count($request->schedule_name_end) > 0) {
-        $query->whereHas('closing.schedule', function ($q) use ($request) {
-            $q->whereIn('name', $request->schedule_name_end);
-        });
-    }
-
-    if ($request->from_date) {
-        $query->whereDate('schedule_departure_date', '>=', $request->from_date);
-    }
-
-    if ($request->to_date) {
-        $query->whereDate('schedule_departure_date', '<=', $request->to_date);
-    }
-
-    if ($request->closing_from_date) {
-        $query->whereDate('closing_date', '>=', $request->closing_from_date);
-    }
-
-    if ($request->closing_to_date) {
-        $query->whereDate('closing_date', '<=', $request->closing_to_date);
-    }
-
-    $merges = $query
-        ->withSum('shortage', 'total_receivable')
-        ->withSum('shortage', 'other_commission')
-        ->withSum('shortage', 'kt_commission')
-        ->withSum('expenses', 'amount')
-        ->get()
-        ->map(function ($item) {
-            $item->expenses_sum_amount =
-                $item->shortage_sum_kt_commission +
-                $item->shortage_sum_other_commission +
-                $item->expenses_sum_amount;
-
-            return $item;
-        });
-
-    return [
-        'merges' => $merges
-    ];
-}
     public function buses()
     {
         $user = Auth::user();
@@ -955,173 +961,173 @@ class ScheduleClosingController extends Controller
     //     return view('reports.busMergeReport', ['data' => $data]);
     // }
 
-  public function mergesPdf(Request $request)
-{
-    if (!checkForSubmenu("merges")) {
-        return response()->json([
-            "Error" => ['You are not authorized to access this url']
-        ], 403);
-    }
-
-    $user = Auth::user();
-
-    $allowedRouteIds = $user->route_ids;
-
-    if (is_string($allowedRouteIds)) {
-        $allowedRouteIds = json_decode($allowedRouteIds, true);
-    }
-
-    $allowedRouteIds = is_array($allowedRouteIds) ? array_map('intval', $allowedRouteIds) : [];
-
-    // Default allowed routes
-    $finalRouteIds = $allowedRouteIds;
-
-    // Safely get requested routes from payload
-    $requestedRoutes = array_map('intval', (array) $request->input('route', []));
-
-    // Check requested routes
-    if (count($requestedRoutes) > 0) {
-        if (!$user->is_super_admin) {
-            $invalidRoutes = array_diff($requestedRoutes, $allowedRouteIds);
-
-            if (!empty($invalidRoutes)) {
-                return response()->json([
-                    'Error' => ['You are not allowed to access these route ids'],
-                    'invalid_route_ids' => array_values($invalidRoutes)
-                ], 403);
-            }
+    public function mergesPdf(Request $request)
+    {
+        if (!checkForSubmenu("merges")) {
+            return response()->json([
+                "Error" => ['You are not authorized to access this url']
+            ], 403);
         }
 
-        $finalRouteIds = $requestedRoutes;
-    }
+        $user = Auth::user();
 
-    $mergesQuery = TicketClosingMerge::where([
-        'company_id' => $user->company_id,
-        'schedule_complete' => 1
-    ]);
+        $allowedRouteIds = $user->route_ids;
 
-    // Restrict by requested/allowed routes
-    if (!empty($finalRouteIds)) {
-        $mergesQuery->whereHas('tickets', function ($q) use ($finalRouteIds) {
-            $q->whereIn('route_id', $finalRouteIds);
-        });
-    } elseif (!$user->is_super_admin) {
-        $mergesQuery->whereRaw('1 = 0');
-    }
+        if (is_string($allowedRouteIds)) {
+            $allowedRouteIds = json_decode($allowedRouteIds, true);
+        }
 
-    // Bus filter
-    $busNumbers = (array) $request->input('bus_number', []);
-    if (count($busNumbers) > 0) {
-        $mergesQuery->whereIn('bus_id', $busNumbers);
-    }
+        $allowedRouteIds = is_array($allowedRouteIds) ? array_map('intval', $allowedRouteIds) : [];
 
-    if ($request->from_date) {
-        $mergesQuery->whereDate('schedule_departure_date', '>=', $request->from_date);
-    }
+        // Default allowed routes
+        $finalRouteIds = $allowedRouteIds;
 
-    if ($request->to_date) {
-        $mergesQuery->whereDate('schedule_departure_date', '<=', $request->to_date);
-    }
+        // Safely get requested routes from payload
+        $requestedRoutes = array_map('intval', (array) $request->input('route', []));
 
-    if ($request->closing_from_date) {
-        $mergesQuery->whereDate('closing_date', '>=', $request->closing_from_date);
-    }
+        // Check requested routes
+        if (count($requestedRoutes) > 0) {
+            if (!$user->is_super_admin) {
+                $invalidRoutes = array_diff($requestedRoutes, $allowedRouteIds);
 
-    if ($request->closing_to_date) {
-        $mergesQuery->whereDate('closing_date', '<=', $request->closing_to_date);
-    }
+                if (!empty($invalidRoutes)) {
+                    return response()->json([
+                        'Error' => ['You are not allowed to access these route ids'],
+                        'invalid_route_ids' => array_values($invalidRoutes)
+                    ], 403);
+                }
+            }
 
-    // Schedule Name Start
-    $scheduleNameStart = (array) $request->input('schedule_name_start', []);
-    if (count($scheduleNameStart) > 0) {
-        $mergesQuery->whereHas('closing.schedule', function ($sub) use ($scheduleNameStart) {
-            $sub->whereIn('name', $scheduleNameStart);
-        });
-    }
+            $finalRouteIds = $requestedRoutes;
+        }
 
-    // Schedule Name End
-    $scheduleNameEnd = (array) $request->input('schedule_name_end', []);
-    if (count($scheduleNameEnd) > 0) {
-        $mergesQuery->whereHas('closing.schedule', function ($sub) use ($scheduleNameEnd) {
-            $sub->whereIn('name', $scheduleNameEnd);
-        });
-    }
+        $mergesQuery = TicketClosingMerge::where([
+            'company_id' => $user->company_id,
+            'schedule_complete' => 1
+        ]);
 
-    $merges = $mergesQuery->pluck('id');
-
-    $results = TicketClosingShortage::with([
-        'bus:id,bus_number',
-        'terminal:id,name,is_online_terminal',
-        'ticket_closing_merge.expenses',
-        'route'
-    ])
-        ->whereIn('ticket_closing_id', $merges)
-        ->when(!empty($finalRouteIds), function ($q) use ($finalRouteIds) {
-            $q->whereIn('route_id', $finalRouteIds);
-        })
-        ->get();
-
-    $dynamicTypes = $results->where('terminal.is_online_terminal', 1)
-        ->pluck('terminal.name')
-        ->unique()
-        ->filter()
-        ->values();
-
-    $mappedResults = $results->groupBy('ticket_closing_id')
-        ->map(function ($group) use ($dynamicTypes) {
-            $first = $group->first();
-
-            $onlineGroup = $group->where('terminal.is_online_terminal', 1);
-            $offlineGroup = $group->where('terminal.is_online_terminal', 0);
-
-            $totalExpense = $group->unique('ticket_closing_id')->sum(function ($item) {
-                return optional($item->ticket_closing_merge)->expenses->sum('amount') ?? 0;
+        // Restrict by requested/allowed routes
+        if (!empty($finalRouteIds)) {
+            $mergesQuery->whereHas('tickets', function ($q) use ($finalRouteIds) {
+                $q->whereIn('route_id', $finalRouteIds);
             });
+        } elseif (!$user->is_super_admin) {
+            $mergesQuery->whereRaw('1 = 0');
+        }
 
-            $totalOnlineSale = $group->sum('total_receivable');
-            $totalReceivedBank = $offlineGroup->sum('total_received_bank');
-            $totalOtherCommission = $group->sum('other_commission');
-            $totalKtCommission = $group->sum('kt_commission');
+        // Bus filter
+        $busNumbers = (array) $request->input('bus_number', []);
+        if (count($busNumbers) > 0) {
+            $mergesQuery->whereIn('bus_id', $busNumbers);
+        }
 
-            $totalExpense += $totalKtCommission + $totalOtherCommission;
+        if ($request->from_date) {
+            $mergesQuery->whereDate('schedule_departure_date', '>=', $request->from_date);
+        }
 
-            $data = [
-                'bus_no'              => $first->bus->bus_number ?? 'N/A',
-                'route'               => $first->route->name ?? 'N/A',
-                'total_received_bank' => $totalReceivedBank,
-                'sale'                => $totalOnlineSale,
-                'expense'             => $totalExpense,
-                'net_sale'            => $totalOnlineSale - $totalExpense,
-            ];
+        if ($request->to_date) {
+            $mergesQuery->whereDate('schedule_departure_date', '<=', $request->to_date);
+        }
 
-            $totalOnlinePortalsAmount = 0;
+        if ($request->closing_from_date) {
+            $mergesQuery->whereDate('closing_date', '>=', $request->closing_from_date);
+        }
 
-            foreach ($dynamicTypes as $terminalName) {
-                $amount = $onlineGroup
-                    ->where('terminal.name', $terminalName)
-                    ->sum(function ($item) {
-                        return ($item->received ?? 0);
-                    });
+        if ($request->closing_to_date) {
+            $mergesQuery->whereDate('closing_date', '<=', $request->closing_to_date);
+        }
 
-                $data['types'][$terminalName] = $amount;
-                $totalOnlinePortalsAmount += $amount;
-            }
+        // Schedule Name Start
+        $scheduleNameStart = (array) $request->input('schedule_name_start', []);
+        if (count($scheduleNameStart) > 0) {
+            $mergesQuery->whereHas('closing.schedule', function ($sub) use ($scheduleNameStart) {
+                $sub->whereIn('name', $scheduleNameStart);
+            });
+        }
 
-            $data['net_cash'] = $data['net_sale'] - $totalOnlinePortalsAmount;
+        // Schedule Name End
+        $scheduleNameEnd = (array) $request->input('schedule_name_end', []);
+        if (count($scheduleNameEnd) > 0) {
+            $mergesQuery->whereHas('closing.schedule', function ($sub) use ($scheduleNameEnd) {
+                $sub->whereIn('name', $scheduleNameEnd);
+            });
+        }
 
-            return $data;
-        })
-        ->values();
+        $merges = $mergesQuery->pluck('id');
 
-    $creditExpenses = TicketMergeExpense::with('expense_category:id,name')
-        ->whereColumn('amount', '!=', 'paid')
-        ->whereIn('ticket_merge_id', $merges)
-        ->whereHas('expense_category', function ($query) {
-            $query->where('include_in_closing', '1');
-        })
-        ->get();
+        $results = TicketClosingShortage::with([
+            'bus:id,bus_number',
+            'terminal:id,name,is_online_terminal',
+            'ticket_closing_merge.expenses',
+            'route'
+        ])
+            ->whereIn('ticket_closing_id', $merges)
+            ->when(!empty($finalRouteIds), function ($q) use ($finalRouteIds) {
+                $q->whereIn('route_id', $finalRouteIds);
+            })
+            ->get();
 
-    $totalCounterExpense = CounterExpense::where(function ($q) use ($request) {
+        $dynamicTypes = $results->where('terminal.is_online_terminal', 1)
+            ->pluck('terminal.name')
+            ->unique()
+            ->filter()
+            ->values();
+
+        $mappedResults = $results->groupBy('ticket_closing_id')
+            ->map(function ($group) use ($dynamicTypes) {
+                $first = $group->first();
+
+                $onlineGroup = $group->where('terminal.is_online_terminal', 1);
+                $offlineGroup = $group->where('terminal.is_online_terminal', 0);
+
+                $totalExpense = $group->unique('ticket_closing_id')->sum(function ($item) {
+                    return optional($item->ticket_closing_merge)->expenses->sum('amount') ?? 0;
+                });
+
+                $totalOnlineSale = $group->sum('total_receivable');
+                $totalReceivedBank = $offlineGroup->sum('total_received_bank');
+                $totalOtherCommission = $group->sum('other_commission');
+                $totalKtCommission = $group->sum('kt_commission');
+
+                $totalExpense += $totalKtCommission + $totalOtherCommission;
+
+                $data = [
+                    'bus_no'              => $first->bus->bus_number ?? 'N/A',
+                    'route'               => $first->route->name ?? 'N/A',
+                    'total_received_bank' => $totalReceivedBank,
+                    'sale'                => $totalOnlineSale,
+                    'expense'             => $totalExpense,
+                    'net_sale'            => $totalOnlineSale - $totalExpense,
+                ];
+
+                $totalOnlinePortalsAmount = 0;
+
+                foreach ($dynamicTypes as $terminalName) {
+                    $amount = $onlineGroup
+                        ->where('terminal.name', $terminalName)
+                        ->sum(function ($item) {
+                            return ($item->received ?? 0);
+                        });
+
+                    $data['types'][$terminalName] = $amount;
+                    $totalOnlinePortalsAmount += $amount;
+                }
+
+                $data['net_cash'] = $data['net_sale'] - $totalOnlinePortalsAmount;
+
+                return $data;
+            })
+            ->values();
+
+        $creditExpenses = TicketMergeExpense::with('expense_category:id,name')
+            ->whereColumn('amount', '!=', 'paid')
+            ->whereIn('ticket_merge_id', $merges)
+            ->whereHas('expense_category', function ($query) {
+                $query->where('include_in_closing', '1');
+            })
+            ->get();
+
+        $totalCounterExpense = CounterExpense::where(function ($q) use ($request) {
             if ($request->closing_from_date) {
                 $q->whereDate('date', '>=', $request->closing_from_date);
             }
@@ -1130,10 +1136,10 @@ class ScheduleClosingController extends Controller
                 $q->whereDate('date', '<=', $request->closing_to_date);
             }
         })
-        ->where('type', 'expense')
-        ->sum('total');
+            ->where('type', 'expense')
+            ->sum('total');
 
-    $totalCounterIncome = CounterExpense::where(function ($q) use ($request) {
+        $totalCounterIncome = CounterExpense::where(function ($q) use ($request) {
             if ($request->closing_from_date) {
                 $q->whereDate('date', '>=', $request->closing_from_date);
             }
@@ -1142,204 +1148,205 @@ class ScheduleClosingController extends Controller
                 $q->whereDate('date', '<=', $request->closing_to_date);
             }
         })
-        ->where('type', 'income')
-        ->sum('total');
+            ->where('type', 'income')
+            ->sum('total');
 
-    $totalKtCommission = TicketClosingShortage::whereIn('ticket_closing_id', $merges)
-        ->when(!empty($finalRouteIds), function ($q) use ($finalRouteIds) {
-            $q->whereIn('route_id', $finalRouteIds);
-        })
-        ->sum('kt_commission');
+        $totalKtCommission = TicketClosingShortage::whereIn('ticket_closing_id', $merges)
+            ->when(!empty($finalRouteIds), function ($q) use ($finalRouteIds) {
+                $q->whereIn('route_id', $finalRouteIds);
+            })
+            ->sum('kt_commission');
 
-    $totalReceivedBank = TicketClosingShortage::whereIn('ticket_closing_id', $merges)
-        ->when(!empty($finalRouteIds), function ($q) use ($finalRouteIds) {
-            $q->whereIn('route_id', $finalRouteIds);
-        })
-        ->whereHas('terminal', function ($query) {
-            $query->where('is_online_terminal', 0);
-        })
-        ->sum('total_received_bank');
+        $totalReceivedBank = TicketClosingShortage::whereIn('ticket_closing_id', $merges)
+            ->when(!empty($finalRouteIds), function ($q) use ($finalRouteIds) {
+                $q->whereIn('route_id', $finalRouteIds);
+            })
+            ->whereHas('terminal', function ($query) {
+                $query->where('is_online_terminal', 0);
+            })
+            ->sum('total_received_bank');
 
-    $data = [
-        'dynamicTypes'        => $dynamicTypes,
-        'merges'              => $mappedResults,
-        'closing_from_date'   => $request->closing_from_date,
-        'closing_to_date'     => $request->closing_to_date,
-        'expenses'            => $creditExpenses,
-        'totalCounterExpense' => $totalCounterExpense,
-        'totalCounterIncome'  => $totalCounterIncome,
-        'totalKtCommission'   => $totalKtCommission,
-        'totalReceivedBank'   => $totalReceivedBank
-    ];
+        $data = [
+            'dynamicTypes'        => $dynamicTypes,
+            'merges'              => $mappedResults,
+            'closing_from_date'   => $request->closing_from_date,
+            'closing_to_date'     => $request->closing_to_date,
+            'expenses'            => $creditExpenses,
+            'totalCounterExpense' => $totalCounterExpense,
+            'totalCounterIncome'  => $totalCounterIncome,
+            'totalKtCommission'   => $totalKtCommission,
+            'totalReceivedBank'   => $totalReceivedBank
+        ];
 
-    return view('reports.busMergeReport', ['data' => $data]);
-}
+        return view('reports.busMergeReport', ['data' => $data]);
+    }
     public function mergesUrduPdf(Request $request)
-    { if (!checkForSubmenu("merges")) {
-        return response()->json([
-            "Error" => ['You are not authorized to access this url']
-        ], 403);
-    }
-
-    $user = Auth::user();
-
-    $allowedRouteIds = $user->route_ids;
-
-    if (is_string($allowedRouteIds)) {
-        $allowedRouteIds = json_decode($allowedRouteIds, true);
-    }
-
-    $allowedRouteIds = is_array($allowedRouteIds) ? array_map('intval', $allowedRouteIds) : [];
-
-    // Default allowed routes
-    $finalRouteIds = $allowedRouteIds;
-
-    // Safely get requested routes from payload
-    $requestedRoutes = array_map('intval', (array) $request->input('route', []));
-
-    // Check requested routes
-    if (count($requestedRoutes) > 0) {
-        if (!$user->is_super_admin) {
-            $invalidRoutes = array_diff($requestedRoutes, $allowedRouteIds);
-
-            if (!empty($invalidRoutes)) {
-                return response()->json([
-                    'Error' => ['You are not allowed to access these route ids'],
-                    'invalid_route_ids' => array_values($invalidRoutes)
-                ], 403);
-            }
+    {
+        if (!checkForSubmenu("merges")) {
+            return response()->json([
+                "Error" => ['You are not authorized to access this url']
+            ], 403);
         }
 
-        $finalRouteIds = $requestedRoutes;
-    }
+        $user = Auth::user();
 
-    $mergesQuery = TicketClosingMerge::where([
-        'company_id' => $user->company_id,
-        'schedule_complete' => 1
-    ]);
+        $allowedRouteIds = $user->route_ids;
 
-    // Restrict by requested/allowed routes
-    if (!empty($finalRouteIds)) {
-        $mergesQuery->whereHas('tickets', function ($q) use ($finalRouteIds) {
-            $q->whereIn('route_id', $finalRouteIds);
-        });
-    } elseif (!$user->is_super_admin) {
-        $mergesQuery->whereRaw('1 = 0');
-    }
+        if (is_string($allowedRouteIds)) {
+            $allowedRouteIds = json_decode($allowedRouteIds, true);
+        }
 
-    // Bus filter
-    $busNumbers = (array) $request->input('bus_number', []);
-    if (count($busNumbers) > 0) {
-        $mergesQuery->whereIn('bus_id', $busNumbers);
-    }
+        $allowedRouteIds = is_array($allowedRouteIds) ? array_map('intval', $allowedRouteIds) : [];
 
-    if ($request->from_date) {
-        $mergesQuery->whereDate('schedule_departure_date', '>=', $request->from_date);
-    }
+        // Default allowed routes
+        $finalRouteIds = $allowedRouteIds;
 
-    if ($request->to_date) {
-        $mergesQuery->whereDate('schedule_departure_date', '<=', $request->to_date);
-    }
+        // Safely get requested routes from payload
+        $requestedRoutes = array_map('intval', (array) $request->input('route', []));
 
-    if ($request->closing_from_date) {
-        $mergesQuery->whereDate('closing_date', '>=', $request->closing_from_date);
-    }
+        // Check requested routes
+        if (count($requestedRoutes) > 0) {
+            if (!$user->is_super_admin) {
+                $invalidRoutes = array_diff($requestedRoutes, $allowedRouteIds);
 
-    if ($request->closing_to_date) {
-        $mergesQuery->whereDate('closing_date', '<=', $request->closing_to_date);
-    }
+                if (!empty($invalidRoutes)) {
+                    return response()->json([
+                        'Error' => ['You are not allowed to access these route ids'],
+                        'invalid_route_ids' => array_values($invalidRoutes)
+                    ], 403);
+                }
+            }
 
-    // Schedule Name Start
-    $scheduleNameStart = (array) $request->input('schedule_name_start', []);
-    if (count($scheduleNameStart) > 0) {
-        $mergesQuery->whereHas('closing.schedule', function ($sub) use ($scheduleNameStart) {
-            $sub->whereIn('name', $scheduleNameStart);
-        });
-    }
+            $finalRouteIds = $requestedRoutes;
+        }
 
-    // Schedule Name End
-    $scheduleNameEnd = (array) $request->input('schedule_name_end', []);
-    if (count($scheduleNameEnd) > 0) {
-        $mergesQuery->whereHas('closing.schedule', function ($sub) use ($scheduleNameEnd) {
-            $sub->whereIn('name', $scheduleNameEnd);
-        });
-    }
+        $mergesQuery = TicketClosingMerge::where([
+            'company_id' => $user->company_id,
+            'schedule_complete' => 1
+        ]);
 
-    $merges = $mergesQuery->pluck('id');
-
-    $results = TicketClosingShortage::with([
-        'bus:id,bus_number',
-        'terminal:id,name,is_online_terminal',
-        'ticket_closing_merge.expenses',
-        'route'
-    ])
-        ->whereIn('ticket_closing_id', $merges)
-        ->when(!empty($finalRouteIds), function ($q) use ($finalRouteIds) {
-            $q->whereIn('route_id', $finalRouteIds);
-        })
-        ->get();
-
-    $dynamicTypes = $results->where('terminal.is_online_terminal', 1)
-        ->pluck('terminal.name')
-        ->unique()
-        ->filter()
-        ->values();
-
-    $mappedResults = $results->groupBy('ticket_closing_id')
-        ->map(function ($group) use ($dynamicTypes) {
-            $first = $group->first();
-
-            $onlineGroup = $group->where('terminal.is_online_terminal', 1);
-            $offlineGroup = $group->where('terminal.is_online_terminal', 0);
-
-            $totalExpense = $group->unique('ticket_closing_id')->sum(function ($item) {
-                return optional($item->ticket_closing_merge)->expenses->sum('amount') ?? 0;
+        // Restrict by requested/allowed routes
+        if (!empty($finalRouteIds)) {
+            $mergesQuery->whereHas('tickets', function ($q) use ($finalRouteIds) {
+                $q->whereIn('route_id', $finalRouteIds);
             });
+        } elseif (!$user->is_super_admin) {
+            $mergesQuery->whereRaw('1 = 0');
+        }
 
-            $totalOnlineSale = $group->sum('total_receivable');
-            $totalReceivedBank = $offlineGroup->sum('total_received_bank');
-            $totalOtherCommission = $group->sum('other_commission');
-            $totalKtCommission = $group->sum('kt_commission');
+        // Bus filter
+        $busNumbers = (array) $request->input('bus_number', []);
+        if (count($busNumbers) > 0) {
+            $mergesQuery->whereIn('bus_id', $busNumbers);
+        }
 
-            $totalExpense += $totalKtCommission + $totalOtherCommission;
+        if ($request->from_date) {
+            $mergesQuery->whereDate('schedule_departure_date', '>=', $request->from_date);
+        }
 
-            $data = [
-                'bus_no'              => $first->bus->bus_number ?? 'N/A',
-                'route'               => $first->route->name ?? 'N/A',
-                'total_received_bank' => $totalReceivedBank,
-                'sale'                => $totalOnlineSale,
-                'expense'             => $totalExpense,
-                'net_sale'            => $totalOnlineSale - $totalExpense,
-            ];
+        if ($request->to_date) {
+            $mergesQuery->whereDate('schedule_departure_date', '<=', $request->to_date);
+        }
 
-            $totalOnlinePortalsAmount = 0;
+        if ($request->closing_from_date) {
+            $mergesQuery->whereDate('closing_date', '>=', $request->closing_from_date);
+        }
 
-            foreach ($dynamicTypes as $terminalName) {
-                $amount = $onlineGroup
-                    ->where('terminal.name', $terminalName)
-                    ->sum(function ($item) {
-                        return ($item->received ?? 0);
-                    });
+        if ($request->closing_to_date) {
+            $mergesQuery->whereDate('closing_date', '<=', $request->closing_to_date);
+        }
 
-                $data['types'][$terminalName] = $amount;
-                $totalOnlinePortalsAmount += $amount;
-            }
+        // Schedule Name Start
+        $scheduleNameStart = (array) $request->input('schedule_name_start', []);
+        if (count($scheduleNameStart) > 0) {
+            $mergesQuery->whereHas('closing.schedule', function ($sub) use ($scheduleNameStart) {
+                $sub->whereIn('name', $scheduleNameStart);
+            });
+        }
 
-            $data['net_cash'] = $data['net_sale'] - $totalOnlinePortalsAmount;
+        // Schedule Name End
+        $scheduleNameEnd = (array) $request->input('schedule_name_end', []);
+        if (count($scheduleNameEnd) > 0) {
+            $mergesQuery->whereHas('closing.schedule', function ($sub) use ($scheduleNameEnd) {
+                $sub->whereIn('name', $scheduleNameEnd);
+            });
+        }
 
-            return $data;
-        })
-        ->values();
+        $merges = $mergesQuery->pluck('id');
 
-    $creditExpenses = TicketMergeExpense::with('expense_category:id,name')
-        ->whereColumn('amount', '!=', 'paid')
-        ->whereIn('ticket_merge_id', $merges)
-        ->whereHas('expense_category', function ($query) {
-            $query->where('include_in_closing', '1');
-        })
-        ->get();
+        $results = TicketClosingShortage::with([
+            'bus:id,bus_number',
+            'terminal:id,name,is_online_terminal',
+            'ticket_closing_merge.expenses',
+            'route'
+        ])
+            ->whereIn('ticket_closing_id', $merges)
+            ->when(!empty($finalRouteIds), function ($q) use ($finalRouteIds) {
+                $q->whereIn('route_id', $finalRouteIds);
+            })
+            ->get();
 
-    $totalCounterExpense = CounterExpense::where(function ($q) use ($request) {
+        $dynamicTypes = $results->where('terminal.is_online_terminal', 1)
+            ->pluck('terminal.name')
+            ->unique()
+            ->filter()
+            ->values();
+
+        $mappedResults = $results->groupBy('ticket_closing_id')
+            ->map(function ($group) use ($dynamicTypes) {
+                $first = $group->first();
+
+                $onlineGroup = $group->where('terminal.is_online_terminal', 1);
+                $offlineGroup = $group->where('terminal.is_online_terminal', 0);
+
+                $totalExpense = $group->unique('ticket_closing_id')->sum(function ($item) {
+                    return optional($item->ticket_closing_merge)->expenses->sum('amount') ?? 0;
+                });
+
+                $totalOnlineSale = $group->sum('total_receivable');
+                $totalReceivedBank = $offlineGroup->sum('total_received_bank');
+                $totalOtherCommission = $group->sum('other_commission');
+                $totalKtCommission = $group->sum('kt_commission');
+
+                $totalExpense += $totalKtCommission + $totalOtherCommission;
+
+                $data = [
+                    'bus_no'              => $first->bus->bus_number ?? 'N/A',
+                    'route'               => $first->route->name ?? 'N/A',
+                    'total_received_bank' => $totalReceivedBank,
+                    'sale'                => $totalOnlineSale,
+                    'expense'             => $totalExpense,
+                    'net_sale'            => $totalOnlineSale - $totalExpense,
+                ];
+
+                $totalOnlinePortalsAmount = 0;
+
+                foreach ($dynamicTypes as $terminalName) {
+                    $amount = $onlineGroup
+                        ->where('terminal.name', $terminalName)
+                        ->sum(function ($item) {
+                            return ($item->received ?? 0);
+                        });
+
+                    $data['types'][$terminalName] = $amount;
+                    $totalOnlinePortalsAmount += $amount;
+                }
+
+                $data['net_cash'] = $data['net_sale'] - $totalOnlinePortalsAmount;
+
+                return $data;
+            })
+            ->values();
+
+        $creditExpenses = TicketMergeExpense::with('expense_category:id,name')
+            ->whereColumn('amount', '!=', 'paid')
+            ->whereIn('ticket_merge_id', $merges)
+            ->whereHas('expense_category', function ($query) {
+                $query->where('include_in_closing', '1');
+            })
+            ->get();
+
+        $totalCounterExpense = CounterExpense::where(function ($q) use ($request) {
             if ($request->closing_from_date) {
                 $q->whereDate('date', '>=', $request->closing_from_date);
             }
@@ -1348,10 +1355,10 @@ class ScheduleClosingController extends Controller
                 $q->whereDate('date', '<=', $request->closing_to_date);
             }
         })
-        ->where('type', 'expense')
-        ->sum('total');
+            ->where('type', 'expense')
+            ->sum('total');
 
-    $totalCounterIncome = CounterExpense::where(function ($q) use ($request) {
+        $totalCounterIncome = CounterExpense::where(function ($q) use ($request) {
             if ($request->closing_from_date) {
                 $q->whereDate('date', '>=', $request->closing_from_date);
             }
@@ -1360,35 +1367,35 @@ class ScheduleClosingController extends Controller
                 $q->whereDate('date', '<=', $request->closing_to_date);
             }
         })
-        ->where('type', 'income')
-        ->sum('total');
+            ->where('type', 'income')
+            ->sum('total');
 
-    $totalKtCommission = TicketClosingShortage::whereIn('ticket_closing_id', $merges)
-        ->when(!empty($finalRouteIds), function ($q) use ($finalRouteIds) {
-            $q->whereIn('route_id', $finalRouteIds);
-        })
-        ->sum('kt_commission');
+        $totalKtCommission = TicketClosingShortage::whereIn('ticket_closing_id', $merges)
+            ->when(!empty($finalRouteIds), function ($q) use ($finalRouteIds) {
+                $q->whereIn('route_id', $finalRouteIds);
+            })
+            ->sum('kt_commission');
 
-    $totalReceivedBank = TicketClosingShortage::whereIn('ticket_closing_id', $merges)
-        ->when(!empty($finalRouteIds), function ($q) use ($finalRouteIds) {
-            $q->whereIn('route_id', $finalRouteIds);
-        })
-        ->whereHas('terminal', function ($query) {
-            $query->where('is_online_terminal', 0);
-        })
-        ->sum('total_received_bank');
+        $totalReceivedBank = TicketClosingShortage::whereIn('ticket_closing_id', $merges)
+            ->when(!empty($finalRouteIds), function ($q) use ($finalRouteIds) {
+                $q->whereIn('route_id', $finalRouteIds);
+            })
+            ->whereHas('terminal', function ($query) {
+                $query->where('is_online_terminal', 0);
+            })
+            ->sum('total_received_bank');
 
-    $data = [
-        'dynamicTypes'        => $dynamicTypes,
-        'merges'              => $mappedResults,
-        'closing_from_date'   => $request->closing_from_date,
-        'closing_to_date'     => $request->closing_to_date,
-        'expenses'            => $creditExpenses,
-        'totalCounterExpense' => $totalCounterExpense,
-        'totalCounterIncome'  => $totalCounterIncome,
-        'totalKtCommission'   => $totalKtCommission,
-        'totalReceivedBank'   => $totalReceivedBank
-    ];
+        $data = [
+            'dynamicTypes'        => $dynamicTypes,
+            'merges'              => $mappedResults,
+            'closing_from_date'   => $request->closing_from_date,
+            'closing_to_date'     => $request->closing_to_date,
+            'expenses'            => $creditExpenses,
+            'totalCounterExpense' => $totalCounterExpense,
+            'totalCounterIncome'  => $totalCounterIncome,
+            'totalKtCommission'   => $totalKtCommission,
+            'totalReceivedBank'   => $totalReceivedBank
+        ];
 
 
         return view('reports.busMergeReportUrdu', ['data' => $data]);
