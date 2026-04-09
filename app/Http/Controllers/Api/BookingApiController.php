@@ -667,7 +667,12 @@ class BookingApiController extends Controller
                             $error = ["Please Enter Valid Amount"];
                             return new ConflictResource($error);
                         }
-
+                        if (isset($request->only_transaction_id)) {
+                            Ticket::where("invoice_id", $request->invoice_id)->update([
+                                'transaction_id' => $request->transaction_id,
+                            ]);
+                            return 'Transaction id updated';
+                        }
                         Ticket::where("invoice_id", $request->invoice_id)->update([
                             'type' => 'booked',
                             'updated_by' => Auth::user()->id,
@@ -953,17 +958,17 @@ class BookingApiController extends Controller
                 optional($lock)->release();
             }
         } catch (\Exception $e) {
-              Log::error('Break error', [
-        'message' => $e->getMessage(),
-        'file'    => $e->getFile(),
-        'line'    => $e->getLine(),
-        'trace'   => $e->getTraceAsString(),
-    ]);
+            Log::error('Break error', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
 
-    return new BreakResource([
-        'message' => $e->getMessage(),
-        'line'    => $e->getLine(),
-    ]);
+            return new BreakResource([
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+            ]);
         }
     }
 }
