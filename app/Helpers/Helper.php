@@ -37,7 +37,80 @@ use Illuminate\Support\Facades\Log;
 use Rawilk\Printing\Facades\Printing;
 use Rawilk\Printing\Receipts\ReceiptPrinter;
 
+if (!function_exists('confirmJazzcashPendingPayment')) {
+    function confirmJazzcashPendingPayment($txnRefNo)
+    {
+        $data = [
+            "pp_MerchantID" => jazzcash()->merchant,
+            "pp_Password" => jazzcash()->password,
+            "pp_TxnRefNo" => $txnRefNo,
+        ];
+        // Sort data keys by ASCII
+        ksort($data);
+        // Concatenate
+        $concatenatedString = jazzcash()->salt;
+        foreach ($data as $key => $value) {
+            $concatenatedString .= "&$value";
+        }
+        // return $concatenatedString;
+        $secureHash = hash_hmac('sha256', $concatenatedString, jazzcash()->salt);
+        $data["pp_SecureHash"] = $secureHash;
 
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post(jazzcash()->statusUrl, $data);
+
+            $response = json_decode(json_encode($response->json()));
+
+            if ($response->pp_PaymentResponseCode === "121") {
+                return (object)[
+                    "status" => true,
+                    "response" => $response
+                ];
+            } else {
+                return (object)[
+                    "status" => false,
+                    "response" => $response
+                ];
+            }
+        } catch (\Exception $e) {
+            return (object)[
+                "status" => false,
+                "response" => $e->getMessage()
+            ];
+        }
+    }
+}
+if (!function_exists('jazzcash')) {
+    function jazzcash()
+    {
+        // live url
+        return (object) [
+            // "returnUrl" => '',
+            "redirectionUrl" => 'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/CustomerPortal/transactionmanagement/merchantform',
+            // with cnic
+            "walletUrl" => 'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v2/rest/payments/m-wallet',
+
+            "statusUrl" => 'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v2/rest/payments/status/inquiry',
+            "salt" => '8335zz8zuu',
+            "merchant" => '00151726',
+            "password" => 'vs8z12syy0',
+        ];
+
+
+        // sandobx url malik.rehman7272
+        // return (object) [
+        //     "returnUrl" => '',
+        //     "redirectionUrl" => 'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/CustomerPortal/transactionmanagement/merchantform',
+        //     "walletUrl" => 'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v2/rest/payments/m-wallet',
+        //     "statusUrl" => 'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v2/rest/payments/status/inquiry',
+        //     "salt" => 'ces2y7499t',
+        //     "merchant" => 'MC990110',
+        //     "password" => 'rld04xm066',
+        // ];
+    }
+}
 if (!function_exists('checkForSubmenu')) {
     function checkForSubmenu($moduleName)
     {
@@ -920,7 +993,7 @@ Is shifted to
 
 Seat# $new_seats,
 " . $new_detail->departure_city->name . " to " . $new_detail->destination_city->name . "
-Date " . $new_detail->date . " 
+Date " . $new_detail->date . "
 $new_html
 " . $cancelMessage . "
 
@@ -1050,7 +1123,7 @@ if (!function_exists('sendMessageToAllBus')) {
             $mobile = "92" . substr($customer->contact, -10);
             $session = $names[$randomNumber];
             $messageConfirmed = "*$request->title*
-            
+
 $request->body";
 
 
@@ -1094,14 +1167,14 @@ if (!function_exists('sendOtpForTicket')) {
                 3 => 'Hamza_4-Device3-204-samsung-a20',
                 4 => 'Hamza_4-Device4',
                 5 => 'Hamza_4-Device-5'
-               
+
             ];
-            
+
             $url = "https://whatsapp.sarzone.com/api/send-messages";
             $mobile = "92" . substr($customer->contact, -10);
             $message = "Your OTP for verification is $otp";
             $session = $names[5];
-            
+
             $response = Http::withHeaders([
                'X-Api-Key' => $auth_key,
             ])->post($url, [
@@ -1145,14 +1218,14 @@ if (!function_exists('sendDiscountOtpForTicket')) {
                 3 => 'Hamza_4-Device3-204-samsung-a20',
                 4 => 'Hamza_4-Device4',
                 5 => 'Hamza_4-Device-5'
-                
+
             ];
-            
+
             $url = "https://whatsapp.sarzone.com/api/send-messages";
             $mobile = "92" . substr($customer->contact, -10);
             $message = "Your OTP for verification is $otp";
             $session = $names[5];
-            
+
             $response = Http::withHeaders([
                'X-Api-Key' => $auth_key,
             ])->post($url, [
