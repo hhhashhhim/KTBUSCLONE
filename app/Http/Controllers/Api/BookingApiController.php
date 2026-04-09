@@ -44,14 +44,18 @@ use Illuminate\Support\Facades\Log;
 class BookingApiController extends Controller
 {
 
-    public function updateTransactionReference(Request $request)
-    {
-        Log::info('=============>', [$request->all()]);
-        Ticket::where('invoice_id', $request->invoice)->update([
-            'transaction_id' => $request->reference
-        ]);
-        return ['message' => 'Hello'];
-    }
+   public function updateTransactionReference(Request $request)
+{
+    Log::info('updateTransactionReference payload', $request->all());
+
+    Ticket::where('invoice_id', $request->invoice)->update([
+        'transaction_id' => $request->transaction_id
+    ]);
+
+    return response()->json([
+        'message' => 'Transaction reference updated successfully'
+    ]);
+}
     public function departureCities(Request $request)
     {
         try {
@@ -364,7 +368,7 @@ class BookingApiController extends Controller
             ])->first();
             // if ($terminalId == 14){
 
-                
+
             //   $scheduleDetail = ScheduleDetail::with("bus_class:id,front_icons,seat_map")->where([
             //     'company_id' => $companyId,
             //     'schedule_id' => $request->schedule_id,
