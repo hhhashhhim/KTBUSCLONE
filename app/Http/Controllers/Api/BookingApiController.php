@@ -667,7 +667,7 @@ class BookingApiController extends Controller
                             $error = ["Please Enter Valid Amount"];
                             return new ConflictResource($error);
                         }
-                        if (isset($request->only_transaction_id)) {
+                        if ($request->boolean('only_transaction_id')) {
                             Ticket::where("invoice_id", $request->invoice_id)->update([
                                 'transaction_id' => $request->transaction_id,
                             ]);
