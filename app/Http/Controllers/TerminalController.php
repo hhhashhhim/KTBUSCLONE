@@ -609,7 +609,7 @@ if (is_array($request->send_message)) {
         ->orderBy('schedule_date', 'asc')
         ->orderBy('schedule_time_exact', 'asc')
         ->get();
-
+ 
     return [
         'record' => $tickets
     ];
