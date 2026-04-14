@@ -13,58 +13,112 @@
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-3" v-if="checkForSubmenuButtons('terminal-sale-terminal-filter')">
-                                                    <label for="terminalFilter">Terminals</label>
-                                                    <select id="terminalFilter" class="form-control"
-                                                            v-model="filterSales.terminal"
-                                                        >
-                                                        <option value="0">Select Terminals</option>
-                                                        <option v-for="(terminal, i) in terminals" :key="i"
-                                                                :value="terminal.id">
-                                                            {{ terminal.name }}
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                                <!-- <div class="col-md-2" v-if="checkForSubmenuButtons('terminal-sale-user-filter')">
-                                                    <label for="usernameFilter">Schedule</label>
-                                                    <select id="usernameFilter" class="form-control"
-                                                            v-model="filterSales.schedule"
-                                                        >
-                                                        <option value="0">Select Schedule</option>
-                                                        <option v-for="(schedule, i) in schedules" :key="i"
-                                                                :value="schedule.id">
-                                                            {{ schedule.name }}
-                                                        </option>
-                                                    </select>
-                                                </div> -->
-                                                <div class="col-md-3" v-if="checkForSubmenuButtons('terminal-sale-route-filter')">
-                                                    <label for="routeIds">Routes</label>
-                                                    <select id="routeIds" class="form-control" multiple
-                                                            v-model="filterSales.route"
-                                                        >
-                                                        <option value="0">Select Route</option>
-                                                        <option v-for="(route, i) in routes" :key="i"
-                                                                :value="route.id">
-                                                            {{ route.name }}  ({{ route.via??'n/a' }})
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label for="fromDate">From Date Time</label>
-                                                    <input id="fromDate" type="datetime-local" class="form-control"
-                                                           v-model="filterSales.fromDateTime">
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label for="toDate">To Date Time</label>
-                                                    <input id="toDate" type="datetime-local" class="form-control"
-                                                           v-model="filterSales.toDateTime">
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <button class="btn btn-primary mt-4" type="button" @click="discountFilter()"
-                                                            :disabled="loadingTable">
-                                                        {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
-                                                    </button>
+                                            <div class="card shadow-sm border-0 mb-3">
+                                                <div class="card-body">
+                                                    <div class="row align-items-end">
+
+                                                        <div class="col-md-3 mb-3"
+                                                            v-if="checkForSubmenuButtons('terminal-sale-terminal-filter')">
+                                                            <label class="filter-label">Terminal</label>
+                                                            <select class="form-control filter-input"
+                                                                v-model="filterSales.terminal">
+                                                                <option value="0">All</option>
+                                                                <option v-for="(terminal, i) in terminals" :key="i"
+                                                                    :value="terminal.id">
+                                                                    {{ terminal.name }}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="col-md-3"
+                                                            v-if="checkForSubmenuButtons('terminal-sale-route-filter')">
+                                                            <label for="routeIds">Routes</label>
+                                                            <select id="routeIds" class="form-control" multiple
+                                                                v-model="filterSales.route">
+                                                                <option value="0">Select Route</option>
+                                                                <option v-for="(route, i) in routes" :key="i"
+                                                                    :value="route.id">
+                                                                    {{ route.name }} ({{ route.via ?? 'n/a' }})
+                                                                </option>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="col-md-3">
+                                                            <label for="terminalFilter">Select Bus</label>
+                                                            <select2 v-model="filterSales.bus_number" :options="buses"
+                                                                :settings="{ multiple: true, width: '100%' }" />
+                                                        </div>
+
+                                                        <div class="col-md-3 mb-3">
+                                                            <label class="filter-label">Passenger Name</label>
+                                                            <input type="text" class="form-control filter-input"
+                                                                v-model="filterSales.name" placeholder="Search Name">
+                                                        </div>
+
+                                                        <div class="col-md-3 mb-3">
+                                                            <label class="filter-label">Cell No</label>
+                                                            <input type="text" class="form-control filter-input"
+                                                                v-model="filterSales.contact"
+                                                                placeholder="Search Contact">
+                                                        </div>
+
+                                                        <div class="col-md-3 mb-3">
+                                                            <label class="filter-label">CNIC</label>
+                                                            <input type="text" class="form-control filter-input"
+                                                                v-model="filterSales.cnic"
+                                                                placeholder="Enter CNIC without dashes">
+                                                        </div>
+
+                                                        <div class="col-md-3 mb-3">
+                                                            <label class="filter-label">Seat No</label>
+                                                            <input type="text" class="form-control filter-input"
+                                                                v-model="filterSales.seat_no"
+                                                                placeholder="Search Seat No">
+                                                        </div>
+
+                                                        <div class="col-md-3 mb-3">
+                                                            <label class="filter-label">Invoice</label>
+                                                            <input type="text" class="form-control filter-input"
+                                                                v-model="filterSales.invoice"
+                                                                placeholder="Search Invoice">
+                                                        </div>
+
+                                                        <!-- <div class="col-md-3 mb-3">
+                                                            <label class="filter-label">Status</label>
+                                                            <select class="form-control filter-input"
+                                                                v-model="filterSales.status">
+                                                                <option value="">All</option>
+                                                                <option value="booked">Booked</option>
+                                                                <option value="advance booking">Advance Booking</option>
+                                                                <option value="reschedule">Reschedule</option>
+                                                                <option value="canceled">Canceled</option>
+                                                                <option value="over-issue">Over Issue</option>
+                                                            </select>
+                                                        </div> -->
+
+                                                        <div class="col-md-3 mb-3">
+                                                            <label class="filter-label">From Date Time</label>
+                                                            <input type="datetime-local"
+                                                                class="form-control filter-input"
+                                                                v-model="filterSales.fromDateTime">
+                                                        </div>
+
+                                                        <div class="col-md-3 mb-3">
+                                                            <label class="filter-label">To Date Time</label>
+                                                            <input type="datetime-local"
+                                                                class="form-control filter-input"
+                                                                v-model="filterSales.toDateTime">
+                                                        </div>
+
+                                                        <div class="col-md-3 mb-3">
+                                                            <button class="btn btn-primary btn-block filter-btn"
+                                                                type="button" @click="discountFilter()"
+                                                                :disabled="loadingTable">
+                                                                {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
+                                                            </button>
+                                                        </div>
+
+                                                    </div>
                                                 </div>
                                             </div>
                                             <!-- <div class="d-flex justify-content-end" v-if="filters.record != null">
@@ -86,49 +140,54 @@
                                                 <div class="col-md-12">
                                                     <div class="table-responsive">
                                                         <table class="table table-striped table-hover text-center"
-                                                               id="saleReportTable">
+                                                            id="saleReportTable">
                                                             <thead>
-                                                            <tr>
-                                                                <th width="150px">Bus Time</th>
-                                                                <th>Bus No</th>
-                                                                <th>Route</th>
-                                                                <th>Name</th>
-                                                                <th>Cnic</th>
-                                                                <th>Seat No</th>
-                                                                <th>Invoice</th>
-                                                                <th>Terminal Name</th>
-                                                                <th>Status</th>
-                                                                <th>Remarks</th>
-                                                                <th>Discount</th>
-                                                                <th>Schedule Discount</th>
-                                                                <th>Terminal Discount</th>
-                                                            </tr>
+                                                                <tr>
+                                                                    <th width="150px">Bus Time</th>
+                                                                    <th>Bus No</th>
+                                                                    <th>Route</th>
+                                                                    <th>Name</th>
+                                                                    <th>Cell No</th>
+                                                                    <th>Cnic</th>
+                                                                    <th>Seat No</th>
+                                                                    <th>Invoice</th>
+                                                                    <th>Terminal Name</th>
+                                                                    <th>Status</th>
+                                                                    <th>Remarks</th>
+                                                                    <th>Discount</th>
+                                                                    <th>Schedule Discount</th>
+                                                                    <th>Terminal Discount</th>
+                                                                </tr>
                                                             </thead>
 
                                                             <tbody>
-                                                            <tr v-for="(data,i) in filters.record" :key="i">
-                                                                <td>{{ data.schedule_date }}<br>{{ data.schedule_time }}</td>
-                                                                <td>{{ data.bus ? data.bus.bus_number : 'N/A' }}</td>
-                                                                <td>{{ data.route.name }}  ({{ data.route.via??'n/a' }})</td>
-                                                                <td>{{ data.customer.name }}</td>
-                                                                <td>{{ data.customer.contact }}</td>
-                                                                <td>{{ data.seat_no }}</td>
-                                                                <td>{{ data.invoice_id }}</td>
-                                                                <td>{{ data.terminal.name }}</td>
-                                                                <td>{{ data.type }}</td>
-                                                                <td>{{ data.remarks }}</td>
-                                                                <td>{{ data.discount }}</td>
-                                                                <td>{{ data.schedule_discount }}</td>
-                                                                <td>{{ data.terminal_discount }}</td>
-                                                            </tr>
-                                                            <tr v-if="filters.record.length > 0">
-                                                                <th colspan="5"></th>
-                                                                <th>{{ filters.record.length }}</th>
-                                                                <th colspan="3"></th>
-                                                                <th>{{ totalDiscount() }}</th>
-                                                                <th>{{ totalScheduleDiscount() }}</th>
-                                                                <th>{{ totalTerminalDiscount() }}</th>
-                                                            </tr>
+                                                                <tr v-for="(data, i) in filters.record" :key="i">
+                                                                    <td>{{ data.schedule_date }}<br>{{
+                                                                        data.schedule_time }}</td>
+                                                                    <td>{{ data.bus ? data.bus.bus_number : 'N/A' }}
+                                                                    </td>
+                                                                    <td>{{ data.route.name }} ({{ data.route.via ?? 'n/a'
+                                                                        }})</td>
+                                                                    <td>{{ data.customer.name }}</td>
+                                                                    <td>{{ data.customer.contact }}</td>
+                                                                    <td>{{ data.customer.cnic }}</td>
+                                                                    <td>{{ data.seat_no }}</td>
+                                                                    <td>{{ data.invoice_id }}</td>
+                                                                    <td>{{ data.terminal.name }}</td>
+                                                                    <td>{{ data.type }}</td>
+                                                                    <td>{{ data.remarks }}</td>
+                                                                    <td>{{ data.discount }}</td>
+                                                                    <td>{{ data.schedule_discount }}</td>
+                                                                    <td>{{ data.terminal_discount }}</td>
+                                                                </tr>
+                                                                <tr v-if="filters.record.length > 0">
+                                                                    <th colspan="5"></th>
+                                                                    <th>{{ filters.record.length }}</th>
+                                                                    <th colspan="5"></th>
+                                                                    <th>{{ totalDiscount() }}</th>
+                                                                    <th>{{ totalScheduleDiscount() }}</th>
+                                                                    <th>{{ totalTerminalDiscount() }}</th>
+                                                                </tr>
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -159,6 +218,7 @@ export default {
             filters: {
                 record: []
             },
+            buses: [],
             refundFilters: [],
             filterSales: {
                 terminal: 0,
@@ -166,12 +226,20 @@ export default {
                 route: [],
                 fromDateTime: '',
                 toDateTime: '',
+                bus_no: '',
+                name: '',
+                contact: '',
+                cnic: '',
+                seat_no: '',
+                invoice: '',
+                status: ''
             },
         }
     },
     async created() {
         $('.modal').remove();
         this.fetchFilters();
+        this.fetchBuses();
         this.permissions = this.$store.state.permissions;
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {
@@ -191,13 +259,25 @@ export default {
         const self = this;
         // route
         const routeIds = $('#routeIds');
-        routeIds.on('change', function() {
+        routeIds.on('change', function () {
             const selectedValues = $(this).val();
             self.filterSales.route = selectedValues;
         });
-       
+
     },
     methods: {
+        async fetchBuses() {
+            try {
+                const res = await this.callApi("post", "booking/close/schedule/merges/buses");
+                console.log("Buses API response:", res); // check the structure
+                if (res.status === 200) {
+                    // adjust based on actual path
+                    this.buses = res.data.buses || res.data;
+                }
+            } catch (error) {
+                console.error("Error fetching buses:", error);
+            }
+        },
         async fetchFilters() {
             const resTerminals = await this.callApi("post", 'advance/sales/getTerminals');
             const resSchedules = await this.callApi("post", 'advance/sales/getSchedules');
@@ -225,7 +305,7 @@ export default {
                     timer: 2000
                 });
             this.loadingTable = true;
-           
+
             const resFetchData = await this.callApi("post", 'terminals/discount/fetchFilterData', this.filterSales);
             if (resFetchData.status == 200) {
                 this.filters.record = Object.values(resFetchData.data.record);
@@ -262,8 +342,8 @@ export default {
         totalDiscount: function () {
             if (this.filters.record && Array.isArray(this.filters.record)) {
                 return this.filters.record.reduce((sum, data) => {
-                        const seatDiscount = Number(data.discount) || 0;
-                        return sum + (seatDiscount);
+                    const seatDiscount = Number(data.discount) || 0;
+                    return sum + (seatDiscount);
                 }, 0);
             } else {
                 return 0;
@@ -272,8 +352,8 @@ export default {
         totalScheduleDiscount: function () {
             if (this.filters.record && Array.isArray(this.filters.record)) {
                 return this.filters.record.reduce((sum, data) => {
-                        const seatScheduleDiscount = Number(data.schedule_discount) || 0;
-                        return sum + (seatScheduleDiscount);
+                    const seatScheduleDiscount = Number(data.schedule_discount) || 0;
+                    return sum + (seatScheduleDiscount);
                 }, 0);
             } else {
                 return 0;
@@ -282,8 +362,8 @@ export default {
         totalTerminalDiscount: function () {
             if (this.filters.record && Array.isArray(this.filters.record)) {
                 return this.filters.record.reduce((sum, data) => {
-                        const seatTerminalDiscount = Number(data.terminal_discount) || 0;
-                        return sum + (seatTerminalDiscount);
+                    const seatTerminalDiscount = Number(data.terminal_discount) || 0;
+                    return sum + (seatTerminalDiscount);
                 }, 0);
             } else {
                 return 0;
@@ -295,7 +375,9 @@ export default {
 }
 </script>
 <style scoped>
-table, th, td {
+table,
+th,
+td {
     border: 1px solid #b9b9b9;
     border-collapse: collapse;
 }
