@@ -162,7 +162,7 @@ class TerminalController extends Controller
     public function update(Request $request)
     {
         // return $request;
-        
+
         if (!checkPermissionButtons("edit-terminal")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
@@ -436,9 +436,9 @@ if (is_array($request->send_message)) {
                 'discount',
                 'seat_no',
                 'customer_id',
-                'route_id',  
+                'route_id',
                 'type',
-                'transaction_id', 
+                'transaction_id',
             ])
             ->where('company_id', Auth::user()->company_id)
             ->where(function ($query) {
@@ -501,57 +501,119 @@ if (is_array($request->send_message)) {
         ];
     }
 
-    public function filterDataDiscount(Request $request)
-    {
-        if (!checkForSubmenu("terminal-sale")) {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
-        $tickets = Ticket::with(
+   public function filterDataDiscount(Request $request)
+{
+    if (!checkForSubmenu("terminal-sale")) {
+        return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+    }
+
+    $contact = preg_replace('/[^0-9]/', '', $request->contact ?? '');
+    $cnic = preg_replace('/[^0-9]/', '', $request->cnic ?? '');
+
+    $routeIds = is_array($request->route)
+        ? array_filter($request->route, fn($r) => $r != 0 && $r != '')
+        : [];
+
+    $busIds = is_array($request->bus_number)
+        ? array_filter($request->bus_number, fn($b) => $b != 0 && $b != '')
+        : [];
+
+    $tickets = Ticket::with([
             'terminal:id,name',
             'busClass:id,name',
             'schedule:id,name,time',
-            "bus:id,bus_number",
-            "customer:id,name,cnic,contact",
-            "route:id,name,via",
-        )
-            ->where('company_id', Auth::user()->company_id)
-            ->where("type", "booked")
-            ->where(function ($query) {
-                $query->where('discount', '>', 0)
-                    ->orWhere('terminal_discount', '>', 0)
-                    ->orWhere('schedule_discount', '>', 0);
-            })
-            ->when($request->terminal, function ($query) use ($request) {
-                return $query->where('terminal_id', $request->terminal);
-            })
-            ->when($request->schedule, function ($query) use ($request) {
-                return $query->where('schedule_id', $request->schedule);
-            })
-            ->when($request->route, function ($query) use ($request) {
-                return $query->whereIn('route_id', $request->route);
-            })
-            ->when($request->fromDateTime, function ($query) use ($request) {
-                return $query->whereRaw(
-                    "CONCAT(schedule_date, ' ', schedule_time_exact) >= ?",
-                    [date("Y-m-d H:i:s", strtotime($request->fromDateTime))]
-                );
-            })
-            ->when($request->toDateTime, function ($query) use ($request) {
-                return $query->whereRaw(
-                    "CONCAT(schedule_date, ' ', schedule_time_exact) <= ?",
-                    [date("Y-m-d H:i:s", strtotime($request->toDateTime))]
-                );
-            })
-            ->orderBy('schedule_date', 'asc')
-            ->get();
-        // return $tickets;
-        $tickets = $tickets->sortBy('schedule_date_time');
+            'bus:id,bus_number',
+            'customer:id,name,cnic,contact',
+            'route:id,name,via',
+        ])
+        ->select([
+            'id',
+            'company_id',
+            'terminal_id',
+            'bus_class_id',
+            'schedule_id',
+            'bus_id',
+            'customer_id',
+            'route_id',
+            'schedule_date',
+            'schedule_time_exact',
+            'seat_no',
+            'invoice_id',
+            'seat_fare',
+            'discount',
+            'terminal_discount',
+            'schedule_discount',
+            'type',
+        ])
+        ->where('company_id', Auth::user()->company_id)
+        ->where(function ($query) use ($request) {
+            if (!empty($request->status)) {
+                $query->where('type', $request->status);
+            } else {
+                $query->where('type', 'booked');
+            }
+        })
+        ->where(function ($query) {
+            $query->where('discount', '>', 0)
+                ->orWhere('terminal_discount', '>', 0)
+                ->orWhere('schedule_discount', '>', 0);
+        })
+        ->when($request->terminal != 0, function ($query) use ($request) {
+            return $query->where('terminal_id', $request->terminal);
+        })
+        ->when($request->schedule != 0, function ($query) use ($request) {
+            return $query->where('schedule_id', $request->schedule);
+        })
+        ->when(!empty($routeIds), function ($query) use ($routeIds) {
+            return $query->whereIn('route_id', $routeIds);
+        })
+        ->when(!empty($busIds), function ($query) use ($busIds) {
+            return $query->whereIn('bus_id', $busIds);
+        })
+        ->when($request->seat_no, function ($query) use ($request) {
+            return $query->where('seat_no', 'LIKE', '%' . $request->seat_no . '%');
+        })
+        ->when($request->invoice, function ($query) use ($request) {
+            return $query->where('invoice_id', 'LIKE', '%' . $request->invoice . '%');
+        })
+        ->when($request->fromDateTime, function ($query) use ($request) {
+            return $query->whereRaw(
+                "CONCAT(schedule_date, ' ', schedule_time_exact) >= ?",
+                [date("Y-m-d H:i:s", strtotime($request->fromDateTime))]
+            );
+        })
+        ->when($request->toDateTime, function ($query) use ($request) {
+            return $query->whereRaw(
+                "CONCAT(schedule_date, ' ', schedule_time_exact) <= ?",
+                [date("Y-m-d H:i:s", strtotime($request->toDateTime))]
+            );
+        })
+        ->when($request->name || $contact || $cnic, function ($query) use ($request, $contact, $cnic) {
+            $query->whereHas('customer', function ($q) use ($request, $contact, $cnic) {
+                if ($request->name) {
+                    $q->where('name', 'LIKE', '%' . $request->name . '%');
+                }
 
-        return [
-            'record' => $tickets
-        ];
-    }
+                if ($contact) {
+                    $q->whereRaw(
+                        "REPLACE(REPLACE(REPLACE(contact, '-', ''), ' ', ''), '+', '') LIKE ?",
+                        ['%' . $contact . '%']
+                    );
+                }
 
+                if ($cnic) {
+                    $q->whereRaw("REPLACE(cnic, '-', '') LIKE ?", ['%' . $cnic . '%']);
+                }
+            });
+        })
+        ->orderBy('schedule_date', 'asc')
+        ->orderBy('schedule_time_exact', 'asc')
+        ->get();
+
+    return [
+        'record' => $tickets
+    ];
+}
     public function dashboardData(Request $request)
     {
         if (checkPermissionButtons("super-data")) {

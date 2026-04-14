@@ -20,7 +20,7 @@ Route::group(['prefix' => 'web/v1/terminals','middleware' => ['auth:sanctum']], 
     Route::post('/sales/fetchFilterData', [TerminalController::class, 'filterData']);
     Route::post('/discount/fetchFilterData', [TerminalController::class, 'filterDataDiscount']);
 
-    Route::post('/routes', [TerminalController::class, 'getRoutes']);
+    Route::post('/routes', [TerminalController::class, 'getRoutes']); 
 
     Route::group(['prefix' => '/commissions', [CustomMiddleware::class]], function () {
         Route::post('/', [TerminalController::class, 'terminalCommissions']);
@@ -31,7 +31,7 @@ Route::group(['prefix' => 'web/v1/terminals','middleware' => ['auth:sanctum']], 
         Route::post('/', [TerminalController::class, 'terminalDiscounts']);
         Route::post('/store', [TerminalController::class, 'discountStore']);
     });
-    
+
     Route::group(['prefix' => '/times', [CustomMiddleware::class]], function () {
         Route::post('/', [TerminalController::class, 'terminalTimes']);
         Route::post('/store', [TerminalController::class, 'timeStore']);
