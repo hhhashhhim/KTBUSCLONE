@@ -40700,14 +40700,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this6 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        var totalFare, enteredCompanyAmount, customerRefundAmount, payload, _data$response, res, data, ppMessage, genericMsg, combinedMsg;
+        var totalFare, enteredRefundAmount, companyKeepAmount, payload, _data$response, res, data, ppMessage, genericMsg, combinedMsg;
 
         return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 totalFare = parseFloat(_this6.totalFare);
-                enteredCompanyAmount = parseFloat(_this6.refundAmount);
+                enteredRefundAmount = parseFloat(_this6.refundAmount);
 
                 if (!(_this6.refundAmount === null || _this6.refundAmount === '')) {
                   _context6.next = 5;
@@ -40717,12 +40717,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 Swal.fire({
                   icon: "warning",
                   title: "Missing Information",
-                  text: "Please enter company keep amount."
+                  text: "Please enter refund amount."
                 });
                 return _context6.abrupt("return");
 
               case 5:
-                if (!(isNaN(enteredCompanyAmount) || enteredCompanyAmount < 0)) {
+                if (!(isNaN(enteredRefundAmount) || enteredRefundAmount < 0)) {
                   _context6.next = 8;
                   break;
                 }
@@ -40730,12 +40730,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 Swal.fire({
                   icon: "warning",
                   title: "Invalid Amount",
-                  text: "Please enter a valid company keep amount."
+                  text: "Please enter a valid refund amount."
                 });
                 return _context6.abrupt("return");
 
               case 8:
-                if (!(enteredCompanyAmount > totalFare)) {
+                if (!(enteredRefundAmount > totalFare)) {
                   _context6.next = 11;
                   break;
                 }
@@ -40743,7 +40743,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 Swal.fire({
                   icon: "warning",
                   title: "Invalid Amount",
-                  text: "Company keep amount cannot be greater than paid fare."
+                  text: "Refund amount cannot be greater than paid fare."
                 });
                 return _context6.abrupt("return");
 
@@ -40761,14 +40761,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _context6.abrupt("return");
 
               case 14:
-                customerRefundAmount = totalFare - enteredCompanyAmount;
+                companyKeepAmount = totalFare - enteredRefundAmount;
                 payload = {
                   ticket_id: _this6.selectedRecord.id,
                   refund_reason: _this6.refundReason,
-                  company_amount: enteredCompanyAmount
+                  refund_amount: enteredRefundAmount
                 };
                 console.log("Payload:", payload);
-                console.log("Customer Refund Amount:", customerRefundAmount);
+                console.log("Company Keep Amount:", companyKeepAmount);
                 Swal.fire({
                   title: "Processing Refund...",
                   text: "Please wait while we process your request.",
@@ -96029,7 +96029,7 @@ var _hoisted_112 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "refundAmount",
     "class": "form-label fw-semibold"
-  }, "Company Keep Amount", -1
+  }, "Refund Amount", -1
   /* HOISTED */
   );
 });
@@ -96043,7 +96043,7 @@ var _hoisted_113 = /*#__PURE__*/_withScopeId(function () {
 var _hoisted_114 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
     "class": "text-muted"
-  }, "Remaining amount will be refunded to customer", -1
+  }, "Entered amount will be refunded to customer, remaining amount will stay with company", -1
   /* HOISTED */
   );
 });
@@ -96057,13 +96057,13 @@ var _hoisted_116 = {
 };
 
 var _hoisted_117 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Company Keep Amount:", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Customer Refund Amount:", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_118 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Customer Refund Amount:", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Company Keep Amount:", -1
   /* HOISTED */
   );
 });
@@ -96419,11 +96419,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* HYDRATE_EVENTS, NEED_PATCH */
   ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.refundAmount]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", _hoisted_115, "Maximum refundable amount: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.totalFare), 1
   /* TEXT */
-  )]), $data.selectedRecord && $data.refundAmount !== '' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_116, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_117, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.refundAmount), 1
+  )]), $data.selectedRecord && $data.refundAmount !== '' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_116, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_117, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(parseFloat($data.refundAmount || 0).toFixed(2)), 1
   /* TEXT */
   )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_118, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((parseFloat($options.totalFare || 0) - parseFloat($data.refundAmount || 0)).toFixed(2)), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_119, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(parseFloat($options.totalFare || 0) > 0 ? (parseFloat($data.refundAmount || 0) / parseFloat($options.totalFare || 1) * 100).toFixed(2) : 0) + "% ", 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_119, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(parseFloat($options.totalFare || 0) > 0 ? ((parseFloat($options.totalFare || 0) - parseFloat($data.refundAmount || 0)) / parseFloat($options.totalFare || 1) * 100).toFixed(2) : 0) + "% ", 1
   /* TEXT */
   )])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Refund Reason "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_120, [_hoisted_121, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
     "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
