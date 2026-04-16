@@ -400,80 +400,85 @@
                     <div class="modal-body">
 
                         <!-- Summary Cards -->
-                        <div class="row g-2 mb-3 text-center">
+                       <div class="row g-3 mb-4 text-center">
 
-                            <div class="col-6">
-                                <div class="p-2 border rounded bg-light">
-                                    <small class="text-muted">Total Paid</small>
-                                    <div class="fw-bold">
-                                        {{
-                                            (
-                                                parseFloat(selectedRefund?.seat_fare || 0)
-                                                - parseFloat(selectedRefund?.discount || 0)
-                                        ).toFixed(2)
-                                        }} PKR
-                                    </div>
-                                </div>
-                            </div>
+  <div class="col-6">
+    <div class="p-3 border rounded bg-light h-100">
+      <small class="text-muted d-block mb-1">Total Paid</small>
+      <div class="fw-bold fs-6">
+        {{
+          (
+            parseFloat(selectedRefund?.seat_fare || 0)
+            - parseFloat(selectedRefund?.discount || 0)
+          ).toFixed(2)
+        }} PKR
+      </div>
+    </div>
+  </div>
 
-                            <div class="col-6">
-                                <div class="p-2 border rounded bg-light">
-                                    <small class="text-muted">Refund</small>
-                                    <div class="fw-bold text-success">
-                                        {{ parseFloat(selectedRefund?.refund_amount || 0).toFixed(2) }} PKR
-                                    </div>
-                                </div>
-                            </div>
+  <div class="col-6">
+    <div class="p-3 border rounded bg-light h-100">
+      <small class="text-muted d-block mb-1">Refund</small>
+      <div class="fw-bold text-success fs-6">
+        {{ parseFloat(selectedRefund?.refund_amount || 0).toFixed(2) }} PKR
+      </div>
+    </div>
+  </div>
 
-                            <div class="col-6">
-                                <div class="p-2 border rounded bg-light">
-                                    <small class="text-muted">Company Keep</small>
-                                    <div class="fw-bold text-danger">
-                                        {{
-                                            Math.max(
-                                                0,
-                                                (
-                                                    parseFloat(selectedRefund?.seat_fare || 0)
-                                                    - parseFloat(selectedRefund?.discount || 0)
-                                                    - parseFloat(selectedRefund?.refund_amount || 0)
-                                        )
-                                        ).toFixed(2)
-                                        }} PKR
-                                    </div>
-                                </div>
-                            </div>
+  <div class="col-6">
+    <div class="p-3 border rounded bg-light h-100">
+      <small class="text-muted d-block mb-1">Company Keep</small>
+      <div class="fw-bold text-danger fs-6">
+        {{
+          Math.max(
+            0,
+            (
+              parseFloat(selectedRefund?.seat_fare || 0)
+              - parseFloat(selectedRefund?.discount || 0)
+              - parseFloat(selectedRefund?.refund_amount || 0)
+            )
+          ).toFixed(2)
+        }} PKR
+      </div>
+    </div>
+  </div>
 
-                            <div class="col-6">
-                                <div class="p-2 border rounded bg-light">
-                                    <small class="text-muted">Refund %</small>
-                                    <div class="fw-bold">
-                                        {{ parseFloat(selectedRefund?.refund_percentage || 0).toFixed(2) }}%
-                                    </div>
-                                </div>
-                            </div>
+  <div class="col-6">
+    <div class="p-3 border rounded bg-light h-100">
+      <small class="text-muted d-block mb-1">Refund %</small>
+      <div class="fw-bold fs-6">
+        {{ parseFloat(selectedRefund?.refund_percentage || 0).toFixed(2) }}%
+      </div>
+    </div>
+  </div>
 
-                            <div class="col-12">
-                                <div class="p-2 border rounded bg-light">
-                                    <small class="text-muted">Company Keep %</small>
-                                    <div class="fw-bold">
-                                        {{
-                                            (
-                                                100 - parseFloat(selectedRefund?.refund_percentage || 0)
-                                        ).toFixed(2)
-                                        }}%
-                                    </div>
-                                </div>
-                            </div>
+  <div class="col-12">
+    <div class="p-3 border rounded bg-light">
+      <small class="text-muted d-block mb-1">Company Keep %</small>
+      <div class="fw-bold fs-6">
+        {{
+          (
+            100 - parseFloat(selectedRefund?.refund_percentage || 0)
+          ).toFixed(2)
+        }}%
+      </div>
+    </div>
+  </div>
 
-                        </div>
+</div>
 
                         <!-- Reason -->
-                        <div>
-                            <label class="fw-semibold mb-1">Refund Reason</label>
-                            <div class="border rounded p-2 bg-light">
-                                {{ selectedRefund?.refund_reason || '-' }}
-                            </div>
-                        </div>
+                     <div class="mt-3">
+  <label class="fw-semibold mb-1">Refund Reason</label>
+  <div class="border rounded p-3 bg-light" style="min-height: 60px;">
+    {{
+      selectedRefund?.refund_reason &&
+      selectedRefund?.refund_reason.trim() !== ''
+        ? selectedRefund.refund_reason
+        : 'No reason provided'
+    }}
+  </div>
+</div>
 
                     </div>
 

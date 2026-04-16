@@ -96127,100 +96127,103 @@ var _hoisted_130 = {
   "class": "modal-body"
 };
 var _hoisted_131 = {
-  "class": "row g-2 mb-3 text-center"
+  "class": "row g-3 mb-4 text-center"
 };
 var _hoisted_132 = {
   "class": "col-6"
 };
 var _hoisted_133 = {
-  "class": "p-2 border rounded bg-light"
+  "class": "p-3 border rounded bg-light h-100"
 };
 
 var _hoisted_134 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
-    "class": "text-muted"
+    "class": "text-muted d-block mb-1"
   }, "Total Paid", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_135 = {
-  "class": "fw-bold"
+  "class": "fw-bold fs-6"
 };
 var _hoisted_136 = {
   "class": "col-6"
 };
 var _hoisted_137 = {
-  "class": "p-2 border rounded bg-light"
+  "class": "p-3 border rounded bg-light h-100"
 };
 
 var _hoisted_138 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
-    "class": "text-muted"
+    "class": "text-muted d-block mb-1"
   }, "Refund", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_139 = {
-  "class": "fw-bold text-success"
+  "class": "fw-bold text-success fs-6"
 };
 var _hoisted_140 = {
   "class": "col-6"
 };
 var _hoisted_141 = {
-  "class": "p-2 border rounded bg-light"
+  "class": "p-3 border rounded bg-light h-100"
 };
 
 var _hoisted_142 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
-    "class": "text-muted"
+    "class": "text-muted d-block mb-1"
   }, "Company Keep", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_143 = {
-  "class": "fw-bold text-danger"
+  "class": "fw-bold text-danger fs-6"
 };
 var _hoisted_144 = {
   "class": "col-6"
 };
 var _hoisted_145 = {
-  "class": "p-2 border rounded bg-light"
+  "class": "p-3 border rounded bg-light h-100"
 };
 
 var _hoisted_146 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
-    "class": "text-muted"
+    "class": "text-muted d-block mb-1"
   }, "Refund %", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_147 = {
-  "class": "fw-bold"
+  "class": "fw-bold fs-6"
 };
 var _hoisted_148 = {
   "class": "col-12"
 };
 var _hoisted_149 = {
-  "class": "p-2 border rounded bg-light"
+  "class": "p-3 border rounded bg-light"
 };
 
 var _hoisted_150 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
-    "class": "text-muted"
+    "class": "text-muted d-block mb-1"
   }, "Company Keep %", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_151 = {
-  "class": "fw-bold"
+  "class": "fw-bold fs-6"
+};
+var _hoisted_152 = {
+  "class": "mt-3"
 };
 
-var _hoisted_152 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_153 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "fw-semibold mb-1"
   }, "Refund Reason", -1
@@ -96228,14 +96231,17 @@ var _hoisted_152 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_153 = {
-  "class": "border rounded p-2 bg-light"
-};
 var _hoisted_154 = {
+  "class": "border rounded p-3 bg-light",
+  style: {
+    "min-height": "60px"
+  }
+};
+var _hoisted_155 = {
   "class": "modal-footer border-0"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _$data$selectedRecord, _$data$selectedRecord2, _$data$selectedRecord3, _$data$selectedRefund, _$data$selectedRefund2, _$data$selectedRefund3, _$data$selectedRefund4, _$data$selectedRefund5, _$data$selectedRefund6, _$data$selectedRefund7, _$data$selectedRefund8, _$data$selectedRefund9;
+  var _$data$selectedRecord, _$data$selectedRecord2, _$data$selectedRecord3, _$data$selectedRefund, _$data$selectedRefund2, _$data$selectedRefund3, _$data$selectedRefund4, _$data$selectedRefund5, _$data$selectedRefund6, _$data$selectedRefund7, _$data$selectedRefund8, _$data$selectedRefund9, _$data$selectedRefund10;
 
   var _component_vue_mask = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("vue-mask");
 
@@ -96539,9 +96545,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_148, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_149, [_hoisted_150, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_151, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((100 - parseFloat(((_$data$selectedRefund8 = $data.selectedRefund) === null || _$data$selectedRefund8 === void 0 ? void 0 : _$data$selectedRefund8.refund_percentage) || 0)).toFixed(2)) + "% ", 1
   /* TEXT */
-  )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Reason "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_152, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_153, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(((_$data$selectedRefund9 = $data.selectedRefund) === null || _$data$selectedRefund9 === void 0 ? void 0 : _$data$selectedRefund9.refund_reason) || '-'), 1
+  )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Reason "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_152, [_hoisted_153, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_154, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$data$selectedRefund9 = $data.selectedRefund) !== null && _$data$selectedRefund9 !== void 0 && _$data$selectedRefund9.refund_reason && ((_$data$selectedRefund10 = $data.selectedRefund) === null || _$data$selectedRefund10 === void 0 ? void 0 : _$data$selectedRefund10.refund_reason.trim()) !== '' ? $data.selectedRefund.refund_reason : 'No reason provided'), 1
   /* TEXT */
-  )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Footer "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_154, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Footer "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_155, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-secondary btn-sm px-3",
     onClick: _cache[27] || (_cache[27] = function ($event) {
