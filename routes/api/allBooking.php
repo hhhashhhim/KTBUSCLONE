@@ -11,6 +11,7 @@ Route::group(['prefix' => 'web/v1/allBooking', 'middleware' => ['auth:sanctum']]
     Route::post('/filter', [AllBookingController::class, 'filter']);
     Route::post('/jazzcashfilter', [AllBookingController::class, 'jazzcashfilter']);
     Route::post('/refund', [AllBookingController::class, 'refund']);
+    Route::post('/booking-refund', [AllBookingController::class, 'bookingRefund']);
     // routes/api.php
     Route::post('/jazzcash-payment', [AllBookingController::class, 'jazzcashPayment']);
 });

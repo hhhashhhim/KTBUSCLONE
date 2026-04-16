@@ -167,7 +167,153 @@ class AllBookingController extends Controller
     $validated = $request->validate([
         'ticket_id'      => 'required|integer|exists:tickets,id',
         'refund_reason'  => 'required|string',
-        'refund_amount'  => 'required|numeric|min:1',
+        'company_amount' => 'required|numeric|min:0',
+    ]);
+
+    $ticket = Ticket::withTrashed()->find($request->ticket_id);
+
+    if (!$ticket || empty($ticket->transaction_id)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Transaction reference not found for this ticket.',
+        ], 404);
+    }
+
+    $totalAmount   = (float) $ticket->seat_fare - (float) $ticket->discount;
+    $companyAmount = (float) $request->company_amount;
+
+    if ($companyAmount > $totalAmount) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Company amount cannot be greater than paid amount.',
+        ], 422);
+    }
+
+    $refundAmount = $totalAmount - $companyAmount;
+
+    if ($refundAmount < 0) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Calculated refund amount is invalid.',
+        ], 422);
+    }
+
+    $refundPercentage = $totalAmount > 0
+        ? round(($refundAmount / $totalAmount) * 100, 2)
+        : 0;
+
+    // اگر refund amount 0 ho to sirf DB update kar do, JazzCash call na karo
+    if ($refundAmount == 0) {
+        $ticket->update([
+            'refund_amount'     => 0,
+            'refund_percentage' => 0,
+            'refund_reason'     => $request->refund_reason,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'No refund processed. Full amount retained by company.',
+        ]);
+    }
+
+    $jazzCashRefundAmount = (int) round($refundAmount * 100);
+
+    $merchantID    = '00151726';
+    $password      = 'vs8z12syy0';
+    $merchantMPIN  = '4400';
+    $integritySalt = '8335zz8zuu';
+
+    $data = [
+        'pp_TxnRefNo'     => $ticket->transaction_id,
+        'pp_Amount'       => (string) $jazzCashRefundAmount,
+        'pp_TxnCurrency'  => 'PKR',
+        'pp_MerchantID'   => $merchantID,
+        'pp_Password'     => $password,
+        'pp_MerchantMPIN' => $merchantMPIN,
+    ];
+
+    ksort($data);
+
+    $hashString = $integritySalt;
+    foreach ($data as $value) {
+        if ($value !== null && $value !== '') {
+            $hashString .= '&' . $value;
+        }
+    }
+
+    $data['pp_SecureHash'] = hash_hmac('sha256', $hashString, $integritySalt);
+
+    try {
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ])->post(
+            'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v1/rest/payments/m-wallet/refund',
+            $data
+        );
+
+        $rawBody = $response->body();
+        $responseData = $response->json();
+
+        Log::info('JazzCash Refund Request', $data);
+        Log::info('JazzCash Refund Status', ['status' => $response->status()]);
+        Log::info('JazzCash Refund Raw Body', ['body' => $rawBody]);
+        Log::info('JazzCash Refund Json', ['json' => $responseData]);
+
+        if (!$response->successful()) {
+            return response()->json([
+                'success'      => false,
+                'status_code'  => $response->status(),
+                'request'      => $data,
+                'raw_response' => $rawBody,
+                'response'     => $responseData,
+                'message'      => 'Refund API call failed',
+            ], 422);
+        }
+
+        $ppResponseCode = $responseData['pp_ResponseCode'] ?? null;
+        $ppMessage      = $responseData['pp_ResponseMessage'] ?? '';
+
+        $isSuccess = ($ppResponseCode === '000');
+
+        if ($isSuccess) {
+            $ticket->update([
+                'refund_amount'     => $refundAmount,
+                'refund_percentage' => $refundPercentage,
+                'refund_reason'     => $request->refund_reason,
+            ]);
+        }
+
+        return response()->json([
+            'success'            => $isSuccess,
+            'status_code'        => $response->status(),
+            'request'            => $data,
+            'raw_response'       => $rawBody,
+            'response'           => $responseData,
+            'refund_amount'      => $refundAmount,
+            'refund_percentage'  => $refundPercentage,
+            'company_amount'     => $companyAmount,
+            'message'            => $isSuccess ? 'Refund Successful' : ($ppMessage ?: 'Refund Failed'),
+        ]);
+    } catch (\Throwable $e) {
+        Log::error('JazzCash Refund Exception', [
+            'message' => $e->getMessage(),
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'request' => $data,
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+}
+   public function bookingRefund(Request $request)
+{
+    $validated = $request->validate([
+        'ticket_id'         => 'required|integer|exists:tickets,id',
+        'refund_reason'     => 'required|string',
+        'refund_amount'     => 'required|numeric|min:0',
+        'refund_percentage' => 'required|numeric|min:0|max:100',
     ]);
 
     $ticket = Ticket::withTrashed()->find($request->ticket_id);
@@ -181,11 +327,19 @@ class AllBookingController extends Controller
 
     $totalAmount  = (float) $ticket->seat_fare - (float) $ticket->discount;
     $refundAmount = (float) $request->refund_amount;
+    $refundPercentage = (float) $request->refund_percentage;
 
     if ($refundAmount > $totalAmount) {
         return response()->json([
             'success' => false,
             'message' => 'Refund amount cannot be greater than paid amount.',
+        ], 422);
+    }
+
+    if ($refundAmount <= 0) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Refund amount must be greater than zero.',
         ], 422);
     }
 
@@ -250,10 +404,6 @@ class AllBookingController extends Controller
         $isSuccess = ($ppResponseCode === '000');
 
         if ($isSuccess) {
-            $refundPercentage = $totalAmount > 0
-                ? round(($refundAmount / $totalAmount) * 100, 2)
-                : 0;
-
             $ticket->update([
                 'refund_amount'     => $refundAmount,
                 'refund_percentage' => $refundPercentage,
