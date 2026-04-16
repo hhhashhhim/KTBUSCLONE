@@ -242,7 +242,7 @@
 
                                 <td>
                                   <div class="d-flex gap-1">
-                                    <button  class="btn btn-sm btn-warning"
+                                    <button v-if="record.refund_amount === null" class="btn btn-sm btn-warning"
                                       @click="openRefundModal(record)">
                                       Refund
                                     </button>
