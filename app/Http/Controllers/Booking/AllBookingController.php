@@ -162,12 +162,12 @@ class AllBookingController extends Controller
             "total_fare" => $data->sum("seat_fare")
         ];
     }
-    public function refund(Request $request)
+  public function refund(Request $request)
 {
     $validated = $request->validate([
-        'ticket_id'      => 'required|integer|exists:tickets,id',
-        'refund_reason'  => 'required|string',
-        'company_amount' => 'required|numeric|min:0',
+        'ticket_id'     => 'required|integer|exists:tickets,id',
+        'refund_reason' => 'required|string',
+        'refund_amount' => 'required|numeric|min:0',
     ]);
 
     $ticket = Ticket::withTrashed()->find($request->ticket_id);
@@ -179,22 +179,22 @@ class AllBookingController extends Controller
         ], 404);
     }
 
-    $totalAmount   = (float) $ticket->seat_fare - (float) $ticket->discount;
-    $companyAmount = (float) $request->company_amount;
+    $totalAmount  = (float) $ticket->seat_fare - (float) $ticket->discount;
+    $refundAmount = (float) $request->refund_amount;
 
-    if ($companyAmount > $totalAmount) {
+    if ($refundAmount > $totalAmount) {
         return response()->json([
             'success' => false,
-            'message' => 'Company amount cannot be greater than paid amount.',
+            'message' => 'Refund amount cannot be greater than paid amount.',
         ], 422);
     }
 
-    $refundAmount = $totalAmount - $companyAmount;
+    $companyAmount = $totalAmount - $refundAmount;
 
-    if ($refundAmount < 0) {
+    if ($companyAmount < 0) {
         return response()->json([
             'success' => false,
-            'message' => 'Calculated refund amount is invalid.',
+            'message' => 'Calculated company amount is invalid.',
         ], 422);
     }
 
@@ -202,7 +202,10 @@ class AllBookingController extends Controller
         ? round(($refundAmount / $totalAmount) * 100, 2)
         : 0;
 
-    // اگر refund amount 0 ho to sirf DB update kar do, JazzCash call na karo
+    $companyPercentage = $totalAmount > 0
+        ? round(($companyAmount / $totalAmount) * 100, 2)
+        : 0;
+
     if ($refundAmount == 0) {
         $ticket->update([
             'refund_amount'     => 0,
@@ -211,8 +214,12 @@ class AllBookingController extends Controller
         ]);
 
         return response()->json([
-            'success' => true,
-            'message' => 'No refund processed. Full amount retained by company.',
+            'success'            => true,
+            'refund_amount'      => 0,
+            'refund_percentage'  => 0,
+            'company_amount'     => $companyAmount,
+            'company_percentage' => $companyPercentage,
+            'message'            => 'No refund processed. Full amount retained by company.',
         ]);
     }
 
@@ -293,6 +300,7 @@ class AllBookingController extends Controller
             'refund_amount'      => $refundAmount,
             'refund_percentage'  => $refundPercentage,
             'company_amount'     => $companyAmount,
+            'company_percentage' => $companyPercentage,
             'message'            => $isSuccess ? 'Refund Successful' : ($ppMessage ?: 'Refund Failed'),
         ]);
     } catch (\Throwable $e) {
