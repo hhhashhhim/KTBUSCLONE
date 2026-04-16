@@ -117,10 +117,10 @@
                                             <div class="col-md-6">
                                                 <label class="py-2 text-danger" v-if="this.haveLabel">{{
                                                     this.label
-                                                }}</label>
+                                                    }}</label>
                                                 <label class="py-2 text-danger" v-if="this.haveLabel">{{
                                                     this.discountLabel
-                                                }}</label>
+                                                    }}</label>
                                             </div>
                                             <div class="col-md-6">
                                                 <!-- POINTS -->
@@ -765,7 +765,7 @@
                                                     <h4 class="mb-0 font-weight-bold mr-3">Type:</h4>
                                                     <h4 class="mb-0 text-muted text-capitalize">{{
                                                         singleSeat.type
-                                                    }}</h4>
+                                                        }}</h4>
                                                 </div>
                                             </div>
                                             <div class="row my-3 pl-3">
@@ -1155,111 +1155,113 @@
                     </div>
                     <div class="modal-body" v-if="cancelData.dataType == 'booked'">
                         <div class="form-group">
-                            <label for="cancel_percentage">Percentage {{ cancelData.dataType }}<span
-                                    class="text-muted ml-2">(Optional)</span></label>
+                            <label for="cancel_percentage">
+                                Company Keep Percentage <span class="text-muted ml-2">(Remaining will be refunded to
+                                    customer)</span>
+                            </label>
                             <select id="cancel_percentage" class="form-control" v-model="cancelData.percentage">
                                 <option value="first">Select Cancellation Percentage</option>
-                               <option value="0">0%</option>
-<option value="1">1%</option>
-<option value="2">2%</option>
-<option value="3">3%</option>
-<option value="4">4%</option>
-<option value="5">5%</option>
-<option value="6">6%</option>
-<option value="7">7%</option>
-<option value="8">8%</option>
-<option value="9">9%</option>
-<option value="10">10%</option>
-<option value="11">11%</option>
-<option value="12">12%</option>
-<option value="13">13%</option>
-<option value="14">14%</option>
-<option value="15">15%</option>
-<option value="16">16%</option>
-<option value="17">17%</option>
-<option value="18">18%</option>
-<option value="19">19%</option>
-<option value="20">20%</option>
-<option value="21">21%</option>
-<option value="22">22%</option>
-<option value="23">23%</option>
-<option value="24">24%</option>
-<option value="25">25%</option>
-<option value="26">26%</option>
-<option value="27">27%</option>
-<option value="28">28%</option>
-<option value="29">29%</option>
-<option value="30">30%</option>
-<option value="31">31%</option>
-<option value="32">32%</option>
-<option value="33">33%</option>
-<option value="34">34%</option>
-<option value="35">35%</option>
-<option value="36">36%</option>
-<option value="37">37%</option>
-<option value="38">38%</option>
-<option value="39">39%</option>
-<option value="40">40%</option>
-<option value="41">41%</option>
-<option value="42">42%</option>
-<option value="43">43%</option>
-<option value="44">44%</option>
-<option value="45">45%</option>
-<option value="46">46%</option>
-<option value="47">47%</option>
-<option value="48">48%</option>
-<option value="49">49%</option>
-<option value="50">50%</option>
-<option value="51">51%</option>
-<option value="52">52%</option>
-<option value="53">53%</option>
-<option value="54">54%</option>
-<option value="55">55%</option>
-<option value="56">56%</option>
-<option value="57">57%</option>
-<option value="58">58%</option>
-<option value="59">59%</option>
-<option value="60">60%</option>
-<option value="61">61%</option>
-<option value="62">62%</option>
-<option value="63">63%</option>
-<option value="64">64%</option>
-<option value="65">65%</option>
-<option value="66">66%</option>
-<option value="67">67%</option>
-<option value="68">68%</option>
-<option value="69">69%</option>
-<option value="70">70%</option>
-<option value="71">71%</option>
-<option value="72">72%</option>
-<option value="73">73%</option>
-<option value="74">74%</option>
-<option value="75">75%</option>
-<option value="76">76%</option>
-<option value="77">77%</option>
-<option value="78">78%</option>
-<option value="79">79%</option>
-<option value="80">80%</option>
-<option value="81">81%</option>
-<option value="82">82%</option>
-<option value="83">83%</option>
-<option value="84">84%</option>
-<option value="85">85%</option>
-<option value="86">86%</option>
-<option value="87">87%</option>
-<option value="88">88%</option>
-<option value="89">89%</option>
-<option value="90">90%</option>
-<option value="91">91%</option>
-<option value="92">92%</option>
-<option value="93">93%</option>
-<option value="94">94%</option>
-<option value="95">95%</option>
-<option value="96">96%</option>
-<option value="97">97%</option>
-<option value="98">98%</option>
-<option value="99">99%</option>
-<option value="100">100%</option>
+                                <option value="0">0%</option>
+                                <option value="1">1%</option>
+                                <option value="2">2%</option>
+                                <option value="3">3%</option>
+                                <option value="4">4%</option>
+                                <option value="5">5%</option>
+                                <option value="6">6%</option>
+                                <option value="7">7%</option>
+                                <option value="8">8%</option>
+                                <option value="9">9%</option>
+                                <option value="10">10%</option>
+                                <option value="11">11%</option>
+                                <option value="12">12%</option>
+                                <option value="13">13%</option>
+                                <option value="14">14%</option>
+                                <option value="15">15%</option>
+                                <option value="16">16%</option>
+                                <option value="17">17%</option>
+                                <option value="18">18%</option>
+                                <option value="19">19%</option>
+                                <option value="20">20%</option>
+                                <option value="21">21%</option>
+                                <option value="22">22%</option>
+                                <option value="23">23%</option>
+                                <option value="24">24%</option>
+                                <option value="25">25%</option>
+                                <option value="26">26%</option>
+                                <option value="27">27%</option>
+                                <option value="28">28%</option>
+                                <option value="29">29%</option>
+                                <option value="30">30%</option>
+                                <option value="31">31%</option>
+                                <option value="32">32%</option>
+                                <option value="33">33%</option>
+                                <option value="34">34%</option>
+                                <option value="35">35%</option>
+                                <option value="36">36%</option>
+                                <option value="37">37%</option>
+                                <option value="38">38%</option>
+                                <option value="39">39%</option>
+                                <option value="40">40%</option>
+                                <option value="41">41%</option>
+                                <option value="42">42%</option>
+                                <option value="43">43%</option>
+                                <option value="44">44%</option>
+                                <option value="45">45%</option>
+                                <option value="46">46%</option>
+                                <option value="47">47%</option>
+                                <option value="48">48%</option>
+                                <option value="49">49%</option>
+                                <option value="50">50%</option>
+                                <option value="51">51%</option>
+                                <option value="52">52%</option>
+                                <option value="53">53%</option>
+                                <option value="54">54%</option>
+                                <option value="55">55%</option>
+                                <option value="56">56%</option>
+                                <option value="57">57%</option>
+                                <option value="58">58%</option>
+                                <option value="59">59%</option>
+                                <option value="60">60%</option>
+                                <option value="61">61%</option>
+                                <option value="62">62%</option>
+                                <option value="63">63%</option>
+                                <option value="64">64%</option>
+                                <option value="65">65%</option>
+                                <option value="66">66%</option>
+                                <option value="67">67%</option>
+                                <option value="68">68%</option>
+                                <option value="69">69%</option>
+                                <option value="70">70%</option>
+                                <option value="71">71%</option>
+                                <option value="72">72%</option>
+                                <option value="73">73%</option>
+                                <option value="74">74%</option>
+                                <option value="75">75%</option>
+                                <option value="76">76%</option>
+                                <option value="77">77%</option>
+                                <option value="78">78%</option>
+                                <option value="79">79%</option>
+                                <option value="80">80%</option>
+                                <option value="81">81%</option>
+                                <option value="82">82%</option>
+                                <option value="83">83%</option>
+                                <option value="84">84%</option>
+                                <option value="85">85%</option>
+                                <option value="86">86%</option>
+                                <option value="87">87%</option>
+                                <option value="88">88%</option>
+                                <option value="89">89%</option>
+                                <option value="90">90%</option>
+                                <option value="91">91%</option>
+                                <option value="92">92%</option>
+                                <option value="93">93%</option>
+                                <option value="94">94%</option>
+                                <option value="95">95%</option>
+                                <option value="96">96%</option>
+                                <option value="97">97%</option>
+                                <option value="98">98%</option>
+                                <option value="99">99%</option>
+                                <option value="100">100%</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -4540,7 +4542,12 @@ export default {
                 ====================== */
                 if (dataEnter.dataType === "booked") {
 
-                    if (dataEnter.percentage === null || dataEnter.percentage === undefined) {
+                    if (
+                        dataEnter.percentage === null ||
+                        dataEnter.percentage === undefined ||
+                        dataEnter.percentage === "" ||
+                        dataEnter.percentage === "first"
+                    ) {
                         Swal.fire("Warning", "Please select a refund percentage.", "warning");
                         return;
                     }
@@ -4588,50 +4595,56 @@ export default {
                         return;
                     }
 
-                    // ✅ 0% refund → cancel only
-                    if (Number(dataEnter.percentage) === 0) {
-                        Swal.fire("Success", "Ticket cancelled successfully (No refund).", "info");
-                        return;
-                    }
-
-                    // ✅ seat_fare check
-                    if (!dataEnter.amount || dataEnter.amount <= 0) {
+                    if (!dataEnter.amount || Number(dataEnter.amount) <= 0) {
                         Swal.fire("Error", "Seat fare missing for refund.", "error");
                         return;
                     }
 
+                    const companyPercentage = Number(dataEnter.percentage); // company keeps this %
+                    const customerRefundPercentage = 100 - companyPercentage; // customer gets this %
+
+                    // ✅ If company keeps 100%, no refund
+                    if (customerRefundPercentage <= 0) {
+                        Swal.fire("Success", "Ticket cancelled successfully (No refund).", "info");
+                        return;
+                    }
+
+                    const refundAmount =
+                        (Number(dataEnter.amount) * customerRefundPercentage) / 100;
+
                     const refundPayload = {
                         ticket_id: ticketId,
-                        refund_percentage: Number(dataEnter.percentage),
-                        refund_amount:
-                            (Number(dataEnter.amount) * Number(dataEnter.percentage)) / 100,
+                        refund_percentage: customerRefundPercentage, // refund %
+                        company_percentage: companyPercentage, // optional, for info/logging
+                        refund_amount: refundAmount,
                         refund_reason: dataEnter.reason.trim(),
                     };
 
-                    console.log("📦 Refund Payload:", refundPayload);
+                    console.log("Refund Payload:", refundPayload);
 
-                    await this.callApi("post", "allBooking/refund", refundPayload);
+                    const refundRes = await this.callApi(
+                        "post",
+                        "allBooking/booking-refund",
+                        refundPayload
+                    );
 
-                    Swal.fire("Success", "Refund processed successfully.", "success");
+                    if (refundRes.status === 200 && refundRes.data.success) {
+                        Swal.fire(
+                            "Success",
+                            `Refund processed successfully. Company kept ${companyPercentage}% and customer got ${customerRefundPercentage}% refund.`,
+                            "success"
+                        );
+                    } else {
+                        Swal.fire(
+                            "Error",
+                            refundRes.data?.message || "Refund failed.",
+                            "error"
+                        );
+                    }
                 }
-
-                /* ======================
-                   FINAL
-                ====================== */
-                await this.callApi(
-                    "post",
-                    "booking/whatsapp/cancel/message",
-                    { tickets: resCancelBooking.data.tickets }
-                );
-
-                this.fetchScheduleData();
-                this.resetArrays();
-                this.closeCancel();
-                this.closeRefundCancel();
-
-            } catch (err) {
-                console.error(err);
-                Swal.fire("Error", "Cancel or refund failed.", "error");
+            } catch (error) {
+                console.log(error);
+                Swal.fire("Error", "Something went wrong.", "error");
             } finally {
                 this.cancelLoading = false;
             }

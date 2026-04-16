@@ -242,7 +242,7 @@
 
                                 <td>
                                   <div class="d-flex gap-1">
-                                    <button v-if="record.refund_amount === null" class="btn btn-sm btn-warning"
+                                    <button  class="btn btn-sm btn-warning"
                                       @click="openRefundModal(record)">
                                       Refund
                                     </button>
@@ -322,7 +322,8 @@
 
         <!-- Manual Refund Amount -->
         <div class="mb-3">
-          <label for="refundAmount" class="form-label fw-semibold">Refund Amount</label>
+         <label for="refundAmount" class="form-label fw-semibold">Company Keep Amount</label><br>
+<small class="text-muted">Remaining amount will be refunded to customer</small>
           <input
             v-model="refundAmount"
             id="refundAmount"
@@ -336,10 +337,18 @@
           <small class="text-muted">Maximum refundable amount: {{ totalFare }}</small>
         </div>
 
-        <div v-if="selectedRecord && refundAmount !== ''" class="alert alert-info py-2 mb-3">
-          <i class="bi bi-cash-coin me-1"></i>
-          Customer Refund Amount: <strong>{{ refundAmount }}</strong>
-        </div>
+    <div v-if="selectedRecord && refundAmount !== ''" class="alert alert-info py-2 mb-3">
+  <div><strong>Company Keep Amount:</strong> {{ refundAmount }}</div>
+  <div><strong>Customer Refund Amount:</strong> {{ (parseFloat(totalFare || 0) - parseFloat(refundAmount || 0)).toFixed(2) }}</div>
+  <div>
+    <strong>Company Keep Percentage:</strong>
+    {{
+      parseFloat(totalFare || 0) > 0
+        ? ((parseFloat(refundAmount || 0) / parseFloat(totalFare || 1)) * 100).toFixed(2)
+        : 0
+    }}%
+  </div>
+</div>
 
         <!-- Refund Reason -->
         <div class="mb-3">
@@ -548,31 +557,31 @@ export default {
 
     async confirmRefund() {
   const totalFare = parseFloat(this.totalFare);
-  const enteredRefundAmount = parseFloat(this.refundAmount);
+  const enteredCompanyAmount = parseFloat(this.refundAmount);
 
   if (this.refundAmount === null || this.refundAmount === '') {
     Swal.fire({
       icon: "warning",
       title: "Missing Information",
-      text: "Please enter refund amount.",
+      text: "Please enter company keep amount.",
     });
     return;
   }
 
-  if (isNaN(enteredRefundAmount) || enteredRefundAmount < 0) {
+  if (isNaN(enteredCompanyAmount) || enteredCompanyAmount < 0) {
     Swal.fire({
       icon: "warning",
       title: "Invalid Amount",
-      text: "Please enter a valid refund amount.",
+      text: "Please enter a valid company keep amount.",
     });
     return;
   }
 
-  if (enteredRefundAmount > totalFare) {
+  if (enteredCompanyAmount > totalFare) {
     Swal.fire({
       icon: "warning",
       title: "Invalid Amount",
-      text: `Refund amount cannot be greater than paid fare.`,
+      text: `Company keep amount cannot be greater than paid fare.`,
     });
     return;
   }
@@ -586,13 +595,16 @@ export default {
     return;
   }
 
+  const customerRefundAmount = totalFare - enteredCompanyAmount;
+
   const payload = {
     ticket_id: this.selectedRecord.id,
     refund_reason: this.refundReason,
-    refund_amount: enteredRefundAmount,
+    company_amount: enteredCompanyAmount,
   };
 
-  console.log("📦 Refund Payload:", payload);
+  console.log("Payload:", payload);
+  console.log("Customer Refund Amount:", customerRefundAmount);
 
   Swal.fire({
     title: "Processing Refund...",
@@ -611,11 +623,7 @@ export default {
     const genericMsg = data?.message || "";
     const combinedMsg = ppMessage || genericMsg || "Refund response received.";
 
-    const isSuccess =
-      ppMessage.toLowerCase().includes("successful") ||
-      genericMsg.toLowerCase().includes("successful");
-
-    if (isSuccess) {
+    if (data?.success) {
       Swal.fire({
         icon: "success",
         title: "Refund Successful",
