@@ -96098,10 +96098,10 @@ var _hoisted_123 = {
   "aria-hidden": "true"
 };
 var _hoisted_124 = {
-  "class": "modal-dialog modal-dialog-centered"
+  "class": "modal-dialog modal-dialog-centered modal-md"
 };
 var _hoisted_125 = {
-  "class": "modal-content"
+  "class": "modal-content shadow border-0 rounded-3"
 };
 var _hoisted_126 = {
   "class": "modal-header bg-info text-white"
@@ -96109,7 +96109,7 @@ var _hoisted_126 = {
 
 var _hoisted_127 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
-    "class": "modal-title",
+    "class": "modal-title fw-semibold",
     id: "refundDetailsModalLabel"
   }, " Refund Details ", -1
   /* HOISTED */
@@ -96117,9 +96117,7 @@ var _hoisted_127 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_128 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "aria-hidden": "true"
-  }, "×", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "×", -1
   /* HOISTED */
   );
 });
@@ -96128,39 +96126,116 @@ var _hoisted_129 = [_hoisted_128];
 var _hoisted_130 = {
   "class": "modal-body"
 };
-
-var _hoisted_131 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Refund Amount:", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_132 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Cancellation Amount:", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_133 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Refund Percentage:", -1
-  /* HOISTED */
-  );
-});
+var _hoisted_131 = {
+  "class": "row g-2 mb-3 text-center"
+};
+var _hoisted_132 = {
+  "class": "col-6"
+};
+var _hoisted_133 = {
+  "class": "p-2 border rounded bg-light"
+};
 
 var _hoisted_134 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Refund Reason:")], -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
+    "class": "text-muted"
+  }, "Total Paid", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_135 = {
-  "class": "border p-2 rounded bg-light"
+  "class": "fw-bold"
 };
 var _hoisted_136 = {
-  "class": "modal-footer"
+  "class": "col-6"
+};
+var _hoisted_137 = {
+  "class": "p-2 border rounded bg-light"
+};
+
+var _hoisted_138 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
+    "class": "text-muted"
+  }, "Refund", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_139 = {
+  "class": "fw-bold text-success"
+};
+var _hoisted_140 = {
+  "class": "col-6"
+};
+var _hoisted_141 = {
+  "class": "p-2 border rounded bg-light"
+};
+
+var _hoisted_142 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
+    "class": "text-muted"
+  }, "Company Keep", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_143 = {
+  "class": "fw-bold text-danger"
+};
+var _hoisted_144 = {
+  "class": "col-6"
+};
+var _hoisted_145 = {
+  "class": "p-2 border rounded bg-light"
+};
+
+var _hoisted_146 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
+    "class": "text-muted"
+  }, "Refund %", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_147 = {
+  "class": "fw-bold"
+};
+var _hoisted_148 = {
+  "class": "col-12"
+};
+var _hoisted_149 = {
+  "class": "p-2 border rounded bg-light"
+};
+
+var _hoisted_150 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
+    "class": "text-muted"
+  }, "Company Keep %", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_151 = {
+  "class": "fw-bold"
+};
+
+var _hoisted_152 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "fw-semibold mb-1"
+  }, "Refund Reason", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_153 = {
+  "class": "border rounded p-2 bg-light"
+};
+var _hoisted_154 = {
+  "class": "modal-footer border-0"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _$data$selectedRecord, _$data$selectedRecord2, _$data$selectedRecord3, _$data$selectedRefund, _$data$selectedRefund2, _$data$selectedRefund3;
+  var _$data$selectedRecord, _$data$selectedRecord2, _$data$selectedRecord3, _$data$selectedRefund, _$data$selectedRefund2, _$data$selectedRefund3, _$data$selectedRefund4, _$data$selectedRefund5, _$data$selectedRefund6, _$data$selectedRefund7, _$data$selectedRefund8, _$data$selectedRefund9;
 
   var _component_vue_mask = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("vue-mask");
 
@@ -96448,24 +96523,27 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[25] || (_cache[25] = function () {
       return $options.confirmRefund && $options.confirmRefund.apply($options, arguments);
     })
-  }, " Confirm Refund ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Refund Details Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_123, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_124, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_125, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_126, [_hoisted_127, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, " Confirm Refund ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Refund Details Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_123, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_124, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_125, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Header "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_126, [_hoisted_127, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
-    "class": "close",
+    "class": "close text-white",
     onClick: _cache[26] || (_cache[26] = function ($event) {
       return $options.closeRefundViewModal();
-    }),
-    "aria-label": "Close"
-  }, _hoisted_129)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_130, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [_hoisted_131, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.selectedRefund.refund_amount) + " PKR ", 1
+    })
+  }, _hoisted_129)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Body "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_130, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Summary Cards "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_131, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_132, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_133, [_hoisted_134, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_135, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((parseFloat(((_$data$selectedRefund = $data.selectedRefund) === null || _$data$selectedRefund === void 0 ? void 0 : _$data$selectedRefund.seat_fare) || 0) - parseFloat(((_$data$selectedRefund2 = $data.selectedRefund) === null || _$data$selectedRefund2 === void 0 ? void 0 : _$data$selectedRefund2.discount) || 0)).toFixed(2)) + " PKR ", 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [_hoisted_132, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(Math.max(0, parseFloat(((_$data$selectedRefund = $data.selectedRefund) === null || _$data$selectedRefund === void 0 ? void 0 : _$data$selectedRefund.seat_fare) || 0) - parseFloat(((_$data$selectedRefund2 = $data.selectedRefund) === null || _$data$selectedRefund2 === void 0 ? void 0 : _$data$selectedRefund2.discount) || 0) - parseFloat(((_$data$selectedRefund3 = $data.selectedRefund) === null || _$data$selectedRefund3 === void 0 ? void 0 : _$data$selectedRefund3.refund_amount) || 0))) + " PKR ", 1
+  )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_136, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_137, [_hoisted_138, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_139, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(parseFloat(((_$data$selectedRefund3 = $data.selectedRefund) === null || _$data$selectedRefund3 === void 0 ? void 0 : _$data$selectedRefund3.refund_amount) || 0).toFixed(2)) + " PKR ", 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [_hoisted_133, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(100 - $data.selectedRefund.refund_percentage) + "% ", 1
+  )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_140, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_141, [_hoisted_142, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_143, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(Math.max(0, parseFloat(((_$data$selectedRefund4 = $data.selectedRefund) === null || _$data$selectedRefund4 === void 0 ? void 0 : _$data$selectedRefund4.seat_fare) || 0) - parseFloat(((_$data$selectedRefund5 = $data.selectedRefund) === null || _$data$selectedRefund5 === void 0 ? void 0 : _$data$selectedRefund5.discount) || 0) - parseFloat(((_$data$selectedRefund6 = $data.selectedRefund) === null || _$data$selectedRefund6 === void 0 ? void 0 : _$data$selectedRefund6.refund_amount) || 0)).toFixed(2)) + " PKR ", 1
   /* TEXT */
-  )]), _hoisted_134, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_135, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.selectedRefund.refund_reason), 1
+  )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_144, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_145, [_hoisted_146, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_147, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(parseFloat(((_$data$selectedRefund7 = $data.selectedRefund) === null || _$data$selectedRefund7 === void 0 ? void 0 : _$data$selectedRefund7.refund_percentage) || 0).toFixed(2)) + "% ", 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_136, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_148, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_149, [_hoisted_150, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_151, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((100 - parseFloat(((_$data$selectedRefund8 = $data.selectedRefund) === null || _$data$selectedRefund8 === void 0 ? void 0 : _$data$selectedRefund8.refund_percentage) || 0)).toFixed(2)) + "% ", 1
+  /* TEXT */
+  )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Reason "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_152, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_153, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(((_$data$selectedRefund9 = $data.selectedRefund) === null || _$data$selectedRefund9 === void 0 ? void 0 : _$data$selectedRefund9.refund_reason) || '-'), 1
+  /* TEXT */
+  )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Footer "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_154, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
-    "class": "btn btn-secondary",
+    "class": "btn btn-secondary btn-sm px-3",
     onClick: _cache[27] || (_cache[27] = function ($event) {
       return $options.closeRefundViewModal();
     })
@@ -149009,7 +149087,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.loading-spinner[data-v-6785e3e1] {\n  display: block;\n  margin: 0 auto;\n  padding: 2em;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.loading-spinner[data-v-6785e3e1] {\n    display: block;\n    margin: 0 auto;\n    padding: 2em;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
