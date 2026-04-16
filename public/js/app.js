@@ -96099,7 +96099,7 @@ var _hoisted_123 = {
   "aria-hidden": "true"
 };
 var _hoisted_124 = {
-  "class": "modal-dialog modal-dialog-centered modal-md"
+  "class": "modal-dialog modal-dialog-centered modal-lg"
 };
 var _hoisted_125 = {
   "class": "modal-content shadow border-0 rounded-3"
@@ -96131,7 +96131,7 @@ var _hoisted_131 = {
   "class": "row g-3 mb-4 text-center"
 };
 var _hoisted_132 = {
-  "class": "col-6"
+  "class": "col-6 my-3"
 };
 var _hoisted_133 = {
   "class": "p-3 border rounded bg-light h-100"
@@ -96149,7 +96149,7 @@ var _hoisted_135 = {
   "class": "fw-bold fs-6"
 };
 var _hoisted_136 = {
-  "class": "col-6"
+  "class": "col-6 my-3"
 };
 var _hoisted_137 = {
   "class": "p-3 border rounded bg-light h-100"
@@ -96167,7 +96167,7 @@ var _hoisted_139 = {
   "class": "fw-bold text-success fs-6"
 };
 var _hoisted_140 = {
-  "class": "col-6"
+  "class": "col-6 my-3"
 };
 var _hoisted_141 = {
   "class": "p-3 border rounded bg-light h-100"
@@ -96185,7 +96185,7 @@ var _hoisted_143 = {
   "class": "fw-bold text-danger fs-6"
 };
 var _hoisted_144 = {
-  "class": "col-6"
+  "class": "col-6 my-3"
 };
 var _hoisted_145 = {
   "class": "p-3 border rounded bg-light h-100"

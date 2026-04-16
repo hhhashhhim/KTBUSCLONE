@@ -195,7 +195,7 @@
                                                                 <td>
                                                                     {{
                                                                         parseFloat(record.seat_fare) -
-                                                                    parseFloat(record.discount ?? 0)
+                                                                        parseFloat(record.discount ?? 0)
                                                                     }}
                                                                 </td>
                                                                 <td>{{ formatDate(record.created_at) }}</td>
@@ -205,8 +205,8 @@
                                                                             ? record.cancel_ticket.added_by_name
                                                                                 ? record.cancel_ticket.added_by_name
                                                                                     .name
-                                                                    : "Auto"
-                                                                    : "N/A"
+                                                                                : "Auto"
+                                                                            : "N/A"
                                                                     }}
                                                                 </td>
                                                                 <td>
@@ -214,16 +214,16 @@
                                                                         record.type == "canceled"
                                                                             ? formatDate(
                                                                                 record.cancel_ticket.created_at
-                                                                    )
-                                                                    : "N/A"
+                                                                            )
+                                                                            : "N/A"
                                                                     }}
                                                                 </td>
                                                                 <td>
                                                                     {{
                                                                         record.type == "over-issue"
                                                                             ? record.over_issue_seats.overissue_by
-                                                                    .name
-                                                                    : "N/A"
+                                                                                .name
+                                                                            : "N/A"
                                                                     }}
                                                                 </td>
                                                                 <td>
@@ -231,22 +231,22 @@
                                                                         record.type == "over-issue"
                                                                             ? formatDate(
                                                                                 record.over_issue_seats.created_at
-                                                                    )
-                                                                    : "N/A"
+                                                                            )
+                                                                            : "N/A"
                                                                     }}
                                                                 </td>
                                                                 <td>
                                                                     {{
                                                                         record.refund_amount
                                                                             ? "Refunded"
-                                                                    : record.type
+                                                                            : record.type
                                                                     }}
                                                                 </td>
 
                                                                 <td>
                                                                     <span v-if="record.refund_amount">
                                                                         {{ record.refund_amount }} → ({{ 100 -
-                                                                        (record.refund_percentage || 0) }}%)
+                                                                            (record.refund_percentage || 0) }}%)
                                                                     </span>
                                                                     <span v-else>-</span>
                                                                 </td>
@@ -354,8 +354,8 @@
                                 {{
                                     parseFloat(totalFare || 0) > 0
                                         ? (((parseFloat(totalFare || 0) - parseFloat(refundAmount || 0)) / parseFloat(totalFare
-                                || 1)) * 100).toFixed(2)
-                                : 0
+                                            || 1)) * 100).toFixed(2)
+                                        : 0
                                 }}%
                             </div>
                         </div>
@@ -383,7 +383,7 @@
         <!-- Refund Details Modal -->
         <div class="modal fade" id="refundDetailsModal" tabindex="-1" aria-labelledby="refundDetailsModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content shadow border-0 rounded-3">
 
                     <!-- Header -->
@@ -400,85 +400,85 @@
                     <div class="modal-body">
 
                         <!-- Summary Cards -->
-                       <div class="row g-3 mb-4 text-center">
+                        <div class="row g-3 mb-4 text-center">
 
-  <div class="col-6">
-    <div class="p-3 border rounded bg-light h-100">
-      <small class="text-muted d-block mb-1">Total Paid</small>
-      <div class="fw-bold fs-6">
-        {{
-          (
-            parseFloat(selectedRefund?.seat_fare || 0)
-            - parseFloat(selectedRefund?.discount || 0)
-          ).toFixed(2)
-        }} PKR
-      </div>
-    </div>
-  </div>
+                            <div class="col-6 my-3">
+                                <div class="p-3 border rounded bg-light h-100">
+                                    <small class="text-muted d-block mb-1">Total Paid</small>
+                                    <div class="fw-bold fs-6">
+                                        {{
+                                            (
+                                                parseFloat(selectedRefund?.seat_fare || 0)
+                                        - parseFloat(selectedRefund?.discount || 0)
+                                        ).toFixed(2)
+                                        }} PKR
+                                    </div>
+                                </div>
+                            </div>
 
-  <div class="col-6">
-    <div class="p-3 border rounded bg-light h-100">
-      <small class="text-muted d-block mb-1">Refund</small>
-      <div class="fw-bold text-success fs-6">
-        {{ parseFloat(selectedRefund?.refund_amount || 0).toFixed(2) }} PKR
-      </div>
-    </div>
-  </div>
+                            <div class="col-6 my-3">
+                                <div class="p-3 border rounded bg-light h-100">
+                                    <small class="text-muted d-block mb-1">Refund</small>
+                                    <div class="fw-bold text-success fs-6">
+                                        {{ parseFloat(selectedRefund?.refund_amount || 0).toFixed(2) }} PKR
+                                    </div>
+                                </div>
+                            </div>
 
-  <div class="col-6">
-    <div class="p-3 border rounded bg-light h-100">
-      <small class="text-muted d-block mb-1">Company Keep</small>
-      <div class="fw-bold text-danger fs-6">
-        {{
-          Math.max(
-            0,
-            (
-              parseFloat(selectedRefund?.seat_fare || 0)
-              - parseFloat(selectedRefund?.discount || 0)
-              - parseFloat(selectedRefund?.refund_amount || 0)
-            )
-          ).toFixed(2)
-        }} PKR
-      </div>
-    </div>
-  </div>
+                            <div class="col-6 my-3">
+                                <div class="p-3 border rounded bg-light h-100">
+                                    <small class="text-muted d-block mb-1">Company Keep</small>
+                                    <div class="fw-bold text-danger fs-6">
+                                        {{
+                                            Math.max(
+                                                0,
+                                                (
+                                                    parseFloat(selectedRefund?.seat_fare || 0)
+                                                    - parseFloat(selectedRefund?.discount || 0)
+                                        - parseFloat(selectedRefund?.refund_amount || 0)
+                                        )
+                                        ).toFixed(2)
+                                        }} PKR
+                                    </div>
+                                </div>
+                            </div>
 
-  <div class="col-6">
-    <div class="p-3 border rounded bg-light h-100">
-      <small class="text-muted d-block mb-1">Refund %</small>
-      <div class="fw-bold fs-6">
-        {{ parseFloat(selectedRefund?.refund_percentage || 0).toFixed(2) }}%
-      </div>
-    </div>
-  </div>
+                            <div class="col-6 my-3">
+                                <div class="p-3 border rounded bg-light h-100">
+                                    <small class="text-muted d-block mb-1">Refund %</small>
+                                    <div class="fw-bold fs-6">
+                                        {{ parseFloat(selectedRefund?.refund_percentage || 0).toFixed(2) }}%
+                                    </div>
+                                </div>
+                            </div>
 
-  <div class="col-12">
-    <div class="p-3 border rounded bg-light">
-      <small class="text-muted d-block mb-1">Company Keep %</small>
-      <div class="fw-bold fs-6">
-        {{
-          (
-            100 - parseFloat(selectedRefund?.refund_percentage || 0)
-          ).toFixed(2)
-        }}%
-      </div>
-    </div>
-  </div>
+                            <div class="col-12">
+                                <div class="p-3 border rounded bg-light">
+                                    <small class="text-muted d-block mb-1">Company Keep %</small>
+                                    <div class="fw-bold fs-6">
+                                        {{
+                                            (
+                                                100 - parseFloat(selectedRefund?.refund_percentage || 0)
+                                        ).toFixed(2)
+                                        }}%
+                                    </div>
+                                </div>
+                            </div>
 
-</div>
+                        </div>
 
                         <!-- Reason -->
-                     <div class="mt-3">
-  <label class="fw-semibold mb-1">Refund Reason</label>
-  <div class="border rounded p-3 bg-light" style="min-height: 60px;">
-    {{
-      selectedRefund?.refund_reason &&
-      selectedRefund?.refund_reason.trim() !== ''
-        ? selectedRefund.refund_reason
-        : 'No reason provided'
-    }}
-  </div>
-</div>
+                        <div class="mt-3">
+                            <label class="fw-semibold mb-1">Refund Reason</label>
+                            <div class="border rounded p-3 bg-light" style="min-height: 60px;">
+                                {{
+                                    selectedRefund?.refund_reason &&
+                                        selectedRefund?.refund_reason.trim() !== ''
+                                ? selectedRefund.refund_reason
+                                : 'No reason provided'
+                                }}
+                            </div>
+                        </div>
 
                     </div>
 
