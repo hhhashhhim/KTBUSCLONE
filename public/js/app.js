@@ -40842,6 +40842,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     viewRefundDetails: function viewRefundDetails(record) {
       this.selectedRefund = {
         refund_amount: record.refund_amount,
+        refund_reason: record.refund_reason,
         refund_percentage: record.refund_percentage,
         seat_fare: record.seat_fare,
         discount: record.discount
