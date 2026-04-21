@@ -1011,7 +1011,7 @@ Terms & Conditions:
 5. Keep your belongings safe. Company is not responsible for loss or damage.
 
 " . $cancelMessage . "";
-
+ 
         // Decide which messages to send
         $sendTypes = match ((int)$message_allow) {
             1 => ['confirm'],
@@ -1019,7 +1019,7 @@ Terms & Conditions:
             3 => ['confirm', 'reserved'],
             default => null,
         };
- 
+
         // Skip if no messages to send
         if (empty($sendTypes)) {
             return [
