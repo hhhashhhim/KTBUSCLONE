@@ -904,7 +904,7 @@ Terms & conditions applied.";
             'session_response' => $session_response
         ];
     }
-}
+} 
 
 if (!function_exists('ticketRescheduledMessage')) {
     function ticketRescheduledMessage($old_tickets, $new_tickets)
