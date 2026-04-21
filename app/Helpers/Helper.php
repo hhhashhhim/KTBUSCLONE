@@ -1019,7 +1019,7 @@ Terms & Conditions:
             3 => ['confirm', 'reserved'],
             default => null,
         };
-
+ 
         // Skip if no messages to send
         if (empty($sendTypes)) {
             return [
