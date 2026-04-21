@@ -57,9 +57,10 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
     Route::post('/fetch/over/issue/seat', [BookingController::class, 'fetchOverIssueSeat']);
     Route::post('/revert/over/issue/seat', [BookingController::class, 'revertOverIssueSeat']);
     Route::post('/whatsapp/message', [BookingController::class, 'whatsappMessage']);
+    Route::post('/whatsapp/message', [BookingController::class, 'onlineWhatsappMessage']);
     Route::post('/whatsapp/cancel/message', [BookingController::class, 'whatsappCancelMessage']);
     Route::post('/whatsapp/bus/send-message', [BookingController::class, 'sendMessageToBus']);
-    
+
 
     // Schedule Closing
     Route::group(['prefix' => '/close/schedule', [CustomMiddleware::class]], function () {
@@ -73,8 +74,8 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
             Route::post('/revert', [ScheduleClosingController::class, 'revertUnclosing']);
             Route::post('/data', [ScheduleClosingController::class, 'unclosingData']);
         });
-        
-        
+
+
         Route::group(['prefix' => '/closing', [CustomMiddleware::class]], function () {
             Route::post('/', [ScheduleClosingController::class, 'closing']);
             Route::post('/commission', [ScheduleClosingController::class, 'commissionClosing']);

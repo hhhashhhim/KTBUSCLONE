@@ -101,7 +101,7 @@ class BookingController extends Controller
         * Validation Types on Ticket Must be
         * 1) Target => Same ticket for same departure and designation must not be same
         * Example Karachi to Moro could not be re issued at any cost
-        *  
+        *
         * Possible Scenario
         * 1) Same Seat can be issue multipe time ( Partial )
         * For Example Karachi to Moro seat no 35 Then seat 35 can be booked onward from Moro to Rwp
@@ -132,9 +132,9 @@ class BookingController extends Controller
                     ->where('departure_time', date("H:i:s", strtotime($request->departure_time)))
                     ->first();
 
-                //  $schedule_time_exact ( Date At which bus will leave from first terminal ) 
+                //  $schedule_time_exact ( Date At which bus will leave from first terminal )
                 $schedule_time_exact = ScheduleDetail::where(["schedule_id" => $detail->schedule_id, "schedule_date" => $detail->schedule_date])->first();
-                // $schedule To get Route Details ( Example Child City for example Karachi to RWP contains Karachi to Moro and more ) 
+                // $schedule To get Route Details ( Example Child City for example Karachi to RWP contains Karachi to Moro and more )
                 $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
                 // $existingTicket Tickets which are already booked or reserved
                 $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->orderBy('id', 'desc')->first(['bus_id', 'ticket_closing_id', 'ticket_merge_id']);
@@ -272,21 +272,21 @@ class BookingController extends Controller
 
                 /*
                 *   Validation
-                *   Only Purpose to Seat Avoid Duplication 
-                *   $lastDestination means last destination Route will have, Route are saved as 
+                *   Only Purpose to Seat Avoid Duplication
+                *   $lastDestination means last destination Route will have, Route are saved as
                 *   Route 1) RWP to Moro
-                *   Route 2) Moro to Karachi 
+                *   Route 2) Moro to Karachi
                 *   $lastDestination will have Karachi
                 *   $allFaresOfRout will have RWP and Moro
-                *   
+                *
                 */
                 $lastDestination = $schedule->route->fares->last();
                 $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
                 //RWP MORO KARACHI are now single Array
                 array_push($allFaresOfRoute, $lastDestination->destination_city_id);
-                //Example MORO departure will have 1 index  
+                //Example MORO departure will have 1 index
                 $scheduleDepIndex = array_search($request->departureCity, $allFaresOfRoute);
-                //Example Karachi destination will have 2 index  
+                //Example Karachi destination will have 2 index
                 $scheduleDesIndex = array_search($request->destinationCity, $allFaresOfRoute);
 
                 // if seat are going to update then case will be different from newly created
@@ -315,7 +315,7 @@ class BookingController extends Controller
                     //Check if Ticket is Booked for RWP to MORO Target is to book MORO to Karachi
                     // $ticketDepIndex will have 0 as Karachi is at index 0
                     $ticketDepIndex = array_search($tkt->departure_city_id, $allFaresOfRoute);
-                    // $ticketDesIndex will have 1 as MORO is at index 1 
+                    // $ticketDesIndex will have 1 as MORO is at index 1
                     $ticketDesIndex = array_search($tkt->destination_city_id, $allFaresOfRoute);
 
                     /*
@@ -325,12 +325,12 @@ class BookingController extends Controller
                     *   Condition 2 )($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
                     *   Output 1 > 1 > 1 && 1 <= 2 Result False
                     */
-                    if (($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
+                    if (($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat
                         || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
                     ) {
                         return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
                     }
-                    if (($scheduleDepIndex >= $ticketDepIndex && $scheduleDepIndex < $ticketDesIndex) // Will Check Partial Seat 
+                    if (($scheduleDepIndex >= $ticketDepIndex && $scheduleDepIndex < $ticketDesIndex) // Will Check Partial Seat
                         || ($scheduleDesIndex > $ticketDepIndex && $scheduleDesIndex <= $ticketDesIndex)
                     ) {
                         return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
@@ -498,6 +498,11 @@ class BookingController extends Controller
 
         return ticketConfirmedMessage($request->invoice_id);
     }
+    public function onlineWhatsappMessage(Request $request)
+    {
+
+        return onlineTicketConfirmedMessage($request->invoice_id);
+    }
 
     public function whatsappCancelMessage(Request $request)
     {
@@ -592,21 +597,21 @@ class BookingController extends Controller
             $schedule = Schedule::where('id', $scheduleDetail->schedule_id)->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             /*
             *   Validation
-            *   Only Purpose to Seat Avoid Duplication 
-            *   $lastDestination means last destination Route will have, Route are saved as 
+            *   Only Purpose to Seat Avoid Duplication
+            *   $lastDestination means last destination Route will have, Route are saved as
             *   Route 1) RWP to Moro
-            *   Route 2) Moro to Karachi 
+            *   Route 2) Moro to Karachi
             *   $lastDestination will have Karachi
             *   $allFaresOfRout will have RWP and Moro
-            *   
+            *
             */
             $lastDestination = $schedule->route->fares->last();
             $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
             //RWP MORO KARACHI are now single Array
             array_push($allFaresOfRoute, $lastDestination->destination_city_id);
-            //Example MORO departure will have 1 index  
+            //Example MORO departure will have 1 index
             $scheduleDepIndex = array_search($scheduleDetail->departure_id, $allFaresOfRoute);
-            //Example Karachi destination will have 2 index  
+            //Example Karachi destination will have 2 index
             $scheduleDesIndex = array_search($scheduleDetail->destination_id, $allFaresOfRoute);
 
 
@@ -627,7 +632,7 @@ class BookingController extends Controller
                     //Check if Ticket is Booked for RWP to MORO Target is to book MORO to Karachi
                     // $ticketDepIndex will have 0 as Karachi is at index 0
                     $ticketDepIndex = array_search($tkt->departure_city_id, $allFaresOfRoute);
-                    // $ticketDesIndex will have 1 as MORO is at index 1 
+                    // $ticketDesIndex will have 1 as MORO is at index 1
                     $ticketDesIndex = array_search($tkt->destination_city_id, $allFaresOfRoute);
 
                     /*
@@ -637,7 +642,7 @@ class BookingController extends Controller
                     *   Condition 2 )($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
                     *   Output 1 > 1 > 1 && 1 <= 2 Result False
                     */
-                    if (($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat 
+                    if (($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex) // Will Check Partial Seat
                         || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
                     ) {
                         return response()->json(["errors" => ["Error" => ["One seat of your combination is already booked"]]], 422);
