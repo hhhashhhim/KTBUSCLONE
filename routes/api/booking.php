@@ -57,7 +57,6 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
     Route::post('/fetch/over/issue/seat', [BookingController::class, 'fetchOverIssueSeat']);
     Route::post('/revert/over/issue/seat', [BookingController::class, 'revertOverIssueSeat']);
     Route::post('/whatsapp/message', [BookingController::class, 'whatsappMessage']);
-    Route::post('/whatsapp/message', [BookingController::class, 'onlineWhatsappMessage']);
     Route::post('/whatsapp/cancel/message', [BookingController::class, 'whatsappCancelMessage']);
     Route::post('/whatsapp/bus/send-message', [BookingController::class, 'sendMessageToBus']);
 
