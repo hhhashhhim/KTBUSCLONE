@@ -686,7 +686,7 @@ class BookingApiController extends Controller
                             "message" => Auth::user()->name . " | update ticket (advance to confirm) | time : " . $checkAlreadyBooked[0]->schedule_date . " " . $checkAlreadyBooked[0]->schedule_time . " | invoice id :" . $request->invoice_id . " / " . (isset($request->total_amount) ? json_encode($request->total_amount) : "*"),
                             "requested_host" => $request->ip(),
                             "company_id" => Auth::user()->company_id
-                        ]); 
+                        ]);
                         return new CreatedResource(["invoice_id" => $request->invoice_id]);
                     } else {
                         $error = ["your seat combinations are not reserved for confirm booking"];

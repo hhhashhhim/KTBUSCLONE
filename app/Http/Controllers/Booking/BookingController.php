@@ -498,12 +498,7 @@ class BookingController extends Controller
 
         return ticketConfirmedMessage($request->invoice_id);
     }
-    public function onlineWhatsappMessage(Request $request)
-    {
-
-        return onlineTicketConfirmedMessage($request->invoice_id);
-    }
-
+   
     public function whatsappCancelMessage(Request $request)
     {
         return ticketCanceledMessage($request->tickets);
