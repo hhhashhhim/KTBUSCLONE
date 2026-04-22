@@ -838,13 +838,28 @@ Terms & conditions applied
 4:For passenger safety Bus will not pick/drop passengers from Roadside or outside Company Terminal
 5: Keep your personal belongings Safe Company is not responsible for any loss or damage.";
 
-        $messageReserved = "Dear " . $ticket->customer->name . ",
-Seat# " . implode(',', $tickets->pluck('seat_no')->toArray()) . ",
-" . $ticket->departure_city->name . " to " . $ticket->destination_city->name . "
-Date " . $ticket->date . "
-Is Reserved
-Departure at:
-$html
+        $messageReserved = "🌐 Online Ticket (Reservation)
+
+Dear " . $ticket->customer->name . ",
+
+Your seat has been reserved:
+
+Seat No." . implode(',', $tickets->pluck('seat_no')->toArray()) . ",
+
+[" . $ticket->departure_city->name . "  → " . $ticket->destination_city->name . "]
+📅 [" . $ticket->date . "] | ⏰ [$html]
+
+⚠️ Important:
+Your reservation is valid for 2 hours only. After that, the seat will be considered on chance.
+
+Terms & Conditions:
+
+1. Please arrive at the terminal 30 minutes before departure.
+2. Luggage allowance is up to 30kg per person. Extra/commercial luggage will be charged.
+3. WiFi (up to 350MB), refreshments & multimedia are complimentary and non-claimable.
+4. No roadside pick/drop. Use only company terminals.
+5. Keep your belongings safe. Company is not responsible for loss or damage.
+
 " . $cancelMessage . "
 
 Terms & conditions applied.";
@@ -904,7 +919,7 @@ Terms & conditions applied.";
             'session_response' => $session_response
         ];
     }
-} 
+}
 
 if (!function_exists('ticketRescheduledMessage')) {
     function ticketRescheduledMessage($old_tickets, $new_tickets)
