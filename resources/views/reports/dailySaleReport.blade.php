@@ -68,9 +68,9 @@
             <th class="centerTH">Route</th>
 
 <th class="fontWightTh">
-    {{ $start?->name }}
+    {{ $start?->name ?? 'N/A' }}
     →
-    {{ $return?->name }}
+    {{ $return?->name ?? 'N/A' }}
 </th>
         </tr>
     </table>
@@ -101,7 +101,7 @@
                 @foreach($startShortages as $item)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $item->terminal->name }}</td>
+                        <td>{{ $item->terminal->name ?? 'N/A' }}</td>
                         <td>{{ $item->passenger_count }}</td>
 
                         @php
@@ -158,7 +158,7 @@
                 @foreach($returnShortages as $item)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $item->terminal->name }}</td>
+                        <td>{{ $item->terminal->name ?? 'N/A' }}</td>
                         <td>{{ $item->passenger_count }}</td>
 
                         @php
@@ -208,7 +208,7 @@
 
         @foreach($expenses as $item)
             <tr>
-                <td>{{ $item->expense_category->name }}</td>
+                <td>{{ $item->expense_category->name ?? 'N/A' }}</td>
                 <td>{{ $item->description }}</td>
                 <td>{{ number_format($item->amount) }}</td>
             </tr>
