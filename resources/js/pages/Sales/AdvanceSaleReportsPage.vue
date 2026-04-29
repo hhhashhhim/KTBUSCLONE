@@ -14,7 +14,7 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
-                                                 <div class="my-2 col-md-3">
+                                                <div class="my-2 col-md-3">
                                                     <label>CNIC No</label>
                                                     <input type="text" class="form-control"
                                                         v-model="filterSales.passenger_cnic">
@@ -25,7 +25,7 @@
                                                     <input type="text" class="form-control"
                                                         v-model="filterSales.passenger_contact">
                                                 </div>
-                                                  <div class="my-2 col-md-3">
+                                                <div class="my-2 col-md-3">
                                                     <label>Passenger Name</label>
                                                     <input type="text" class="form-control"
                                                         v-model="filterSales.passenger_name">
@@ -41,7 +41,8 @@
                                                     <input type="text" class="form-control"
                                                         v-model="filterSales.transaction_id">
                                                 </div>
-                                                <div class="my-2 col-md-4" v-if="checkForSubmenuButtons('terminal-filter')">
+                                                <div class="my-2 col-md-4"
+                                                    v-if="checkForSubmenuButtons('terminal-filter')">
                                                     <label for="terminalFilter">Terminals</label>
                                                     <select id="terminalFilter" class="form-control"
                                                         v-model="filterSales.terminal">
@@ -63,7 +64,7 @@
                                                         </option>
                                                     </select>
                                                 </div>
-                                                 <div class="my-2 col-md-3">
+                                                <div class="my-2 col-md-3">
                                                     <label for="usernameFilter">Users</label>
                                                     <select id="usernameFilter" class="form-control"
                                                         v-model="filterSales.user">
@@ -105,71 +106,85 @@
                                                         </div>
                                                         <div v-else>
                                                             <div class="d-flex justify-content-end mb-2">
-                                                               <form
-    :action="$store.state.api_url + 'api/web/v1/advance/sales/pdf'"
-    method="POST" ref="salePrint" target="_blank">
+                                                                <form
+                                                                    :action="$store.state.api_url + 'api/web/v1/advance/sales/pdf'"
+                                                                    method="POST" ref="salePrint" target="_blank">
 
-    <input type="hidden" name="token" :value="this.$store.state.token">
-    <input type="hidden" name="terminal" :value="filterSales.terminal">
-    <input type="hidden" name="user" :value="filterSales.user">
-    <input type="hidden" name="route" :value="filterSales.route">
-    <input type="hidden" name="invoice_id" :value="filterSales.invoice_id">
-    <input type="hidden" name="transaction_id" :value="filterSales.transaction_id">
-    <input type="hidden" name="passenger_name" :value="filterSales.passenger_name">
-    <input type="hidden" name="passenger_contact" :value="filterSales.passenger_contact">
-    <input type="hidden" name="passenger_cnic" :value="filterSales.passenger_cnic">
-    <input type="hidden" name="fromDateTime" :value="filterSales.fromDateTime">
-    <input type="hidden" name="toDateTime" :value="filterSales.toDateTime">
-    <input type="hidden" name="counterSale" :value="filterSales.counterSale">
+                                                                    <input type="hidden" name="token"
+                                                                        :value="this.$store.state.token">
+                                                                    <input type="hidden" name="terminal"
+                                                                        :value="filterSales.terminal">
+                                                                    <input type="hidden" name="user"
+                                                                        :value="filterSales.user">
+                                                                    <input type="hidden" name="route"
+                                                                        :value="filterSales.route">
+                                                                    <input type="hidden" name="invoice_id"
+                                                                        :value="filterSales.invoice_id">
+                                                                    <input type="hidden" name="transaction_id"
+                                                                        :value="filterSales.transaction_id">
+                                                                    <input type="hidden" name="passenger_name"
+                                                                        :value="filterSales.passenger_name">
+                                                                    <input type="hidden" name="passenger_contact"
+                                                                        :value="filterSales.passenger_contact">
+                                                                    <input type="hidden" name="passenger_cnic"
+                                                                        :value="filterSales.passenger_cnic">
+                                                                    <input type="hidden" name="fromDateTime"
+                                                                        :value="filterSales.fromDateTime">
+                                                                    <input type="hidden" name="toDateTime"
+                                                                        :value="filterSales.toDateTime">
+                                                                    <input type="hidden" name="counterSale"
+                                                                        :value="filterSales.counterSale">
 
-    <input type="submit" value="Print" class="btn btn-dark">
-</form>
+                                                                    <input type="submit" value="Print"
+                                                                        class="btn btn-dark">
+                                                                </form>
                                                             </div>
-                                                            <table class="table table-striped table-hover text-center" id="saleReportTable">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Bus No</th>
-            <th>Bus Class</th>
-            <th>No of Seat</th>
-            <th>Terminal Name</th>
-            <th>User Name</th>
-            <th>Invoice</th>
-            <th>Transaction #</th>
-            <th>Passenger Name</th>
-            <th>Cell No</th>
-            <th>CNIC No</th>
-            <th>Sale Amount</th>
-            <th>ELT Amount</th>
-        </tr>
-    </thead>
+                                                            <table class="table table-striped table-hover text-center"
+                                                                id="saleReportTable">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Date</th>
+                                                                        <th>Bus No</th>
+                                                                        <th>Bus Class</th>
+                                                                        <th>No of Seat</th>
+                                                                        <th>Terminal Name</th>
+                                                                        <th>User Name</th>
+                                                                        <th>Invoice</th>
+                                                                        <th>Transaction #</th>
+                                                                        <th>Passenger Name</th>
+                                                                        <th>Cell No</th>
+                                                                        <th>CNIC No</th>
+                                                                        <th>Sale Amount</th>
+                                                                        <th>ELT Amount</th>
+                                                                    </tr>
+                                                                </thead>
 
-    <tbody>
-        <tr v-for="(data, i) in filters.record" :key="i">
-            <td>{{ data.date }}<br>{{ data.time }}</td>
-            <td>{{ data.bus_number }}</td>
-            <td>{{ data.bus_class }}</td>
-            <td>{{ data.seats }}</td>
-            <td>{{ data.terminal }}</td>
-            <td>{{ data.user }}</td>
-            <td>{{ data.invoice_id ?? 'N/A' }}</td>
-            <td>{{ data.transaction_id ?? 'N/A' }}</td>
-            <td>{{ data.passenger_name ?? 'N/A' }}</td>
-            <td>{{ data.passenger_contact ?? 'N/A' }}</td>
-            <td>{{ data.passenger_cnic ?? 'N/A' }}</td>
-            <td>{{ data.sales }}</td>
-            <td>{{ data.elt }}</td>
-        </tr>
+                                                                <tbody>
+                                                                    <tr v-for="(data, i) in filters.record" :key="i">
+                                                                        <td>{{ data.date }}<br>{{ data.time }}</td>
+                                                                        <td>{{ data.bus_number }}</td>
+                                                                        <td>{{ data.bus_class }}</td>
+                                                                        <td>{{ data.seats }}</td>
+                                                                        <td>{{ data.terminal }}</td>
+                                                                        <td>{{ data.user }}</td>
+                                                                        <td>{{ data.invoice_id ?? 'N/A' }}</td>
+                                                                        <td>{{ data.transaction_id ?? 'N/A' }}</td>
+                                                                        <td>{{ data.passenger_name ?? 'N/A' }}</td>
+                                                                        <td>{{ data.passenger_contact ?? 'N/A' }}</td>
+                                                                        <td>{{ data.passenger_cnic ?? 'N/A' }}</td>
+                                                                        <td>{{ data.sales }}</td>
+                                                                        <td>{{ data.elt }}</td>
+                                                                    </tr>
 
-        <tr>
-            <th colspan="3"></th>
-            <th>{{ totalSeats() ?? 0 }}</th>
-            <th colspan="7"></th>
-            <th>{{ totalSeatFare() ?? 0 }}</th>
-            <th>{{ totalEltFare() ?? 0 }}</th>
-        </tr>
-    </tbody>
-</table>
+                                                                    <tr>
+                                                                        <th colspan="3"></th>
+                                                                        <th>{{ totalSeats() ?? 0 }}</th>
+                                                                        <th colspan="7"></th>
+                                                                        <th>{{ totalSeatFare() ?? 0 }}</th>
+                                                                        <th>{{ totalEltFare() ?? 0 }}</th>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -382,32 +397,69 @@ export default {
             }
 
         },
-        async salesFilter() {
-            this.tableLoading = true;
-            if (!this.filterSales.fromDateTime)
-                return swal({
-                    title: "Required",
-                    text: "From date is required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.filterSales.toDateTime)
-                return swal({
-                    title: "Required",
-                    text: "To date is required",
-                    icon: "error",
-                    timer: 2000
-                });
-            const resFetchData = await this.callApi("post", 'advance/sales/fetchFilterData', this.filterSales);
-            if (resFetchData.status == 200) {
-                this.tableLoading = false;
-                this.filters.record = resFetchData.data.record;
-                this.filters.refund = resFetchData.data.refund;
-                this.filters.counterExpenses = resFetchData.data.counterExpenses;
-                this.loadingTable = false;
-            }
+       async salesFilter() {
+    this.tableLoading = true;
+    this.loadingTable = true;
 
-        },
+    if (!this.filterSales.fromDateTime) {
+        this.tableLoading = false;
+        this.loadingTable = false;
+
+        return swal({
+            title: "Required",
+            text: "From date is required",
+            icon: "error",
+            timer: 2000
+        });
+    }
+
+    if (!this.filterSales.toDateTime) {
+        this.tableLoading = false;
+        this.loadingTable = false;
+
+        return swal({
+            title: "Required",
+            text: "To date is required",
+            icon: "error",
+            timer: 2000
+        });
+    }
+
+    try {
+        const resFetchData = await this.callApi(
+            "post",
+            "advance/sales/fetchFilterData",
+            this.filterSales
+        );
+
+        if (resFetchData && resFetchData.status === 200) {
+            this.filters.record = resFetchData.data.record;
+            this.filters.refund = resFetchData.data.refund;
+            this.filters.counterExpenses = resFetchData.data.counterExpenses;
+        } else {
+            swal({
+                title: "Error",
+                text: "Something went wrong while fetching records.",
+                icon: "error",
+                timer: 2000
+            });
+        }
+
+    } catch (error) {
+        console.log("Sales filter error:", error);
+
+        swal({
+            title: "Error",
+            text: "Server error. Please check logs.",
+            icon: "error",
+            timer: 2000
+        });
+
+    } finally {
+        this.tableLoading = false;
+        this.loadingTable = false;
+    }
+},
         // sales Table
         totalSeats: function () {
             if (this.filters.record) {

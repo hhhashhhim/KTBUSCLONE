@@ -30007,12 +30007,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 _this3.tableLoading = true;
+                _this3.loadingTable = true;
 
                 if (_this3.filterSales.fromDateTime) {
-                  _context3.next = 3;
+                  _context3.next = 6;
                   break;
                 }
 
+                _this3.tableLoading = false;
+                _this3.loadingTable = false;
                 return _context3.abrupt("return", swal({
                   title: "Required",
                   text: "From date is required",
@@ -30020,12 +30023,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 3:
+              case 6:
                 if (_this3.filterSales.toDateTime) {
-                  _context3.next = 5;
+                  _context3.next = 10;
                   break;
                 }
 
+                _this3.tableLoading = false;
+                _this3.loadingTable = false;
                 return _context3.abrupt("return", swal({
                   title: "Required",
                   text: "To date is required",
@@ -30033,27 +30038,53 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 5:
-                _context3.next = 7;
-                return _this3.callApi("post", 'advance/sales/fetchFilterData', _this3.filterSales);
+              case 10:
+                _context3.prev = 10;
+                _context3.next = 13;
+                return _this3.callApi("post", "advance/sales/fetchFilterData", _this3.filterSales);
 
-              case 7:
+              case 13:
                 resFetchData = _context3.sent;
 
-                if (resFetchData.status == 200) {
-                  _this3.tableLoading = false;
+                if (resFetchData && resFetchData.status === 200) {
                   _this3.filters.record = resFetchData.data.record;
                   _this3.filters.refund = resFetchData.data.refund;
                   _this3.filters.counterExpenses = resFetchData.data.counterExpenses;
-                  _this3.loadingTable = false;
+                } else {
+                  swal({
+                    title: "Error",
+                    text: "Something went wrong while fetching records.",
+                    icon: "error",
+                    timer: 2000
+                  });
                 }
 
-              case 9:
+                _context3.next = 21;
+                break;
+
+              case 17:
+                _context3.prev = 17;
+                _context3.t0 = _context3["catch"](10);
+                console.log("Sales filter error:", _context3.t0);
+                swal({
+                  title: "Error",
+                  text: "Server error. Please check logs.",
+                  icon: "error",
+                  timer: 2000
+                });
+
+              case 21:
+                _context3.prev = 21;
+                _this3.tableLoading = false;
+                _this3.loadingTable = false;
+                return _context3.finish(21);
+
+              case 25:
               case "end":
                 return _context3.stop();
             }
           }
-        }, _callee3);
+        }, _callee3, null, [[10, 17, 21, 25]]);
       }))();
     },
     // sales Table
