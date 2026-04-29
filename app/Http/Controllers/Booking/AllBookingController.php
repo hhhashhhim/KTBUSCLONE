@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Models\RefundLog;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -133,7 +134,6 @@ class AllBookingController extends Controller
     $data = Ticket::where(["tickets.company_id" => Auth::user()->company_id])
         ->where("tickets.terminal_id", 14)
         ->whereNotNull("tickets.transaction_id")
-        ->whereNotNull("cancel_ticket.added_by")
         ->join("customers", "customers.id", "tickets.customer_id")
 
         ->where("customers.cnic", 'like', '%' . str_replace("-", "", $request->cnicFilter) . '%')
@@ -174,13 +174,17 @@ class AllBookingController extends Controller
             return $q;
         });
 
-    if ($request->statusFilter == "canceled") {
-        $data->where("type", "canceled")
-            ->whereHas('cancel_ticket', function ($q) {
-                $q->whereNotNull('added_by');
-            })
-            ->withTrashed();
-    } elseif ($request->statusFilter == "over-issue") {
+  if ($request->statusFilter == "canceled") {
+    $data->where("tickets.type", "canceled")
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('booking_cancels')
+                ->whereColumn('booking_cancels.ticket_id', 'tickets.id')
+                ->whereNotNull('booking_cancels.added_by')
+                ->whereNull('booking_cancels.deleted_at');
+        })
+        ->withTrashed();
+} elseif ($request->statusFilter == "over-issue") {
         $data->where("type", "over-issue")->withTrashed();
     } else {
         $data->where(function ($query) {
