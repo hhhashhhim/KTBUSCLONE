@@ -14,65 +14,83 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-md-2" v-if="checkForSubmenuButtons('terminal-filter')">
+                                                <div class="my-2 col-md-3">
+                                                    <label>CNIC No</label>
+                                                    <input type="text" class="form-control"
+                                                        v-model="filterSales.passenger_cnic">
+                                                </div>
+
+                                                <div class="my-2 col-md-3">
+                                                    <label>Cell No</label>
+                                                    <input type="text" class="form-control"
+                                                        v-model="filterSales.passenger_contact">
+                                                </div>
+                                                <div class="my-2 col-md-3">
+                                                    <label>Passenger Name</label>
+                                                    <input type="text" class="form-control"
+                                                        v-model="filterSales.passenger_name">
+                                                </div>
+                                                <div class="my-2 col-md-3">
+                                                    <label>Invoice ID</label>
+                                                    <input type="text" class="form-control"
+                                                        v-model="filterSales.invoice_id">
+                                                </div>
+
+                                                <div class="my-2 col-md-4">
+                                                    <label>Transaction ID</label>
+                                                    <input type="text" class="form-control"
+                                                        v-model="filterSales.transaction_id">
+                                                </div>
+                                                <div class="my-2 col-md-4"
+                                                    v-if="checkForSubmenuButtons('terminal-filter')">
                                                     <label for="terminalFilter">Terminals</label>
                                                     <select id="terminalFilter" class="form-control"
-                                                            v-model="filterSales.terminal"
-                                                        >
+                                                        v-model="filterSales.terminal">
                                                         <option value="0">Select Terminals</option>
                                                         <option v-for="(terminal, i) in terminals" :key="i"
-                                                                :value="terminal.id">
+                                                            :value="terminal.id">
                                                             {{ terminal.name }}
                                                         </option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-2">
+
+                                                <div class="my-2 col-md-4">
+                                                    <label for="routeIds">Routes</label>
+                                                    <select id="routeIds" class="form-control" multiple
+                                                        v-model="filterSales.route">
+                                                        <option value="0">Select Route</option>
+                                                        <option v-for="(route, i) in routes" :key="i" :value="route.id">
+                                                            {{ route.name }} ({{ route.via ?? 'n/a' }})
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div class="my-2 col-md-3">
                                                     <label for="usernameFilter">Users</label>
                                                     <select id="usernameFilter" class="form-control"
-                                                            v-model="filterSales.user"
-                                                        >
+                                                        v-model="filterSales.user">
                                                         <option value="0">Select Users</option>
-                                                        <option v-for="(user, i) in users" :key="i"
-                                                                :value="user.id">
+                                                        <option v-for="(user, i) in users" :key="i" :value="user.id">
                                                             {{ user.name }}
                                                         </option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-2">
-                                                    <label for="routeIds">Routes</label>
-                                                    <select id="routeIds" class="form-control" multiple
-                                                            v-model="filterSales.route"
-                                                        >
-                                                        <option value="0">Select Route</option>
-                                                        <option v-for="(route, i) in routes" :key="i"
-                                                                :value="route.id">
-                                                            {{ route.name }}  ({{ route.via??'n/a' }})
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-2">
+                                                <div class="my-2 col-md-3">
                                                     <label for="fromDate">From Date Time</label>
                                                     <input id="fromDate" type="datetime-local" class="form-control"
-                                                           v-model="filterSales.fromDateTime">
+                                                        v-model="filterSales.fromDateTime">
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="my-2 col-md-3">
                                                     <label for="toDate">To Date Time</label>
                                                     <input id="toDate" type="datetime-local" class="form-control"
-                                                           v-model="filterSales.toDateTime">
+                                                        v-model="filterSales.toDateTime">
                                                 </div>
-                                                <div class="col-md-2">
-                                                    <button class="btn btn-primary mt-4" type="button" @click="salesFilter()"
-                                                            :disabled="loadingTable">
+                                                <div class="my-2 col-md-3">
+                                                    <button class="btn btn-primary mt-4 w-100" type="button"
+                                                        @click="salesFilter()" :disabled="loadingTable">
                                                         {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
                                                     </button>
                                                 </div>
                                             </div>
-                                            <!-- <div class="d-flex justify-content-end" v-if="filters.record != null">
-                                                <button class="btn btn-dark mt-4" type="button" @click="salesPrint()"
-                                                        :disabled="loadingTable">
-                                                    {{ loadingTable ? 'Loading...' : 'Print Record' }}
-                                                </button>
-                                            </div> -->
                                             <div class="row mt-2">
                                                 <div class="col-md-12">
                                                     <input type="checkbox" v-model="filterSales.counterSale">
@@ -83,55 +101,88 @@
                                                 <div class="col-md-12">
                                                     <div class="table-responsive">
                                                         <div v-if="tableLoading">
-                                                            <img class="loading-spinner" :src="$store.state.main_url + 'assets/img/loading-spinner.gif'">
+                                                            <img class="loading-spinner"
+                                                                :src="$store.state.main_url + 'assets/img/loading-spinner.gif'">
                                                         </div>
                                                         <div v-else>
                                                             <div class="d-flex justify-content-end mb-2">
-                                                                <form :action="$store.state.api_url + 'api/web/v1/advance/sales/pdf'" method="POST" ref="salePrint"
-                                                                    target="_blank">
-                                                                    <input type="hidden" name="token" :value="this.$store.state.token">
-                                                                    <input type="hidden" name="terminal" :value="filterSales.terminal">
-                                                                    <input type="hidden" name="user" :value="filterSales.user">
-                                                                    <input type="hidden" name="route" :value="filterSales.route">
-                                                                    <input type="hidden" name="fromDateTime" :value="filterSales.fromDateTime">
-                                                                    <input type="hidden" name="toDateTime" :value="filterSales.toDateTime">
-                                                                    <input type="hidden" name="counterSale" :value="filterSales.counterSale">
-                                                                    <input type="submit" value="Print" class="btn btn-dark">
+                                                                <form
+                                                                    :action="$store.state.api_url + 'api/web/v1/advance/sales/pdf'"
+                                                                    method="POST" ref="salePrint" target="_blank">
+
+                                                                    <input type="hidden" name="token"
+                                                                        :value="this.$store.state.token">
+                                                                    <input type="hidden" name="terminal"
+                                                                        :value="filterSales.terminal">
+                                                                    <input type="hidden" name="user"
+                                                                        :value="filterSales.user">
+                                                                    <input type="hidden" name="route"
+                                                                        :value="filterSales.route">
+                                                                    <input type="hidden" name="invoice_id"
+                                                                        :value="filterSales.invoice_id">
+                                                                    <input type="hidden" name="transaction_id"
+                                                                        :value="filterSales.transaction_id">
+                                                                    <input type="hidden" name="passenger_name"
+                                                                        :value="filterSales.passenger_name">
+                                                                    <input type="hidden" name="passenger_contact"
+                                                                        :value="filterSales.passenger_contact">
+                                                                    <input type="hidden" name="passenger_cnic"
+                                                                        :value="filterSales.passenger_cnic">
+                                                                    <input type="hidden" name="fromDateTime"
+                                                                        :value="filterSales.fromDateTime">
+                                                                    <input type="hidden" name="toDateTime"
+                                                                        :value="filterSales.toDateTime">
+                                                                    <input type="hidden" name="counterSale"
+                                                                        :value="filterSales.counterSale">
+
+                                                                    <input type="submit" value="Print"
+                                                                        class="btn btn-dark">
                                                                 </form>
                                                             </div>
                                                             <table class="table table-striped table-hover text-center"
                                                                 id="saleReportTable">
                                                                 <thead>
-                                                                <tr>
-                                                                    <th>Date</th>
-                                                                    <th>Bus No</th>
-                                                                    <th>Bus Class</th>
-                                                                    <th>No of Seat</th>
-                                                                    <th>Terminal Name</th>
-                                                                    <th>User Name</th>
-                                                                    <th>Sale Amount</th>
-                                                                    <th>ELT Amount</th>
-                                                                </tr>
+                                                                    <tr>
+                                                                        <th>Date</th>
+                                                                        <th>Bus No</th>
+                                                                        <th>Bus Class</th>
+                                                                        <th>No of Seat</th>
+                                                                        <th>Terminal Name</th>
+                                                                        <th>User Name</th>
+                                                                        <th>Invoice</th>
+                                                                        <th>Transaction #</th>
+                                                                        <th>Passenger Name</th>
+                                                                        <th>Cell No</th>
+                                                                        <th>CNIC No</th>
+                                                                        <th>Sale Amount</th>
+                                                                        <th>ELT Amount</th>
+                                                                    </tr>
                                                                 </thead>
 
                                                                 <tbody>
-                                                                <tr v-for="(data,i) in filters.record" :key="i">
-                                                                    <td>{{ data.date }}<br>{{ data.time }}</td>
-                                                                    <td>{{ data.bus_number }}</td>
-                                                                    <td>{{ data.bus_class }}</td>
-                                                                    <td>{{ data.seats }}</td>
-                                                                    <td>{{ data.terminal }}</td>
-                                                                    <td>{{ data.user }}</td>
-                                                                    <td>{{ data.sales }}</td>
-                                                                    <td>{{ data.elt }}</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <th colspan="3"></th>
-                                                                    <th>{{ totalSeats() ?? 0 }}</th>
-                                                                    <th colspan="2"></th>
-                                                                    <th>{{ totalSeatFare() ?? 0 }}</th>
-                                                                    <th>{{ totalEltFare() ?? 0 }}</th>
-                                                                </tr>
+                                                                    <tr v-for="(data, i) in filters.record" :key="i">
+                                                                        <td>{{ data.date }}<br>{{ data.time }}</td>
+                                                                        <td>{{ data.bus_number }}</td>
+                                                                        <td>{{ data.bus_class }}</td>
+                                                                        <td>{{ data.seats }}</td>
+                                                                        <td>{{ data.terminal }}</td>
+                                                                        <td>{{ data.user }}</td>
+                                                                        <td>{{ data.invoice_id ?? 'N/A' }}</td>
+                                                                        <td>{{ data.transaction_id ?? 'N/A' }}</td>
+                                                                        <td>{{ data.passenger_name ?? 'N/A' }}</td>
+                                                                        <td>{{ data.passenger_contact ?? 'N/A' }}</td>
+                                                                        <td>{{ data.passenger_cnic ?? 'N/A' }}</td>
+                                                                        <td>{{ data.sales }}</td>
+                                                                        <td>{{ data.elt }}</td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <th colspan="3"></th>
+                                                                        <th>{{ totalSeats() ?? 0 }}</th>
+                                                                        <th colspan="7"></th>
+                                                                        <th>{{ totalSeatFare() ?? 0 }}</th>
+                                                                        <th>{{ totalEltFare() ?? 0 }}</th>
+                                                                    </tr>
                                                                 </tbody>
                                                             </table>
                                                         </div>
@@ -294,6 +345,11 @@ export default {
                 terminal: 0,
                 user: 0,
                 route: [],
+                invoice_id: '',
+                transaction_id: '',
+                passenger_name: '',
+                passenger_contact: '',
+                passenger_cnic: '',
                 fromDateTime: '',
                 toDateTime: '',
                 counterSale: false,
@@ -322,7 +378,7 @@ export default {
         const self = this;
         // route
         const routeIds = $('#routeIds');
-        routeIds.on('change', function() {
+        routeIds.on('change', function () {
             const selectedValues = $(this).val();
             self.filterSales.route = selectedValues;
         });
@@ -341,32 +397,69 @@ export default {
             }
 
         },
-        async salesFilter() {
-            this.tableLoading = true;
-            if (!this.filterSales.fromDateTime)
-                return swal({
-                    title: "Required",
-                    text: "From date is required",
-                    icon: "error",
-                    timer: 2000
-                });
-            if (!this.filterSales.toDateTime)
-                return swal({
-                    title: "Required",
-                    text: "To date is required",
-                    icon: "error",
-                    timer: 2000
-                });
-            const resFetchData = await this.callApi("post", 'advance/sales/fetchFilterData', this.filterSales);
-            if (resFetchData.status == 200) {
-                this.tableLoading = false;
-                this.filters.record = resFetchData.data.record;
-                this.filters.refund = resFetchData.data.refund;
-                this.filters.counterExpenses = resFetchData.data.counterExpenses;
-                this.loadingTable = false;
-            }
+       async salesFilter() {
+    this.tableLoading = true;
+    this.loadingTable = true;
 
-        },
+    if (!this.filterSales.fromDateTime) {
+        this.tableLoading = false;
+        this.loadingTable = false;
+
+        return swal({
+            title: "Required",
+            text: "From date is required",
+            icon: "error",
+            timer: 2000
+        });
+    }
+
+    if (!this.filterSales.toDateTime) {
+        this.tableLoading = false;
+        this.loadingTable = false;
+
+        return swal({
+            title: "Required",
+            text: "To date is required",
+            icon: "error",
+            timer: 2000
+        });
+    }
+
+    try {
+        const resFetchData = await this.callApi(
+            "post",
+            "advance/sales/fetchFilterData",
+            this.filterSales
+        );
+
+        if (resFetchData && resFetchData.status === 200) {
+            this.filters.record = resFetchData.data.record;
+            this.filters.refund = resFetchData.data.refund;
+            this.filters.counterExpenses = resFetchData.data.counterExpenses;
+        } else {
+            swal({
+                title: "Error",
+                text: "Something went wrong while fetching records.",
+                icon: "error",
+                timer: 2000
+            });
+        }
+
+    } catch (error) {
+        console.log("Sales filter error:", error);
+
+        swal({
+            title: "Error",
+            text: "Server error. Please check logs.",
+            icon: "error",
+            timer: 2000
+        });
+
+    } finally {
+        this.tableLoading = false;
+        this.loadingTable = false;
+    }
+},
         // sales Table
         totalSeats: function () {
             if (this.filters.record) {
@@ -435,34 +528,37 @@ export default {
         },
         refundTotal: function () {
             if (this.filters.refund) {
-            let totalRefund = 0;
-            for (const key in this.filters.refund) {
-                if (this.filters.refund.hasOwnProperty(key)) {
-                    totalRefund += this.filters.refund[key].amount_refund;
+                let totalRefund = 0;
+                for (const key in this.filters.refund) {
+                    if (this.filters.refund.hasOwnProperty(key)) {
+                        totalRefund += this.filters.refund[key].amount_refund;
+                    }
                 }
+                return totalRefund;
             }
-            return totalRefund;
-        }
-        return 0; // Return 0 if this.filters.refund is falsy
+            return 0; // Return 0 if this.filters.refund is falsy
         },
-            refundTotalSeats: function () {
-                if (this.filters.refund) {
-                    return this.filters.refund.length;
-                }
+        refundTotalSeats: function () {
+            if (this.filters.refund) {
+                return this.filters.refund.length;
             }
+        }
 
     },
 
 }
 </script>
 <style scoped>
-table, th, td {
+table,
+th,
+td {
     border: 1px solid #b9b9b9;
     border-collapse: collapse;
 }
+
 .loading-spinner {
     display: block;
     margin: 0 auto;
     padding: 2em;
-  }
+}
 </style>
