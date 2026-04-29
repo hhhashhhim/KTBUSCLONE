@@ -14,7 +14,38 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-md-2"
+                                                <div class="my-2 col-md-3">
+                                                    <label>CNIC No</label>
+                                                    <input type="text" class="form-control"
+                                                        v-model="filterSales.passenger_cnic">
+                                                </div>
+                                                <div class="my-2 col-md-3">
+                                                    <label>Passenger Name</label>
+                                                    <input type="text" class="form-control"
+                                                        v-model="filterSales.passenger_name">
+                                                </div>
+
+                                                <div class="my-2 col-md-3">
+                                                    <label>Cell No</label>
+                                                    <input type="text" class="form-control"
+                                                        v-model="filterSales.passenger_contact">
+                                                </div>
+                                                <div class="my-2 col-md-3">
+                                                    <label>Invoice ID</label>
+                                                    <input type="text" class="form-control"
+                                                        v-model="filterSales.invoice_id">
+                                                </div>
+
+                                                <div class="my-2 col-md-4">
+                                                    <label>Transaction ID</label>
+                                                    <input type="text" class="form-control"
+                                                        v-model="filterSales.transaction_id">
+                                                </div>
+
+
+
+
+                                                <div class="my-2 col-md-4"
                                                     v-if="checkForSubmenuButtons('terminal-sale-terminal-filter')">
                                                     <label for="terminalFilter">Terminals</label>
                                                     <select id="terminalFilter" class="form-control"
@@ -26,18 +57,8 @@
                                                         </option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-2"
-                                                    v-if="checkForSubmenuButtons('terminal-sale-user-filter')">
-                                                    <label for="usernameFilter">Users</label>
-                                                    <select id="usernameFilter" class="form-control"
-                                                        v-model="filterSales.user">
-                                                        <option value="0">Select Users</option>
-                                                        <option v-for="(user, i) in users" :key="i" :value="user.id">
-                                                            {{ user.name }}
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-2"
+
+                                                <div class="my-2 col-md-4"
                                                     v-if="checkForSubmenuButtons('terminal-sale-route-filter')">
                                                     <label for="routeIds">Routes</label>
                                                     <select id="routeIds" class="form-control" multiple
@@ -48,17 +69,28 @@
                                                         </option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="my-2 col-md-3"
+                                                    v-if="checkForSubmenuButtons('terminal-sale-user-filter')">
+                                                    <label for="usernameFilter">Users</label>
+                                                    <select id="usernameFilter" class="form-control"
+                                                        v-model="filterSales.user">
+                                                        <option value="0">Select Users</option>
+                                                        <option v-for="(user, i) in users" :key="i" :value="user.id">
+                                                            {{ user.name }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div class="my-2 col-md-3">
                                                     <label for="fromDate">From Date Time</label>
                                                     <input id="fromDate" type="datetime-local" class="form-control"
                                                         v-model="filterSales.fromDateTime">
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="my-2 col-md-3">
                                                     <label for="toDate">To Date Time</label>
                                                     <input id="toDate" type="datetime-local" class="form-control"
                                                         v-model="filterSales.toDateTime">
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="my-2 col-md-3">
                                                     <button class="btn btn-primary mt-4" type="button"
                                                         @click="salesFilter()" :disabled="loadingTable">
                                                         {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
@@ -114,8 +146,9 @@
                                                                     <td>{{ data.bus ? data.bus.bus_number : 'N/A' }}
                                                                     </td>
                                                                     <td>{{ data.bus_class.name }}</td>
-                                                                    <td>{{ data.route.name }} ({{ data.route.via ?? 'n/a'
-                                                                        }})</td>
+                                                                    <td>{{ data.route.name }} ({{ data.route.via ??
+                                                                        'n/a'
+                                                                    }})</td>
                                                                     <td>{{ data.customer.name }}</td>
                                                                     <td>{{ data.customer.cnic }}</td>
                                                                     <td>{{ data.customer.contact }}</td>
@@ -134,7 +167,7 @@
                                                                     <td>
                                                                         <!-- Net Cash -->
                                                                         {{ (data.seat_fare - data.discount) +
-                                                                        (data.refund ?? 0) - (data.comsn ?? 0) }}
+                                                                            (data.refund ?? 0) - (data.comsn ?? 0) }}
                                                                     </td>
                                                                 </tr>
                                                                 <tr v-if="filters.record.length > 0">
@@ -181,6 +214,11 @@ export default {
                 terminal: 0,
                 user: 0,
                 route: [],
+                invoice_id: '',
+                transaction_id: '',
+                passenger_name: '',
+                passenger_contact: '',
+                passenger_cnic: '',
                 fromDateTime: '',
                 toDateTime: '',
             },

@@ -44,8 +44,8 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label for="name">Invoice</label>
-                                                        <input id="name" type="text" class="form-control"
+                                                        <label for="invoice">Invoice</label>
+                                                        <input id="invoice" type="text" class="form-control"
                                                                v-model="filterForm.invoiceFilter"
                                                                @keyup="filterFunction()">
                                                     </div>
@@ -127,6 +127,14 @@
                                                                @change="filterFunction()">
                                                     </div>
                                                 </div>
+                                                  <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label for="transaction">Transaction #</label>
+                                                        <input id="transaction" type="text" class="form-control"
+                                                               v-model="filterForm.transactionFilter"
+                                                               @keyup="filterFunction()">
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div>
                                                 <div class="table-responsive">
@@ -150,6 +158,7 @@
                                                             <th>CNIC</th>
                                                             <th>Contact</th>
                                                             <th>Fare</th>
+                                                            <th>Transaction #</th>
                                                             <th>Booking Time</th>
                                                             <th>Canceled By</th>
                                                             <th>Canceled Date</th>
@@ -184,6 +193,7 @@
                                                             <td>{{ record.contact }}</td>
                                                             <td>{{ parseFloat(record.seat_fare) - parseFloat(record.discount ?? 0) }}
                                                             </td>
+                                                            <td>{{ record.transaction_id ?? 'N/A' }}</td>
                                                             <td>{{ formatDate(record.created_at) }}</td>
                                                             <td>{{ record.type == "canceled"
     ? (record.cancel_ticket?.added_by_name?.name || 'Auto')
@@ -200,6 +210,7 @@
                                                             <td>{{ record.type }}</td>
                                                         </tr>
                                                         <tr>
+                                                            <th></th>
                                                             <th></th>
                                                             <th></th>
                                                             <th></th>
@@ -273,6 +284,7 @@ export default {
                 toDateFilter: "",
                 nameFilter: "",
                 invoiceFilter: "",
+                transactionFilter: "",
                 phoneFilter: "",
                 terminalFilter: "",
                 routeFilter: "",

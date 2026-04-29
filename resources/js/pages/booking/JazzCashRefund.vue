@@ -113,6 +113,14 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group">
+                                                        <label for="transactionFilter">Transaction #</label>
+                                                        <input id="transactionFilter" type="text" class="form-control"
+                                                            v-model="filterForm.transactionFilter"
+                                                            @keyup="filterFunction()" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
                                                         <label for="dateFilter">Departure Date From</label>
                                                         <input type="date" class="form-control" id="dateFilter"
                                                             v-model="filterForm.fromDateFilter"
@@ -156,6 +164,7 @@
                                                                 <th>CNIC</th>
                                                                 <th>Contact</th>
                                                                 <th>Fare</th>
+                                                                <th>Transaction #</th>
                                                                 <th>Booking Time</th>
                                                                 <th>Canceled By</th>
                                                                 <th>Canceled Date</th>
@@ -198,15 +207,13 @@
                                                                         parseFloat(record.discount ?? 0)
                                                                     }}
                                                                 </td>
+                                                                <td>{{ record.transaction_id ?? 'N/A' }}</td>
                                                                 <td>{{ formatDate(record.created_at) }}</td>
                                                                 <td>
                                                                     {{
                                                                         record.type == "canceled"
-                                                                            ? record.cancel_ticket.added_by_name
-                                                                                ? record.cancel_ticket.added_by_name
-                                                                                    .name
-                                                                                : "Auto"
-                                                                            : "N/A"
+                                                                    ? (record.cancel_ticket?.added_by?.name || "Auto")
+                                                                    : "N/A"
                                                                     }}
                                                                 </td>
                                                                 <td>
@@ -268,6 +275,7 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
+                                                                <th></th>
                                                                 <th></th>
                                                                 <th></th>
                                                                 <th></th>
@@ -409,8 +417,8 @@
                                         {{
                                             (
                                                 parseFloat(selectedRefund?.seat_fare || 0)
-                                        - parseFloat(selectedRefund?.discount || 0)
-                                        ).toFixed(2)
+                                                - parseFloat(selectedRefund?.discount || 0)
+                                            ).toFixed(2)
                                         }} PKR
                                     </div>
                                 </div>
@@ -435,9 +443,9 @@
                                                 (
                                                     parseFloat(selectedRefund?.seat_fare || 0)
                                                     - parseFloat(selectedRefund?.discount || 0)
-                                        - parseFloat(selectedRefund?.refund_amount || 0)
-                                        )
-                                        ).toFixed(2)
+                                                    - parseFloat(selectedRefund?.refund_amount || 0)
+                                                )
+                                            ).toFixed(2)
                                         }} PKR
                                     </div>
                                 </div>
@@ -459,7 +467,7 @@
                                         {{
                                             (
                                                 100 - parseFloat(selectedRefund?.refund_percentage || 0)
-                                        ).toFixed(2)
+                                            ).toFixed(2)
                                         }}%
                                     </div>
                                 </div>
@@ -474,8 +482,8 @@
                                 {{
                                     selectedRefund?.refund_reason &&
                                         selectedRefund?.refund_reason.trim() !== ''
-                                ? selectedRefund.refund_reason
-                                : 'No reason provided'
+                                        ? selectedRefund.refund_reason
+                                        : 'No reason provided'
                                 }}
                             </div>
                         </div>
@@ -533,6 +541,7 @@ export default {
                 toDateFilter: "",
                 nameFilter: "",
                 invoiceFilter: "",
+                transactionFilter: "",
                 phoneFilter: "",
                 terminalFilter: "",
                 routeFilter: "",
