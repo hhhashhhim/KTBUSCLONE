@@ -62,11 +62,11 @@
         <th>No of Seat</th>
         <th>Terminal Name</th>
         <th>User Name</th>
-        <th>Invoice</th>
+        {{-- <th>Invoice</th>
         <th>Transaction #</th>
         <th>Passenger Name</th>
         <th>Cell No</th>
-        <th>CNIC No</th>
+        <th>CNIC No</th> --}}
         <th>Sale Amount</th>
         <th>Elt Amount</th>
     </tr>
@@ -79,11 +79,11 @@
             <td>{{ $data['seats'] }}</td>
             <td>{{ $data['terminal'] }}</td>
             <td>{{ $data['user'] }}</td>
-            <td>{{ $data['invoice_id'] }}</td>
+            {{-- <td>{{ $data['invoice_id'] }}</td>
             <td>{{ $data['transaction_id'] }}</td>
             <td>{{ $data['passenger_name'] }}</td>
             <td>{{ $data['passenger_contact'] }}</td>
-            <td>{{ $data['passenger_cnic'] }}</td>
+            <td>{{ $data['passenger_cnic'] }}</td> --}}
             <td>{{ $data['sales'] }}</td>
             <td>{{ $data['elt'] }}</td>
         </tr>
