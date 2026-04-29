@@ -402,104 +402,126 @@ if (is_array($request->send_message)) {
         }
     }
 
-    public function filterData(Request $request)
-    {
-        if (!checkForSubmenu("terminal-sale")) {
-            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-        }
-        $tickets = Ticket::with([
-            'updated_name:id,name',
-            'terminal:id,name',
-            'busClass:id,name',
-            'schedule:id,name,time',
-            'bus:id,bus_number',
-            'customer:id,name,cnic,contact',
-            'route:id,name,via',
-            'cancel_ticket:id,percentage,ticket_id',
-            'commission' => function ($q) {
-                $q->where('route_id', 2)->select('id', 'terminal_id', 'route_id', 'fix_commission', 'percentage_commission');
-            }
-        ])
-            ->withTrashed()
-            ->select([
-                'id',
-                'terminal_id',
-                'route_id',
-                'bus_class_id',
-                'schedule_date',
-                'schedule_time',
-                'schedule_time_exact',
-                'updated_by',
-                'bus_id',
-                'invoice_id',
-                'seat_fare',
-                'discount',
-                'seat_no',
-                'customer_id',
-                'route_id',
-                'type',
-                'transaction_id',
-            ])
-            ->where('company_id', Auth::user()->company_id)
-            ->where(function ($query) {
-                $query->whereIn('type', ['booked', 'over-issue'])
-                    ->orWhere(function ($query) {
-                        $query->where('type', 'canceled')
-                            ->whereHas('cancel_ticket', function ($q) {
-                                $q->where('percentage', '>', 0);
-                            });
-                    });
-            })
-            ->when($request->terminal, function ($query) use ($request) {
-                $query->where('terminal_id', $request->terminal);
-            }, function ($query) {
-                $query->where('terminal_id', Auth::user()->terminal_id);
-            })
-            ->when($request->user, function ($query) use ($request) {
-                $query->where('updated_by', $request->user);
-            })
-            ->when($request->route, function ($query) use ($request) {
-                $query->whereIn('route_id', $request->route);
-            })
-            ->when($request->fromDateTime, function ($query) use ($request) {
-                $query->whereRaw("STR_TO_DATE(CONCAT(schedule_date, ' ', schedule_time_exact), '%Y-%m-%d %H:%i:%s') >= ?", [date("Y-m-d H:i:s", strtotime($request->fromDateTime))]);
-            })
-            ->when($request->toDateTime, function ($query) use ($request) {
-                $query->whereRaw("STR_TO_DATE(CONCAT(schedule_date, ' ', schedule_time_exact), '%Y-%m-%d %H:%i:%s') <= ?", [date("Y-m-d H:i:s", strtotime($request->toDateTime))]);
-            })
-            ->orderBy('schedule_date')
-            ->orderBy('schedule_time_exact')
-            ->get();
-
-        $tickets->map(function ($ticket) {
-            // Calculate full datetime once
-            $datetime = $ticket->schedule_date . ' ' . $ticket->schedule_time_exact;
-            $ticket->schedule_date_time = date('Y-m-d H:i:s', strtotime($datetime));
-
-            // Commission calculation
-            $commission = $ticket->commission;
-            $fare = $ticket->seat_fare - $ticket->discount;
-            if ($commission) {
-                $ticket->comsn = $commission->fix_commission > 0
-                    ? $commission->fix_commission
-                    : ($fare * $commission->percentage_commission) / 100;
-            } else {
-                $ticket->comsn = 0;
-            }
-
-            // Refund calculation
-            $ticket->refund = 0;
-            if ($ticket->type === 'canceled' && $ticket->cancel_ticket) {
-                $ticket->refund = ($fare * $ticket->cancel_ticket->percentage) / 100;
-            }
-
-            return $ticket;
-        });
-        // return $tickets;
-        return [
-            'record' => $tickets->sortBy('schedule_date_time')->values()
-        ];
+   public function filterData(Request $request)
+{
+    if (!checkForSubmenu("terminal-sale")) {
+        return response()->json(["Error" => ['You are not authorized to access this url']], 403);
     }
+
+    $tickets = Ticket::with([
+        'updated_name:id,name',
+        'terminal:id,name',
+        'busClass:id,name',
+        'schedule:id,name,time',
+        'bus:id,bus_number',
+        'customer:id,name,cnic,contact',
+        'route:id,name,via',
+        'cancel_ticket:id,percentage,ticket_id',
+        'commission' => function ($q) {
+            $q->where('route_id', 2)->select('id', 'terminal_id', 'route_id', 'fix_commission', 'percentage_commission');
+        }
+    ])
+        ->withTrashed()
+        ->select([
+            'id',
+            'terminal_id',
+            'route_id',
+            'bus_class_id',
+            'schedule_date',
+            'schedule_time',
+            'schedule_time_exact',
+            'updated_by',
+            'bus_id',
+            'invoice_id',
+            'seat_fare',
+            'discount',
+            'seat_no',
+            'customer_id',
+            'type',
+            'transaction_id',
+        ])
+        ->where('company_id', Auth::user()->company_id)
+        ->where(function ($query) {
+            $query->whereIn('type', ['booked', 'over-issue'])
+                ->orWhere(function ($query) {
+                    $query->where('type', 'canceled')
+                        ->whereHas('cancel_ticket', function ($q) {
+                            $q->where('percentage', '>', 0);
+                        });
+                });
+        })
+      ->when($request->terminal && $request->terminal != 0, function ($query) use ($request) {
+    $query->where('terminal_id', $request->terminal);
+})
+        ->when($request->user && $request->user != 0, function ($query) use ($request) {
+            $query->where('updated_by', $request->user);
+        })
+        ->when(!empty($request->route) && count($request->route) > 0, function ($query) use ($request) {
+            $query->whereIn('route_id', $request->route);
+        })
+        ->when($request->invoice_id != '', function ($query) use ($request) {
+            $query->where('invoice_id', 'LIKE', '%' . trim($request->invoice_id) . '%');
+        })
+        ->when($request->transaction_id != '', function ($query) use ($request) {
+            $query->where('transaction_id', 'LIKE', '%' . trim($request->transaction_id) . '%');
+        })
+        ->whereHas('customer', function ($query) use ($request) {
+            if ($request->passenger_name) {
+                $query->where('name', 'LIKE', '%' . trim($request->passenger_name) . '%');
+            }
+
+            if ($request->passenger_contact) {
+                $query->where('contact', 'LIKE', '%' . str_replace("-", "", trim($request->passenger_contact)) . '%');
+            }
+
+            if ($request->passenger_cnic) {
+                $query->where('cnic', 'LIKE', '%' . str_replace("-", "", trim($request->passenger_cnic)) . '%');
+            }
+        })
+        ->when($request->fromDateTime, function ($query) use ($request) {
+            $query->whereRaw(
+                "STR_TO_DATE(CONCAT(schedule_date, ' ', schedule_time_exact), '%Y-%m-%d %H:%i:%s') >= ?",
+                [date("Y-m-d H:i:s", strtotime($request->fromDateTime))]
+            );
+        })
+        ->when($request->toDateTime, function ($query) use ($request) {
+            $query->whereRaw(
+                "STR_TO_DATE(CONCAT(schedule_date, ' ', schedule_time_exact), '%Y-%m-%d %H:%i:%s') <= ?",
+                [date("Y-m-d H:i:s", strtotime($request->toDateTime))]
+            );
+        })
+        ->orderBy('schedule_date')
+        ->orderBy('schedule_time_exact')
+        ->get();
+
+    $tickets->map(function ($ticket) {
+        $datetime = $ticket->schedule_date . ' ' . $ticket->schedule_time_exact;
+        $ticket->schedule_date_time = date('Y-m-d H:i:s', strtotime($datetime));
+
+        $commission = $ticket->commission;
+        $fare = $ticket->seat_fare - $ticket->discount;
+
+        if ($commission) {
+            $ticket->comsn = $commission->fix_commission > 0
+                ? $commission->fix_commission
+                : ($fare * $commission->percentage_commission) / 100;
+        } else {
+            $ticket->comsn = 0;
+        }
+
+        $ticket->refund = 0;
+
+        if ($ticket->type === 'canceled' && $ticket->cancel_ticket) {
+            $ticket->refund = ($fare * $ticket->cancel_ticket->percentage) / 100;
+        }
+
+        return $ticket;
+    });
+
+    return [
+        'record' => $tickets->sortBy('schedule_date_time')->values()
+    ];
+}
 
    public function filterDataDiscount(Request $request)
 {
@@ -609,7 +631,7 @@ if (is_array($request->send_message)) {
         ->orderBy('schedule_date', 'asc')
         ->orderBy('schedule_time_exact', 'asc')
         ->get();
- 
+
     return [
         'record' => $tickets
     ];

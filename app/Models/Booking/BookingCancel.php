@@ -11,29 +11,32 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BookingCancel extends Model
 {
-    use HasFactory, softDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
 
-    public function company(){
-        return $this->hasOne( Company::class,'id','company_id' );
-    }
-    public function ticket(){
-        return $this->hasOne( Ticket::class,'id','ticket_id' );
-    }
-    public function addedBy(){
-        return $this->hasOne( User::class,'id','added_by' );
-    }
-    public function added_by_name(){
-        return $this->hasOne( User::class,'id','added_by' );
-    }
-    public function updatedBy(){
-        return $this->hasOne( User::class,'id','updated_by' );
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id', 'id');
     }
 
+    public function ticket()
+    {
+        return $this->belongsTo(Ticket::class, 'ticket_id', 'id');
+    }
 
+    public function addedBy()
+    {
+        return $this->belongsTo(User::class, 'added_by', 'id');
+    }
 
+    public function added_by_name()
+    {
+        return $this->belongsTo(User::class, 'added_by', 'id');
+    }
 
-
-
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by', 'id');
+    }
 }

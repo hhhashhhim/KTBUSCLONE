@@ -48,37 +48,47 @@
     </div>
     <br>
     <table border="2" style="text-align: center;">
-        <thead>
+    <thead>
         <tr>
-            <th>Bus Time</th>
+            <th width="200px">Bus Time</th>
             <th>Terminal Name</th>
+            <th>Route</th>
+            <th>Transaction #</th>
+            <th>Invoice</th>
             <th>Seat No</th>
             <th>Type</th>
             <th>Passenger Name</th>
             <th>Cell NO</th>
+            <th>Cnic NO</th>
             <th>Total Fare</th>
             <th>Remarks</th>
             <th>Over Issue By</th>
-            <th>Over Issue Time</th>
+            <th width="200px">Over Issue Time</th>
         </tr>
-        </thead>
-        <tbody>
+    </thead>
+
+    <tbody>
         @foreach($tickets as $single)
             <tr>
-                <td>{{ $single->bus_time}}</td>
-                <td>{{ $single->terminal_name}}</td>
-                <td>{{ $single->seat_no}}</td>
-                <td>{{ $single->type}}</td>
-                <td>{{ $single->passenger_name}}</td>
-                <td>{{ $single->passenger_contact}}</td>
-                <td>{{ $single->total_fare}}</td>
-                <td>{{ $single->overissue_reason}}</td>
-                <td>{{ $single->overissue_by}}</td>
+                <td>{{ $single->bus_time }}</td>
+                <td>{{ $single->terminal_name }}</td>
+                <td>{{ $single->route_name }}</td>
+                <td>{{ $single->transaction_id ?? 'N/A' }}</td>
+                <td>{{ $single->invoice_id ?? 'N/A' }}</td>
+                <td>{{ $single->seat_no }}</td>
+                <td>{{ $single->type }}</td>
+                <td>{{ $single->passenger_name }}</td>
+                <td>{{ $single->passenger_contact }}</td>
+                <td>{{ $single->passenger_cnic }}</td>
+                <td>{{ $single->total_fare }}</td>
+                <td>{{ $single->overissue_reason }}</td>
+                <td>{{ $single->overissue_by }}</td>
                 <td>{{ $single->overissue_date }}</td>
             </tr>
         @endforeach
-        </tbody>
-    </table>
+    </tbody>
+</table>
+
 </div>
 </body>
 </html>
