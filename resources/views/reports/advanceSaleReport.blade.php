@@ -92,7 +92,7 @@
     <tr>
         <th colspan="3"></th>
         <th>{{ array_sum(array_column($record, 'seats')) }}</th>
-        <th colspan="5"></th>
+        <th colspan="2"></th>
         <th>{{ array_sum(array_column($record, 'sales')) }}</th>
         <th>{{ array_sum(array_column($record, 'elt')) }}</th>
     </tr>
