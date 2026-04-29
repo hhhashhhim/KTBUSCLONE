@@ -176,13 +176,14 @@ class AllBookingController extends Controller
 
   if ($request->statusFilter == "canceled") {
     $data->where("tickets.type", "canceled")
-        ->whereExists(function ($query) {
-            $query->select(DB::raw(1))
-                ->from('booking_cancels')
-                ->whereColumn('booking_cancels.ticket_id', 'tickets.id')
-                ->whereNotNull('booking_cancels.added_by')
-                ->whereNull('booking_cancels.deleted_at');
-        })
+       ->whereExists(function ($query) {
+    $query->select(DB::raw(1))
+        ->from('booking_cancels')
+        ->whereColumn('booking_cancels.ticket_id', 'tickets.id')
+        ->whereNotNull('booking_cancels.added_by')
+        ->where('booking_cancels.reason', '!=', 'auto cancel')
+        ->whereNull('booking_cancels.deleted_at');
+})
         ->withTrashed();
 } elseif ($request->statusFilter == "over-issue") {
         $data->where("type", "over-issue")->withTrashed();
