@@ -38,7 +38,7 @@
 </head>
 
 <body>
-@php($companyInfo = $appCompanyInfo ?? getCompanyInfo())
+
 <div >
 
     <div id="info">
