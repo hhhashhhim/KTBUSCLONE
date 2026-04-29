@@ -157,7 +157,7 @@
                                                                     <td>{{ data.transaction_id ?? 0 }}</td>
                                                                     <td>{{ data.terminal.name }}</td>
                                                                     <td>{{ data.type }}</td>
-                                                                    <td>{{ data.updated_name.name }}</td>
+                                                                    <td>{{ data.updated_name.name ?? 'N/A' }}</td>
                                                                     <td>{{ data.type != 'canceled' ? (data.seat_fare -
                                                                         data.discount) : 0 }}</td>
                                                                     <td>{{ data.type == 'canceled' ? data.refund : 0 }}
