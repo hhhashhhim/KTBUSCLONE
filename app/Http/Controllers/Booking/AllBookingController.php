@@ -135,7 +135,7 @@ class AllBookingController extends Controller
             ->where("tickets.terminal_id", 14)
             ->whereNotNull("tickets.transaction_id")
             // Join customer table
-            ->whereHas('cancel_ticket')
+            ->whereHas('cancel_ticket','cancel_ticket.added_by')
             ->join("customers", "customers.id", "tickets.customer_id")
 
             // Customer filters
