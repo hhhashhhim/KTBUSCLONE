@@ -134,6 +134,7 @@ class AllBookingController extends Controller
     $data = Ticket::where(["tickets.company_id" => Auth::user()->company_id])
         ->where("tickets.terminal_id", 14)
         ->whereNotNull("tickets.transaction_id")
+        ->whereNotNull('booking_cancels.added_by')
         ->join("customers", "customers.id", "tickets.customer_id")
 
         ->where("customers.cnic", 'like', '%' . str_replace("-", "", $request->cnicFilter) . '%')
