@@ -51,266 +51,244 @@ class AdvanceSalesReportController extends Controller
         return Route::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name',"via"]);
     }
 
-   public function filterData(Request $request)
-{
-    if (!checkForSubmenu("sales")) {
-        return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-    }
+    public function filterData(Request $request)
+    {
+        if(!checkForSubmenu("sales"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
+            ->withTrashed()
+            ->where('company_id', Auth::user()->company_id)
+             ->where(function ($query) {
+                $query->where("type", "booked")
+                      ->orWhere("type", "over-issue");
+                })
 
-    $tickets = Ticket::with(
-        'updated_name:id,name',
-        'ticketElt:id,ticket_id,elt_price',
-        'terminal:id,name',
-        'busClass:id,name',
-        'schedule:id,name,time',
-        'bus:id,bus_number',
-        'customer:id,name,contact,cnic'
-    )
-    ->withTrashed()
-    ->where('company_id', Auth::user()->company_id)
-    ->where(function ($query) {
-        $query->where("type", "booked")
-            ->orWhere("type", "over-issue");
-    })
-    ->when($request->terminal && $request->terminal != 0, function ($query) use ($request) {
-        return $query->where('terminal_id', $request->terminal);
-    })
-    ->when($request->user && $request->user != 0, function ($query) use ($request) {
-        return $query->where('updated_by', $request->user);
-    })
-    ->when(!empty($request->route) && is_array($request->route) && count($request->route) > 0, function ($query) use ($request) {
-        $routeIds = array_filter($request->route, function ($id) {
-            return $id != 0 && $id != '';
+            ->where(function($query) use ($request){
+                if($request->terminal)
+                {
+                    return $query->where('terminal_id', $request->terminal);
+                }
+                else
+                {
+                    return $query->where('terminal_id', Auth::user()->terminal_id);
+                }
+            })
+            ->when($request->user, function ($query) use ($request) {
+                return $query->where('updated_by', $request->user);
+            })
+            ->when($request->route, function ($query) use ($request) {
+                return $query->whereIn('route_id', $request->route);
+            })
+            ->when($request->counterSale, function ($query) use ($request) {
+                return $query->whereBetween('created_at', [date("Y-m-d H:i:s",strtotime($request->fromDateTime)),date("Y-m-d H:i:s",strtotime($request->toDateTime))]);
+            })
+            ->orderBy('date', 'desc')
+            ->get();
+
+        $tickets->transform(function ($single) {
+            $single->schedule_date_time = date('Y-m-d H:i:s', strtotime($single->schedule_date . ' ' . $single->schedule_time_exact));
+            return $single;
         });
 
-        if (!empty($routeIds)) {
-            return $query->whereIn('route_id', $routeIds);
+        // date filter
+        if($request->fromDateTime && $request->counterSale == false)
+        {
+            $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s",strtotime($request->fromDateTime)));
         }
-
-        return $query;
-    })
-    ->when($request->invoice_id != '', function ($query) use ($request) {
-        return $query->where('invoice_id', 'LIKE', '%' . trim($request->invoice_id) . '%');
-    })
-    ->when($request->transaction_id != '', function ($query) use ($request) {
-        return $query->where('transaction_id', 'LIKE', '%' . trim($request->transaction_id) . '%');
-    })
-    ->when(
-        $request->passenger_name || $request->passenger_contact || $request->passenger_cnic,
-        function ($query) use ($request) {
-            return $query->whereHas('customer', function ($customerQuery) use ($request) {
-                if ($request->passenger_name) {
-                    $customerQuery->where('name', 'LIKE', '%' . trim($request->passenger_name) . '%');
-                }
-
-                if ($request->passenger_contact) {
-                    $contact = str_replace("-", "", trim($request->passenger_contact));
-                    $customerQuery->where('contact', 'LIKE', '%' . $contact . '%');
-                }
-
-                if ($request->passenger_cnic) {
-                    $cnic = str_replace("-", "", trim($request->passenger_cnic));
-                    $customerQuery->where('cnic', 'LIKE', '%' . $cnic . '%');
-                }
-            });
+        if($request->toDateTime && $request->counterSale == false)
+        {
+            $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
-    )
-    ->when($request->counterSale, function ($query) use ($request) {
-        return $query->whereBetween('created_at', [
-            date("Y-m-d H:i:s", strtotime($request->fromDateTime)),
-            date("Y-m-d H:i:s", strtotime($request->toDateTime))
-        ]);
-    })
-    ->orderBy('date', 'desc')
-    ->get();
+        // return $tickets;
+        $tickets = $tickets->sortBy('schedule_date_time')->groupBy(['schedule_date_time','route_id', 'updated_by']);
 
-    $tickets->transform(function ($single) {
-        $single->schedule_date_time = date('Y-m-d H:i:s', strtotime($single->schedule_date . ' ' . $single->schedule_time_exact));
-        return $single;
-    });
+        $sortData = [];
+        foreach ($tickets as $time) {
+            foreach ($time as $route) {
+                foreach ($route as $inner) {
 
-    if ($request->fromDateTime && $request->counterSale == false) {
-        $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s", strtotime($request->fromDateTime)));
-    }
+                    $single = [];
+                    $single['bus_number'] = $inner[0]->bus->bus_number??'N/A';
+                    $single['bus_class'] = $inner[0]->busClass->name;
+                    $single['seats'] = $inner->count();
+                    $single['terminal'] = $inner[0]->terminal->name;
+                    $single['user'] = $inner[0]->updated_name->name??'N/A';
+                    $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
+                    $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
+                    $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
+                    $eltSum = 0;
+                    foreach ($inner as $tkt) {
+                        if ($tkt->ticketElt) {
+                            $eltSum += $tkt->ticketElt->elt_price;
+                        } else {
+                            $eltSum += 0;
+                        }
 
-    if ($request->toDateTime && $request->counterSale == false) {
-        $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s", strtotime($request->toDateTime)));
-    }
-
-    $tickets = $tickets->sortBy('schedule_date_time')->groupBy(['schedule_date_time', 'route_id', 'updated_by']);
-
-    $sortData = [];
-
-    foreach ($tickets as $time) {
-        foreach ($time as $route) {
-            foreach ($route as $inner) {
-                $customer = $inner[0]->customer ?? null;
-
-                $single = [];
-                $single['bus_number'] = $inner[0]->bus->bus_number ?? 'N/A';
-                $single['bus_class'] = $inner[0]->busClass->name ?? 'N/A';
-                $single['seats'] = $inner->count();
-                $single['terminal'] = $inner[0]->terminal->name ?? 'N/A';
-                $single['user'] = $inner[0]->updated_name->name ?? 'N/A';
-                $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
-                $single['date'] = date("Y-m-d", strtotime($inner[0]->schedule_date_time));
-                $single['time'] = date("h:i A", strtotime($inner[0]->schedule_date_time));
-
-                $single['invoice_id'] = $inner[0]->invoice_id ?? 'N/A';
-                $single['transaction_id'] = $inner[0]->transaction_id ?? 'N/A';
-                $single['passenger_name'] = $customer->name ?? 'N/A';
-                $single['passenger_contact'] = $customer->contact ?? 'N/A';
-                $single['passenger_cnic'] = $customer->cnic ?? 'N/A';
-
-                $eltSum = 0;
-
-                foreach ($inner as $tkt) {
-                    $eltSum += $tkt->ticketElt ? $tkt->ticketElt->elt_price : 0;
-                }
-
-                $single['elt'] = $eltSum;
-
-                array_push($sortData, $single);
-            }
-        }
-    }
-
-    return response()->json([
-        'record' => $sortData,
-        'refund' => [],
-        'counterExpenses' => [],
-    ]);
-}
-
-   public function advanceSalePdf(Request $request)
-{
-    if (!checkForSubmenu("sales")) {
-        return response()->json(["Error" => ['You are not authorized to access this url']], 403);
-    }
-
-    $route_ids = $request->route ? explode(",", $request->route) : [];
-
-    $tickets = Ticket::with(
-        'updated_name:id,name',
-        'ticketElt:id,ticket_id,elt_price',
-        'terminal:id,name',
-        'busClass:id,name',
-        'schedule:id,name,time',
-        'bus:id,bus_number',
-        'customer:id,name,contact,cnic'
-    )
-        ->withTrashed()
-        ->where('company_id', Auth::user()->company_id)
-        ->where(function ($query) {
-            $query->where("type", "booked")
-                ->orWhere("type", "over-issue");
-        })
-        ->when($request->terminal && $request->terminal != 0, function ($query) use ($request) {
-            return $query->where('terminal_id', $request->terminal);
-        })
-        ->when($request->user && $request->user != 0, function ($query) use ($request) {
-            return $query->where('updated_by', $request->user);
-        })
-        ->when($request->route && count($route_ids) > 0, function ($query) use ($route_ids) {
-            return $query->whereIn('route_id', $route_ids);
-        })
-        ->when($request->invoice_id != '', function ($query) use ($request) {
-            return $query->where('invoice_id', 'LIKE', '%' . trim($request->invoice_id) . '%');
-        })
-        ->when($request->transaction_id != '', function ($query) use ($request) {
-            return $query->where('transaction_id', 'LIKE', '%' . trim($request->transaction_id) . '%');
-        })
-        ->whereHas('customer', function ($query) use ($request) {
-            if ($request->passenger_name) {
-                $query->where('name', 'LIKE', '%' . trim($request->passenger_name) . '%');
-            }
-
-            if ($request->passenger_contact) {
-                $query->where('contact', 'LIKE', '%' . str_replace("-", "", trim($request->passenger_contact)) . '%');
-            }
-
-            if ($request->passenger_cnic) {
-                $query->where('cnic', 'LIKE', '%' . str_replace("-", "", trim($request->passenger_cnic)) . '%');
-            }
-        })
-        ->when(($request->counterSale == "true"), function ($query) use ($request) {
-            return $query->whereBetween('created_at', [
-                date("Y-m-d H:i:s", strtotime($request->fromDateTime)),
-                date("Y-m-d H:i:s", strtotime($request->toDateTime))
-            ]);
-        })
-        ->orderBy('date', 'desc')
-        ->get();
-
-    $tickets->transform(function ($single) {
-        $single->schedule_date_time = date('Y-m-d H:i:s', strtotime($single->schedule_date . ' ' . $single->schedule_time_exact));
-        return $single;
-    });
-
-    if ($request->fromDateTime && $request->counterSale == "false") {
-        $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s", strtotime($request->fromDateTime)));
-    }
-
-    if ($request->toDateTime && $request->counterSale == "false") {
-        $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s", strtotime($request->toDateTime)));
-    }
-
-    $tickets = $tickets->sortBy('schedule_date_time')->groupBy(['schedule_date_time', 'route_id', 'updated_by']);
-
-    $sortData = [];
-
-    foreach ($tickets as $time) {
-        foreach ($time as $route) {
-            foreach ($route as $inner) {
-
-                $single = [];
-                $single['bus_number'] = $inner[0]->bus->bus_number ?? 'N/A';
-                $single['bus_class'] = $inner[0]->busClass->name ?? 'N/A';
-                $single['seats'] = $inner->count();
-                $single['terminal'] = $inner[0]->terminal->name ?? 'N/A';
-                $single['user'] = $inner[0]->updated_name->name ?? 'N/A';
-
-                $single['invoice_id'] = $inner[0]->invoice_id ?? 'N/A';
-                $single['transaction_id'] = $inner[0]->transaction_id ?? 'N/A';
-                $single['passenger_name'] = $inner[0]->customer->name ?? 'N/A';
-                $single['passenger_contact'] = $inner[0]->customer ? formatContact($inner[0]->customer->contact) : 'N/A';
-                $single['passenger_cnic'] = $inner[0]->customer ? formatCNIC($inner[0]->customer->cnic) : 'N/A';
-
-                $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
-                $single['date'] = date("Y-m-d", strtotime($inner[0]->schedule_date_time));
-                $single['time'] = date("h:i A", strtotime($inner[0]->schedule_date_time));
-
-                $eltSum = 0;
-
-                foreach ($inner as $tkt) {
-                    if ($tkt->ticketElt) {
-                        $eltSum += $tkt->ticketElt->elt_price;
-                    } else {
-                        $eltSum += 0;
                     }
+                    $single['elt'] = $eltSum;
+                    array_push($sortData, $single);
                 }
-
-                $single['elt'] = $eltSum;
-
-                array_push($sortData, $single);
             }
         }
+
+//        Refund Data Details
+
+        // $refundTickets = Ticket::with('cancel_ticket', 'schedule:id,time')->where('company_id', Auth::user()->company_id)
+        //     ->where('type', 'canceled')->withTrashed()
+        //     ->when($request->terminal, function ($query) use ($request) {
+        //         return $query->where('terminal_id', $request->terminal);
+        //     })
+        //     ->when($request->user, function ($query) use ($request) {
+        //         return $query->where('added_by', $request->user);
+        //     })
+        //     ->when($request->route, function ($query) use ($request) {
+        //         return $query->whereIn('route_id', $request->route);
+        //     })
+        //     ->get();
+        // $refundTickets->map(function ($q) {
+        //     $q->cancel_percentage = $q->cancel_ticket->percentage;
+        //     $user = User::find($q->cancel_ticket->added_by);
+        //     $q->refund_by = $user ? $user->name : '-';
+        //     $q->cancel_date = $q->cancel_ticket->time;
+        //     $q->bus_NO = BusClass::find($q->bus_class_id)->name;
+        //     $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
+        //     $percentageValue = ((int)$q->seat_fare - (int)$q->discount) * $q->cancel_percentage;
+        //     $final = $percentageValue / 100;
+        //     $q->amount_refund = round((int)$q->seat_fare - $final);
+        //     $q->cancelation_charges = round($final);
+        //     unset($q->cancel_ticket, $q->schedule);
+        // });
+
+
+        // Counter expenses data
+        // if ((int)$request->terminal !== 0 || (int)$request->user !== 0 || $request->fromDateTime || $request->toDateTime) {
+        //     $counterexpenses = CounterExpense::with('added_by', 'terminal')->where('company_id', Auth::user()->company_id)
+        //         ->when($request->terminal, function ($query) use ($request) {
+        //             return $query->where('terminal_id', $request->terminal);
+        //         })
+        //         ->when($request->user, function ($query) use ($request) {
+        //             return $query->where('added_by', $request->user);
+        //         })
+        //         ->when($request->fromDateTime, function ($query) use ($request) {
+        //             return $query->where('time', '>=', $request->fromDateTime);
+        //         })
+        //         ->when($request->toDateTime, function ($query) use ($request) {
+        //             return $query->where('time', '<=', $request->toDateTime);
+        //         })
+        //         ->get();
+        //     }
+
+
+            return [
+                'record' => $sortData,
+                'refund' => [],
+                'counterExpenses' => $counterexpenses ?? [],
+        ];
+
     }
 
-    $filterData = (object)[];
-    $filterData->terminal = Terminal::find($request->terminal)->name ?? "All";
-    $filterData->user = User::find($request->user)->name ?? "All";
-    $filterData->route = Route::whereIn("id", $route_ids)->pluck("name")->toArray();
-    $filterData->from = date("Y/m/d H:i A", strtotime($request->fromDateTime));
-    $filterData->to = date("Y/m/d h:i A", strtotime($request->toDateTime));
+    public function advanceSalePdf(Request $request)
+    {
+        if(!checkForSubmenu("sales"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        $route_ids = $request->route ? explode(",",$request->route) : [];
+        $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
+            ->withTrashed()
+            ->where('company_id', Auth::user()->company_id)
+             ->where(function ($query) {
+                $query->where("type", "booked")
+                      ->orWhere("type", "over-issue");
+                })
 
-    return view('reports.advanceSaleReport', [
-        'record' => $sortData,
-        'refund' => [],
-        'counterExpenses' => $counterexpenses ?? [],
-        'filterData' => $filterData,
-    ]);
-}
+            ->where(function($query) use ($request){
+                if($request->terminal)
+                {
+                    return $query->where('terminal_id', $request->terminal);
+                }
+                else
+                {
+                    return $query->where('terminal_id', Auth::user()->terminal_id);
+                }
+            })
+            ->when($request->user, function ($query) use ($request) {
+                return $query->where('updated_by', $request->user);
+            })
+            ->when($request->route, function ($query) use ($route_ids) {
+                return $query->whereIn('route_id', $route_ids);
+            })
+            ->when(($request->counterSale == "true"), function ($query) use ($request) {
+                return $query->whereBetween('created_at', [date("Y-m-d H:i:s",strtotime($request->fromDateTime)),date("Y-m-d H:i:s",strtotime($request->toDateTime))]);
+            })
+            ->orderBy('date', 'desc')
+            ->get();
+
+        $tickets->transform(function ($single) {
+            $single->schedule_date_time = date('Y-m-d H:i:s', strtotime($single->schedule_date . ' ' . $single->schedule_time_exact));
+            return $single;
+        });
+
+        // date filter
+        if($request->fromDateTime && $request->counterSale == "false")
+        {
+            $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s",strtotime($request->fromDateTime)));
+        }
+        if($request->toDateTime && $request->counterSale == "false")
+        {
+            $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
+        }
+        // return $tickets;
+        $tickets = $tickets->sortBy('schedule_date_time')->groupBy(['schedule_date_time','route_id', 'updated_by']);
+
+        $sortData = [];
+        foreach ($tickets as $time) {
+            foreach ($time as $route) {
+                foreach ($route as $inner) {
+
+                    $single = [];
+                    $single['bus_number'] = $inner[0]->bus->bus_number??'N/A';
+                    $single['bus_class'] = $inner[0]->busClass->name;
+                    $single['seats'] = $inner->count();
+                    $single['terminal'] = $inner[0]->terminal->name;
+                    $single['user'] = $inner[0]->updated_name->name??'N/A';
+                    $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
+                    $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
+                    $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
+                    $eltSum = 0;
+                    foreach ($inner as $tkt) {
+                        if ($tkt->ticketElt) {
+                            $eltSum += $tkt->ticketElt->elt_price;
+                        } else {
+                            $eltSum += 0;
+                        }
+
+                    }
+                    $single['elt'] = $eltSum;
+                    array_push($sortData, $single);
+                }
+            }
+        }
+
+
+        $filterData = (object)[];
+        $filterData->terminal = Terminal::find($request->terminal)->name??"All";
+        $filterData->user = User::find($request->terminal)->name??"All";
+        $filterData->route = Route::whereIn("id",$route_ids)->pluck("name")->toArray();
+        $filterData->from = date("Y/m/d H:i A",strtotime($request->fromDateTime));
+        $filterData->to = date("Y/m/d h:i A",strtotime($request->toDateTime));
+
+
+
+        return view('reports.advanceSaleReport', [
+            'record' => $sortData,
+            'refund' =>[],
+            'counterExpenses' => $counterexpenses ?? [],
+            'filterData' => $filterData,
+        ]);
+    }
 
 
 }
