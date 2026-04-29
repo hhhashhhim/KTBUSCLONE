@@ -38,8 +38,13 @@
 </head>
 
 <body>
+@php($companyInfo = $appCompanyInfo ?? getCompanyInfo())
 <div >
 
+    <div id="info">
+        <div class="companyName"><span>{{ $companyInfo->report_header_text }}</span></div>
+    </div>
+    <br><br>
     <div id="info">
         <div class="companyName"><span>Advance Sale Report</span></div>
     </div>
@@ -55,52 +60,41 @@
     </table>
 
     <table border="2">
-    <tr>
-        <th>Date</th>
-        <th>Bus No</th>
-        <th>Bus Class</th>
-        <th>No of Seat</th>
-        <th>Terminal Name</th>
-        <th>User Name</th>
-        <th>Invoice</th>
-        <th>Transaction #</th>
-        <th>Passenger Name</th>
-        <th>Cell No</th>
-        <th>CNIC No</th>
-        <th>Sale Amount</th>
-        <th>Elt Amount</th>
-    </tr>
-
-    @foreach($record as $data)
         <tr>
-            <td>{{ $data['date'] }}<br>{{ $data['time'] }}</td>
-            <td>{{ $data['bus_number'] }}</td>
-            <td>{{ $data['bus_class'] }}</td>
-            <td>{{ $data['seats'] }}</td>
-            <td>{{ $data['terminal'] }}</td>
-            <td>{{ $data['user'] }}</td>
-            <td>{{ $data['invoice_id'] }}</td>
-            <td>{{ $data['transaction_id'] }}</td>
-            <td>{{ $data['passenger_name'] }}</td>
-            <td>{{ $data['passenger_contact'] }}</td>
-            <td>{{ $data['passenger_cnic'] }}</td>
-            <td>{{ $data['sales'] }}</td>
-            <td>{{ $data['elt'] }}</td>
+            <th>Date</th>
+            <th>Bus No</th>
+            <th>Bus Class</th>
+            <th>No of Seat</th>
+            <th>Terminal Name</th>
+            <th>User Name</th>
+            <th>Sale Amount</th>
+            <th>Elt Amount</th>
         </tr>
-    @endforeach
-
-    <tr>
-        <th colspan="3"></th>
-        <th>{{ array_sum(array_column($record, 'seats')) }}</th>
-        <th colspan="7"></th>
-        <th>{{ array_sum(array_column($record, 'sales')) }}</th>
-        <th>{{ array_sum(array_column($record, 'elt')) }}</th>
-    </tr>
-</table>
-
-
-
-
+        @foreach($record as $data)
+        <tr>
+            <td>{{$data['date']}}<br>{{$data['time']}}</td>
+            <td>{{$data['bus_number']}}</td>
+            <td>{{$data['bus_class']}}</td>
+            <td>{{$data['seats']}}</td>
+            <td>{{$data['terminal']}}</td>
+            <td>{{$data['user']}}</td>
+            <td>{{$data['sales']}}</td>
+            <td>{{$data['elt']}}</td>
+        </tr>
+        @endforeach
+        <!-- Total Row -->
+        <tr>
+            <th colspan="3"></th>
+            <th>{{ array_sum(array_column($record, 'seats'))}}</th>
+            <th></th>
+            <th></th>
+            <th>{{ array_sum(array_column($record, 'sales'))}}</th>
+            <th>{{ array_sum(array_column($record, 'elt'))}}</th>
+        </tr>
+    </table>
+    @if($companyInfo->report_footer_text)
+        <div style="margin-top: 20px; text-align: center; font-size: 10pt;">{{ $companyInfo->report_footer_text }}</div>
+    @endif
 </div>
 </body>
 </html>
