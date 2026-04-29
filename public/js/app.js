@@ -142565,32 +142565,52 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 6:
                 _context.prev = 6;
                 _context.t0 = _context["catch"](0);
+                console.log('API Error:', _context.t0);
 
-                if (_context.t0.response.status == 401) {
-                  localStorage.removeItem("user");
-                  localStorage.removeItem("token");
-                  window.location.href = _this.$store.state.main_url;
+                if (_context.t0.response) {
+                  _context.next = 11;
+                  break;
                 }
 
+                return _context.abrupt("return", {
+                  status: 0,
+                  data: {
+                    message: _context.t0.message || 'Network/CORS error'
+                  }
+                });
+
+              case 11:
+                if (!(_context.t0.response.status == 401)) {
+                  _context.next = 16;
+                  break;
+                }
+
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
+                window.location.href = _this.$store.state.main_url;
+                return _context.abrupt("return", _context.t0.response);
+
+              case 16:
                 if (!(_context.t0.response.status == 403)) {
-                  _context.next = 12;
+                  _context.next = 20;
                   break;
                 }
 
                 setTimeout(function () {
                   window.location.href = _this.$store.state.main_url + 'admin/dashboard';
                 }, 500);
-                return _context.abrupt("return", swal({
+                swal({
                   title: "OOPS!!!!!",
                   text: "ACCESS DENIED",
                   icon: "error",
                   timer: 2000
-                }));
-
-              case 12:
+                });
                 return _context.abrupt("return", _context.t0.response);
 
-              case 13:
+              case 20:
+                return _context.abrupt("return", _context.t0.response);
+
+              case 21:
               case "end":
                 return _context.stop();
             }
