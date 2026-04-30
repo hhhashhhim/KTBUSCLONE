@@ -57,6 +57,15 @@ class AdvanceSalesReportController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+        $routeIds = is_array($request->route)
+            ? array_values(array_filter($request->route, fn ($routeId) => $routeId != 0 && $routeId !== ''))
+            : [];
+        $passengerName = trim($request->passenger_name ?? '');
+        $passengerContact = preg_replace('/[^0-9]/', '', $request->passenger_contact ?? '');
+        $passengerCnic = preg_replace('/[^0-9]/', '', $request->passenger_cnic ?? '');
+        $isCounterSale = filter_var($request->counterSale, FILTER_VALIDATE_BOOLEAN);
+        $selectedTerminalId = $request->filled('terminal') ? $request->terminal : Auth::user()->terminal_id;
+
         $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
             ->withTrashed()
             ->where('company_id', Auth::user()->company_id)
@@ -65,23 +74,40 @@ class AdvanceSalesReportController extends Controller
                       ->orWhere("type", "over-issue");
                 })
 
-            ->where(function($query) use ($request){
-                if($request->terminal)
-                {
-                    return $query->where('terminal_id', $request->terminal);
-                }
-                else
-                {
-                    return $query->where('terminal_id', Auth::user()->terminal_id);
-                }
+            ->where(function($query) use ($selectedTerminalId){
+                return $query->where('terminal_id', $selectedTerminalId);
             })
             ->when($request->user, function ($query) use ($request) {
                 return $query->where('updated_by', $request->user);
             })
-            ->when($request->route, function ($query) use ($request) {
-                return $query->whereIn('route_id', $request->route);
+            ->when(!empty($routeIds), function ($query) use ($routeIds) {
+                return $query->whereIn('route_id', $routeIds);
             })
-            ->when($request->counterSale, function ($query) use ($request) {
+            ->when($request->invoice_id, function ($query) use ($request) {
+                return $query->where('invoice_id', 'LIKE', '%' . trim($request->invoice_id) . '%');
+            })
+            ->when($request->transaction_id, function ($query) use ($request) {
+                return $query->where('transaction_id', 'LIKE', '%' . trim($request->transaction_id) . '%');
+            })
+            ->when($passengerName || $passengerContact || $passengerCnic, function ($query) use ($passengerName, $passengerContact, $passengerCnic) {
+                return $query->whereHas('customer', function ($customerQuery) use ($passengerName, $passengerContact, $passengerCnic) {
+                    if ($passengerName != '') {
+                        $customerQuery->where('name', 'LIKE', '%' . $passengerName . '%');
+                    }
+
+                    if ($passengerContact != '') {
+                        $customerQuery->whereRaw(
+                            "REPLACE(REPLACE(REPLACE(contact, '-', ''), ' ', ''), '+', '') LIKE ?",
+                            ['%' . $passengerContact . '%']
+                        );
+                    }
+
+                    if ($passengerCnic != '') {
+                        $customerQuery->whereRaw("REPLACE(cnic, '-', '') LIKE ?", ['%' . $passengerCnic . '%']);
+                    }
+                });
+            })
+            ->when($isCounterSale, function ($query) use ($request) {
                 return $query->whereBetween('created_at', [date("Y-m-d H:i:s",strtotime($request->fromDateTime)),date("Y-m-d H:i:s",strtotime($request->toDateTime))]);
             })
             ->orderBy('date', 'desc')
@@ -93,11 +119,11 @@ class AdvanceSalesReportController extends Controller
         });
 
         // date filter
-        if($request->fromDateTime && $request->counterSale == false)
+        if($request->fromDateTime && !$isCounterSale)
         {
             $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s",strtotime($request->fromDateTime)));
         }
-        if($request->toDateTime && $request->counterSale == false)
+        if($request->toDateTime && !$isCounterSale)
         {
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
@@ -195,7 +221,13 @@ class AdvanceSalesReportController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $route_ids = $request->route ? explode(",",$request->route) : [];
+        $route_ids = $request->route ? array_values(array_filter(explode(",",$request->route), fn ($routeId) => $routeId != 0 && $routeId !== '')) : [];
+        $passengerName = trim($request->passenger_name ?? '');
+        $passengerContact = preg_replace('/[^0-9]/', '', $request->passenger_contact ?? '');
+        $passengerCnic = preg_replace('/[^0-9]/', '', $request->passenger_cnic ?? '');
+        $isCounterSale = filter_var($request->counterSale, FILTER_VALIDATE_BOOLEAN);
+        $selectedTerminalId = $request->filled('terminal') ? $request->terminal : Auth::user()->terminal_id;
+
         $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
             ->withTrashed()
             ->where('company_id', Auth::user()->company_id)
@@ -204,23 +236,40 @@ class AdvanceSalesReportController extends Controller
                       ->orWhere("type", "over-issue");
                 })
 
-            ->where(function($query) use ($request){
-                if($request->terminal)
-                {
-                    return $query->where('terminal_id', $request->terminal);
-                }
-                else
-                {
-                    return $query->where('terminal_id', Auth::user()->terminal_id);
-                }
+            ->where(function($query) use ($selectedTerminalId){
+                return $query->where('terminal_id', $selectedTerminalId);
             })
             ->when($request->user, function ($query) use ($request) {
                 return $query->where('updated_by', $request->user);
             })
-            ->when($request->route, function ($query) use ($route_ids) {
+            ->when(!empty($route_ids), function ($query) use ($route_ids) {
                 return $query->whereIn('route_id', $route_ids);
             })
-            ->when(($request->counterSale == "true"), function ($query) use ($request) {
+            ->when($request->invoice_id, function ($query) use ($request) {
+                return $query->where('invoice_id', 'LIKE', '%' . trim($request->invoice_id) . '%');
+            })
+            ->when($request->transaction_id, function ($query) use ($request) {
+                return $query->where('transaction_id', 'LIKE', '%' . trim($request->transaction_id) . '%');
+            })
+            ->when($passengerName || $passengerContact || $passengerCnic, function ($query) use ($passengerName, $passengerContact, $passengerCnic) {
+                return $query->whereHas('customer', function ($customerQuery) use ($passengerName, $passengerContact, $passengerCnic) {
+                    if ($passengerName != '') {
+                        $customerQuery->where('name', 'LIKE', '%' . $passengerName . '%');
+                    }
+
+                    if ($passengerContact != '') {
+                        $customerQuery->whereRaw(
+                            "REPLACE(REPLACE(REPLACE(contact, '-', ''), ' ', ''), '+', '') LIKE ?",
+                            ['%' . $passengerContact . '%']
+                        );
+                    }
+
+                    if ($passengerCnic != '') {
+                        $customerQuery->whereRaw("REPLACE(cnic, '-', '') LIKE ?", ['%' . $passengerCnic . '%']);
+                    }
+                });
+            })
+            ->when($isCounterSale, function ($query) use ($request) {
                 return $query->whereBetween('created_at', [date("Y-m-d H:i:s",strtotime($request->fromDateTime)),date("Y-m-d H:i:s",strtotime($request->toDateTime))]);
             })
             ->orderBy('date', 'desc')
@@ -232,11 +281,11 @@ class AdvanceSalesReportController extends Controller
         });
 
         // date filter
-        if($request->fromDateTime && $request->counterSale == "false")
+        if($request->fromDateTime && !$isCounterSale)
         {
             $tickets = $tickets->where('schedule_date_time', '>=', date("Y-m-d H:i:s",strtotime($request->fromDateTime)));
         }
-        if($request->toDateTime && $request->counterSale == "false")
+        if($request->toDateTime && !$isCounterSale)
         {
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
@@ -274,8 +323,8 @@ class AdvanceSalesReportController extends Controller
 
 
         $filterData = (object)[];
-        $filterData->terminal = Terminal::find($request->terminal)->name??"All";
-        $filterData->user = User::find($request->terminal)->name??"All";
+        $filterData->terminal = Terminal::find($selectedTerminalId)->name??"N/A";
+        $filterData->user = User::find($request->user)->name??"All";
         $filterData->route = Route::whereIn("id",$route_ids)->pluck("name")->toArray();
         $filterData->from = date("Y/m/d H:i A",strtotime($request->fromDateTime));
         $filterData->to = date("Y/m/d h:i A",strtotime($request->toDateTime));
