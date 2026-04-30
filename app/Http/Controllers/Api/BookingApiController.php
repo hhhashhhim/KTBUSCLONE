@@ -635,213 +635,340 @@ class BookingApiController extends Controller
             return response()->json(["Success" => "Terminal data updated"]);
         }
     }
-  public function bookSeat(Request $request)
-{
-    $scheduleId = $request->schedule_id;
-    $lockName = "stayLock:" . $scheduleId;
-
-    try {
-        $lock = Cache::lock($lockName, 7)->block(10);
-
+    public function bookSeat(Request $request)
+    {
+        $scheduleId = $request->schedule_id;
+        $lockName = "stayLock:" . $scheduleId;  // Dynamic lock based on schedule ID
         try {
-            $companyId = Auth::user()->company_id;
-            $terminalId = Auth::user()->terminal_id;
+            $lock = Cache::lock($lockName, 7)->block(10);  // 7-second timeout
 
-            // --- SECTION 1: CONVERT ADVANCE TO BOOKED (Confirmation via Payment) ---
-            if (isset($request->flag) && $request->flag == 1) {
+            try {
+
+                $companyId = Auth::user()->company_id;
+                $terminalId = Auth::user()->terminal_id;
+
+                // for reserved to confirm
+                if (isset($request->flag) && $request->flag == 1) {
+                    $validator = Validator::make($request->all(), [
+                        'invoice_id' => 'required|integer',
+                    ]);
+                    if ($validator->fails()) {
+                        return new ValidationResource($validator->errors());
+                    }
+                    // checking only reserved seats will go through this process
+                    $checkAlreadyBooked = Ticket::where("invoice_id", $request->invoice_id)->where(['company_id' => $companyId, "type" => "advance booking"])->get();
+
+                    if ($checkAlreadyBooked->count() > 0) {
+                        // this is for fare validation how much amount received from payment gateway
+                        $checkTotal = Ticket::where("invoice_id", $request->invoice_id)->where(['company_id' => $companyId, "type" => "advance booking"])
+                            ->selectRaw('(SUM(seat_fare) - SUM(discount)) as amount')
+                            ->first()->amount;
+                        if (isset($request->total_amount) && $request->total_amount != $checkTotal) {
+                            $error = ["Please Enter Valid Amount"];
+                            return new ConflictResource($error);
+                        }
+                        if ($request->boolean('only_transaction_id')) {
+                            Ticket::where("invoice_id", $request->invoice_id)->update([
+                                'transaction_id' => $request->transaction_id,
+                            ]);
+                            return 'Transaction id updated';
+                        }
+                        Ticket::where("invoice_id", $request->invoice_id)->update([
+                            'type' => 'booked',
+                            'updated_by' => Auth::user()->id,
+                            'transaction_id' => $request->transaction_id,
+                            'booked_time' => date("Y-m-d H:i:s"),
+                        ]);
+                        ticketConfirmedMessage($request->invoice_id);
+                        //////////////////////////////////////////////
+                        ActivityLog::create([
+                            "activity_by" => Auth::user()->id,
+                            "message" => Auth::user()->name . " | update ticket (advance to confirm) | time : " . $checkAlreadyBooked[0]->schedule_date . " " . $checkAlreadyBooked[0]->schedule_time . " | invoice id :" . $request->invoice_id . " / " . (isset($request->total_amount) ? json_encode($request->total_amount) : "*"),
+                            "requested_host" => $request->ip(),
+                            "company_id" => Auth::user()->company_id
+                        ]);
+                        return new CreatedResource(["invoice_id" => $request->invoice_id]);
+                    } else {
+                        $error = ["your seat combinations are not reserved for confirm booking"];
+                        return new ConflictResource($error);
+                    }
+                }
+
                 $validator = Validator::make($request->all(), [
-                    'invoice_id' => 'required|integer',
+                    'departure_city_id' => 'required',
+                    'destination_city_id' => 'required',
+                    'date' => 'required',
+                    'gender' => 'required',
+                    'book_type' => 'required',
+                    'selected_seats' => 'required',
+                    'selected_seats_class' => 'required',
+                    'selected_seats_fare' => 'required',
+                    'customer_name' => 'required',
+                    'customer_cnic' => 'required',
+                    'contact' => 'required',
+                    'schedule_id' => 'required',
+                    'departure_time' => 'required',
                 ]);
 
+
+                // if validation fails
                 if ($validator->fails()) {
                     return new ValidationResource($validator->errors());
                 }
 
-                // Identify seats currently in 'advance booking'
-                $checkAlreadyBooked = Ticket::where("invoice_id", $request->invoice_id)
-                    ->where(['company_id' => $companyId, "type" => "advance booking"])
-                    ->get();
+                if ($request->book_type != "booked" && $request->book_type != "advance booking") {
+                    $error = ["Please Enter Type booked/advance booking"];
+                    return new ConflictResource($error);
+                }
 
-                if ($checkAlreadyBooked->count() > 0) {
-                    // Fare validation
-                    $checkTotal = Ticket::where("invoice_id", $request->invoice_id)
-                        ->where(['company_id' => $companyId, "type" => "advance booking"])
-                        ->selectRaw('(SUM(seat_fare) - SUM(discount)) as amount')
-                        ->first()->amount;
+                // seat fare validation
+                if (seatFareIsWrong($request)) {
+                    $error = ["Please Enter Valid Fare"];
+                    return new ConflictResource($error);
+                }
 
-                    if (isset($request->total_amount) && $request->total_amount != $checkTotal) {
-                        return new ConflictResource(["Please Enter Valid Amount"]);
+                // to make array of terminal's available seats
+                $available_seats = Terminal::where('id', Auth::user()->terminal_id)->value('available_seats');
+                if (!is_null($available_seats)) {
+                    if (strpos($available_seats, '-') !== false) {
+                        $rangeSeats = explode("|", str_replace(',', '|', $available_seats));
+                        $output = [];
+                        foreach ($rangeSeats as $range) {
+                            $parts = explode("-", $range);
+                            $start = intval($parts[0]);
+                            $end = intval($parts[1]);
+                            for ($i = $start; $i <= $end; $i++) {
+                                $output[] = (int)str_pad($i, 2, "0", STR_PAD_LEFT);
+                            }
+                        }
+                        $seats = array_unique($output);
+                    } else {
+                        $arrays = explode(",", $available_seats);
+                        $seats = [];
+                        foreach ($arrays as $item) {
+                            $seats[] = (int)$item;
+                        }
                     }
+                }
+                // Data
+                DB::beginTransaction();
 
-                    DB::beginTransaction();
+                // this is for get actual schedule date
+                $detail = ScheduleDetail::where("departure_id", $request->departure_city_id)
+                    ->where("destination_id", $request->destination_city_id)
+                    ->where('schedule_id', $request->schedule_id)
+                    ->where('departure_date', date('Y-m-d', strtotime($request->date)))
+                    ->where('company_id', $companyId)
+                    ->where('departure_time', date("H:i:s", strtotime($request->departure_time)))
+                    ->first();
 
-                    // CASE A: Only updating the Transaction ID
-                    if ($request->boolean('only_transaction_id')) {
-                        Ticket::where("invoice_id", $request->invoice_id)->update([
-                            'transaction_id' => $request->transaction_id,
-                        ]);
-                        DB::commit();
-                        return 'Transaction id updated';
+                $schedule_time_exact = ScheduleDetail::where(["schedule_id" => $detail->schedule_id, "schedule_date" => $detail->schedule_date])->first();
+                $existingTicket = Ticket::where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id', 'ticket_merge_id']);
+
+                $allTicket = [];
+                // if (isset($request->flag) && $request->flag == 1) {
+                //     // checking only reserved seats will go through this process
+                //     $checkAlreadyBooked = Ticket::whereIn("id",$request->alreadyBookedId)->where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id,"type" => "advance booking"])->get();
+                //     if($checkAlreadyBooked->count() != count($request->alreadyBookedId))
+                //     {
+                //         $error = ["Some of your seat combinations are not reserved for confirm booking"];
+                //         return new ConflictResource($error);
+                //     }
+                //     $allTicket = updateAdvancedSeatApi($request, $companyId);
+                // } else {
+
+                // checking booking available with these seat selection
+                // check seat duplication
+                $schedule = Schedule::where('id', $request->schedule_id)->where('company_id', $companyId)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name,online_seat_choices', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
+                $lastFare = $schedule->route->fares->last();
+                $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
+                array_push($allFaresOfRoute, $lastFare->destination_city_id);
+                $scheduleDepIndex = array_search($request->departure_city_id, $allFaresOfRoute);
+                $scheduleDesIndex = array_search($request->destination_city_id, $allFaresOfRoute);
+                $checkAlreadyBooked = Ticket::whereIn("seat_no", $request->selected_seats)->where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->get();
+                foreach ($checkAlreadyBooked as $tkt) {
+                    $ticketDepIndex = array_search($tkt->departure_city_id, $allFaresOfRoute);
+                    $ticketDesIndex = array_search($tkt->destination_city_id, $allFaresOfRoute);
+                    if (($ticketDepIndex >= $scheduleDepIndex && $ticketDepIndex < $scheduleDesIndex)
+                        || ($ticketDesIndex > $scheduleDepIndex && $ticketDesIndex <= $scheduleDesIndex)
+                    ) {
+                        return response()->json(["errors" => ["Error" => ["One seat of your combination already booked"]]], 422);
                     }
+                    if (($scheduleDepIndex >= $ticketDepIndex && $scheduleDepIndex < $ticketDesIndex)
+                        || ($scheduleDesIndex > $ticketDepIndex && $scheduleDesIndex <= $ticketDesIndex)
+                    ) {
+                        return response()->json(["errors" => ["Error" => ["One seat of your combination already booked"]]], 422);
+                    }
+                }
+                $seatChoices =  $schedule->route->online_seat_choices ? explode(",", $schedule->route->online_seat_choices) : null;
+                // check allow seat
+                foreach ($request->selected_seats as $seatNo) {
+                    // allow seat manage
+                    if (isset($seats) && !in_array(preg_replace("/[^0-9]/", "", $seatNo), $seats)) {
+                        $error = ["One seat of your combination is not allow to book"];
+                        return new ConflictResource($error);
+                    }
+                    // allow seat manage route wise
+                    if ($seatChoices) {
+                        if (!in_array(preg_replace("/[^0-9]/", "", $seatNo), $seatChoices)) {
+                            $error = ["One seat of your combination is not allow to book"];
+                            return new ConflictResource($error);
+                        }
+                    }
+                }
 
-                    // CASE B: Full Confirmation (Change type to 'booked')
-                    Ticket::where("invoice_id", $request->invoice_id)->update([
-                        'type' => 'booked',
-                        'updated_by' => Auth::user()->id,
-                        'transaction_id' => $request->transaction_id,
-                        'booked_time' => now(),
-                    ]);
 
-                    // Cleanup: Remove from tracking tables now that it's a confirmed booking
-                    $ticketIds = $checkAlreadyBooked->pluck('id');
-                    TicketAdvancedBooked::whereIn('ticket_id', $ticketIds)->delete();
-                    TicketIsPartial::whereIn('ticket_id', $ticketIds)->update(['type' => 'booked']);
-
-                    ActivityLog::create([
-                        "activity_by" => Auth::user()->id,
-                        "message" => Auth::user()->name . " | Confirmed Advance to Booked | Invoice: " . $request->invoice_id . " | Txn: " . $request->transaction_id,
-                        "requested_host" => $request->ip(),
-                        "company_id" => $companyId
-                    ]);
-
-                    DB::commit();
-                    ticketConfirmedMessage($request->invoice_id);
-
-                    return new CreatedResource(["invoice_id" => $request->invoice_id]);
+                $departure_city_id = $schedule->route->fares->first()->departure_city_id;
+                $destination_city_id = $schedule->route->fares->last()->destination_city_id;
+                $isPartial = 0;
+                if ($request->departure_city_id != $departure_city_id || $request->destination_city_id != $destination_city_id) {
+                    $isPartial = 1;
+                }
+                if ($request->customer_cnic && $request->book_type == 'booked') {
+                    $customer = Customer::where('cnic', plainContactAndCnic($request->customer_cnic))->where('company_id', $companyId)->first();
+                } else if ($request->book_type == 'advance booking') {
+                    $customer = Customer::where('contact', plainContactAndCnic($request->contact))->where('company_id', $companyId)->first();
                 } else {
-                    return new ConflictResource(["Seats are not in 'advance booking' status or already confirmed."]);
+                    $customer = false;
                 }
-            }
+                // Fare Fetching About the Schedule
+                if ($customer) {
+                    $customer->name = $request->customer_name;
+                    $customer->cnic = is_null($request->customer_cnic) ? 0 : plainContactAndCnic($request->customer_cnic);
+                    $customer->contact = plainContactAndCnic($request->contact);
+                    $customer->save();
+                } else {
+                    $customer = Customer::create([
+                        'company_id' => $companyId,
+                        'added_by' => Auth::user()->id,
+                        'name' => $request->customer_name,
+                        'cnic' => is_null($request->customer_cnic) ? 0 : plainContactAndCnic($request->customer_cnic),
+                        'contact' => plainContactAndCnic($request->contact),
+                    ]);
+                }
 
-            // --- SECTION 2: NEW BOOKING LOGIC ---
-            $validator = Validator::make($request->all(), [
-                'departure_city_id' => 'required',
-                'destination_city_id' => 'required',
-                'date' => 'required',
-                'gender' => 'required',
-                'book_type' => 'required', // 'booked' or 'advance booking'
-                'selected_seats' => 'required',
-                'selected_seats_class' => 'required',
-                'selected_seats_fare' => 'required',
-                'customer_name' => 'required',
-                'customer_cnic' => 'required',
-                'contact' => 'required',
-                'schedule_id' => 'required',
-                'departure_time' => 'required',
-            ]);
-
-            if ($validator->fails()) {
-                return new ValidationResource($validator->errors());
-            }
-
-            // Seat fare and type validation
-            if (!in_array($request->book_type, ["booked", "advance booking"])) {
-                return new ConflictResource(["Please Enter Type booked/advance booking"]);
-            }
-
-            if (seatFareIsWrong($request)) {
-                return new ConflictResource(["Please Enter Valid Fare"]);
-            }
-
-            // Begin Transaction for New Seats
-            DB::beginTransaction();
-
-            // Fetch Schedule Details
-            $detail = ScheduleDetail::where("departure_id", $request->departure_city_id)
-                ->where("destination_id", $request->destination_city_id)
-                ->where('schedule_id', $request->schedule_id)
-                ->where('departure_date', date('Y-m-d', strtotime($request->date)))
-                ->where('company_id', $companyId)
-                ->where('departure_time', date("H:i:s", strtotime($request->departure_time)))
-                ->first();
-
-            if (!$detail) {
-                return new ConflictResource(["Schedule details not found"]);
-            }
-
-            // Seat Overlap Check
-            $checkOverlap = Ticket::whereIn("seat_no", $request->selected_seats)
-                ->where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])
-                ->exists();
-
-            if ($checkOverlap) {
-                return response()->json(["errors" => ["Error" => ["One or more seats already booked"]]], 422);
-            }
-
-            // Customer Handling
-            $cleanCnic = plainContactAndCnic($request->customer_cnic);
-            $cleanContact = plainContactAndCnic($request->contact);
-            $customer = Customer::updateOrCreate(
-                ['contact' => $cleanContact, 'company_id' => $companyId],
-                ['name' => $request->customer_name, 'cnic' => $cleanCnic, 'added_by' => Auth::user()->id]
-            );
-
-            // Invoice Generation
-            $invoice = Invoice::create([
-                "schedule_id" => $request->schedule_id,
-                "terminal_id" => $terminalId,
-                "schedule_date" => $detail->schedule_date,
-                "schedule_time" => $detail->departure_time,
-                "company_id" => $companyId,
-                "added_by" => Auth::user()->id,
-            ]);
-
-            $isPartial = ($request->departure_city_id != $detail->departure_id || $request->destination_city_id != $detail->destination_id) ? 1 : 0;
-            $terminal = Terminal::find($terminalId);
-
-            foreach ($request->selected_seats as $i => $seat) {
-                $checkDiscount = checkDiscountAmount($detail, $terminalId, $request->selected_seats_class[$i]);
-
-                $ticket = Ticket::create([
-                    'company_id' => $companyId,
-                    'departure_city_id' => $request->departure_city_id,
-                    'destination_city_id' => $request->destination_city_id,
-                    'seat_no' => $seat,
-                    'bus_class_id' => $detail->bus_class_id,
-                    'seat_fare' => $request->selected_seats_fare[$i],
-                    'is_partial' => $isPartial,
-                    'invoice_id' => $invoice->id,
-                    'schedule_date' => $detail->schedule_date,
-                    'schedule_time' => $detail->departure_time,
-                    'date' => date('Y-m-d', strtotime($request->date)),
-                    'customer_id' => $customer->id,
-                    'schedule_id' => $request->schedule_id,
-                    'schedule_details_id' => $detail->id,
-                    'terminal_id' => $terminalId,
-                    'online_terminal' => $terminal->is_online_terminal ?? 0,
-                    'gender' => $request->gender[$i],
-                    'type' => $request->book_type,
-                    'booked_time' => now(),
-                    'added_by' => Auth::user()->id,
-                    'transaction_id' => $request->pp_TxnRefNo ?? null,
+                // Getting Already Booked Tickets
+                if (date('Y-m-d', strtotime($request->date)) == date('Y-m-d')) {
+                    $bookingNo = Ticket::where('date', date('Y-m-d', strtotime($request->date)))->latest()->first()->booking_no ?? 0;
+                    ++$bookingNo;
+                } else {
+                    $bookingNo = Ticket::where('date', date('Y-m-d', strtotime($request->date)))->latest()->first()->booking_no ?? 0;
+                    ++$bookingNo;
+                }
+                $invoice = Invoice::create([
+                    "schedule_id" => $schedule->id,
+                    "route_id" => $schedule->route_id,
+                    "terminal_id" => $request->terminalId ?? Auth::user()->terminal_id,
+                    "schedule_date" => $detail->schedule_date,
+                    "schedule_time" => $detail->departure_time,
+                    "company_id" => Auth::user()->company_id,
+                    "added_by" => Auth::user()->id,
                 ]);
+                $allTicket = [];
+                foreach ($request->selected_seats as $i => $seat) {
+                    $checkDiscount =  checkDiscountAmount($detail, $terminalId, $request->selected_seats_class[$i]);
+                    $ticket = Ticket::create([
+                        'company_id' => $companyId,
+                        'departure_city_id' => $request->departure_city_id,
+                        'destination_city_id' => $request->destination_city_id,
+                        'seat_no' => $seat,
+                        'bus_class_id' => $detail->bus_class_id,
+                        'seat_fare' => $request->selected_seats_fare[$i],
+                        'is_partial' => $isPartial,
+                        'booking_no' => $bookingNo,
+                        'invoice_id' => $invoice->id,
+                        'schedule_date' => $detail->schedule_date,
+                        'schedule_time' => $detail->departure_time,
+                        'schedule_time_exact' => $schedule_time_exact->departure_time,
+                        'date' =>  date('Y-m-d', strtotime($request->date)),
+                        'customer_id' => $customer->id,
+                        'schedule_id' => $schedule->id,
+                        'route_id' => $schedule->route_id,
+                        'ticket_closing_id' => $existingTicket ? $existingTicket->ticket_closing_id : null,
+                        'ticket_merge_id' => $existingTicket ? $existingTicket->ticket_merge_id : null,
+                        'bus_id' => $existingTicket ? $existingTicket->bus_id : null,
+                        'schedule_details_id' => $detail->id,
+                        'terminal_id' => $terminalId,
+                        'terminal_name' => Terminal::find($terminalId)->name,
+                        'online_terminal' => Terminal::find($terminalId)->is_online_terminal,
+                        'remarks' => $request->remarks,
+                        'gender' => $request->gender[$i],
+                        'type' => $request->book_type,
+                        'discount_type' => null,
+                        'booked_time' => date("Y-m-d H:i:s"),
+                        'added_by' => Auth::user()->id,
+                        'updated_by' => Auth::user()->id,
+                        'discount' => 0,
+                        'schedule_discount'   => $checkDiscount->schedule_discount,
+                        'terminal_discount'   => $checkDiscount->terminal_discount,
+                        'points_usage' => 0,
+                        'transaction_id' => $request->pp_TxnRefNo ?? null,
+                    ]);
+                    if ($isPartial == 1) {
 
-                if ($isPartial) {
-                    TicketIsPartial::create(array_merge($ticket->toArray(), ['ticket_id' => $ticket->id]));
-                }
+                        TicketIsPartial::create([
+                            'company_id' => $companyId,
+                            'departure_city_id' => $ticket->departure_city_id,
+                            'destination_city_id' => $ticket->destination_city_id,
+                            'ticket_id' => $ticket->id,
+                            'seat_no' => $ticket->seat_no,
+                            'seat_fare' => $ticket->seat_fare,
+                            'booking_no' => $ticket->booking_no,
+                            'date' => date('Y-m-d', strtotime($ticket->date)),
+                            'customer_id' => $ticket->customer_id,
+                            'schedule_id' => $ticket->schedule_id,
+                            'gender' => $request->gender[$i],
+                            'type' => $ticket->type,
+                            'added_by' => Auth::user()->id,
+                        ]);
+                    }
 
-                if ($request->book_type == 'advance booking') {
-                    TicketAdvancedBooked::create(array_merge($ticket->toArray(), ['ticket_id' => $ticket->id]));
+                    if ($request->book_type == 'advance booking') {
+                        TicketAdvancedBooked::create([
+                            'company_id' => $companyId,
+                            'departure_city_id' => $ticket->departure_city_id,
+                            'destination_city_id' => $ticket->destination_city_id,
+                            'ticket_id' => $ticket->id,
+                            'seat_no' => $ticket->seat_no,
+                            'seat_fare' => $ticket->seat_fare,
+                            'booking_no' => $ticket->booking_no,
+                            'date' => date('Y-m-d', strtotime($ticket->date)),
+                            'customer_id' => $ticket->customer_id,
+                            'schedule_id' => $ticket->schedule_id,
+                            'gender' => $request->gender[$i],
+                            'type' => $ticket->type,
+                            'added_by' => Auth::user()->id,
+
+                        ]);
+                    }
+                    $allTicket[] = $ticket->id;
                 }
+                // }
+                ActivityLog::create([
+                    "activity_by" => Auth::user()->id,
+                    "message" => Auth::user()->name . " | stored ticket ($request->book_type) | time : $detail->schedule_date $detail->departure_time | seat no :" . json_encode($request->selected_seats),
+                    "requested_host" => $request->ip(),
+                    "company_id" => Auth::user()->company_id
+                ]);
+                DB::commit();
+
+                return new CreatedResource(["invoice_id" => $invoice->id]);
+            } finally {
+                // Always release the lock, regardless of success or failure in the inner try block
+                optional($lock)->release();
             }
-
-            ActivityLog::create([
-                "activity_by" => Auth::user()->id,
-                "message" => Auth::user()->name . " | Stored Ticket ($request->book_type) | Invoice: $invoice->id",
-                "requested_host" => $request->ip(),
-                "company_id" => $companyId
+        } catch (\Exception $e) {
+            Log::error('Break error', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'trace'   => $e->getTraceAsString(),
             ]);
 
-            DB::commit();
-            return new CreatedResource(["invoice_id" => $invoice->id]);
-
-        } finally {
-            optional($lock)->release();
+            return new BreakResource([
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+            ]);
         }
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Booking Error: ' . $e->getMessage());
-        return new BreakResource(['message' => $e->getMessage(), 'line' => $e->getLine()]);
     }
-}
 }
