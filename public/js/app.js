@@ -29987,7 +29987,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 8:
                 resterminals = _context2.sent;
 
-                if (resUserNames.status == 200 && resRoutes.status == 200 && resterminals.status == 200) {
+                if (resUserNames.status == 200 || resRoutes.status == 200 || resterminals.status == 200) {
                   _this2.tableLoading = false;
                   _this2.users = resUserNames.data;
                   _this2.routes = resRoutes.data;

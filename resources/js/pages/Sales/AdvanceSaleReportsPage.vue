@@ -407,7 +407,7 @@ export default {
             const resUserNames = await this.callApi("post", 'advance/sales/getUserNames');
             const resRoutes = await this.callApi("post", 'advance/sales/getRoutes');
             const resterminals = await this.callApi("post", 'advance/sales/getTerminals');
-            if (resUserNames.status == 200 && resRoutes.status == 200 && resterminals.status == 200) {
+            if (resUserNames.status == 200 || resRoutes.status == 200 || resterminals.status == 200) {
                 this.tableLoading = false;
                 this.users = resUserNames.data;
                 this.routes = resRoutes.data;
