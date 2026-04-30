@@ -40,52 +40,75 @@ use Rawilk\Printing\Receipts\ReceiptPrinter;
 if (!function_exists('confirmJazzcashPendingPayment')) {
     function confirmJazzcashPendingPayment($txnRefNo)
     {
-        $jc = jazzcash();
         $data = [
-            "pp_MerchantID" => $jc->merchant,
-            "pp_Password"   => $jc->password,
-            "pp_TxnRefNo"   => $txnRefNo,
+            "pp_MerchantID" => jazzcash()->merchant,
+            "pp_Password" => jazzcash()->password,
+            "pp_TxnRefNo" => $txnRefNo,
         ];
-
+        // Sort data keys by ASCII
         ksort($data);
-        $concatenatedString = $jc->salt;
-        foreach ($data as $value) {
-            if ($value != '') {
-                $concatenatedString .= '&' . $value;
-            }
+        // Concatenate
+        $concatenatedString = jazzcash()->salt;
+        foreach ($data as $key => $value) {
+            $concatenatedString .= "&$value";
         }
-
-        $data["pp_SecureHash"] = hash_hmac('sha256', $concatenatedString, $jc->salt);
+        // return $concatenatedString;
+        $secureHash = hash_hmac('sha256', $concatenatedString, jazzcash()->salt);
+        $data["pp_SecureHash"] = $secureHash;
 
         try {
-            $apiResponse = Http::timeout(30)
-                ->withHeaders(['Content-Type' => 'application/json'])
-                ->post($jc->statusUrl, $data);
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post(jazzcash()->statusUrl, $data);
 
-            if ($apiResponse->failed()) {
-                return (object)["status" => false, "response" => $apiResponse->json()];
+            $response = json_decode(json_encode($response->json()));
+
+            if ($response->pp_PaymentResponseCode === "121") {
+                return (object)[
+                    "status" => true,
+                    "response" => $response
+                ];
+            } else {
+                return (object)[
+                    "status" => false,
+                    "response" => $response
+                ];
             }
-
-            $resObj = (object) $apiResponse->json();
-            // Code 121 means Transaction found and is Successful
-            $isSuccess = isset($resObj->pp_PaymentResponseCode) && $resObj->pp_PaymentResponseCode == "121";
-
-            return (object)["status" => $isSuccess, "response" => $resObj];
         } catch (\Exception $e) {
-            Log::error("JazzCash API Error: " . $e->getMessage());
-            return (object)["status" => false, "response" => $e->getMessage()];
+            return (object)[
+                "status" => false,
+                "response" => $e->getMessage()
+            ];
         }
     }
 }
-
 if (!function_exists('jazzcash')) {
-    function jazzcash() {
+    function jazzcash()
+    {
+        // live url
         return (object) [
+            // "returnUrl" => '',
+            "redirectionUrl" => 'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/CustomerPortal/transactionmanagement/merchantform',
+            // with cnic
+            "walletUrl" => 'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v2/rest/payments/m-wallet',
+
             "statusUrl" => 'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v2/rest/payments/status/inquiry',
-            "salt"      => env('JAZZCASH_SALT', '8335zz8zuu'),
-            "merchant"  => env('JAZZCASH_MERCHANT_ID', '00151726'),
-            "password"  => env('JAZZCASH_PASSWORD', 'vs8z12syy0'),
+            "salt" => '8335zz8zuu',
+            "merchant" => '00151726',
+            "password" => 'vs8z12syy0',
         ];
+
+
+        // sandobx url malik.rehman7272
+        // return (object) [
+        //     "returnUrl" => '',
+        //     "redirectionUrl" => 'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/CustomerPortal/transactionmanagement/merchantform',
+        //     "walletUrl" => 'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v2/rest/payments/m-wallet',
+        //     "statusUrl" => 'https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v2/rest/payments/status/inquiry',
+        //     "salt" => 'ces2y7499t',
+        //     "merchant" => 'MC990110',
+        //     "password" => 'rld04xm066',
+        // ];
     }
 }
 if (!function_exists('checkForSubmenu')) {
