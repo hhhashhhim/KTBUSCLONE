@@ -66,7 +66,7 @@ class AdvanceSalesReportController extends Controller
         $isCounterSale = filter_var($request->counterSale, FILTER_VALIDATE_BOOLEAN);
         $selectedTerminalId = $request->filled('terminal') ? $request->terminal : Auth::user()->terminal_id;
 
-        $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
+        $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number", 'customer:id,name,contact,cnic')
             ->withTrashed()
             ->where('company_id', Auth::user()->company_id)
              ->where(function ($query) {
@@ -144,6 +144,39 @@ class AdvanceSalesReportController extends Controller
                     $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
                     $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
                     $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
+                    $single['invoice_id'] = $inner->pluck('invoice_id')
+                        ->filter(fn ($invoiceId) => !empty($invoiceId))
+                        ->unique()
+                        ->values()
+                        ->toArray();
+                    $single['transaction_id'] = $inner->pluck('transaction_id')
+                        ->filter(fn ($transactionId) => !empty($transactionId))
+                        ->unique()
+                        ->values()
+                        ->toArray();
+                    $single['passenger_name'] = $inner->map(fn ($ticket) => $ticket->customer->name ?? null)
+                        ->filter()
+                        ->unique()
+                        ->values()
+                        ->toArray();
+                    $single['passenger_contact'] = $inner->map(function ($ticket) {
+                        return !empty($ticket->customer?->contact)
+                            ? formatContact($ticket->customer->contact)
+                            : null;
+                    })
+                        ->filter()
+                        ->unique()
+                        ->values()
+                        ->toArray();
+                    $single['passenger_cnic'] = $inner->map(function ($ticket) {
+                        return !empty($ticket->customer?->cnic)
+                            ? formatCNIC($ticket->customer->cnic)
+                            : null;
+                    })
+                        ->filter()
+                        ->unique()
+                        ->values()
+                        ->toArray();
                     $eltSum = 0;
                     foreach ($inner as $tkt) {
                         if ($tkt->ticketElt) {
@@ -228,7 +261,7 @@ class AdvanceSalesReportController extends Controller
         $isCounterSale = filter_var($request->counterSale, FILTER_VALIDATE_BOOLEAN);
         $selectedTerminalId = $request->filled('terminal') ? $request->terminal : Auth::user()->terminal_id;
 
-        $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number")
+        $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number", 'customer:id,name,contact,cnic')
             ->withTrashed()
             ->where('company_id', Auth::user()->company_id)
              ->where(function ($query) {
@@ -306,6 +339,39 @@ class AdvanceSalesReportController extends Controller
                     $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
                     $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
                     $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
+                    $single['invoice_id'] = $inner->pluck('invoice_id')
+                        ->filter(fn ($invoiceId) => !empty($invoiceId))
+                        ->unique()
+                        ->values()
+                        ->toArray();
+                    $single['transaction_id'] = $inner->pluck('transaction_id')
+                        ->filter(fn ($transactionId) => !empty($transactionId))
+                        ->unique()
+                        ->values()
+                        ->toArray();
+                    $single['passenger_name'] = $inner->map(fn ($ticket) => $ticket->customer->name ?? null)
+                        ->filter()
+                        ->unique()
+                        ->values()
+                        ->toArray();
+                    $single['passenger_contact'] = $inner->map(function ($ticket) {
+                        return !empty($ticket->customer?->contact)
+                            ? formatContact($ticket->customer->contact)
+                            : null;
+                    })
+                        ->filter()
+                        ->unique()
+                        ->values()
+                        ->toArray();
+                    $single['passenger_cnic'] = $inner->map(function ($ticket) {
+                        return !empty($ticket->customer?->cnic)
+                            ? formatCNIC($ticket->customer->cnic)
+                            : null;
+                    })
+                        ->filter()
+                        ->unique()
+                        ->values()
+                        ->toArray();
                     $eltSum = 0;
                     foreach ($inner as $tkt) {
                         if ($tkt->ticketElt) {
@@ -328,6 +394,12 @@ class AdvanceSalesReportController extends Controller
         $filterData->route = Route::whereIn("id",$route_ids)->pluck("name")->toArray();
         $filterData->from = date("Y/m/d H:i A",strtotime($request->fromDateTime));
         $filterData->to = date("Y/m/d h:i A",strtotime($request->toDateTime));
+        $filterData->invoice_id = trim($request->invoice_id ?? '') ?: 'All';
+        $filterData->transaction_id = trim($request->transaction_id ?? '') ?: 'All';
+        $filterData->passenger_name = trim($request->passenger_name ?? '') ?: 'All';
+        $filterData->passenger_contact = trim($request->passenger_contact ?? '') ?: 'All';
+        $filterData->passenger_cnic = trim($request->passenger_cnic ?? '') ?: 'All';
+        $filterData->counter_sale = $isCounterSale ? 'Yes' : 'No';
 
 
 
