@@ -14,6 +14,18 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
+                                                <div class="col-md-2" v-if="checkForSubmenuButtons('terminal-filter')">
+                                                    <label for="terminalFilter">Terminals</label>
+                                                    <select id="terminalFilter" class="form-control"
+                                                            v-model="filterSales.terminal"
+                                                        >
+                                                        <option value="0">Select Terminals</option>
+                                                        <option v-for="(terminal, i) in terminals" :key="i"
+                                                                :value="terminal.id">
+                                                            {{ terminal.name }}
+                                                        </option>
+                                                    </select>
+                                                </div>
                                                 <div class="col-md-2">
                                                     <label for="usernameFilter">Users</label>
                                                     <select id="usernameFilter" class="form-control"
@@ -110,6 +122,7 @@
                                                                 <form :action="$store.state.api_url + 'api/web/v1/advance/sales/pdf'" method="POST" ref="salePrint"
                                                                     target="_blank">
                                                                     <input type="hidden" name="token" :value="this.$store.state.token">
+                                                                    <input type="hidden" name="terminal" :value="filterSales.terminal">
                                                                     <input type="hidden" name="user" :value="filterSales.user">
                                                                     <input type="hidden" name="route" :value="filterSales.route">
                                                                     <input type="hidden" name="invoice_id" :value="filterSales.invoice_id">
@@ -319,6 +332,7 @@ export default {
             },
             refundFilters: [],
             filterSales: {
+                terminal: 0,
                 user: 0,
                 route: [],
                 invoice_id: '',
