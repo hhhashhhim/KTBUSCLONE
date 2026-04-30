@@ -14,18 +14,6 @@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-md-2" v-if="checkForSubmenuButtons('terminal-filter')">
-                                                    <label for="terminalFilter">Terminals</label>
-                                                    <select id="terminalFilter" class="form-control"
-                                                            v-model="filterSales.terminal"
-                                                        >
-                                                        <option value="0">Select Terminals</option>
-                                                        <option v-for="(terminal, i) in terminals" :key="i"
-                                                                :value="terminal.id">
-                                                            {{ terminal.name }}
-                                                        </option>
-                                                    </select>
-                                                </div>
                                                 <div class="col-md-2">
                                                     <label for="usernameFilter">Users</label>
                                                     <select id="usernameFilter" class="form-control"
@@ -49,6 +37,38 @@
                                                             {{ route.name }}  ({{ route.via??'n/a' }})
                                                         </option>
                                                     </select>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label for="invoiceId">Invoice ID</label>
+                                                    <input id="invoiceId" type="text" class="form-control"
+                                                           v-model="filterSales.invoice_id"
+                                                           placeholder="Enter invoice id">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label for="transactionId">Transaction ID</label>
+                                                    <input id="transactionId" type="text" class="form-control"
+                                                           v-model="filterSales.transaction_id"
+                                                           placeholder="Enter transaction id">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label for="passengerName">Passenger Name</label>
+                                                    <input id="passengerName" type="text" class="form-control"
+                                                           v-model="filterSales.passenger_name"
+                                                           placeholder="Enter passenger name">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label for="passengerContact">Passenger Contact</label>
+                                                    <input id="passengerContact" type="text" class="form-control"
+                                                           v-model="filterSales.passenger_contact"
+                                                           placeholder="Enter passenger contact">
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-md-2">
+                                                    <label for="passengerCnic">Passenger CNIC</label>
+                                                    <input id="passengerCnic" type="text" class="form-control"
+                                                           v-model="filterSales.passenger_cnic"
+                                                           placeholder="Enter passenger CNIC">
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label for="fromDate">From Date Time</label>
@@ -90,9 +110,13 @@
                                                                 <form :action="$store.state.api_url + 'api/web/v1/advance/sales/pdf'" method="POST" ref="salePrint"
                                                                     target="_blank">
                                                                     <input type="hidden" name="token" :value="this.$store.state.token">
-                                                                    <input type="hidden" name="terminal" :value="filterSales.terminal">
                                                                     <input type="hidden" name="user" :value="filterSales.user">
                                                                     <input type="hidden" name="route" :value="filterSales.route">
+                                                                    <input type="hidden" name="invoice_id" :value="filterSales.invoice_id">
+                                                                    <input type="hidden" name="transaction_id" :value="filterSales.transaction_id">
+                                                                    <input type="hidden" name="passenger_name" :value="filterSales.passenger_name">
+                                                                    <input type="hidden" name="passenger_contact" :value="filterSales.passenger_contact">
+                                                                    <input type="hidden" name="passenger_cnic" :value="filterSales.passenger_cnic">
                                                                     <input type="hidden" name="fromDateTime" :value="filterSales.fromDateTime">
                                                                     <input type="hidden" name="toDateTime" :value="filterSales.toDateTime">
                                                                     <input type="hidden" name="counterSale" :value="filterSales.counterSale">
@@ -282,18 +306,25 @@ export default {
     data() {
         return {
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            terminals: [],
             loadingTable: false,
             tableLoading: true,
             users: [],
             permissions: [],
             routes: [],
-            filters: [],
+            filters: {
+                record: [],
+                refund: [],
+                counterExpenses: [],
+            },
             refundFilters: [],
             filterSales: {
-                terminal: 0,
                 user: 0,
                 route: [],
+                invoice_id: '',
+                transaction_id: '',
+                passenger_name: '',
+                passenger_contact: '',
+                passenger_cnic: '',
                 fromDateTime: '',
                 toDateTime: '',
                 counterSale: false,
@@ -330,19 +361,16 @@ export default {
     },
     methods: {
         async fetchFilters() {
-            const resTerminals = await this.callApi("post", 'advance/sales/getTerminals');
             const resUserNames = await this.callApi("post", 'advance/sales/getUserNames');
             const resRoutes = await this.callApi("post", 'advance/sales/getRoutes');
-            if (resTerminals.status == 200 && resUserNames.status == 200 && resRoutes.status == 200) {
+            if (resUserNames.status == 200 && resRoutes.status == 200) {
                 this.tableLoading = false;
-                this.terminals = resTerminals.data;
                 this.users = resUserNames.data;
                 this.routes = resRoutes.data;
             }
 
         },
         async salesFilter() {
-            this.tableLoading = true;
             if (!this.filterSales.fromDateTime)
                 return swal({
                     title: "Required",
@@ -357,14 +385,16 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
+            this.loadingTable = true;
+            this.tableLoading = true;
             const resFetchData = await this.callApi("post", 'advance/sales/fetchFilterData', this.filterSales);
             if (resFetchData.status == 200) {
-                this.tableLoading = false;
                 this.filters.record = resFetchData.data.record;
                 this.filters.refund = resFetchData.data.refund;
                 this.filters.counterExpenses = resFetchData.data.counterExpenses;
-                this.loadingTable = false;
             }
+            this.tableLoading = false;
+            this.loadingTable = false;
 
         },
         // sales Table
