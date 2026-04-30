@@ -172,6 +172,11 @@
                                                                     <th>No of Seat</th>
                                                                     <th>Terminal Name</th>
                                                                     <th>User Name</th>
+                                                                    <th>Invoice</th>
+                                                                    <th>Transaction #</th>
+                                                                    <th>Passenger Name</th>
+                                                                    <th>Cell No</th>
+                                                                    <th>CNIC No</th>
                                                                     <th>Sale Amount</th>
                                                                     <th>ELT Amount</th>
                                                                 </tr>
@@ -185,13 +190,53 @@
                                                                     <td>{{ data.seats }}</td>
                                                                     <td>{{ data.terminal }}</td>
                                                                     <td>{{ data.user }}</td>
+                                                                    <td>
+                                                                        <div v-if="data.invoice_id && data.invoice_id.length">
+                                                                            <div v-for="(invoiceId, invoiceIndex) in data.invoice_id" :key="`invoice-${i}-${invoiceIndex}`">
+                                                                                {{ invoiceId }}
+                                                                            </div>
+                                                                        </div>
+                                                                        <span v-else>N/A</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div v-if="data.transaction_id && data.transaction_id.length">
+                                                                            <div v-for="(transactionId, transactionIndex) in data.transaction_id" :key="`transaction-${i}-${transactionIndex}`">
+                                                                                {{ transactionId }}
+                                                                            </div>
+                                                                        </div>
+                                                                        <span v-else>N/A</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div v-if="data.passenger_name && data.passenger_name.length">
+                                                                            <div v-for="(passengerName, passengerIndex) in data.passenger_name" :key="`passenger-name-${i}-${passengerIndex}`">
+                                                                                {{ passengerName }}
+                                                                            </div>
+                                                                        </div>
+                                                                        <span v-else>N/A</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div v-if="data.passenger_contact && data.passenger_contact.length">
+                                                                            <div v-for="(passengerContact, contactIndex) in data.passenger_contact" :key="`passenger-contact-${i}-${contactIndex}`">
+                                                                                {{ passengerContact }}
+                                                                            </div>
+                                                                        </div>
+                                                                        <span v-else>N/A</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div v-if="data.passenger_cnic && data.passenger_cnic.length">
+                                                                            <div v-for="(passengerCnic, cnicIndex) in data.passenger_cnic" :key="`passenger-cnic-${i}-${cnicIndex}`">
+                                                                                {{ passengerCnic }}
+                                                                            </div>
+                                                                        </div>
+                                                                        <span v-else>N/A</span>
+                                                                    </td>
                                                                     <td>{{ data.sales }}</td>
                                                                     <td>{{ data.elt }}</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <th colspan="3"></th>
                                                                     <th>{{ totalSeats() ?? 0 }}</th>
-                                                                    <th colspan="2"></th>
+                                                                    <th colspan="7"></th>
                                                                     <th>{{ totalSeatFare() ?? 0 }}</th>
                                                                     <th>{{ totalEltFare() ?? 0 }}</th>
                                                                 </tr>
@@ -407,7 +452,7 @@ export default {
             const resUserNames = await this.callApi("post", 'advance/sales/getUserNames');
             const resRoutes = await this.callApi("post", 'advance/sales/getRoutes');
             const resterminals = await this.callApi("post", 'advance/sales/getTerminals');
-            if (resUserNames.status == 200 || resRoutes.status == 200 || resterminals.status == 200) {
+            if (resUserNames.status == 200 && resRoutes.status == 200 && resterminals.status == 200) {
                 this.tableLoading = false;
                 this.users = resUserNames.data;
                 this.routes = resRoutes.data;
