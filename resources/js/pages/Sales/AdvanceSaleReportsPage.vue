@@ -311,6 +311,7 @@ export default {
             users: [],
             permissions: [],
             routes: [],
+            terminals: [],
             filters: {
                 record: [],
                 refund: [],
@@ -334,6 +335,7 @@ export default {
     async created() {
         $('.modal').remove();
         this.fetchFilters();
+
         this.permissions = this.$store.state.permissions;
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {
@@ -363,10 +365,12 @@ export default {
         async fetchFilters() {
             const resUserNames = await this.callApi("post", 'advance/sales/getUserNames');
             const resRoutes = await this.callApi("post", 'advance/sales/getRoutes');
-            if (resUserNames.status == 200 && resRoutes.status == 200) {
+            const resterminals = await this.callApi("post", 'advance/sales/getTerminals');
+            if (resUserNames.status == 200 && resRoutes.status == 200 && resterminals.status == 200) {
                 this.tableLoading = false;
                 this.users = resUserNames.data;
                 this.routes = resRoutes.data;
+                this.terminals = resterminals.data;
             }
 
         },

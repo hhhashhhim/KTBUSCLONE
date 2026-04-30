@@ -29891,6 +29891,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       users: [],
       permissions: [],
       routes: [],
+      terminals: [],
       filters: {
         record: [],
         refund: [],
@@ -29963,7 +29964,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var resUserNames, resRoutes;
+        var resUserNames, resRoutes, resterminals;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
@@ -29978,14 +29979,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 5:
                 resRoutes = _context2.sent;
+                _context2.next = 8;
+                return _this2.callApi("post", 'advance/sales/getTerminals');
 
-                if (resUserNames.status == 200 && resRoutes.status == 200) {
+              case 8:
+                resterminals = _context2.sent;
+
+                if (resUserNames.status == 200 && resRoutes.status == 200 && resterminals.status == 200) {
                   _this2.tableLoading = false;
                   _this2.users = resUserNames.data;
                   _this2.routes = resRoutes.data;
+                  _this2.terminals = resterminals.data;
                 }
 
-              case 7:
+              case 10:
               case "end":
                 return _context2.stop();
             }
