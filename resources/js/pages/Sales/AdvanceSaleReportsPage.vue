@@ -13,90 +13,122 @@
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-2" v-if="checkForSubmenuButtons('terminal-filter')">
-                                                    <label for="terminalFilter">Terminals</label>
-                                                    <select id="terminalFilter" class="form-control"
-                                                            v-model="filterSales.terminal"
-                                                        >
-                                                        <option value="0">Select Terminals</option>
-                                                        <option v-for="(terminal, i) in terminals" :key="i"
-                                                                :value="terminal.id">
-                                                            {{ terminal.name }}
-                                                        </option>
-                                                    </select>
+                                            <div class="advance-filter-panel">
+                                                <div class="filter-panel-head">
+                                                    <div>
+                                                        <h5 class="filter-panel-title">Refine Report</h5>
+                                                        <p class="filter-panel-subtitle">
+                                                            Filter by terminal, route, passenger, payment, and time range.
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div class="col-md-2">
-                                                    <label for="usernameFilter">Users</label>
-                                                    <select id="usernameFilter" class="form-control"
-                                                            v-model="filterSales.user"
-                                                        >
-                                                        <option value="0">Select Users</option>
-                                                        <option v-for="(user, i) in users" :key="i"
-                                                                :value="user.id">
-                                                            {{ user.name }}
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label for="routeIds">Routes</label>
-                                                    <select id="routeIds" class="form-control" multiple
-                                                            v-model="filterSales.route"
-                                                        >
-                                                        <option value="0">Select Route</option>
-                                                        <option v-for="(route, i) in routes" :key="i"
-                                                                :value="route.id">
-                                                            {{ route.name }}  ({{ route.via??'n/a' }})
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label for="invoiceId">Invoice ID</label>
-                                                    <input id="invoiceId" type="text" class="form-control"
-                                                           v-model="filterSales.invoice_id"
-                                                           placeholder="Enter invoice id">
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label for="transactionId">Transaction ID</label>
-                                                    <input id="transactionId" type="text" class="form-control"
-                                                           v-model="filterSales.transaction_id"
-                                                           placeholder="Enter transaction id">
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label for="passengerName">Passenger Name</label>
-                                                    <input id="passengerName" type="text" class="form-control"
-                                                           v-model="filterSales.passenger_name"
-                                                           placeholder="Enter passenger name">
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label for="passengerContact">Passenger Contact</label>
-                                                    <input id="passengerContact" type="text" class="form-control"
-                                                           v-model="filterSales.passenger_contact"
-                                                           placeholder="Enter passenger contact">
-                                                </div>
-                                            </div>
-                                            <div class="row mt-2">
-                                                <div class="col-md-2">
-                                                    <label for="passengerCnic">Passenger CNIC</label>
-                                                    <input id="passengerCnic" type="text" class="form-control"
-                                                           v-model="filterSales.passenger_cnic"
-                                                           placeholder="Enter passenger CNIC">
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label for="fromDate">From Date Time</label>
-                                                    <input id="fromDate" type="datetime-local" class="form-control"
-                                                           v-model="filterSales.fromDateTime">
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label for="toDate">To Date Time</label>
-                                                    <input id="toDate" type="datetime-local" class="form-control"
-                                                           v-model="filterSales.toDateTime">
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <button class="btn btn-primary mt-4" type="button" @click="salesFilter()"
-                                                            :disabled="loadingTable">
-                                                        {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
-                                                    </button>
+                                                <div class="row">
+                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3"
+                                                         v-if="checkForSubmenuButtons('terminal-filter')">
+                                                        <div class="filter-field">
+                                                            <label class="filter-label" for="terminalFilter">Terminals</label>
+                                                            <select id="terminalFilter" class="form-control filter-control"
+                                                                    v-model="filterSales.terminal">
+                                                                <option value="0">Select Terminals</option>
+                                                                <option v-for="(terminal, i) in terminals" :key="i"
+                                                                        :value="terminal.id">
+                                                                    {{ terminal.name }}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                                                        <div class="filter-field">
+                                                            <label class="filter-label" for="usernameFilter">Users</label>
+                                                            <select id="usernameFilter" class="form-control filter-control"
+                                                                    v-model="filterSales.user">
+                                                                <option value="0">Select Users</option>
+                                                                <option v-for="(user, i) in users" :key="i"
+                                                                        :value="user.id">
+                                                                    {{ user.name }}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                                                        <div class="filter-field">
+                                                            <label class="filter-label" for="routeIds">Routes</label>
+                                                            <select id="routeIds" class="form-control filter-control filter-select2" multiple
+                                                                    v-model="filterSales.route">
+                                                                <option value="0">Select Route</option>
+                                                                <option v-for="(route, i) in routes" :key="i"
+                                                                        :value="route.id">
+                                                                    {{ route.name }} ({{ route.via??'n/a' }})
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                                                        <div class="filter-field">
+                                                            <label class="filter-label" for="invoiceId">Invoice ID</label>
+                                                            <input id="invoiceId" type="text" class="form-control filter-control"
+                                                                   v-model="filterSales.invoice_id"
+                                                                   placeholder="Enter invoice id">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                                                        <div class="filter-field">
+                                                            <label class="filter-label" for="transactionId">Transaction ID</label>
+                                                            <input id="transactionId" type="text" class="form-control filter-control"
+                                                                   v-model="filterSales.transaction_id"
+                                                                   placeholder="Enter transaction id">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                                                        <div class="filter-field">
+                                                            <label class="filter-label" for="passengerName">Passenger Name</label>
+                                                            <input id="passengerName" type="text" class="form-control filter-control"
+                                                                   v-model="filterSales.passenger_name"
+                                                                   placeholder="Enter passenger name">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                                                        <div class="filter-field">
+                                                            <label class="filter-label" for="passengerContact">Passenger Contact</label>
+                                                            <input id="passengerContact" type="text" class="form-control filter-control"
+                                                                   v-model="filterSales.passenger_contact"
+                                                                   placeholder="Enter passenger contact">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                                                        <div class="filter-field">
+                                                            <label class="filter-label" for="passengerCnic">Passenger CNIC</label>
+                                                            <input id="passengerCnic" type="text" class="form-control filter-control"
+                                                                   v-model="filterSales.passenger_cnic"
+                                                                   placeholder="Enter passenger CNIC">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                                                        <div class="filter-field">
+                                                            <label class="filter-label" for="fromDate">From Date Time</label>
+                                                            <input id="fromDate" type="datetime-local" class="form-control filter-control"
+                                                                   v-model="filterSales.fromDateTime">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                                                        <div class="filter-field">
+                                                            <label class="filter-label" for="toDate">To Date Time</label>
+                                                            <input id="toDate" type="datetime-local" class="form-control filter-control"
+                                                                   v-model="filterSales.toDateTime">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-4 col-lg-6 col-md-8 mb-3">
+                                                        <div class="filter-action-wrap">
+                                                            <label class="counter-sale-toggle">
+                                                                <input type="checkbox" v-model="filterSales.counterSale">
+                                                                <span>Check for count sale</span>
+                                                            </label>
+                                                            <button class="btn btn-primary filter-submit-btn" type="button" @click="salesFilter()"
+                                                                    :disabled="loadingTable">
+                                                                {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <!-- <div class="d-flex justify-content-end" v-if="filters.record != null">
@@ -105,12 +137,6 @@
                                                     {{ loadingTable ? 'Loading...' : 'Print Record' }}
                                                 </button>
                                             </div> -->
-                                            <div class="row mt-2">
-                                                <div class="col-md-12">
-                                                    <input type="checkbox" v-model="filterSales.counterSale">
-                                                    <lable class="mx-1">Check for count sale</lable>
-                                                </div>
-                                            </div>
                                             <div class="row mt-2">
                                                 <div class="col-md-12">
                                                     <div class="table-responsive">
@@ -361,7 +387,8 @@ export default {
         }
         setTimeout(() => {
             $("#routeIds").select2({
-                closeOnSelect: false
+                closeOnSelect: false,
+                width: '100%'
             });
         }, 300);
     },
@@ -508,9 +535,155 @@ table, th, td {
     border: 1px solid #b9b9b9;
     border-collapse: collapse;
 }
+
+.advance-filter-panel {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem 1.4rem 1.2rem;
+    border: 1px solid #e4e9f7;
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at top right, rgba(88, 102, 241, 0.08), transparent 32%),
+        linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+    box-shadow: 0 12px 28px rgba(31, 45, 61, 0.08);
+}
+
+.filter-panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1.1rem;
+}
+
+.filter-panel-title {
+    margin: 0;
+    color: #1d2a57;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.filter-panel-subtitle {
+    margin: 0.3rem 0 0;
+    color: #6a7695;
+    font-size: 0.9rem;
+}
+
+.filter-field {
+    height: 100%;
+}
+
+.filter-label {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: #43506f;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.filter-control {
+    min-height: 44px;
+    border: 1px solid #d7def3;
+    border-radius: 12px;
+    background: #fff;
+    color: #25304f;
+    box-shadow: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.filter-control:focus {
+    border-color: #6a78f0;
+    box-shadow: 0 0 0 0.2rem rgba(106, 120, 240, 0.14);
+}
+
+.filter-action-wrap {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 100%;
+    padding: 0.35rem 0 0;
+}
+
+.counter-sale-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0.8rem 1rem;
+    border: 1px solid #dfe5f5;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.88);
+    color: #50607f;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.counter-sale-toggle input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #5a68ee;
+}
+
+.filter-submit-btn {
+    min-width: 170px;
+    min-height: 46px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #5a68ee 0%, #7484ff 100%);
+    box-shadow: 0 10px 20px rgba(90, 104, 238, 0.24);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.filter-submit-btn:hover:not(:disabled),
+.filter-submit-btn:focus:not(:disabled) {
+    background: linear-gradient(135deg, #4c5ae4 0%, #6b7cff 100%);
+    box-shadow: 0 12px 24px rgba(90, 104, 238, 0.28);
+}
+
+.filter-submit-btn:disabled {
+    opacity: 0.8;
+    box-shadow: none;
+}
+
+:deep(.filter-select2 + .select2-container),
+:deep(#routeIds + .select2-container) {
+    width: 100% !important;
+}
+
+:deep(#routeIds + .select2-container .select2-selection--multiple) {
+    min-height: 44px;
+    border: 1px solid #d7def3;
+    border-radius: 12px;
+    background: #fff;
+    padding: 0.35rem 0.45rem;
+}
+
+:deep(#routeIds + .select2-container.select2-container--focus .select2-selection--multiple) {
+    border-color: #6a78f0;
+    box-shadow: 0 0 0 0.2rem rgba(106, 120, 240, 0.14);
+}
+
+:deep(#routeIds + .select2-container .select2-search__field) {
+    margin-top: 0 !important;
+}
+
 .loading-spinner {
     display: block;
     margin: 0 auto;
     padding: 2em;
-  }
+}
+
+@media (max-width: 991.98px) {
+    .filter-action-wrap {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-submit-btn {
+        width: 100%;
+    }
+}
 </style>
