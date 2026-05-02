@@ -755,15 +755,24 @@ if (!function_exists('superDataWhatsappMessage')) {
 if (!function_exists('ticketConfirmedMessage')) {
     function ticketConfirmedMessage($invoice_id)
     {
-        $auth_key = Company::where("id", Auth::user()->company_id)->value('whatsapp_auth_key');
-        $message_allow = Terminal::where("id", Auth::user()->terminal_id)->value('send_message');
+        $ticket = Ticket::withTrashed()->where("invoice_id", $invoice_id)->first();
+
+        if (!$ticket) {
+            return ['status' => 'skipped', 'reason' => 'No tickets found'];
+        }
+
+        $companyId = $ticket->company_id;
+        $terminalId = $ticket->terminal_id;
+
+        $auth_key = Company::where("id", $companyId)->value('whatsapp_auth_key');
+        $message_allow = Terminal::where("id", $terminalId)->value('send_message');
 
         if (!$auth_key || !$message_allow) {
             return ['status' => 'skipped', 'reason' => 'No auth key or messaging disabled'];
         }
 
         $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city')
-            ->where('company_id', Auth::user()->company_id)
+            ->where('company_id', $companyId)
             ->withTrashed()
             ->where("invoice_id", $invoice_id)
             ->get();
@@ -812,7 +821,7 @@ if (!function_exists('ticketConfirmedMessage')) {
             ->join("ticket_template_terminals", "ticket_template_terminals.ticket_template_id", "tickets_templates.id")
             ->whereNull('tickets_templates.deleted_at')
             ->whereNull('ticket_template_terminals.deleted_at')
-            ->where(['tickets_templates.company_id' => Auth::user()->company_id, "ticket_template_terminals.terminal_id" => Auth::user()->terminal_id])
+            ->where(['tickets_templates.company_id' => $companyId, "ticket_template_terminals.terminal_id" => $terminalId])
             ->where('tickets_templates.status', 1)
             ->first();
 

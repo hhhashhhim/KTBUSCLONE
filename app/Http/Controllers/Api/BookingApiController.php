@@ -646,6 +646,7 @@ class BookingApiController extends Controller
 
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
+                $pendingSeatTypes = ['advance booking', 'reserved', 'pending booking'];
 
                 // for reserved to confirm
                 if (isset($request->flag) && $request->flag == 1) {
@@ -656,11 +657,16 @@ class BookingApiController extends Controller
                         return new ValidationResource($validator->errors());
                     }
                     // checking only reserved seats will go through this process
-                    $checkAlreadyBooked = Ticket::where("invoice_id", $request->invoice_id)->where(['company_id' => $companyId, "type" => "advance booking"])->get();
+                    $checkAlreadyBooked = Ticket::where("invoice_id", $request->invoice_id)
+                        ->where('company_id', $companyId)
+                        ->whereIn("type", $pendingSeatTypes)
+                        ->get();
 
                     if ($checkAlreadyBooked->count() > 0) {
                         // this is for fare validation how much amount received from payment gateway
-                        $checkTotal = Ticket::where("invoice_id", $request->invoice_id)->where(['company_id' => $companyId, "type" => "advance booking"])
+                        $checkTotal = Ticket::where("invoice_id", $request->invoice_id)
+                            ->where('company_id', $companyId)
+                            ->whereIn("type", $pendingSeatTypes)
                             ->selectRaw('(SUM(seat_fare) - SUM(discount)) as amount')
                             ->first()->amount;
                         if (isset($request->total_amount) && $request->total_amount != $checkTotal) {
@@ -668,12 +674,17 @@ class BookingApiController extends Controller
                             return new ConflictResource($error);
                         }
                         if ($request->boolean('only_transaction_id')) {
-                            Ticket::where("invoice_id", $request->invoice_id)->update([
+                            Ticket::where("invoice_id", $request->invoice_id)
+                                ->where('company_id', $companyId)
+                                ->update([
                                 'transaction_id' => $request->transaction_id,
                             ]);
                             return 'Transaction id updated';
                         }
-                        Ticket::where("invoice_id", $request->invoice_id)->update([
+                        Ticket::where("invoice_id", $request->invoice_id)
+                            ->where('company_id', $companyId)
+                            ->whereIn('type', $pendingSeatTypes)
+                            ->update([
                             'type' => 'booked',
                             'updated_by' => Auth::user()->id,
                             'transaction_id' => $request->transaction_id,
