@@ -63,7 +63,7 @@ if (!function_exists('confirmJazzcashPendingPayment')) {
 
             $response = json_decode(json_encode($response->json()));
 
-            if ($response->pp_PaymentResponseCode === "121") {
+            if ($response->pp_PaymentResponseCode === "000") {
                 return (object)[
                     "status" => true,
                     "response" => $response
