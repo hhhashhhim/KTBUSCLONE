@@ -94,7 +94,17 @@ class CheckJazzcashPendingPayment extends Command
                         'invoice_id' => $ticket->invoice_id,
                         'updated_rows' => $updatedRows,
                     ]);
-                    ticketConfirmedMessage($ticket->invoice_id);
+                    try {
+                        ticketConfirmedMessage($ticket->invoice_id);
+                    } catch (\Throwable $e) {
+                        Log::error('Ticket confirmation message failed after booked update', [
+                            'transaction_id' => $ticket->transaction_id,
+                            'invoice_id' => $ticket->invoice_id,
+                            'message' => $e->getMessage(),
+                            'file' => $e->getFile(),
+                            'line' => $e->getLine(),
+                        ]);
+                    }
                     //////////////////////////////////////////////
                     ActivityLog::create([
                         "activity_by" => 0,

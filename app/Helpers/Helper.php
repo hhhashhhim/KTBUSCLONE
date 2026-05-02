@@ -763,9 +763,14 @@ if (!function_exists('ticketConfirmedMessage')) {
 
         $companyId = $ticket->company_id;
         $terminalId = $ticket->terminal_id;
+        $terminal = Terminal::find($terminalId);
 
         $auth_key = Company::where("id", $companyId)->value('whatsapp_auth_key');
         $message_allow = Terminal::where("id", $terminalId)->value('send_message');
+
+        if (!$terminal) {
+            return ['status' => 'skipped', 'reason' => 'Terminal not found'];
+        }
 
         if (!$auth_key || !$message_allow) {
             return ['status' => 'skipped', 'reason' => 'No auth key or messaging disabled'];
@@ -825,7 +830,7 @@ if (!function_exists('ticketConfirmedMessage')) {
             ->where('tickets_templates.status', 1)
             ->first();
 
-        $finalData = ['tickets' => $tickets, 'format' => $format];
+        $finalData = ['tickets' => $tickets, 'format' => $format, 'terminal' => $terminal];
         $base64Pdf = base64_encode(Pdf::loadView('pdf/singleTicket', ['data' => $finalData])->output());
 
         // Messages

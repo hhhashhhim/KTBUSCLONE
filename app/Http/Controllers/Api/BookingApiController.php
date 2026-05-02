@@ -690,7 +690,17 @@ class BookingApiController extends Controller
                             'transaction_id' => $request->transaction_id,
                             'booked_time' => date("Y-m-d H:i:s"),
                         ]);
-                        ticketConfirmedMessage($request->invoice_id);
+                        try {
+                            ticketConfirmedMessage($request->invoice_id);
+                        } catch (\Throwable $e) {
+                            Log::error('Ticket confirmation message failed after booking confirmation', [
+                                'invoice_id' => $request->invoice_id,
+                                'transaction_id' => $request->transaction_id,
+                                'message' => $e->getMessage(),
+                                'file' => $e->getFile(),
+                                'line' => $e->getLine(),
+                            ]);
+                        }
                         //////////////////////////////////////////////
                         ActivityLog::create([
                             "activity_by" => Auth::user()->id,

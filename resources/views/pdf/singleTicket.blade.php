@@ -113,7 +113,7 @@
 <div id="info">
     <div class="companyname"><span>{{isset($data['format']->name) ? $data['format']->name : "Kainat Travels"}}</span></div>
     <div class="companyAddress">
-        <span>{{ auth()->user()->terminal->address }}</span>
+        <span>{{ $data['terminal']->address ?? '' }}</span>
         <div><span><b>UAN(24/7) : </b>{{isset($data['format']->uan) ? $data['format']->uan : "03-111-777-333"}}</span></div>
         @if(isset($data['format']) && $data['format']->show_phone == 1)
             @if(isset($data['format']->phone))
@@ -121,7 +121,7 @@
             </div>
             @endif
         @else
-        <div><span><b>Phone : </b> {{ formatContact(auth()->user()->terminal->contact) }} </span>
+        <div><span><b>Phone : </b> {{ isset($data['terminal']->contact) ? formatContact($data['terminal']->contact) : '' }} </span>
         </div>
         @endif
     </div>
