@@ -65,7 +65,10 @@ if (!function_exists('confirmJazzcashPendingPayment')) {
 
             if (
                 ($response->pp_ResponseCode ?? null) === "000"
-                && ($response->pp_PaymentResponseCode ?? null) === "121"
+                && (
+                    ($response->pp_PaymentResponseCode ?? null) === "121"
+                    || ($response->pp_Status ?? null) === "Completed"
+                )
             ) {
                 return (object)[
                     "status" => true,
