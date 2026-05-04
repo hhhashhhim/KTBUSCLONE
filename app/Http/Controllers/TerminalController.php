@@ -25,6 +25,26 @@ use Illuminate\Support\Facades\Log;
 
 class TerminalController extends Controller
 {
+    private const TERMINAL_SALES_COLUMNS = [
+        'bus_time',
+        'bus_number',
+        'bus_class',
+        'route',
+        'passenger_name',
+        'passenger_cnic',
+        'passenger_contact',
+        'seat_no',
+        'invoice_id',
+        'transaction_id',
+        'terminal_name',
+        'status',
+        'action_by',
+        'sale',
+        'refund',
+        'commission',
+        'net_cash',
+    ];
+
     public function index()
     {
         if (!checkForSubmenu("terminals")) {
@@ -522,6 +542,40 @@ if (is_array($request->send_message)) {
         'record' => $tickets->sortBy('schedule_date_time')->values()
     ];
 }
+
+    public function terminalSalesPdf(Request $request)
+    {
+        if (!checkForSubmenu("terminal-sale")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $reportData = $this->filterData($request);
+        $tickets = $reportData['record'];
+
+        return view('reports.terminalSaleReport', [
+            'tickets' => $tickets,
+            'visibleColumns' => $this->getVisibleColumns($request),
+        ]);
+    }
+
+    private function getVisibleColumns(Request $request): array
+    {
+        if (!$request->has('visible_columns')) {
+            return self::TERMINAL_SALES_COLUMNS;
+        }
+
+        $visibleColumns = $request->input('visible_columns');
+
+        if (is_string($visibleColumns)) {
+            $visibleColumns = trim($visibleColumns) === ''
+                ? []
+                : array_map('trim', explode(',', $visibleColumns));
+        } elseif (!is_array($visibleColumns)) {
+            return self::TERMINAL_SALES_COLUMNS;
+        }
+
+        return array_values(array_intersect(self::TERMINAL_SALES_COLUMNS, $visibleColumns));
+    }
 
    public function filterDataDiscount(Request $request)
 {

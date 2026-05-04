@@ -14,6 +14,26 @@ use Illuminate\Support\Facades\Auth;
 
 class ConfirmCancellationReportController extends Controller
 {
+    private const CONFIRM_CANCELLATION_COLUMNS = [
+        'bus_time',
+        'cancel_date',
+        'remarks',
+        'terminal_name',
+        'route',
+        'transaction_id',
+        'invoice',
+        'cancel_by',
+        'seat_no',
+        'type',
+        'passenger_name',
+        'passenger_contact',
+        'passenger_cnic',
+        'total_fare',
+        'cancel_percentage',
+        'amount_refund',
+        'cancelation_charges',
+    ];
+
     public function getTerminals()
     {
         if (!checkForSubmenu("confirm-cancel")) {
@@ -270,6 +290,28 @@ public function buses()
         unset($q->cancel_ticket, $q->schedule);
     });
 
-    return view('reports.confirmCancelReport', ['tickets' => $tickets]);
+    return view('reports.confirmCancelReport', [
+        'tickets' => $tickets,
+        'visibleColumns' => $this->getVisibleColumns($request),
+    ]);
 }
+
+    private function getVisibleColumns(Request $request): array
+    {
+        if (!$request->has('visible_columns')) {
+            return self::CONFIRM_CANCELLATION_COLUMNS;
+        }
+
+        $visibleColumns = $request->input('visible_columns');
+
+        if (is_string($visibleColumns)) {
+            $visibleColumns = trim($visibleColumns) === ''
+                ? []
+                : array_map('trim', explode(',', $visibleColumns));
+        } elseif (!is_array($visibleColumns)) {
+            return self::CONFIRM_CANCELLATION_COLUMNS;
+        }
+
+        return array_values(array_intersect(self::CONFIRM_CANCELLATION_COLUMNS, $visibleColumns));
+    }
 }

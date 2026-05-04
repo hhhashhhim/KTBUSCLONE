@@ -7,6 +7,7 @@ use App\Http\Controllers\Report\ConfirmCancellationReportController;
 use App\Http\Controllers\Report\OverissueReportController;
 use App\Http\Controllers\Report\RescheduleReportController;
 use App\Http\Controllers\Schedule\ScheduleClosingController;
+use App\Http\Controllers\TerminalController;
 use App\Http\Middleware\CustomMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,7 @@ Route::group(['middleware' => ['custom.sanctum.token.verify']], function () {
     Route::post('web/v1/print/pdf/confirm/cancellation/report', [ConfirmCancellationReportController::class, 'getPrintPdf']);
     Route::post('web/v1/print/pdf/over-issue/report', [OverissueReportController::class, 'getPrintPdf']);
     Route::post('web/v1/print/pdf/reschedule/report', [RescheduleReportController::class, 'getPrintPdf']);
+    Route::post('web/v1/print/pdf/terminal/sales/report', [TerminalController::class, 'terminalSalesPdf']);
     Route::post('web/v1/booking/close/schedule/merges/pdf', [ScheduleClosingController::class, 'mergesPdf']);
     Route::post('web/v1/reportExport/pdf', [ScheduleClosingController::class, 'summaryReport']);
     Route::post('web/v1/booking/close/schedule/merges/urdu/pdf', [ScheduleClosingController::class, 'mergesUrduPdf']);

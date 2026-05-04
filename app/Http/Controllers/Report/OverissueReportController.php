@@ -13,6 +13,23 @@ use Illuminate\Support\Facades\Auth;
 
 class OverissueReportController extends Controller
 {
+    private const OVERISSUE_COLUMNS = [
+        'bus_time',
+        'terminal_name',
+        'route',
+        'transaction_id',
+        'invoice',
+        'seat_no',
+        'type',
+        'passenger_name',
+        'passenger_contact',
+        'passenger_cnic',
+        'total_fare',
+        'remarks',
+        'overissue_by',
+        'overissue_time',
+    ];
+
     public function getTerminals()
     {
         if(!checkForSubmenu("confirm-cancel"))
@@ -218,6 +235,28 @@ public function routes()
         unset($q->overIssueSeats, $q->schedule, $q->terminal, $q->customer);
     });
 
-    return view('reports.overIssueReport', ['tickets' => $tickets]);
+    return view('reports.overIssueReport', [
+        'tickets' => $tickets,
+        'visibleColumns' => $this->getVisibleColumns($request),
+    ]);
 }
+
+    private function getVisibleColumns(Request $request): array
+    {
+        if (!$request->has('visible_columns')) {
+            return self::OVERISSUE_COLUMNS;
+        }
+
+        $visibleColumns = $request->input('visible_columns');
+
+        if (is_string($visibleColumns)) {
+            $visibleColumns = trim($visibleColumns) === ''
+                ? []
+                : array_map('trim', explode(',', $visibleColumns));
+        } elseif (!is_array($visibleColumns)) {
+            return self::OVERISSUE_COLUMNS;
+        }
+
+        return array_values(array_intersect(self::OVERISSUE_COLUMNS, $visibleColumns));
+    }
 }

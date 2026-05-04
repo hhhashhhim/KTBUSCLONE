@@ -15,6 +15,22 @@ use Illuminate\Support\Facades\Auth;
 
 class AdvanceSalesReportController extends Controller
 {
+    private const ADVANCE_SALES_COLUMNS = [
+        'date',
+        'bus_number',
+        'bus_class',
+        'seats',
+        'terminal',
+        'user',
+        'invoice_id',
+        'transaction_id',
+        'passenger_name',
+        'passenger_contact',
+        'passenger_cnic',
+        'sales',
+        'elt',
+    ];
+
     public function getUserNames()
     {
         if(!checkForSubmenu("sales"))
@@ -408,8 +424,27 @@ class AdvanceSalesReportController extends Controller
             'refund' =>[],
             'counterExpenses' => $counterexpenses ?? [],
             'filterData' => $filterData,
+            'visibleColumns' => $this->getVisibleColumns($request),
         ]);
     }
 
+    private function getVisibleColumns(Request $request): array
+    {
+        if (!$request->has('visible_columns')) {
+            return self::ADVANCE_SALES_COLUMNS;
+        }
+
+        $visibleColumns = $request->input('visible_columns');
+
+        if (is_string($visibleColumns)) {
+            $visibleColumns = trim($visibleColumns) === ''
+                ? []
+                : array_map('trim', explode(',', $visibleColumns));
+        } elseif (!is_array($visibleColumns)) {
+            return self::ADVANCE_SALES_COLUMNS;
+        }
+
+        return array_values(array_intersect(self::ADVANCE_SALES_COLUMNS, $visibleColumns));
+    }
 
 }

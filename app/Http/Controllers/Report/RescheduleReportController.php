@@ -12,6 +12,26 @@ use Illuminate\Support\Facades\Auth;
 
 class RescheduleReportController extends Controller
 {
+    private const RESCHEDULE_COLUMNS = [
+        'terminal_name',
+        'passenger_name',
+        'passenger_contact',
+        'passenger_cnic',
+        'status',
+        'current_status',
+        'from_bus_time',
+        'to_bus_time',
+        'reschedule_from',
+        'reschedule_to',
+        'from_seat',
+        'to_seat',
+        'old_fare',
+        'new_fare',
+        'remarks',
+        'reschedule_by',
+        'reschedule_time',
+    ];
+
     public function getTerminals()
     {
         if (!checkForSubmenu("confirm-cancel")) {
@@ -172,14 +192,16 @@ class RescheduleReportController extends Controller
             })
             ->orderBy('id', 'DESC')
             ->limit(($request->fromDate == '' && $request->toDate == '') ? 50 : 2000)
-            ->get(["id", "terminal_name", "schedule_id", "schedule_date", "customer_id", "seat_fare", "discount", "seat_no", "type"]);
+            ->get(["id", "terminal_name", "schedule_id", "schedule_date", "schedule_time_exact", "customer_id", "seat_fare", "discount", "seat_no", "type"]);
 
         $tickets->map(function ($q) {
             $q->reason = $q->reschedule_seat->reason;
             $q->reschedule_by = User::find($q->reschedule_seat->added_by)->name ?? 'N/A';
             $q->reschedule_time = date("h:i A d-m-Y", strtotime($q->reschedule_seat->created_at));
-            $q->passenger_name = Customer::find($q->customer_id)->name;
-            $q->passenger_contact = formatContact(Customer::find($q->customer_id)->contact);
+            $customer = Customer::find($q->customer_id);
+            $q->passenger_name = $customer->name ?? 'N/A';
+            $q->passenger_contact = isset($customer) ? formatContact($customer->contact) : 'N/A';
+            $q->passenger_cnic = isset($customer) ? formatCNIC($customer->cnic) : 'N/A';
             $q->type = $q->type;
             $q->new_type = $q->reschedule_seat->new_ticket->type;
             $q->old_seat = $q->seat_no;
@@ -195,6 +217,28 @@ class RescheduleReportController extends Controller
             $q->badge = getRowBadgeColor(date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule_time_exact)), $q->reschedule_seat->created_at);
             unset($q->reschedule_seat, $q->schedule);
         });
-        return view('reports.rescheduleReport', ['tickets' => $tickets]);
+        return view('reports.rescheduleReport', [
+            'tickets' => $tickets,
+            'visibleColumns' => $this->getVisibleColumns($request),
+        ]);
+    }
+
+    private function getVisibleColumns(Request $request): array
+    {
+        if (!$request->has('visible_columns')) {
+            return self::RESCHEDULE_COLUMNS;
+        }
+
+        $visibleColumns = $request->input('visible_columns');
+
+        if (is_string($visibleColumns)) {
+            $visibleColumns = trim($visibleColumns) === ''
+                ? []
+                : array_map('trim', explode(',', $visibleColumns));
+        } elseif (!is_array($visibleColumns)) {
+            return self::RESCHEDULE_COLUMNS;
+        }
+
+        return array_values(array_intersect(self::RESCHEDULE_COLUMNS, $visibleColumns));
     }
 }

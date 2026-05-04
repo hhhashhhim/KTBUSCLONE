@@ -1,3 +1,5 @@
+@php($visibleColumnsLookup = array_fill_keys($visibleColumns ?? [], true))
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -50,40 +52,96 @@
     <table border="2" style="text-align: center;">
     <thead>
         <tr>
-            <th width="200px">Bus Time</th>
-            <th>Terminal Name</th>
-            <th>Route</th>
-            <th>Transaction #</th>
-            <th>Invoice</th>
-            <th>Seat No</th>
-            <th>Type</th>
-            <th>Passenger Name</th>
-            <th>Cell NO</th>
-            <th>Cnic NO</th>
-            <th>Total Fare</th>
-            <th>Remarks</th>
-            <th>Over Issue By</th>
-            <th width="200px">Over Issue Time</th>
+            @if(!empty($visibleColumnsLookup['bus_time']))
+                <th width="200px">Bus Time</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['terminal_name']))
+                <th>Terminal Name</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['route']))
+                <th>Route</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['transaction_id']))
+                <th>Transaction #</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['invoice']))
+                <th>Invoice</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['seat_no']))
+                <th>Seat No</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['type']))
+                <th>Type</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['passenger_name']))
+                <th>Passenger Name</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['passenger_contact']))
+                <th>Cell NO</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['passenger_cnic']))
+                <th>Cnic NO</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['total_fare']))
+                <th>Total Fare</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['remarks']))
+                <th>Remarks</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['overissue_by']))
+                <th>Over Issue By</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['overissue_time']))
+                <th width="200px">Over Issue Time</th>
+            @endif
         </tr>
     </thead>
 
     <tbody>
         @foreach($tickets as $single)
             <tr>
-                <td>{{ $single->bus_time }}</td>
-                <td>{{ $single->terminal_name }}</td>
-                <td>{{ $single->route_name }}</td>
-                <td>{{ $single->transaction_id ?? 'N/A' }}</td>
-                <td>{{ $single->invoice_id ?? 'N/A' }}</td>
-                <td>{{ $single->seat_no }}</td>
-                <td>{{ $single->type }}</td>
-                <td>{{ $single->passenger_name }}</td>
-                <td>{{ $single->passenger_contact }}</td>
-                <td>{{ $single->passenger_cnic }}</td>
-                <td>{{ $single->total_fare }}</td>
-                <td>{{ $single->overissue_reason }}</td>
-                <td>{{ $single->overissue_by }}</td>
-                <td>{{ $single->overissue_date }}</td>
+                @if(!empty($visibleColumnsLookup['bus_time']))
+                    <td>{{ $single->bus_time }}</td>
+                @endif
+                @if(!empty($visibleColumnsLookup['terminal_name']))
+                    <td>{{ $single->terminal_name }}</td>
+                @endif
+                @if(!empty($visibleColumnsLookup['route']))
+                    <td>{{ $single->route_name }}</td>
+                @endif
+                @if(!empty($visibleColumnsLookup['transaction_id']))
+                    <td>{{ $single->transaction_id ?? 'N/A' }}</td>
+                @endif
+                @if(!empty($visibleColumnsLookup['invoice']))
+                    <td>{{ $single->invoice_id ?? 'N/A' }}</td>
+                @endif
+                @if(!empty($visibleColumnsLookup['seat_no']))
+                    <td>{{ $single->seat_no }}</td>
+                @endif
+                @if(!empty($visibleColumnsLookup['type']))
+                    <td>{{ $single->type }}</td>
+                @endif
+                @if(!empty($visibleColumnsLookup['passenger_name']))
+                    <td>{{ $single->passenger_name }}</td>
+                @endif
+                @if(!empty($visibleColumnsLookup['passenger_contact']))
+                    <td>{{ $single->passenger_contact }}</td>
+                @endif
+                @if(!empty($visibleColumnsLookup['passenger_cnic']))
+                    <td>{{ $single->passenger_cnic }}</td>
+                @endif
+                @if(!empty($visibleColumnsLookup['total_fare']))
+                    <td>{{ $single->total_fare }}</td>
+                @endif
+                @if(!empty($visibleColumnsLookup['remarks']))
+                    <td>{{ $single->overissue_reason }}</td>
+                @endif
+                @if(!empty($visibleColumnsLookup['overissue_by']))
+                    <td>{{ $single->overissue_by }}</td>
+                @endif
+                @if(!empty($visibleColumnsLookup['overissue_time']))
+                    <td>{{ $single->overissue_date }}</td>
+                @endif
             </tr>
         @endforeach
     </tbody>

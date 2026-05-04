@@ -1,3 +1,5 @@
+@php($visibleColumnsLookup = array_fill_keys($visibleColumns ?? [], true))
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -57,74 +59,160 @@
 
     <table border="2">
         <tr>
-            <th>Date</th>
-            <th>Bus No</th>
-            <th>Bus Class</th>
-            <th>No of Seat</th>
-            <th>Terminal Name</th>
-            <th>User Name</th>
-            <th>Invoice</th>
-            <th>Transaction #</th>
-            <th>Passenger Name</th>
-            <th>Cell No</th>
-            <th>CNIC No</th>
-            <th>Sale Amount</th>
-            <th>Elt Amount</th>
+            @if(!empty($visibleColumnsLookup['date']))
+                <th>Date</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['bus_number']))
+                <th>Bus No</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['bus_class']))
+                <th>Bus Class</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['seats']))
+                <th>No of Seat</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['terminal']))
+                <th>Terminal Name</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['user']))
+                <th>User Name</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['invoice_id']))
+                <th>Invoice</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['transaction_id']))
+                <th>Transaction #</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['passenger_name']))
+                <th>Passenger Name</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['passenger_contact']))
+                <th>Cell No</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['passenger_cnic']))
+                <th>CNIC No</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['sales']))
+                <th>Sale Amount</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['elt']))
+                <th>Elt Amount</th>
+            @endif
         </tr>
         @foreach($record as $data)
         <tr>
-            <td>{{$data['date']}}<br>{{$data['time']}}</td>
-            <td>{{$data['bus_number']}}</td>
-            <td>{{$data['bus_class']}}</td>
-            <td>{{$data['seats']}}</td>
-            <td>{{$data['terminal']}}</td>
-            <td>{{$data['user']}}</td>
-            <td>
+            @if(!empty($visibleColumnsLookup['date']))
+                <td>{{$data['date']}}<br>{{$data['time']}}</td>
+            @endif
+            @if(!empty($visibleColumnsLookup['bus_number']))
+                <td>{{$data['bus_number']}}</td>
+            @endif
+            @if(!empty($visibleColumnsLookup['bus_class']))
+                <td>{{$data['bus_class']}}</td>
+            @endif
+            @if(!empty($visibleColumnsLookup['seats']))
+                <td>{{$data['seats']}}</td>
+            @endif
+            @if(!empty($visibleColumnsLookup['terminal']))
+                <td>{{$data['terminal']}}</td>
+            @endif
+            @if(!empty($visibleColumnsLookup['user']))
+                <td>{{$data['user']}}</td>
+            @endif
+            @if(!empty($visibleColumnsLookup['invoice_id']))
+                <td>
                 @if(!empty($data['invoice_id']))
                     {!! implode('<br>', $data['invoice_id']) !!}
                 @else
                     N/A
                 @endif
-            </td>
-            <td>
+                </td>
+            @endif
+            @if(!empty($visibleColumnsLookup['transaction_id']))
+                <td>
                 @if(!empty($data['transaction_id']))
                     {!! implode('<br>', $data['transaction_id']) !!}
                 @else
                     N/A
                 @endif
-            </td>
-            <td>
+                </td>
+            @endif
+            @if(!empty($visibleColumnsLookup['passenger_name']))
+                <td>
                 @if(!empty($data['passenger_name']))
                     {!! implode('<br>', $data['passenger_name']) !!}
                 @else
                     N/A
                 @endif
-            </td>
-            <td>
+                </td>
+            @endif
+            @if(!empty($visibleColumnsLookup['passenger_contact']))
+                <td>
                 @if(!empty($data['passenger_contact']))
                     {!! implode('<br>', $data['passenger_contact']) !!}
                 @else
                     N/A
                 @endif
-            </td>
-            <td>
+                </td>
+            @endif
+            @if(!empty($visibleColumnsLookup['passenger_cnic']))
+                <td>
                 @if(!empty($data['passenger_cnic']))
                     {!! implode('<br>', $data['passenger_cnic']) !!}
                 @else
                     N/A
                 @endif
-            </td>
-            <td>{{$data['sales']}}</td>
-            <td>{{$data['elt']}}</td>
+                </td>
+            @endif
+            @if(!empty($visibleColumnsLookup['sales']))
+                <td>{{$data['sales']}}</td>
+            @endif
+            @if(!empty($visibleColumnsLookup['elt']))
+                <td>{{$data['elt']}}</td>
+            @endif
         </tr>
         @endforeach
         <!-- Total Row -->
         <tr>
-            <th colspan="3"></th>
-            <th>{{ array_sum(array_column($record, 'seats'))}}</th>
-            <th colspan="7"></th>
-            <th>{{ array_sum(array_column($record, 'sales'))}}</th>
-            <th>{{ array_sum(array_column($record, 'elt'))}}</th>
+            @if(!empty($visibleColumnsLookup['date']))
+                <th></th>
+            @endif
+            @if(!empty($visibleColumnsLookup['bus_number']))
+                <th></th>
+            @endif
+            @if(!empty($visibleColumnsLookup['bus_class']))
+                <th></th>
+            @endif
+            @if(!empty($visibleColumnsLookup['seats']))
+                <th>{{ array_sum(array_column($record, 'seats'))}}</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['terminal']))
+                <th></th>
+            @endif
+            @if(!empty($visibleColumnsLookup['user']))
+                <th></th>
+            @endif
+            @if(!empty($visibleColumnsLookup['invoice_id']))
+                <th></th>
+            @endif
+            @if(!empty($visibleColumnsLookup['transaction_id']))
+                <th></th>
+            @endif
+            @if(!empty($visibleColumnsLookup['passenger_name']))
+                <th></th>
+            @endif
+            @if(!empty($visibleColumnsLookup['passenger_contact']))
+                <th></th>
+            @endif
+            @if(!empty($visibleColumnsLookup['passenger_cnic']))
+                <th></th>
+            @endif
+            @if(!empty($visibleColumnsLookup['sales']))
+                <th>{{ array_sum(array_column($record, 'sales'))}}</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['elt']))
+                <th>{{ array_sum(array_column($record, 'elt'))}}</th>
+            @endif
         </tr>
     </table>
 

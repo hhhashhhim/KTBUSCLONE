@@ -39,7 +39,7 @@ class UserController extends Controller
             ->where(['company_id'=> Auth::user()->company_id,"hide"=>0])
             ->latest('id')
             ->get();
-        
+
         foreach ($users as $user) {
             $user->name = ucfirst($user->name);
         }
@@ -53,13 +53,13 @@ class UserController extends Controller
 {
     if (!checkForSubmenu("users")) {
         return response()->json(
-            ["Error" => ['You are not authorized to access this url']], 
+            ["Error" => ['You are not authorized to access this url']],
             403
         );
     }
 
     $cities = City::where('company_id', Auth::user()->company_id)
-                  ->where('hide', 0) 
+                  ->where('hide', 0)
                   ->get(['id', 'name']);
 
     foreach ($cities as $single) {
@@ -78,7 +78,7 @@ class UserController extends Controller
         ], 403);
     }
 
-    try {
+    // try {
         DB::beginTransaction();
 
         $this->validate($request, [
@@ -135,16 +135,16 @@ class UserController extends Controller
             'data' => $user
         ], 200);
 
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Database transaction error: ' . $e->getMessage());
+    // } catch (\Exception $e) {
+    //     DB::rollBack();
+    //     Log::error('Database transaction error: ' . $e->getMessage());
 
-        return response()->json([
-            "errors" => [
-                "Error" => ['An error occurred during the database transaction.']
-            ]
-        ], 422);
-    }
+    //     return response()->json([
+    //         "errors" => [
+    //             "Error" => ['An error occurred during the database transaction.']
+    //         ]
+    //     ], 422);
+    // }
 }
 
     public function edit(Request $request)
