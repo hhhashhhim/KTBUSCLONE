@@ -1210,99 +1210,189 @@ $request->body";
         }
     }
 }
-
 if (!function_exists('sendOtpForTicket')) {
     function sendOtpForTicket($request)
     {
-        $auth_key = Company::where("id", Auth::user()->company_id)->first()->whatsapp_auth_key;
+        $middlewareApiKey = 'sz_HGbn6ASieGhi5RuKAkhxgaM80nz9DgAoqHcyaT5PvPpjLwUghe6hqvqbvyBq2m6k';
 
-        $customer = Customer::where("cnic", plainContactAndCnic($request->customerCNIC))->first();
-
-        $otp = rand(100000, 999999); // Generate a 6-digit OTP
-
-        $customer->update([
-            "loyalty_otp" => $otp,
-            "loyalty_otp_expiration" => Carbon::now()->addMinutes(5),
-        ]);
-
-
-        if ($customer) {
-            $names = [
-                1 => 'Hamza_4-Device1',
-                2 => 'Hamza_4-Device2-201-samsung-a20',
-                3 => 'Hamza_4-Device3-204-samsung-a20',
-                4 => 'Hamza_4-Device4',
-                5 => 'Hamza_4-Device-5'
-
-            ];
-
-            $url = "https://whatsapp.sarzone.com/api/send-messages";
-            $mobile = "92" . substr($customer->contact, -10);
-            $message = "Your OTP for verification is $otp";
-            $session = $names[5];
-
-            $response = Http::withHeaders([
-                'X-Api-Key' => $auth_key,
-            ])->post($url, [
-                "session" => $session,
-                "message_type" =>  'text',
-                "receiver_number" => $mobile,
-                "message_body" => $message
-            ]);
-            return $response;
-        } else {
-            return response()->json(["error" => ['Customer not found']], 409);
-        }
-    }
-}
-if (!function_exists('sendDiscountOtpForTicket')) {
-    function sendDiscountOtpForTicket($request)
-    {
-        // Get WhatsApp auth key for the company (optional, if needed)
-        $auth_key = Company::where("id", Auth::user()->company_id)->first()->whatsapp_auth_key;
-
-        // Find customer by CNIC (after cleaning)
         $customer = Customer::where("cnic", plainContactAndCnic($request->customerCNIC))->first();
 
         if (!$customer) {
             return response()->json(["error" => ['Customer not found']], 409);
         }
 
-        // Generate 6-digit OTP
         $otp = rand(100000, 999999);
 
-        // Save OTP & expiration in DB
+        $customer->update([
+            "loyalty_otp" => $otp,
+            "loyalty_otp_expiration" => Carbon::now()->addMinutes(5),
+        ]);
+
+        $rawContact = plainContactAndCnic($request->contact ?? $customer->contact);
+
+        if (substr($rawContact, 0, 2) === '92' && strlen($rawContact) === 12) {
+            $mobile = $rawContact;
+        } elseif (substr($rawContact, 0, 1) === '0' && strlen($rawContact) === 11) {
+            $mobile = '92' . substr($rawContact, 1);
+        } elseif (strlen($rawContact) === 10) {
+            $mobile = '92' . $rawContact;
+        } elseif (strlen($rawContact) > 10) {
+            $mobile = '92' . substr($rawContact, -10);
+        } else {
+            return response()->json([
+                "success" => false,
+                "message" => "Invalid WhatsApp number format.",
+                "errors" => [
+                    "to" => ["Unable to normalize customer WhatsApp number."]
+                ]
+            ], 422);
+        }
+
+        $referenceId = 'KAINAT_TRAVELS_OTP_' . $customer->id . '_' . now()->format('YmdHis');
+
+        $payload = [
+            "client_code" => "kainat-travels",
+            "to" => $mobile,
+            "template_name" => "otp",
+            "language_code" => "en",
+            "variables" => [
+                "code" => (string) $otp,
+            ],
+            "reference_id" => $referenceId,
+        ];
+
+        try {
+            $response = Http::withToken($middlewareApiKey)
+                ->acceptJson()
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                ])
+                ->timeout(10)
+                ->post("https://wa.sarzone.com/api/v1/whatsapp/send-template", $payload);
+
+            if (!$response->successful() || ($response->json('success') === false)) {
+                Log::error('SAR ZONE OTP WhatsApp API failed.', [
+                    'function' => 'sendOtpForTicket',
+                    'customer_id' => $customer->id,
+                    'mobile' => $mobile,
+                    'payload' => $payload,
+                    'status' => $response->status(),
+                    'response' => $response->json(),
+                    'body' => $response->body(),
+                ]);
+            }
+
+            return response()->json($response->json(), $response->status());
+
+        } catch (\Exception $e) {
+            Log::error('SAR ZONE OTP WhatsApp exception.', [
+                'function' => 'sendOtpForTicket',
+                'customer_id' => $customer->id,
+                'mobile' => $mobile,
+                'payload' => $payload,
+                'exception' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                "success" => false,
+                "message" => "Failed to send WhatsApp message.",
+                "errors" => [
+                    "exception" => [$e->getMessage()]
+                ]
+            ], 500);
+        }
+    }
+}
+if (!function_exists('sendDiscountOtpForTicket')) {
+    function sendDiscountOtpForTicket($request)
+    {
+        $middlewareApiKey = 'sz_HGbn6ASieGhi5RuKAkhxgaM80nz9DgAoqHcyaT5PvPpjLwUghe6hqvqbvyBq2m6k';
+
+        $customer = Customer::where("cnic", plainContactAndCnic($request->customerCNIC))->first();
+
+        if (!$customer) {
+            return response()->json(["error" => ['Customer not found']], 409);
+        }
+
+        $otp = rand(100000, 999999);
+
         $customer->update([
             "discount_otp" => $otp,
             "discount_otp_expiration" => Carbon::now()->addMinutes(5),
         ]);
 
-        if ($customer) {
-            $names = [
-                1 => 'Hamza_4-Device1',
-                2 => 'Hamza_4-Device2-201-samsung-a20',
-                3 => 'Hamza_4-Device3-204-samsung-a20',
-                4 => 'Hamza_4-Device4',
-                5 => 'Hamza_4-Device-5'
+        $rawContact = plainContactAndCnic($request->contact ?? $customer->contact);
 
-            ];
-
-            $url = "https://whatsapp.sarzone.com/api/send-messages";
-            $mobile = "92" . substr($customer->contact, -10);
-            $message = "Your OTP for verification is $otp";
-            $session = $names[5];
-
-            $response = Http::withHeaders([
-                'X-Api-Key' => $auth_key,
-            ])->post($url, [
-                "session" => $session,
-                "message_type" =>  'text',
-                "receiver_number" => $mobile,
-                "message_body" => $message
-            ]);
-            return $response;
+        if (substr($rawContact, 0, 2) === '92' && strlen($rawContact) === 12) {
+            $mobile = $rawContact;
+        } elseif (substr($rawContact, 0, 1) === '0' && strlen($rawContact) === 11) {
+            $mobile = '92' . substr($rawContact, 1);
+        } elseif (strlen($rawContact) === 10) {
+            $mobile = '92' . $rawContact;
+        } elseif (strlen($rawContact) > 10) {
+            $mobile = '92' . substr($rawContact, -10);
         } else {
-            return response()->json(["error" => ['Customer not found']], 409);
+            return response()->json([
+                "success" => false,
+                "message" => "Invalid WhatsApp number format.",
+                "errors" => [
+                    "to" => ["Unable to normalize customer WhatsApp number."]
+                ]
+            ], 422);
+        }
+
+        $referenceId = 'KAINAT_TRAVELS_DISCOUNT_OTP_' . $customer->id . '_' . now()->format('YmdHis');
+
+        $payload = [
+            "client_code" => "kainat-travels",
+            "to" => $mobile,
+            "template_name" => "otp",
+            "language_code" => "en",
+            "variables" => [
+                "code" => (string) $otp,
+            ],
+            "reference_id" => $referenceId,
+        ];
+
+        try {
+            $response = Http::withToken($middlewareApiKey)
+                ->acceptJson()
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                ])
+                ->timeout(15)
+                ->post("https://wa.sarzone.com/api/v1/whatsapp/send-template", $payload);
+
+            if (!$response->successful() || ($response->json('success') === false)) {
+                Log::error('SAR ZONE discount OTP WhatsApp API failed.', [
+                    'function' => 'sendDiscountOtpForTicket',
+                    'customer_id' => $customer->id,
+                    'mobile' => $mobile,
+                    'payload' => $payload,
+                    'status' => $response->status(),
+                    'response' => $response->json(),
+                    'body' => $response->body(),
+                ]);
+            }
+
+            return response()->json($response->json(), $response->status());
+
+        } catch (\Exception $e) {
+            Log::error('SAR ZONE discount OTP WhatsApp exception.', [
+                'function' => 'sendDiscountOtpForTicket',
+                'customer_id' => $customer->id,
+                'mobile' => $mobile,
+                'payload' => $payload,
+                'exception' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                "success" => false,
+                "message" => "Failed to send WhatsApp message.",
+                "errors" => [
+                    "exception" => [$e->getMessage()]
+                ]
+            ], 500);
         }
     }
 }
