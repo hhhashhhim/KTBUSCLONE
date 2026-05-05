@@ -47,7 +47,8 @@ class DailyReport extends Command
      */
     public function handle()
     {
-        $auth_key = "@+_VbdTWAYv4c1kkuIO!NQQupcb@yNw%_I^qNWJ1cp+owvKF35";
+        $auth_key = 'i4uI8ww8T2@WRvumiBP&KiFM2_M9qrZhZIf7Q9&upIW6er*$Uu35';
+        // $auth_key = "@+_VbdTWAYv4c1kkuIO!NQQupcb@yNw%_I^qNWJ1cp+owvKF35";
 
         // ✅ ensure Auth user exists (for CLI/schedule)
         if (!Auth::check()) {
