@@ -97,21 +97,50 @@
                                                     </button>
                                                 </div>
                                             </div>
-                                            <!-- <div class="d-flex justify-content-end" v-if="filters.record != null">
-                                                <button class="btn btn-dark mt-4" type="button" @click="salesPrint()"
-                                                        :disabled="loadingTable">
-                                                    {{ loadingTable ? 'Loading...' : 'Print Record' }}
-                                                </button>
+                                            <div class="report-tools-bar mt-2">
+                                                <div class="column-dropdown-wrapper"
+                                                    ref="columnDropdown">
+                                                    <label>Show/Hide Table Headers</label>
+                                                    <button type="button"
+                                                        class="btn btn-outline-secondary column-dropdown-toggle"
+                                                        @click.stop="toggleColumnDropdown()">
+                                                        {{ columnSelectionLabel }}
+                                                    </button>
+                                                    <div v-if="showColumnDropdown"
+                                                        class="column-dropdown-menu"
+                                                        @click.stop>
+                                                        <label v-for="column in columnOptions"
+                                                            :key="column.key"
+                                                            class="column-option">
+                                                            <input type="checkbox"
+                                                                :value="column.key"
+                                                                v-model="visibleColumns">
+                                                            <span>{{ column.label }}</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div v-if="filters.record != null">
+                                                    <button class="btn btn-dark mt-4" type="button" @click="salesPrint()"
+                                                            :disabled="loadingTable">
+                                                        {{ loadingTable ? 'Loading...' : 'Print Record' }}
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <form :action="$store.state.api_url + 'api/web/v1/advance/sales/pdf'" method="POST" ref="salePrint"
+                                            <form :action="$store.state.api_url + 'api/web/v1/print/pdf/terminal/sales/report'" method="POST" ref="salePrint"
                                                 target="_blank">
                                                 <input type="hidden" name="token" :value="this.$store.state.token">
                                                 <input type="hidden" name="terminal" :value="filterSales.terminal">
                                                 <input type="hidden" name="user" :value="filterSales.user">
                                                 <input type="hidden" name="route" :value="filterSales.route">
+                                                <input type="hidden" name="invoice_id" :value="filterSales.invoice_id">
+                                                <input type="hidden" name="transaction_id" :value="filterSales.transaction_id">
+                                                <input type="hidden" name="passenger_name" :value="filterSales.passenger_name">
+                                                <input type="hidden" name="passenger_contact" :value="filterSales.passenger_contact">
+                                                <input type="hidden" name="passenger_cnic" :value="filterSales.passenger_cnic">
                                                 <input type="hidden" name="fromDateTime" :value="filterSales.fromDateTime">
                                                 <input type="hidden" name="toDateTime" :value="filterSales.toDateTime">
-                                            </form> -->
+                                                <input type="hidden" name="visible_columns" :value="visibleColumns.join(',')">
+                                            </form>
                                             <div class="row mt-2">
                                                 <div class="col-md-12">
                                                     <div class="table-responsive">
@@ -119,65 +148,75 @@
                                                             id="saleReportTable">
                                                             <thead>
                                                                 <tr>
-                                                                    <th>Bus Time</th>
-                                                                    <th>Bus No</th>
-                                                                    <th>Bus Class</th>
-                                                                    <th>Route</th>
-                                                                    <th>Name</th>
-                                                                    <th>Cnic</th>
-                                                                    <th>Contact</th>
-                                                                    <th>Seat No</th>
-                                                                    <th>Invoice</th>
-                                                                    <th>Transaction id </th>
-                                                                    <th>Terminal Name</th>
-                                                                    <th>Status</th>
-                                                                    <th>Action By</th>
-                                                                    <th>Sale</th>
-                                                                    <th>Refund</th>
-                                                                    <th>Commission</th>
-                                                                    <th>Net Cash</th>
+                                                                    <th v-if="isColumnVisible('bus_time')">Bus Time</th>
+                                                                    <th v-if="isColumnVisible('bus_number')">Bus No</th>
+                                                                    <th v-if="isColumnVisible('bus_class')">Bus Class</th>
+                                                                    <th v-if="isColumnVisible('route')">Route</th>
+                                                                    <th v-if="isColumnVisible('passenger_name')">Name</th>
+                                                                    <th v-if="isColumnVisible('passenger_cnic')">Cnic</th>
+                                                                    <th v-if="isColumnVisible('passenger_contact')">Contact</th>
+                                                                    <th v-if="isColumnVisible('seat_no')">Seat No</th>
+                                                                    <th v-if="isColumnVisible('invoice_id')">Invoice</th>
+                                                                    <th v-if="isColumnVisible('transaction_id')">Transaction id </th>
+                                                                    <th v-if="isColumnVisible('terminal_name')">Terminal Name</th>
+                                                                    <th v-if="isColumnVisible('status')">Status</th>
+                                                                    <th v-if="isColumnVisible('action_by')">Action By</th>
+                                                                    <th v-if="isColumnVisible('sale')">Sale</th>
+                                                                    <th v-if="isColumnVisible('refund')">Refund</th>
+                                                                    <th v-if="isColumnVisible('commission')">Commission</th>
+                                                                    <th v-if="isColumnVisible('net_cash')">Net Cash</th>
                                                                 </tr>
                                                             </thead>
 
                                                             <tbody>
                                                                 <tr v-for="(data, i) in filters.record" :key="i">
-                                                                    <td>{{ data.schedule_date }}<br>{{
+                                                                    <td v-if="isColumnVisible('bus_time')">{{ data.schedule_date }}<br>{{
                                                                         data.schedule_time }}</td>
-                                                                    <td>{{ data.bus ? data.bus.bus_number : 'N/A' }}
+                                                                    <td v-if="isColumnVisible('bus_number')">{{ data.bus ? data.bus.bus_number : 'N/A' }}
                                                                     </td>
-                                                                    <td>{{ data.bus_class.name }}</td>
-                                                                    <td>{{ data.route.name }} ({{ data.route.via ??
+                                                                    <td v-if="isColumnVisible('bus_class')">{{ data.bus_class.name }}</td>
+                                                                    <td v-if="isColumnVisible('route')">{{ data.route.name }} ({{ data.route.via ??
                                                                         'n/a'
                                                                     }})</td>
-                                                                    <td>{{ data.customer.name }}</td>
-                                                                    <td>{{ data.customer.cnic }}</td>
-                                                                    <td>{{ data.customer.contact }}</td>
-                                                                    <td>{{ data.seat_no }}</td>
-                                                                    <td>{{ data.invoice_id }}</td>
-                                                                    <td>{{ data.transaction_id ?? 0 }}</td>
-                                                                    <td>{{ data.terminal.name }}</td>
-                                                                    <td>{{ data.type }}</td>
-                                                                    <td>{{ data.updated_name.name ?? 'N/A' }}</td>
-                                                                    <td>{{ data.type != 'canceled' ? (data.seat_fare -
+                                                                    <td v-if="isColumnVisible('passenger_name')">{{ data.customer.name }}</td>
+                                                                    <td v-if="isColumnVisible('passenger_cnic')">{{ data.customer.cnic }}</td>
+                                                                    <td v-if="isColumnVisible('passenger_contact')">{{ data.customer.contact }}</td>
+                                                                    <td v-if="isColumnVisible('seat_no')">{{ data.seat_no }}</td>
+                                                                    <td v-if="isColumnVisible('invoice_id')">{{ data.invoice_id }}</td>
+                                                                    <td v-if="isColumnVisible('transaction_id')">{{ data.transaction_id ?? 0 }}</td>
+                                                                    <td v-if="isColumnVisible('terminal_name')">{{ data.terminal.name }}</td>
+                                                                    <td v-if="isColumnVisible('status')">{{ data.type }}</td>
+                                                                    <td v-if="isColumnVisible('action_by')">{{ data.updated_name.name ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('sale')">{{ data.type != 'canceled' ? (data.seat_fare -
                                                                         data.discount) : 0 }}</td>
-                                                                    <td>{{ data.type == 'canceled' ? data.refund : 0 }}
+                                                                    <td v-if="isColumnVisible('refund')">{{ data.type == 'canceled' ? data.refund : 0 }}
                                                                     </td>
-                                                                    <td>{{ data.type == 'canceled' ? 0 : data.comsn }}
+                                                                    <td v-if="isColumnVisible('commission')">{{ data.type == 'canceled' ? 0 : data.comsn }}
                                                                     </td>
-                                                                    <td>
+                                                                    <td v-if="isColumnVisible('net_cash')">
                                                                         <!-- Net Cash -->
                                                                         {{ (data.seat_fare - data.discount) +
                                                                             (data.refund ?? 0) - (data.comsn ?? 0) }}
                                                                     </td>
                                                                 </tr>
                                                                 <tr v-if="filters.record.length > 0">
-                                                                    <th colspan="7"></th>
-                                                                    <th>{{ filters.record.length }}</th>
-                                                                    <th colspan="4"></th>
-                                                                    <th>{{ totalSaleAmount() }}</th>
-                                                                    <th>{{ totalRefundAmount() }}</th>
-                                                                    <th>{{ totalCommission() }}</th>
-                                                                    <th>{{ totalNetCash() }}</th>
+                                                                    <th v-if="isColumnVisible('bus_time')"></th>
+                                                                    <th v-if="isColumnVisible('bus_number')"></th>
+                                                                    <th v-if="isColumnVisible('bus_class')"></th>
+                                                                    <th v-if="isColumnVisible('route')"></th>
+                                                                    <th v-if="isColumnVisible('passenger_name')"></th>
+                                                                    <th v-if="isColumnVisible('passenger_cnic')"></th>
+                                                                    <th v-if="isColumnVisible('passenger_contact')"></th>
+                                                                    <th v-if="isColumnVisible('seat_no')">{{ filters.record.length }}</th>
+                                                                    <th v-if="isColumnVisible('invoice_id')"></th>
+                                                                    <th v-if="isColumnVisible('transaction_id')"></th>
+                                                                    <th v-if="isColumnVisible('terminal_name')"></th>
+                                                                    <th v-if="isColumnVisible('status')"></th>
+                                                                    <th v-if="isColumnVisible('action_by')"></th>
+                                                                    <th v-if="isColumnVisible('sale')">{{ totalSaleAmount() }}</th>
+                                                                    <th v-if="isColumnVisible('refund')">{{ totalRefundAmount() }}</th>
+                                                                    <th v-if="isColumnVisible('commission')">{{ totalCommission() }}</th>
+                                                                    <th v-if="isColumnVisible('net_cash')">{{ totalNetCash() }}</th>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -197,6 +236,26 @@
     </section>
 </template>
 <script>
+const COLUMN_OPTIONS = [
+    { key: 'bus_time', label: 'Bus Time', checked: true },
+    { key: 'bus_number', label: 'Bus No', checked: true },
+    { key: 'bus_class', label: 'Bus Class', checked: true },
+    { key: 'route', label: 'Route', checked: true },
+    { key: 'passenger_name', label: 'Name', checked: true },
+    { key: 'passenger_cnic', label: 'Cnic', checked: true },
+    { key: 'passenger_contact', label: 'Contact', checked: true },
+    { key: 'seat_no', label: 'Seat No', checked: true },
+    { key: 'invoice_id', label: 'Invoice', checked: true },
+    { key: 'transaction_id', label: 'Transaction id', checked: true },
+    { key: 'terminal_name', label: 'Terminal Name', checked: true },
+    { key: 'status', label: 'Status', checked: true },
+    { key: 'action_by', label: 'Action By', checked: true },
+    { key: 'sale', label: 'Sale', checked: true },
+    { key: 'refund', label: 'Refund', checked: true },
+    { key: 'commission', label: 'Commission', checked: true },
+    { key: 'net_cash', label: 'Net Cash', checked: true },
+];
+
 export default {
     name: "TerminalSaleReportsPage",
     data() {
@@ -206,6 +265,9 @@ export default {
             loadingTable: false,
             users: [],
             permissions: [],
+            columnOptions: COLUMN_OPTIONS.map((column) => ({ ...column })),
+            visibleColumns: COLUMN_OPTIONS.filter((column) => column.checked).map((column) => column.key),
+            showColumnDropdown: false,
             filters: {
                 record: []
             },
@@ -222,6 +284,19 @@ export default {
                 fromDateTime: '',
                 toDateTime: '',
             },
+        }
+    },
+    computed: {
+        columnSelectionLabel() {
+            if (this.visibleColumns.length === this.columnOptions.length) {
+                return 'All Table Headers Selected';
+            }
+
+            if (this.visibleColumns.length === 0) {
+                return 'No Table Headers Selected';
+            }
+
+            return `${this.visibleColumns.length} Table Headers Selected`;
         }
     },
     async created() {
@@ -243,6 +318,7 @@ export default {
         }, 300);
     },
     mounted() {
+        document.addEventListener('click', this.handleDocumentClick);
         const self = this;
         // route
         const routeIds = $('#routeIds');
@@ -252,7 +328,25 @@ export default {
         });
 
     },
+    beforeUnmount() {
+        document.removeEventListener('click', this.handleDocumentClick);
+    },
     methods: {
+        toggleColumnDropdown() {
+            this.showColumnDropdown = !this.showColumnDropdown;
+        },
+        handleDocumentClick(event) {
+            if (!this.showColumnDropdown || !this.$refs.columnDropdown) {
+                return;
+            }
+
+            if (!this.$refs.columnDropdown.contains(event.target)) {
+                this.showColumnDropdown = false;
+            }
+        },
+        isColumnVisible(columnKey) {
+            return this.visibleColumns.includes(columnKey);
+        },
         async fetchFilters() {
             const resTerminals = await this.callApi("post", 'advance/sales/getTerminals');
             const resUserNames = await this.callApi("post", 'advance/sales/getUserNames');
@@ -377,5 +471,51 @@ th,
 td {
     border: 1px solid #b9b9b9;
     border-collapse: collapse;
+}
+
+.report-tools-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.column-dropdown-wrapper {
+    position: relative;
+    min-width: 280px;
+    max-width: 320px;
+}
+
+.column-dropdown-toggle {
+    width: 100%;
+    text-align: left;
+}
+
+.column-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    z-index: 20;
+    width: 100%;
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 0.75rem;
+    background: #fff;
+    border: 1px solid #d7dce3;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+}
+
+.column-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+.column-option:last-child {
+    margin-bottom: 0;
 }
 </style>

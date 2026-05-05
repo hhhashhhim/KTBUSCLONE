@@ -144,7 +144,28 @@
                                                             <img class="loading-spinner" :src="$store.state.main_url + 'assets/img/loading-spinner.gif'">
                                                         </div>
                                                         <div v-else>
-                                                            <div class="d-flex justify-content-end mb-2">
+                                                            <div class="report-tools-bar mb-2">
+                                                                <div class="column-dropdown-wrapper"
+                                                                    ref="columnDropdown">
+                                                                    <label class="filter-label">Show/Hide Table Headers</label>
+                                                                    <button type="button"
+                                                                        class="btn btn-outline-secondary column-dropdown-toggle"
+                                                                        @click.stop="toggleColumnDropdown()">
+                                                                        {{ columnSelectionLabel }}
+                                                                    </button>
+                                                                    <div v-if="showColumnDropdown"
+                                                                        class="column-dropdown-menu"
+                                                                        @click.stop>
+                                                                        <label v-for="column in columnOptions"
+                                                                            :key="column.key"
+                                                                            class="column-option">
+                                                                            <input type="checkbox"
+                                                                                :value="column.key"
+                                                                                v-model="visibleColumns">
+                                                                            <span>{{ column.label }}</span>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
                                                                 <form :action="$store.state.api_url + 'api/web/v1/advance/sales/pdf'" method="POST" ref="salePrint"
                                                                     target="_blank">
                                                                     <input type="hidden" name="token" :value="this.$store.state.token">
@@ -159,6 +180,7 @@
                                                                     <input type="hidden" name="fromDateTime" :value="filterSales.fromDateTime">
                                                                     <input type="hidden" name="toDateTime" :value="filterSales.toDateTime">
                                                                     <input type="hidden" name="counterSale" :value="filterSales.counterSale">
+                                                                    <input type="hidden" name="visible_columns" :value="visibleColumns.join(',')">
                                                                     <input type="submit" value="Print" class="btn btn-dark">
                                                                 </form>
                                                             </div>
@@ -166,31 +188,31 @@
                                                                 id="saleReportTable">
                                                                 <thead>
                                                                 <tr>
-                                                                    <th>Date</th>
-                                                                    <th>Bus No</th>
-                                                                    <th>Bus Class</th>
-                                                                    <th>No of Seat</th>
-                                                                    <th>Terminal Name</th>
-                                                                    <th>User Name</th>
-                                                                    <th>Invoice</th>
-                                                                    <th>Transaction #</th>
-                                                                    <th>Passenger Name</th>
-                                                                    <th>Cell No</th>
-                                                                    <th>CNIC No</th>
-                                                                    <th>Sale Amount</th>
-                                                                    <th>ELT Amount</th>
+                                                                    <th v-if="isColumnVisible('date')">Date</th>
+                                                                    <th v-if="isColumnVisible('bus_number')">Bus No</th>
+                                                                    <th v-if="isColumnVisible('bus_class')">Bus Class</th>
+                                                                    <th v-if="isColumnVisible('seats')">No of Seat</th>
+                                                                    <th v-if="isColumnVisible('terminal')">Terminal Name</th>
+                                                                    <th v-if="isColumnVisible('user')">User Name</th>
+                                                                    <th v-if="isColumnVisible('invoice_id')">Invoice</th>
+                                                                    <th v-if="isColumnVisible('transaction_id')">Transaction #</th>
+                                                                    <th v-if="isColumnVisible('passenger_name')">Passenger Name</th>
+                                                                    <th v-if="isColumnVisible('passenger_contact')">Cell No</th>
+                                                                    <th v-if="isColumnVisible('passenger_cnic')">CNIC No</th>
+                                                                    <th v-if="isColumnVisible('sales')">Sale Amount</th>
+                                                                    <th v-if="isColumnVisible('elt')">ELT Amount</th>
                                                                 </tr>
                                                                 </thead>
 
                                                                 <tbody>
                                                                 <tr v-for="(data,i) in filters.record" :key="i">
-                                                                    <td>{{ data.date }}<br>{{ data.time }}</td>
-                                                                    <td>{{ data.bus_number }}</td>
-                                                                    <td>{{ data.bus_class }}</td>
-                                                                    <td>{{ data.seats }}</td>
-                                                                    <td>{{ data.terminal }}</td>
-                                                                    <td>{{ data.user }}</td>
-                                                                    <td>
+                                                                    <td v-if="isColumnVisible('date')">{{ data.date }}<br>{{ data.time }}</td>
+                                                                    <td v-if="isColumnVisible('bus_number')">{{ data.bus_number }}</td>
+                                                                    <td v-if="isColumnVisible('bus_class')">{{ data.bus_class }}</td>
+                                                                    <td v-if="isColumnVisible('seats')">{{ data.seats }}</td>
+                                                                    <td v-if="isColumnVisible('terminal')">{{ data.terminal }}</td>
+                                                                    <td v-if="isColumnVisible('user')">{{ data.user }}</td>
+                                                                    <td v-if="isColumnVisible('invoice_id')">
                                                                         <div v-if="data.invoice_id && data.invoice_id.length">
                                                                             <div v-for="(invoiceId, invoiceIndex) in data.invoice_id" :key="`invoice-${i}-${invoiceIndex}`">
                                                                                 {{ invoiceId }}
@@ -198,7 +220,7 @@
                                                                         </div>
                                                                         <span v-else>N/A</span>
                                                                     </td>
-                                                                    <td>
+                                                                    <td v-if="isColumnVisible('transaction_id')">
                                                                         <div v-if="data.transaction_id && data.transaction_id.length">
                                                                             <div v-for="(transactionId, transactionIndex) in data.transaction_id" :key="`transaction-${i}-${transactionIndex}`">
                                                                                 {{ transactionId }}
@@ -206,7 +228,7 @@
                                                                         </div>
                                                                         <span v-else>N/A</span>
                                                                     </td>
-                                                                    <td>
+                                                                    <td v-if="isColumnVisible('passenger_name')">
                                                                         <div v-if="data.passenger_name && data.passenger_name.length">
                                                                             <div v-for="(passengerName, passengerIndex) in data.passenger_name" :key="`passenger-name-${i}-${passengerIndex}`">
                                                                                 {{ passengerName }}
@@ -214,7 +236,7 @@
                                                                         </div>
                                                                         <span v-else>N/A</span>
                                                                     </td>
-                                                                    <td>
+                                                                    <td v-if="isColumnVisible('passenger_contact')">
                                                                         <div v-if="data.passenger_contact && data.passenger_contact.length">
                                                                             <div v-for="(passengerContact, contactIndex) in data.passenger_contact" :key="`passenger-contact-${i}-${contactIndex}`">
                                                                                 {{ passengerContact }}
@@ -222,7 +244,7 @@
                                                                         </div>
                                                                         <span v-else>N/A</span>
                                                                     </td>
-                                                                    <td>
+                                                                    <td v-if="isColumnVisible('passenger_cnic')">
                                                                         <div v-if="data.passenger_cnic && data.passenger_cnic.length">
                                                                             <div v-for="(passengerCnic, cnicIndex) in data.passenger_cnic" :key="`passenger-cnic-${i}-${cnicIndex}`">
                                                                                 {{ passengerCnic }}
@@ -230,15 +252,23 @@
                                                                         </div>
                                                                         <span v-else>N/A</span>
                                                                     </td>
-                                                                    <td>{{ data.sales }}</td>
-                                                                    <td>{{ data.elt }}</td>
+                                                                    <td v-if="isColumnVisible('sales')">{{ data.sales }}</td>
+                                                                    <td v-if="isColumnVisible('elt')">{{ data.elt }}</td>
                                                                 </tr>
                                                                 <tr>
-                                                                    <th colspan="3"></th>
-                                                                    <th>{{ totalSeats() ?? 0 }}</th>
-                                                                    <th colspan="7"></th>
-                                                                    <th>{{ totalSeatFare() ?? 0 }}</th>
-                                                                    <th>{{ totalEltFare() ?? 0 }}</th>
+                                                                    <th v-if="isColumnVisible('date')"></th>
+                                                                    <th v-if="isColumnVisible('bus_number')"></th>
+                                                                    <th v-if="isColumnVisible('bus_class')"></th>
+                                                                    <th v-if="isColumnVisible('seats')">{{ totalSeats() ?? 0 }}</th>
+                                                                    <th v-if="isColumnVisible('terminal')"></th>
+                                                                    <th v-if="isColumnVisible('user')"></th>
+                                                                    <th v-if="isColumnVisible('invoice_id')"></th>
+                                                                    <th v-if="isColumnVisible('transaction_id')"></th>
+                                                                    <th v-if="isColumnVisible('passenger_name')"></th>
+                                                                    <th v-if="isColumnVisible('passenger_contact')"></th>
+                                                                    <th v-if="isColumnVisible('passenger_cnic')"></th>
+                                                                    <th v-if="isColumnVisible('sales')">{{ totalSeatFare() ?? 0 }}</th>
+                                                                    <th v-if="isColumnVisible('elt')">{{ totalEltFare() ?? 0 }}</th>
                                                                 </tr>
                                                                 </tbody>
                                                             </table>
@@ -385,6 +415,22 @@
     </section>
 </template>
 <script>
+const COLUMN_OPTIONS = [
+    { key: 'date', label: 'Date', checked: true },
+    { key: 'bus_number', label: 'Bus No', checked: true },
+    { key: 'bus_class', label: 'Bus Class', checked: true },
+    { key: 'seats', label: 'No of Seat', checked: true },
+    { key: 'terminal', label: 'Terminal Name', checked: true },
+    { key: 'user', label: 'User Name', checked: true },
+    { key: 'invoice_id', label: 'Invoice', checked: true },
+    { key: 'transaction_id', label: 'Transaction #', checked: true },
+    { key: 'passenger_name', label: 'Passenger Name', checked: true },
+    { key: 'passenger_contact', label: 'Cell No', checked: true },
+    { key: 'passenger_cnic', label: 'CNIC No', checked: true },
+    { key: 'sales', label: 'Sale Amount', checked: true },
+    { key: 'elt', label: 'ELT Amount', checked: true },
+];
+
 export default {
     name: "AdvanceSaleReportsPage",
     data() {
@@ -396,6 +442,9 @@ export default {
             permissions: [],
             routes: [],
             terminals: [],
+            columnOptions: COLUMN_OPTIONS.map((column) => ({ ...column })),
+            visibleColumns: COLUMN_OPTIONS.filter((column) => column.checked).map((column) => column.key),
+            showColumnDropdown: false,
             filters: {
                 record: [],
                 refund: [],
@@ -415,6 +464,19 @@ export default {
                 toDateTime: '',
                 counterSale: false,
             },
+        }
+    },
+    computed: {
+        columnSelectionLabel() {
+            if (this.visibleColumns.length === this.columnOptions.length) {
+                return 'All Table Headers Selected';
+            }
+
+            if (this.visibleColumns.length === 0) {
+                return 'No Table Headers Selected';
+            }
+
+            return `${this.visibleColumns.length} Table Headers Selected`;
         }
     },
     async created() {
@@ -438,6 +500,7 @@ export default {
         }, 300);
     },
     mounted() {
+        document.addEventListener('click', this.handleDocumentClick);
         const self = this;
         // route
         const routeIds = $('#routeIds');
@@ -447,7 +510,25 @@ export default {
         });
 
     },
+    beforeUnmount() {
+        document.removeEventListener('click', this.handleDocumentClick);
+    },
     methods: {
+        toggleColumnDropdown() {
+            this.showColumnDropdown = !this.showColumnDropdown;
+        },
+        handleDocumentClick(event) {
+            if (!this.showColumnDropdown || !this.$refs.columnDropdown) {
+                return;
+            }
+
+            if (!this.$refs.columnDropdown.contains(event.target)) {
+                this.showColumnDropdown = false;
+            }
+        },
+        isColumnVisible(columnKey) {
+            return this.visibleColumns.includes(columnKey);
+        },
         async fetchFilters() {
             const resUserNames = await this.callApi("post", 'advance/sales/getUserNames');
             const resRoutes = await this.callApi("post", 'advance/sales/getRoutes');
@@ -721,8 +802,59 @@ table, th, td {
     padding: 2em;
 }
 
+.report-tools-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.column-dropdown-wrapper {
+    position: relative;
+    min-width: 280px;
+    max-width: 320px;
+}
+
+.column-dropdown-toggle {
+    width: 100%;
+    text-align: left;
+}
+
+.column-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    z-index: 20;
+    width: 100%;
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 0.75rem;
+    background: #fff;
+    border: 1px solid #d7dce3;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+}
+
+.column-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+.column-option:last-child {
+    margin-bottom: 0;
+}
+
 @media (max-width: 991.98px) {
     .filter-action-wrap {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .report-tools-bar {
         flex-direction: column;
         align-items: stretch;
     }
