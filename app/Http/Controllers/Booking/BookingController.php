@@ -498,7 +498,7 @@ class BookingController extends Controller
 
         return ticketConfirmedMessage($request->invoice_id);
     }
-   
+
     public function whatsappCancelMessage(Request $request)
     {
         return ticketCanceledMessage($request->tickets);
@@ -1650,19 +1650,39 @@ class BookingController extends Controller
             //Deduct points reverse in case of cancellation
             $customer = Customer::where('id', $ticket->customer_id)->first();
             $checkCard = CardAssign::where(['cnic' => $customer->cnic, 'company_id' => Auth::user()->company_id])->with("cardCategory")->first();
-            if ($checkCard) {
-                if ($checkCard->cardCategory->point_type == "flatPoints") {
-                    $subPoint = $ticket->seat_fare / $checkCard->cardCategory->point_flat;
-                } else {
-                    $distance = FareTable::where(['from_city_id' => $ticket->departure_city_id, 'to_city_id' => $ticket->destination_city_id, 'company_id' => Auth::user()->company_id])->first()->distance_in_km;
-                    $subPoint = $distance / $checkCard->cardCategory->point_distance;
-                }
-                if ($ticket->type == "booked") {
-                    $checkCard->decrement("starting_points", $subPoint);
-                }
+           if ($checkCard) {
+    $subPoint = 0;
 
-                $checkCard->increment("starting_points", $ticket->points_usage);
+    if ($checkCard->cardCategory) {
+        if ($checkCard->cardCategory->point_type == "flatPoints") {
+            $pointFlat = (float) $checkCard->cardCategory->point_flat;
+
+            if ($pointFlat > 0) {
+                $subPoint = $ticket->seat_fare / $pointFlat;
             }
+        } else {
+            $fareTable = FareTable::where([
+                'from_city_id' => $ticket->departure_city_id,
+                'to_city_id' => $ticket->destination_city_id,
+                'company_id' => Auth::user()->company_id
+            ])->first();
+
+            $pointDistance = (float) $checkCard->cardCategory->point_distance;
+
+            if ($fareTable && $pointDistance > 0) {
+                $subPoint = $fareTable->distance_in_km / $pointDistance;
+            }
+        }
+
+        if ($ticket->type == "booked" && $subPoint > 0) {
+            $checkCard->decrement("starting_points", $subPoint);
+        }
+
+        if ($ticket->points_usage > 0) {
+            $checkCard->increment("starting_points", $ticket->points_usage);
+        }
+    }
+}
 
             $delElt = TicketELT::where('ticket_id', $ticket->id)->first();
             if ($delElt) {
