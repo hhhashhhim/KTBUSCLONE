@@ -5,6 +5,7 @@ namespace App\Http\Controllers\ReportsHeader;
 use App\Http\Controllers\Controller;
 use App\Models\ReportsHeader;
 use App\Models\ReportHeaderLink;
+use App\Models\Schedule\TicketClosingMerge;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ActivityLog;
@@ -105,6 +106,23 @@ class ReportsHeaderController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+        $request->validate([
+            'ticket_merge_id' => 'required|integer',
+        ]);
+
+        $merge = TicketClosingMerge::where([
+            'id' => $request->ticket_merge_id,
+            'company_id' => Auth::user()->company_id,
+        ])->first();
+
+        if (!$merge) {
+            return response()->json([
+                'errors' => [
+                    'ticket_merge_id' => ['Selected merge record was not found.'],
+                ],
+            ], 404);
+        }
+
         $links = ReportHeaderLink::where(['company_id'=> Auth::user()->company_id,'ticket_merge_id'=>$request->ticket_merge_id])->get();
         $headers = ReportsHeader::with('addedBy')->where('company_id', Auth::user()->company_id)->get();
         if($links->count() > 0)
@@ -129,12 +147,46 @@ class ReportsHeaderController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        // try {
-           DB::beginTransaction();
-    ReportHeaderLink::where("ticket_merge_id", $request->ticket_merge_id)->delete();
-    $headIds = $request->headIds ?? [];
-    $values = $request->values ?? [];
-               foreach ($headIds as $key => $value) {
+        $request->validate([
+            'ticket_merge_id' => 'required|integer',
+            'values' => 'required|array|min:1',
+            'values.*' => 'nullable|numeric',
+        ]);
+
+        $headIds = $request->headIds ?? $request->expenseHeadIds ?? [];
+        if (!is_array($headIds) || count($headIds) === 0) {
+            return response()->json([
+                'errors' => [
+                    'headIds' => ['At least one header is required.'],
+                ],
+            ], 422);
+        }
+
+        if (count($headIds) !== count($request->values)) {
+            return response()->json([
+                'errors' => [
+                    'Error' => ['headIds and values count mismatch'],
+                ],
+            ], 422);
+        }
+
+        $merge = TicketClosingMerge::where([
+            'id' => $request->ticket_merge_id,
+            'company_id' => Auth::user()->company_id,
+        ])->first();
+
+        if (!$merge) {
+            return response()->json([
+                'errors' => [
+                    'ticket_merge_id' => ['Selected merge record was not found.'],
+                ],
+            ], 404);
+        }
+
+        DB::beginTransaction();
+        ReportHeaderLink::where("ticket_merge_id", $request->ticket_merge_id)->delete();
+        $values = $request->values ?? [];
+        foreach ($headIds as $key => $value) {
         ReportHeaderLink::create([
             'ticket_merge_id' => $request->ticket_merge_id,
             'header_id' => $value, // Use $value directly from the foreach
@@ -150,11 +202,9 @@ class ReportsHeaderController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
-            // } catch (\Exception $e) {
-            //     DB::rollBack();
-            //     Log::error('Database transaction error: ' . $e->getMessage());
-            //     return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            // }
+                return response()->json([
+                    'success' => true,
+                ], 200);
     }
     public function headerMergeLink(Request $request)
     {

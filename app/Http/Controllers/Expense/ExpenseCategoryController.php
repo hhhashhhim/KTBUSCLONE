@@ -13,6 +13,7 @@ use App\Models\ActivityLog;
 use App\Models\Expense\ExpenseCategory;
 use App\Models\ReportHeaderLink;
 use App\Models\ReportsHeader;
+use App\Models\Schedule\TicketClosingMerge;
 use App\Models\Route\RouteFare;
 use App\Models\Terminal;
 use Illuminate\Http\Request;
@@ -102,6 +103,23 @@ class ExpenseCategoryController extends Controller
     }
  public function reportHeaderLinkGet(Request $request)
     {
+        $request->validate([
+            'ticket_merge_id' => 'required|integer',
+        ]);
+
+        $merge = TicketClosingMerge::where([
+            'id' => $request->ticket_merge_id,
+            'company_id' => Auth::user()->company_id,
+        ])->first();
+
+        if (!$merge) {
+            return response()->json([
+                'errors' => [
+                    'ticket_merge_id' => ['Selected merge record was not found.'],
+                ],
+            ], 404);
+        }
+
         $links = ReportHeaderLink::where(['company_id'=> Auth::user()->company_id,'ticket_merge_id'=>$request->ticket_merge_id])->get();
         $headers = ReportsHeader::with('addedBy')->where('company_id', Auth::user()->company_id)->get();
         if($links->count() > 0)
@@ -128,6 +146,19 @@ class ExpenseCategoryController extends Controller
         'values' => 'required|array|min:1',
         'values.*' => 'nullable|numeric',
     ]);
+
+    $merge = TicketClosingMerge::where([
+        'id' => $request->ticket_merge_id,
+        'company_id' => Auth::user()->company_id,
+    ])->first();
+
+    if (!$merge) {
+        return response()->json([
+            'errors' => [
+                'ticket_merge_id' => ['Selected merge record was not found.'],
+            ],
+        ], 404);
+    }
 
     if (count($request->headIds) !== count($request->values)) {
         return response()->json([

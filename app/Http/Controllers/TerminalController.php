@@ -257,8 +257,20 @@ if (is_array($request->send_message)) {
         if (!checkPermissionButtons("commission")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $terminalCommission = TerminalCommission::where(["terminal_id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
+        $request->validate([
+            "terminal_id" => 'required|integer',
+        ]);
+
         $terminal = Terminal::where(["id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->first();
+        if (!$terminal) {
+            return response()->json([
+                "errors" => [
+                    "terminal_id" => ["Selected terminal was not found."],
+                ],
+            ], 404);
+        }
+
+        $terminalCommission = TerminalCommission::where(["terminal_id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
         return [
             "terminalCommission" => $terminalCommission,
             "terminal" => $terminal,
@@ -273,13 +285,25 @@ if (is_array($request->send_message)) {
         try {
             DB::beginTransaction();
             $request->validate([
-                "terminal_id" => 'required',
-                "route" => 'required',
-                "fixCommission" => 'required',
-                "flatCommission" => 'required',
-                "percentCommission" => 'required',
-                "adjustmentCommission" => 'required',
+                "terminal_id" => 'required|integer',
+                "route" => 'required|array|min:1',
+                "route.*" => 'required|integer',
+                "fixCommission" => 'required|array|min:1',
+                "flatCommission" => 'required|array|min:1',
+                "percentCommission" => 'required|array|min:1',
+                "adjustmentCommission" => 'required|array|min:1',
             ]);
+
+            $terminal = Terminal::where(["id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->first();
+            if (!$terminal) {
+                DB::rollBack();
+                return response()->json([
+                    "errors" => [
+                        "terminal_id" => ["Selected terminal was not found."],
+                    ],
+                ], 404);
+            }
+
             TerminalCommission::where("terminal_id", $request->terminal_id)->delete();
             foreach ($request->route as $key => $value) {
                 $checkExist = TerminalCommission::where(["terminal_id" => $request->terminal_id, "route_id" => $request->route[$key], 'company_id' => Auth::user()->company_id])->first();
@@ -315,8 +339,20 @@ if (is_array($request->send_message)) {
         if (!checkPermissionButtons("discount")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
+        $request->validate([
+            "terminal_id" => 'required|integer',
+        ]);
+
         $terminal = Terminal::where(["id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->first();
+        if (!$terminal) {
+            return response()->json([
+                "errors" => [
+                    "terminal_id" => ["Selected terminal was not found."],
+                ],
+            ], 404);
+        }
+
+        $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
         return [
             "terminalDiscount" => $terminalDiscount,
             "terminal" => $terminal,
@@ -331,12 +367,23 @@ if (is_array($request->send_message)) {
         try {
             DB::beginTransaction();
             $request->validate([
-                "terminal_id" => 'required',
-                "route" => 'required',
-                "discount" => 'required',
-                "startDate" => 'required',
-                "endDate" => 'required',
+                "terminal_id" => 'required|integer',
+                "route" => 'required|array|min:1',
+                "route.*" => 'required|integer',
+                "discount" => 'required|array|min:1',
+                "startDate" => 'required|array|min:1',
+                "endDate" => 'required|array|min:1',
             ]);
+
+            $terminal = Terminal::where(["id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->first();
+            if (!$terminal) {
+                DB::rollBack();
+                return response()->json([
+                    "errors" => [
+                        "terminal_id" => ["Selected terminal was not found."],
+                    ],
+                ], 404);
+            }
 
             TerminalDiscount::where("terminal_id", $request->terminal_id)->delete();
             foreach ($request->route as $key => $value) {
@@ -372,8 +419,20 @@ if (is_array($request->send_message)) {
         if (!checkPermissionButtons("edit-terminal")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $terminalTimes = TerminalTimeDifference::where(["terminal_id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
+        $request->validate([
+            "terminal_id" => 'required|integer',
+        ]);
+
         $terminal = Terminal::where(["id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->first();
+        if (!$terminal) {
+            return response()->json([
+                "errors" => [
+                    "terminal_id" => ["Selected terminal was not found."],
+                ],
+            ], 404);
+        }
+
+        $terminalTimes = TerminalTimeDifference::where(["terminal_id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
         return [
             "terminalTimes" => $terminalTimes,
             "terminal" => $terminal,
@@ -388,11 +447,25 @@ if (is_array($request->send_message)) {
         try {
             DB::beginTransaction();
             $request->validate([
-                "terminal_id" => 'required',
+                "terminal_id" => 'required|integer',
+                "route" => 'required|array|min:1',
+                "route.*" => 'required|integer',
+                "name" => 'required|array|min:1',
+                "time" => 'required|array|min:1',
             ]);
 
             TerminalTimeDifference::where("terminal_id", $request->terminal_id)->delete();
-            $city_id = Terminal::find($request->terminal_id)->city_id;
+            $terminal = Terminal::where(["id" => $request->terminal_id, 'company_id' => Auth::user()->company_id])->first();
+            if (!$terminal) {
+                DB::rollBack();
+                return response()->json([
+                    "errors" => [
+                        "terminal_id" => ["Selected terminal was not found."],
+                    ],
+                ], 404);
+            }
+
+            $city_id = $terminal->city_id;
             foreach ($request->route as $key => $value) {
                 $checkExist = TerminalTimeDifference::where(["terminal_id" => $request->terminal_id, "route_id" => $request->route[$key], 'company_id' => Auth::user()->company_id])->first();
                 if (!$checkExist) {

@@ -28,10 +28,15 @@ class ExpenseController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $expenses = TicketMergeExpense::where(["ticket_merge_id" => $request->ticket_merge_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
+        $request->validate([
+            "ticket_merge_id" => 'required|integer',
+        ]);
 
-        // for sale show at front
-        $merge = TicketClosingMerge::where(['company_id' => Auth::user()->company_id, 'schedule_complete' => 1,"id" => $request->ticket_merge_id])
+        $merge = TicketClosingMerge::where([
+                'company_id' => Auth::user()->company_id,
+                'schedule_complete' => 1,
+                "id" => $request->ticket_merge_id,
+            ])
             ->with("closing:id,ticket_merge_id,schedule_id", "closing.schedule:id,name")
             ->with("tickets.elt:id,ticket_id,elt_price","tickets.schedule:id,route_id")
             ->with(["tickets"=>function($q){
@@ -40,7 +45,17 @@ class ExpenseController extends Controller
             }])
             ->first(["id","schedule_departure_date","schedule_return_date","bus_id"]);
 
+        if (!$merge) {
+            return response()->json([
+                "errors" => [
+                    "ticket_merge_id" => ["Selected merge record was not found."],
+                ],
+            ], 404);
+        }
 
+        $expenses = TicketMergeExpense::where(["ticket_merge_id" => $request->ticket_merge_id, 'company_id' => Auth::user()->company_id])->orderBy('id')->get();
+
+        // for sale show at front
         $merge->seat_fare = $merge->tickets->sum("seat_fare");
         $merge->discount = $merge->tickets->sum("discount");
 
@@ -250,7 +265,9 @@ class ExpenseController extends Controller
     // }
 public function dailySummery(Request $request)
 {
-
+    $request->validate([
+        "ticket_merge_id" => 'required|integer',
+    ]);
 
     if (!checkPermissionButtons("add-expense")) {
         return response()->json(["Error" => ['You are not authorized to access this url']], 403);
@@ -264,7 +281,11 @@ public function dailySummery(Request $request)
         ->first();
 
     if (!$singleData) {
-        return back()->with('error', 'Ticket Closing not found.');
+        return response()->json([
+            "errors" => [
+                "ticket_merge_id" => ["Selected merge record was not found."],
+            ],
+        ], 404);
     }
 
     // ================= START SHORTAGES =================

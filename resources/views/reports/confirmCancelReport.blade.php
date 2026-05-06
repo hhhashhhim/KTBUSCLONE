@@ -31,6 +31,18 @@
             border-collapse: collapse;
             width: 100% !important;
         }
+
+        .red {
+            background-color: #ec3030;
+        }
+
+        .green {
+            background-color: #03b203;
+        }
+
+        .white {
+            background-color: #ffffff;
+        }
     </style>
 
     <title> Confirm Cancellation Report</title>
@@ -108,7 +120,7 @@
 
     <tbody>
         @foreach($tickets as $single)
-            <tr>
+            <tr class="{{ $single->cancellation_status_color ?? $single->badge ?? 'white' }}">
                 @if(!empty($visibleColumnsLookup['bus_time']))
                     <td>{{ $single->bus_time }}</td>
                 @endif

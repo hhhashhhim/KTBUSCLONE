@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bus\Bus;
-use App\Models\Customer;
 use App\Models\Route\Route;
 use App\Models\Terminal;
+use App\Models\Terminal\TerminalTimeDifference;
 use App\Models\Ticket;
-use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class ConfirmCancellationReportController extends Controller
@@ -72,125 +72,24 @@ public function buses()
         return response()->json(["Error" => ['You are not authorized to access this url']], 403);
     }
 
-    $tickets = Ticket::with('cancel_ticket', 'schedule:id,time,route_id', 'terminal', 'route')
-        ->where('company_id', Auth::user()->company_id)
-        ->where('type', 'canceled')
-        ->onlyTrashed()
-        ->when($request->terminal != 0, function ($query) use ($request) {
-            return $query->where('terminal_id', $request->terminal);
-        })
-      ->when($request->route != 0, function ($query) use ($request) {
-    return $query->where('route_id', $request->route);
-})
-        ->when($request->invoice_id, function ($query) use ($request) {
-            return $query->where('invoice_id', 'LIKE', '%' . $request->invoice_id . '%');
-        })
-        ->when($request->transaction_id, function ($query) use ($request) {
-            return $query->where('transaction_id', 'LIKE', '%' . $request->transaction_id . '%');
-        })
-        ->when($request->fromDate != '', function ($query) use ($request) {
-            return $query->where('schedule_date', '>=', $request->fromDate);
-        })
-        ->when($request->toDate != '', function ($query) use ($request) {
-            return $query->where('schedule_date', '<=', $request->toDate);
-        })
-        ->whereHas('cancel_ticket', function ($query) use ($request) {
-            if ($request->type != 0) {
-                $query->where('type', $request->type);
-            } else {
-                // to show all
-                $query->whereIn('type', ["advance booking", "booked"]);
-            }
-        })
-        ->whereHas('customer', function ($query) use ($request) {
+    $tickets = $this->buildFilteredTicketsQuery($request)->get([
+        "id",
+        "terminal_id",
+        "terminal_name",
+        "route_id",
+        "schedule_id",
+        "schedule_date",
+        "schedule_time",
+        "schedule_time_exact",
+        "customer_id",
+        "seat_fare",
+        "discount",
+        "seat_no",
+        "invoice_id",
+        "transaction_id"
+    ]);
 
-            if ($request->passenger_name) {
-                $query->where('name', 'LIKE', '%' . $request->passenger_name . '%');
-            }
-
-            if ($request->passenger_contact) {
-                $query->where('contact', 'LIKE', '%' . str_replace("-", "", $request->passenger_contact) . '%');
-            }
-
-            if ($request->passenger_cnic) {
-                $query->where('cnic', 'LIKE', '%' . str_replace("-", "", $request->passenger_cnic) . '%');
-            }
-        })
-        ->orderBy('id', 'DESC')
-        ->limit(($request->fromDate == '' && $request->toDate == '') ? 50 : 2000)
-     ->get([
-    "id",
-    "terminal_id",
-    "route_id",
-    "schedule_id",
-    "schedule_date",
-    "customer_id",
-    "seat_fare",
-    "discount",
-    "seat_no",
-    "invoice_id",
-    "transaction_id"
-]);
-
-    $tickets->map(function ($q) {
-
-        // Cancel percentage & basic info
-        $q->cancel_percentage = $q->cancel_ticket->percentage;
-        $q->type              = $q->cancel_ticket->type;
-        $q->cancel_reason     = $q->cancel_ticket->reason;
-
-        // Cancel by user OR auto cancel
-        $user = User::find($q->cancel_ticket->added_by);
-
-        if ($user) {
-            $q->cancel_by = $user->name;
-        } else {
-            $q->cancel_by = 'Auto Cancel';
-            $q->cancel_reason = $q->cancel_ticket->reason;
-        }
-
-        // Dates & times
-        $q->cancel_date = date(
-            "h:i A d-m-Y",
-            strtotime($q->cancel_ticket->created_at)
-        );
-
-        $q->bus_time =
-            date('h:i A', strtotime($q->schedule->time)) . ' ' .
-            date('d-m-Y', strtotime($q->schedule_date));
-
-        // Passenger info
-        $customer = Customer::find($q->customer_id);
-        $q->passenger_name    = $customer->name ?? 'N/A';
-        $q->passenger_contact = isset($customer)
-            ? formatContact($customer->contact)
-            : 'N/A';
-        $q->passenger_cnic = isset($customer)
-            ? formatCNIC($customer->cnic)
-            : 'N/A';
-
-        // Fare calculations
-        $q->total_fare = (int) $q->seat_fare - (int) $q->discount;
-
-        $percentageValue = $q->total_fare * $q->cancel_percentage;
-        $final = $percentageValue / 100;
-
-        $q->amount_refund = (int) $q->seat_fare - $final;
-        $q->cancelation_charges = round($final);
-
-        // Badge
-        $q->badge = getRowBadgeColor(
-            date('Y-m-d', strtotime($q->schedule_date)) . ' ' .
-                date('H:i:s', strtotime($q->schedule->time)),
-            $q->cancel_ticket->time
-        );
-
-        // Cleanup
-        unset($q->cancel_ticket, $q->schedule);
-
-        return $q;
-    });
-
+    $this->hydrateReportRows($tickets);
 
     return $tickets;
 }
@@ -201,56 +100,16 @@ public function buses()
         return response()->json(["Error" => ['You are not authorized to access this url']], 403);
     }
 
-    $tickets = Ticket::with('cancel_ticket', 'schedule:id,time')
-        ->where('company_id', Auth::user()->company_id)
-        ->where('type', 'canceled')
-        ->onlyTrashed()
-        ->when($request->terminal != 0, function ($query) use ($request) {
-            return $query->where('terminal_id', $request->terminal);
-        })
-        ->when($request->route != 0, function ($query) use ($request) {
-            return $query->where('route_id', $request->route);
-        })
-        ->when($request->invoice_id, function ($query) use ($request) {
-            return $query->where('invoice_id', 'LIKE', '%' . $request->invoice_id . '%');
-        })
-        ->when($request->transaction_id, function ($query) use ($request) {
-            return $query->where('transaction_id', 'LIKE', '%' . $request->transaction_id . '%');
-        })
-        ->when($request->fromDate != '', function ($query) use ($request) {
-            return $query->where('schedule_date', '>=', $request->fromDate);
-        })
-        ->when($request->toDate != '', function ($query) use ($request) {
-            return $query->where('schedule_date', '<=', $request->toDate);
-        })
-        ->whereHas('cancel_ticket', function ($query) use ($request) {
-            if ($request->type != 0) {
-                $query->where('type', $request->type);
-            } else {
-                $query->whereIn('type', ["advance booking", "booked"]);
-            }
-        })
-        ->whereHas('customer', function ($query) use ($request) {
-            if ($request->passenger_name) {
-                $query->where('name', 'LIKE', '%' . $request->passenger_name . '%');
-            }
-
-            if ($request->passenger_contact) {
-                $query->where('contact', 'LIKE', '%' . str_replace("-", "", $request->passenger_contact) . '%');
-            }
-
-            if ($request->passenger_cnic) {
-                $query->where('cnic', 'LIKE', '%' . str_replace("-", "", $request->passenger_cnic) . '%');
-            }
-        })
-        ->orderBy('id', 'DESC')
-        ->limit(($request->fromDate == '' && $request->toDate == '') ? 50 : 2000)
+    $tickets = $this->buildFilteredTicketsQuery($request)
         ->get([
             "id",
+            "terminal_id",
             "terminal_name",
             "route_id",
             "schedule_id",
             "schedule_date",
+            "schedule_time",
+            "schedule_time_exact",
             "customer_id",
             "seat_fare",
             "discount",
@@ -259,42 +118,162 @@ public function buses()
             "transaction_id"
         ]);
 
-    $tickets->map(function ($q) {
-        $q->cancel_percentage = $q->cancel_ticket->percentage;
-        $q->type = $q->cancel_ticket->type;
-        $q->cancel_reason = $q->cancel_ticket->reason;
-        $q->cancel_by = User::find($q->cancel_ticket->added_by)->name ?? 'N/A';
-        $q->cancel_date = date("h:i A d-m-Y", strtotime($q->cancel_ticket->created_at));
-        $q->bus_time = date('h:i A', strtotime($q->schedule->time)) . ' ' . date('d-m-Y', strtotime($q->schedule_date));
-
-        $customer = Customer::find($q->customer_id);
-        $q->passenger_name = $customer->name ?? 'N/A';
-        $q->passenger_contact = isset($customer) ? formatContact($customer->contact) : 'N/A';
-        $q->passenger_cnic = isset($customer) ? formatCNIC($customer->cnic) : 'N/A';
-
-        $route = Route::find($q->route_id);
-        $q->route_name = $route->name ?? 'N/A';
-
-        $q->total_fare = (int)$q->seat_fare - (int)$q->discount;
-        $percentageValue = ((int)$q->seat_fare - (int)$q->discount) * $q->cancel_percentage;
-        $final = $percentageValue / 100;
-
-        $q->amount_refund = (int)$q->seat_fare - $final;
-        $q->cancelation_charges = round($final);
-
-        $q->badge = getRowBadgeColor(
-            date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time)),
-            $q->cancel_ticket->time
-        );
-
-        unset($q->cancel_ticket, $q->schedule);
-    });
+    $this->hydrateReportRows($tickets);
 
     return view('reports.confirmCancelReport', [
         'tickets' => $tickets,
         'visibleColumns' => $this->getVisibleColumns($request),
     ]);
 }
+
+    private function buildFilteredTicketsQuery(Request $request)
+    {
+        return Ticket::with([
+            'cancel_ticket:id,ticket_id,percentage,reason,type,added_by,time,created_at',
+            'cancel_ticket.addedBy:id,name',
+            'schedule:id,time,route_id',
+            'terminal:id,name',
+            'route:id,name',
+            'customer:id,name,contact,cnic',
+        ])
+            ->where('company_id', Auth::user()->company_id)
+            ->where('type', 'canceled')
+            ->onlyTrashed()
+            ->when($request->terminal != 0, function ($query) use ($request) {
+                return $query->where('terminal_id', $request->terminal);
+            })
+            ->when($request->route != 0, function ($query) use ($request) {
+                return $query->where('route_id', $request->route);
+            })
+            ->when($request->invoice_id, function ($query) use ($request) {
+                return $query->where('invoice_id', 'LIKE', '%' . $request->invoice_id . '%');
+            })
+            ->when($request->transaction_id, function ($query) use ($request) {
+                return $query->where('transaction_id', 'LIKE', '%' . $request->transaction_id . '%');
+            })
+            ->when($request->fromDate != '', function ($query) use ($request) {
+                return $query->where('schedule_date', '>=', $request->fromDate);
+            })
+            ->when($request->toDate != '', function ($query) use ($request) {
+                return $query->where('schedule_date', '<=', $request->toDate);
+            })
+            ->whereHas('cancel_ticket', function ($query) use ($request) {
+                if ($request->type != 0) {
+                    $query->where('type', $request->type);
+                } else {
+                    $query->whereIn('type', ["advance booking", "booked"]);
+                }
+            })
+            ->whereHas('customer', function ($query) use ($request) {
+                if ($request->passenger_name) {
+                    $query->where('name', 'LIKE', '%' . $request->passenger_name . '%');
+                }
+
+                if ($request->passenger_contact) {
+                    $query->where('contact', 'LIKE', '%' . str_replace("-", "", $request->passenger_contact) . '%');
+                }
+
+                if ($request->passenger_cnic) {
+                    $query->where('cnic', 'LIKE', '%' . str_replace("-", "", $request->passenger_cnic) . '%');
+                }
+            })
+            ->orderBy('id', 'DESC')
+            ->limit(($request->fromDate == '' && $request->toDate == '') ? 50 : 2000);
+    }
+
+    private function hydrateReportRows($tickets): void
+    {
+        $terminalTimeDifferences = TerminalTimeDifference::where('company_id', Auth::user()->company_id)
+            ->whereIn('terminal_id', $tickets->pluck('terminal_id')->filter()->unique()->values())
+            ->whereIn('route_id', $tickets->pluck('route_id')->filter()->unique()->values())
+            ->get()
+            ->keyBy(function ($item) {
+                return $item->terminal_id . '-' . $item->route_id;
+            });
+
+        $tickets->transform(function ($ticket) use ($terminalTimeDifferences) {
+            $customer = $ticket->customer;
+            $cancelTicket = $ticket->cancel_ticket;
+
+            $ticket->cancel_percentage = optional($cancelTicket)->percentage;
+            $ticket->type = optional($cancelTicket)->type ?? $ticket->type;
+            $ticket->cancel_reason = optional($cancelTicket)->reason;
+            $ticket->cancel_by = optional(optional($cancelTicket)->addedBy)->name ?? 'Auto Cancel';
+
+            $busDateTime = $this->getTerminalWiseBusDateTime($ticket, $terminalTimeDifferences);
+            $cancellationDateTime = $this->getCancellationDateTime($cancelTicket);
+
+            $ticket->bus_datetime = $busDateTime ? $busDateTime->format('Y-m-d H:i:s') : null;
+            $ticket->bus_time = $busDateTime ? $busDateTime->format('h:i A d-m-Y') : 'N/A';
+            $ticket->cancellation_datetime = $cancellationDateTime ? $cancellationDateTime->format('Y-m-d H:i:s') : null;
+            $ticket->cancel_date = $cancellationDateTime ? $cancellationDateTime->format('h:i A d-m-Y') : 'N/A';
+
+            $ticket->is_late_cancelled = $busDateTime && $cancellationDateTime
+                ? $cancellationDateTime->greaterThanOrEqualTo($busDateTime)
+                : null;
+            $ticket->cancellation_status_color = $this->getCancellationStatusColor($busDateTime, $cancellationDateTime);
+            $ticket->badge = $ticket->cancellation_status_color;
+
+            $ticket->terminal_name = $ticket->terminal->name ?? $ticket->terminal_name ?? 'N/A';
+            $ticket->route_name = $ticket->route->name ?? 'N/A';
+            $ticket->passenger_name = $customer->name ?? 'N/A';
+            $ticket->passenger_contact = $customer ? formatContact($customer->contact) : 'N/A';
+            $ticket->passenger_cnic = $customer ? formatCNIC($customer->cnic) : 'N/A';
+
+            $ticket->total_fare = (int) $ticket->seat_fare - (int) $ticket->discount;
+            $percentageValue = $ticket->total_fare * (int) $ticket->cancel_percentage;
+            $final = $percentageValue / 100;
+            $ticket->amount_refund = (int) $ticket->seat_fare - $final;
+            $ticket->cancelation_charges = round($final);
+
+            unset($ticket->cancel_ticket, $ticket->schedule, $ticket->customer);
+
+            return $ticket;
+        });
+    }
+
+    private function getTerminalWiseBusDateTime($ticket, $terminalTimeDifferences): ?Carbon
+    {
+        $baseTime = $ticket->schedule_time
+            ?? $ticket->schedule_time_exact
+            ?? optional($ticket->schedule)->time;
+
+        if (!$ticket->schedule_date || !$baseTime) {
+            return null;
+        }
+
+        $dateTime = Carbon::parse($ticket->schedule_date . ' ' . $baseTime);
+        $terminalTime = $terminalTimeDifferences->get($ticket->terminal_id . '-' . $ticket->route_id);
+
+        if ($terminalTime) {
+            $dateTime->addSeconds((int) round($terminalTime->time_difference * 60));
+        }
+
+        return $dateTime;
+    }
+
+    private function getCancellationDateTime($cancelTicket): ?Carbon
+    {
+        if (!$cancelTicket) {
+            return null;
+        }
+
+        $cancellationDateTime = $cancelTicket->time ?? $cancelTicket->created_at ?? null;
+
+        return $cancellationDateTime ? Carbon::parse($cancellationDateTime) : null;
+    }
+
+    private function getCancellationStatusColor(?Carbon $busDateTime, ?Carbon $cancellationDateTime): string
+    {
+        if (!$busDateTime || !$cancellationDateTime) {
+            return 'white';
+        }
+
+        return getRowBadgeColor(
+            $busDateTime->format('Y-m-d H:i:s'),
+            $cancellationDateTime->format('Y-m-d H:i:s')
+        );
+    }
 
     private function getVisibleColumns(Request $request): array
     {
