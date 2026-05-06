@@ -1,5 +1,6 @@
 import Profile from "./components/Profile.vue";
 import { createWebHistory, createRouter } from "vue-router";
+import store from "./store.js";
 import Users from "./pages/users/Users.vue";
 import Roles from "./pages/roles/Roles.vue";
 import Company from "./pages/company/Company.vue";
@@ -539,6 +540,11 @@ const router = createRouter({
     history: createWebHistory(),
     mode: history,
     routes,
+});
+
+router.beforeEach(async () => {
+    await store.dispatch("initializeAppState");
+    return true;
 });
 
 export default router;

@@ -102,39 +102,30 @@
                                                                     v-model="filterCancel.toDate"
                                                                     @change="CancelFilter()">
                                                             </div>
+                                                            <div class="col-md-4 mb-3">
+                                                               <div class="column-dropdown-wrapper" ref="columnDropdown">
+                                <label class="filter-label">Show/Hide Table Headers</label>
+                                <button type="button" class="btn btn-outline-secondary column-dropdown-toggle"
+                                    @click.stop="toggleColumnDropdown()">
+                                    {{ columnSelectionLabel }}
+                                </button>
+                                <div v-if="showColumnDropdown" class="column-dropdown-menu" @click.stop>
+                                    <label v-for="column in columnOptions" :key="column.key" class="column-option">
+                                        <input type="checkbox" :value="column.key" v-model="visibleColumns">
+                                        <span>{{ column.label }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                                                            </div>
 
                                                             <div class="col-12 mb-3">
-                                                                <div class="report-actions">
-                                                                    <div class="column-dropdown-wrapper"
-                                                                        ref="columnDropdown">
-                                                                        <label class="filter-label">Show/Hide Table Headers</label>
-                                                                        <button type="button"
-                                                                            class="btn btn-outline-secondary column-dropdown-toggle"
-                                                                            @click.stop="toggleColumnDropdown()">
-                                                                            {{ columnSelectionLabel }}
-                                                                        </button>
-                                                                        <div v-if="showColumnDropdown"
-                                                                            class="column-dropdown-menu"
-                                                                            @click.stop>
-                                                                            <label
-                                                                                v-for="column in columnOptions"
-                                                                                :key="column.key"
-                                                                                class="column-option">
-                                                                                <input type="checkbox"
-                                                                                    :value="column.key"
-                                                                                    v-model="visibleColumns">
-                                                                                <span>{{ column.label }}</span>
-                                                                            </label>
-                                                                        </div>
-                                                                    </div>
 
-                                                                    <button
-                                                                        class="btn btn-primary filter-btn print-btn"
-                                                                        type="button"
-                                                                        @click="getPdfPrint()">
-                                                                        <i class="fa fa-print mr-1"></i> Print
-                                                                    </button>
-                                                                </div>
+
+                                                                <button class="btn btn-primary filter-btn print-btn"
+                                                                    type="button" @click="getPdfPrint()">
+                                                                    <i class="fa fa-print mr-1"></i> Print
+                                                                </button>
+
                                                             </div>
 
                                                         </div>
@@ -184,41 +175,39 @@
                                                                 <tr>
                                                                     <th v-if="isColumnVisible('bus_time')"
                                                                         width="200px">Bus Time</th>
-                                                                    <th
-                                                                        v-if="isColumnVisible('cancel_date')"
+                                                                    <th v-if="isColumnVisible('cancel_date')"
                                                                         width="200px">Cancellation Date</th>
-                                                                    <th
-                                                                        v-if="isColumnVisible('remarks')">Remarks</th>
-                                                                    <th
-                                                                        v-if="isColumnVisible('terminal_name')">Terminal Name</th>
+                                                                    <th v-if="isColumnVisible('remarks')">Remarks</th>
+                                                                    <th v-if="isColumnVisible('terminal_name')">Terminal
+                                                                        Name</th>
                                                                     <th v-if="isColumnVisible('route')">Route</th>
-                                                                    <th
-                                                                        v-if="isColumnVisible('transaction_id')">Transaction #</th>
+                                                                    <th v-if="isColumnVisible('transaction_id')">
+                                                                        Transaction #</th>
                                                                     <th v-if="isColumnVisible('invoice')">Invoice</th>
-                                                                    <th
-                                                                        v-if="isColumnVisible('cancel_by')">Cancel By</th>
+                                                                    <th v-if="isColumnVisible('cancel_by')">Cancel By
+                                                                    </th>
                                                                     <th v-if="isColumnVisible('seat_no')">Seat No</th>
                                                                     <th v-if="isColumnVisible('type')">Type</th>
-                                                                    <th
-                                                                        v-if="isColumnVisible('passenger_name')">Passenger Name</th>
-                                                                    <th
-                                                                        v-if="isColumnVisible('passenger_contact')">Cell NO</th>
-                                                                    <th
-                                                                        v-if="isColumnVisible('passenger_cnic')">Cnic NO</th>
-                                                                    <th
-                                                                        v-if="isColumnVisible('total_fare')">Total Fare</th>
-                                                                    <th
-                                                                        v-if="isColumnVisible('cancel_percentage')">Cancellation Percentage</th>
-                                                                    <th
-                                                                        v-if="isColumnVisible('amount_refund')">Amount Refund</th>
-                                                                    <th
-                                                                        v-if="isColumnVisible('cancelation_charges')">Cancellation Charges</th>
+                                                                    <th v-if="isColumnVisible('passenger_name')">
+                                                                        Passenger Name</th>
+                                                                    <th v-if="isColumnVisible('passenger_contact')">Cell
+                                                                        NO</th>
+                                                                    <th v-if="isColumnVisible('passenger_cnic')">Cnic NO
+                                                                    </th>
+                                                                    <th v-if="isColumnVisible('total_fare')">Total Fare
+                                                                    </th>
+                                                                    <th v-if="isColumnVisible('cancel_percentage')">
+                                                                        Cancellation Percentage</th>
+                                                                    <th v-if="isColumnVisible('amount_refund')">Amount
+                                                                        Refund</th>
+                                                                    <th v-if="isColumnVisible('cancelation_charges')">
+                                                                        Cancellation Charges</th>
                                                                 </tr>
                                                             </thead>
 
                                                             <tbody>
                                                                 <tr v-for="(filter, i) in filters" :key="i"
-                                                                    :class="filter.badge">
+                                                                    :class="filter.cancellation_status_color || filter.badge">
                                                                     <td v-if="isColumnVisible('bus_time')">{{
                                                                         filter.bus_time }}</td>
                                                                     <td v-if="isColumnVisible('cancel_date')">{{
@@ -241,21 +230,17 @@
                                                                         filter.type }}</td>
                                                                     <td v-if="isColumnVisible('passenger_name')">{{
                                                                         filter.passenger_name }}</td>
-                                                                    <td
-                                                                        v-if="isColumnVisible('passenger_contact')">{{
+                                                                    <td v-if="isColumnVisible('passenger_contact')">{{
                                                                         filter.passenger_contact }}</td>
                                                                     <td v-if="isColumnVisible('passenger_cnic')">{{
                                                                         filter.passenger_cnic }}</td>
                                                                     <td v-if="isColumnVisible('total_fare')">{{
                                                                         filter.total_fare }}</td>
-                                                                    <td
-                                                                        v-if="isColumnVisible('cancel_percentage')">{{
+                                                                    <td v-if="isColumnVisible('cancel_percentage')">{{
                                                                         filter.cancel_percentage }} %</td>
-                                                                    <td
-                                                                        v-if="isColumnVisible('amount_refund')">{{
+                                                                    <td v-if="isColumnVisible('amount_refund')">{{
                                                                         filter.amount_refund }}</td>
-                                                                    <td
-                                                                        v-if="isColumnVisible('cancelation_charges')">{{
+                                                                    <td v-if="isColumnVisible('cancelation_charges')">{{
                                                                         filter.cancelation_charges }}</td>
                                                                 </tr>
                                                             </tbody>
@@ -398,7 +383,6 @@ export default {
         async CancelFilter() {
             this.tableLoading = true;
             const resFetchData = await this.callApi("post", 'confirm/cancellation/fetchFilterData', this.filterCancel);
-            console.log(resFetchData);
             if (resFetchData.status == 200) {
                 this.filters = resFetchData.data;
                 this.tableLoading = false;

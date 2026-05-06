@@ -163,8 +163,13 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
         $(".modal").click();
-        this.fetchData();
-        this.existingCommissions();
+        const isReady = await this.ensurePageReady({ requiredRouteParams: ["id"] });
+        if (!isReady) {
+            return;
+        }
+
+        await this.fetchData();
+        await this.existingCommissions();
         setTimeout(function () {
             $("#commission_table").DataTable();
         }, 300);

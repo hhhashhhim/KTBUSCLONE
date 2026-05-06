@@ -91,14 +91,7 @@
                                                         v-model="filterSales.toDateTime">
                                                 </div>
                                                 <div class="my-2 col-md-3">
-                                                    <button class="btn btn-primary mt-4" type="button"
-                                                        @click="salesFilter()" :disabled="loadingTable">
-                                                        {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="report-tools-bar mt-2">
-                                                <div class="column-dropdown-wrapper"
+                                                   <div class=""
                                                     ref="columnDropdown">
                                                     <label>Show/Hide Table Headers</label>
                                                     <button type="button"
@@ -119,6 +112,16 @@
                                                         </label>
                                                     </div>
                                                 </div>
+                                                </div>
+                                                <div class="my-2 col-md-3">
+                                                    <button class="btn btn-primary mt-4" type="button"
+                                                        @click="salesFilter()" :disabled="loadingTable">
+                                                        {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="report-tools-bar mt-2">
+
                                                 <div v-if="filters.record != null">
                                                     <button class="btn btn-dark mt-4" type="button" @click="salesPrint()"
                                                             :disabled="loadingTable">
@@ -478,7 +481,7 @@ td {
     flex-wrap: wrap;
     gap: 1rem;
     align-items: flex-end;
-    justify-content: space-between;
+    justify-content:flex-end;
 }
 
 .column-dropdown-wrapper {

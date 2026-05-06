@@ -78,10 +78,8 @@
                                                                 <option value="advance booking">Advance Booking</option>
                                                             </select>
                                                         </div>
-
-                                                        <div class="col-12 mb-3">
-                                                            <div class="report-actions">
-                                                                <div class="column-dropdown-wrapper"
+                                                        <div class="col-md-3 mb-3">
+                                                           <div class=""
                                                                     ref="columnDropdown">
                                                                     <label class="filter-label">Show/Hide Table Headers</label>
                                                                     <button type="button"
@@ -102,6 +100,11 @@
                                                                         </label>
                                                                     </div>
                                                                 </div>
+                                                        </div>
+
+                                                        <div class="col-12 mb-3">
+                                                            <div class="report-actions">
+
 
                                                                 <button class="btn btn-primary filter-btn print-btn"
                                                                     type="button"

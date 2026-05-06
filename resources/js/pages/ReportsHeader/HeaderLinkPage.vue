@@ -125,8 +125,13 @@ export default {
             window.removeEventListener('keydown', this.enterKey);
             window.removeEventListener('keydown', this.altM);
         }
+        const isReady = await this.ensurePageReady({ requiredRouteParams: ["id"] });
+        if (!isReady) {
+            return;
+        }
+
         this.expensePostData.ticket_merge_id = this.$route.params.id;
-        this.fetchExpenseData();
+        await this.fetchExpenseData();
         setTimeout(function () {
             $("#header_table").DataTable();
         }, 300);
@@ -139,7 +144,7 @@ export default {
         async fetchExpenseData() {
             const res = await this.callApi("post", 'reportsHeader/link/get', {ticket_merge_id: this.expensePostData.ticket_merge_id});
             if (res.status == 200) {
-                this.expenseHeader = res.data.expenseHeader;
+                this.expenseHeader = res.data.expenseHeader ?? res.data.headers ?? [];
 
                 if (res.data.links != null) {
                     this.expensePostData.values = [];
@@ -164,8 +169,20 @@ export default {
             }
         },
         async expenseAdd() {
+            if (!this.expensePostData.ticket_merge_id || this.expensePostData.expenseHeadIds.length === 0) {
+                return swal({
+                    title: "Error",
+                    text: "Required report data is missing. Please reload this tab.",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+
             this.loading = true;
-            const res = await this.callApi("post", "reportsHeader/link", this.expensePostData);
+            const res = await this.callApi("post", "reportsHeader/link", {
+                ...this.expensePostData,
+                headIds: this.expensePostData.expenseHeadIds,
+            });
             if (res.status === 200) {
                 this.loading = false;
                 // $('#expense').DataTable().destroy();

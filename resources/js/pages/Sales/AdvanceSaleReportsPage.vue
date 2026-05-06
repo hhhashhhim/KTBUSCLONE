@@ -123,6 +123,37 @@
                                                                 <input type="checkbox" v-model="filterSales.counterSale">
                                                                 <span>Check for count sale</span>
                                                             </label>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-4 col-lg-6 col-md-8 mb-3">
+                                                        <div class="filter-action-wrap">
+                                                           <div class="column-dropdown-wrapper"
+                                                                    ref="columnDropdown">
+                                                                    <label class="filter-label">Show/Hide Table Headers</label>
+                                                                    <button type="button"
+                                                                        class="btn btn-outline-secondary column-dropdown-toggle"
+                                                                        @click.stop="toggleColumnDropdown()">
+                                                                        {{ columnSelectionLabel }}
+                                                                    </button>
+                                                                    <div v-if="showColumnDropdown"
+                                                                        class="column-dropdown-menu"
+                                                                        @click.stop>
+                                                                        <label v-for="column in columnOptions"
+                                                                            :key="column.key"
+                                                                            class="column-option">
+                                                                            <input type="checkbox"
+                                                                                :value="column.key"
+                                                                                v-model="visibleColumns">
+                                                                            <span>{{ column.label }}</span>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-4 col-lg-6 col-md-8 mb-3">
+                                                        <div class="filter-action-wrap">
                                                             <button class="btn btn-primary filter-submit-btn" type="button" @click="salesFilter()"
                                                                     :disabled="loadingTable">
                                                                 {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
@@ -145,27 +176,7 @@
                                                         </div>
                                                         <div v-else>
                                                             <div class="report-tools-bar mb-2">
-                                                                <div class="column-dropdown-wrapper"
-                                                                    ref="columnDropdown">
-                                                                    <label class="filter-label">Show/Hide Table Headers</label>
-                                                                    <button type="button"
-                                                                        class="btn btn-outline-secondary column-dropdown-toggle"
-                                                                        @click.stop="toggleColumnDropdown()">
-                                                                        {{ columnSelectionLabel }}
-                                                                    </button>
-                                                                    <div v-if="showColumnDropdown"
-                                                                        class="column-dropdown-menu"
-                                                                        @click.stop>
-                                                                        <label v-for="column in columnOptions"
-                                                                            :key="column.key"
-                                                                            class="column-option">
-                                                                            <input type="checkbox"
-                                                                                :value="column.key"
-                                                                                v-model="visibleColumns">
-                                                                            <span>{{ column.label }}</span>
-                                                                        </label>
-                                                                    </div>
-                                                                </div>
+
                                                                 <form :action="$store.state.api_url + 'api/web/v1/advance/sales/pdf'" method="POST" ref="salePrint"
                                                                     target="_blank">
                                                                     <input type="hidden" name="token" :value="this.$store.state.token">

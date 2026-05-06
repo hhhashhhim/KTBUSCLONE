@@ -763,6 +763,11 @@ export default {
             window.removeEventListener("keydown", this.enterKey);
             window.removeEventListener("keydown", this.altM);
         }
+        const isReady = await this.ensurePageReady({ requiredRouteParams: ["id"] });
+        if (!isReady) {
+            return;
+        }
+
         this.postData.ticket_merge_id = this.$route.params.id;
         this.expensePostData.ticket_merge_id = this.$route.params.id;
         await this.fetchExpenseData();
@@ -773,8 +778,8 @@ export default {
                 $("#expense_table").DataTable();
             }
         }, 300);
-        this.fetchData();
-        this.existingExpenses();
+        await this.fetchData();
+        await this.existingExpenses();
 
         // total amount sum only for show
         this.totalAmount = this.postData.amount.reduce(

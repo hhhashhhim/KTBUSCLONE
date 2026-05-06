@@ -142,6 +142,11 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
         $(".modal").click();
+        const isReady = await this.ensurePageReady({ requiredRouteParams: ["id"] });
+        if (!isReady) {
+            return;
+        }
+
         await this.fetchData();
         await this.existingTimes();
         setTimeout(function () {

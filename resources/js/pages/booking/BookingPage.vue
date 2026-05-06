@@ -5295,7 +5295,14 @@ export default {
 
     watch: {
         'addForm.terminalId': function (newVal) {
-            this.$store.state.user.terminal_id = newVal;
+            if (!this.$store.state.user) {
+                return;
+            }
+
+            this.$store.commit("updateUser", {
+                ...this.$store.state.user,
+                terminal_id: newVal,
+            });
         },
         hasAnySeatSelected(val) {
             if (!val) {

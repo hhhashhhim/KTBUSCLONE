@@ -101,10 +101,8 @@
                                                                     v-model="filterCancel.toDate"
                                                                     @change="overissueFilter()">
                                                             </div>
-
-                                                            <div class="col-12 mb-3">
-                                                                <div class="report-actions">
-                                                                    <div class="column-dropdown-wrapper"
+                                                            <div class="col-md-4 mb-3">
+                                                                <div class="column-dropdown-wrapper"
                                                                         ref="columnDropdown">
                                                                         <label class="filter-label">Show/Hide Table Headers</label>
                                                                         <button type="button"
@@ -125,6 +123,11 @@
                                                                             </label>
                                                                         </div>
                                                                     </div>
+                                                            </div>
+
+                                                            <div class="col-12 mb-3">
+                                                                <div class="report-actions">
+
 
                                                                     <button class="btn btn-primary filter-btn print-btn"
                                                                         type="button"

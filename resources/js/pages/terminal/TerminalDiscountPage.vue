@@ -151,6 +151,11 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
         $(".modal").click();
+        const isReady = await this.ensurePageReady({ requiredRouteParams: ["id"] });
+        if (!isReady) {
+            return;
+        }
+
         await this.fetchData();
         await this.existingDiscounts();
         setTimeout(function () {
@@ -204,8 +209,6 @@ export default {
             if (fieldName == "fourth") {
                 this.postData.endDate[index] = event.target.value;
             }
-
-            console.log(this.postData);
         },
         addRow() {
             this.loop++;
@@ -216,9 +219,6 @@ export default {
             this.postData.startDate.splice(index, 1);
             this.postData.endDate.splice(index, 1);
             this.loop--;
-
-
-            console.log(this.postData);
         },
         closeTab() {
             window.close();

@@ -14,15 +14,46 @@ window.Swal = require('sweetalert2');
 // Admin Panel Customization
 // Vue.mixin(common); // Adding Common Functions
 
+const syncPersistedState = async () => {
+    await store.dispatch("initializeAppState", { force: true });
+};
 
-const app = createApp();
+const bootstrapApplication = async () => {
+    const app = createApp();
 
-Object.keys(globalFunctions).forEach((key) => {
-    app.config.globalProperties[`$${key}`] = globalFunctions[key]
-})
-app.component('select2', Select2);
-app.component("main-app",App);
-app.component("test-app",Test);
-app.mixin(common);
-app.use(common).use(store).use(router);
-app.mount("#app");
+    Object.keys(globalFunctions).forEach((key) => {
+        app.config.globalProperties[`$${key}`] = globalFunctions[key]
+    });
+
+    app.component('select2', Select2);
+    app.component("main-app",App);
+    app.component("test-app",Test);
+    app.mixin(common);
+    app.use(common).use(store).use(router);
+
+    await store.dispatch("initializeAppState");
+
+    if (typeof window !== "undefined") {
+        window.addEventListener("storage", (event) => {
+            if (!event.key || event.key === "user" || event.key === "token") {
+                syncPersistedState();
+            }
+        });
+
+        window.addEventListener("pageshow", () => {
+            syncPersistedState();
+        });
+    }
+
+    if (typeof document !== "undefined") {
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                syncPersistedState();
+            }
+        });
+    }
+
+    app.mount("#app");
+};
+
+bootstrapApplication();
