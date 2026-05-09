@@ -177,19 +177,19 @@
                                                                         data.schedule_time }}</td>
                                                                     <td v-if="isColumnVisible('bus_number')">{{ data.bus ? data.bus.bus_number : 'N/A' }}
                                                                     </td>
-                                                                    <td v-if="isColumnVisible('bus_class')">{{ data.bus_class.name }}</td>
-                                                                    <td v-if="isColumnVisible('route')">{{ data.route.name }} ({{ data.route.via ??
+                                                                    <td v-if="isColumnVisible('bus_class')">{{ data.bus_class?.name ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('route')">{{ data.route?.name ?? 'N/A' }} ({{ data.route?.via ??
                                                                         'n/a'
                                                                     }})</td>
-                                                                    <td v-if="isColumnVisible('passenger_name')">{{ data.customer.name ?? 'N/A' }}</td>
-                                                                    <td v-if="isColumnVisible('passenger_cnic')">{{ data.customer.cnic ?? 'N/A' }}</td>
-                                                                    <td v-if="isColumnVisible('passenger_contact')">{{ data.customer.contact ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('passenger_name')">{{ data.customer?.name ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('passenger_cnic')">{{ data.customer?.cnic ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('passenger_contact')">{{ data.customer?.contact ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('seat_no')">{{ data.seat_no ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('invoice_id')">{{ data.invoice_id ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('transaction_id')">{{ data.transaction_id ?? 'N/A' }}</td>
-                                                                    <td v-if="isColumnVisible('terminal_name')">{{ data.terminal.name ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('terminal_name')">{{ data.terminal?.name ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('status')">{{ data.type ?? 'N/A' }}</td>
-                                                                    <td v-if="isColumnVisible('action_by')">{{ data.updated_name.name ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('action_by')">{{ data.updated_name?.name ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('sale')">{{ data.type != 'canceled' ? (data.seat_fare -
                                                                         data.discount) : 0 }}</td>
                                                                     <td v-if="isColumnVisible('refund')">{{ data.type == 'canceled' ? data.refund : 0 }}
