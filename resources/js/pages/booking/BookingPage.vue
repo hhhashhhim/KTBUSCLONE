@@ -256,9 +256,11 @@
                                             </div>
                                             <div class="col-md-6" v-if="checkForSubmenu('jazz-cash-refund')">
                                                 <div class="form-group mb-0">
-                                                    <label>Transaction No</label>
+                                                    <label>Transaction No <span v-if="isJazzCashTerminalSelected"
+                                                            class="text-danger ml-1">*</span></label>
                                                     <input type="text" class="form-control" id="fullName"
-                                                        v-model="addForm.transaction_id" />
+                                                        v-model="addForm.transaction_id"
+                                                        :required="isJazzCashTerminalSelected" />
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -4072,6 +4074,14 @@ export default {
                     timer: 2000
                 });
             }
+            if (this.isJazzCashTerminalSelected && !String(this.addForm.transaction_id ?? "").trim()) {
+                return swal({
+                    title: "Required!",
+                    text: "Transaction No is required for Jazz Cash terminal",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             if (this.selectedSeats.length == 0 && this.selectedBookedSeats.length == 0) {
                 return swal({
                     title: "required!",
@@ -5351,6 +5361,9 @@ export default {
                 this.addForm.otp_valid === true ||
                 this.addForm.discount_otp_valid === true
             );
+        },
+        isJazzCashTerminalSelected() {
+            return Number(this.addForm.terminalId) === 14;
         },
 
         canShowJazzCashRefund() {
