@@ -181,14 +181,14 @@
                                                                     <td v-if="isColumnVisible('route')">{{ data.route.name }} ({{ data.route.via ??
                                                                         'n/a'
                                                                     }})</td>
-                                                                    <td v-if="isColumnVisible('passenger_name')">{{ data.customer.name }}</td>
-                                                                    <td v-if="isColumnVisible('passenger_cnic')">{{ data.customer.cnic }}</td>
-                                                                    <td v-if="isColumnVisible('passenger_contact')">{{ data.customer.contact }}</td>
-                                                                    <td v-if="isColumnVisible('seat_no')">{{ data.seat_no }}</td>
-                                                                    <td v-if="isColumnVisible('invoice_id')">{{ data.invoice_id }}</td>
-                                                                    <td v-if="isColumnVisible('transaction_id')">{{ data.transaction_id ?? 0 }}</td>
-                                                                    <td v-if="isColumnVisible('terminal_name')">{{ data.terminal.name }}</td>
-                                                                    <td v-if="isColumnVisible('status')">{{ data.type }}</td>
+                                                                    <td v-if="isColumnVisible('passenger_name')">{{ data.customer.name ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('passenger_cnic')">{{ data.customer.cnic ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('passenger_contact')">{{ data.customer.contact ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('seat_no')">{{ data.seat_no ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('invoice_id')">{{ data.invoice_id ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('transaction_id')">{{ data.transaction_id ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('terminal_name')">{{ data.terminal.name ?? 'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('status')">{{ data.type ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('action_by')">{{ data.updated_name.name ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('sale')">{{ data.type != 'canceled' ? (data.seat_fare -
                                                                         data.discount) : 0 }}</td>
