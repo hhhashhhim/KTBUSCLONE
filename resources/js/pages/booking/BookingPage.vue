@@ -77,7 +77,7 @@
                                                             v-if="this.addForm.type != 'advance booking'">*</span></label>
                                                     <vue-mask @blur="handleBlur" class="form-control"
                                                         v-model="addForm.customerCNIC" mask="00000-0000000-0"
-                                                        :raw="false" :options="options" :disabled="isCustomerLocked">
+                                                        :raw="false" :options="options" :disabled="isPassengerDetailsLocked">
                                                     </vue-mask>
 
 
@@ -88,7 +88,7 @@
                                                 <div class="form-group mb-0">
                                                     <label>Full Name <span class="text-danger ml-1">*</span></label>
                                                     <input type="text" class="form-control" id="fullName"
-                                                        v-model="addForm.customerName" :disabled="isCustomerLocked" />
+                                                        v-model="addForm.customerName" :disabled="isPassengerDetailsLocked" />
 
                                                 </div>
                                             </div>
@@ -99,7 +99,7 @@
                                                     <label>Contact <span class="text-danger ml-1">*</span></label>
                                                     <vue-mask class="form-control" v-model="addForm.contact"
                                                         mask="0000-0000000" :raw="false" :options="optionsPhone"
-                                                        :disabled="isCustomerLocked">
+                                                        :disabled="isPassengerDetailsLocked">
                                                     </vue-mask>
 
                                                 </div>
@@ -2061,10 +2061,12 @@ export default {
             hideDivButtonsDrop: true,
             ticketsIds: "",
             label: "",
+            discountLabel: "",
             haveLabel: false,
             hideCheckBox: false,
             runUpdateFun: true,
             pointsCardId: "",
+            discountCardId: "",
             ticketsId: "",
             appliedSurcharge: "",
             appliedDiscount: "",
@@ -2073,6 +2075,7 @@ export default {
             pointsUsage: "",
             checkedUsagePoints: false,
             checkSameType: [],
+            customerAssignmentLocked: false,
             loadingRevertButton: false,
             depLoading: false,
             desLoading: false,
@@ -2293,10 +2296,21 @@ export default {
                 this.addForm.otp_valid = false;
             }
         },
-        handleBlur() {
-            this.getCustomer('addFormCNIC');
-            this.getPoints('addFormCNIC');
-            this.getDiscountCard('addFormCNIC');
+        async handleBlur() {
+            const cleanCNIC = (this.addForm.customerCNIC || "").replace(/\D/g, "");
+
+            if (cleanCNIC.length !== 13) {
+                this.customerAssignmentLocked = false;
+                return;
+            }
+
+            await this.getCustomer('addFormCNIC');
+            const [hasPointsCard, hasDiscountCard] = await Promise.all([
+                this.getPoints('addFormCNIC'),
+                this.getDiscountCard('addFormCNIC')
+            ]);
+
+            this.customerAssignmentLocked = Boolean(hasPointsCard || hasDiscountCard);
         },
         // modal close
         closeModal() {
@@ -3140,7 +3154,7 @@ export default {
             return string.replace(/(\d{4})(\d{7})/, "$1-$2");
         },
         async getPoints(value) {
-            if (!this.addForm.customerCNIC) return;
+            if (!this.addForm.customerCNIC) return false;
 
             const res = await this.callApi("post", "booking/getPoints", {
                 cnicNumber: this.addForm.customerCNIC,
@@ -3155,13 +3169,15 @@ export default {
                 this.pointsValidation = res.data.starting_points;
                 this.showPointsCheckbox = res.data.starting_points > 0;
                 this.haveLabel = true;
+                return true;
             } else {
                 this.label = "";
                 this.showPointsCheckbox = false;
+                return false;
             }
         },
         async getDiscountCard(value) {
-            if (!this.addForm.customerCNIC) return;
+            if (!this.addForm.customerCNIC) return false;
 
             const res = await this.callApi("post", "booking/getDiscountCard", {
                 cnicNumber: this.addForm.customerCNIC,
@@ -3187,6 +3203,7 @@ export default {
                 this.discountCardId = res.data.id;
                 this.showDiscountCheckbox = true;
                 this.haveLabel = true;
+                return true;
             } else {
                 this.discountLabel = "";
                 this.showDiscountCheckbox = false;
@@ -3194,6 +3211,7 @@ export default {
                 if (!this.showPointsCheckbox) {
                     this.haveLabel = false;
                 }
+                return false;
             }
         },
 
@@ -5361,6 +5379,9 @@ export default {
                 this.addForm.otp_valid === true ||
                 this.addForm.discount_otp_valid === true
             );
+        },
+        isPassengerDetailsLocked() {
+            return this.isCustomerLocked || (this.customerAssignmentLocked && Boolean(this.addForm.customerCNIC));
         },
         isJazzCashTerminalSelected() {
             return Number(this.addForm.terminalId) === 14;

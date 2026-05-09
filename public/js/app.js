@@ -36242,10 +36242,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       hideDivButtonsDrop: true,
       ticketsIds: "",
       label: "",
+      discountLabel: "",
       haveLabel: false,
       hideCheckBox: false,
       runUpdateFun: true,
       pointsCardId: "",
+      discountCardId: "",
       ticketsId: "",
       appliedSurcharge: "",
       appliedDiscount: "",
@@ -36254,6 +36256,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       pointsUsage: "",
       checkedUsagePoints: false,
       checkSameType: [],
+      customerAssignmentLocked: false,
       loadingRevertButton: false,
       depLoading: false,
       desLoading: false,
@@ -36504,9 +36507,47 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
     },
     handleBlur: function handleBlur() {
-      this.getCustomer('addFormCNIC');
-      this.getPoints('addFormCNIC');
-      this.getDiscountCard('addFormCNIC');
+      var _this4 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var cleanCNIC, _yield$Promise$all, _yield$Promise$all2, hasPointsCard, hasDiscountCard;
+
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                cleanCNIC = (_this4.addForm.customerCNIC || "").replace(/\D/g, "");
+
+                if (!(cleanCNIC.length !== 13)) {
+                  _context3.next = 4;
+                  break;
+                }
+
+                _this4.customerAssignmentLocked = false;
+                return _context3.abrupt("return");
+
+              case 4:
+                _context3.next = 6;
+                return _this4.getCustomer('addFormCNIC');
+
+              case 6:
+                _context3.next = 8;
+                return Promise.all([_this4.getPoints('addFormCNIC'), _this4.getDiscountCard('addFormCNIC')]);
+
+              case 8:
+                _yield$Promise$all = _context3.sent;
+                _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 2);
+                hasPointsCard = _yield$Promise$all2[0];
+                hasDiscountCard = _yield$Promise$all2[1];
+                _this4.customerAssignmentLocked = Boolean(hasPointsCard || hasDiscountCard);
+
+              case 13:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }))();
     },
     // modal close
     closeModal: function closeModal() {
@@ -36586,16 +36627,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
     },
     altM: function altM(e) {
-      var _this4 = this;
+      var _this5 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 if ((e.metaKey || e.altKey) && String.fromCharCode(e.which).toLowerCase() == 'm') {
-                  if (_this4.checkForSubmenuButtons('seat-details-shortcut')) {
-                    _this4.seatDetails();
+                  if (_this5.checkForSubmenuButtons('seat-details-shortcut')) {
+                    _this5.seatDetails();
                   } else {
                     swal({
                       title: "OOPS!!",
@@ -36608,27 +36649,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 1:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3);
+        }, _callee4);
       }))();
     },
     seatDetails: function seatDetails() {
-      var _this5 = this;
+      var _this6 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var dataSeats, resSeatData;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                if (!(_this5.addForm.departureCity == 0)) {
-                  _context4.next = 2;
+                if (!(_this6.addForm.departureCity == 0)) {
+                  _context5.next = 2;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "OOPS!!",
                   text: "Please Select Departure City First",
                   icon: "error",
@@ -36636,12 +36677,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 2:
-                if (!(_this5.addForm.destinationCity == 0)) {
-                  _context4.next = 4;
+                if (!(_this6.addForm.destinationCity == 0)) {
+                  _context5.next = 4;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "OOPS!!",
                   text: "Please Select Destination City First",
                   icon: "error",
@@ -36649,12 +36690,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 4:
-                if (!(_this5.addForm.schedule == 0)) {
-                  _context4.next = 6;
+                if (!(_this6.addForm.schedule == 0)) {
+                  _context5.next = 6;
                   break;
                 }
 
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "OOPS!!",
                   text: "Please Select Departure Time First ",
                   icon: "error",
@@ -36662,36 +36703,36 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 6:
-                if (!(_this5.selectedBookedSeats.length != 0 || _this5.selectedBookedOverIssueSeats.length != 0)) {
-                  _context4.next = 16;
+                if (!(_this6.selectedBookedSeats.length != 0 || _this6.selectedBookedOverIssueSeats.length != 0)) {
+                  _context5.next = 16;
                   break;
                 }
 
                 dataSeats = {
-                  seatNO: _this5.selectedBookedSeats.length != 0 && _this5.selectedBookedOverIssueSeats.length == 0 ? _this5.selectedBookedSeats : _this5.selectedBookedOverIssueSeats,
-                  scheduleId: _this5.addForm.schedule,
-                  date: _this5.addForm.date,
-                  departureCity: _this5.addForm.departureCity,
-                  destinationCity: _this5.addForm.destinationCity,
-                  departure_time: _this5.addForm.departure_time
+                  seatNO: _this6.selectedBookedSeats.length != 0 && _this6.selectedBookedOverIssueSeats.length == 0 ? _this6.selectedBookedSeats : _this6.selectedBookedOverIssueSeats,
+                  scheduleId: _this6.addForm.schedule,
+                  date: _this6.addForm.date,
+                  departureCity: _this6.addForm.departureCity,
+                  destinationCity: _this6.addForm.destinationCity,
+                  departure_time: _this6.addForm.departure_time
                 };
-                _this5.selectedSeatDataBackEnd = [];
-                _context4.next = 11;
-                return _this5.callApi("post", "booking/advance", dataSeats);
+                _this6.selectedSeatDataBackEnd = [];
+                _context5.next = 11;
+                return _this6.callApi("post", "booking/advance", dataSeats);
 
               case 11:
-                resSeatData = _context4.sent;
+                resSeatData = _context5.sent;
 
                 if (resSeatData.status == 200) {
-                  _this5.selectedSeatDataBackEnd = resSeatData.data.tickets;
-                  _this5.allRescheduleButton = resSeatData.data.showButton;
+                  _this6.selectedSeatDataBackEnd = resSeatData.data.tickets;
+                  _this6.allRescheduleButton = resSeatData.data.showButton;
                   $('#seatAllDetailsModal').modal('show'); // for cancel all ticket and duplicate all ticket functionality
 
-                  _this5.cancelAllData.cancelAllSeat = [];
-                  _this5.cancelAllData.cancelAllSeatType = [];
-                  _this5.duplicateAllTicket = [];
-                  _this5.duplicateAllSeatType = [];
-                  Object.entries(_this5.selectedSeatDataBackEnd).forEach(function (_ref2) {
+                  _this6.cancelAllData.cancelAllSeat = [];
+                  _this6.cancelAllData.cancelAllSeatType = [];
+                  _this6.duplicateAllTicket = [];
+                  _this6.duplicateAllSeatType = [];
+                  Object.entries(_this6.selectedSeatDataBackEnd).forEach(function (_ref2) {
                     var _ref3 = _slicedToArray(_ref2, 2),
                         key1 = _ref3[0],
                         single = _ref3[1];
@@ -36701,29 +36742,29 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                           key2 = _ref5[0],
                           seat = _ref5[1];
 
-                      _this5.cancelAllData.cancelAllSeat.push(seat.id);
+                      _this6.cancelAllData.cancelAllSeat.push(seat.id);
 
-                      _this5.cancelAllData.cancelAllSeatType.push(seat.type);
+                      _this6.cancelAllData.cancelAllSeatType.push(seat.type);
 
-                      _this5.duplicateAllTicket.push(seat.id);
+                      _this6.duplicateAllTicket.push(seat.id);
 
-                      _this5.duplicateAllSeatType.push(seat.type);
+                      _this6.duplicateAllSeatType.push(seat.type);
                     });
                   }); // to check all ticket type are same or not
 
-                  if (!_this5.cancelAllData.cancelAllSeatType.every(function (value) {
-                    return value === _this5.cancelAllData.cancelAllSeatType[0];
+                  if (!_this6.cancelAllData.cancelAllSeatType.every(function (value) {
+                    return value === _this6.cancelAllData.cancelAllSeatType[0];
                   })) {
-                    _this5.cancelAllData.cancelAllSeat = [];
-                    _this5.cancelAllData.cancelAllSeatType = [];
+                    _this6.cancelAllData.cancelAllSeat = [];
+                    _this6.cancelAllData.cancelAllSeatType = [];
                   } // to check all ticket type are same or not
 
 
-                  if (!_this5.duplicateAllSeatType.every(function (value) {
-                    return value === _this5.duplicateAllSeatType[0];
+                  if (!_this6.duplicateAllSeatType.every(function (value) {
+                    return value === _this6.duplicateAllSeatType[0];
                   })) {
-                    _this5.duplicateAllTicket = [];
-                    _this5.duplicateAllSeatType = [];
+                    _this6.duplicateAllTicket = [];
+                    _this6.duplicateAllSeatType = [];
                   }
                 }
 
@@ -36746,11 +36787,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   })();
                 }
 
-                _context4.next = 17;
+                _context5.next = 17;
                 break;
 
               case 16:
-                return _context4.abrupt("return", swal({
+                return _context5.abrupt("return", swal({
                   title: "OOPS!!",
                   text: "Please Select Already Booked Seat",
                   icon: "error",
@@ -36759,69 +36800,69 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 17:
               case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4);
-      }))();
-    },
-    scheduleDropdown: function scheduleDropdown(schedule) {
-      return schedule.departure_date + ' ' + schedule.departure_time + ' - ' + schedule.schedule.name;
-    },
-    getFilterRecord: function getFilterRecord() {
-      var _this6 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var resDateFilter;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                _this6.allBookings = [];
-                _context5.next = 3;
-                return _this6.callApi("post", "booking", {
-                  date: _this6.filterDate
-                });
-
-              case 3:
-                resDateFilter = _context5.sent;
-
-                if (resDateFilter.status == 200) {
-                  if (resDateFilter.data.length != 0) {
-                    _this6.allBookings = resDateFilter.data;
-                  }
-                }
-
-              case 5:
-              case "end":
                 return _context5.stop();
             }
           }
         }, _callee5);
       }))();
     },
-    allSeatCancel: function allSeatCancel() {
+    scheduleDropdown: function scheduleDropdown(schedule) {
+      return schedule.departure_date + ' ' + schedule.departure_time + ' - ' + schedule.schedule.name;
+    },
+    getFilterRecord: function getFilterRecord() {
       var _this7 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        var resCancelSeats, resBookingDetail;
+        var resDateFilter;
         return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                _this7.cancelLoading = true;
+                _this7.allBookings = [];
                 _context6.next = 3;
-                return _this7.callApi("post", "booking/canceling/all", _this7.cancelAllData);
+                return _this7.callApi("post", "booking", {
+                  date: _this7.filterDate
+                });
 
               case 3:
-                resCancelSeats = _context6.sent;
+                resDateFilter = _context6.sent;
+
+                if (resDateFilter.status == 200) {
+                  if (resDateFilter.data.length != 0) {
+                    _this7.allBookings = resDateFilter.data;
+                  }
+                }
+
+              case 5:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6);
+      }))();
+    },
+    allSeatCancel: function allSeatCancel() {
+      var _this8 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+        var resCancelSeats, resBookingDetail;
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                _this8.cancelLoading = true;
+                _context7.next = 3;
+                return _this8.callApi("post", "booking/canceling/all", _this8.cancelAllData);
+
+              case 3:
+                resCancelSeats = _context7.sent;
 
                 if (!(resCancelSeats.status == 200)) {
-                  _context6.next = 17;
+                  _context7.next = 17;
                   break;
                 }
 
-                _this7.cancelLoading = true;
+                _this8.cancelLoading = true;
                 swal({
                   title: "Success",
                   text: "Seats Canceled Successfully",
@@ -36829,28 +36870,28 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 });
 
-                _this7.fetchScheduleData();
+                _this8.fetchScheduleData();
 
-                _this7.addForm.flag = 0;
-                _this7.cancelAllData.cancelAllSeat = [];
-                _this7.cancelAllData.cancelAllSeatType = [];
-                _this7.cancelAllData.percentage = "0";
-                _this7.cancelAllData.reason = "";
+                _this8.addForm.flag = 0;
+                _this8.cancelAllData.cancelAllSeat = [];
+                _this8.cancelAllData.cancelAllSeatType = [];
+                _this8.cancelAllData.percentage = "0";
+                _this8.cancelAllData.reason = "";
 
-                _this7.closeModal();
+                _this8.closeModal();
 
-                _context6.next = 16;
-                return _this7.callApi("post", "booking/whatsapp/cancel/message", {
+                _context7.next = 16;
+                return _this8.callApi("post", "booking/whatsapp/cancel/message", {
                   tickets: resCancelSeats.data.tickets
                 });
 
               case 16:
-                resBookingDetail = _context6.sent;
+                resBookingDetail = _context7.sent;
 
               case 17:
                 if (resCancelSeats.status == 422) {
                   (function () {
-                    _this7.dropScheduleButton = false;
+                    _this8.dropScheduleButton = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -36868,14 +36909,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   })();
                 }
 
-                _this7.cancelLoading = false;
+                _this8.cancelLoading = false;
 
               case 19:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
           }
-        }, _callee6);
+        }, _callee7);
       }))();
     },
     minDateFilter: function minDateFilter() {
@@ -36900,152 +36941,47 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.rescheduleData.rescheduleSchedule = this.allReSchedules[event.target.selectedIndex - 1].schedule_id;
     },
     getDestinationCity: function getDestinationCity() {
-      var _this8 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-        var resDepartureCity;
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                _this8.desLoading = true;
-                _this8.specificCities = [];
-                _this8.addForm.destinationCity = "0";
-
-                if (!(_this8.addForm.departureCity == '0')) {
-                  _context7.next = 7;
-                  break;
-                }
-
-                _this8.addForm.destinationCity = 0;
-                _context7.next = 11;
-                break;
-
-              case 7:
-                _context7.next = 9;
-                return _this8.callApi("post", "booking/getDestination", {
-                  id: _this8.addForm.departureCity
-                });
-
-              case 9:
-                resDepartureCity = _context7.sent;
-
-                if (resDepartureCity.length == 0) {
-                  _this8.addForm.destinationCity = 0;
-                  _this8.desLoading = false;
-                } else {
-                  _this8.addForm.destinationCity = 0;
-                  _this8.specificCities = resDepartureCity.data;
-                  _this8.desLoading = false;
-                  $('#destinationCity').select2();
-                }
-
-              case 11:
-              case "end":
-                return _context7.stop();
-            }
-          }
-        }, _callee7);
-      }))();
-    },
-    closingData: function closingData() {
       var _this9 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-        var resData;
+        var resDepartureCity;
         return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                if (!(_this9.addForm.departureCity == 0)) {
-                  _context8.next = 2;
+                _this9.desLoading = true;
+                _this9.specificCities = [];
+                _this9.addForm.destinationCity = "0";
+
+                if (!(_this9.addForm.departureCity == '0')) {
+                  _context8.next = 7;
                   break;
                 }
 
-                return _context8.abrupt("return", swal({
-                  title: "OOPS!!",
-                  text: "Please Select Departure City First",
-                  icon: "error",
-                  timer: 2000
-                }));
+                _this9.addForm.destinationCity = 0;
+                _context8.next = 11;
+                break;
 
-              case 2:
-                if (!(_this9.addForm.destinationCity == 0)) {
-                  _context8.next = 4;
-                  break;
-                }
-
-                return _context8.abrupt("return", swal({
-                  title: "OOPS!!",
-                  text: "Please Select Destination City First",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 4:
-                if (!(_this9.addForm.date == "" || typeof _this9.addForm.date == 'undefined')) {
-                  _context8.next = 6;
-                  break;
-                }
-
-                return _context8.abrupt("return", swal({
-                  title: "OOPS!!",
-                  text: "Please Select Date First ",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 6:
-                if (!(_this9.addForm.schedule == 0)) {
-                  _context8.next = 8;
-                  break;
-                }
-
-                return _context8.abrupt("return", swal({
-                  title: "OOPS!!",
-                  text: "Please Select Departure Time First ",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 8:
-                _context8.next = 10;
-                return _this9.callApi("post", "booking/getClosingData", {
-                  scheduleId: _this9.addForm.schedule,
-                  date: _this9.addForm.date,
-                  departureCity: _this9.addForm.departureCity,
-                  destinationCity: _this9.addForm.destinationCity,
-                  departure_time: _this9.addForm.departure_time
+              case 7:
+                _context8.next = 9;
+                return _this9.callApi("post", "booking/getDestination", {
+                  id: _this9.addForm.departureCity
                 });
 
-              case 10:
-                resData = _context8.sent;
+              case 9:
+                resDepartureCity = _context8.sent;
 
-                if (resData.status == 200) {
-                  _this9.buses = resData.data.buses;
-                  _this9.drivers = resData.data.drivers;
-                  _this9.hosts = resData.data.hosts;
-                  _this9.BusNo = resData.data.infoData.bus_no;
-                  _this9.dataForClose.date = resData.data.infoData.schedule_date;
-                  _this9.dataForClose.ticket_closing_id = resData.data.infoData.ticket_closing_id;
-                  _this9.dataForClose.alreadyAssigned = resData.data.infoData.alreadyAssigned;
-                  _this9.dataForClose.ticket_merge_id = resData.data.infoData.merge_id;
-                  _this9.dataForClose.schedule_detail = resData.data.infoData.schedule;
-                  _this9.dataForClose.schedule = resData.data.infoData.schedule_id;
-                  _this9.dataForClose.route_name = resData.data.infoData.route_name;
-                  _this9.dataForClose.bus = resData.data.infoData.bus;
-                  _this9.dataForClose.drivers = resData.data.infoData.drivers;
-                  _this9.dataForClose.hosts = resData.data.infoData.hosts;
-                  _this9.dataForClose.description = resData.data.infoData.description;
-                  _this9.checkCloseData = resData.data.infoData.bus == "" ? false : true;
-                  $("#".concat(_this9.formAddID)).modal('show');
-                  setTimeout(function () {
-                    $("#assignDriver").select2();
-                    $("#assignHost").select2();
-                  }, 200);
+                if (resDepartureCity.length == 0) {
+                  _this9.addForm.destinationCity = 0;
+                  _this9.desLoading = false;
+                } else {
+                  _this9.addForm.destinationCity = 0;
+                  _this9.specificCities = resDepartureCity.data;
+                  _this9.desLoading = false;
+                  $('#destinationCity').select2();
                 }
 
-              case 12:
+              case 11:
               case "end":
                 return _context8.stop();
             }
@@ -37053,7 +36989,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }, _callee8);
       }))();
     },
-    sendMessageToBus: function sendMessageToBus() {
+    closingData: function closingData() {
       var _this10 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
@@ -37062,74 +36998,95 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
-                if (!(_this10.addForm.schedule == 0)) {
+                if (!(_this10.addForm.departureCity == 0)) {
                   _context9.next = 2;
                   break;
                 }
 
                 return _context9.abrupt("return", swal({
                   title: "OOPS!!",
-                  text: "Please open schedule first",
+                  text: "Please Select Departure City First",
                   icon: "error",
                   timer: 2000
                 }));
 
               case 2:
-                if (!(_this10.messageData.title == "")) {
+                if (!(_this10.addForm.destinationCity == 0)) {
                   _context9.next = 4;
                   break;
                 }
 
                 return _context9.abrupt("return", swal({
                   title: "OOPS!!",
-                  text: "Please enter title ",
+                  text: "Please Select Destination City First",
                   icon: "error",
                   timer: 2000
                 }));
 
               case 4:
-                if (!(_this10.messageData.body == "")) {
+                if (!(_this10.addForm.date == "" || typeof _this10.addForm.date == 'undefined')) {
                   _context9.next = 6;
                   break;
                 }
 
                 return _context9.abrupt("return", swal({
                   title: "OOPS!!",
-                  text: "Please enter message body ",
+                  text: "Please Select Date First ",
                   icon: "error",
                   timer: 2000
                 }));
 
               case 6:
-                _this10.messageLoader = true;
-                _this10.messageData = _objectSpread(_objectSpread({}, _this10.messageData), {}, {
+                if (!(_this10.addForm.schedule == 0)) {
+                  _context9.next = 8;
+                  break;
+                }
+
+                return _context9.abrupt("return", swal({
+                  title: "OOPS!!",
+                  text: "Please Select Departure Time First ",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 8:
+                _context9.next = 10;
+                return _this10.callApi("post", "booking/getClosingData", {
                   scheduleId: _this10.addForm.schedule,
                   date: _this10.addForm.date,
                   departureCity: _this10.addForm.departureCity,
                   destinationCity: _this10.addForm.destinationCity,
                   departure_time: _this10.addForm.departure_time
                 });
-                _context9.next = 10;
-                return _this10.callApi("post", "booking/whatsapp/bus/send-message", _this10.messageData);
 
               case 10:
                 resData = _context9.sent;
 
                 if (resData.status == 200) {
-                  swal({
-                    title: "Success",
-                    text: "Message Sent Successfully",
-                    icon: "success",
-                    timer: 2000
-                  });
-                  _this10.messageData.title = "";
-                  _this10.messageData.body = "";
-                  $(".modal").click();
+                  _this10.buses = resData.data.buses;
+                  _this10.drivers = resData.data.drivers;
+                  _this10.hosts = resData.data.hosts;
+                  _this10.BusNo = resData.data.infoData.bus_no;
+                  _this10.dataForClose.date = resData.data.infoData.schedule_date;
+                  _this10.dataForClose.ticket_closing_id = resData.data.infoData.ticket_closing_id;
+                  _this10.dataForClose.alreadyAssigned = resData.data.infoData.alreadyAssigned;
+                  _this10.dataForClose.ticket_merge_id = resData.data.infoData.merge_id;
+                  _this10.dataForClose.schedule_detail = resData.data.infoData.schedule;
+                  _this10.dataForClose.schedule = resData.data.infoData.schedule_id;
+                  _this10.dataForClose.route_name = resData.data.infoData.route_name;
+                  _this10.dataForClose.bus = resData.data.infoData.bus;
+                  _this10.dataForClose.drivers = resData.data.infoData.drivers;
+                  _this10.dataForClose.hosts = resData.data.infoData.hosts;
+                  _this10.dataForClose.description = resData.data.infoData.description;
+                  _this10.checkCloseData = resData.data.infoData.bus == "" ? false : true;
+                  $("#".concat(_this10.formAddID)).modal('show');
+                  setTimeout(function () {
+                    $("#assignDriver").select2();
+                    $("#assignHost").select2();
+                  }, 200);
                 }
 
-                _this10.messageLoader = false;
-
-              case 13:
+              case 12:
               case "end":
                 return _context9.stop();
             }
@@ -37137,7 +37094,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }, _callee9);
       }))();
     },
-    busClass: function busClass() {
+    sendMessageToBus: function sendMessageToBus() {
       var _this11 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
@@ -37146,75 +37103,74 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
-                if (!(_this11.addForm.departureCity == 0)) {
+                if (!(_this11.addForm.schedule == 0)) {
                   _context10.next = 2;
                   break;
                 }
 
                 return _context10.abrupt("return", swal({
                   title: "OOPS!!",
-                  text: "Please Select Departure City First",
+                  text: "Please open schedule first",
                   icon: "error",
                   timer: 2000
                 }));
 
               case 2:
-                if (!(_this11.addForm.destinationCity == 0)) {
+                if (!(_this11.messageData.title == "")) {
                   _context10.next = 4;
                   break;
                 }
 
                 return _context10.abrupt("return", swal({
                   title: "OOPS!!",
-                  text: "Please Select Destination City First",
+                  text: "Please enter title ",
                   icon: "error",
                   timer: 2000
                 }));
 
               case 4:
-                if (!(_this11.addForm.date == "" || typeof _this11.addForm.date == 'undefined')) {
+                if (!(_this11.messageData.body == "")) {
                   _context10.next = 6;
                   break;
                 }
 
                 return _context10.abrupt("return", swal({
                   title: "OOPS!!",
-                  text: "Please Select Date First ",
+                  text: "Please enter message body ",
                   icon: "error",
                   timer: 2000
                 }));
 
               case 6:
-                if (!(_this11.addForm.schedule == 0)) {
-                  _context10.next = 8;
-                  break;
-                }
-
-                return _context10.abrupt("return", swal({
-                  title: "OOPS!!",
-                  text: "Please Select Departure Time First ",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 8:
-                _context10.next = 10;
-                return _this11.callApi("post", "booking/getBusClasses", {
+                _this11.messageLoader = true;
+                _this11.messageData = _objectSpread(_objectSpread({}, _this11.messageData), {}, {
                   scheduleId: _this11.addForm.schedule,
                   date: _this11.addForm.date,
                   departureCity: _this11.addForm.departureCity,
-                  destinationCity: _this11.addForm.destinationCity
+                  destinationCity: _this11.addForm.destinationCity,
+                  departure_time: _this11.addForm.departure_time
                 });
+                _context10.next = 10;
+                return _this11.callApi("post", "booking/whatsapp/bus/send-message", _this11.messageData);
 
               case 10:
                 resData = _context10.sent;
 
                 if (resData.status == 200) {
-                  _this11.bus_classes = resData.data.bus_classes;
-                  $('#busClassModal').modal('show');
+                  swal({
+                    title: "Success",
+                    text: "Message Sent Successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
+                  _this11.messageData.title = "";
+                  _this11.messageData.body = "";
+                  $(".modal").click();
                 }
 
-              case 12:
+                _this11.messageLoader = false;
+
+              case 13:
               case "end":
                 return _context10.stop();
             }
@@ -37222,138 +37178,84 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }, _callee10);
       }))();
     },
-    closeSchedule: function closeSchedule() {
+    busClass: function busClass() {
       var _this12 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
-        var res;
+        var resData;
         return _regeneratorRuntime().wrap(function _callee11$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
               case 0:
-                _this12.validationErrors = [];
-
-                if (_this12.dataForClose.bus) {
-                  _context11.next = 3;
+                if (!(_this12.addForm.departureCity == 0)) {
+                  _context11.next = 2;
                   break;
                 }
 
                 return _context11.abrupt("return", swal({
-                  title: "Required",
-                  text: "Bus is required",
-                  icon: 'error',
+                  title: "OOPS!!",
+                  text: "Please Select Departure City First",
+                  icon: "error",
                   timer: 2000
                 }));
 
-              case 3:
-                if (_this12.dataForClose.date) {
-                  _context11.next = 5;
+              case 2:
+                if (!(_this12.addForm.destinationCity == 0)) {
+                  _context11.next = 4;
                   break;
                 }
 
                 return _context11.abrupt("return", swal({
-                  title: "Required",
-                  text: "Date is required",
-                  icon: 'error',
+                  title: "OOPS!!",
+                  text: "Please Select Destination City First",
+                  icon: "error",
                   timer: 2000
                 }));
 
-              case 5:
-                if (_this12.dataForClose.schedule) {
-                  _context11.next = 7;
+              case 4:
+                if (!(_this12.addForm.date == "" || typeof _this12.addForm.date == 'undefined')) {
+                  _context11.next = 6;
                   break;
                 }
 
                 return _context11.abrupt("return", swal({
-                  title: "Required",
-                  text: "Schedule is required",
-                  icon: 'error',
+                  title: "OOPS!!",
+                  text: "Please Select Date First ",
+                  icon: "error",
                   timer: 2000
                 }));
 
-              case 7:
-                if (!(_this12.dataForClose.drivers.length == 0)) {
-                  _context11.next = 9;
+              case 6:
+                if (!(_this12.addForm.schedule == 0)) {
+                  _context11.next = 8;
                   break;
                 }
 
                 return _context11.abrupt("return", swal({
-                  title: "Required",
-                  text: "Driver is required",
-                  icon: 'error',
+                  title: "OOPS!!",
+                  text: "Please Select Departure Time First ",
+                  icon: "error",
                   timer: 2000
                 }));
 
-              case 9:
-                if (!(_this12.dataForClose.hosts.length == 0)) {
-                  _context11.next = 11;
-                  break;
-                }
-
-                return _context11.abrupt("return", swal({
-                  title: "Required",
-                  text: "Host is required",
-                  icon: 'error',
-                  timer: 2000
-                }));
-
-              case 11:
-                _this12.loading = true;
-                _context11.next = 14;
-                return _this12.callApi("post", "booking/close/schedule/closing/store", _objectSpread(_objectSpread({}, _this12.dataForClose), {}, {
-                  // Spread the properties from this.dataForClose (assuming it is an object)
+              case 8:
+                _context11.next = 10;
+                return _this12.callApi("post", "booking/getBusClasses", {
+                  scheduleId: _this12.addForm.schedule,
+                  date: _this12.addForm.date,
                   departureCity: _this12.addForm.departureCity,
-                  destinationCity: _this12.addForm.destinationCity,
-                  departure_time: _this12.addForm.departure_time
-                }));
+                  destinationCity: _this12.addForm.destinationCity
+                });
 
-              case 14:
-                res = _context11.sent;
+              case 10:
+                resData = _context11.sent;
 
-                if (res.status == 201) {
-                  swal({
-                    title: "Success",
-                    text: "Schedule Closed Successfully",
-                    icon: "success",
-                    timer: 2000
-                  });
-                  _this12.loading = false;
-                  _this12.editAble = true;
-                  _this12.dataForClose.bus = "";
-                  _this12.dataForClose.date = "";
-                  _this12.dataForClose.schedule = "";
-                  _this12.dataForClose.drivers = [];
-                  _this12.dataForClose.hosts = [];
-                  _this12.dataForClose.description = "";
-
-                  _this12.closingData();
-
-                  setTimeout(function () {
-                    return _this12.closeModal();
-                  }, 1500);
-                } else {
-                  if (res.status == 422) {
-                    (function () {
-                      _this12.loading = false;
-                      var errorContent = "";
-                      var count = 0;
-
-                      for (var key in res.data.errors) {
-                        res.data.errors[key].forEach(function (element) {
-                          errorContent += ++count + " - " + element + "\n";
-                        });
-                        swal({
-                          title: "Error",
-                          text: errorContent,
-                          icon: "error",
-                          timer: 2000
-                        });
-                      }
-                    })();
-                  }
+                if (resData.status == 200) {
+                  _this12.bus_classes = resData.data.bus_classes;
+                  $('#busClassModal').modal('show');
                 }
 
-              case 16:
+              case 12:
               case "end":
                 return _context11.stop();
             }
@@ -37361,7 +37263,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }, _callee11);
       }))();
     },
-    updateCloseSchedule: function updateCloseSchedule() {
+    closeSchedule: function closeSchedule() {
       var _this13 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
@@ -37438,18 +37340,21 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 11:
                 _this13.loading = true;
-                _this13.dataForClose.mergeId = _this13.dataForClose.ticket_merge_id;
-                _this13.dataForClose.closingId = _this13.dataForClose.ticket_closing_id;
-                _context12.next = 16;
-                return _this13.callApi("post", "booking/close/schedule/closing/update", _this13.dataForClose);
+                _context12.next = 14;
+                return _this13.callApi("post", "booking/close/schedule/closing/store", _objectSpread(_objectSpread({}, _this13.dataForClose), {}, {
+                  // Spread the properties from this.dataForClose (assuming it is an object)
+                  departureCity: _this13.addForm.departureCity,
+                  destinationCity: _this13.addForm.destinationCity,
+                  departure_time: _this13.addForm.departure_time
+                }));
 
-              case 16:
+              case 14:
                 res = _context12.sent;
 
-                if (res.status == 200) {
+                if (res.status == 201) {
                   swal({
                     title: "Success",
-                    text: "Updated Successfully",
+                    text: "Schedule Closed Successfully",
                     icon: "success",
                     timer: 2000
                   });
@@ -37489,7 +37394,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   }
                 }
 
-              case 18:
+              case 16:
               case "end":
                 return _context12.stop();
             }
@@ -37497,7 +37402,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }, _callee12);
       }))();
     },
-    updateBusClass: function updateBusClass() {
+    updateCloseSchedule: function updateCloseSchedule() {
       var _this14 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13() {
@@ -37508,31 +37413,78 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               case 0:
                 _this14.validationErrors = [];
 
-                if (!(_this14.busClassData.bus_class == 0)) {
+                if (_this14.dataForClose.bus) {
                   _context13.next = 3;
                   break;
                 }
 
                 return _context13.abrupt("return", swal({
                   title: "Required",
-                  text: "Bus Class is required",
+                  text: "Bus is required",
                   icon: 'error',
                   timer: 2000
                 }));
 
               case 3:
-                _context13.next = 5;
-                return _this14.callApi("post", "booking/busclass/update", {
-                  id: _this14.addForm.schedule,
-                  date: _this14.addForm.date,
-                  departureCity: _this14.addForm.departureCity,
-                  destinationCity: _this14.addForm.destinationCity,
-                  dropTerminal: _this14.addForm.terminalId,
-                  departure_time: _this14.addForm.departure_time,
-                  bus_class: _this14.busClassData.bus_class
-                });
+                if (_this14.dataForClose.date) {
+                  _context13.next = 5;
+                  break;
+                }
+
+                return _context13.abrupt("return", swal({
+                  title: "Required",
+                  text: "Date is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
 
               case 5:
+                if (_this14.dataForClose.schedule) {
+                  _context13.next = 7;
+                  break;
+                }
+
+                return _context13.abrupt("return", swal({
+                  title: "Required",
+                  text: "Schedule is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
+
+              case 7:
+                if (!(_this14.dataForClose.drivers.length == 0)) {
+                  _context13.next = 9;
+                  break;
+                }
+
+                return _context13.abrupt("return", swal({
+                  title: "Required",
+                  text: "Driver is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
+
+              case 9:
+                if (!(_this14.dataForClose.hosts.length == 0)) {
+                  _context13.next = 11;
+                  break;
+                }
+
+                return _context13.abrupt("return", swal({
+                  title: "Required",
+                  text: "Host is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
+
+              case 11:
+                _this14.loading = true;
+                _this14.dataForClose.mergeId = _this14.dataForClose.ticket_merge_id;
+                _this14.dataForClose.closingId = _this14.dataForClose.ticket_closing_id;
+                _context13.next = 16;
+                return _this14.callApi("post", "booking/close/schedule/closing/update", _this14.dataForClose);
+
+              case 16:
                 res = _context13.sent;
 
                 if (res.status == 200) {
@@ -37542,10 +37494,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     icon: "success",
                     timer: 2000
                   });
+                  _this14.loading = false;
+                  _this14.editAble = true;
+                  _this14.dataForClose.bus = "";
+                  _this14.dataForClose.date = "";
+                  _this14.dataForClose.schedule = "";
+                  _this14.dataForClose.drivers = [];
+                  _this14.dataForClose.hosts = [];
+                  _this14.dataForClose.description = "";
 
-                  _this14.fetchScheduleData();
+                  _this14.closingData();
 
-                  _this14.closeModal();
+                  setTimeout(function () {
+                    return _this14.closeModal();
+                  }, 1500);
                 } else {
                   if (res.status == 422) {
                     (function () {
@@ -37568,7 +37530,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   }
                 }
 
-              case 7:
+              case 18:
               case "end":
                 return _context13.stop();
             }
@@ -37576,43 +37538,78 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }, _callee13);
       }))();
     },
-    getReDestinationCity: function getReDestinationCity() {
+    updateBusClass: function updateBusClass() {
       var _this15 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee14() {
-        var resReDepartureCity;
+        var res;
         return _regeneratorRuntime().wrap(function _callee14$(_context14) {
           while (1) {
             switch (_context14.prev = _context14.next) {
               case 0:
-                _this15.reSpecificCities = [];
+                _this15.validationErrors = [];
 
-                if (!(parseInt(_this15.rescheduleData.dataDepartureCity) == 0)) {
-                  _context14.next = 5;
+                if (!(_this15.busClassData.bus_class == 0)) {
+                  _context14.next = 3;
                   break;
                 }
 
-                _this15.rescheduleData.rescheduleDestinationCity = 0;
-                _context14.next = 9;
-                break;
+                return _context14.abrupt("return", swal({
+                  title: "Required",
+                  text: "Bus Class is required",
+                  icon: 'error',
+                  timer: 2000
+                }));
 
-              case 5:
-                _context14.next = 7;
-                return _this15.callApi("post", "booking/getDestination", {
-                  id: parseInt(_this15.rescheduleData.dataDepartureCity)
+              case 3:
+                _context14.next = 5;
+                return _this15.callApi("post", "booking/busclass/update", {
+                  id: _this15.addForm.schedule,
+                  date: _this15.addForm.date,
+                  departureCity: _this15.addForm.departureCity,
+                  destinationCity: _this15.addForm.destinationCity,
+                  dropTerminal: _this15.addForm.terminalId,
+                  departure_time: _this15.addForm.departure_time,
+                  bus_class: _this15.busClassData.bus_class
                 });
 
-              case 7:
-                resReDepartureCity = _context14.sent;
+              case 5:
+                res = _context14.sent;
 
-                if (resReDepartureCity.length == 0) {
-                  _this15.rescheduleData.rescheduleDestinationCity = 0;
+                if (res.status == 200) {
+                  swal({
+                    title: "Success",
+                    text: "Updated Successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
+
+                  _this15.fetchScheduleData();
+
+                  _this15.closeModal();
                 } else {
-                  _this15.rescheduleData.rescheduleDestinationCity = 0;
-                  _this15.reSpecificCities = resReDepartureCity.data;
+                  if (res.status == 422) {
+                    (function () {
+                      _this15.loading = false;
+                      var errorContent = "";
+                      var count = 0;
+
+                      for (var key in res.data.errors) {
+                        res.data.errors[key].forEach(function (element) {
+                          errorContent += ++count + " - " + element + "\n";
+                        });
+                        swal({
+                          title: "Error",
+                          text: errorContent,
+                          icon: "error",
+                          timer: 2000
+                        });
+                      }
+                    })();
+                  }
                 }
 
-              case 9:
+              case 7:
               case "end":
                 return _context14.stop();
             }
@@ -37620,52 +37617,96 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }, _callee14);
       }))();
     },
-    fetchAllSchedules: function fetchAllSchedules() {
+    getReDestinationCity: function getReDestinationCity() {
       var _this16 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee15() {
-        var resCity, resTerminals, resClass;
+        var resReDepartureCity;
         return _regeneratorRuntime().wrap(function _callee15$(_context15) {
           while (1) {
             switch (_context15.prev = _context15.next) {
               case 0:
-                _this16.depLoading = true; // const resBooking = await this.callApi("post", "booking");
+                _this16.reSpecificCities = [];
 
-                _context15.next = 3;
-                return _this16.callApi("post", "booking/cities");
-
-              case 3:
-                resCity = _context15.sent;
-                _context15.next = 6;
-                return _this16.callApi("post", "booking/terminals");
-
-              case 6:
-                resTerminals = _context15.sent;
-                _context15.next = 9;
-                return _this16.callApi("post", "booking/fare_class");
-
-              case 9:
-                resClass = _context15.sent;
-
-                if (resClass.status == 200 && resCity.status == 200 && resTerminals.status == 200) {
-                  // this.allBookings = resBooking.data;
-                  _this16.cities = resCity.data;
-                  _this16.terminals = resTerminals.data.terminals;
-                  _this16.allSeatClasses = resClass.data;
-                  _this16.addForm.terminalId = resTerminals.data.authTerminalId;
-                  _this16.depLoading = false;
-                  $('#departureCity').select2();
-                } else {
-                  _this16.depLoading = false;
-                  console.log(res);
+                if (!(parseInt(_this16.rescheduleData.dataDepartureCity) == 0)) {
+                  _context15.next = 5;
+                  break;
                 }
 
-              case 11:
+                _this16.rescheduleData.rescheduleDestinationCity = 0;
+                _context15.next = 9;
+                break;
+
+              case 5:
+                _context15.next = 7;
+                return _this16.callApi("post", "booking/getDestination", {
+                  id: parseInt(_this16.rescheduleData.dataDepartureCity)
+                });
+
+              case 7:
+                resReDepartureCity = _context15.sent;
+
+                if (resReDepartureCity.length == 0) {
+                  _this16.rescheduleData.rescheduleDestinationCity = 0;
+                } else {
+                  _this16.rescheduleData.rescheduleDestinationCity = 0;
+                  _this16.reSpecificCities = resReDepartureCity.data;
+                }
+
+              case 9:
               case "end":
                 return _context15.stop();
             }
           }
         }, _callee15);
+      }))();
+    },
+    fetchAllSchedules: function fetchAllSchedules() {
+      var _this17 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee16() {
+        var resCity, resTerminals, resClass;
+        return _regeneratorRuntime().wrap(function _callee16$(_context16) {
+          while (1) {
+            switch (_context16.prev = _context16.next) {
+              case 0:
+                _this17.depLoading = true; // const resBooking = await this.callApi("post", "booking");
+
+                _context16.next = 3;
+                return _this17.callApi("post", "booking/cities");
+
+              case 3:
+                resCity = _context16.sent;
+                _context16.next = 6;
+                return _this17.callApi("post", "booking/terminals");
+
+              case 6:
+                resTerminals = _context16.sent;
+                _context16.next = 9;
+                return _this17.callApi("post", "booking/fare_class");
+
+              case 9:
+                resClass = _context16.sent;
+
+                if (resClass.status == 200 && resCity.status == 200 && resTerminals.status == 200) {
+                  // this.allBookings = resBooking.data;
+                  _this17.cities = resCity.data;
+                  _this17.terminals = resTerminals.data.terminals;
+                  _this17.allSeatClasses = resClass.data;
+                  _this17.addForm.terminalId = resTerminals.data.authTerminalId;
+                  _this17.depLoading = false;
+                  $('#departureCity').select2();
+                } else {
+                  _this17.depLoading = false;
+                  console.log(res);
+                }
+
+              case 11:
+              case "end":
+                return _context16.stop();
+            }
+          }
+        }, _callee16);
       }))();
     },
     resetSelectBooking: function resetSelectBooking(evt) {
@@ -37676,34 +37717,34 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
     },
     fetchSpecificSchedules: function fetchSpecificSchedules() {
-      var _this17 = this;
+      var _this18 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee16() {
-        var _this17$user, previousDays, previousDate, formDate, yyyy, mm, dd, minAllowedDate, data, resFetchSchedule;
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee17() {
+        var _this18$user, previousDays, previousDate, formDate, yyyy, mm, dd, minAllowedDate, data, resFetchSchedule;
 
-        return _regeneratorRuntime().wrap(function _callee16$(_context16) {
+        return _regeneratorRuntime().wrap(function _callee17$(_context17) {
           while (1) {
-            switch (_context16.prev = _context16.next) {
+            switch (_context17.prev = _context17.next) {
               case 0:
-                if (!_this17.checkForSubmenuButtons('previous-date')) {
-                  _context16.next = 17;
+                if (!_this18.checkForSubmenuButtons('previous-date')) {
+                  _context17.next = 17;
                   break;
                 }
 
                 // number of previous days from API or fallback to 0
-                previousDays = parseInt(((_this17$user = _this17.user) === null || _this17$user === void 0 ? void 0 : _this17$user.previous_days) || 0); // calculate minimum allowed date (local, midnight)
+                previousDays = parseInt(((_this18$user = _this18.user) === null || _this18$user === void 0 ? void 0 : _this18$user.previous_days) || 0); // calculate minimum allowed date (local, midnight)
 
                 previousDate = new Date();
                 previousDate.setHours(0, 0, 0, 0);
                 previousDate.setDate(previousDate.getDate() - previousDays); // convert form date safely and normalize
 
-                formDate = new Date(_this17.addForm.date + 'T00:00:00'); // DEBUG (optional - remove later)
+                formDate = new Date(_this18.addForm.date + 'T00:00:00'); // DEBUG (optional - remove later)
 
                 console.log('Min Allowed Date:', previousDate);
                 console.log('Form Date:', formDate); // compare the dates
 
                 if (!(formDate < previousDate)) {
-                  _context16.next = 17;
+                  _context17.next = 17;
                   break;
                 }
 
@@ -37719,93 +37760,93 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }); // reset input to minimum allowed date
 
-                _this17.addForm.date = minAllowedDate; // re-fetch with corrected date
+                _this18.addForm.date = minAllowedDate; // re-fetch with corrected date
 
-                _this17.$nextTick(function () {
-                  _this17.fetchSpecificSchedules();
+                _this18.$nextTick(function () {
+                  _this18.fetchSpecificSchedules();
                 });
 
-                return _context16.abrupt("return");
+                return _context17.abrupt("return");
 
               case 17:
                 // =============================
                 // Continue normal schedule fetch
                 // =============================
-                _this17.getSchedule = true;
-                _this17.showBookingDiv = false;
-                _this17.allSchedules = {};
-                _this17.addForm.schedule = 0;
+                _this18.getSchedule = true;
+                _this18.showBookingDiv = false;
+                _this18.allSchedules = {};
+                _this18.addForm.schedule = 0;
                 data = {
-                  departure_city_id: _this17.addForm.departureCity,
-                  destination_city_id: _this17.addForm.destinationCity,
-                  date: _this17.addForm.date,
-                  terminal: _this17.addForm.terminalId
+                  departure_city_id: _this18.addForm.departureCity,
+                  destination_city_id: _this18.addForm.destinationCity,
+                  date: _this18.addForm.date,
+                  terminal: _this18.addForm.terminalId
                 };
-                _context16.next = 24;
-                return _this17.callApi("post", "booking/fetchSchedule", data);
-
-              case 24:
-                resFetchSchedule = _context16.sent;
-
-                if (resFetchSchedule.status == 200) {
-                  if (resFetchSchedule.data && resFetchSchedule.data.length != 0) {
-                    _this17.getSchedule = false;
-                    _this17.allSchedules = resFetchSchedule.data;
-                    $('#scheduleName').select2();
-                  } else {
-                    _this17.addForm.schedule = 0;
-                    _this17.showBookingDiv = false;
-                  }
-                }
-
-                _this17.fetchScheduleData();
-
-              case 27:
-              case "end":
-                return _context16.stop();
-            }
-          }
-        }, _callee16);
-      }))();
-    },
-    fetchReSpecificSchedules: function fetchReSpecificSchedules() {
-      var _this18 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee17() {
-        var data, resFetchSchedule;
-        return _regeneratorRuntime().wrap(function _callee17$(_context17) {
-          while (1) {
-            switch (_context17.prev = _context17.next) {
-              case 0:
-                _this18.allReSchedules = {};
-                _this18.rescheduleData.rescheduleSchedule = 0;
-                _this18.seatMapReschedule = false;
-                data = {
-                  departure_city_id: parseInt(_this18.rescheduleData.dataDepartureCity),
-                  destination_city_id: _this18.rescheduleData.rescheduleDestinationCity,
-                  date: _this18.rescheduleData.rescheduleDate
-                };
-                _context17.next = 6;
+                _context17.next = 24;
                 return _this18.callApi("post", "booking/fetchSchedule", data);
 
-              case 6:
+              case 24:
                 resFetchSchedule = _context17.sent;
 
                 if (resFetchSchedule.status == 200) {
-                  if (resFetchSchedule.length != 0) {
-                    _this18.seatMapReschedule = false;
-                    _this18.allReSchedules = resFetchSchedule.data;
+                  if (resFetchSchedule.data && resFetchSchedule.data.length != 0) {
+                    _this18.getSchedule = false;
+                    _this18.allSchedules = resFetchSchedule.data;
+                    $('#scheduleName').select2();
                   } else {
-                    _this18.rescheduleData.rescheduleSchedule = 0;
+                    _this18.addForm.schedule = 0;
+                    _this18.showBookingDiv = false;
                   }
                 }
 
-              case 8:
+                _this18.fetchScheduleData();
+
+              case 27:
               case "end":
                 return _context17.stop();
             }
           }
         }, _callee17);
+      }))();
+    },
+    fetchReSpecificSchedules: function fetchReSpecificSchedules() {
+      var _this19 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee18() {
+        var data, resFetchSchedule;
+        return _regeneratorRuntime().wrap(function _callee18$(_context18) {
+          while (1) {
+            switch (_context18.prev = _context18.next) {
+              case 0:
+                _this19.allReSchedules = {};
+                _this19.rescheduleData.rescheduleSchedule = 0;
+                _this19.seatMapReschedule = false;
+                data = {
+                  departure_city_id: parseInt(_this19.rescheduleData.dataDepartureCity),
+                  destination_city_id: _this19.rescheduleData.rescheduleDestinationCity,
+                  date: _this19.rescheduleData.rescheduleDate
+                };
+                _context18.next = 6;
+                return _this19.callApi("post", "booking/fetchSchedule", data);
+
+              case 6:
+                resFetchSchedule = _context18.sent;
+
+                if (resFetchSchedule.status == 200) {
+                  if (resFetchSchedule.length != 0) {
+                    _this19.seatMapReschedule = false;
+                    _this19.allReSchedules = resFetchSchedule.data;
+                  } else {
+                    _this19.rescheduleData.rescheduleSchedule = 0;
+                  }
+                }
+
+              case 8:
+              case "end":
+                return _context18.stop();
+            }
+          }
+        }, _callee18);
       }))();
     },
     cnicFormat: function cnicFormat(string) {
@@ -37815,56 +37856,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       return string.replace(/(\d{4})(\d{7})/, "$1-$2");
     },
     getPoints: function getPoints(value) {
-      var _this19 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee18() {
-        var res;
-        return _regeneratorRuntime().wrap(function _callee18$(_context18) {
-          while (1) {
-            switch (_context18.prev = _context18.next) {
-              case 0:
-                if (_this19.addForm.customerCNIC) {
-                  _context18.next = 2;
-                  break;
-                }
-
-                return _context18.abrupt("return");
-
-              case 2:
-                _context18.next = 4;
-                return _this19.callApi("post", "booking/getPoints", {
-                  cnicNumber: _this19.addForm.customerCNIC,
-                  status: value
-                });
-
-              case 4:
-                res = _context18.sent;
-                _this19.showPointsCheckbox = false; // reset
-
-                if (res.status === 200 && res.data !== "") {
-                  _this19.label = "This Customer Has a Loyalty Card with " + res.data.starting_points + " Points";
-                  _this19.pointsCardId = res.data.id;
-                  _this19.pointsValidation = res.data.starting_points;
-                  _this19.showPointsCheckbox = res.data.starting_points > 0;
-                  _this19.haveLabel = true;
-                } else {
-                  _this19.label = "";
-                  _this19.showPointsCheckbox = false;
-                }
-
-              case 7:
-              case "end":
-                return _context18.stop();
-            }
-          }
-        }, _callee18);
-      }))();
-    },
-    getDiscountCard: function getDiscountCard(value) {
       var _this20 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee19() {
-        var res, card, discountText;
+        var res;
         return _regeneratorRuntime().wrap(function _callee19$(_context19) {
           while (1) {
             switch (_context19.prev = _context19.next) {
@@ -37874,45 +37869,37 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   break;
                 }
 
-                return _context19.abrupt("return");
+                return _context19.abrupt("return", false);
 
               case 2:
                 _context19.next = 4;
-                return _this20.callApi("post", "booking/getDiscountCard", {
+                return _this20.callApi("post", "booking/getPoints", {
                   cnicNumber: _this20.addForm.customerCNIC,
                   status: value
                 });
 
               case 4:
                 res = _context19.sent;
-                _this20.showDiscountCheckbox = false; // reset
+                _this20.showPointsCheckbox = false; // reset
 
-                if (res.status === 200 && res.data !== "") {
-                  card = res.data.discount_card_type; // Detect whether discount is flat or percentage
-
-                  discountText = "";
-
-                  if (card.discount_type === "flat") {
-                    discountText = "Flat Discount: Rs ".concat(card.flat_discount);
-                  } else if (card.discount_type === "percentage") {
-                    discountText = "Discount: ".concat(card.percentage_discount, "%");
-                  } // Show label with discount amount
-
-
-                  _this20.discountLabel = "This Customer Has a Discount Card (".concat(discountText, ")");
-                  _this20.discountCardId = res.data.id;
-                  _this20.showDiscountCheckbox = true;
-                  _this20.haveLabel = true;
-                } else {
-                  _this20.discountLabel = "";
-                  _this20.showDiscountCheckbox = false;
-
-                  if (!_this20.showPointsCheckbox) {
-                    _this20.haveLabel = false;
-                  }
+                if (!(res.status === 200 && res.data !== "")) {
+                  _context19.next = 15;
+                  break;
                 }
 
-              case 7:
+                _this20.label = "This Customer Has a Loyalty Card with " + res.data.starting_points + " Points";
+                _this20.pointsCardId = res.data.id;
+                _this20.pointsValidation = res.data.starting_points;
+                _this20.showPointsCheckbox = res.data.starting_points > 0;
+                _this20.haveLabel = true;
+                return _context19.abrupt("return", true);
+
+              case 15:
+                _this20.label = "";
+                _this20.showPointsCheckbox = false;
+                return _context19.abrupt("return", false);
+
+              case 18:
               case "end":
                 return _context19.stop();
             }
@@ -37920,17 +37907,84 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }, _callee19);
       }))();
     },
-    revertOverIssueFunction: function revertOverIssueFunction(item) {
+    getDiscountCard: function getDiscountCard(value) {
       var _this21 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee20() {
-        var resFinalRevert;
+        var res, card, discountText;
         return _regeneratorRuntime().wrap(function _callee20$(_context20) {
           while (1) {
             switch (_context20.prev = _context20.next) {
               case 0:
-                _context20.next = 2;
-                return _this21.callApi("post", "booking/revert/over/issue/seat", {
+                if (_this21.addForm.customerCNIC) {
+                  _context20.next = 2;
+                  break;
+                }
+
+                return _context20.abrupt("return", false);
+
+              case 2:
+                _context20.next = 4;
+                return _this21.callApi("post", "booking/getDiscountCard", {
+                  cnicNumber: _this21.addForm.customerCNIC,
+                  status: value
+                });
+
+              case 4:
+                res = _context20.sent;
+                _this21.showDiscountCheckbox = false; // reset
+
+                if (!(res.status === 200 && res.data !== "")) {
+                  _context20.next = 17;
+                  break;
+                }
+
+                card = res.data.discount_card_type; // Detect whether discount is flat or percentage
+
+                discountText = "";
+
+                if (card.discount_type === "flat") {
+                  discountText = "Flat Discount: Rs ".concat(card.flat_discount);
+                } else if (card.discount_type === "percentage") {
+                  discountText = "Discount: ".concat(card.percentage_discount, "%");
+                } // Show label with discount amount
+
+
+                _this21.discountLabel = "This Customer Has a Discount Card (".concat(discountText, ")");
+                _this21.discountCardId = res.data.id;
+                _this21.showDiscountCheckbox = true;
+                _this21.haveLabel = true;
+                return _context20.abrupt("return", true);
+
+              case 17:
+                _this21.discountLabel = "";
+                _this21.showDiscountCheckbox = false;
+
+                if (!_this21.showPointsCheckbox) {
+                  _this21.haveLabel = false;
+                }
+
+                return _context20.abrupt("return", false);
+
+              case 21:
+              case "end":
+                return _context20.stop();
+            }
+          }
+        }, _callee20);
+      }))();
+    },
+    revertOverIssueFunction: function revertOverIssueFunction(item) {
+      var _this22 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee21() {
+        var resFinalRevert;
+        return _regeneratorRuntime().wrap(function _callee21$(_context21) {
+          while (1) {
+            switch (_context21.prev = _context21.next) {
+              case 0:
+                _context21.next = 2;
+                return _this22.callApi("post", "booking/revert/over/issue/seat", {
                   ticket_id: item.id,
                   schedule_id: item.schedule_id,
                   schedule_date: item.schedule_date,
@@ -37938,11 +37992,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 });
 
               case 2:
-                resFinalRevert = _context20.sent;
-                _this21.loadingRevertButton = true;
+                resFinalRevert = _context21.sent;
+                _this22.loadingRevertButton = true;
 
                 if (resFinalRevert.status == 200) {
-                  _this21.loadingRevertButton = false;
+                  _this22.loadingRevertButton = false;
                   swal({
                     title: "Success!",
                     text: "Seat Revert Successfully!",
@@ -37950,10 +38004,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this21.fetchScheduleData();
+                  _this22.fetchScheduleData();
                 } else if (resFinalRevert.status == 422) {
                   (function () {
-                    _this21.loadingRevertButton = false;
+                    _this22.loadingRevertButton = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -37973,124 +38027,124 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 5:
               case "end":
-                return _context20.stop();
-            }
-          }
-        }, _callee20);
-      }))();
-    },
-    usePoints: function usePoints(e) {
-      var _this22 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee21() {
-        var resUsagePoints;
-        return _regeneratorRuntime().wrap(function _callee21$(_context21) {
-          while (1) {
-            switch (_context21.prev = _context21.next) {
-              case 0:
-                if (!e.target.checked) {
-                  _context21.next = 7;
-                  break;
-                }
-
-                _context21.next = 3;
-                return _this22.callApi("post", "booking/usagePoints", {
-                  id: _this22.pointsCardId,
-                  points: _this22.pointsCardId
-                });
-
-              case 3:
-                resUsagePoints = _context21.sent;
-
-                if (resUsagePoints.status == 200) {
-                  _this22.pointsUsage = "You Have " + resUsagePoints.data;
-                  _this22.checkedUsagePoints = true;
-                } else {
-                  _this22.pointsUsage = "";
-                  _this22.addForm.pointsUseInput = "";
-                  _this22.checkedUsagePoints = false;
-                }
-
-                _context21.next = 9;
-                break;
-
-              case 7:
-                _this22.pointsUsage = "";
-                _this22.checkedUsagePoints = false;
-
-              case 9:
-              case "end":
                 return _context21.stop();
             }
           }
         }, _callee21);
       }))();
     },
-    getCustomer: function getCustomer(flag) {
+    usePoints: function usePoints(e) {
       var _this23 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee22() {
-        var resCnic, _resCnic;
-
+        var resUsagePoints;
         return _regeneratorRuntime().wrap(function _callee22$(_context22) {
           while (1) {
             switch (_context22.prev = _context22.next) {
               case 0:
-                if (!(flag == 'addFormCNIC')) {
-                  _context22.next = 6;
+                if (!e.target.checked) {
+                  _context22.next = 7;
                   break;
                 }
 
-                if (!(_this23.addForm.customerCNIC != '' && _this23.addForm.customerCNIC != 'undefined')) {
-                  _context22.next = 6;
-                  break;
-                }
-
-                _context22.next = 4;
-                return _this23.callApi("post", "booking/getCNIC", {
-                  cnicNumber: _this23.addForm.customerCNIC,
-                  status: flag
+                _context22.next = 3;
+                return _this23.callApi("post", "booking/usagePoints", {
+                  id: _this23.pointsCardId,
+                  points: _this23.pointsCardId
                 });
 
-              case 4:
-                resCnic = _context22.sent;
+              case 3:
+                resUsagePoints = _context22.sent;
 
-                if (resCnic.data) {
-                  _this23.addForm.contact = resCnic.data.contact;
-                  _this23.addForm.customerName = resCnic.data.name;
+                if (resUsagePoints.status == 200) {
+                  _this23.pointsUsage = "You Have " + resUsagePoints.data;
+                  _this23.checkedUsagePoints = true;
+                } else {
+                  _this23.pointsUsage = "";
+                  _this23.addForm.pointsUseInput = "";
+                  _this23.checkedUsagePoints = false;
                 }
 
-              case 6:
-                if (!(flag == 'addFormContact')) {
-                  _context22.next = 12;
-                  break;
-                }
+                _context22.next = 9;
+                break;
 
-                if (!(_this23.addForm.contact != '' && _this23.addForm.contact != 'undefined')) {
-                  _context22.next = 12;
-                  break;
-                }
+              case 7:
+                _this23.pointsUsage = "";
+                _this23.checkedUsagePoints = false;
 
-                _context22.next = 10;
-                return _this23.callApi("post", "booking/getCNIC", {
-                  phoneNumber: _this23.addForm.contact,
-                  status: flag
-                });
-
-              case 10:
-                _resCnic = _context22.sent;
-
-                if (_resCnic.data) {
-                  _this23.addForm.customerCNIC = _resCnic.data.cnic;
-                  _this23.addForm.customerName = _resCnic.data.name;
-                }
-
-              case 12:
+              case 9:
               case "end":
                 return _context22.stop();
             }
           }
         }, _callee22);
+      }))();
+    },
+    getCustomer: function getCustomer(flag) {
+      var _this24 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee23() {
+        var resCnic, _resCnic;
+
+        return _regeneratorRuntime().wrap(function _callee23$(_context23) {
+          while (1) {
+            switch (_context23.prev = _context23.next) {
+              case 0:
+                if (!(flag == 'addFormCNIC')) {
+                  _context23.next = 6;
+                  break;
+                }
+
+                if (!(_this24.addForm.customerCNIC != '' && _this24.addForm.customerCNIC != 'undefined')) {
+                  _context23.next = 6;
+                  break;
+                }
+
+                _context23.next = 4;
+                return _this24.callApi("post", "booking/getCNIC", {
+                  cnicNumber: _this24.addForm.customerCNIC,
+                  status: flag
+                });
+
+              case 4:
+                resCnic = _context23.sent;
+
+                if (resCnic.data) {
+                  _this24.addForm.contact = resCnic.data.contact;
+                  _this24.addForm.customerName = resCnic.data.name;
+                }
+
+              case 6:
+                if (!(flag == 'addFormContact')) {
+                  _context23.next = 12;
+                  break;
+                }
+
+                if (!(_this24.addForm.contact != '' && _this24.addForm.contact != 'undefined')) {
+                  _context23.next = 12;
+                  break;
+                }
+
+                _context23.next = 10;
+                return _this24.callApi("post", "booking/getCNIC", {
+                  phoneNumber: _this24.addForm.contact,
+                  status: flag
+                });
+
+              case 10:
+                _resCnic = _context23.sent;
+
+                if (_resCnic.data) {
+                  _this24.addForm.customerCNIC = _resCnic.data.cnic;
+                  _this24.addForm.customerName = _resCnic.data.name;
+                }
+
+              case 12:
+              case "end":
+                return _context23.stop();
+            }
+          }
+        }, _callee23);
       }))();
     },
     calculateTotal: function calculateTotal() {
@@ -38133,20 +38187,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       return string.charAt(0).toUpperCase() + string.slice(1);
     },
     fetchScheduleData: function fetchScheduleData() {
-      var _this24 = this;
+      var _this25 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee23() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee24() {
         var resSelected, i, j, terminalSeats, restDiscount, resFetchDiscountSurcharge, responseEltDetails, resFetchOverIssueSeat;
-        return _regeneratorRuntime().wrap(function _callee23$(_context23) {
+        return _regeneratorRuntime().wrap(function _callee24$(_context24) {
           while (1) {
-            switch (_context23.prev = _context23.next) {
+            switch (_context24.prev = _context24.next) {
               case 0:
-                if (!(_this24.addForm.terminalId == 0 && _this24.$store.state.user.terminal_id == null)) {
-                  _context23.next = 2;
+                if (!(_this25.addForm.terminalId == 0 && _this25.$store.state.user.terminal_id == null)) {
+                  _context24.next = 2;
                   break;
                 }
 
-                return _context23.abrupt("return", swal({
+                return _context24.abrupt("return", swal({
                   title: "Required!",
                   text: "Terminal is Required! Please Select it From DropDown or Assign Terminal to your Account",
                   icon: "error",
@@ -38154,197 +38208,197 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 2:
-                _this24.getSchedule = true;
+                _this25.getSchedule = true;
 
-                _this24.resetArrays();
+                _this25.resetArrays();
 
-                _this24.schedule = [];
-                _this24.addForm.otp_valid = false;
-                _this24.addForm.otp = "";
-                _this24.addForm.otp_cnic = "";
-                _this24.addForm.customerCNIC = "";
-                _this24.pointsUsage = "";
-                _this24.checkedUsagePoints = false;
-                _this24.hideCheckBox = false;
-                _this24.haveLabel = false;
-                _this24.addForm.customerName = "";
-                _this24.addForm.contact = "";
-                _this24.addForm.flag = 0;
-                _this24.addForm.alreadyBookedId = [];
-                _this24.addForm.reservedFare = [];
-                _this24.addForm.advanceSeatClass = [];
-                _this24.addForm.remarks = "";
-                _this24.addForm.totalFare = 0;
-                _this24.selectedSeats = [];
-                _this24.selectedSeatsFare = [];
-                _this24.selectedSeatsClass = [];
-                _this24.selectedOverIssueSeats = [];
-                _this24.addForm.selectedSeats = [];
-                _this24.addForm.selectedSeatsFare = [];
-                _this24.addForm.selectedSeatsClass = [];
-                _this24.addForm.totalAmount = 0;
-                _this24.addForm.discount = '';
-                _this24.advanceSeat = [];
-                _this24.validationErrors = [];
-                _this24.loading = true;
-                _this24.showBookingDiv = false;
-                _this24.checkedUsagePoints = false;
+                _this25.schedule = [];
+                _this25.addForm.otp_valid = false;
+                _this25.addForm.otp = "";
+                _this25.addForm.otp_cnic = "";
+                _this25.addForm.customerCNIC = "";
+                _this25.pointsUsage = "";
+                _this25.checkedUsagePoints = false;
+                _this25.hideCheckBox = false;
+                _this25.haveLabel = false;
+                _this25.addForm.customerName = "";
+                _this25.addForm.contact = "";
+                _this25.addForm.flag = 0;
+                _this25.addForm.alreadyBookedId = [];
+                _this25.addForm.reservedFare = [];
+                _this25.addForm.advanceSeatClass = [];
+                _this25.addForm.remarks = "";
+                _this25.addForm.totalFare = 0;
+                _this25.selectedSeats = [];
+                _this25.selectedSeatsFare = [];
+                _this25.selectedSeatsClass = [];
+                _this25.selectedOverIssueSeats = [];
+                _this25.addForm.selectedSeats = [];
+                _this25.addForm.selectedSeatsFare = [];
+                _this25.addForm.selectedSeatsClass = [];
+                _this25.addForm.totalAmount = 0;
+                _this25.addForm.discount = '';
+                _this25.advanceSeat = [];
+                _this25.validationErrors = [];
+                _this25.loading = true;
+                _this25.showBookingDiv = false;
+                _this25.checkedUsagePoints = false;
 
-                if (!(_this24.addForm.schedule != 0 && _this24.addForm.date && _this24.addForm.departureCity != 0 && _this24.addForm.destinationCity != 0)) {
-                  _context23.next = 81;
+                if (!(_this25.addForm.schedule != 0 && _this25.addForm.date && _this25.addForm.departureCity != 0 && _this25.addForm.destinationCity != 0)) {
+                  _context24.next = 81;
                   break;
                 }
 
-                _context23.next = 38;
-                return _this24.callApi("post", "booking/schedule/selected", {
-                  id: _this24.addForm.schedule,
-                  date: _this24.addForm.date,
-                  departureCity: _this24.addForm.departureCity,
-                  destinationCity: _this24.addForm.destinationCity,
-                  dropTerminal: _this24.addForm.terminalId,
-                  departure_time: _this24.addForm.departure_time
+                _context24.next = 38;
+                return _this25.callApi("post", "booking/schedule/selected", {
+                  id: _this25.addForm.schedule,
+                  date: _this25.addForm.date,
+                  departureCity: _this25.addForm.departureCity,
+                  destinationCity: _this25.addForm.destinationCity,
+                  dropTerminal: _this25.addForm.terminalId,
+                  departure_time: _this25.addForm.departure_time
                 });
 
               case 38:
-                resSelected = _context23.sent;
+                resSelected = _context24.sent;
 
                 if (resSelected.status == 200) {
-                  _this24.loading = false;
-                  _this24.showBookingDiv = true;
-                  _this24.schedule = resSelected.data;
-                  _this24.totalSeats = 0;
-                  _this24.BusNo = resSelected.data.bus_no;
-                  _this24.totalSeatsBooked = 0;
-                  _this24.auth_terminal = resSelected.data.auth_terminal;
-                  _this24.totalSeatsIssued = 0;
-                  _this24.totalSeatsAvailable = 0;
+                  _this25.loading = false;
+                  _this25.showBookingDiv = true;
+                  _this25.schedule = resSelected.data;
+                  _this25.totalSeats = 0;
+                  _this25.BusNo = resSelected.data.bus_no;
+                  _this25.totalSeatsBooked = 0;
+                  _this25.auth_terminal = resSelected.data.auth_terminal;
+                  _this25.totalSeatsIssued = 0;
+                  _this25.totalSeatsAvailable = 0;
 
                   for (i = 0; i < resSelected.data.bus_class.seat_map.length; i++) {
                     for (j = 0; j < resSelected.data.bus_class.seat_map[i].length; j++) {
                       if (resSelected.data.bus_class.seat_map[i][j].hasOwnProperty("seatNo") && resSelected.data.bus_class.seat_map[i][j].type !== "not_for_sale") {
-                        _this24.totalSeats++;
+                        _this25.totalSeats++;
                       }
 
                       if (resSelected.data.bus_class.seat_map[i][j].type == 'booked') {
-                        _this24.totalSeatsBooked++;
+                        _this25.totalSeatsBooked++;
                       }
 
                       if (resSelected.data.bus_class.seat_map[i][j].type == 'advance booking') {
-                        _this24.totalSeatsIssued++;
+                        _this25.totalSeatsIssued++;
                       }
                     }
                   }
 
-                  _this24.totalSeatsAvailable = _this24.totalSeats - (_this24.totalSeatsBooked + _this24.totalSeatsIssued);
+                  _this25.totalSeatsAvailable = _this25.totalSeats - (_this25.totalSeatsBooked + _this25.totalSeatsIssued);
                 }
 
-                _this24.addForm.customerCNIC = "";
-                _this24.addForm.customerName = "";
-                _this24.addForm.contact = "";
-                _this24.addForm.flag = 0;
-                _this24.addForm.alreadyBookedId = [];
-                _this24.addForm.reservedFare = [];
-                _this24.addForm.advanceSeatClass = [];
-                _this24.addForm.remarks = "";
-                _this24.addForm.totalFare = 0;
-                _this24.selectedSeats = [];
-                _this24.selectedSeatsFare = [];
-                _this24.selectedSeatsClass = [];
-                _this24.addForm.selectedSeatsFare = [];
-                _this24.selectedBookedSeats = [];
-                _this24.selectedOverIssueSeats = [];
-                _this24.addForm.selectedSeatsClass = [];
-                _this24.addForm.totalAmount = 0;
-                _this24.addForm.discount = '';
-                _context23.next = 60;
-                return _this24.callApi("post", "booking/terminal/seats", {
-                  terminal_id: _this24.$store.state.user.terminal_id
+                _this25.addForm.customerCNIC = "";
+                _this25.addForm.customerName = "";
+                _this25.addForm.contact = "";
+                _this25.addForm.flag = 0;
+                _this25.addForm.alreadyBookedId = [];
+                _this25.addForm.reservedFare = [];
+                _this25.addForm.advanceSeatClass = [];
+                _this25.addForm.remarks = "";
+                _this25.addForm.totalFare = 0;
+                _this25.selectedSeats = [];
+                _this25.selectedSeatsFare = [];
+                _this25.selectedSeatsClass = [];
+                _this25.addForm.selectedSeatsFare = [];
+                _this25.selectedBookedSeats = [];
+                _this25.selectedOverIssueSeats = [];
+                _this25.addForm.selectedSeatsClass = [];
+                _this25.addForm.totalAmount = 0;
+                _this25.addForm.discount = '';
+                _context24.next = 60;
+                return _this25.callApi("post", "booking/terminal/seats", {
+                  terminal_id: _this25.$store.state.user.terminal_id
                 });
 
               case 60:
-                terminalSeats = _context23.sent;
-                _context23.next = 63;
-                return _this24.callApi("post", "booking/schedule/terminal/discount/fetch", {
-                  id: _this24.addForm.schedule,
-                  date: _this24.addForm.date,
-                  departureCity: _this24.addForm.departureCity,
-                  destinationCity: _this24.addForm.destinationCity,
-                  dropTerminal: _this24.addForm.terminalId
+                terminalSeats = _context24.sent;
+                _context24.next = 63;
+                return _this25.callApi("post", "booking/schedule/terminal/discount/fetch", {
+                  id: _this25.addForm.schedule,
+                  date: _this25.addForm.date,
+                  departureCity: _this25.addForm.departureCity,
+                  destinationCity: _this25.addForm.destinationCity,
+                  dropTerminal: _this25.addForm.terminalId
                 });
 
               case 63:
-                restDiscount = _context23.sent;
-                _context23.next = 66;
-                return _this24.callApi("post", "booking/discount/surcharge/fetch", {
-                  schedule_id: _this24.addForm.schedule
+                restDiscount = _context24.sent;
+                _context24.next = 66;
+                return _this25.callApi("post", "booking/discount/surcharge/fetch", {
+                  schedule_id: _this25.addForm.schedule
                 });
 
               case 66:
-                resFetchDiscountSurcharge = _context23.sent;
-                _context23.next = 69;
-                return _this24.callApi("post", "booking/booked/seats/elt/detail", {
-                  id: _this24.addForm.schedule,
-                  date: _this24.addForm.date,
-                  departureCity: _this24.addForm.departureCity,
-                  destinationCity: _this24.addForm.destinationCity
+                resFetchDiscountSurcharge = _context24.sent;
+                _context24.next = 69;
+                return _this25.callApi("post", "booking/booked/seats/elt/detail", {
+                  id: _this25.addForm.schedule,
+                  date: _this25.addForm.date,
+                  departureCity: _this25.addForm.departureCity,
+                  destinationCity: _this25.addForm.destinationCity
                 });
 
               case 69:
-                responseEltDetails = _context23.sent;
-                _context23.next = 72;
-                return _this24.callApi("post", "booking/fetch/over/issue/seat", {
-                  id: _this24.addForm.schedule,
-                  date: _this24.addForm.date,
-                  departureCity: _this24.addForm.departureCity,
-                  destinationCity: _this24.addForm.destinationCity
+                responseEltDetails = _context24.sent;
+                _context24.next = 72;
+                return _this25.callApi("post", "booking/fetch/over/issue/seat", {
+                  id: _this25.addForm.schedule,
+                  date: _this25.addForm.date,
+                  departureCity: _this25.addForm.departureCity,
+                  destinationCity: _this25.addForm.destinationCity
                 });
 
               case 72:
-                resFetchOverIssueSeat = _context23.sent;
+                resFetchOverIssueSeat = _context24.sent;
 
                 if (resFetchOverIssueSeat.status == 200) {
-                  _this24.overIssueSeatsRevert = resFetchOverIssueSeat.data;
+                  _this25.overIssueSeatsRevert = resFetchOverIssueSeat.data;
 
                   if (resFetchOverIssueSeat.data.length == 0) {
-                    _this24.closeOverIssueDetail();
+                    _this25.closeOverIssueDetail();
                   }
                 } else {
                   console.log(resFetchOverIssueSeat);
                 }
 
                 if (responseEltDetails.status == 200) {
-                  _this24.eltDetailsModel = responseEltDetails.data;
+                  _this25.eltDetailsModel = responseEltDetails.data;
                 } else if (responseEltDetails.status == 204) {
-                  _this24.eltDetailsModel = [];
+                  _this25.eltDetailsModel = [];
                 } // Fetch Discount and Surcharge  against schedule
 
 
                 if (resFetchDiscountSurcharge.status == 200) {
-                  _this24.appliedDiscount = resFetchDiscountSurcharge.data.discount ? resFetchDiscountSurcharge.data.discount.type == 'percentage' ? resFetchDiscountSurcharge.data.discount.percentage + '%' : resFetchDiscountSurcharge.data.discount.flat : 'N/A';
-                  _this24.appliedSurcharge = resFetchDiscountSurcharge.data.surcharge ? resFetchDiscountSurcharge.data.surcharge.type == 'percentage' ? resFetchDiscountSurcharge.data.surcharge.percentage + '%' : resFetchDiscountSurcharge.data.surcharge.flat : 'N/A';
+                  _this25.appliedDiscount = resFetchDiscountSurcharge.data.discount ? resFetchDiscountSurcharge.data.discount.type == 'percentage' ? resFetchDiscountSurcharge.data.discount.percentage + '%' : resFetchDiscountSurcharge.data.discount.flat : 'N/A';
+                  _this25.appliedSurcharge = resFetchDiscountSurcharge.data.surcharge ? resFetchDiscountSurcharge.data.surcharge.type == 'percentage' ? resFetchDiscountSurcharge.data.surcharge.percentage + '%' : resFetchDiscountSurcharge.data.surcharge.flat : 'N/A';
                 }
 
                 if (restDiscount.status == 200) {
-                  _this24.terminalDiscount = restDiscount.data.discount ? restDiscount.data.discount + '%' : 'N/A';
+                  _this25.terminalDiscount = restDiscount.data.discount ? restDiscount.data.discount + '%' : 'N/A';
                 }
 
                 if (terminalSeats.status == 200) {
-                  _this24.allowedSeats = terminalSeats.data;
+                  _this25.allowedSeats = terminalSeats.data;
                 } else if (terminalSeats.status == 204) {
-                  _this24.allowedSeats = 0;
+                  _this25.allowedSeats = 0;
                 }
 
-                if (resSelected.status == 500 && _this24.addForm.schedule == 0) {
-                  _this24.getSchedule = false;
-                  _this24.loading = true;
-                  _this24.showBookingDiv = false;
+                if (resSelected.status == 500 && _this25.addForm.schedule == 0) {
+                  _this25.getSchedule = false;
+                  _this25.loading = true;
+                  _this25.showBookingDiv = false;
                 }
 
                 if (resSelected.status == 422) {
                   (function () {
-                    _this24.getSchedule = false;
-                    _this24.showBookingDiv = false;
-                    _this24.loading = false;
+                    _this25.getSchedule = false;
+                    _this25.showBookingDiv = false;
+                    _this25.loading = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -38362,31 +38416,31 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   })();
                 }
 
-                _this24.getSchedule = false;
+                _this25.getSchedule = false;
 
               case 81:
               case "end":
-                return _context23.stop();
+                return _context24.stop();
             }
           }
-        }, _callee23);
+        }, _callee24);
       }))();
     },
     revertDropSchedule: function revertDropSchedule() {
-      var _this25 = this;
+      var _this26 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee24() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee25() {
         var data, revertDropSchedule;
-        return _regeneratorRuntime().wrap(function _callee24$(_context24) {
+        return _regeneratorRuntime().wrap(function _callee25$(_context25) {
           while (1) {
-            switch (_context24.prev = _context24.next) {
+            switch (_context25.prev = _context25.next) {
               case 0:
-                if (!(_this25.addForm.departureCity == 0)) {
-                  _context24.next = 2;
+                if (!(_this26.addForm.departureCity == 0)) {
+                  _context25.next = 2;
                   break;
                 }
 
-                return _context24.abrupt("return", swal({
+                return _context25.abrupt("return", swal({
                   title: "Required!",
                   text: "Please Select Departure City",
                   icon: "error",
@@ -38394,12 +38448,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 2:
-                if (!(_this25.addForm.destinationCity == 0)) {
-                  _context24.next = 4;
+                if (!(_this26.addForm.destinationCity == 0)) {
+                  _context25.next = 4;
                   break;
                 }
 
-                return _context24.abrupt("return", swal({
+                return _context25.abrupt("return", swal({
                   title: "Required!",
                   text: "Please Select Destination City",
                   icon: "error",
@@ -38407,12 +38461,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 4:
-                if (_this25.addForm.date) {
-                  _context24.next = 6;
+                if (_this26.addForm.date) {
+                  _context25.next = 6;
                   break;
                 }
 
-                return _context24.abrupt("return", swal({
+                return _context25.abrupt("return", swal({
                   title: "Required!",
                   text: "Date is Required",
                   icon: "error",
@@ -38420,12 +38474,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 6:
-                if (!(_this25.addForm.schedule == 0)) {
-                  _context24.next = 8;
+                if (!(_this26.addForm.schedule == 0)) {
+                  _context25.next = 8;
                   break;
                 }
 
-                return _context24.abrupt("return", swal({
+                return _context25.abrupt("return", swal({
                   title: "Required!",
                   text: "Departure Time is Required",
                   icon: "error",
@@ -38434,22 +38488,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 8:
                 data = {
-                  departure_city_id: _this25.addForm.departureCity,
-                  destination_city_id: _this25.addForm.destinationCity,
-                  date: _this25.addForm.date,
-                  schedule_id: _this25.addForm.schedule
+                  departure_city_id: _this26.addForm.departureCity,
+                  destination_city_id: _this26.addForm.destinationCity,
+                  date: _this26.addForm.date,
+                  schedule_id: _this26.addForm.schedule
                 };
-                _this25.revertScheduleButton = true;
-                _context24.next = 12;
-                return _this25.callApi("post", "booking/revertDropSchedule", data);
+                _this26.revertScheduleButton = true;
+                _context25.next = 12;
+                return _this26.callApi("post", "booking/revertDropSchedule", data);
 
               case 12:
-                revertDropSchedule = _context24.sent;
+                revertDropSchedule = _context25.sent;
 
                 if (revertDropSchedule.status == 200) {
-                  _this25.revertScheduleButton = false;
+                  _this26.revertScheduleButton = false;
 
-                  _this25.busDropCheck();
+                  _this26.busDropCheck();
 
                   swal({
                     title: "Success",
@@ -38458,12 +38512,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this25.busDropCheck();
+                  _this26.busDropCheck();
                 }
 
                 if (revertDropSchedule.status == 422) {
                   (function () {
-                    _this25.revertScheduleButton = false;
+                    _this26.revertScheduleButton = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -38483,10 +38537,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 15:
               case "end":
-                return _context24.stop();
+                return _context25.stop();
             }
           }
-        }, _callee24);
+        }, _callee25);
       }))();
     },
     scheduleDrop: function scheduleDrop() {
@@ -38536,88 +38590,88 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       $('#dropSchedule').modal('show');
     },
     busDropCheck: function busDropCheck() {
-      var _this26 = this;
+      var _this27 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee25() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee26() {
         var resDropCheck, _ref6;
 
-        return _regeneratorRuntime().wrap(function _callee25$(_context25) {
+        return _regeneratorRuntime().wrap(function _callee26$(_context26) {
           while (1) {
-            switch (_context25.prev = _context25.next) {
+            switch (_context26.prev = _context26.next) {
               case 0:
-                _this26.labelDrop = '';
-                _this26.hideDivButtonsDrop = true;
-                _context25.next = 4;
-                return _this26.callApi("post", "booking/schedule/dropCheck", {
-                  id: _this26.addForm.schedule,
-                  date: _this26.addForm.date,
-                  departureCity: _this26.addForm.departureCity,
-                  destinationCity: _this26.addForm.destinationCity,
-                  departure_time: _this26.addForm.departure_time
+                _this27.labelDrop = '';
+                _this27.hideDivButtonsDrop = true;
+                _context26.next = 4;
+                return _this27.callApi("post", "booking/schedule/dropCheck", {
+                  id: _this27.addForm.schedule,
+                  date: _this27.addForm.date,
+                  departureCity: _this27.addForm.departureCity,
+                  destinationCity: _this27.addForm.destinationCity,
+                  departure_time: _this27.addForm.departure_time
                 });
 
               case 4:
-                resDropCheck = _context25.sent;
+                resDropCheck = _context26.sent;
 
                 if (resDropCheck.status == 200) {
                   if (resDropCheck.data.checkDrop) {
-                    _this26.labelDrop = (_ref6 = "This schedule is dropped by " + resDropCheck.data.checkDrop.drop_by.name) !== null && _ref6 !== void 0 ? _ref6 : 'N/A';
-                    _this26.hideDivButtonsDrop = false;
+                    _this27.labelDrop = (_ref6 = "This schedule is dropped by " + resDropCheck.data.checkDrop.drop_by.name) !== null && _ref6 !== void 0 ? _ref6 : 'N/A';
+                    _this27.hideDivButtonsDrop = false;
                   } else {
-                    _this26.hideDivButtonsDrop = true;
-                    _this26.labelDrop = '';
+                    _this27.hideDivButtonsDrop = true;
+                    _this27.labelDrop = '';
                   }
                 }
 
               case 6:
               case "end":
-                return _context25.stop();
+                return _context26.stop();
             }
           }
-        }, _callee25);
+        }, _callee26);
       }))();
     },
     fetchReScheduleData: function fetchReScheduleData() {
-      var _this27 = this;
+      var _this28 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee26() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee27() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee26$(_context26) {
+        return _regeneratorRuntime().wrap(function _callee27$(_context27) {
           while (1) {
-            switch (_context26.prev = _context26.next) {
+            switch (_context27.prev = _context27.next) {
               case 0:
-                _this27.reScheduleSeatMap = [];
-                _this27.reScheduleSchedule = '';
-                _this27.reScheduleDepart = '';
-                _this27.reScheduleDest = '';
-                _this27.reScheduleDate = '';
-                _this27.alreadyBookedSeatClassName = [];
-                _this27.alreadyBookedSeatClass = [];
-                _this27.alreadyBookedSeatFare = [];
-                _this27.totalAlreadyBookedSeatFare = 0;
-                _this27.alreadyBookedSeat = [];
-                _this27.seatMapReschedule = false;
+                _this28.reScheduleSeatMap = [];
+                _this28.reScheduleSchedule = '';
+                _this28.reScheduleDepart = '';
+                _this28.reScheduleDest = '';
+                _this28.reScheduleDate = '';
+                _this28.alreadyBookedSeatClassName = [];
+                _this28.alreadyBookedSeatClass = [];
+                _this28.alreadyBookedSeatFare = [];
+                _this28.totalAlreadyBookedSeatFare = 0;
+                _this28.alreadyBookedSeat = [];
+                _this28.seatMapReschedule = false;
 
-                if (_this27.rescheduleData.rescheduleSchedule == 0) {
-                  _this27.seatMapReschedule = false;
+                if (_this28.rescheduleData.rescheduleSchedule == 0) {
+                  _this28.seatMapReschedule = false;
                 }
 
-                _context26.next = 14;
-                return _this27.callApi("post", "booking/schedule/selected", {
-                  id: _this27.rescheduleData.rescheduleSchedule,
-                  date: _this27.rescheduleData.rescheduleDate,
-                  departureCity: parseInt(_this27.rescheduleData.dataDepartureCity),
-                  destinationCity: _this27.rescheduleData.rescheduleDestinationCity,
-                  dropTerminal: _this27.addForm.terminalId,
-                  departure_time: _this27.rescheduleData.departure_time
+                _context27.next = 14;
+                return _this28.callApi("post", "booking/schedule/selected", {
+                  id: _this28.rescheduleData.rescheduleSchedule,
+                  date: _this28.rescheduleData.rescheduleDate,
+                  departureCity: parseInt(_this28.rescheduleData.dataDepartureCity),
+                  destinationCity: _this28.rescheduleData.rescheduleDestinationCity,
+                  dropTerminal: _this28.addForm.terminalId,
+                  departure_time: _this28.rescheduleData.departure_time
                 });
 
               case 14:
-                res = _context26.sent;
+                res = _context27.sent;
 
                 if (res.status == 200) {
-                  _this27.seatMapReschedule = true;
-                  _this27.reScheduleSeatMap = res.data;
+                  _this28.seatMapReschedule = true;
+                  _this28.reScheduleSeatMap = res.data;
                 } else {
                   if (res.status == 422) {
                     (function () {
@@ -38641,31 +38695,31 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 16:
               case "end":
-                return _context26.stop();
+                return _context27.stop();
             }
           }
-        }, _callee26);
+        }, _callee27);
       }))();
     },
     selectSeat: function selectSeat(row, col, seatNo, fare, colClass) {
-      var _this28 = this;
+      var _this29 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee27() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee28() {
         var index, _index, _index2, _index3;
 
-        return _regeneratorRuntime().wrap(function _callee27$(_context27) {
+        return _regeneratorRuntime().wrap(function _callee28$(_context28) {
           while (1) {
-            switch (_context27.prev = _context27.next) {
+            switch (_context28.prev = _context28.next) {
               case 0:
-                _this28.validationErrors = [];
-                _this28.runUpdateFun = true;
+                _this29.validationErrors = [];
+                _this29.runUpdateFun = true;
 
-                if (!(_this28.addForm.oldBookings == 1 && !_this28.schedule.bus_class.seat_map[row][col].type)) {
-                  _context27.next = 4;
+                if (!(_this29.addForm.oldBookings == 1 && !_this29.schedule.bus_class.seat_map[row][col].type)) {
+                  _context28.next = 4;
                   break;
                 }
 
-                return _context27.abrupt("return", swal({
+                return _context28.abrupt("return", swal({
                   title: "Ops",
                   text: "Please Select Already Booked Seat",
                   icon: "error",
@@ -38673,247 +38727,82 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 4:
-                if (!(_this28.schedule.bus_class.seat_map[row][col].type && _this28.selectedSeats.length == 0)) {
-                  _context27.next = 11;
+                if (!(_this29.schedule.bus_class.seat_map[row][col].type && _this29.selectedSeats.length == 0)) {
+                  _context28.next = 11;
                   break;
                 }
 
-                index = _this28.selectedBookedSeats.indexOf(seatNo);
+                index = _this29.selectedBookedSeats.indexOf(seatNo);
 
                 if (index != -1) {
-                  _this28.schedule.bus_class.seat_map[row][col].selected = false;
+                  _this29.schedule.bus_class.seat_map[row][col].selected = false;
 
-                  _this28.selectedBookedSeats.splice(index, 1);
+                  _this29.selectedBookedSeats.splice(index, 1);
 
-                  _this28.checkSameType.splice(index, 1);
+                  _this29.checkSameType.splice(index, 1);
 
-                  _this28.bookedSeats = _this28.bookedSeats.filter(function (seat) {
+                  _this29.bookedSeats = _this29.bookedSeats.filter(function (seat) {
                     if (seat.seatNo != seatNo) {
                       return seat;
                     }
                   });
-                  _this28.addForm.totalFare -= parseFloat(_this28.schedule.bus_class.seat_map[row][col].fare);
+                  _this29.addForm.totalFare -= parseFloat(_this29.schedule.bus_class.seat_map[row][col].fare);
                 } else {
-                  _this28.schedule.bus_class.seat_map[row][col].selected = true;
+                  _this29.schedule.bus_class.seat_map[row][col].selected = true;
 
-                  _this28.checkSameType.push(_this28.schedule.bus_class.seat_map[row][col].type);
+                  _this29.checkSameType.push(_this29.schedule.bus_class.seat_map[row][col].type);
 
-                  _this28.selectedBookedSeats.push(seatNo);
+                  _this29.selectedBookedSeats.push(seatNo);
 
-                  _this28.bookedSeats.push(_this28.schedule.bus_class.seat_map[row][col]);
+                  _this29.bookedSeats.push(_this29.schedule.bus_class.seat_map[row][col]);
 
-                  _this28.addForm.totalFare += parseFloat(_this28.schedule.bus_class.seat_map[row][col].fare);
+                  _this29.addForm.totalFare += parseFloat(_this29.schedule.bus_class.seat_map[row][col].fare);
                 }
 
-                _this28.addForm.totalAmount = _this28.addForm.totalFare;
-                _this28.addForm.selectedBookedSeats = _this28.selectedBookedSeats;
-                _context27.next = 24;
+                _this29.addForm.totalAmount = _this29.addForm.totalFare;
+                _this29.addForm.selectedBookedSeats = _this29.selectedBookedSeats;
+                _context28.next = 24;
                 break;
 
               case 11:
-                if (!(!_this28.schedule.bus_class.seat_map[row][col].type && _this28.selectedBookedSeats.length == 0)) {
-                  _context27.next = 20;
+                if (!(!_this29.schedule.bus_class.seat_map[row][col].type && _this29.selectedBookedSeats.length == 0)) {
+                  _context28.next = 20;
                   break;
                 }
 
-                _index = _this28.selectedSeats.indexOf(seatNo);
+                _index = _this29.selectedSeats.indexOf(seatNo);
 
                 if (_index != -1) {
-                  _this28.schedule.bus_class.seat_map[row][col].selected = false;
+                  _this29.schedule.bus_class.seat_map[row][col].selected = false;
 
-                  _this28.selectedSeats.splice(_index, 1);
+                  _this29.selectedSeats.splice(_index, 1);
 
-                  _this28.selectedSeatsFare.splice(_index, 1);
+                  _this29.selectedSeatsFare.splice(_index, 1);
 
-                  _this28.selectedSeatsClass.splice(_index, 1);
+                  _this29.selectedSeatsClass.splice(_index, 1);
 
-                  _this28.addForm.totalFare -= _this28.schedule.bus_class.seat_map[row][col].fare;
+                  _this29.addForm.totalFare -= _this29.schedule.bus_class.seat_map[row][col].fare;
                 } else {
-                  _this28.schedule.bus_class.seat_map[row][col].selected = true;
+                  _this29.schedule.bus_class.seat_map[row][col].selected = true;
 
-                  _this28.selectedSeats.push(seatNo);
+                  _this29.selectedSeats.push(seatNo);
 
-                  _this28.selectedSeatsFare.push(fare);
+                  _this29.selectedSeatsFare.push(fare);
 
-                  _this28.selectedSeatsClass.push(colClass);
+                  _this29.selectedSeatsClass.push(colClass);
 
-                  _this28.addForm.totalFare += _this28.schedule.bus_class.seat_map[row][col].fare;
+                  _this29.addForm.totalFare += _this29.schedule.bus_class.seat_map[row][col].fare;
                 }
 
-                _this28.addForm.totalAmount = _this28.addForm.totalFare;
-                _this28.addForm.selectedSeats = _this28.selectedSeats;
-                _this28.addForm.selectedSeatsFare = _this28.selectedSeatsFare;
-                _this28.addForm.selectedSeatsClass = _this28.selectedSeatsClass;
-                _context27.next = 24;
+                _this29.addForm.totalAmount = _this29.addForm.totalFare;
+                _this29.addForm.selectedSeats = _this29.selectedSeats;
+                _this29.addForm.selectedSeatsFare = _this29.selectedSeatsFare;
+                _this29.addForm.selectedSeatsClass = _this29.selectedSeatsClass;
+                _context28.next = 24;
                 break;
 
               case 20:
-                _this28.runUpdateFun = false;
-
-                _this28.fetchScheduleData();
-
-                _this28.resetArrays();
-
-                return _context27.abrupt("return", swal({
-                  title: "Oops",
-                  text: "Invalid Seat Combination",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 24:
-                if (!(_this28.schedule.bus_class.seat_map[row][col].over_issue && _this28.selectedOverIssueSeats.length == 0)) {
-                  _context27.next = 30;
-                  break;
-                }
-
-                _index2 = _this28.selectedBookedOverIssueSeats.indexOf(seatNo);
-
-                if (_index2 != -1) {
-                  _this28.schedule.bus_class.seat_map[row][col].selected = false;
-
-                  _this28.selectedBookedOverIssueSeats.splice(_index2, 1);
-
-                  _this28.bookedOverIssueSeats = _this28.bookedOverIssueSeats.filter(function (seat) {
-                    if (seat.seatNo != seatNo) {
-                      return seat;
-                    }
-                  });
-                } else {
-                  _this28.schedule.bus_class.seat_map[row][col].selected = true;
-
-                  _this28.selectedBookedOverIssueSeats.push(seatNo);
-
-                  _this28.bookedOverIssueSeats.push(_this28.schedule.bus_class.seat_map[row][col]);
-                }
-
-                _this28.addForm.selectedBookedOverIssueSeats = _this28.selectedBookedOverIssueSeats;
-                _context27.next = 40;
-                break;
-
-              case 30:
-                if (!(!_this28.schedule.bus_class.seat_map[row][col].over_issue && _this28.selectedBookedOverIssueSeats.length == 0)) {
-                  _context27.next = 36;
-                  break;
-                }
-
-                _index3 = _this28.selectedOverIssueSeats.indexOf(seatNo);
-
-                if (_index3 != -1) {
-                  _this28.schedule.bus_class.seat_map[row][col].selected = false;
-
-                  _this28.selectedOverIssueSeats.splice(_index3, 1);
-                } else {
-                  _this28.schedule.bus_class.seat_map[row][col].selected = true;
-
-                  _this28.selectedOverIssueSeats.push(seatNo);
-                }
-
-                _this28.addForm.selectedOverIssueSeats = _this28.selectedOverIssueSeats;
-                _context27.next = 40;
-                break;
-
-              case 36:
-                _this28.runUpdateFun = false;
-
-                _this28.fetchScheduleData();
-
-                _this28.resetArrays();
-
-                return _context27.abrupt("return", swal({
-                  title: "Oops",
-                  text: "Invalid Seat Combination",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 40:
-                // 🔁 If all seats are unselected → reset checkbox
-                if (!_this28.hasAnySeatSelected) {
-                  _this28.selectedOption = null;
-                  _this28.pointsUsage = false;
-                  _this28.discountUsage = false;
-                  _this28.addForm.discountOtp = "";
-                  _this28.addForm.discount_otp_valid = false;
-                  _this28.addForm.pointsUseInput = "";
-                  _this28.addForm.otp = "";
-                  _this28.addForm.otp_valid = false;
-                }
-
-              case 41:
-              case "end":
-                return _context27.stop();
-            }
-          }
-        }, _callee27);
-      }))();
-    },
-    // update Form After  advanced Booked seat
-    updateBookedSeat: function updateBookedSeat(data) {
-      var _this29 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee28() {
-        var index, uniqueArray;
-        return _regeneratorRuntime().wrap(function _callee28$(_context28) {
-          while (1) {
-            switch (_context28.prev = _context28.next) {
-              case 0:
-                if (_this29.runUpdateFun == true) {
-                  if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
-                    index = _this29.advanceSeat.indexOf(data.seatNo);
-
-                    if (index != -1) {
-                      _this29.addForm.selectedSeats.splice(index, 1);
-
-                      _this29.advanceSeat.splice(index, 1);
-
-                      _this29.addForm.alreadyBookedId.splice(index, 1);
-
-                      _this29.addForm.reservedFare.splice(index, 1);
-
-                      _this29.addForm.advanceSeatClass.splice(index, 1);
-
-                      _this29.addForm.customerName = "";
-                      _this29.addForm.customerCNIC = "";
-                      _this29.addForm.contact = "";
-
-                      if (_this29.advanceSeat.length == 0) {
-                        _this29.addForm.flag = 0;
-                      }
-
-                      _this29.getPoints('addFormCNIC');
-                    } else {
-                      _this29.addForm.alreadyBookedId.push(data.id);
-
-                      _this29.addForm.reservedFare.push(data.fare);
-
-                      _this29.addForm.advanceSeatClass.push(data["class"]);
-
-                      if (_this29.auth_terminal.other_terminal_passenger_detail == 1 || data.terminal == _this29.auth_terminal.id) {
-                        _this29.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
-                        _this29.addForm.customerName = data.customer_name;
-                        _this29.addForm.contact = data.customer_phone;
-                      } // this.addForm.remarks = data.remarks;
-
-
-                      _this29.addForm.selectedSeats.push(data.seatNo);
-
-                      _this29.advanceSeat.push(data.seatNo);
-
-                      _this29.addForm.flag = 1;
-
-                      _this29.getPoints('addFormCNIC');
-                    }
-                  }
-                } // this validation only for if types is different selected liked booked or advance booking mixed
-
-
-                uniqueArray = _toConsumableArray(new Set(_this29.checkSameType));
-
-                if (!(uniqueArray.length > 1)) {
-                  _context28.next = 6;
-                  break;
-                }
+                _this29.runUpdateFun = false;
 
                 _this29.fetchScheduleData();
 
@@ -38926,12 +38815,177 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 6:
+              case 24:
+                if (!(_this29.schedule.bus_class.seat_map[row][col].over_issue && _this29.selectedOverIssueSeats.length == 0)) {
+                  _context28.next = 30;
+                  break;
+                }
+
+                _index2 = _this29.selectedBookedOverIssueSeats.indexOf(seatNo);
+
+                if (_index2 != -1) {
+                  _this29.schedule.bus_class.seat_map[row][col].selected = false;
+
+                  _this29.selectedBookedOverIssueSeats.splice(_index2, 1);
+
+                  _this29.bookedOverIssueSeats = _this29.bookedOverIssueSeats.filter(function (seat) {
+                    if (seat.seatNo != seatNo) {
+                      return seat;
+                    }
+                  });
+                } else {
+                  _this29.schedule.bus_class.seat_map[row][col].selected = true;
+
+                  _this29.selectedBookedOverIssueSeats.push(seatNo);
+
+                  _this29.bookedOverIssueSeats.push(_this29.schedule.bus_class.seat_map[row][col]);
+                }
+
+                _this29.addForm.selectedBookedOverIssueSeats = _this29.selectedBookedOverIssueSeats;
+                _context28.next = 40;
+                break;
+
+              case 30:
+                if (!(!_this29.schedule.bus_class.seat_map[row][col].over_issue && _this29.selectedBookedOverIssueSeats.length == 0)) {
+                  _context28.next = 36;
+                  break;
+                }
+
+                _index3 = _this29.selectedOverIssueSeats.indexOf(seatNo);
+
+                if (_index3 != -1) {
+                  _this29.schedule.bus_class.seat_map[row][col].selected = false;
+
+                  _this29.selectedOverIssueSeats.splice(_index3, 1);
+                } else {
+                  _this29.schedule.bus_class.seat_map[row][col].selected = true;
+
+                  _this29.selectedOverIssueSeats.push(seatNo);
+                }
+
+                _this29.addForm.selectedOverIssueSeats = _this29.selectedOverIssueSeats;
+                _context28.next = 40;
+                break;
+
+              case 36:
+                _this29.runUpdateFun = false;
+
+                _this29.fetchScheduleData();
+
+                _this29.resetArrays();
+
+                return _context28.abrupt("return", swal({
+                  title: "Oops",
+                  text: "Invalid Seat Combination",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 40:
+                // 🔁 If all seats are unselected → reset checkbox
+                if (!_this29.hasAnySeatSelected) {
+                  _this29.selectedOption = null;
+                  _this29.pointsUsage = false;
+                  _this29.discountUsage = false;
+                  _this29.addForm.discountOtp = "";
+                  _this29.addForm.discount_otp_valid = false;
+                  _this29.addForm.pointsUseInput = "";
+                  _this29.addForm.otp = "";
+                  _this29.addForm.otp_valid = false;
+                }
+
+              case 41:
               case "end":
                 return _context28.stop();
             }
           }
         }, _callee28);
+      }))();
+    },
+    // update Form After  advanced Booked seat
+    updateBookedSeat: function updateBookedSeat(data) {
+      var _this30 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee29() {
+        var index, uniqueArray;
+        return _regeneratorRuntime().wrap(function _callee29$(_context29) {
+          while (1) {
+            switch (_context29.prev = _context29.next) {
+              case 0:
+                if (_this30.runUpdateFun == true) {
+                  if (data.type == 'advance booking' && data.type != 0 && data.type != 'booked') {
+                    index = _this30.advanceSeat.indexOf(data.seatNo);
+
+                    if (index != -1) {
+                      _this30.addForm.selectedSeats.splice(index, 1);
+
+                      _this30.advanceSeat.splice(index, 1);
+
+                      _this30.addForm.alreadyBookedId.splice(index, 1);
+
+                      _this30.addForm.reservedFare.splice(index, 1);
+
+                      _this30.addForm.advanceSeatClass.splice(index, 1);
+
+                      _this30.addForm.customerName = "";
+                      _this30.addForm.customerCNIC = "";
+                      _this30.addForm.contact = "";
+
+                      if (_this30.advanceSeat.length == 0) {
+                        _this30.addForm.flag = 0;
+                      }
+
+                      _this30.getPoints('addFormCNIC');
+                    } else {
+                      _this30.addForm.alreadyBookedId.push(data.id);
+
+                      _this30.addForm.reservedFare.push(data.fare);
+
+                      _this30.addForm.advanceSeatClass.push(data["class"]);
+
+                      if (_this30.auth_terminal.other_terminal_passenger_detail == 1 || data.terminal == _this30.auth_terminal.id) {
+                        _this30.addForm.customerCNIC = data.customer_cnic != 0 ? data.customer_cnic : "";
+                        _this30.addForm.customerName = data.customer_name;
+                        _this30.addForm.contact = data.customer_phone;
+                      } // this.addForm.remarks = data.remarks;
+
+
+                      _this30.addForm.selectedSeats.push(data.seatNo);
+
+                      _this30.advanceSeat.push(data.seatNo);
+
+                      _this30.addForm.flag = 1;
+
+                      _this30.getPoints('addFormCNIC');
+                    }
+                  }
+                } // this validation only for if types is different selected liked booked or advance booking mixed
+
+
+                uniqueArray = _toConsumableArray(new Set(_this30.checkSameType));
+
+                if (!(uniqueArray.length > 1)) {
+                  _context29.next = 6;
+                  break;
+                }
+
+                _this30.fetchScheduleData();
+
+                _this30.resetArrays();
+
+                return _context29.abrupt("return", swal({
+                  title: "Oops",
+                  text: "Invalid Seat Combination",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 6:
+              case "end":
+                return _context29.stop();
+            }
+          }
+        }, _callee29);
       }))();
     },
     reScheduleSelectSeat: function reScheduleSelectSeat(row, col, data) {
@@ -39042,22 +39096,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       return 'border:2px solid ' + col.color + ' !important;' + disabledSeat;
     },
     add: function add() {
-      var _this30 = this;
+      var _this31 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee29() {
-        var _this30$addForm$trans;
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee30() {
+        var _this31$addForm$trans;
 
         var resTicket, bookType, departureTime, date, resBookingDetail;
-        return _regeneratorRuntime().wrap(function _callee29$(_context29) {
+        return _regeneratorRuntime().wrap(function _callee30$(_context30) {
           while (1) {
-            switch (_context29.prev = _context29.next) {
+            switch (_context30.prev = _context30.next) {
               case 0:
-                if (!(_this30.addForm.departureCity == 0)) {
-                  _context29.next = 2;
+                if (!(_this31.addForm.departureCity == 0)) {
+                  _context30.next = 2;
                   break;
                 }
 
-                return _context29.abrupt("return", swal({
+                return _context30.abrupt("return", swal({
                   title: "Required!",
                   text: "Please Select Departure City",
                   icon: "error",
@@ -39065,12 +39119,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 2:
-                if (!(_this30.addForm.destinationCity == 0)) {
-                  _context29.next = 4;
+                if (!(_this31.addForm.destinationCity == 0)) {
+                  _context30.next = 4;
                   break;
                 }
 
-                return _context29.abrupt("return", swal({
+                return _context30.abrupt("return", swal({
                   title: "Required!",
                   text: "Please Select Destination City",
                   icon: "error",
@@ -39078,12 +39132,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 4:
-                if (_this30.addForm.date) {
-                  _context29.next = 6;
+                if (_this31.addForm.date) {
+                  _context30.next = 6;
                   break;
                 }
 
-                return _context29.abrupt("return", swal({
+                return _context30.abrupt("return", swal({
                   title: "Required!",
                   text: "Date is Required",
                   icon: "error",
@@ -39091,12 +39145,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 6:
-                if (!(_this30.addForm.schedule == 0)) {
-                  _context29.next = 8;
+                if (!(_this31.addForm.schedule == 0)) {
+                  _context30.next = 8;
                   break;
                 }
 
-                return _context29.abrupt("return", swal({
+                return _context30.abrupt("return", swal({
                   title: "Required!",
                   text: "Departure Time is Required",
                   icon: "error",
@@ -39104,12 +39158,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 8:
-                if (!((_this30.addForm.customerCNIC == '' || _this30.addForm.customerCNIC.length < 13) && _this30.addForm.type != 'advance booking')) {
-                  _context29.next = 10;
+                if (!((_this31.addForm.customerCNIC == '' || _this31.addForm.customerCNIC.length < 13) && _this31.addForm.type != 'advance booking')) {
+                  _context30.next = 10;
                   break;
                 }
 
-                return _context29.abrupt("return", swal({
+                return _context30.abrupt("return", swal({
                   title: "Required!",
                   text: "13 Digit CNIC is Required ",
                   icon: "error",
@@ -39117,12 +39171,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 10:
-                if (!(!_this30.addForm.customerName || typeof _this30.addForm.customerName == 'undefined')) {
-                  _context29.next = 12;
+                if (!(!_this31.addForm.customerName || typeof _this31.addForm.customerName == 'undefined')) {
+                  _context30.next = 12;
                   break;
                 }
 
-                return _context29.abrupt("return", swal({
+                return _context30.abrupt("return", swal({
                   title: "Required!",
                   text: "Customer Name is Required",
                   icon: "error",
@@ -39130,12 +39184,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 12:
-                if (!(!_this30.addForm.contact || _this30.addForm.contact.length < 11)) {
-                  _context29.next = 14;
+                if (!(!_this31.addForm.contact || _this31.addForm.contact.length < 11)) {
+                  _context30.next = 14;
                   break;
                 }
 
-                return _context29.abrupt("return", swal({
+                return _context30.abrupt("return", swal({
                   title: "Required!",
                   text: "11 Digit Contact Number is required,",
                   icon: "error",
@@ -39143,12 +39197,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 14:
-                if (!(_this30.isJazzCashTerminalSelected && !String((_this30$addForm$trans = _this30.addForm.transaction_id) !== null && _this30$addForm$trans !== void 0 ? _this30$addForm$trans : "").trim())) {
-                  _context29.next = 16;
+                if (!(_this31.isJazzCashTerminalSelected && !String((_this31$addForm$trans = _this31.addForm.transaction_id) !== null && _this31$addForm$trans !== void 0 ? _this31$addForm$trans : "").trim())) {
+                  _context30.next = 16;
                   break;
                 }
 
-                return _context29.abrupt("return", swal({
+                return _context30.abrupt("return", swal({
                   title: "Required!",
                   text: "Transaction No is required for Jazz Cash terminal",
                   icon: "error",
@@ -39156,12 +39210,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 16:
-                if (!(_this30.selectedSeats.length == 0 && _this30.selectedBookedSeats.length == 0)) {
-                  _context29.next = 18;
+                if (!(_this31.selectedSeats.length == 0 && _this31.selectedBookedSeats.length == 0)) {
+                  _context30.next = 18;
                   break;
                 }
 
-                return _context29.abrupt("return", swal({
+                return _context30.abrupt("return", swal({
                   title: "required!",
                   text: "Please Select At Least One Seat",
                   icon: "error",
@@ -39169,12 +39223,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 18:
-                if (!(_this30.addForm.pointsUseInput > _this30.pointsValidation)) {
-                  _context29.next = 20;
+                if (!(_this31.addForm.pointsUseInput > _this31.pointsValidation)) {
+                  _context30.next = 20;
                   break;
                 }
 
-                return _context29.abrupt("return", swal({
+                return _context30.abrupt("return", swal({
                   title: "OOPS!",
                   text: "Enter Numbers of points must be less then the points Card have",
                   icon: "error",
@@ -39182,15 +39236,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 20:
-                _this30.addForm.pointsCardId = _this30.pointsCardId;
-                _this30.addForm.usagePoints = _this30.checkedUsagePoints;
+                _this31.addForm.pointsCardId = _this31.pointsCardId;
+                _this31.addForm.usagePoints = _this31.checkedUsagePoints;
 
-                if (!(_this30.addForm.usagePoints == true && _this30.addForm.otp_valid == false)) {
-                  _context29.next = 24;
+                if (!(_this31.addForm.usagePoints == true && _this31.addForm.otp_valid == false)) {
+                  _context30.next = 24;
                   break;
                 }
 
-                return _context29.abrupt("return", swal({
+                return _context30.abrupt("return", swal({
                   title: "OOPS!",
                   text: "Please verify otp to use loyalty card otherwise uncheck the box",
                   icon: "error",
@@ -39198,12 +39252,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 24:
-                if (!(_this30.addForm.usagePoints == true && _this30.addForm.otp_valid == false && _this30.addForm.otp_cnic != _this30.addForm.customerCNIC)) {
-                  _context29.next = 26;
+                if (!(_this31.addForm.usagePoints == true && _this31.addForm.otp_valid == false && _this31.addForm.otp_cnic != _this31.addForm.customerCNIC)) {
+                  _context30.next = 26;
                   break;
                 }
 
-                return _context29.abrupt("return", swal({
+                return _context30.abrupt("return", swal({
                   title: "OOPS!",
                   text: "Cnic changed please verify it",
                   icon: "error",
@@ -39211,12 +39265,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 26:
-                if (!_this30.bookingLoading) {
-                  _context29.next = 28;
+                if (!_this31.bookingLoading) {
+                  _context30.next = 28;
                   break;
                 }
 
-                return _context29.abrupt("return", swal({
+                return _context30.abrupt("return", swal({
                   title: "OOPS!",
                   text: "Please Wait",
                   icon: "error",
@@ -39224,15 +39278,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 28:
-                _this30.bookingLoading = true;
-                _context29.next = 31;
-                return _this30.callApi("post", "booking/store", _this30.addForm);
+                _this31.bookingLoading = true;
+                _context30.next = 31;
+                return _this31.callApi("post", "booking/store", _this31.addForm);
 
               case 31:
-                resTicket = _context29.sent;
+                resTicket = _context30.sent;
 
                 if (!(resTicket.status == 200)) {
-                  _context29.next = 64;
+                  _context30.next = 64;
                   break;
                 }
 
@@ -39242,10 +39296,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   position: 'topRight',
                   hideAfter: 1000
                 });
-                bookType = _this30.addForm.type;
-                departureTime = _this30.addForm.departure_time;
-                date = _this30.addForm.date;
-                _this30.addForm = {
+                bookType = _this31.addForm.type;
+                departureTime = _this31.addForm.departure_time;
+                date = _this31.addForm.date;
+                _this31.addForm = {
                   totalAmount: 0,
                   discount: '',
                   totalFare: 0,
@@ -39256,45 +39310,45 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   customerCNIC: "",
                   transaction_id: ""
                 };
-                _this30.label = "";
-                _this30.hideCheckBox = false;
-                _this30.haveLabel = false;
-                _this30.pointsUsage = false;
-                _this30.ticketsIds = resTicket.data.ids;
-                _this30.addForm.date = date;
-                _this30.addForm.terminalId = resTicket.data.authTerminalId;
-                _this30.addForm.gender = 1;
-                _this30.addForm.type = bookType;
-                _this30.addForm.departure_time = departureTime;
-                _this30.addForm.schedule = resTicket.data.ticket[0].schedule_id;
-                _this30.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
-                _this30.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
-                _this30.selectedSeats.length = 0;
-                _this30.addForm.alreadyBookedId = [];
-                _this30.addForm.reservedFare = [];
-                _this30.addForm.advanceSeatClass = [];
+                _this31.label = "";
+                _this31.hideCheckBox = false;
+                _this31.haveLabel = false;
+                _this31.pointsUsage = false;
+                _this31.ticketsIds = resTicket.data.ids;
+                _this31.addForm.date = date;
+                _this31.addForm.terminalId = resTicket.data.authTerminalId;
+                _this31.addForm.gender = 1;
+                _this31.addForm.type = bookType;
+                _this31.addForm.departure_time = departureTime;
+                _this31.addForm.schedule = resTicket.data.ticket[0].schedule_id;
+                _this31.addForm.destinationCity = parseInt(resTicket.data.ticket[0].destination_city_id);
+                _this31.addForm.departureCity = parseInt(resTicket.data.ticket[0].departure_city_id);
+                _this31.selectedSeats.length = 0;
+                _this31.addForm.alreadyBookedId = [];
+                _this31.addForm.reservedFare = [];
+                _this31.addForm.advanceSeatClass = [];
 
-                _this30.fetchScheduleData();
+                _this31.fetchScheduleData();
 
-                _this30.resetArrays();
+                _this31.resetArrays();
 
                 setTimeout(function () {
-                  _this30.bookingLoading = false;
+                  _this31.bookingLoading = false;
                 }, 1000);
                 setTimeout(function () {
                   if (resTicket.data.ticket[0].type == "booked") {
-                    _this30.$refs.refTicket.submit();
+                    _this31.$refs.refTicket.submit();
                   }
                 }, 700);
-                _context29.next = 61;
-                return _this30.callApi("post", "booking/whatsapp/message", {
+                _context30.next = 61;
+                return _this31.callApi("post", "booking/whatsapp/message", {
                   invoice_id: resTicket.data.ticket[0].invoice_id,
                   type: bookType
                 });
 
               case 61:
-                resBookingDetail = _context29.sent;
-                _context29.next = 67;
+                resBookingDetail = _context30.sent;
+                _context30.next = 67;
                 break;
 
               case 64:
@@ -39320,34 +39374,34 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }
 
                 setTimeout(function () {
-                  _this30.bookingLoading = false;
+                  _this31.bookingLoading = false;
                 }, 1000);
 
               case 67:
               case "end":
-                return _context29.stop();
+                return _context30.stop();
             }
           }
-        }, _callee29);
+        }, _callee30);
       }))();
     },
     resendSms: function resendSms(invoice_id, type) {
-      var _this31 = this;
+      var _this32 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee30() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee31() {
         var resMessage;
-        return _regeneratorRuntime().wrap(function _callee30$(_context30) {
+        return _regeneratorRuntime().wrap(function _callee31$(_context31) {
           while (1) {
-            switch (_context30.prev = _context30.next) {
+            switch (_context31.prev = _context31.next) {
               case 0:
-                _context30.next = 2;
-                return _this31.callApi("post", "booking/whatsapp/message", {
+                _context31.next = 2;
+                return _this32.callApi("post", "booking/whatsapp/message", {
                   invoice_id: invoice_id,
                   type: type
                 });
 
               case 2:
-                resMessage = _context30.sent;
+                resMessage = _context31.sent;
 
                 if (resMessage.status == 200) {
                   swal({
@@ -39360,27 +39414,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 4:
               case "end":
-                return _context30.stop();
+                return _context31.stop();
             }
           }
-        }, _callee30);
+        }, _callee31);
       }))();
     },
     sendOtp: function sendOtp() {
-      var _this32 = this;
+      var _this33 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee31() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee32() {
         var resMessage;
-        return _regeneratorRuntime().wrap(function _callee31$(_context31) {
+        return _regeneratorRuntime().wrap(function _callee32$(_context32) {
           while (1) {
-            switch (_context31.prev = _context31.next) {
+            switch (_context32.prev = _context32.next) {
               case 0:
-                if (_this32.addForm.customerCNIC) {
-                  _context31.next = 2;
+                if (_this33.addForm.customerCNIC) {
+                  _context32.next = 2;
                   break;
                 }
 
-                return _context31.abrupt("return", swal({
+                return _context32.abrupt("return", swal({
                   title: "OOPS!",
                   text: "Please enter valid cnic",
                   icon: "error",
@@ -39388,12 +39442,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 2:
-                _this32.otpLoader = true;
-                _context31.next = 5;
-                return _this32.callApi("post", "booking/send-otp", _this32.addForm);
+                _this33.otpLoader = true;
+                _context32.next = 5;
+                return _this33.callApi("post", "booking/send-otp", _this33.addForm);
 
               case 5:
-                resMessage = _context31.sent;
+                resMessage = _context32.sent;
 
                 if (resMessage.status == 200) {
                   swal({
@@ -39405,67 +39459,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }
 
                 if (resMessage.status == 409) {
-                  swal({
-                    title: "OOPS!",
-                    text: resMessage.data.error.join("\n"),
-                    icon: "error",
-                    timer: 2000
-                  });
-                  console.log(resMessage.data.error);
-                }
-
-                _this32.otpLoader = false;
-
-              case 9:
-              case "end":
-                return _context31.stop();
-            }
-          }
-        }, _callee31);
-      }))();
-    },
-    verifyOtp: function verifyOtp() {
-      var _this33 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee32() {
-        var resMessage;
-        return _regeneratorRuntime().wrap(function _callee32$(_context32) {
-          while (1) {
-            switch (_context32.prev = _context32.next) {
-              case 0:
-                if (!(!_this33.addForm.otp || _this33.addForm.otp.length !== 6)) {
-                  _context32.next = 2;
-                  break;
-                }
-
-                return _context32.abrupt("return", swal({
-                  title: "OOPS!",
-                  text: "Please enter a valid 6-digit OTP",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 2:
-                _this33.otpLoader = true;
-                _context32.next = 5;
-                return _this33.callApi("post", "booking/verify-otp", _this33.addForm);
-
-              case 5:
-                resMessage = _context32.sent;
-
-                if (resMessage.status == 200) {
-                  _this33.addForm.otp_valid = true;
-                  _this33.addForm.otp_cnic = _this33.addForm.customerCNIC;
-                  swal({
-                    title: "Success",
-                    text: "Verified Successfully",
-                    icon: "success",
-                    timer: 2000
-                  });
-                }
-
-                if (resMessage.status == 409) {
-                  _this33.addForm.otp_valid = false;
                   swal({
                     title: "OOPS!",
                     text: resMessage.data.error.join("\n"),
@@ -39485,7 +39478,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }, _callee32);
       }))();
     },
-    sendDiscountOtp: function sendDiscountOtp() {
+    verifyOtp: function verifyOtp() {
       var _this34 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee33() {
@@ -39494,14 +39487,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           while (1) {
             switch (_context33.prev = _context33.next) {
               case 0:
-                if (_this34.addForm.customerCNIC) {
+                if (!(!_this34.addForm.otp || _this34.addForm.otp.length !== 6)) {
                   _context33.next = 2;
                   break;
                 }
 
                 return _context33.abrupt("return", swal({
                   title: "OOPS!",
-                  text: "Please enter valid CNIC",
+                  text: "Please enter a valid 6-digit OTP",
                   icon: "error",
                   timer: 2000
                 }));
@@ -39509,10 +39502,71 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               case 2:
                 _this34.otpLoader = true;
                 _context33.next = 5;
-                return _this34.callApi("post", "booking/send-discount-otp", _this34.addForm);
+                return _this34.callApi("post", "booking/verify-otp", _this34.addForm);
 
               case 5:
                 resMessage = _context33.sent;
+
+                if (resMessage.status == 200) {
+                  _this34.addForm.otp_valid = true;
+                  _this34.addForm.otp_cnic = _this34.addForm.customerCNIC;
+                  swal({
+                    title: "Success",
+                    text: "Verified Successfully",
+                    icon: "success",
+                    timer: 2000
+                  });
+                }
+
+                if (resMessage.status == 409) {
+                  _this34.addForm.otp_valid = false;
+                  swal({
+                    title: "OOPS!",
+                    text: resMessage.data.error.join("\n"),
+                    icon: "error",
+                    timer: 2000
+                  });
+                  console.log(resMessage.data.error);
+                }
+
+                _this34.otpLoader = false;
+
+              case 9:
+              case "end":
+                return _context33.stop();
+            }
+          }
+        }, _callee33);
+      }))();
+    },
+    sendDiscountOtp: function sendDiscountOtp() {
+      var _this35 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee34() {
+        var resMessage;
+        return _regeneratorRuntime().wrap(function _callee34$(_context34) {
+          while (1) {
+            switch (_context34.prev = _context34.next) {
+              case 0:
+                if (_this35.addForm.customerCNIC) {
+                  _context34.next = 2;
+                  break;
+                }
+
+                return _context34.abrupt("return", swal({
+                  title: "OOPS!",
+                  text: "Please enter valid CNIC",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 2:
+                _this35.otpLoader = true;
+                _context34.next = 5;
+                return _this35.callApi("post", "booking/send-discount-otp", _this35.addForm);
+
+              case 5:
+                resMessage = _context34.sent;
 
                 if (resMessage.status == 200) {
                   swal({
@@ -39533,31 +39587,31 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   console.log(resMessage.data.error);
                 }
 
-                _this34.otpLoader = false;
+                _this35.otpLoader = false;
 
               case 9:
               case "end":
-                return _context33.stop();
+                return _context34.stop();
             }
           }
-        }, _callee33);
+        }, _callee34);
       }))();
     },
     verifyDiscountOtp: function verifyDiscountOtp() {
-      var _this35 = this;
+      var _this36 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee34() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee35() {
         var resMessage;
-        return _regeneratorRuntime().wrap(function _callee34$(_context34) {
+        return _regeneratorRuntime().wrap(function _callee35$(_context35) {
           while (1) {
-            switch (_context34.prev = _context34.next) {
+            switch (_context35.prev = _context35.next) {
               case 0:
-                if (!(!_this35.addForm.discountOtp || _this35.addForm.discountOtp.length !== 6)) {
-                  _context34.next = 2;
+                if (!(!_this36.addForm.discountOtp || _this36.addForm.discountOtp.length !== 6)) {
+                  _context35.next = 2;
                   break;
                 }
 
-                return _context34.abrupt("return", swal({
+                return _context35.abrupt("return", swal({
                   title: "OOPS!",
                   text: "Please enter a valid 6-digit OTP",
                   icon: "error",
@@ -39565,23 +39619,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 2:
-                _this35.otpLoader = true;
-                _context34.next = 5;
-                return _this35.callApi("post", "booking/verify-discount-otp", _this35.addForm);
+                _this36.otpLoader = true;
+                _context35.next = 5;
+                return _this36.callApi("post", "booking/verify-discount-otp", _this36.addForm);
 
               case 5:
-                resMessage = _context34.sent;
+                resMessage = _context35.sent;
 
                 if (!(resMessage.status == 200)) {
-                  _context34.next = 12;
+                  _context35.next = 12;
                   break;
                 }
 
-                _this35.addForm.discount_otp_valid = true;
-                _this35.addForm.discountOtpCnic = _this35.addForm.customerCNIC; // Apply discount automatically
+                _this36.addForm.discount_otp_valid = true;
+                _this36.addForm.discountOtpCnic = _this36.addForm.customerCNIC; // Apply discount automatically
 
-                _context34.next = 11;
-                return _this35.applyDiscountCardAuto();
+                _context35.next = 11;
+                return _this36.applyDiscountCardAuto();
 
               case 11:
                 swal({
@@ -39593,7 +39647,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 12:
                 if (resMessage.status === 409) {
-                  _this35.addForm.discount_otp_valid = false;
+                  _this36.addForm.discount_otp_valid = false;
                   swal({
                     title: "OOPS!",
                     text: resMessage.data.error.join("\n"),
@@ -39602,44 +39656,44 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   });
                 }
 
-                _this35.otpLoader = false;
+                _this36.otpLoader = false;
 
               case 14:
               case "end":
-                return _context34.stop();
+                return _context35.stop();
             }
           }
-        }, _callee34);
+        }, _callee35);
       }))();
     },
     applyDiscountCardAuto: function applyDiscountCardAuto() {
-      var _this36 = this;
+      var _this37 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee35() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee36() {
         var cleanCNIC, _res, card, discountAmount, discountText;
 
-        return _regeneratorRuntime().wrap(function _callee35$(_context35) {
+        return _regeneratorRuntime().wrap(function _callee36$(_context36) {
           while (1) {
-            switch (_context35.prev = _context35.next) {
+            switch (_context36.prev = _context36.next) {
               case 0:
-                if (_this36.addForm.customerCNIC) {
-                  _context35.next = 2;
+                if (_this37.addForm.customerCNIC) {
+                  _context36.next = 2;
                   break;
                 }
 
-                return _context35.abrupt("return");
+                return _context36.abrupt("return");
 
               case 2:
-                cleanCNIC = _this36.addForm.customerCNIC.replace(/\D/g, "");
-                _context35.prev = 3;
-                _context35.next = 6;
-                return _this36.callApi("post", "booking/getDiscountCard", {
-                  cnicNumber: _this36.addForm.customerCNIC,
+                cleanCNIC = _this37.addForm.customerCNIC.replace(/\D/g, "");
+                _context36.prev = 3;
+                _context36.next = 6;
+                return _this37.callApi("post", "booking/getDiscountCard", {
+                  cnicNumber: _this37.addForm.customerCNIC,
                   status: 'addFormCNIC'
                 });
 
               case 6:
-                _res = _context35.sent;
+                _res = _context36.sent;
 
                 if (_res.status === 200 && _res.data && _res.data.discount_card_type) {
                   card = _res.data.discount_card_type;
@@ -39650,118 +39704,118 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     discountAmount = Number(card.flat_discount || 0);
                     discountText = "Flat Discount: Rs ".concat(discountAmount);
                   } else if (card.discount_type === "percentage") {
-                    discountAmount = Number(_this36.addForm.totalFare) * Number(card.percentage_discount || 0) / 100;
+                    discountAmount = Number(_this37.addForm.totalFare) * Number(card.percentage_discount || 0) / 100;
                     discountText = "Discount: ".concat(card.percentage_discount, "%");
                   } // Apply discount
 
 
-                  _this36.addForm.discount = discountAmount; // Recalculate total
+                  _this37.addForm.discount = discountAmount; // Recalculate total
 
-                  _this36.$nextTick(function () {
-                    return _this36.calculateTotal();
+                  _this37.$nextTick(function () {
+                    return _this37.calculateTotal();
                   }); // Update UI
 
 
-                  _this36.discountLabel = "This Customer Has a Discount Card (".concat(discountText, ")");
-                  _this36.discountCardId = _res.data.id;
-                  _this36.showDiscountCheckbox = true;
-                  _this36.haveLabel = true;
+                  _this37.discountLabel = "This Customer Has a Discount Card (".concat(discountText, ")");
+                  _this37.discountCardId = _res.data.id;
+                  _this37.showDiscountCheckbox = true;
+                  _this37.haveLabel = true;
                 } else {
                   // No discount
-                  _this36.addForm.discount = 0;
+                  _this37.addForm.discount = 0;
 
-                  _this36.$nextTick(function () {
-                    return _this36.calculateTotal();
+                  _this37.$nextTick(function () {
+                    return _this37.calculateTotal();
                   });
 
-                  _this36.discountLabel = "";
-                  _this36.showDiscountCheckbox = false;
-                  if (!_this36.showPointsCheckbox) _this36.haveLabel = false;
+                  _this37.discountLabel = "";
+                  _this37.showDiscountCheckbox = false;
+                  if (!_this37.showPointsCheckbox) _this37.haveLabel = false;
                 }
 
-                _context35.next = 18;
+                _context36.next = 18;
                 break;
 
               case 10:
-                _context35.prev = 10;
-                _context35.t0 = _context35["catch"](3);
-                console.error("Error fetching discount card:", _context35.t0);
-                _this36.addForm.discount = 0;
+                _context36.prev = 10;
+                _context36.t0 = _context36["catch"](3);
+                console.error("Error fetching discount card:", _context36.t0);
+                _this37.addForm.discount = 0;
 
-                _this36.$nextTick(function () {
-                  return _this36.calculateTotal();
+                _this37.$nextTick(function () {
+                  return _this37.calculateTotal();
                 });
 
-                _this36.discountLabel = "";
-                _this36.showDiscountCheckbox = false;
-                if (!_this36.showPointsCheckbox) _this36.haveLabel = false;
-
-              case 18:
-              case "end":
-                return _context35.stop();
-            }
-          }
-        }, _callee35, null, [[3, 10]]);
-      }))();
-    },
-    resetArrays: function resetArrays() {
-      var _this37 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee36() {
-        return _regeneratorRuntime().wrap(function _callee36$(_context36) {
-          while (1) {
-            switch (_context36.prev = _context36.next) {
-              case 0:
-                _this37.selectedSeats = [];
-                _this37.schedule = [];
-                _this37.selectedSeatsFare = [];
-                _this37.selectedSeatsClass = [];
-                _this37.checkSameType = [];
-                _this37.selectedBookedSeats = [];
-                _this37.selectedOverIssueSeats = [];
-                _this37.selectedBookedOverIssueSeats = [];
-                _this37.addForm.selectedSeats = [];
-                _this37.addForm.selectedBookedSeats = [];
-                _this37.addForm.selectedOverIssueSeats = [];
-                _this37.addForm.alreadyBookedId = [];
-                _this37.addForm.reservedFare = [];
-                _this37.addForm.advanceSeatClass = [];
-                _this37.advanceSeat = [];
-                _this37.addForm.selectedBookedOverIssueSeats = [];
-                _this37.bookedSeats = [];
-                _this37.bookedOverIssueSeats = [];
+                _this37.discountLabel = "";
+                _this37.showDiscountCheckbox = false;
+                if (!_this37.showPointsCheckbox) _this37.haveLabel = false;
 
               case 18:
               case "end":
                 return _context36.stop();
             }
           }
-        }, _callee36);
+        }, _callee36, null, [[3, 10]]);
       }))();
     },
-    details: function details(date, schedule_id) {
+    resetArrays: function resetArrays() {
       var _this38 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee37() {
-        var resBookingDetail;
         return _regeneratorRuntime().wrap(function _callee37$(_context37) {
           while (1) {
             switch (_context37.prev = _context37.next) {
               case 0:
-                $("#" + _this38.detailsFormId + " table").DataTable().destroy();
-                _context37.next = 3;
-                return _this38.callApi("post", "booking/details", {
+                _this38.selectedSeats = [];
+                _this38.schedule = [];
+                _this38.selectedSeatsFare = [];
+                _this38.selectedSeatsClass = [];
+                _this38.checkSameType = [];
+                _this38.selectedBookedSeats = [];
+                _this38.selectedOverIssueSeats = [];
+                _this38.selectedBookedOverIssueSeats = [];
+                _this38.addForm.selectedSeats = [];
+                _this38.addForm.selectedBookedSeats = [];
+                _this38.addForm.selectedOverIssueSeats = [];
+                _this38.addForm.alreadyBookedId = [];
+                _this38.addForm.reservedFare = [];
+                _this38.addForm.advanceSeatClass = [];
+                _this38.advanceSeat = [];
+                _this38.addForm.selectedBookedOverIssueSeats = [];
+                _this38.bookedSeats = [];
+                _this38.bookedOverIssueSeats = [];
+
+              case 18:
+              case "end":
+                return _context37.stop();
+            }
+          }
+        }, _callee37);
+      }))();
+    },
+    details: function details(date, schedule_id) {
+      var _this39 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee38() {
+        var resBookingDetail;
+        return _regeneratorRuntime().wrap(function _callee38$(_context38) {
+          while (1) {
+            switch (_context38.prev = _context38.next) {
+              case 0:
+                $("#" + _this39.detailsFormId + " table").DataTable().destroy();
+                _context38.next = 3;
+                return _this39.callApi("post", "booking/details", {
                   date: date,
                   schedule_id: schedule_id
                 });
 
               case 3:
-                resBookingDetail = _context37.sent;
+                resBookingDetail = _context38.sent;
 
                 if (resBookingDetail.status === 200) {
-                  _this38.bookingDetails = resBookingDetail.data;
+                  _this39.bookingDetails = resBookingDetail.data;
                   setTimeout(function () {
-                    $("#" + _this38.detailsFormId + " table").DataTable();
+                    $("#" + _this39.detailsFormId + " table").DataTable();
                   }, 300);
                 } else {
                   console.log(resBookingDetail);
@@ -39769,10 +39823,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 5:
               case "end":
-                return _context37.stop();
+                return _context38.stop();
             }
           }
-        }, _callee37);
+        }, _callee38);
       }))();
     },
     passDataToCancelModel: function passDataToCancelModel(data) {
@@ -39807,15 +39861,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       $("#cancel_all_ticket").modal('show');
     },
     cancelBooking: function cancelBooking(dataEnter) {
-      var _this39 = this;
+      var _this40 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee38() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee39() {
         var data, resCancelBooking, resBookingDetail;
-        return _regeneratorRuntime().wrap(function _callee38$(_context38) {
+        return _regeneratorRuntime().wrap(function _callee39$(_context39) {
           while (1) {
-            switch (_context38.prev = _context38.next) {
+            switch (_context39.prev = _context39.next) {
               case 0:
-                _this39.cancelLoading = true;
+                _this40.cancelLoading = true;
                 data = {
                   date: dataEnter.dataDate,
                   schedule_id: dataEnter.dataSchedule,
@@ -39826,44 +39880,44 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   percentage: dataEnter.percentage,
                   remarks: dataEnter.reason
                 };
-                _context38.next = 4;
-                return _this39.callApi("post", "booking/canceling", data);
+                _context39.next = 4;
+                return _this40.callApi("post", "booking/canceling", data);
 
               case 4:
-                resCancelBooking = _context38.sent;
+                resCancelBooking = _context39.sent;
 
                 if (!(resCancelBooking.status == 200)) {
-                  _context38.next = 15;
+                  _context39.next = 15;
                   break;
                 }
 
-                _this39.cancelLoading = false;
+                _this40.cancelLoading = false;
                 swal({
                   title: "Success",
                   text: "Booking Canceled Successfully",
                   icon: "success",
                   timer: 2000
                 });
-                _this39.addForm.flag = 0;
+                _this40.addForm.flag = 0;
 
-                _this39.fetchScheduleData();
+                _this40.fetchScheduleData();
 
-                _this39.resetArrays();
+                _this40.resetArrays();
 
-                _this39.closeModal();
+                _this40.closeModal();
 
-                _context38.next = 14;
-                return _this39.callApi("post", "booking/whatsapp/cancel/message", {
+                _context39.next = 14;
+                return _this40.callApi("post", "booking/whatsapp/cancel/message", {
                   tickets: resCancelBooking.data.tickets
                 });
 
               case 14:
-                resBookingDetail = _context38.sent;
+                resBookingDetail = _context39.sent;
 
               case 15:
                 if (resCancelBooking.status == 422) {
                   (function () {
-                    _this39.dropScheduleButton = false;
+                    _this40.dropScheduleButton = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -39881,50 +39935,50 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   })();
                 }
 
-                _this39.cancelLoading = false;
+                _this40.cancelLoading = false;
 
               case 17:
               case "end":
-                return _context38.stop();
+                return _context39.stop();
             }
           }
-        }, _callee38);
+        }, _callee39);
       }))();
     },
     cancelRefundBooking: function cancelRefundBooking(dataEnter) {
-      var _this40 = this;
+      var _this41 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee39() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee40() {
         var cancelData, resCancelBooking, _resCancelBooking$dat, ticketId, companyPercentage, customerRefundPercentage, refundAmount, refundPayload, refundRes, _refundRes$data;
 
-        return _regeneratorRuntime().wrap(function _callee39$(_context39) {
+        return _regeneratorRuntime().wrap(function _callee40$(_context40) {
           while (1) {
-            switch (_context39.prev = _context39.next) {
+            switch (_context40.prev = _context40.next) {
               case 0:
-                _this40.cancelLoading = true;
-                _context39.prev = 1;
+                _this41.cancelLoading = true;
+                _context40.prev = 1;
 
                 if (!(dataEnter.dataType === "booked")) {
-                  _context39.next = 9;
+                  _context40.next = 9;
                   break;
                 }
 
                 if (!(dataEnter.percentage === null || dataEnter.percentage === undefined || dataEnter.percentage === "" || dataEnter.percentage === "first")) {
-                  _context39.next = 6;
+                  _context40.next = 6;
                   break;
                 }
 
                 Swal.fire("Warning", "Please select a refund percentage.", "warning");
-                return _context39.abrupt("return");
+                return _context40.abrupt("return");
 
               case 6:
                 if (!(!dataEnter.reason || !dataEnter.reason.trim())) {
-                  _context39.next = 9;
+                  _context40.next = 9;
                   break;
                 }
 
                 Swal.fire("Warning", "Please enter a refund reason.", "warning");
-                return _context39.abrupt("return");
+                return _context40.abrupt("return");
 
               case 9:
                 /* ======================
@@ -39940,44 +39994,44 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   percentage: dataEnter.percentage,
                   remarks: dataEnter.reason
                 };
-                _context39.next = 12;
-                return _this40.callApi("post", "booking/canceling", cancelData);
+                _context40.next = 12;
+                return _this41.callApi("post", "booking/canceling", cancelData);
 
               case 12:
-                resCancelBooking = _context39.sent;
+                resCancelBooking = _context40.sent;
 
                 if (!(resCancelBooking.status !== 200)) {
-                  _context39.next = 16;
+                  _context40.next = 16;
                   break;
                 }
 
                 Swal.fire("Error", "Unable to cancel booking.", "error");
-                return _context39.abrupt("return");
+                return _context40.abrupt("return");
 
               case 16:
                 if (!(dataEnter.dataType === "booked")) {
-                  _context39.next = 36;
+                  _context40.next = 36;
                   break;
                 }
 
                 ticketId = (_resCancelBooking$dat = resCancelBooking.data.tickets) === null || _resCancelBooking$dat === void 0 ? void 0 : _resCancelBooking$dat[0];
 
                 if (ticketId) {
-                  _context39.next = 21;
+                  _context40.next = 21;
                   break;
                 }
 
                 Swal.fire("Error", "Ticket ID missing for refund.", "error");
-                return _context39.abrupt("return");
+                return _context40.abrupt("return");
 
               case 21:
                 if (!(!dataEnter.amount || Number(dataEnter.amount) <= 0)) {
-                  _context39.next = 24;
+                  _context40.next = 24;
                   break;
                 }
 
                 Swal.fire("Error", "Seat fare missing for refund.", "error");
-                return _context39.abrupt("return");
+                return _context40.abrupt("return");
 
               case 24:
                 companyPercentage = Number(dataEnter.percentage); // company keeps this %
@@ -39986,12 +40040,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 // ✅ If company keeps 100%, no refund
 
                 if (!(customerRefundPercentage <= 0)) {
-                  _context39.next = 29;
+                  _context40.next = 29;
                   break;
                 }
 
                 Swal.fire("Success", "Ticket cancelled successfully (No refund).", "info");
-                return _context39.abrupt("return");
+                return _context40.abrupt("return");
 
               case 29:
                 refundAmount = Number(dataEnter.amount) * customerRefundPercentage / 100;
@@ -40005,11 +40059,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   refund_reason: dataEnter.reason.trim()
                 };
                 console.log("Refund Payload:", refundPayload);
-                _context39.next = 34;
-                return _this40.callApi("post", "allBooking/booking-refund", refundPayload);
+                _context40.next = 34;
+                return _this41.callApi("post", "allBooking/booking-refund", refundPayload);
 
               case 34:
-                refundRes = _context39.sent;
+                refundRes = _context40.sent;
 
                 if (refundRes.status === 200 && refundRes.data.success) {
                   Swal.fire("Success", "Refund processed successfully. Company kept ".concat(companyPercentage, "% and customer got ").concat(customerRefundPercentage, "% refund."), "success");
@@ -40018,26 +40072,26 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }
 
               case 36:
-                _context39.next = 42;
+                _context40.next = 42;
                 break;
 
               case 38:
-                _context39.prev = 38;
-                _context39.t0 = _context39["catch"](1);
-                console.log(_context39.t0);
+                _context40.prev = 38;
+                _context40.t0 = _context40["catch"](1);
+                console.log(_context40.t0);
                 Swal.fire("Error", "Something went wrong.", "error");
 
               case 42:
-                _context39.prev = 42;
-                _this40.cancelLoading = false;
-                return _context39.finish(42);
+                _context40.prev = 42;
+                _this41.cancelLoading = false;
+                return _context40.finish(42);
 
               case 45:
               case "end":
-                return _context39.stop();
+                return _context40.stop();
             }
           }
-        }, _callee39, null, [[1, 38, 42, 45]]);
+        }, _callee40, null, [[1, 38, 42, 45]]);
       }))();
     },
     //over issue model complete data
@@ -40053,20 +40107,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       $("#overIssue_model").modal('show');
     },
     addOverIssueTicket: function addOverIssueTicket(dataEnter) {
-      var _this41 = this;
+      var _this42 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee40() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee41() {
         var data, resOverIssue;
-        return _regeneratorRuntime().wrap(function _callee40$(_context40) {
+        return _regeneratorRuntime().wrap(function _callee41$(_context41) {
           while (1) {
-            switch (_context40.prev = _context40.next) {
+            switch (_context41.prev = _context41.next) {
               case 0:
                 if (!(dataEnter.reason == '' || typeof dataEnter.reason == 'undefined')) {
-                  _context40.next = 2;
+                  _context41.next = 2;
                   break;
                 }
 
-                return _context40.abrupt("return", swal({
+                return _context41.abrupt("return", swal({
                   title: "Required!!",
                   text: "Remarks is Required!",
                   icon: "error",
@@ -40084,11 +40138,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   percentage: dataEnter.percentage,
                   remarks: dataEnter.reason
                 };
-                _context40.next = 5;
-                return _this41.callApi("post", "booking/overIssueAdd", data);
+                _context41.next = 5;
+                return _this42.callApi("post", "booking/overIssueAdd", data);
 
               case 5:
-                resOverIssue = _context40.sent;
+                resOverIssue = _context41.sent;
 
                 if (resOverIssue.status == 200) {
                   swal({
@@ -40098,9 +40152,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this41.fetchScheduleData();
+                  _this42.fetchScheduleData();
 
-                  _this41.closeModal();
+                  _this42.closeModal();
                 }
 
                 if (resOverIssue.status == 422 && resOverIssue.data.message) {
@@ -40133,23 +40187,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 9:
               case "end":
-                return _context40.stop();
+                return _context41.stop();
             }
           }
-        }, _callee40);
+        }, _callee41);
       }))();
     },
     //ELT MODEL DATA
     passDataToEltModel: function passDataToEltModel(data) {
-      var _this42 = this;
+      var _this43 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee41() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee42() {
         var resELT;
-        return _regeneratorRuntime().wrap(function _callee41$(_context41) {
+        return _regeneratorRuntime().wrap(function _callee42$(_context42) {
           while (1) {
-            switch (_context41.prev = _context41.next) {
+            switch (_context42.prev = _context42.next) {
               case 0:
-                _this42.eltData = {
+                _this43.eltData = {
                   dataDate: data.date,
                   dataCustomer: data.customer_id,
                   dataSchedule: data.schedule_id,
@@ -40158,50 +40212,50 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   dataSeat_no: data.seat_no,
                   dataSeatFare: data.seat_fare
                 };
-                _context41.next = 3;
-                return _this42.callApi("post", "booking/elt/fetch/old", data);
+                _context42.next = 3;
+                return _this43.callApi("post", "booking/elt/fetch/old", data);
 
               case 3:
-                resELT = _context41.sent;
+                resELT = _context42.sent;
 
                 if (resELT.status == 200) {
-                  _this42.editAbleELT = true;
-                  _this42.eltData.eltWeight = resELT.data.elt_weight;
-                  _this42.eltData.eltPrice = resELT.data.elt_price;
-                  _this42.eltData.dataDescription = resELT.data.elt_description;
-                  _this42.eltData.alreadyExist = resELT.data.alreadyExist;
+                  _this43.editAbleELT = true;
+                  _this43.eltData.eltWeight = resELT.data.elt_weight;
+                  _this43.eltData.eltPrice = resELT.data.elt_price;
+                  _this43.eltData.dataDescription = resELT.data.elt_description;
+                  _this43.eltData.alreadyExist = resELT.data.alreadyExist;
                 } else if (resELT.status == 204) {
-                  _this42.editAbleELT = false;
-                  _this42.eltData.eltWeight = '';
-                  _this42.eltData.eltPrice = '';
-                  _this42.eltData.dataDescription = '';
+                  _this43.editAbleELT = false;
+                  _this43.eltData.eltWeight = '';
+                  _this43.eltData.eltPrice = '';
+                  _this43.eltData.dataDescription = '';
                 }
 
                 $("#addELTModel").modal('show');
 
               case 6:
               case "end":
-                return _context41.stop();
+                return _context42.stop();
             }
           }
-        }, _callee41);
+        }, _callee42);
       }))();
     },
     addEltToTicket: function addEltToTicket(dataEnter) {
-      var _this43 = this;
+      var _this44 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee42() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee43() {
         var data, resOverIssue;
-        return _regeneratorRuntime().wrap(function _callee42$(_context42) {
+        return _regeneratorRuntime().wrap(function _callee43$(_context43) {
           while (1) {
-            switch (_context42.prev = _context42.next) {
+            switch (_context43.prev = _context43.next) {
               case 0:
                 if (!(dataEnter.eltWeight == '' || typeof dataEnter.eltWeight == 'undefined')) {
-                  _context42.next = 2;
+                  _context43.next = 2;
                   break;
                 }
 
-                return _context42.abrupt("return", swal({
+                return _context43.abrupt("return", swal({
                   title: "required!",
                   text: "Weight is Required",
                   icon: "error",
@@ -40210,11 +40264,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 2:
                 if (!(dataEnter.eltPrice == '' || typeof dataEnter.eltPrice == 'undefined')) {
-                  _context42.next = 4;
+                  _context43.next = 4;
                   break;
                 }
 
-                return _context42.abrupt("return", swal({
+                return _context43.abrupt("return", swal({
                   title: "required!",
                   text: "Price is Required",
                   icon: "error",
@@ -40235,21 +40289,21 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   eltDescription: dataEnter.dataDescription,
                   alreadyExist: dataEnter.alreadyExist
                 };
-                _this43.EltButton = true;
-                _context42.next = 8;
-                return _this43.callApi("post", "booking/elt", data);
+                _this44.EltButton = true;
+                _context43.next = 8;
+                return _this44.callApi("post", "booking/elt", data);
 
               case 8:
-                resOverIssue = _context42.sent;
+                resOverIssue = _context43.sent;
 
                 if (resOverIssue.status == 201) {
-                  _this43.EltButton = false;
-                  _this43.eltIds = resOverIssue.data.id;
+                  _this44.EltButton = false;
+                  _this44.eltIds = resOverIssue.data.id;
 
-                  _this43.fetchScheduleData();
+                  _this44.fetchScheduleData();
 
                   setTimeout(function () {
-                    _this43.$refs.refElt.submit();
+                    _this44.$refs.refElt.submit();
                   }, 700);
                   swal({
                     title: "Success",
@@ -40258,17 +40312,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this43.closeModal();
+                  _this44.closeModal();
                 }
 
                 if (resOverIssue.status == 200) {
-                  _this43.EltButton = false;
-                  _this43.eltIds = resOverIssue.data.id;
+                  _this44.EltButton = false;
+                  _this44.eltIds = resOverIssue.data.id;
 
-                  _this43.fetchScheduleData();
+                  _this44.fetchScheduleData();
 
                   setTimeout(function () {
-                    _this43.$refs.refElt.submit();
+                    _this44.$refs.refElt.submit();
                   }, 700);
                   swal({
                     title: "Success",
@@ -40277,11 +40331,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this43.closeModal();
+                  _this44.closeModal();
                 }
 
                 if (resOverIssue.status == 422 && resOverIssue.data.message) {
-                  _this43.EltButton = false;
+                  _this44.EltButton = false;
                   swal({
                     title: "Error",
                     text: resOverIssue.data.message,
@@ -40289,14 +40343,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this43.closeModal();
+                  _this44.closeModal();
                 }
 
                 if (resOverIssue.status == 422) {
                   (function () {
-                    _this43.EltButton = false;
+                    _this44.EltButton = false;
 
-                    _this43.closeModal();
+                    _this44.closeModal();
 
                     var errorContent = "";
                     var count = 0;
@@ -40317,27 +40371,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 13:
               case "end":
-                return _context42.stop();
+                return _context43.stop();
             }
           }
-        }, _callee42);
+        }, _callee43);
       }))();
     },
     allRescheduleData: function allRescheduleData() {
-      var _this44 = this;
+      var _this45 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee43() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee44() {
         var arraySingleRescheduleData, oldSeats, totalFare, resReDepartureCity;
-        return _regeneratorRuntime().wrap(function _callee43$(_context43) {
+        return _regeneratorRuntime().wrap(function _callee44$(_context44) {
           while (1) {
-            switch (_context43.prev = _context43.next) {
+            switch (_context44.prev = _context44.next) {
               case 0:
                 arraySingleRescheduleData = [];
                 oldSeats = [];
                 totalFare = 0;
-                _this44.reSpecificCities = [];
-                _this44.rescheduleData.rescheduleSchedule = [];
-                Object.entries(_this44.selectedSeatDataBackEnd).forEach(function (singleSeat, i) {
+                _this45.reSpecificCities = [];
+                _this45.rescheduleData.rescheduleSchedule = [];
+                Object.entries(_this45.selectedSeatDataBackEnd).forEach(function (singleSeat, i) {
                   var _singleSeat$1$0$disco;
 
                   var singlePostData = {};
@@ -40356,34 +40410,34 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   arraySingleRescheduleData['totalFare'] = totalFare;
                   arraySingleRescheduleData['oldSeats'] = oldSeats;
                 });
-                _this44.mainAllRescheduleData = arraySingleRescheduleData;
-                _this44.rescheduleData.dataDepartureCity = parseInt(_this44.mainAllRescheduleData[0].dataDepartureCity);
-                _this44.rescheduleData.rescheduleDate = _this44.mainAllRescheduleData[0].rescheduleDate;
-                _this44.rescheduleData.rescheduleSchedule = 0;
+                _this45.mainAllRescheduleData = arraySingleRescheduleData;
+                _this45.rescheduleData.dataDepartureCity = parseInt(_this45.mainAllRescheduleData[0].dataDepartureCity);
+                _this45.rescheduleData.rescheduleDate = _this45.mainAllRescheduleData[0].rescheduleDate;
+                _this45.rescheduleData.rescheduleSchedule = 0;
 
-                if (!(parseInt(_this44.rescheduleData.dataDepartureCity) == 0)) {
-                  _context43.next = 14;
+                if (!(parseInt(_this45.rescheduleData.dataDepartureCity) == 0)) {
+                  _context44.next = 14;
                   break;
                 }
 
-                _this44.rescheduleData.rescheduleDestinationCity = 0;
-                _context43.next = 18;
+                _this45.rescheduleData.rescheduleDestinationCity = 0;
+                _context44.next = 18;
                 break;
 
               case 14:
-                _context43.next = 16;
-                return _this44.callApi("post", "booking/getDestination", {
-                  id: _this44.mainAllRescheduleData[0].dataDepartureCity
+                _context44.next = 16;
+                return _this45.callApi("post", "booking/getDestination", {
+                  id: _this45.mainAllRescheduleData[0].dataDepartureCity
                 });
 
               case 16:
-                resReDepartureCity = _context43.sent;
+                resReDepartureCity = _context44.sent;
 
                 if (resReDepartureCity.length == 0) {
-                  _this44.rescheduleData.rescheduleDestinationCity = 0;
+                  _this45.rescheduleData.rescheduleDestinationCity = 0;
                 } else {
-                  _this44.rescheduleData.rescheduleDestinationCity = 0;
-                  _this44.reSpecificCities = resReDepartureCity.data;
+                  _this45.rescheduleData.rescheduleDestinationCity = 0;
+                  _this45.reSpecificCities = resReDepartureCity.data;
                 }
 
               case 18:
@@ -40391,25 +40445,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 19:
               case "end":
-                return _context43.stop();
+                return _context44.stop();
             }
           }
-        }, _callee43);
+        }, _callee44);
       }))();
     },
     // Reschedule model
     passDataToRescheduleModel: function passDataToRescheduleModel(data) {
-      var _this45 = this;
+      var _this46 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee44() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee45() {
         var resReDepartureCity;
-        return _regeneratorRuntime().wrap(function _callee44$(_context44) {
+        return _regeneratorRuntime().wrap(function _callee45$(_context45) {
           while (1) {
-            switch (_context44.prev = _context44.next) {
+            switch (_context45.prev = _context45.next) {
               case 0:
-                _this45.mainAllRescheduleData = [];
-                _this45.reSpecificCities = [];
-                _this45.rescheduleData = {
+                _this46.mainAllRescheduleData = [];
+                _this46.reSpecificCities = [];
+                _this46.rescheduleData = {
                   rescheduleDate: data.date,
                   existingDate: data.date,
                   dataCustomer: data.customer_id,
@@ -40421,33 +40475,33 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   dataSeatDiscount: data.discount,
                   dataAll: data
                 };
-                _this45.mainAllRescheduleData[0] = _this45.rescheduleData;
-                _this45.mainAllRescheduleData.totalFare = parseInt(_this45.rescheduleData.dataSeatFare) - parseInt(_this45.rescheduleData.dataSeatDiscount);
-                _this45.mainAllRescheduleData.oldSeats = _this45.rescheduleData.dataSeat_no;
+                _this46.mainAllRescheduleData[0] = _this46.rescheduleData;
+                _this46.mainAllRescheduleData.totalFare = parseInt(_this46.rescheduleData.dataSeatFare) - parseInt(_this46.rescheduleData.dataSeatDiscount);
+                _this46.mainAllRescheduleData.oldSeats = _this46.rescheduleData.dataSeat_no;
 
-                if (!(parseInt(_this45.rescheduleData.dataDepartureCity) == 0)) {
-                  _context44.next = 10;
+                if (!(parseInt(_this46.rescheduleData.dataDepartureCity) == 0)) {
+                  _context45.next = 10;
                   break;
                 }
 
-                _this45.rescheduleData.rescheduleDestinationCity = 0;
-                _context44.next = 14;
+                _this46.rescheduleData.rescheduleDestinationCity = 0;
+                _context45.next = 14;
                 break;
 
               case 10:
-                _context44.next = 12;
-                return _this45.callApi("post", "booking/getDestination", {
-                  id: parseInt(_this45.rescheduleData.dataDepartureCity)
+                _context45.next = 12;
+                return _this46.callApi("post", "booking/getDestination", {
+                  id: parseInt(_this46.rescheduleData.dataDepartureCity)
                 });
 
               case 12:
-                resReDepartureCity = _context44.sent;
+                resReDepartureCity = _context45.sent;
 
                 if (resReDepartureCity.length == 0) {
-                  _this45.rescheduleData.rescheduleDestinationCity = 0;
+                  _this46.rescheduleData.rescheduleDestinationCity = 0;
                 } else {
-                  _this45.rescheduleData.rescheduleDestinationCity = 0;
-                  _this45.reSpecificCities = resReDepartureCity.data;
+                  _this46.rescheduleData.rescheduleDestinationCity = 0;
+                  _this46.reSpecificCities = resReDepartureCity.data;
                 }
 
               case 14:
@@ -40455,32 +40509,32 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 15:
               case "end":
-                return _context44.stop();
+                return _context45.stop();
             }
           }
-        }, _callee44);
+        }, _callee45);
       }))();
     },
     dropScheduleData: function dropScheduleData() {
-      var _this46 = this;
+      var _this47 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee45() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee46() {
         var resDropSchedule;
-        return _regeneratorRuntime().wrap(function _callee45$(_context45) {
+        return _regeneratorRuntime().wrap(function _callee46$(_context46) {
           while (1) {
-            switch (_context45.prev = _context45.next) {
+            switch (_context46.prev = _context46.next) {
               case 0:
-                _this46.dropScheduleButton = true;
-                _context45.next = 3;
-                return _this46.callApi("post", "booking/dropSchedule", _this46.dropScheduleFormData);
+                _this47.dropScheduleButton = true;
+                _context46.next = 3;
+                return _this47.callApi("post", "booking/dropSchedule", _this47.dropScheduleFormData);
 
               case 3:
-                resDropSchedule = _context45.sent;
+                resDropSchedule = _context46.sent;
 
                 if (resDropSchedule.status == 200) {
-                  _this46.dropScheduleButton = false;
+                  _this47.dropScheduleButton = false;
 
-                  _this46.busDropCheck();
+                  _this47.busDropCheck();
 
                   swal({
                     title: "Success",
@@ -40489,12 +40543,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this46.closeModal();
+                  _this47.closeModal();
                 }
 
                 if (resDropSchedule.status == 422) {
                   (function () {
-                    _this46.dropScheduleButton = false;
+                    _this47.dropScheduleButton = false;
                     var errorContent = "";
                     var count = 0;
 
@@ -40514,44 +40568,44 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 6:
               case "end":
-                return _context45.stop();
+                return _context46.stop();
             }
           }
-        }, _callee45);
+        }, _callee46);
       }))();
     },
     rescheduleSeats: function rescheduleSeats() {
-      var _this47 = this;
+      var _this48 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee46() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee47() {
         var resReschedule;
-        return _regeneratorRuntime().wrap(function _callee46$(_context46) {
+        return _regeneratorRuntime().wrap(function _callee47$(_context47) {
           while (1) {
-            switch (_context46.prev = _context46.next) {
+            switch (_context47.prev = _context47.next) {
               case 0:
-                if (!(_this47.alreadyBookedSeat.length != _this47.mainAllRescheduleData.length)) {
-                  _context46.next = 4;
+                if (!(_this48.alreadyBookedSeat.length != _this48.mainAllRescheduleData.length)) {
+                  _context47.next = 4;
                   break;
                 }
 
-                _this47.alreadyBookedSeat = [];
+                _this48.alreadyBookedSeat = [];
 
-                _this47.fetchReScheduleData();
+                _this48.fetchReScheduleData();
 
-                return _context46.abrupt("return", swal({
+                return _context47.abrupt("return", swal({
                   title: "Oops",
-                  text: "Your Just Select " + _this47.mainAllRescheduleData.length + " for Reschedule",
+                  text: "Your Just Select " + _this48.mainAllRescheduleData.length + " for Reschedule",
                   icon: "error",
                   timer: 2000
                 }));
 
               case 4:
-                if (!(parseInt(_this47.rescheduleData.dataDepartureCity) == 0)) {
-                  _context46.next = 6;
+                if (!(parseInt(_this48.rescheduleData.dataDepartureCity) == 0)) {
+                  _context47.next = 6;
                   break;
                 }
 
-                return _context46.abrupt("return", swal({
+                return _context47.abrupt("return", swal({
                   title: "Required!!",
                   text: "Please Select Departure City",
                   icon: "error",
@@ -40559,12 +40613,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 6:
-                if (!(_this47.rescheduleData.rescheduleDestinationCity == 0)) {
-                  _context46.next = 8;
+                if (!(_this48.rescheduleData.rescheduleDestinationCity == 0)) {
+                  _context47.next = 8;
                   break;
                 }
 
-                return _context46.abrupt("return", swal({
+                return _context47.abrupt("return", swal({
                   title: "Required!!",
                   text: "Please Select Destination City",
                   icon: "error",
@@ -40572,12 +40626,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 8:
-                if (!(_this47.rescheduleData.rescheduleDate == '' || typeof _this47.rescheduleData.rescheduleDate == 'undefined')) {
-                  _context46.next = 10;
+                if (!(_this48.rescheduleData.rescheduleDate == '' || typeof _this48.rescheduleData.rescheduleDate == 'undefined')) {
+                  _context47.next = 10;
                   break;
                 }
 
-                return _context46.abrupt("return", swal({
+                return _context47.abrupt("return", swal({
                   title: "Required!!",
                   text: "Date is Required",
                   icon: "error",
@@ -40585,12 +40639,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 10:
-                if (!(_this47.rescheduleData.rescheduleSchedule == 0)) {
-                  _context46.next = 12;
+                if (!(_this48.rescheduleData.rescheduleSchedule == 0)) {
+                  _context47.next = 12;
                   break;
                 }
 
-                return _context46.abrupt("return", swal({
+                return _context47.abrupt("return", swal({
                   title: "Required!!",
                   text: "Please Select Departure Time!!",
                   icon: "error",
@@ -40598,34 +40652,34 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 12:
-                _this47.mainAllRescheduleData.map(function (single, index) {
-                  single.selected_seatNo = _this47.alreadyBookedSeat[index];
-                  single.selected_seatClass = _this47.alreadyBookedSeatClass[index];
-                  single.selected_seatFare = _this47.alreadyBookedSeatFare[index];
-                  single.reason = _this47.rescheduleData.reason;
-                  single.rescheduleDate = _this47.rescheduleData.rescheduleDate;
-                  single.rescheduleSchedule = _this47.rescheduleData.rescheduleSchedule;
-                  single.rescheduleType = _this47.rescheduleSeatType;
-                  single.overIssueReschedule = _this47.overIssueScheduleCheckBox;
-                  single.newDepartureTime = _this47.rescheduleData.rescheduleSchedule;
-                  single.rescheduleDiscount = _this47.rescheduleDiscount;
-                  single.dataDepartureCity = parseInt(_this47.rescheduleData.dataDepartureCity);
-                  single.dataDestination = _this47.rescheduleData.rescheduleDestinationCity;
-                  single.departure_time = _this47.rescheduleData.departure_time;
+                _this48.mainAllRescheduleData.map(function (single, index) {
+                  single.selected_seatNo = _this48.alreadyBookedSeat[index];
+                  single.selected_seatClass = _this48.alreadyBookedSeatClass[index];
+                  single.selected_seatFare = _this48.alreadyBookedSeatFare[index];
+                  single.reason = _this48.rescheduleData.reason;
+                  single.rescheduleDate = _this48.rescheduleData.rescheduleDate;
+                  single.rescheduleSchedule = _this48.rescheduleData.rescheduleSchedule;
+                  single.rescheduleType = _this48.rescheduleSeatType;
+                  single.overIssueReschedule = _this48.overIssueScheduleCheckBox;
+                  single.newDepartureTime = _this48.rescheduleData.rescheduleSchedule;
+                  single.rescheduleDiscount = _this48.rescheduleDiscount;
+                  single.dataDepartureCity = parseInt(_this48.rescheduleData.dataDepartureCity);
+                  single.dataDestination = _this48.rescheduleData.rescheduleDestinationCity;
+                  single.departure_time = _this48.rescheduleData.departure_time;
                 });
 
-                _this47.loadingRescheduleButton = true;
-                _context46.next = 16;
-                return _this47.callApi("post", "booking/store", {
-                  'data': _this47.mainAllRescheduleData,
+                _this48.loadingRescheduleButton = true;
+                _context47.next = 16;
+                return _this48.callApi("post", "booking/store", {
+                  'data': _this48.mainAllRescheduleData,
                   "rc_flag": 1
                 });
 
               case 16:
-                resReschedule = _context46.sent;
+                resReschedule = _context47.sent;
 
                 if (resReschedule.status == 200) {
-                  _this47.loadingRescheduleButton = false;
+                  _this48.loadingRescheduleButton = false;
                   swal({
                     title: "Success",
                     text: "Seat Reschedule Successfully",
@@ -40633,15 +40687,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     timer: 2000
                   });
 
-                  _this47.fetchScheduleData();
+                  _this48.fetchScheduleData();
 
-                  _this47.fetchReScheduleData();
+                  _this48.fetchReScheduleData();
 
-                  _this47.closeModal();
+                  _this48.closeModal();
                 } else {
                   if (resReschedule.status == 422) {
                     (function () {
-                      _this47.loadingRescheduleButton = false;
+                      _this48.loadingRescheduleButton = false;
                       var errorContent = "";
                       var count = 0;
 
@@ -40662,22 +40716,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
               case 18:
               case "end":
-                return _context46.stop();
+                return _context47.stop();
             }
           }
-        }, _callee46);
+        }, _callee47);
       }))();
     },
     // Duplicate Ticket
     duplicateTicket: function duplicateTicket(data) {
-      var _this48 = this;
+      var _this49 = this;
 
       this.ticketsId = data.id;
       setTimeout(function () {
         if (data.type == "booked" || data.type == "over-issue") {
-          _this48.$refs.refDuplicateTicket.submit();
+          _this49.$refs.refDuplicateTicket.submit();
 
-          _this48.closeModal();
+          _this49.closeModal();
         } else {
           swal({
             title: "OOppss!!!",
@@ -40686,139 +40740,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             timer: 2000
           });
 
-          _this48.closeModal();
+          _this49.closeModal();
         }
       }, 700);
     },
     // Duplicate All Ticket
     allTicketDuplicate: function allTicketDuplicate() {
-      var _this49 = this;
+      var _this50 = this;
 
       this.duplicateAllTicket = this.duplicateAllTicket.join('-');
       setTimeout(function () {
-        _this49.$refs.refDuplicateAllTicket.submit();
+        _this50.$refs.refDuplicateAllTicket.submit();
 
-        _this49.closeModal();
+        _this50.closeModal();
       }, 700);
     },
     // Get Passengers list
     getCustomerList: function getCustomerList() {
-      var _this50 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee47() {
-        var resCheckedBus;
-        return _regeneratorRuntime().wrap(function _callee47$(_context47) {
-          while (1) {
-            switch (_context47.prev = _context47.next) {
-              case 0:
-                if (!(_this50.addForm.departureCity == 0)) {
-                  _context47.next = 2;
-                  break;
-                }
-
-                return _context47.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Please Select Departure City",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 2:
-                if (!(_this50.addForm.destinationCity == 0)) {
-                  _context47.next = 4;
-                  break;
-                }
-
-                return _context47.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Please Select Destination City",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 4:
-                if (_this50.addForm.date) {
-                  _context47.next = 6;
-                  break;
-                }
-
-                return _context47.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Date is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 6:
-                if (!(_this50.addForm.schedule == 0)) {
-                  _context47.next = 8;
-                  break;
-                }
-
-                return _context47.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Departure Time is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 8:
-                if (!_this50.checkForSubmenuButtons('check-assigned-bus')) {
-                  _context47.next = 20;
-                  break;
-                }
-
-                _context47.next = 11;
-                return _this50.callApi("post", "booking/check/bus/assigned", {
-                  scheduleId: _this50.addForm.schedule,
-                  date: _this50.addForm.date,
-                  departureCity: _this50.addForm.departureCity,
-                  destinationCity: _this50.addForm.destinationCity
-                });
-
-              case 11:
-                resCheckedBus = _context47.sent;
-
-                if (!(resCheckedBus.status == 200)) {
-                  _context47.next = 16;
-                  break;
-                }
-
-                _this50.$refs.refPassengerList.submit();
-
-                _context47.next = 18;
-                break;
-
-              case 16:
-                if (!(resCheckedBus.status == 204)) {
-                  _context47.next = 18;
-                  break;
-                }
-
-                return _context47.abrupt("return", swal({
-                  title: "OOPS!!",
-                  text: "Please Assign Bus First!",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 18:
-                _context47.next = 21;
-                break;
-
-              case 20:
-                _this50.$refs.refPassengerList.submit();
-
-              case 21:
-              case "end":
-                return _context47.stop();
-            }
-          }
-        }, _callee47);
-      }))();
-    },
-    // Get Terminal Invoice
-    getTerminalInvoice: function getTerminalInvoice() {
       var _this51 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee48() {
@@ -40879,25 +40817,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 8:
-                if (!(_this51.addForm.terminalId == 0 && _this51.$store.state.user.terminal_id == null)) {
-                  _context48.next = 10;
-                  break;
-                }
-
-                return _context48.abrupt("return", swal({
-                  title: "Required!",
-                  text: "Terminal is Required! Please Select it From DropDown or Assign Terminal to your Account",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 10:
                 if (!_this51.checkForSubmenuButtons('check-assigned-bus')) {
-                  _context48.next = 22;
+                  _context48.next = 20;
                   break;
                 }
 
-                _context48.next = 13;
+                _context48.next = 11;
                 return _this51.callApi("post", "booking/check/bus/assigned", {
                   scheduleId: _this51.addForm.schedule,
                   date: _this51.addForm.date,
@@ -40905,22 +40830,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   destinationCity: _this51.addForm.destinationCity
                 });
 
-              case 13:
+              case 11:
                 resCheckedBus = _context48.sent;
 
                 if (!(resCheckedBus.status == 200)) {
-                  _context48.next = 18;
+                  _context48.next = 16;
                   break;
                 }
 
-                _this51.$refs.refTerminalInvoice.submit();
+                _this51.$refs.refPassengerList.submit();
 
-                _context48.next = 20;
+                _context48.next = 18;
                 break;
 
-              case 18:
+              case 16:
                 if (!(resCheckedBus.status == 204)) {
-                  _context48.next = 20;
+                  _context48.next = 18;
                   break;
                 }
 
@@ -40931,14 +40856,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 20:
-                _context48.next = 23;
+              case 18:
+                _context48.next = 21;
                 break;
 
-              case 22:
-                _this51.$refs.refTerminalInvoice.submit();
+              case 20:
+                _this51.$refs.refPassengerList.submit();
 
-              case 23:
+              case 21:
               case "end":
                 return _context48.stop();
             }
@@ -40946,8 +40871,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }, _callee48);
       }))();
     },
-    // Get Bus Invoice
-    getBusInvoice: function getBusInvoice() {
+    // Get Terminal Invoice
+    getTerminalInvoice: function getTerminalInvoice() {
       var _this52 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee49() {
@@ -41008,12 +40933,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 8:
-                if (!_this52.checkForSubmenuButtons('check-assign-bus')) {
-                  _context49.next = 20;
+                if (!(_this52.addForm.terminalId == 0 && _this52.$store.state.user.terminal_id == null)) {
+                  _context49.next = 10;
                   break;
                 }
 
-                _context49.next = 11;
+                return _context49.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Terminal is Required! Please Select it From DropDown or Assign Terminal to your Account",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 10:
+                if (!_this52.checkForSubmenuButtons('check-assigned-bus')) {
+                  _context49.next = 22;
+                  break;
+                }
+
+                _context49.next = 13;
                 return _this52.callApi("post", "booking/check/bus/assigned", {
                   scheduleId: _this52.addForm.schedule,
                   date: _this52.addForm.date,
@@ -41021,22 +40959,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   destinationCity: _this52.addForm.destinationCity
                 });
 
-              case 11:
+              case 13:
                 resCheckedBus = _context49.sent;
 
                 if (!(resCheckedBus.status == 200)) {
-                  _context49.next = 16;
+                  _context49.next = 18;
                   break;
                 }
 
-                _this52.$refs.refBusInvoice.submit();
+                _this52.$refs.refTerminalInvoice.submit();
 
-                _context49.next = 18;
+                _context49.next = 20;
                 break;
 
-              case 16:
+              case 18:
                 if (!(resCheckedBus.status == 204)) {
-                  _context49.next = 18;
+                  _context49.next = 20;
                   break;
                 }
 
@@ -41047,19 +40985,135 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 18:
-                _context49.next = 21;
+              case 20:
+                _context49.next = 23;
                 break;
 
-              case 20:
-                _this52.$refs.refBusInvoice.submit();
+              case 22:
+                _this52.$refs.refTerminalInvoice.submit();
 
-              case 21:
+              case 23:
               case "end":
                 return _context49.stop();
             }
           }
         }, _callee49);
+      }))();
+    },
+    // Get Bus Invoice
+    getBusInvoice: function getBusInvoice() {
+      var _this53 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee50() {
+        var resCheckedBus;
+        return _regeneratorRuntime().wrap(function _callee50$(_context50) {
+          while (1) {
+            switch (_context50.prev = _context50.next) {
+              case 0:
+                if (!(_this53.addForm.departureCity == 0)) {
+                  _context50.next = 2;
+                  break;
+                }
+
+                return _context50.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Please Select Departure City",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 2:
+                if (!(_this53.addForm.destinationCity == 0)) {
+                  _context50.next = 4;
+                  break;
+                }
+
+                return _context50.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Please Select Destination City",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 4:
+                if (_this53.addForm.date) {
+                  _context50.next = 6;
+                  break;
+                }
+
+                return _context50.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Date is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 6:
+                if (!(_this53.addForm.schedule == 0)) {
+                  _context50.next = 8;
+                  break;
+                }
+
+                return _context50.abrupt("return", swal({
+                  title: "Required!",
+                  text: "Departure Time is Required",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 8:
+                if (!_this53.checkForSubmenuButtons('check-assign-bus')) {
+                  _context50.next = 20;
+                  break;
+                }
+
+                _context50.next = 11;
+                return _this53.callApi("post", "booking/check/bus/assigned", {
+                  scheduleId: _this53.addForm.schedule,
+                  date: _this53.addForm.date,
+                  departureCity: _this53.addForm.departureCity,
+                  destinationCity: _this53.addForm.destinationCity
+                });
+
+              case 11:
+                resCheckedBus = _context50.sent;
+
+                if (!(resCheckedBus.status == 200)) {
+                  _context50.next = 16;
+                  break;
+                }
+
+                _this53.$refs.refBusInvoice.submit();
+
+                _context50.next = 18;
+                break;
+
+              case 16:
+                if (!(resCheckedBus.status == 204)) {
+                  _context50.next = 18;
+                  break;
+                }
+
+                return _context50.abrupt("return", swal({
+                  title: "OOPS!!",
+                  text: "Please Assign Bus First!",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 18:
+                _context50.next = 21;
+                break;
+
+              case 20:
+                _this53.$refs.refBusInvoice.submit();
+
+              case 21:
+              case "end":
+                return _context50.stop();
+            }
+          }
+        }, _callee50);
       }))();
     },
     checkForSubmenu: function checkForSubmenu(moduleName) {
@@ -41131,6 +41185,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     isCustomerLocked: function isCustomerLocked() {
       return this.addForm.otp_valid === true || this.addForm.discount_otp_valid === true;
+    },
+    isPassengerDetailsLocked: function isPassengerDetailsLocked() {
+      return this.isCustomerLocked || this.customerAssignmentLocked && Boolean(this.addForm.customerCNIC);
     },
     isJazzCashTerminalSelected: function isJazzCashTerminalSelected() {
       return Number(this.addForm.terminalId) === 14;
@@ -96171,7 +96228,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     mask: "00000-0000000-0",
     raw: false,
     options: $data.options,
-    disabled: $options.isCustomerLocked
+    disabled: $options.isPassengerDetailsLocked
   }, null, 8
   /* PROPS */
   , ["onBlur", "modelValue", "options", "disabled"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -96181,7 +96238,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
       return $data.addForm.customerName = $event;
     }),
-    disabled: $options.isCustomerLocked
+    disabled: $options.isPassengerDetailsLocked
   }, null, 8
   /* PROPS */
   , _hoisted_42), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addForm.customerName]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
@@ -96193,7 +96250,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     mask: "0000-0000000",
     raw: false,
     options: $data.optionsPhone,
-    disabled: $options.isCustomerLocked
+    disabled: $options.isPassengerDetailsLocked
   }, null, 8
   /* PROPS */
   , ["modelValue", "options", "disabled"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
