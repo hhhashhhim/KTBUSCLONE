@@ -190,16 +190,16 @@
                                                                     <td v-if="isColumnVisible('terminal_name')">{{ data.terminal?.name ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('status')">{{ data.type ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('action_by')">{{ data.updated_name?.name ?? 'N/A' }}</td>
-                                                                    <td v-if="isColumnVisible('sale')">{{ data.type != 'canceled' ? (data.seat_fare -
-                                                                        data.discount) : 0 }}</td>
-                                                                    <td v-if="isColumnVisible('refund')">{{ data.type == 'canceled' ? data.refund : 0 }}
+                                                                    <td v-if="isColumnVisible('sale')">{{ $insertComma(data.type != 'canceled' ? (data.seat_fare -
+                                                                        data.discount) : 0) }}</td>
+                                                                    <td v-if="isColumnVisible('refund')">{{ $insertComma(data.type == 'canceled' ? data.refund : 0) }}
                                                                     </td>
-                                                                    <td v-if="isColumnVisible('commission')">{{ data.type == 'canceled' ? 0 : data.comsn }}
+                                                                    <td v-if="isColumnVisible('commission')">{{ $insertComma(data.type != 'canceled' ? (data.comsn ?? 0) : 0) }}
                                                                     </td>
                                                                     <td v-if="isColumnVisible('net_cash')">
                                                                         <!-- Net Cash -->
-                                                                        {{ (data.seat_fare - data.discount) +
-                                                                            (data.refund ?? 0) - (data.comsn ?? 0) }}
+                                                                        {{ $insertComma((data.seat_fare - data.discount) +
+                                                                            (data.refund ?? 0) - (data.comsn ?? 0)) }}
                                                                     </td>
                                                                 </tr>
                                                                 <tr v-if="filters.record.length > 0">
