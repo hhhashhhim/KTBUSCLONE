@@ -157,6 +157,7 @@
                                                                     <th v-if="isColumnVisible('current_status')">Current Status</th>
                                                                     <th v-if="isColumnVisible('from_bus_time')">From Bus Time</th>
                                                                     <th v-if="isColumnVisible('to_bus_time')">To Bus Time</th>
+                                                                     <th v-if="isColumnVisible('reschedule_time')">Over Issue Time</th>
                                                                     <th v-if="isColumnVisible('reschedule_from')">Reschedule From</th>
                                                                     <th v-if="isColumnVisible('reschedule_to')">Reschedule To</th>
                                                                     <th v-if="isColumnVisible('from_seat')">From Seat</th>
@@ -165,7 +166,7 @@
                                                                     <th v-if="isColumnVisible('new_fare')">New Fare</th>
                                                                     <th v-if="isColumnVisible('remarks')">Remarks</th>
                                                                     <th v-if="isColumnVisible('reschedule_by')">Over Issue By</th>
-                                                                    <th v-if="isColumnVisible('reschedule_time')">Over Issue Time</th>
+
                                                                 </tr>
                                                             </thead>
 
@@ -181,6 +182,7 @@
                                                                     <td v-if="isColumnVisible('current_status')">{{ filter.new_type }}</td>
                                                                     <td v-if="isColumnVisible('from_bus_time')">{{ filter.old_bus_time }}</td>
                                                                     <td v-if="isColumnVisible('to_bus_time')">{{ filter.new_bus_time }}</td>
+                                                                     <td v-if="isColumnVisible('reschedule_time')">{{ filter.reschedule_time }}</td>
                                                                     <td v-if="isColumnVisible('reschedule_from')">{{
                                                                         filter.old_departure+'-'+filter.old_destination
                                                                         }}</td>
@@ -193,7 +195,7 @@
                                                                     <td v-if="isColumnVisible('new_fare')">{{ filter.new_fare }}</td>
                                                                     <td v-if="isColumnVisible('remarks')">{{ filter.reason }}</td>
                                                                     <td v-if="isColumnVisible('reschedule_by')">{{ filter.reschedule_by }}</td>
-                                                                    <td v-if="isColumnVisible('reschedule_time')">{{ filter.reschedule_time }}</td>
+
                                                                 </tr>
                                                             </tbody>
                                                         </table>

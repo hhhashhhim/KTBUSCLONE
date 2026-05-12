@@ -81,14 +81,18 @@
                                                                     @keyup="CancelFilter()"
                                                                     placeholder="Transaction ID">
                                                             </div>
-
-
-
-
-
-
+                                                             <div class="col-md-3 mb-3">
+                                                                <label class="filter-label">Type</label>
+                                                                <select class="form-control filter-input"
+                                                                    v-model="filterCancel.type"
+                                                                    @change="CancelFilter()">
+                                                                    <option value="0">All</option>
+                                                                    <option value="advance booking">Advance Seat</option>
+                                                                    <option value="booked">Booked Seat</option>
+                                                                </select>
+                                                            </div>
                                                             <!-- From Date -->
-                                                            <div class="col-md-4 mb-3">
+                                                            <div class="col-md-3 mb-3">
                                                                 <label class="filter-label">From</label>
                                                                 <input type="date" class="form-control filter-input"
                                                                     v-model="filterCancel.fromDate"
@@ -96,36 +100,38 @@
                                                             </div>
 
                                                             <!-- To Date -->
-                                                            <div class="col-md-4 mb-3">
+                                                            <div class="col-md-3 mb-3">
                                                                 <label class="filter-label">To</label>
                                                                 <input type="date" class="form-control filter-input"
                                                                     v-model="filterCancel.toDate"
                                                                     @change="CancelFilter()">
                                                             </div>
-                                                            <div class="col-md-4 mb-3">
-                                                               <div class="column-dropdown-wrapper" ref="columnDropdown">
-                                <label class="filter-label">Show/Hide Table Headers</label>
-                                <button type="button" class="btn btn-outline-secondary column-dropdown-toggle"
-                                    @click.stop="toggleColumnDropdown()">
-                                    {{ columnSelectionLabel }}
-                                </button>
-                                <div v-if="showColumnDropdown" class="column-dropdown-menu" @click.stop>
-                                    <label v-for="column in columnOptions" :key="column.key" class="column-option">
-                                        <input type="checkbox" :value="column.key" v-model="visibleColumns">
-                                        <span>{{ column.label }}</span>
-                                    </label>
-                                </div>
-                            </div>
+                                                            <div class="col-md-3 mb-3">
+                                                                <div class=""
+                                                                    ref="columnDropdown">
+                                                                    <label class="filter-label">Show/Hide Table
+                                                                        Headers</label>
+                                                                    <button type="button"
+                                                                        class="btn btn-outline-secondary column-dropdown-toggle"
+                                                                        @click.stop="toggleColumnDropdown()">
+                                                                        {{ columnSelectionLabel }}
+                                                                    </button>
+                                                                    <div v-if="showColumnDropdown"
+                                                                        class="column-dropdown-menu" @click.stop>
+                                                                        <label v-for="column in columnOptions"
+                                                                            :key="column.key" class="column-option">
+                                                                            <input type="checkbox" :value="column.key"
+                                                                                v-model="visibleColumns">
+                                                                            <span>{{ column.label }}</span>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-
                                                             <div class="col-12 mb-3">
-
-
                                                                 <button class="btn btn-primary filter-btn print-btn"
                                                                     type="button" @click="getPdfPrint()">
                                                                     <i class="fa fa-print mr-1"></i> Print
                                                                 </button>
-
                                                             </div>
 
                                                         </div>
@@ -349,11 +355,7 @@ export default {
             this.showColumnDropdown = !this.showColumnDropdown;
         },
         handleDocumentClick(event) {
-            if (!this.showColumnDropdown || !this.$refs.columnDropdown) {
-                return;
-            }
-
-            if (!this.$refs.columnDropdown.contains(event.target)) {
+            if (this.showColumnDropdown && this.$refs.columnDropdown && !this.$refs.columnDropdown.contains(event.target)) {
                 this.showColumnDropdown = false;
             }
         },
