@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Auth;
 
 class ConfirmCancellationReportController extends Controller
 {
+    private const CANCELLATION_TYPES = [
+        'advance booking',
+        'booked',
+    ];
+
     private const CONFIRM_CANCELLATION_COLUMNS = [
         'bus_time',
         'cancel_date',
@@ -128,6 +133,8 @@ public function buses()
 
     private function buildFilteredTicketsQuery(Request $request)
     {
+        $selectedCancellationTypes = $this->getSelectedCancellationTypes($request);
+
         return Ticket::with([
             'cancel_ticket:id,ticket_id,percentage,reason,type,added_by,time,created_at',
             'cancel_ticket.addedBy:id,name',
@@ -157,12 +164,13 @@ public function buses()
             ->when($request->toDate != '', function ($query) use ($request) {
                 return $query->where('schedule_date', '<=', $request->toDate);
             })
-            ->whereHas('cancel_ticket', function ($query) use ($request) {
-                if ($request->type != 0) {
-                    $query->where('type', $request->type);
-                } else {
-                    $query->whereIn('type', ["advance booking", "booked"]);
+            ->whereHas('cancel_ticket', function ($query) use ($selectedCancellationTypes) {
+                if (empty($selectedCancellationTypes)) {
+                    $query->whereRaw('1 = 0');
+                    return;
                 }
+
+                $query->whereIn('type', $selectedCancellationTypes);
             })
             ->whereHas('customer', function ($query) use ($request) {
                 if ($request->passenger_name) {
@@ -292,5 +300,45 @@ public function buses()
         }
 
         return array_values(array_intersect(self::CONFIRM_CANCELLATION_COLUMNS, $visibleColumns));
+    }
+
+    private function getSelectedCancellationTypes(Request $request): array
+    {
+        if ($request->has('booking_types')) {
+            $requestedTypes = $request->input('booking_types');
+
+            if (is_string($requestedTypes)) {
+                $requestedTypes = trim($requestedTypes) === ''
+                    ? []
+                    : array_map('trim', explode(',', $requestedTypes));
+            } elseif (!is_array($requestedTypes)) {
+                $requestedTypes = [];
+            }
+        } elseif ($request->type != 0 && $request->type !== null && $request->type !== '') {
+            $requestedTypes = [$request->type];
+        } else {
+            return self::CANCELLATION_TYPES;
+        }
+
+        $typeMap = [
+            'advance booking' => 'advance booking',
+            'advance_booking' => 'advance booking',
+            'advance-booking' => 'advance booking',
+            'advance' => 'advance booking',
+            'booked' => 'booked',
+            'booked seats' => 'booked',
+            'booked_seats' => 'booked',
+            'booked-seats' => 'booked',
+        ];
+
+        return collect($requestedTypes)
+            ->map(function ($type) use ($typeMap) {
+                $normalizedType = strtolower(trim((string) $type));
+                return $typeMap[$normalizedType] ?? null;
+            })
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 }
