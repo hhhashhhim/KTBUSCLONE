@@ -14,3 +14,4 @@ Route::group(['prefix' => 'web/v1/terminal/commissions','middleware' => ['auth:s
 Route::group(['prefix' => 'web/v1/terminal/commissions','middleware' => ['custom.sanctum.token.verify']], function () {
     Route::post('/pdf', [TerminalCommissionReportController::class, 'advanceSalePdf']);
 });
+ 

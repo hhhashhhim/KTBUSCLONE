@@ -511,7 +511,7 @@ if (is_array($request->send_message)) {
         'route:id,name,via',
         'cancel_ticket:id,percentage,ticket_id',
         'commission' => function ($q) {
-            $q->where('route_id', 2)->select('id', 'terminal_id', 'route_id', 'fix_commission', 'percentage_commission');
+            $q->select('id', 'terminal_id', 'route_id', 'fix_commission', 'percentage_commission');
         }
     ])
         ->withTrashed()
