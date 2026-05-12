@@ -216,10 +216,10 @@
                                                                     <th v-if="isColumnVisible('terminal_name')"></th>
                                                                     <th v-if="isColumnVisible('status')"></th>
                                                                     <th v-if="isColumnVisible('action_by')"></th>
-                                                                    <th v-if="isColumnVisible('sale')">{{ totalSaleAmount() }}</th>
-                                                                    <th v-if="isColumnVisible('refund')">{{ totalRefundAmount() }}</th>
-                                                                    <th v-if="isColumnVisible('commission')">{{ totalCommission() }}</th>
-                                                                    <th v-if="isColumnVisible('net_cash')">{{ totalNetCash() }}</th>
+                                                                    <th v-if="isColumnVisible('sale')">{{ $insertComma(totalSaleAmount()) }}</th>
+                                                                    <th v-if="isColumnVisible('refund')">{{ $insertComma(totalRefundAmount()) }}</th>
+                                                                    <th v-if="isColumnVisible('commission')">{{ $insertComma(totalCommission()) }}</th>
+                                                                    <th v-if="isColumnVisible('net_cash')">{{ $insertComma(totalNetCash()) }}</th>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
