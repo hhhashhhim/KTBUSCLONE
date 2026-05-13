@@ -685,17 +685,17 @@ class BookingApiController extends Controller
                             ->where('company_id', $companyId)
                             ->whereIn('type', $pendingSeatTypes)
                             ->update([
-                                'type' => 'booked',
-                                'updated_by' => Auth::user()->id,
+                                'type'           => 'booked',
+                                'updated_by'     => Auth::user()->id,
                                 'transaction_id' => $request->transaction_id,
-                                'booked_time' => date("Y-m-d H:i:s"),
-
-                                Log::error('Ticket confirmation message failed after booking confirmation', [
-                                    'invoice_id'     => $request->invoice_id,
-                                    'transaction_id' => $request->transaction_id,
-                                    'payload'        => json_encode($request->all()),
-                                ])
+                                'booked_time'    => date("Y-m-d H:i:s"),
                             ]);
+
+                        Log::info('Ticket booking updated successfully', [
+                            'invoice_id'     => $request->invoice_id,
+                            'transaction_id' => $request->transaction_id,
+                            'payload'        => json_encode($request->all(), JSON_PRETTY_PRINT),
+                        ]);
                         try {
                             ticketConfirmedMessage($request->invoice_id);
                         } catch (\Throwable $e) {
