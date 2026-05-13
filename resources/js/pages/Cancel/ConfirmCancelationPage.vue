@@ -87,8 +87,8 @@
                                                                     v-model="filterCancel.type"
                                                                     @change="CancelFilter()">
                                                                     <option value="0">All</option>
-                                                                    <option value="advance booking">Advance Seat</option>
-                                                                    <option value="booked">Booked Seat</option>
+                                                                    <option value="advance booking">Advance Booking</option>
+                                                                    <option value="booked">Booked</option>
                                                                 </select>
                                                             </div>
                                                             <!-- From Date -->

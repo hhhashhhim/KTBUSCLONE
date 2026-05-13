@@ -75,6 +75,7 @@
                                                                 <option value="0">All</option>
                                                                 <option value="reschedule">Reschedule</option>
                                                                 <option value="booked">Booked</option>
+                                                                <option value="canceled">Cancelled</option>
                                                                 <option value="advance booking">Advance Booking</option>
                                                             </select>
                                                         </div>
