@@ -126,7 +126,7 @@
                                                                 :value="filterCancel.fromDate">
                                                             <input type="hidden" name="toDate"
                                                                 :value="filterCancel.toDate">
-                                                            <input type="hidden" name="type" :value="filterCancel.type">
+                                                                <input type="hidden" name="type" :value="filterCancel.type">
                                                             <input type="hidden" name="passenger_name"
                                                                 :value="filterCancel.passenger_name">
                                                             <input type="hidden" name="passenger_contact"
