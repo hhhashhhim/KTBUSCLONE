@@ -689,6 +689,12 @@ class BookingApiController extends Controller
                             'updated_by' => Auth::user()->id,
                             'transaction_id' => $request->transaction_id,
                             'booked_time' => date("Y-m-d H:i:s"),
+
+                               Log::error('Ticket confirmation message failed after booking confirmation', [
+                                'invoice_id' => $request->invoice_id,
+                                'transaction_id' => $request->transaction_id,
+
+                            ])
                         ]);
                         try {
                             ticketConfirmedMessage($request->invoice_id);
@@ -699,6 +705,7 @@ class BookingApiController extends Controller
                                 'message' => $e->getMessage(),
                                 'file' => $e->getFile(),
                                 'line' => $e->getLine(),
+
                             ]);
                         }
                         //////////////////////////////////////////////
