@@ -677,25 +677,25 @@ class BookingApiController extends Controller
                             Ticket::where("invoice_id", $request->invoice_id)
                                 ->where('company_id', $companyId)
                                 ->update([
-                                'transaction_id' => $request->transaction_id,
-                            ]);
+                                    'transaction_id' => $request->transaction_id,
+                                ]);
                             return 'Transaction id updated';
                         }
                         Ticket::where("invoice_id", $request->invoice_id)
                             ->where('company_id', $companyId)
                             ->whereIn('type', $pendingSeatTypes)
                             ->update([
-                            'type' => 'booked',
-                            'updated_by' => Auth::user()->id,
-                            'transaction_id' => $request->transaction_id,
-                            'booked_time' => date("Y-m-d H:i:s"),
-
-                               Log::error('Ticket confirmation message failed after booking confirmation', [
-                                'invoice_id' => $request->invoice_id,
+                                'type' => 'booked',
+                                'updated_by' => Auth::user()->id,
                                 'transaction_id' => $request->transaction_id,
+                                'booked_time' => date("Y-m-d H:i:s"),
 
-                            ])
-                        ]);
+                                Log::error('Ticket confirmation message failed after booking confirmation', [
+                                    'invoice_id'     => $request->invoice_id,
+                                    'transaction_id' => $request->transaction_id,
+                                    'payload'        => json_encode($request->all()),
+                                ])
+                            ]);
                         try {
                             ticketConfirmedMessage($request->invoice_id);
                         } catch (\Throwable $e) {
@@ -711,7 +711,7 @@ class BookingApiController extends Controller
                         //////////////////////////////////////////////
                         ActivityLog::create([
                             "activity_by" => Auth::user()->id,
-                            "message" => Auth::user()->name . " | update ticket (advance to confirm) | time : " . $checkAlreadyBooked[0]->schedule_date . " " . $checkAlreadyBooked[0]->schedule_time . " | invoice id :" . $request->invoice_id . " / " . (isset($request->total_amount) ? json_encode($request->total_amount) : "*"),
+                            "message" => Auth::user()->name . " | update ticket (advance to confirm) | time : " . $checkAlreadyBooked[0]->schedule_date . " " . $checkAlreadyBooked[0]->schedule_time . " | invoice id :" . $request->invoice_id . " / " . json_encode($request->all()),
                             "requested_host" => $request->ip(),
                             "company_id" => Auth::user()->company_id
                         ]);
