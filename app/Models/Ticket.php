@@ -26,12 +26,12 @@ class Ticket extends Model
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }
-    
+
     public function added_name()
     {
         return $this->hasOne(User::class, 'id', 'added_by');
     }
-    
+
     public function route()
     {
         return $this->hasOne(Route::class, 'id', 'route_id');
@@ -51,7 +51,7 @@ class Ticket extends Model
     {
         return $this->hasOne(User::class, 'id', 'updated_by');
     }
-    
+
     public function updated_name()
     {
         return $this->hasOne(User::class, 'id', 'updated_by');
@@ -121,7 +121,7 @@ class Ticket extends Model
     {
         return $this->hasOne(TicketsOverIssue::class, 'ticket_id', 'id');
     }
-    
+
     public function reschedule_seat()
     {
         return $this->hasOne(TicketReschedule::class, 'old_ticket_id', 'id');

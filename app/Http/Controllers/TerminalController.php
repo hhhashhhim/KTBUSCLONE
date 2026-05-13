@@ -495,11 +495,29 @@ if (is_array($request->send_message)) {
         }
     }
 
-   public function filterData(Request $request)
+
+public function filterData(Request $request)
 {
     if (!checkForSubmenu("terminal-sale")) {
-        return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        return response()->json([
+            "Error" => ['You are not authorized to access this url']
+        ], 403);
     }
+
+    // Load all commissions once
+    $commissions = TerminalCommission::select(
+        'id',
+        'terminal_id',
+        'route_id',
+        'fix_commission',
+        'percentage_commission',
+        'adjustment_commission'
+    )
+    ->whereNull('deleted_at')
+    ->get()
+    ->keyBy(function ($item) {
+        return $item->terminal_id . '_' . $item->route_id;
+    });
 
     $tickets = Ticket::with([
         'updated_name:id,name',
@@ -510,9 +528,6 @@ if (is_array($request->send_message)) {
         'customer:id,name,cnic,contact',
         'route:id,name,via',
         'cancel_ticket:id,percentage,ticket_id',
-        'commission' => function ($q) {
-            $q->select('id', 'terminal_id', 'route_id', 'fix_commission', 'percentage_commission');
-        }
     ])
         ->withTrashed()
         ->select([
@@ -534,6 +549,7 @@ if (is_array($request->send_message)) {
             'transaction_id',
         ])
         ->where('company_id', Auth::user()->company_id)
+
         ->where(function ($query) {
             $query->whereIn('type', ['booked', 'over-issue'])
                 ->orWhere(function ($query) {
@@ -543,69 +559,105 @@ if (is_array($request->send_message)) {
                         });
                 });
         })
-      ->when($request->terminal && $request->terminal != 0, function ($query) use ($request) {
-    $query->where('terminal_id', $request->terminal);
-})
+
+        ->when($request->terminal && $request->terminal != 0, function ($query) use ($request) {
+            $query->where('terminal_id', $request->terminal);
+        })
+
         ->when($request->user && $request->user != 0, function ($query) use ($request) {
             $query->where('updated_by', $request->user);
         })
+
         ->when(!empty($request->route) && count($request->route) > 0, function ($query) use ($request) {
             $query->whereIn('route_id', $request->route);
         })
+
         ->when($request->invoice_id != '', function ($query) use ($request) {
             $query->where('invoice_id', 'LIKE', '%' . trim($request->invoice_id) . '%');
         })
+
         ->when($request->transaction_id != '', function ($query) use ($request) {
             $query->where('transaction_id', 'LIKE', '%' . trim($request->transaction_id) . '%');
         })
+
         ->whereHas('customer', function ($query) use ($request) {
+
             if ($request->passenger_name) {
                 $query->where('name', 'LIKE', '%' . trim($request->passenger_name) . '%');
             }
 
             if ($request->passenger_contact) {
-                $query->where('contact', 'LIKE', '%' . str_replace("-", "", trim($request->passenger_contact)) . '%');
+                $query->where(
+                    'contact',
+                    'LIKE',
+                    '%' . str_replace("-", "", trim($request->passenger_contact)) . '%'
+                );
             }
 
             if ($request->passenger_cnic) {
-                $query->where('cnic', 'LIKE', '%' . str_replace("-", "", trim($request->passenger_cnic)) . '%');
+                $query->where(
+                    'cnic',
+                    'LIKE',
+                    '%' . str_replace("-", "", trim($request->passenger_cnic)) . '%'
+                );
             }
         })
+
         ->when($request->fromDateTime, function ($query) use ($request) {
             $query->whereRaw(
                 "STR_TO_DATE(CONCAT(schedule_date, ' ', schedule_time_exact), '%Y-%m-%d %H:%i:%s') >= ?",
                 [date("Y-m-d H:i:s", strtotime($request->fromDateTime))]
             );
         })
+
         ->when($request->toDateTime, function ($query) use ($request) {
             $query->whereRaw(
                 "STR_TO_DATE(CONCAT(schedule_date, ' ', schedule_time_exact), '%Y-%m-%d %H:%i:%s') <= ?",
                 [date("Y-m-d H:i:s", strtotime($request->toDateTime))]
             );
         })
+
         ->orderBy('schedule_date')
         ->orderBy('schedule_time_exact')
         ->get();
 
-    $tickets->map(function ($ticket) {
-        $datetime = $ticket->schedule_date . ' ' . $ticket->schedule_time_exact;
-        $ticket->schedule_date_time = date('Y-m-d H:i:s', strtotime($datetime));
+    $tickets->map(function ($ticket) use ($commissions) {
 
-        $commission = $ticket->commission;
+        $datetime = $ticket->schedule_date . ' ' . $ticket->schedule_time_exact;
+
+        $ticket->schedule_date_time = date(
+            'Y-m-d H:i:s',
+            strtotime($datetime)
+        );
+
         $fare = $ticket->seat_fare - $ticket->discount;
 
+        // Match commission by terminal + route
+        $key = $ticket->terminal_id . '_' . $ticket->route_id;
+
+        $commission = $commissions[$key] ?? null;
+
         if ($commission) {
+
+            $ticket->commission = $commission;
+
             $ticket->comsn = $commission->fix_commission > 0
                 ? $commission->fix_commission
                 : ($fare * $commission->percentage_commission) / 100;
+
         } else {
+
+            $ticket->commission = null;
             $ticket->comsn = 0;
         }
 
         $ticket->refund = 0;
 
         if ($ticket->type === 'canceled' && $ticket->cancel_ticket) {
-            $ticket->refund = ($fare * $ticket->cancel_ticket->percentage) / 100;
+
+            $ticket->refund = (
+                $fare * $ticket->cancel_ticket->percentage
+            ) / 100;
         }
 
         return $ticket;
@@ -615,7 +667,6 @@ if (is_array($request->send_message)) {
         'record' => $tickets->sortBy('schedule_date_time')->values()
     ];
 }
-
     public function terminalSalesPdf(Request $request)
     {
         if (!checkForSubmenu("terminal-sale")) {
