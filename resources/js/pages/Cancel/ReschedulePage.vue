@@ -158,7 +158,7 @@
                                                                     <th v-if="isColumnVisible('current_status')">Current Status</th>
                                                                     <th v-if="isColumnVisible('from_bus_time')">From Bus Time</th>
                                                                     <th v-if="isColumnVisible('to_bus_time')">To Bus Time</th>
-                                                                     <th v-if="isColumnVisible('reschedule_time')">Over Issue Time</th>
+                                                                     <th v-if="isColumnVisible('reschedule_time')">Reschedule Time</th>
                                                                     <th v-if="isColumnVisible('reschedule_from')">Reschedule From</th>
                                                                     <th v-if="isColumnVisible('reschedule_to')">Reschedule To</th>
                                                                     <th v-if="isColumnVisible('from_seat')">From Seat</th>
@@ -166,7 +166,7 @@
                                                                     <th v-if="isColumnVisible('old_fare')">Old Fare</th>
                                                                     <th v-if="isColumnVisible('new_fare')">New Fare</th>
                                                                     <th v-if="isColumnVisible('remarks')">Remarks</th>
-                                                                    <th v-if="isColumnVisible('reschedule_by')">Over Issue By</th>
+                                                                    <th v-if="isColumnVisible('reschedule_by')">Reschedule By</th>
 
                                                                 </tr>
                                                             </thead>
