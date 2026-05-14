@@ -754,7 +754,11 @@ class BookingApiController extends Controller
                     $error = ["Please Enter Valid Fare"];
                     return new ConflictResource($error);
                 }
-
+Log::info('Fare Check Debug', [
+    'request_fare' => $request->selected_seats_fare,
+    'schedule_id' => $request->schedule_id,
+    'class' => $request->selected_seats_class,
+]);
                 // to make array of terminal's available seats
                 $available_seats = Terminal::where('id', Auth::user()->terminal_id)->value('available_seats');
                 if (!is_null($available_seats)) {

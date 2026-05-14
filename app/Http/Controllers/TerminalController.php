@@ -41,7 +41,8 @@ class TerminalController extends Controller
         'action_by',
         'sale',
         'refund',
-        'commission',
+        'terminal_commission',
+        'seat_commission',
         'net_cash',
     ];
 
@@ -510,6 +511,7 @@ public function filterData(Request $request)
         'terminal_id',
         'route_id',
         'fix_commission',
+        'flat_commission',
         'percentage_commission',
         'adjustment_commission'
     )
@@ -637,19 +639,30 @@ public function filterData(Request $request)
 
         $commission = $commissions[$key] ?? null;
 
-        if ($commission) {
+      if ($commission) {
 
-            $ticket->commission = $commission;
+    $ticket->commission = $commission;
 
-            $ticket->comsn = $commission->fix_commission > 0
-                ? $commission->fix_commission
-                : ($fare * $commission->percentage_commission) / 100;
+    // Seat commission (always calculated)
+    if ($commission->percentage_commission > 0) {
+        $ticket->seat_commission = round(($fare * $commission->percentage_commission) / 100);
+    } elseif ($commission->flat_commission > 0) {
+        $ticket->seat_commission = $commission->flat_commission;
+    } else {
+        $ticket->seat_commission = 0;
+    }
 
-        } else {
+    // Main commission (ONLY FIX)
+    $ticket->comsn = $commission->fix_commission > 0
+        ? $commission->fix_commission
+        : null;
 
-            $ticket->commission = null;
-            $ticket->comsn = 0;
-        }
+} else {
+
+    $ticket->commission = null;
+    $ticket->seat_commission = 0;
+    $ticket->comsn = null;
+}
 
         $ticket->refund = 0;
 
