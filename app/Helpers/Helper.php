@@ -479,9 +479,25 @@ if (!function_exists('seatFareIsWrong')) {
                 $fare = customRound($fare ?? 0);
             }
 
-            if ($fare != $request->selected_seats_fare[$i]) {
-                return true;
-            }
+          if ($fare != $request->selected_seats_fare[$i]) {
+
+    Log::info('Seat Fare/Class Validation Failed', [
+        'seat' => $request->selected_seats[$i] ?? null,
+        'request_class' => $request->selected_seats_class[$i],
+        'request_fare' => $request->selected_seats_fare[$i],
+        'expected_class' => $data->fare_class ?? null,
+        'expected_fare' => $fare,
+    ]);
+
+    return [
+        'status' => true,
+        'message' => 'Invalid selected_seats_class or fare',
+        'expected_class' => $data->fare_class ?? null,
+        'expected_fare' => $fare,
+        'request_class' => $request->selected_seats_class[$i],
+        'request_fare' => $request->selected_seats_fare[$i],
+    ];
+}
         }
     }
 }

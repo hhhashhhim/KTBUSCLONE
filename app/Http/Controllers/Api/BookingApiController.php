@@ -750,17 +750,21 @@ class BookingApiController extends Controller
                 }
 
                 // seat fare validation
-                if (seatFareIsWrong($request)) {
-                    $error = ["Please Enter Valid Fare"];
-                    return new ConflictResource($error);
-                }
-Log::info('Fare Validation Debug', [
-    'request_fare' => $request->selected_seats_fare,
-    'request_class' => $request->selected_seats_class,
-    'schedule_id' => $request->schedule_id,
-    'departure' => $request->departure_city_id,
-    'destination' => $request->destination_city_id,
-]);
+               $fareValidation = seatFareIsWrong($request);
+
+if ($fareValidation) {
+
+    $error = [
+        $fareValidation['message'],
+        'Expected Class: ' . $fareValidation['expected_class'],
+        'Expected Fare: ' . $fareValidation['expected_fare'],
+        'Request Class: ' . $fareValidation['request_class'],
+        'Request Fare: ' . $fareValidation['request_fare'],
+    ];
+
+    return new ConflictResource($error);
+}
+
                 // to make array of terminal's available seats
                 $available_seats = Terminal::where('id', Auth::user()->terminal_id)->value('available_seats');
                 if (!is_null($available_seats)) {
