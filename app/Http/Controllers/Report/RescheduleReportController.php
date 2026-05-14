@@ -177,11 +177,11 @@ class RescheduleReportController extends Controller
             $newBusTime = $newTicket->schedule_time ?? $newTicket->schedule_time_exact ?? null;
 
             $q->old_bus_time = $oldBusTime
-                ? date('H:i:s', strtotime($oldBusTime))
+                ? date('h:i A', strtotime($oldBusTime))
                 : 'N/A';
 
             $q->new_bus_time = $newBusTime
-                ? date('H:i:s', strtotime($newBusTime))
+                ? date('h:i A', strtotime($newBusTime))
                 : 'N/A';
 
             $q->old_departure = optional(optional($rescheduleSeat)->old_departure)->name ?? 'N/A';
