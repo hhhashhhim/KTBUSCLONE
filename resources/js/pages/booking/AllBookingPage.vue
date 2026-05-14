@@ -201,11 +201,11 @@
 }}
 
                                                             </td>
-                                                            <td>{{ record.type == "canceled" ? formatDate(record.cancel_ticket.created_at) : 'N/A' }}
+                                                            <td>{{ record.type == "canceled" && record.cancel_ticket?.created_at ? formatDate(record.cancel_ticket.created_at) : 'N/A' }}
                                                             </td>
-                                                            <td>{{ record.type == "over-issue" ? record.over_issue_seats.overissue_by.name : 'N/A' }}
+                                                            <td>{{ record.type == "over-issue" ? (record.over_issue_seats?.overissue_by?.name ?? 'N/A') : 'N/A' }}
                                                             </td>
-                                                            <td>{{ record.type == "over-issue" ? formatDate(record.over_issue_seats.created_at) : 'N/A' }}
+                                                            <td>{{ record.type == "over-issue" && record.over_issue_seats?.created_at ? formatDate(record.over_issue_seats.created_at) : 'N/A' }}
                                                             </td>
                                                             <td>{{ record.type }}</td>
                                                         </tr>

@@ -166,7 +166,10 @@
                                                                     <th v-if="isColumnVisible('action_by')">Action By</th>
                                                                     <th v-if="isColumnVisible('sale')">Sale</th>
                                                                     <th v-if="isColumnVisible('refund')">Refund</th>
-                                                                    <th v-if="isColumnVisible('commission')">Commission</th>
+                                                                    <th v-if="isColumnVisible('terminal_commission')">Terminal Commission</th>
+                                                                    <th v-if="isColumnVisible('seat_commission')">
+    Seat Commission
+</th>
                                                                     <th v-if="isColumnVisible('net_cash')">Net Cash</th>
                                                                 </tr>
                                                             </thead>
@@ -194,8 +197,20 @@
                                                                         data.discount) : 0) }}</td>
                                                                     <td v-if="isColumnVisible('refund')">{{ $insertComma(data.type == 'canceled' ? data.refund : 0) }}
                                                                     </td>
-                                                                    <td v-if="isColumnVisible('commission')">{{ $insertComma(data.type != 'canceled' ? (data.comsn ?? 0) : 0) }}
-                                                                    </td>
+                                                                   <td v-if="isColumnVisible('terminal_commission')">
+    {{
+        data.type != 'canceled'
+            ? (
+                Number(data.comsn) > 0
+                    ? $insertComma(data.comsn)
+                    : 'N/A'
+            )
+            : 0
+    }}
+</td>
+                                                                    <td v-if="isColumnVisible('seat_commission')">
+    {{ $insertComma(data.seat_commission ?? 0) }}
+</td>
                                                                     <td v-if="isColumnVisible('net_cash')">
                                                                         <!-- Net Cash -->
                                                                         {{ $insertComma((data.seat_fare - data.discount) +
@@ -218,7 +233,10 @@
                                                                     <th v-if="isColumnVisible('action_by')"></th>
                                                                     <th v-if="isColumnVisible('sale')">{{ $insertComma(totalSaleAmount()) }}</th>
                                                                     <th v-if="isColumnVisible('refund')">{{ $insertComma(totalRefundAmount()) }}</th>
-                                                                    <th v-if="isColumnVisible('commission')">{{ $insertComma(totalCommission()) }}</th>
+                                                                    <th v-if="isColumnVisible('terminal_commission')">{{ $insertComma(totalCommission()) }}</th>
+                                                                    <th v-if="isColumnVisible('seat_commission')">
+    {{ $insertComma(totalSeatCommission()) }}
+</th>
                                                                     <th v-if="isColumnVisible('net_cash')">{{ $insertComma(totalNetCash()) }}</th>
                                                                 </tr>
                                                             </tbody>
@@ -255,7 +273,8 @@ const COLUMN_OPTIONS = [
     { key: 'action_by', label: 'Action By', checked: true },
     { key: 'sale', label: 'Sale', checked: true },
     { key: 'refund', label: 'Refund', checked: true },
-    { key: 'commission', label: 'Commission', checked: true },
+    { key: 'terminal_commission', label: 'Terminal Commission', checked: true },
+    { key: 'seat_commission', label: 'Seat Commission', checked: true },
     { key: 'net_cash', label: 'Net Cash', checked: true },
 ];
 
@@ -445,24 +464,50 @@ export default {
             }, 0);
         },
         totalCommission: function () {
-            if (this.filters.record && Array.isArray(this.filters.record)) {
-                return this.filters.record.reduce((sum, data) => {
-                    // Ensure that data.seat_fare and data.discount are numeric values
-                    const comsn = Number(data.comsn) || 0;
+    if (this.filters.record && Array.isArray(this.filters.record)) {
 
-                    // Add the difference to the sum
+        const seen = new Set();
 
-                    if (data.type == 'canceled') {
-                        return sum + 0;
-                    }
-                    else {
-                        return sum + comsn;
-                    }
-                }, 0);
-            } else {
-                return 0; // or handle the case when there are no records
+        return this.filters.record.reduce((sum, data) => {
+
+            if (data.type == 'canceled') {
+                return sum;
             }
-        }
+
+            const terminalId = data.terminal_id;
+
+            // agar terminal already count ho chuka hai
+            if (seen.has(terminalId)) {
+                return sum;
+            }
+
+            seen.add(terminalId);
+
+            const comsn = Number(data.comsn) || 0;
+
+            return sum + comsn;
+
+        }, 0);
+    }
+
+    return 0;
+},
+        totalSeatCommission: function () {
+    if (this.filters.record && Array.isArray(this.filters.record)) {
+        return this.filters.record.reduce((sum, data) => {
+
+            const seatCom = Number(data.seat_commission) || 0;
+
+            if (data.type == 'canceled') {
+                return sum;
+            }
+
+            return sum + seatCom;
+
+        }, 0);
+    }
+    return 0;
+}
 
     },
 

@@ -256,11 +256,11 @@
                                             </div>
                                             <div class="col-md-6" v-if="checkForSubmenu('jazz-cash-refund')">
                                                 <div class="form-group mb-0">
-                                                    <label>Transaction No <span v-if="isJazzCashTerminalSelected"
+                                                    <label>Transaction No <span v-if="isOnlineTerminalSelected"
                                                             class="text-danger ml-1">*</span></label>
                                                     <input type="text" class="form-control" id="fullName"
                                                         v-model="addForm.transaction_id"
-                                                        :required="isJazzCashTerminalSelected" />
+                                                        :required="isOnlineTerminalSelected" />
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -4092,10 +4092,10 @@ export default {
                     timer: 2000
                 });
             }
-            if (this.isJazzCashTerminalSelected && !String(this.addForm.transaction_id ?? "").trim()) {
+            if (this.isOnlineTerminalSelected && !String(this.addForm.transaction_id ?? "").trim()) {
                 return swal({
                     title: "Required!",
-                    text: "Transaction No is required for Jazz Cash terminal",
+                    text: "Transaction No is required for online terminal",
                     icon: "error",
                     timer: 2000
                 });
@@ -5383,8 +5383,13 @@ export default {
         isPassengerDetailsLocked() {
             return this.isCustomerLocked || (this.customerAssignmentLocked && Boolean(this.addForm.customerCNIC));
         },
-        isJazzCashTerminalSelected() {
-            return Number(this.addForm.terminalId) === 14;
+        selectedTerminal() {
+            return this.terminals.find(
+                (terminal) => Number(terminal.id) === Number(this.addForm.terminalId)
+            ) ?? null;
+        },
+        isOnlineTerminalSelected() {
+            return Number(this.selectedTerminal?.is_online_terminal ?? 0) === 1;
         },
 
         canShowJazzCashRefund() {
