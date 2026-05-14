@@ -192,9 +192,9 @@ class RescheduleReportController extends Controller
             $q->old_fare = (int) $q->seat_fare - (int) $q->discount;
             $q->new_fare = $newTicket ? ((int) $newTicket->seat_fare - (int) $newTicket->discount) : 0;
 
-            $q->badge = $rescheduleSeat
+            $q->badge = ($rescheduleSeat && $oldBusTime)
                 ? getRowBadgeColor(
-                    date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule_time_exact)),
+                    date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($oldBusTime)),
                     $rescheduleSeat->created_at
                 )
                 : '';
