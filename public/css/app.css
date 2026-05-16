@@ -10889,3 +10889,42 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+.departure-status-row > td,
+.departure-status-card {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.departure-status-card {
+  border: 1px solid #d9dee5;
+  border-left: 4px solid #d9dee5;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.departure-status-row.departure-status--red > td,
+.departure-status-card.departure-status--red {
+  background-color: #ec3030 !important;
+  border-color: #c82333 !important;
+  color: #ffffff !important;
+}
+
+.departure-status-row.departure-status--yellow > td,
+.departure-status-card.departure-status--yellow {
+  background-color: #ffe082 !important;
+  border-color: #d4b24c !important;
+  color: #3f3200 !important;
+}
+
+.departure-status-row.departure-status--green > td,
+.departure-status-card.departure-status--green {
+  background-color: #03b203 !important;
+  border-color: #028c02 !important;
+  color: #ffffff !important;
+}
+
+.departure-status-row.departure-status--white > td,
+.departure-status-card.departure-status--white {
+  background-color: #ffffff !important;
+  border-color: #cfd6de !important;
+  color: #1f2937 !important;
+}

@@ -173,7 +173,7 @@
 
                                                             <tbody>
                                                                 <tr v-for="(filter, i) in filters" :key="i"
-                                                                    :class="filter.badge">
+                                                                    :class="getRescheduleRowClass(filter)">
                                                                     <td v-if="isColumnVisible('terminal_name')">{{ filter.terminal_name ? filter.terminal_name :
                                                                         'Not Fetched' }}</td>
                                                                     <td v-if="isColumnVisible('passenger_name')">{{ filter.passenger_name }}</td>
@@ -247,6 +247,8 @@ export default {
             columnOptions: COLUMN_OPTIONS.map((column) => ({ ...column })),
             visibleColumns: COLUMN_OPTIONS.filter((column) => column.checked).map((column) => column.key),
             showColumnDropdown: false,
+            departureStatusTick: Date.now(),
+            departureStatusIntervalId: null,
             tableLoading: true,
             filterCancel: {
                 terminal: 0,
@@ -287,12 +289,26 @@ export default {
     },
     mounted() {
         document.addEventListener('click', this.handleDocumentClick);
+        this.startDepartureStatusTicker();
     },
     beforeUnmount() {
         document.removeEventListener('click', this.handleDocumentClick);
+        this.stopDepartureStatusTicker();
     },
 
     methods: {
+        startDepartureStatusTicker() {
+            this.stopDepartureStatusTicker();
+            this.departureStatusIntervalId = window.setInterval(() => {
+                this.departureStatusTick = Date.now();
+            }, 30000);
+        },
+        stopDepartureStatusTicker() {
+            if (this.departureStatusIntervalId) {
+                window.clearInterval(this.departureStatusIntervalId);
+                this.departureStatusIntervalId = null;
+            }
+        },
         toggleColumnDropdown() {
             this.showColumnDropdown = !this.showColumnDropdown;
         },
@@ -307,6 +323,18 @@ export default {
         },
         isColumnVisible(columnKey) {
             return this.visibleColumns.includes(columnKey);
+        },
+        getRescheduleRowClass(filter) {
+            this.departureStatusTick;
+
+            const departureStatus = this.$getDepartureStatusMeta(filter, {
+                combinedKeys: ["old_bus_time"],
+            });
+
+            return [
+                "departure-status-row",
+                departureStatus.toneClass || filter.badge || "",
+            ];
         },
         async fetchFilters() {
             const resTerminals = await this.callApi("post", 'reschedule/getTerminals');

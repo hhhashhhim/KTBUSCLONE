@@ -28929,6 +28929,8 @@ var COLUMN_OPTIONS = [{
         return column.key;
       }),
       showColumnDropdown: false,
+      departureStatusTick: Date.now(),
+      departureStatusIntervalId: null,
       tableLoading: true,
       filterCancel: {
         terminal: 0,
@@ -28996,11 +28998,27 @@ var COLUMN_OPTIONS = [{
   },
   mounted: function mounted() {
     document.addEventListener('click', this.handleDocumentClick);
+    this.startDepartureStatusTicker();
   },
   beforeUnmount: function beforeUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
+    this.stopDepartureStatusTicker();
   },
   methods: {
+    startDepartureStatusTicker: function startDepartureStatusTicker() {
+      var _this2 = this;
+
+      this.stopDepartureStatusTicker();
+      this.departureStatusIntervalId = window.setInterval(function () {
+        _this2.departureStatusTick = Date.now();
+      }, 30000);
+    },
+    stopDepartureStatusTicker: function stopDepartureStatusTicker() {
+      if (this.departureStatusIntervalId) {
+        window.clearInterval(this.departureStatusIntervalId);
+        this.departureStatusIntervalId = null;
+      }
+    },
     toggleColumnDropdown: function toggleColumnDropdown() {
       this.showColumnDropdown = !this.showColumnDropdown;
     },
@@ -29012,8 +29030,15 @@ var COLUMN_OPTIONS = [{
     isColumnVisible: function isColumnVisible(columnKey) {
       return this.visibleColumns.includes(columnKey);
     },
+    getCancellationRowClass: function getCancellationRowClass(filter) {
+      this.departureStatusTick;
+      var departureStatus = this.$getDepartureStatusMeta(filter, {
+        combinedKeys: ["bus_time"]
+      });
+      return ["departure-status-row", departureStatus.toneClass || filter.cancellation_status_color || filter.badge || ""];
+    },
     fetchRoutes: function fetchRoutes() {
-      var _this2 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var resRoute;
@@ -29022,13 +29047,13 @@ var COLUMN_OPTIONS = [{
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this2.callApi("post", "confirm/cancellation/routes");
+                return _this3.callApi("post", "confirm/cancellation/routes");
 
               case 2:
                 resRoute = _context2.sent;
 
                 if (resRoute.status == 200) {
-                  _this2.routes = resRoute.data;
+                  _this3.routes = resRoute.data;
                 }
 
               case 4:
@@ -29040,7 +29065,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     fetchFilters: function fetchFilters() {
-      var _this3 = this;
+      var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var resTerminals;
@@ -29049,13 +29074,13 @@ var COLUMN_OPTIONS = [{
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return _this3.callApi("post", 'confirm/cancellation/getTerminals');
+                return _this4.callApi("post", 'confirm/cancellation/getTerminals');
 
               case 2:
                 resTerminals = _context3.sent;
 
                 if (resTerminals.status == 200) {
-                  _this3.terminals = resTerminals.data;
+                  _this4.terminals = resTerminals.data;
                 }
 
               case 4:
@@ -29067,7 +29092,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     fetchFilterBuses: function fetchFilterBuses() {
-      var _this4 = this;
+      var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var resBuses;
@@ -29076,13 +29101,13 @@ var COLUMN_OPTIONS = [{
             switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.next = 2;
-                return _this4.callApi("post", 'confirm/cancellation/getBuses');
+                return _this5.callApi("post", 'confirm/cancellation/getBuses');
 
               case 2:
                 resBuses = _context4.sent;
 
                 if (resBuses.status == 200) {
-                  _this4.buses = resBuses.data;
+                  _this5.buses = resBuses.data;
                 }
 
               case 4:
@@ -29094,7 +29119,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     CancelFilter: function CancelFilter() {
-      var _this5 = this;
+      var _this6 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var resFetchData;
@@ -29102,16 +29127,16 @@ var COLUMN_OPTIONS = [{
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _this5.tableLoading = true;
+                _this6.tableLoading = true;
                 _context5.next = 3;
-                return _this5.callApi("post", 'confirm/cancellation/fetchFilterData', _this5.filterCancel);
+                return _this6.callApi("post", 'confirm/cancellation/fetchFilterData', _this6.filterCancel);
 
               case 3:
                 resFetchData = _context5.sent;
 
                 if (resFetchData.status == 200) {
-                  _this5.filters = resFetchData.data;
-                  _this5.tableLoading = false;
+                  _this6.filters = resFetchData.data;
+                  _this6.tableLoading = false;
                 }
 
               case 5:
@@ -29518,6 +29543,8 @@ var COLUMN_OPTIONS = [{
         return column.key;
       }),
       showColumnDropdown: false,
+      departureStatusTick: Date.now(),
+      departureStatusIntervalId: null,
       tableLoading: true,
       filterCancel: {
         terminal: 0,
@@ -29578,11 +29605,27 @@ var COLUMN_OPTIONS = [{
   },
   mounted: function mounted() {
     document.addEventListener('click', this.handleDocumentClick);
+    this.startDepartureStatusTicker();
   },
   beforeUnmount: function beforeUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
+    this.stopDepartureStatusTicker();
   },
   methods: {
+    startDepartureStatusTicker: function startDepartureStatusTicker() {
+      var _this2 = this;
+
+      this.stopDepartureStatusTicker();
+      this.departureStatusIntervalId = window.setInterval(function () {
+        _this2.departureStatusTick = Date.now();
+      }, 30000);
+    },
+    stopDepartureStatusTicker: function stopDepartureStatusTicker() {
+      if (this.departureStatusIntervalId) {
+        window.clearInterval(this.departureStatusIntervalId);
+        this.departureStatusIntervalId = null;
+      }
+    },
     toggleColumnDropdown: function toggleColumnDropdown() {
       this.showColumnDropdown = !this.showColumnDropdown;
     },
@@ -29598,8 +29641,15 @@ var COLUMN_OPTIONS = [{
     isColumnVisible: function isColumnVisible(columnKey) {
       return this.visibleColumns.includes(columnKey);
     },
+    getRescheduleRowClass: function getRescheduleRowClass(filter) {
+      this.departureStatusTick;
+      var departureStatus = this.$getDepartureStatusMeta(filter, {
+        combinedKeys: ["old_bus_time"]
+      });
+      return ["departure-status-row", departureStatus.toneClass || filter.badge || ""];
+    },
     fetchFilters: function fetchFilters() {
-      var _this2 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var resTerminals;
@@ -29608,13 +29658,13 @@ var COLUMN_OPTIONS = [{
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this2.callApi("post", 'reschedule/getTerminals');
+                return _this3.callApi("post", 'reschedule/getTerminals');
 
               case 2:
                 resTerminals = _context2.sent;
 
                 if (resTerminals.status == 200) {
-                  _this2.terminals = resTerminals.data;
+                  _this3.terminals = resTerminals.data;
                 }
 
               case 4:
@@ -29626,7 +29676,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     overissueFilter: function overissueFilter() {
-      var _this3 = this;
+      var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var resFetchData;
@@ -29634,17 +29684,17 @@ var COLUMN_OPTIONS = [{
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _this3.tableLoading = true;
+                _this4.tableLoading = true;
                 _context3.next = 3;
-                return _this3.callApi("post", 'reschedule/fetchFilterData', _this3.filterCancel);
+                return _this4.callApi("post", 'reschedule/fetchFilterData', _this4.filterCancel);
 
               case 3:
                 resFetchData = _context3.sent;
                 console.log(resFetchData);
 
                 if (resFetchData.status == 200) {
-                  _this3.filters = resFetchData.data;
-                  _this3.tableLoading = false;
+                  _this4.filters = resFetchData.data;
+                  _this4.tableLoading = false;
                 }
 
               case 6:
@@ -84550,7 +84600,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i,
-      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(filter.cancellation_status_color || filter.badge)
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.getCancellationRowClass(filter))
     }, [$options.isColumnVisible('bus_time') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_88, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter.bus_time), 1
     /* TEXT */
     )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('cancel_date') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_89, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter.cancel_date), 1
@@ -85744,7 +85794,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , _hoisted_58)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("table", _hoisted_59, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [$options.isColumnVisible('terminal_name') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_60, "Terminal Name")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('passenger_name') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_61, "Passenger Name")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('passenger_contact') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_62, "Cell NO")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('passenger_cnic') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_63, "Cnic NO")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('status') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_64, "Status")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('current_status') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_65, "Current Status")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('from_bus_time') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_66, "From Bus Time")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('to_bus_time') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_67, "To Bus Time")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('reschedule_time') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_68, "Reschedule Time")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('reschedule_from') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_69, "Reschedule From")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('reschedule_to') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_70, "Reschedule To")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('from_seat') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_71, "From Seat")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('to_seat') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_72, "To Seat")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('old_fare') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_73, "Old Fare")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('new_fare') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_74, "New Fare")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('remarks') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_75, "Remarks")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('reschedule_by') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_76, "Reschedule By")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters, function (filter, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i,
-      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(filter.badge)
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.getRescheduleRowClass(filter))
     }, [$options.isColumnVisible('terminal_name') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_77, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter.terminal_name ? filter.terminal_name : 'Not Fetched'), 1
     /* TEXT */
     )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('passenger_name') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_78, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter.passenger_name), 1
@@ -96700,7 +96750,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* STABLE_FRAGMENT */
   ))])], 2112
   /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
-  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" side bar "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_168, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_169, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_170, [_hoisted_171, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"border-bottom w-100\">\n                                                    <div class=\"my-1\" style=\"padding-bottom: 10px !important;\">\n                                                        <div class=\"bg-danger text-dark circles mr-1 border shadow\"><i\n                                                            class=\"fas fa-minus-circle\"></i></div>\n                                                        <span class=\"text-wrap\">Not For Sale</span>\n                                                    </div>\n                                                    <div class=\"my-1\">\n                                                        <div\n                                                            class=\"circles icons-legend mr-1 border shadow\">\n                                                            <i class=\"fas fa-check\"></i>\n                                                        </div>\n                                                        <span class=\"text-wrap mrn\">Advance Issued</span>\n                                                    </div>\n                                                    <div class=\"my-2\">\n                                                        <div\n                                                            class=\"fas fa-check-double circles icons-legend shadow mr-1 border\"\n                                                        ></div>\n                                                        <span class=\"text-wrap mrn\">Confirmed Booked</span>\n                                                    </div>\n                                                    <div class=\"my-2\">\n                                                        <div\n                                                            class=\"partial-seat circles mr-1 border shadow\"></div>\n                                                        <span class=\"text-wrap mrn\"\n                                                              style=\"margin-top:-10px;\">Partial Seat</span>\n                                                    </div>\n                                                    <div class=\"my-2\">\n                                                        <div class=\"circles icons-legend mr-1 border shadow\">\n                                                            <i class=\"far fa-hand-paper text-dark\"></i>\n                                                        </div>\n                                                        <span\n                                                            class=\"text-wrap mrn\">Over Issue</span>\n                                                    </div>\n                                                </div> "), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.allSeatClasses, function (seatClass, i) {
+  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" side bar "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_168, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_169, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_170, [_hoisted_171, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"border-bottom w-100\">\r\n                                                    <div class=\"my-1\" style=\"padding-bottom: 10px !important;\">\r\n                                                        <div class=\"bg-danger text-dark circles mr-1 border shadow\"><i\r\n                                                            class=\"fas fa-minus-circle\"></i></div>\r\n                                                        <span class=\"text-wrap\">Not For Sale</span>\r\n                                                    </div>\r\n                                                    <div class=\"my-1\">\r\n                                                        <div\r\n                                                            class=\"circles icons-legend mr-1 border shadow\">\r\n                                                            <i class=\"fas fa-check\"></i>\r\n                                                        </div>\r\n                                                        <span class=\"text-wrap mrn\">Advance Issued</span>\r\n                                                    </div>\r\n                                                    <div class=\"my-2\">\r\n                                                        <div\r\n                                                            class=\"fas fa-check-double circles icons-legend shadow mr-1 border\"\r\n                                                        ></div>\r\n                                                        <span class=\"text-wrap mrn\">Confirmed Booked</span>\r\n                                                    </div>\r\n                                                    <div class=\"my-2\">\r\n                                                        <div\r\n                                                            class=\"partial-seat circles mr-1 border shadow\"></div>\r\n                                                        <span class=\"text-wrap mrn\"\r\n                                                              style=\"margin-top:-10px;\">Partial Seat</span>\r\n                                                    </div>\r\n                                                    <div class=\"my-2\">\r\n                                                        <div class=\"circles icons-legend mr-1 border shadow\">\r\n                                                            <i class=\"far fa-hand-paper text-dark\"></i>\r\n                                                        </div>\r\n                                                        <span\r\n                                                            class=\"text-wrap mrn\">Over Issue</span>\r\n                                                    </div>\r\n                                                </div> "), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.allSeatClasses, function (seatClass, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       "class": "my-1",
       key: i
@@ -144681,7 +144731,256 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+
+
+var DEPARTURE_DATE_TIME_FORMATS = ["YYYY-MM-DD HH:mm:ss", "YYYY-MM-DD HH:mm", "YYYY-MM-DD hh:mm:ss A", "YYYY-MM-DD hh:mm A", "YYYY-MM-DD h:mm:ss A", "YYYY-MM-DD h:mm A", "YYYY/MM/DD HH:mm:ss", "YYYY/MM/DD HH:mm", "YYYY/MM/DD hh:mm:ss A", "YYYY/MM/DD hh:mm A", "DD-MM-YYYY HH:mm:ss", "DD-MM-YYYY HH:mm", "DD-MM-YYYY hh:mm:ss A", "DD-MM-YYYY hh:mm A", "DD/MM/YYYY HH:mm:ss", "DD/MM/YYYY HH:mm", "DD/MM/YYYY hh:mm:ss A", "DD/MM/YYYY hh:mm A", "MMM D YYYY HH:mm:ss", "MMM D YYYY HH:mm", "MMM D YYYY hh:mm:ss A", "MMM D YYYY hh:mm A", "D MMM YYYY HH:mm:ss", "D MMM YYYY HH:mm", "D MMM YYYY hh:mm:ss A", "D MMM YYYY hh:mm A"];
+var DEPARTURE_TIME_ONLY_FORMATS = ["HH:mm:ss", "HH:mm", "hh:mm:ss A", "hh:mm A", "h:mm:ss A", "h:mm A"];
+var DEFAULT_DEPARTURE_DATE_KEYS = ["departure_date", "schedule_date", "date", "new_departure_date", "old_departure_date"];
+var DEFAULT_DEPARTURE_TIME_KEYS = ["departure_time", "departure_city_time", "time"];
+var DEFAULT_DEPARTURE_COMBINED_KEYS = ["departure_datetime", "departureDateTime", "schedule_datetime", "scheduleDateTime", "departure_at", "bus_time", "new_bus_time", "old_bus_time"];
+
+var normalizeDateTimeCandidate = function normalizeDateTimeCandidate(candidate) {
+  if (candidate === undefined || candidate === null || candidate === "") {
+    return "";
+  }
+
+  if (moment__WEBPACK_IMPORTED_MODULE_1___default().isMoment(candidate)) {
+    return candidate.clone();
+  }
+
+  if (candidate instanceof Date || typeof candidate === "number") {
+    return moment__WEBPACK_IMPORTED_MODULE_1___default()(candidate);
+  }
+
+  var value = String(candidate).trim().replace(/\s+/g, " ");
+
+  if (!value) {
+    return "";
+  }
+
+  if (value.includes(" - ")) {
+    return value.split(" - ")[0].trim();
+  }
+
+  return value;
+};
+
+var parseDateTimeCandidate = function parseDateTimeCandidate(candidate) {
+  var normalized = normalizeDateTimeCandidate(candidate);
+
+  if (!normalized) {
+    return null;
+  }
+
+  if (moment__WEBPACK_IMPORTED_MODULE_1___default().isMoment(normalized)) {
+    return normalized.isValid() ? normalized : null;
+  }
+
+  if (normalized instanceof Date) {
+    var parsedFromDate = moment__WEBPACK_IMPORTED_MODULE_1___default()(normalized);
+    return parsedFromDate.isValid() ? parsedFromDate : null;
+  }
+
+  var strictIso = moment__WEBPACK_IMPORTED_MODULE_1___default()(normalized, (moment__WEBPACK_IMPORTED_MODULE_1___default().ISO_8601), true);
+
+  if (strictIso.isValid()) {
+    return strictIso;
+  }
+
+  var strictDateTime = moment__WEBPACK_IMPORTED_MODULE_1___default()(normalized, DEPARTURE_DATE_TIME_FORMATS, true);
+
+  if (strictDateTime.isValid()) {
+    return strictDateTime;
+  }
+
+  var looseDateTime = moment__WEBPACK_IMPORTED_MODULE_1___default()(normalized);
+
+  if (looseDateTime.isValid()) {
+    return looseDateTime;
+  }
+
+  return null;
+};
+
+var parseDepartureMoment = function parseDepartureMoment(payload) {
+  var _mergedDateKeys$map$f, _mergedTimeKeys$map$f;
+
+  var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+      _ref$dateKeys = _ref.dateKeys,
+      dateKeys = _ref$dateKeys === void 0 ? [] : _ref$dateKeys,
+      _ref$timeKeys = _ref.timeKeys,
+      timeKeys = _ref$timeKeys === void 0 ? [] : _ref$timeKeys,
+      _ref$combinedKeys = _ref.combinedKeys,
+      combinedKeys = _ref$combinedKeys === void 0 ? [] : _ref$combinedKeys,
+      _ref$fallbackDate = _ref.fallbackDate,
+      fallbackDate = _ref$fallbackDate === void 0 ? null : _ref$fallbackDate,
+      _ref$fallbackTime = _ref.fallbackTime,
+      fallbackTime = _ref$fallbackTime === void 0 ? null : _ref$fallbackTime;
+
+  if (!payload && !fallbackDate && !fallbackTime) {
+    return null;
+  }
+
+  if (moment__WEBPACK_IMPORTED_MODULE_1___default().isMoment(payload) || payload instanceof Date || typeof payload === "string" || typeof payload === "number") {
+    var directValue = parseDateTimeCandidate(payload);
+
+    if (directValue) {
+      return directValue;
+    }
+  }
+
+  var row = payload && _typeof(payload) === "object" ? payload : {};
+  var mergedDateKeys = [].concat(_toConsumableArray(dateKeys), DEFAULT_DEPARTURE_DATE_KEYS);
+  var mergedTimeKeys = [].concat(_toConsumableArray(timeKeys), DEFAULT_DEPARTURE_TIME_KEYS);
+  var mergedCombinedKeys = [].concat(_toConsumableArray(combinedKeys), DEFAULT_DEPARTURE_COMBINED_KEYS);
+  var departureDate = (_mergedDateKeys$map$f = mergedDateKeys.map(function (key) {
+    return row === null || row === void 0 ? void 0 : row[key];
+  }).find(function (value) {
+    return value !== undefined && value !== null && value !== "";
+  })) !== null && _mergedDateKeys$map$f !== void 0 ? _mergedDateKeys$map$f : fallbackDate;
+
+  var _iterator = _createForOfIteratorHelper(mergedCombinedKeys),
+      _step;
+
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var key = _step.value;
+      var combinedValue = row === null || row === void 0 ? void 0 : row[key];
+
+      if (combinedValue === undefined || combinedValue === null || combinedValue === "") {
+        continue;
+      }
+
+      var parsedCombined = parseDateTimeCandidate(combinedValue);
+
+      if (parsedCombined) {
+        return parsedCombined;
+      }
+
+      if (departureDate) {
+        var timeOnly = normalizeDateTimeCandidate(combinedValue);
+        var parsedWithDate = moment__WEBPACK_IMPORTED_MODULE_1___default()("".concat(departureDate, " ").concat(timeOnly), [].concat(DEPARTURE_DATE_TIME_FORMATS, DEPARTURE_TIME_ONLY_FORMATS), true);
+
+        if (parsedWithDate.isValid()) {
+          return parsedWithDate;
+        }
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+
+  var departureTime = (_mergedTimeKeys$map$f = mergedTimeKeys.map(function (key) {
+    return row === null || row === void 0 ? void 0 : row[key];
+  }).find(function (value) {
+    return value !== undefined && value !== null && value !== "";
+  })) !== null && _mergedTimeKeys$map$f !== void 0 ? _mergedTimeKeys$map$f : fallbackTime;
+
+  if (departureDate && departureTime) {
+    var combinedDateTime = moment__WEBPACK_IMPORTED_MODULE_1___default()("".concat(departureDate, " ").concat(departureTime), [].concat(DEPARTURE_DATE_TIME_FORMATS, DEPARTURE_TIME_ONLY_FORMATS), true);
+
+    if (combinedDateTime.isValid()) {
+      return combinedDateTime;
+    }
+  }
+
+  if (departureTime) {
+    var parsedTimeOnly = parseDateTimeCandidate(departureTime);
+
+    if (parsedTimeOnly) {
+      return parsedTimeOnly;
+    }
+  }
+
+  return null;
+};
+
+var formatRemainingTime = function formatRemainingTime(remainingMinutes) {
+  if (remainingMinutes < 1) {
+    return "Less than a minute remaining";
+  }
+
+  var hours = Math.floor(remainingMinutes / 60);
+  var minutes = remainingMinutes % 60;
+
+  if (!hours) {
+    return "".concat(minutes, " minute").concat(minutes === 1 ? "" : "s", " remaining");
+  }
+
+  if (!minutes) {
+    return "".concat(hours, " hour").concat(hours === 1 ? "" : "s", " remaining");
+  }
+
+  return "".concat(hours, " hour").concat(hours === 1 ? "" : "s", " ").concat(minutes, " minute").concat(minutes === 1 ? "" : "s", " remaining");
+};
+
+var buildDepartureStatusMeta = function buildDepartureStatusMeta(departureMoment) {
+  if (!departureMoment || !departureMoment.isValid()) {
+    return {
+      statusKey: "unknown",
+      toneClass: "",
+      statusLabel: "Departure time unavailable",
+      remainingMinutes: null,
+      remainingText: "",
+      departureMoment: null,
+      departureText: "",
+      isPast: false,
+      isValid: false
+    };
+  }
+
+  var now = moment__WEBPACK_IMPORTED_MODULE_1___default()();
+  var remainingMinutes = Math.ceil(departureMoment.diff(now, "minutes", true));
+  var isPast = now.isAfter(departureMoment);
+  var statusKey = "";
+  var statusLabel = "More than 6 hours remaining";
+
+  if (isPast) {
+    statusKey = "red";
+    statusLabel = "Departed";
+  } else if (remainingMinutes <= 30) {
+    statusKey = "yellow";
+    statusLabel = "30 minutes or less remaining";
+  } else if (remainingMinutes <= 120) {
+    statusKey = "green";
+    statusLabel = "2 hours or less remaining";
+  } else if (remainingMinutes <= 360) {
+    statusKey = "white";
+    statusLabel = "6 hours or less remaining";
+  }
+
+  return {
+    statusKey: statusKey,
+    toneClass: statusKey ? "departure-status--".concat(statusKey) : "",
+    statusLabel: statusLabel,
+    remainingMinutes: Math.max(remainingMinutes, 0),
+    remainingText: isPast ? "Departure time has passed" : formatRemainingTime(Math.max(remainingMinutes, 0)),
+    departureMoment: departureMoment,
+    departureText: departureMoment.format("DD-MMM-YYYY hh:mm A"),
+    isPast: isPast,
+    isValid: true
+  };
+};
 /*
     this function will work on input text field
     all parameter are optional except first one that is event
@@ -144693,17 +144992,18 @@ __webpack_require__.r(__webpack_exports__);
     len = mean you can't exceed that number
 */
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   numberValidate: function numberValidate(event) {
-    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-        _ref$dot = _ref.dot,
-        dot = _ref$dot === void 0 ? false : _ref$dot,
-        _ref$maxLen = _ref.maxLen,
-        maxLen = _ref$maxLen === void 0 ? null : _ref$maxLen,
-        _ref$negative = _ref.negative,
-        negative = _ref$negative === void 0 ? false : _ref$negative,
-        _ref$comma = _ref.comma,
-        comma = _ref$comma === void 0 ? false : _ref$comma;
+    var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref2$dot = _ref2.dot,
+        dot = _ref2$dot === void 0 ? false : _ref2$dot,
+        _ref2$maxLen = _ref2.maxLen,
+        maxLen = _ref2$maxLen === void 0 ? null : _ref2$maxLen,
+        _ref2$negative = _ref2.negative,
+        negative = _ref2$negative === void 0 ? false : _ref2$negative,
+        _ref2$comma = _ref2.comma,
+        comma = _ref2$comma === void 0 ? false : _ref2$comma;
 
     var charCode = event.charCode;
     var value = event.target.value.toString().replace(/,/g, ''); // Allow numbers (48-57), dot (46), and control keys (0)
@@ -144836,6 +145136,11 @@ __webpack_require__.r(__webpack_exports__);
 
       return "".concat(day, "-").concat(month, "-").concat(year);
     }
+  },
+  getDepartureStatusMeta: function getDepartureStatusMeta(payload) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var departureMoment = parseDepartureMoment(payload, options);
+    return buildDepartureStatusMeta(departureMoment);
   },
   getFileType: function getFileType(filePath) {
     if (!filePath || typeof filePath !== 'string') {
@@ -151656,7 +151961,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-b3c0c3b4],\nth[data-v-b3c0c3b4],\ntd[data-v-b3c0c3b4] {\n    border: 1px solid #b9b9b9;\n    border-collapse: collapse;\n}\n.red[data-v-b3c0c3b4] {\n    background-color: #ec3030;\n}\n.yellow[data-v-b3c0c3b4] {\n    background-color: #bdbd02;\n}\n.white[data-v-b3c0c3b4] {\n    background-color: #FFFFFF;\n}\n.green[data-v-b3c0c3b4] {\n    background-color: #03b203;\n}\n.loading-spinner[data-v-b3c0c3b4] {\n    display: block;\n    margin: 0 auto;\n    padding: 2em;\n}\n.report-actions[data-v-b3c0c3b4] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 1rem;\n    align-items: flex-end;\n    justify-content: space-between;\n}\n.column-dropdown-wrapper[data-v-b3c0c3b4] {\n    position: relative;\n    min-width: 280px;\n    max-width: 320px;\n}\n.column-dropdown-toggle[data-v-b3c0c3b4] {\n    width: 100%;\n    text-align: left;\n}\n.column-dropdown-menu[data-v-b3c0c3b4] {\n    position: absolute;\n    top: calc(100% + 0.5rem);\n    left: 0;\n    z-index: 20;\n    width: 100%;\n    max-height: 260px;\n    overflow-y: auto;\n    padding: 0.75rem;\n    background: #fff;\n    border: 1px solid #d7dce3;\n    border-radius: 0.5rem;\n    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.column-option[data-v-b3c0c3b4] {\n    display: flex;\n    align-items: center;\n    gap: 0.5rem;\n    margin-bottom: 0.5rem;\n    cursor: pointer;\n}\n.column-option[data-v-b3c0c3b4]:last-child {\n    margin-bottom: 0;\n}\n.print-btn[data-v-b3c0c3b4] {\n    min-width: 160px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-b3c0c3b4],\r\nth[data-v-b3c0c3b4],\r\ntd[data-v-b3c0c3b4] {\r\n    border: 1px solid #b9b9b9;\r\n    border-collapse: collapse;\n}\n.red[data-v-b3c0c3b4] {\r\n    background-color: #ec3030;\n}\n.yellow[data-v-b3c0c3b4] {\r\n    background-color: #bdbd02;\n}\n.white[data-v-b3c0c3b4] {\r\n    background-color: #FFFFFF;\n}\n.green[data-v-b3c0c3b4] {\r\n    background-color: #03b203;\n}\n.loading-spinner[data-v-b3c0c3b4] {\r\n    display: block;\r\n    margin: 0 auto;\r\n    padding: 2em;\n}\n.report-actions[data-v-b3c0c3b4] {\r\n    display: flex;\r\n    flex-wrap: wrap;\r\n    gap: 1rem;\r\n    align-items: flex-end;\r\n    justify-content: space-between;\n}\n.column-dropdown-wrapper[data-v-b3c0c3b4] {\r\n    position: relative;\r\n    min-width: 280px;\r\n    max-width: 320px;\n}\n.column-dropdown-toggle[data-v-b3c0c3b4] {\r\n    width: 100%;\r\n    text-align: left;\n}\n.column-dropdown-menu[data-v-b3c0c3b4] {\r\n    position: absolute;\r\n    top: calc(100% + 0.5rem);\r\n    left: 0;\r\n    z-index: 20;\r\n    width: 100%;\r\n    max-height: 260px;\r\n    overflow-y: auto;\r\n    padding: 0.75rem;\r\n    background: #fff;\r\n    border: 1px solid #d7dce3;\r\n    border-radius: 0.5rem;\r\n    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.column-option[data-v-b3c0c3b4] {\r\n    display: flex;\r\n    align-items: center;\r\n    gap: 0.5rem;\r\n    margin-bottom: 0.5rem;\r\n    cursor: pointer;\n}\n.column-option[data-v-b3c0c3b4]:last-child {\r\n    margin-bottom: 0;\n}\n.print-btn[data-v-b3c0c3b4] {\r\n    min-width: 160px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -151704,7 +152009,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-e95aa1d6],\nth[data-v-e95aa1d6],\ntd[data-v-e95aa1d6] {\n    border: 1px solid #b9b9b9;\n    border-collapse: collapse;\n}\n.red[data-v-e95aa1d6] {\n    background-color: #ec3030;\n}\n.yellow[data-v-e95aa1d6] {\n    background-color: #bdbd02;\n}\n.white[data-v-e95aa1d6] {\n    background-color: #FFFFFF;\n}\n.green[data-v-e95aa1d6] {\n    background-color: #03b203;\n}\n.loading-spinner[data-v-e95aa1d6] {\n    display: block;\n    margin: 0 auto;\n    padding: 2em;\n}\n.report-actions[data-v-e95aa1d6] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 1rem;\n    align-items: flex-end;\n    justify-content: space-between;\n}\n.column-dropdown-wrapper[data-v-e95aa1d6] {\n    position: relative;\n    min-width: 280px;\n    max-width: 320px;\n}\n.column-dropdown-toggle[data-v-e95aa1d6] {\n    width: 100%;\n    text-align: left;\n}\n.column-dropdown-menu[data-v-e95aa1d6] {\n    position: absolute;\n    top: calc(100% + 0.5rem);\n    left: 0;\n    z-index: 20;\n    width: 100%;\n    max-height: 260px;\n    overflow-y: auto;\n    padding: 0.75rem;\n    background: #fff;\n    border: 1px solid #d7dce3;\n    border-radius: 0.5rem;\n    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.column-option[data-v-e95aa1d6] {\n    display: flex;\n    align-items: center;\n    gap: 0.5rem;\n    margin-bottom: 0.5rem;\n    cursor: pointer;\n}\n.column-option[data-v-e95aa1d6]:last-child {\n    margin-bottom: 0;\n}\n.print-btn[data-v-e95aa1d6] {\n    min-width: 160px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-e95aa1d6],\r\nth[data-v-e95aa1d6],\r\ntd[data-v-e95aa1d6] {\r\n    border: 1px solid #b9b9b9;\r\n    border-collapse: collapse;\n}\n.red[data-v-e95aa1d6] {\r\n    background-color: #ec3030;\n}\n.yellow[data-v-e95aa1d6] {\r\n    background-color: #bdbd02;\n}\n.white[data-v-e95aa1d6] {\r\n    background-color: #FFFFFF;\n}\n.green[data-v-e95aa1d6] {\r\n    background-color: #03b203;\n}\n.loading-spinner[data-v-e95aa1d6] {\r\n    display: block;\r\n    margin: 0 auto;\r\n    padding: 2em;\n}\n.report-actions[data-v-e95aa1d6] {\r\n    display: flex;\r\n    flex-wrap: wrap;\r\n    gap: 1rem;\r\n    align-items: flex-end;\r\n    justify-content: space-between;\n}\n.column-dropdown-wrapper[data-v-e95aa1d6] {\r\n    position: relative;\r\n    min-width: 280px;\r\n    max-width: 320px;\n}\n.column-dropdown-toggle[data-v-e95aa1d6] {\r\n    width: 100%;\r\n    text-align: left;\n}\n.column-dropdown-menu[data-v-e95aa1d6] {\r\n    position: absolute;\r\n    top: calc(100% + 0.5rem);\r\n    left: 0;\r\n    z-index: 20;\r\n    width: 100%;\r\n    max-height: 260px;\r\n    overflow-y: auto;\r\n    padding: 0.75rem;\r\n    background: #fff;\r\n    border: 1px solid #d7dce3;\r\n    border-radius: 0.5rem;\r\n    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.column-option[data-v-e95aa1d6] {\r\n    display: flex;\r\n    align-items: center;\r\n    gap: 0.5rem;\r\n    margin-bottom: 0.5rem;\r\n    cursor: pointer;\n}\n.column-option[data-v-e95aa1d6]:last-child {\r\n    margin-bottom: 0;\n}\n.print-btn[data-v-e95aa1d6] {\r\n    min-width: 160px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -151872,7 +152177,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-03b302d9] {\n    background-color: #a2a3a7;\n    border-radius: 10px;\n    cursor: pointer;\n    position: relative;\n    isolation: isolate;\n}\n.image-span[data-v-03b302d9]:hover {\n    background-color: #6db131;\n}\n#seatMapDiv[data-v-03b302d9] {\n    border-radius: 10px;\n    border: 3px #c5c3c3 groove;\n    max-height: 100% !important;\n    margin: 10px 0 10px 0 !important;\n}\n.economy[data-v-03b302d9] {\n    border: 3px solid #6d6e69 !important;\n}\n.business[data-v-03b302d9] {\n    border: 3px solid orangered !important;\n}\n.executive[data-v-03b302d9] {\n    border: 3px solid gold !important;\n}\n.for-male-reserved[data-v-03b302d9] {\n    background-color: #3d8ff2 !important;\n}\n.for-female-reserved[data-v-03b302d9] {\n    background-color: hotpink !important;\n}\n.for-male-booked[data-v-03b302d9] {\n    background-color: #731631 !important;\n}\n.for-female-booked[data-v-03b302d9] {\n    background-color: #ff7276 !important;\n}\n.for-online-male-reserved[data-v-03b302d9] {\n    background-color: #0c6077 !important;\n}\n.for-online-female-reserved[data-v-03b302d9] {\n    background-color: #9d92f0 !important;\n}\n.for-online-male-booked[data-v-03b302d9] {\n    background-color: #343434 !important;\n}\n.for-online-female-booked[data-v-03b302d9] {\n    background-color: #d71e7a !important;\n}\n.not-for-sale[data-v-03b302d9] {\n    background-color: #D40B0BFF !important;\n}\n.selected[data-v-03b302d9] {\n    background-color: #6db131 !important;\n}\n.partial[data-v-03b302d9]::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    right: 0;\n    z-index: -1;\n    height: 100%;\n    width: 50%;\n    border-top-right-radius: 10px;\n    border-bottom-right-radius: 10px;\n    background-color: rgba(0, 0, 0, 0.8);\n}\n.femaleReserve[data-v-03b302d9]::after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    right: 0;\n    z-index: -1;\n    height: 100%;\n    width: 50%;\n    border-top-right-radius: 10px;\n    border-bottom-right-radius: 10px;\n    background-color: hotpink !important;\n}\n.seat-img[data-v-03b302d9] {\n    height: 47px;\n    margin: 10px 0px;\n}\n.seat-img .image-span[data-v-03b302d9],\n.seat-img span[data-v-03b302d9] {\n    height: 45px;\n    width: 45px;\n    line-height: 1.01;\n    display: inline-block;\n    cursor: pointer !important;\n    margin: 2px;\n}\nimg[data-v-03b302d9] {\n    cursor: pointer !important;\n}\n.circles[data-v-03b302d9] {\n    width: 15px;\n    height: 15px;\n    border-radius: 50px;\n    display: inline-block;\n    box-sizing: content-box;\n}\n.icons-legend[data-v-03b302d9] {\n    position: relative;\n    bottom: 12px;\n    color: rgb(62, 61, 61);\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n}\n.circles+span[data-v-03b302d9] {\n    position: relative;\n    top: -4px;\n    padding: 5px;\n    color: black;\n}\n.type-icons[data-v-03b302d9] {\n    position: relative;\n    z-index: 10;\n}\n.partial-seat[data-v-03b302d9] {\n    width: 15px;\n    height: 15px;\n    background: linear-gradient(90deg, white 50%, black 50%);\n    border-radius: 50%;\n    display: inline-block;\n    box-sizing: content-box;\n    -moz-border-radius: 25px;\n    -webkit-border-radius: 25px;\n}\n.mrn[data-v-03b302d9] {\n    top: -10px !important;\n}\n.lds-roller[data-v-03b302d9] {\n    display: inline-block;\n    position: relative;\n    width: 80px;\n    height: 80px;\n}\n.lds-roller div[data-v-03b302d9] {\n    -webkit-animation: lds-roller-03b302d9 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;\n            animation: lds-roller-03b302d9 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;\n    transform-origin: 40px 40px;\n}\n.lds-roller div[data-v-03b302d9]:after {\n    content: \" \";\n    display: block;\n    position: absolute;\n    width: 7px;\n    height: 7px;\n    border-radius: 50%;\n    background: #6777ef;\n    margin: -4px 0 0 -4px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(1) {\n    -webkit-animation-delay: -0.036s;\n            animation-delay: -0.036s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(1):after {\n    top: 63px;\n    left: 63px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(2) {\n    -webkit-animation-delay: -0.072s;\n            animation-delay: -0.072s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(2):after {\n    top: 68px;\n    left: 56px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(3) {\n    -webkit-animation-delay: -0.108s;\n            animation-delay: -0.108s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(3):after {\n    top: 71px;\n    left: 48px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(4) {\n    -webkit-animation-delay: -0.144s;\n            animation-delay: -0.144s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(4):after {\n    top: 72px;\n    left: 40px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(5) {\n    -webkit-animation-delay: -0.18s;\n            animation-delay: -0.18s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(5):after {\n    top: 71px;\n    left: 32px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(6) {\n    -webkit-animation-delay: -0.216s;\n            animation-delay: -0.216s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(6):after {\n    top: 68px;\n    left: 24px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(7) {\n    -webkit-animation-delay: -0.252s;\n            animation-delay: -0.252s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(7):after {\n    top: 63px;\n    left: 17px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(8) {\n    -webkit-animation-delay: -0.288s;\n            animation-delay: -0.288s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(8):after {\n    top: 56px;\n    left: 12px;\n}\n@-webkit-keyframes lds-roller-03b302d9 {\n0% {\n        transform: rotate(0deg);\n}\n100% {\n        transform: rotate(360deg);\n}\n}\n@keyframes lds-roller-03b302d9 {\n0% {\n        transform: rotate(0deg);\n}\n100% {\n        transform: rotate(360deg);\n}\n}\n\n/* loader */\n.bus-seat-wrapper[data-v-03b302d9] {\n    max-width: 420px;\n    margin: auto;\n    text-align: center;\n}\n.seat-map[data-v-03b302d9] {\n    display: flex;\n    flex-direction: column;\n    gap: 10px;\n}\n.seat-row[data-v-03b302d9] {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    gap: 10px;\n}\n.seat[data-v-03b302d9],\n.seat-skeleton[data-v-03b302d9] {\n    width: 50px;\n    height: 35px;\n    line-height: 35px;\n    font-size: 13px;\n    border-radius: 6px;\n    margin: 2px;\n    /* 👈 add spacing between seats */\n}\n.seat[data-v-03b302d9] {\n    background-color: #e3f2fd;\n}\n.seat.occupied[data-v-03b302d9] {\n    background-color: #ffcdd2;\n}\n.seat-skeleton[data-v-03b302d9] {\n    background-color: #ccc;\n    -webkit-animation: pulse-03b302d9 1.5s infinite;\n            animation: pulse-03b302d9 1.5s infinite;\n}\n.aisle[data-v-03b302d9] {\n    width: 30px;\n}\n@-webkit-keyframes pulse-03b302d9 {\n0% {\n        background-color: #ccc;\n}\n50% {\n        background-color: #ddd;\n}\n100% {\n        background-color: #ccc;\n}\n}\n@keyframes pulse-03b302d9 {\n0% {\n        background-color: #ccc;\n}\n50% {\n        background-color: #ddd;\n}\n100% {\n        background-color: #ccc;\n}\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-03b302d9] {\r\n    background-color: #a2a3a7;\r\n    border-radius: 10px;\r\n    cursor: pointer;\r\n    position: relative;\r\n    isolation: isolate;\n}\n.image-span[data-v-03b302d9]:hover {\r\n    background-color: #6db131;\n}\n#seatMapDiv[data-v-03b302d9] {\r\n    border-radius: 10px;\r\n    border: 3px #c5c3c3 groove;\r\n    max-height: 100% !important;\r\n    margin: 10px 0 10px 0 !important;\n}\n.economy[data-v-03b302d9] {\r\n    border: 3px solid #6d6e69 !important;\n}\n.business[data-v-03b302d9] {\r\n    border: 3px solid orangered !important;\n}\n.executive[data-v-03b302d9] {\r\n    border: 3px solid gold !important;\n}\n.for-male-reserved[data-v-03b302d9] {\r\n    background-color: #3d8ff2 !important;\n}\n.for-female-reserved[data-v-03b302d9] {\r\n    background-color: hotpink !important;\n}\n.for-male-booked[data-v-03b302d9] {\r\n    background-color: #731631 !important;\n}\n.for-female-booked[data-v-03b302d9] {\r\n    background-color: #ff7276 !important;\n}\n.for-online-male-reserved[data-v-03b302d9] {\r\n    background-color: #0c6077 !important;\n}\n.for-online-female-reserved[data-v-03b302d9] {\r\n    background-color: #9d92f0 !important;\n}\n.for-online-male-booked[data-v-03b302d9] {\r\n    background-color: #343434 !important;\n}\n.for-online-female-booked[data-v-03b302d9] {\r\n    background-color: #d71e7a !important;\n}\n.not-for-sale[data-v-03b302d9] {\r\n    background-color: #D40B0BFF !important;\n}\n.selected[data-v-03b302d9] {\r\n    background-color: #6db131 !important;\n}\n.partial[data-v-03b302d9]::after {\r\n    content: \"\";\r\n    position: absolute;\r\n    top: 0;\r\n    right: 0;\r\n    z-index: -1;\r\n    height: 100%;\r\n    width: 50%;\r\n    border-top-right-radius: 10px;\r\n    border-bottom-right-radius: 10px;\r\n    background-color: rgba(0, 0, 0, 0.8);\n}\n.femaleReserve[data-v-03b302d9]::after {\r\n    content: \"\";\r\n    position: absolute;\r\n    top: 0;\r\n    right: 0;\r\n    z-index: -1;\r\n    height: 100%;\r\n    width: 50%;\r\n    border-top-right-radius: 10px;\r\n    border-bottom-right-radius: 10px;\r\n    background-color: hotpink !important;\n}\n.seat-img[data-v-03b302d9] {\r\n    height: 47px;\r\n    margin: 10px 0px;\n}\n.seat-img .image-span[data-v-03b302d9],\r\n.seat-img span[data-v-03b302d9] {\r\n    height: 45px;\r\n    width: 45px;\r\n    line-height: 1.01;\r\n    display: inline-block;\r\n    cursor: pointer !important;\r\n    margin: 2px;\n}\nimg[data-v-03b302d9] {\r\n    cursor: pointer !important;\n}\n.circles[data-v-03b302d9] {\r\n    width: 15px;\r\n    height: 15px;\r\n    border-radius: 50px;\r\n    display: inline-block;\r\n    box-sizing: content-box;\n}\n.icons-legend[data-v-03b302d9] {\r\n    position: relative;\r\n    bottom: 12px;\r\n    color: rgb(62, 61, 61);\r\n    display: inline-flex;\r\n    align-items: center;\r\n    justify-content: center;\n}\n.circles+span[data-v-03b302d9] {\r\n    position: relative;\r\n    top: -4px;\r\n    padding: 5px;\r\n    color: black;\n}\n.type-icons[data-v-03b302d9] {\r\n    position: relative;\r\n    z-index: 10;\n}\n.partial-seat[data-v-03b302d9] {\r\n    width: 15px;\r\n    height: 15px;\r\n    background: linear-gradient(90deg, white 50%, black 50%);\r\n    border-radius: 50%;\r\n    display: inline-block;\r\n    box-sizing: content-box;\r\n    -moz-border-radius: 25px;\r\n    -webkit-border-radius: 25px;\n}\n.mrn[data-v-03b302d9] {\r\n    top: -10px !important;\n}\n.lds-roller[data-v-03b302d9] {\r\n    display: inline-block;\r\n    position: relative;\r\n    width: 80px;\r\n    height: 80px;\n}\n.lds-roller div[data-v-03b302d9] {\r\n    -webkit-animation: lds-roller-03b302d9 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;\r\n            animation: lds-roller-03b302d9 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;\r\n    transform-origin: 40px 40px;\n}\n.lds-roller div[data-v-03b302d9]:after {\r\n    content: \" \";\r\n    display: block;\r\n    position: absolute;\r\n    width: 7px;\r\n    height: 7px;\r\n    border-radius: 50%;\r\n    background: #6777ef;\r\n    margin: -4px 0 0 -4px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(1) {\r\n    -webkit-animation-delay: -0.036s;\r\n            animation-delay: -0.036s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(1):after {\r\n    top: 63px;\r\n    left: 63px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(2) {\r\n    -webkit-animation-delay: -0.072s;\r\n            animation-delay: -0.072s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(2):after {\r\n    top: 68px;\r\n    left: 56px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(3) {\r\n    -webkit-animation-delay: -0.108s;\r\n            animation-delay: -0.108s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(3):after {\r\n    top: 71px;\r\n    left: 48px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(4) {\r\n    -webkit-animation-delay: -0.144s;\r\n            animation-delay: -0.144s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(4):after {\r\n    top: 72px;\r\n    left: 40px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(5) {\r\n    -webkit-animation-delay: -0.18s;\r\n            animation-delay: -0.18s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(5):after {\r\n    top: 71px;\r\n    left: 32px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(6) {\r\n    -webkit-animation-delay: -0.216s;\r\n            animation-delay: -0.216s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(6):after {\r\n    top: 68px;\r\n    left: 24px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(7) {\r\n    -webkit-animation-delay: -0.252s;\r\n            animation-delay: -0.252s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(7):after {\r\n    top: 63px;\r\n    left: 17px;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(8) {\r\n    -webkit-animation-delay: -0.288s;\r\n            animation-delay: -0.288s;\n}\n.lds-roller div[data-v-03b302d9]:nth-child(8):after {\r\n    top: 56px;\r\n    left: 12px;\n}\n@-webkit-keyframes lds-roller-03b302d9 {\n0% {\r\n        transform: rotate(0deg);\n}\n100% {\r\n        transform: rotate(360deg);\n}\n}\n@keyframes lds-roller-03b302d9 {\n0% {\r\n        transform: rotate(0deg);\n}\n100% {\r\n        transform: rotate(360deg);\n}\n}\r\n\r\n/* loader */\n.bus-seat-wrapper[data-v-03b302d9] {\r\n    max-width: 420px;\r\n    margin: auto;\r\n    text-align: center;\n}\n.seat-map[data-v-03b302d9] {\r\n    display: flex;\r\n    flex-direction: column;\r\n    gap: 10px;\n}\n.seat-row[data-v-03b302d9] {\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n    gap: 10px;\n}\n.seat[data-v-03b302d9],\r\n.seat-skeleton[data-v-03b302d9] {\r\n    width: 50px;\r\n    height: 35px;\r\n    line-height: 35px;\r\n    font-size: 13px;\r\n    border-radius: 6px;\r\n    margin: 2px;\r\n    /* 👈 add spacing between seats */\n}\n.seat[data-v-03b302d9] {\r\n    background-color: #e3f2fd;\n}\n.seat.occupied[data-v-03b302d9] {\r\n    background-color: #ffcdd2;\n}\n.seat-skeleton[data-v-03b302d9] {\r\n    background-color: #ccc;\r\n    -webkit-animation: pulse-03b302d9 1.5s infinite;\r\n            animation: pulse-03b302d9 1.5s infinite;\n}\n.aisle[data-v-03b302d9] {\r\n    width: 30px;\n}\n@-webkit-keyframes pulse-03b302d9 {\n0% {\r\n        background-color: #ccc;\n}\n50% {\r\n        background-color: #ddd;\n}\n100% {\r\n        background-color: #ccc;\n}\n}\n@keyframes pulse-03b302d9 {\n0% {\r\n        background-color: #ccc;\n}\n50% {\r\n        background-color: #ddd;\n}\n100% {\r\n        background-color: #ccc;\n}\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
