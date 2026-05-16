@@ -278,8 +278,8 @@ public function buses()
         }
 
         return getRowBadgeColor(
-            $busDateTime->format('Y-m-d H:i:s'),
-            $cancellationDateTime->format('Y-m-d H:i:s')
+            $busDateTime->format('d-m-Y h:i A'),
+            $cancellationDateTime->format('d-m-Y h:i A')
         );
     }
 

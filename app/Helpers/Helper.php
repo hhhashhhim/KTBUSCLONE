@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\BusColorHelper;
 use App\Models\Booking\TicketELT;
 use App\Models\City;
 use App\Models\Customer;
@@ -1899,22 +1900,7 @@ if (!function_exists('getDynamicHeaders')) {
 if (!function_exists('getRowBadgeColor')) {
     function getRowBadgeColor($departureTime, $cancellationTime)
     {
-        $secDepart = strtotime($departureTime);
-        $secCancellation = strtotime($cancellationTime);
-        $threeHoursBefore = $secDepart - 10800;
-        $oneHoursBefore = $threeHoursBefore - 3600;
-
-        if ($secCancellation > $secDepart) {
-            return "red";
-        }
-
-        if ($secCancellation > $threeHoursBefore) {
-            return "yellow";
-        }
-        if ($secCancellation > $oneHoursBefore) {
-            return "green";
-        }
-        return "white";
+        return BusColorHelper::getColor($departureTime, $cancellationTime);
     }
 }
 

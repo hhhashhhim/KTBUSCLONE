@@ -9,6 +9,7 @@ use App\Models\Terminal;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class OverissueReportController extends Controller
@@ -127,8 +128,8 @@ public function routes()
 
         $q->badge = ($q->schedule && $q->overIssueSeats)
             ? getRowBadgeColor(
-                date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time)),
-                $q->overIssueSeats->created_at
+                Carbon::parse($q->schedule_date . ' ' . $q->schedule->time)->format('d-m-Y h:i A'),
+                Carbon::parse($q->overIssueSeats->created_at)->format('d-m-Y h:i A')
             )
             : '';
 
@@ -227,8 +228,8 @@ public function routes()
 
         $q->badge = ($q->schedule && $q->overIssueSeats)
             ? getRowBadgeColor(
-                date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($q->schedule->time)),
-                $q->overIssueSeats->created_at
+                Carbon::parse($q->schedule_date . ' ' . $q->schedule->time)->format('d-m-Y h:i A'),
+                Carbon::parse($q->overIssueSeats->created_at)->format('d-m-Y h:i A')
             )
             : '';
 
