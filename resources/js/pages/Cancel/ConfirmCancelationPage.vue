@@ -300,6 +300,8 @@ export default {
             columnOptions: COLUMN_OPTIONS.map((column) => ({ ...column })),
             visibleColumns: COLUMN_OPTIONS.filter((column) => column.checked).map((column) => column.key),
             showColumnDropdown: false,
+            departureStatusTick: Date.now(),
+            departureStatusIntervalId: null,
             tableLoading: true,
             filterCancel: {
                 terminal: 0,
@@ -345,12 +347,26 @@ export default {
     },
     mounted() {
         document.addEventListener('click', this.handleDocumentClick);
+        this.startDepartureStatusTicker();
     },
     beforeUnmount() {
         document.removeEventListener('click', this.handleDocumentClick);
+        this.stopDepartureStatusTicker();
     },
 
     methods: {
+        startDepartureStatusTicker() {
+            this.stopDepartureStatusTicker();
+            this.departureStatusIntervalId = window.setInterval(() => {
+                this.departureStatusTick = Date.now();
+            }, 30000);
+        },
+        stopDepartureStatusTicker() {
+            if (this.departureStatusIntervalId) {
+                window.clearInterval(this.departureStatusIntervalId);
+                this.departureStatusIntervalId = null;
+            }
+        },
         toggleColumnDropdown() {
             this.showColumnDropdown = !this.showColumnDropdown;
         },
@@ -363,11 +379,15 @@ export default {
             return this.visibleColumns.includes(columnKey);
         },
         getCancellationRowClass(filter) {
-            const busStatusColor = filter.cancellation_status_color || filter.badge || 'white';
+            this.departureStatusTick;
+
+            const departureStatus = this.$getDepartureStatusMeta(filter, {
+                combinedKeys: ["bus_time"],
+            });
 
             return [
                 "departure-status-row",
-                `departure-status--${busStatusColor}`,
+                departureStatus.toneClass || filter.cancellation_status_color || filter.badge || "",
             ];
         },
         async fetchRoutes() {

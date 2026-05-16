@@ -28929,6 +28929,8 @@ var COLUMN_OPTIONS = [{
         return column.key;
       }),
       showColumnDropdown: false,
+      departureStatusTick: Date.now(),
+      departureStatusIntervalId: null,
       tableLoading: true,
       filterCancel: {
         terminal: 0,
@@ -28996,11 +28998,27 @@ var COLUMN_OPTIONS = [{
   },
   mounted: function mounted() {
     document.addEventListener('click', this.handleDocumentClick);
+    this.startDepartureStatusTicker();
   },
   beforeUnmount: function beforeUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
+    this.stopDepartureStatusTicker();
   },
   methods: {
+    startDepartureStatusTicker: function startDepartureStatusTicker() {
+      var _this2 = this;
+
+      this.stopDepartureStatusTicker();
+      this.departureStatusIntervalId = window.setInterval(function () {
+        _this2.departureStatusTick = Date.now();
+      }, 30000);
+    },
+    stopDepartureStatusTicker: function stopDepartureStatusTicker() {
+      if (this.departureStatusIntervalId) {
+        window.clearInterval(this.departureStatusIntervalId);
+        this.departureStatusIntervalId = null;
+      }
+    },
     toggleColumnDropdown: function toggleColumnDropdown() {
       this.showColumnDropdown = !this.showColumnDropdown;
     },
@@ -29013,11 +29031,14 @@ var COLUMN_OPTIONS = [{
       return this.visibleColumns.includes(columnKey);
     },
     getCancellationRowClass: function getCancellationRowClass(filter) {
-      var busStatusColor = filter.cancellation_status_color || filter.badge || 'white';
-      return ["departure-status-row", "departure-status--".concat(busStatusColor)];
+      this.departureStatusTick;
+      var departureStatus = this.$getDepartureStatusMeta(filter, {
+        combinedKeys: ["bus_time"]
+      });
+      return ["departure-status-row", departureStatus.toneClass || filter.cancellation_status_color || filter.badge || ""];
     },
     fetchRoutes: function fetchRoutes() {
-      var _this2 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var resRoute;
@@ -29026,13 +29047,13 @@ var COLUMN_OPTIONS = [{
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this2.callApi("post", "confirm/cancellation/routes");
+                return _this3.callApi("post", "confirm/cancellation/routes");
 
               case 2:
                 resRoute = _context2.sent;
 
                 if (resRoute.status == 200) {
-                  _this2.routes = resRoute.data;
+                  _this3.routes = resRoute.data;
                 }
 
               case 4:
@@ -29044,7 +29065,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     fetchFilters: function fetchFilters() {
-      var _this3 = this;
+      var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var resTerminals;
@@ -29053,13 +29074,13 @@ var COLUMN_OPTIONS = [{
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return _this3.callApi("post", 'confirm/cancellation/getTerminals');
+                return _this4.callApi("post", 'confirm/cancellation/getTerminals');
 
               case 2:
                 resTerminals = _context3.sent;
 
                 if (resTerminals.status == 200) {
-                  _this3.terminals = resTerminals.data;
+                  _this4.terminals = resTerminals.data;
                 }
 
               case 4:
@@ -29071,7 +29092,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     fetchFilterBuses: function fetchFilterBuses() {
-      var _this4 = this;
+      var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var resBuses;
@@ -29080,13 +29101,13 @@ var COLUMN_OPTIONS = [{
             switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.next = 2;
-                return _this4.callApi("post", 'confirm/cancellation/getBuses');
+                return _this5.callApi("post", 'confirm/cancellation/getBuses');
 
               case 2:
                 resBuses = _context4.sent;
 
                 if (resBuses.status == 200) {
-                  _this4.buses = resBuses.data;
+                  _this5.buses = resBuses.data;
                 }
 
               case 4:
@@ -29098,7 +29119,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     CancelFilter: function CancelFilter() {
-      var _this5 = this;
+      var _this6 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var resFetchData;
@@ -29106,16 +29127,16 @@ var COLUMN_OPTIONS = [{
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _this5.tableLoading = true;
+                _this6.tableLoading = true;
                 _context5.next = 3;
-                return _this5.callApi("post", 'confirm/cancellation/fetchFilterData', _this5.filterCancel);
+                return _this6.callApi("post", 'confirm/cancellation/fetchFilterData', _this6.filterCancel);
 
               case 3:
                 resFetchData = _context5.sent;
 
                 if (resFetchData.status == 200) {
-                  _this5.filters = resFetchData.data;
-                  _this5.tableLoading = false;
+                  _this6.filters = resFetchData.data;
+                  _this6.tableLoading = false;
                 }
 
               case 5:
@@ -29522,6 +29543,8 @@ var COLUMN_OPTIONS = [{
         return column.key;
       }),
       showColumnDropdown: false,
+      departureStatusTick: Date.now(),
+      departureStatusIntervalId: null,
       tableLoading: true,
       filterCancel: {
         terminal: 0,
@@ -29582,11 +29605,27 @@ var COLUMN_OPTIONS = [{
   },
   mounted: function mounted() {
     document.addEventListener('click', this.handleDocumentClick);
+    this.startDepartureStatusTicker();
   },
   beforeUnmount: function beforeUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
+    this.stopDepartureStatusTicker();
   },
   methods: {
+    startDepartureStatusTicker: function startDepartureStatusTicker() {
+      var _this2 = this;
+
+      this.stopDepartureStatusTicker();
+      this.departureStatusIntervalId = window.setInterval(function () {
+        _this2.departureStatusTick = Date.now();
+      }, 30000);
+    },
+    stopDepartureStatusTicker: function stopDepartureStatusTicker() {
+      if (this.departureStatusIntervalId) {
+        window.clearInterval(this.departureStatusIntervalId);
+        this.departureStatusIntervalId = null;
+      }
+    },
     toggleColumnDropdown: function toggleColumnDropdown() {
       this.showColumnDropdown = !this.showColumnDropdown;
     },
@@ -29603,11 +29642,14 @@ var COLUMN_OPTIONS = [{
       return this.visibleColumns.includes(columnKey);
     },
     getRescheduleRowClass: function getRescheduleRowClass(filter) {
-      var busStatusColor = filter.badge || 'white';
-      return ["departure-status-row", "departure-status--".concat(busStatusColor)];
+      this.departureStatusTick;
+      var departureStatus = this.$getDepartureStatusMeta(filter, {
+        combinedKeys: ["old_bus_time"]
+      });
+      return ["departure-status-row", departureStatus.toneClass || filter.badge || ""];
     },
     fetchFilters: function fetchFilters() {
-      var _this2 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var resTerminals;
@@ -29616,13 +29658,13 @@ var COLUMN_OPTIONS = [{
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this2.callApi("post", 'reschedule/getTerminals');
+                return _this3.callApi("post", 'reschedule/getTerminals');
 
               case 2:
                 resTerminals = _context2.sent;
 
                 if (resTerminals.status == 200) {
-                  _this2.terminals = resTerminals.data;
+                  _this3.terminals = resTerminals.data;
                 }
 
               case 4:
@@ -29634,7 +29676,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     overissueFilter: function overissueFilter() {
-      var _this3 = this;
+      var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var resFetchData;
@@ -29642,17 +29684,17 @@ var COLUMN_OPTIONS = [{
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _this3.tableLoading = true;
+                _this4.tableLoading = true;
                 _context3.next = 3;
-                return _this3.callApi("post", 'reschedule/fetchFilterData', _this3.filterCancel);
+                return _this4.callApi("post", 'reschedule/fetchFilterData', _this4.filterCancel);
 
               case 3:
                 resFetchData = _context3.sent;
                 console.log(resFetchData);
 
                 if (resFetchData.status == 200) {
-                  _this3.filters = resFetchData.data;
-                  _this3.tableLoading = false;
+                  _this4.filters = resFetchData.data;
+                  _this4.tableLoading = false;
                 }
 
               case 6:
@@ -144689,7 +144731,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
 
+
+var DEPARTURE_DATE_TIME_FORMATS = ["YYYY-MM-DD HH:mm:ss", "YYYY-MM-DD HH:mm", "YYYY-MM-DD hh:mm:ss A", "YYYY-MM-DD hh:mm A", "YYYY-MM-DD h:mm:ss A", "YYYY-MM-DD h:mm A", "YYYY/MM/DD HH:mm:ss", "YYYY/MM/DD HH:mm", "YYYY/MM/DD hh:mm:ss A", "YYYY/MM/DD hh:mm A", "DD-MM-YYYY HH:mm:ss", "DD-MM-YYYY HH:mm", "DD-MM-YYYY hh:mm:ss A", "DD-MM-YYYY hh:mm A", "DD/MM/YYYY HH:mm:ss", "DD/MM/YYYY HH:mm", "DD/MM/YYYY hh:mm:ss A", "DD/MM/YYYY hh:mm A", "MMM D YYYY HH:mm:ss", "MMM D YYYY HH:mm", "MMM D YYYY hh:mm:ss A", "MMM D YYYY hh:mm A", "D MMM YYYY HH:mm:ss", "D MMM YYYY HH:mm", "D MMM YYYY hh:mm:ss A", "D MMM YYYY hh:mm A"];
+var DEPARTURE_TIME_ONLY_FORMATS = ["HH:mm:ss", "HH:mm", "hh:mm:ss A", "hh:mm A", "h:mm:ss A", "h:mm A"];
+
+var normalizeDateTimeCandidate = function normalizeDateTimeCandidate(candidate) {
+  if (candidate === undefined || candidate === null || candidate === "") {
+    return "";
+  }
+
+  if (moment__WEBPACK_IMPORTED_MODULE_1___default().isMoment(candidate)) {
+    return candidate.clone();
+  }
+
+  if (candidate instanceof Date || typeof candidate === "number") {
+    return moment__WEBPACK_IMPORTED_MODULE_1___default()(candidate);
+  }
+
+  var value = String(candidate).trim().replace(/\s+/g, " ");
+
+  if (!value) {
+    return "";
+  }
+
+  if (value.includes(" - ")) {
+    return value.split(" - ")[0].trim();
+  }
+
+  return value;
+};
+
+var parseDateTimeCandidate = function parseDateTimeCandidate(candidate) {
+  var normalized = normalizeDateTimeCandidate(candidate);
+
+  if (!normalized) {
+    return null;
+  }
+
+  if (moment__WEBPACK_IMPORTED_MODULE_1___default().isMoment(normalized)) {
+    return normalized.isValid() ? normalized : null;
+  }
+
+  if (normalized instanceof Date) {
+    var parsedFromDate = moment__WEBPACK_IMPORTED_MODULE_1___default()(normalized);
+    return parsedFromDate.isValid() ? parsedFromDate : null;
+  }
+
+  var strictIso = moment__WEBPACK_IMPORTED_MODULE_1___default()(normalized, (moment__WEBPACK_IMPORTED_MODULE_1___default().ISO_8601), true);
+
+  if (strictIso.isValid()) {
+    return strictIso;
+  }
+
+  var strictDateTime = moment__WEBPACK_IMPORTED_MODULE_1___default()(normalized, DEPARTURE_DATE_TIME_FORMATS, true);
+
+  if (strictDateTime.isValid()) {
+    return strictDateTime;
+  }
+
+  var looseDateTime = moment__WEBPACK_IMPORTED_MODULE_1___default()(normalized);
+
+  if (looseDateTime.isValid()) {
+    return looseDateTime;
+  }
+
+  return null;
+};
 /*
     this function will work on input text field
     all parameter are optional except first one that is event
@@ -144700,6 +144810,7 @@ __webpack_require__.r(__webpack_exports__);
     negative = true/false | accept/not accept
     len = mean you can't exceed that number
 */
+
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   numberValidate: function numberValidate(event) {
@@ -144844,6 +144955,34 @@ __webpack_require__.r(__webpack_exports__);
 
       return "".concat(day, "-").concat(month, "-").concat(year);
     }
+  },
+  getBusStatusColor: function getBusStatusColor(departureDateTime, actionDateTime) {
+    var departureMoment = parseDateTimeCandidate(departureDateTime);
+    var actionMoment = parseDateTimeCandidate(actionDateTime);
+
+    if (!departureMoment || !actionMoment) {
+      return "white";
+    }
+
+    if (actionMoment.isAfter(departureMoment)) {
+      return "red";
+    }
+
+    var differenceInMinutes = departureMoment.diff(actionMoment, "minutes", true);
+
+    if (differenceInMinutes <= 30) {
+      return "yellow";
+    }
+
+    if (differenceInMinutes <= 120) {
+      return "green";
+    }
+
+    if (differenceInMinutes <= 360) {
+      return "white";
+    }
+
+    return "white";
   },
   getFileType: function getFileType(filePath) {
     if (!filePath || typeof filePath !== 'string') {
