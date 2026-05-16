@@ -1,6 +1,5 @@
 <?php
 
-use App\Helpers\BusColorHelper;
 use App\Models\Booking\TicketELT;
 use App\Models\City;
 use App\Models\Customer;
@@ -686,21 +685,6 @@ if (!function_exists('getDynamicHeaders')) {
     function getDynamicHeaders()
     {
         return \App\Models\ReportsHeader::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
-    }
-}
-
-if (!function_exists('getBusStatusColor')) {
-    function getBusStatusColor($departure, $actionTime)
-    {
-        return BusColorHelper::getColor($departure, $actionTime);
-    }
-}
-
-// Backward compatibility for existing callers.
-if (!function_exists('getRowBadgeColor')) {
-    function getRowBadgeColor($departureTime, $cancellationTime)
-    {
-        return getBusStatusColor($departureTime, $cancellationTime);
     }
 }
 

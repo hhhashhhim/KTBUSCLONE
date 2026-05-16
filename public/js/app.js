@@ -144689,75 +144689,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
 
-
-var DEPARTURE_DATE_TIME_FORMATS = ["YYYY-MM-DD HH:mm:ss", "YYYY-MM-DD HH:mm", "YYYY-MM-DD hh:mm:ss A", "YYYY-MM-DD hh:mm A", "YYYY-MM-DD h:mm:ss A", "YYYY-MM-DD h:mm A", "YYYY/MM/DD HH:mm:ss", "YYYY/MM/DD HH:mm", "YYYY/MM/DD hh:mm:ss A", "YYYY/MM/DD hh:mm A", "DD-MM-YYYY HH:mm:ss", "DD-MM-YYYY HH:mm", "DD-MM-YYYY hh:mm:ss A", "DD-MM-YYYY hh:mm A", "DD/MM/YYYY HH:mm:ss", "DD/MM/YYYY HH:mm", "DD/MM/YYYY hh:mm:ss A", "DD/MM/YYYY hh:mm A", "MMM D YYYY HH:mm:ss", "MMM D YYYY HH:mm", "MMM D YYYY hh:mm:ss A", "MMM D YYYY hh:mm A", "D MMM YYYY HH:mm:ss", "D MMM YYYY HH:mm", "D MMM YYYY hh:mm:ss A", "D MMM YYYY hh:mm A"];
-var DEPARTURE_TIME_ONLY_FORMATS = ["HH:mm:ss", "HH:mm", "hh:mm:ss A", "hh:mm A", "h:mm:ss A", "h:mm A"];
-
-var normalizeDateTimeCandidate = function normalizeDateTimeCandidate(candidate) {
-  if (candidate === undefined || candidate === null || candidate === "") {
-    return "";
-  }
-
-  if (moment__WEBPACK_IMPORTED_MODULE_1___default().isMoment(candidate)) {
-    return candidate.clone();
-  }
-
-  if (candidate instanceof Date || typeof candidate === "number") {
-    return moment__WEBPACK_IMPORTED_MODULE_1___default()(candidate);
-  }
-
-  var value = String(candidate).trim().replace(/\s+/g, " ");
-
-  if (!value) {
-    return "";
-  }
-
-  if (value.includes(" - ")) {
-    return value.split(" - ")[0].trim();
-  }
-
-  return value;
-};
-
-var parseDateTimeCandidate = function parseDateTimeCandidate(candidate) {
-  var normalized = normalizeDateTimeCandidate(candidate);
-
-  if (!normalized) {
-    return null;
-  }
-
-  if (moment__WEBPACK_IMPORTED_MODULE_1___default().isMoment(normalized)) {
-    return normalized.isValid() ? normalized : null;
-  }
-
-  if (normalized instanceof Date) {
-    var parsedFromDate = moment__WEBPACK_IMPORTED_MODULE_1___default()(normalized);
-    return parsedFromDate.isValid() ? parsedFromDate : null;
-  }
-
-  var strictIso = moment__WEBPACK_IMPORTED_MODULE_1___default()(normalized, (moment__WEBPACK_IMPORTED_MODULE_1___default().ISO_8601), true);
-
-  if (strictIso.isValid()) {
-    return strictIso;
-  }
-
-  var strictDateTime = moment__WEBPACK_IMPORTED_MODULE_1___default()(normalized, DEPARTURE_DATE_TIME_FORMATS, true);
-
-  if (strictDateTime.isValid()) {
-    return strictDateTime;
-  }
-
-  var looseDateTime = moment__WEBPACK_IMPORTED_MODULE_1___default()(normalized);
-
-  if (looseDateTime.isValid()) {
-    return looseDateTime;
-  }
-
-  return null;
-};
 /*
     this function will work on input text field
     all parameter are optional except first one that is event
@@ -144768,7 +144700,6 @@ var parseDateTimeCandidate = function parseDateTimeCandidate(candidate) {
     negative = true/false | accept/not accept
     len = mean you can't exceed that number
 */
-
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   numberValidate: function numberValidate(event) {
@@ -144913,34 +144844,6 @@ var parseDateTimeCandidate = function parseDateTimeCandidate(candidate) {
 
       return "".concat(day, "-").concat(month, "-").concat(year);
     }
-  },
-  getBusStatusColor: function getBusStatusColor(departureDateTime, actionDateTime) {
-    var departureMoment = parseDateTimeCandidate(departureDateTime);
-    var actionMoment = parseDateTimeCandidate(actionDateTime);
-
-    if (!departureMoment || !actionMoment) {
-      return "white";
-    }
-
-    if (actionMoment.isAfter(departureMoment)) {
-      return "red";
-    }
-
-    var differenceInMinutes = departureMoment.diff(actionMoment, "minutes", true);
-
-    if (differenceInMinutes <= 30) {
-      return "yellow";
-    }
-
-    if (differenceInMinutes <= 120) {
-      return "green";
-    }
-
-    if (differenceInMinutes <= 360) {
-      return "white";
-    }
-
-    return "white";
   },
   getFileType: function getFileType(filePath) {
     if (!filePath || typeof filePath !== 'string') {
