@@ -309,7 +309,7 @@ export default {
             return this.visibleColumns.includes(columnKey);
         },
         getRescheduleRowClass(filter) {
-            const busStatusColor = this.$getBusStatusColor(filter.old_bus_time, filter.reschedule_time);
+            const busStatusColor = filter.badge || 'white';
 
             return [
                 "departure-status-row",

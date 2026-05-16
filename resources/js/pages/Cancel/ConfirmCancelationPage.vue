@@ -363,7 +363,7 @@ export default {
             return this.visibleColumns.includes(columnKey);
         },
         getCancellationRowClass(filter) {
-            const busStatusColor = this.$getBusStatusColor(filter.bus_time, filter.cancel_date);
+            const busStatusColor = filter.cancellation_status_color || filter.badge || 'white';
 
             return [
                 "departure-status-row",

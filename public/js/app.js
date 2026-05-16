@@ -29013,7 +29013,7 @@ var COLUMN_OPTIONS = [{
       return this.visibleColumns.includes(columnKey);
     },
     getCancellationRowClass: function getCancellationRowClass(filter) {
-      var busStatusColor = this.$getBusStatusColor(filter.bus_time, filter.cancel_date);
+      var busStatusColor = filter.cancellation_status_color || filter.badge || 'white';
       return ["departure-status-row", "departure-status--".concat(busStatusColor)];
     },
     fetchRoutes: function fetchRoutes() {
@@ -29603,7 +29603,7 @@ var COLUMN_OPTIONS = [{
       return this.visibleColumns.includes(columnKey);
     },
     getRescheduleRowClass: function getRescheduleRowClass(filter) {
-      var busStatusColor = this.$getBusStatusColor(filter.old_bus_time, filter.reschedule_time);
+      var busStatusColor = filter.badge || 'white';
       return ["departure-status-row", "departure-status--".concat(busStatusColor)];
     },
     fetchFilters: function fetchFilters() {
