@@ -39,31 +39,6 @@ const DEPARTURE_TIME_ONLY_FORMATS = [
     "h:mm A",
 ];
 
-const DEFAULT_DEPARTURE_DATE_KEYS = [
-    "departure_date",
-    "schedule_date",
-    "date",
-    "new_departure_date",
-    "old_departure_date",
-];
-
-const DEFAULT_DEPARTURE_TIME_KEYS = [
-    "departure_time",
-    "departure_city_time",
-    "time",
-];
-
-const DEFAULT_DEPARTURE_COMBINED_KEYS = [
-    "departure_datetime",
-    "departureDateTime",
-    "schedule_datetime",
-    "scheduleDateTime",
-    "departure_at",
-    "bus_time",
-    "new_bus_time",
-    "old_bus_time",
-];
-
 const normalizeDateTimeCandidate = (candidate) => {
     if (candidate === undefined || candidate === null || candidate === "") {
         return "";
@@ -122,161 +97,6 @@ const parseDateTimeCandidate = (candidate) => {
     }
 
     return null;
-};
-
-const parseDepartureMoment = (
-    payload,
-    {
-        dateKeys = [],
-        timeKeys = [],
-        combinedKeys = [],
-        fallbackDate = null,
-        fallbackTime = null,
-    } = {}
-) => {
-    if (!payload && !fallbackDate && !fallbackTime) {
-        return null;
-    }
-
-    if (
-        moment.isMoment(payload) ||
-        payload instanceof Date ||
-        typeof payload === "string" ||
-        typeof payload === "number"
-    ) {
-        const directValue = parseDateTimeCandidate(payload);
-        if (directValue) {
-            return directValue;
-        }
-    }
-
-    const row = payload && typeof payload === "object" ? payload : {};
-    const mergedDateKeys = [...dateKeys, ...DEFAULT_DEPARTURE_DATE_KEYS];
-    const mergedTimeKeys = [...timeKeys, ...DEFAULT_DEPARTURE_TIME_KEYS];
-    const mergedCombinedKeys = [...combinedKeys, ...DEFAULT_DEPARTURE_COMBINED_KEYS];
-
-    const departureDate = mergedDateKeys
-        .map((key) => row?.[key])
-        .find((value) => value !== undefined && value !== null && value !== "") ?? fallbackDate;
-
-    for (const key of mergedCombinedKeys) {
-        const combinedValue = row?.[key];
-
-        if (combinedValue === undefined || combinedValue === null || combinedValue === "") {
-            continue;
-        }
-
-        const parsedCombined = parseDateTimeCandidate(combinedValue);
-        if (parsedCombined) {
-            return parsedCombined;
-        }
-
-        if (departureDate) {
-            const timeOnly = normalizeDateTimeCandidate(combinedValue);
-            const parsedWithDate = moment(
-                `${departureDate} ${timeOnly}`,
-                [...DEPARTURE_DATE_TIME_FORMATS, ...DEPARTURE_TIME_ONLY_FORMATS],
-                true
-            );
-
-            if (parsedWithDate.isValid()) {
-                return parsedWithDate;
-            }
-        }
-    }
-
-    const departureTime = mergedTimeKeys
-        .map((key) => row?.[key])
-        .find((value) => value !== undefined && value !== null && value !== "") ?? fallbackTime;
-
-    if (departureDate && departureTime) {
-        const combinedDateTime = moment(
-            `${departureDate} ${departureTime}`,
-            [...DEPARTURE_DATE_TIME_FORMATS, ...DEPARTURE_TIME_ONLY_FORMATS],
-            true
-        );
-
-        if (combinedDateTime.isValid()) {
-            return combinedDateTime;
-        }
-    }
-
-    if (departureTime) {
-        const parsedTimeOnly = parseDateTimeCandidate(departureTime);
-        if (parsedTimeOnly) {
-            return parsedTimeOnly;
-        }
-    }
-
-    return null;
-};
-
-const formatRemainingTime = (remainingMinutes) => {
-    if (remainingMinutes < 1) {
-        return "Less than a minute remaining";
-    }
-
-    const hours = Math.floor(remainingMinutes / 60);
-    const minutes = remainingMinutes % 60;
-
-    if (!hours) {
-        return `${minutes} minute${minutes === 1 ? "" : "s"} remaining`;
-    }
-
-    if (!minutes) {
-        return `${hours} hour${hours === 1 ? "" : "s"} remaining`;
-    }
-
-    return `${hours} hour${hours === 1 ? "" : "s"} ${minutes} minute${minutes === 1 ? "" : "s"} remaining`;
-};
-
-const buildDepartureStatusMeta = (departureMoment) => {
-    if (!departureMoment || !departureMoment.isValid()) {
-        return {
-            statusKey: "unknown",
-            toneClass: "",
-            statusLabel: "Departure time unavailable",
-            remainingMinutes: null,
-            remainingText: "",
-            departureMoment: null,
-            departureText: "",
-            isPast: false,
-            isValid: false,
-        };
-    }
-
-    const now = moment();
-    const remainingMinutes = Math.ceil(departureMoment.diff(now, "minutes", true));
-    const isPast = now.isAfter(departureMoment);
-
-    let statusKey = "";
-    let statusLabel = "More than 6 hours remaining";
-
-    if (isPast) {
-        statusKey = "red";
-        statusLabel = "Departed";
-    } else if (remainingMinutes <= 30) {
-        statusKey = "yellow";
-        statusLabel = "30 minutes or less remaining";
-    } else if (remainingMinutes <= 120) {
-        statusKey = "green";
-        statusLabel = "2 hours or less remaining";
-    } else if (remainingMinutes <= 360) {
-        statusKey = "white";
-        statusLabel = "6 hours or less remaining";
-    }
-
-    return {
-        statusKey,
-        toneClass: statusKey ? `departure-status--${statusKey}` : "",
-        statusLabel,
-        remainingMinutes: Math.max(remainingMinutes, 0),
-        remainingText: isPast ? "Departure time has passed" : formatRemainingTime(Math.max(remainingMinutes, 0)),
-        departureMoment,
-        departureText: departureMoment.format("DD-MMM-YYYY hh:mm A"),
-        isPast,
-        isValid: true,
-    };
 };
 
 /*
@@ -408,9 +228,33 @@ export default {
         }
     },
 
-    getDepartureStatusMeta(payload, options = {}) {
-        const departureMoment = parseDepartureMoment(payload, options);
-        return buildDepartureStatusMeta(departureMoment);
+    getBusStatusColor(departureDateTime, actionDateTime) {
+        const departureMoment = parseDateTimeCandidate(departureDateTime);
+        const actionMoment = parseDateTimeCandidate(actionDateTime);
+
+        if (!departureMoment || !actionMoment) {
+            return "white";
+        }
+
+        if (actionMoment.isAfter(departureMoment)) {
+            return "red";
+        }
+
+        const differenceInMinutes = departureMoment.diff(actionMoment, "minutes", true);
+
+        if (differenceInMinutes <= 30) {
+            return "yellow";
+        }
+
+        if (differenceInMinutes <= 120) {
+            return "green";
+        }
+
+        if (differenceInMinutes <= 360) {
+            return "white";
+        }
+
+        return "white";
     },
 
     getFileType(filePath) {

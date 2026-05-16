@@ -688,26 +688,82 @@ if (!function_exists('getDynamicHeaders')) {
     }
 }
 
-//Get getRowBadgeColor
+if (!function_exists('normalizeBusDateTime')) {
+    function normalizeBusDateTime($value)
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $normalizedValue = preg_replace('/\s+/', ' ', trim((string) $value));
+
+        if ($normalizedValue === '') {
+            return null;
+        }
+
+        if (str_contains($normalizedValue, ' - ')) {
+            $normalizedValue = trim(explode(' - ', $normalizedValue)[0]);
+        }
+
+        return $normalizedValue;
+    }
+}
+
+if (!function_exists('parseBusDateTime')) {
+    function parseBusDateTime($value)
+    {
+        $normalizedValue = normalizeBusDateTime($value);
+
+        if (!$normalizedValue) {
+            return null;
+        }
+
+        try {
+            return \Carbon\Carbon::parse($normalizedValue);
+        } catch (\Throwable $exception) {
+            return null;
+        }
+    }
+}
+
+//Get getBusStatusColor
+if (!function_exists('getBusStatusColor')) {
+    function getBusStatusColor($departure, $actionTime)
+    {
+        $departureDateTime = parseBusDateTime($departure);
+        $actionDateTime = parseBusDateTime($actionTime);
+
+        if (!$departureDateTime || !$actionDateTime) {
+            return 'white';
+        }
+
+        if ($actionDateTime->greaterThan($departureDateTime)) {
+            return 'red';
+        }
+
+        $differenceInMinutes = ($departureDateTime->getTimestamp() - $actionDateTime->getTimestamp()) / 60;
+
+        if ($differenceInMinutes <= 30) {
+            return 'yellow';
+        }
+
+        if ($differenceInMinutes <= 120) {
+            return 'green';
+        }
+
+        if ($differenceInMinutes <= 360) {
+            return 'white';
+        }
+
+        return 'white';
+    }
+}
+
+// Backward compatibility for existing callers.
 if (!function_exists('getRowBadgeColor')) {
     function getRowBadgeColor($departureTime, $cancellationTime)
     {
-        $secDepart = strtotime($departureTime);
-        $secCancellation = strtotime($cancellationTime);
-        $threeHoursBefore = $secDepart - 10800;
-        $oneHoursBefore = $threeHoursBefore - 3600;
-
-        if ($secCancellation > $secDepart) {
-            return "red";
-        }
-
-        if ($secCancellation > $threeHoursBefore) {
-            return "yellow";
-        }
-        if ($secCancellation > $oneHoursBefore) {
-            return "green";
-        }
-        return "white";
+        return getBusStatusColor($departureTime, $cancellationTime);
     }
 }
 

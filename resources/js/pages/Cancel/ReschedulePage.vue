@@ -247,8 +247,6 @@ export default {
             columnOptions: COLUMN_OPTIONS.map((column) => ({ ...column })),
             visibleColumns: COLUMN_OPTIONS.filter((column) => column.checked).map((column) => column.key),
             showColumnDropdown: false,
-            departureStatusTick: Date.now(),
-            departureStatusIntervalId: null,
             tableLoading: true,
             filterCancel: {
                 terminal: 0,
@@ -289,26 +287,12 @@ export default {
     },
     mounted() {
         document.addEventListener('click', this.handleDocumentClick);
-        this.startDepartureStatusTicker();
     },
     beforeUnmount() {
         document.removeEventListener('click', this.handleDocumentClick);
-        this.stopDepartureStatusTicker();
     },
 
     methods: {
-        startDepartureStatusTicker() {
-            this.stopDepartureStatusTicker();
-            this.departureStatusIntervalId = window.setInterval(() => {
-                this.departureStatusTick = Date.now();
-            }, 30000);
-        },
-        stopDepartureStatusTicker() {
-            if (this.departureStatusIntervalId) {
-                window.clearInterval(this.departureStatusIntervalId);
-                this.departureStatusIntervalId = null;
-            }
-        },
         toggleColumnDropdown() {
             this.showColumnDropdown = !this.showColumnDropdown;
         },
@@ -325,15 +309,11 @@ export default {
             return this.visibleColumns.includes(columnKey);
         },
         getRescheduleRowClass(filter) {
-            this.departureStatusTick;
-
-            const departureStatus = this.$getDepartureStatusMeta(filter, {
-                combinedKeys: ["old_bus_time"],
-            });
+            const busStatusColor = this.$getBusStatusColor(filter.old_bus_time, filter.reschedule_time);
 
             return [
                 "departure-status-row",
-                departureStatus.toneClass || filter.badge || "",
+                `departure-status--${busStatusColor}`,
             ];
         },
         async fetchFilters() {

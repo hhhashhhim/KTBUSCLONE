@@ -28929,8 +28929,6 @@ var COLUMN_OPTIONS = [{
         return column.key;
       }),
       showColumnDropdown: false,
-      departureStatusTick: Date.now(),
-      departureStatusIntervalId: null,
       tableLoading: true,
       filterCancel: {
         terminal: 0,
@@ -28998,27 +28996,11 @@ var COLUMN_OPTIONS = [{
   },
   mounted: function mounted() {
     document.addEventListener('click', this.handleDocumentClick);
-    this.startDepartureStatusTicker();
   },
   beforeUnmount: function beforeUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
-    this.stopDepartureStatusTicker();
   },
   methods: {
-    startDepartureStatusTicker: function startDepartureStatusTicker() {
-      var _this2 = this;
-
-      this.stopDepartureStatusTicker();
-      this.departureStatusIntervalId = window.setInterval(function () {
-        _this2.departureStatusTick = Date.now();
-      }, 30000);
-    },
-    stopDepartureStatusTicker: function stopDepartureStatusTicker() {
-      if (this.departureStatusIntervalId) {
-        window.clearInterval(this.departureStatusIntervalId);
-        this.departureStatusIntervalId = null;
-      }
-    },
     toggleColumnDropdown: function toggleColumnDropdown() {
       this.showColumnDropdown = !this.showColumnDropdown;
     },
@@ -29031,14 +29013,11 @@ var COLUMN_OPTIONS = [{
       return this.visibleColumns.includes(columnKey);
     },
     getCancellationRowClass: function getCancellationRowClass(filter) {
-      this.departureStatusTick;
-      var departureStatus = this.$getDepartureStatusMeta(filter, {
-        combinedKeys: ["bus_time"]
-      });
-      return ["departure-status-row", departureStatus.toneClass || filter.cancellation_status_color || filter.badge || ""];
+      var busStatusColor = this.$getBusStatusColor(filter.bus_time, filter.cancel_date);
+      return ["departure-status-row", "departure-status--".concat(busStatusColor)];
     },
     fetchRoutes: function fetchRoutes() {
-      var _this3 = this;
+      var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var resRoute;
@@ -29047,13 +29026,13 @@ var COLUMN_OPTIONS = [{
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this3.callApi("post", "confirm/cancellation/routes");
+                return _this2.callApi("post", "confirm/cancellation/routes");
 
               case 2:
                 resRoute = _context2.sent;
 
                 if (resRoute.status == 200) {
-                  _this3.routes = resRoute.data;
+                  _this2.routes = resRoute.data;
                 }
 
               case 4:
@@ -29065,7 +29044,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     fetchFilters: function fetchFilters() {
-      var _this4 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var resTerminals;
@@ -29074,13 +29053,13 @@ var COLUMN_OPTIONS = [{
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return _this4.callApi("post", 'confirm/cancellation/getTerminals');
+                return _this3.callApi("post", 'confirm/cancellation/getTerminals');
 
               case 2:
                 resTerminals = _context3.sent;
 
                 if (resTerminals.status == 200) {
-                  _this4.terminals = resTerminals.data;
+                  _this3.terminals = resTerminals.data;
                 }
 
               case 4:
@@ -29092,7 +29071,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     fetchFilterBuses: function fetchFilterBuses() {
-      var _this5 = this;
+      var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var resBuses;
@@ -29101,13 +29080,13 @@ var COLUMN_OPTIONS = [{
             switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.next = 2;
-                return _this5.callApi("post", 'confirm/cancellation/getBuses');
+                return _this4.callApi("post", 'confirm/cancellation/getBuses');
 
               case 2:
                 resBuses = _context4.sent;
 
                 if (resBuses.status == 200) {
-                  _this5.buses = resBuses.data;
+                  _this4.buses = resBuses.data;
                 }
 
               case 4:
@@ -29119,7 +29098,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     CancelFilter: function CancelFilter() {
-      var _this6 = this;
+      var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var resFetchData;
@@ -29127,16 +29106,16 @@ var COLUMN_OPTIONS = [{
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _this6.tableLoading = true;
+                _this5.tableLoading = true;
                 _context5.next = 3;
-                return _this6.callApi("post", 'confirm/cancellation/fetchFilterData', _this6.filterCancel);
+                return _this5.callApi("post", 'confirm/cancellation/fetchFilterData', _this5.filterCancel);
 
               case 3:
                 resFetchData = _context5.sent;
 
                 if (resFetchData.status == 200) {
-                  _this6.filters = resFetchData.data;
-                  _this6.tableLoading = false;
+                  _this5.filters = resFetchData.data;
+                  _this5.tableLoading = false;
                 }
 
               case 5:
@@ -29543,8 +29522,6 @@ var COLUMN_OPTIONS = [{
         return column.key;
       }),
       showColumnDropdown: false,
-      departureStatusTick: Date.now(),
-      departureStatusIntervalId: null,
       tableLoading: true,
       filterCancel: {
         terminal: 0,
@@ -29605,27 +29582,11 @@ var COLUMN_OPTIONS = [{
   },
   mounted: function mounted() {
     document.addEventListener('click', this.handleDocumentClick);
-    this.startDepartureStatusTicker();
   },
   beforeUnmount: function beforeUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
-    this.stopDepartureStatusTicker();
   },
   methods: {
-    startDepartureStatusTicker: function startDepartureStatusTicker() {
-      var _this2 = this;
-
-      this.stopDepartureStatusTicker();
-      this.departureStatusIntervalId = window.setInterval(function () {
-        _this2.departureStatusTick = Date.now();
-      }, 30000);
-    },
-    stopDepartureStatusTicker: function stopDepartureStatusTicker() {
-      if (this.departureStatusIntervalId) {
-        window.clearInterval(this.departureStatusIntervalId);
-        this.departureStatusIntervalId = null;
-      }
-    },
     toggleColumnDropdown: function toggleColumnDropdown() {
       this.showColumnDropdown = !this.showColumnDropdown;
     },
@@ -29642,14 +29603,11 @@ var COLUMN_OPTIONS = [{
       return this.visibleColumns.includes(columnKey);
     },
     getRescheduleRowClass: function getRescheduleRowClass(filter) {
-      this.departureStatusTick;
-      var departureStatus = this.$getDepartureStatusMeta(filter, {
-        combinedKeys: ["old_bus_time"]
-      });
-      return ["departure-status-row", departureStatus.toneClass || filter.badge || ""];
+      var busStatusColor = this.$getBusStatusColor(filter.old_bus_time, filter.reschedule_time);
+      return ["departure-status-row", "departure-status--".concat(busStatusColor)];
     },
     fetchFilters: function fetchFilters() {
-      var _this3 = this;
+      var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var resTerminals;
@@ -29658,13 +29616,13 @@ var COLUMN_OPTIONS = [{
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this3.callApi("post", 'reschedule/getTerminals');
+                return _this2.callApi("post", 'reschedule/getTerminals');
 
               case 2:
                 resTerminals = _context2.sent;
 
                 if (resTerminals.status == 200) {
-                  _this3.terminals = resTerminals.data;
+                  _this2.terminals = resTerminals.data;
                 }
 
               case 4:
@@ -29676,7 +29634,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     overissueFilter: function overissueFilter() {
-      var _this4 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var resFetchData;
@@ -29684,17 +29642,17 @@ var COLUMN_OPTIONS = [{
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _this4.tableLoading = true;
+                _this3.tableLoading = true;
                 _context3.next = 3;
-                return _this4.callApi("post", 'reschedule/fetchFilterData', _this4.filterCancel);
+                return _this3.callApi("post", 'reschedule/fetchFilterData', _this3.filterCancel);
 
               case 3:
                 resFetchData = _context3.sent;
                 console.log(resFetchData);
 
                 if (resFetchData.status == 200) {
-                  _this4.filters = resFetchData.data;
-                  _this4.tableLoading = false;
+                  _this3.filters = resFetchData.data;
+                  _this3.tableLoading = false;
                 }
 
               case 6:
@@ -144733,29 +144691,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-
 
 
 var DEPARTURE_DATE_TIME_FORMATS = ["YYYY-MM-DD HH:mm:ss", "YYYY-MM-DD HH:mm", "YYYY-MM-DD hh:mm:ss A", "YYYY-MM-DD hh:mm A", "YYYY-MM-DD h:mm:ss A", "YYYY-MM-DD h:mm A", "YYYY/MM/DD HH:mm:ss", "YYYY/MM/DD HH:mm", "YYYY/MM/DD hh:mm:ss A", "YYYY/MM/DD hh:mm A", "DD-MM-YYYY HH:mm:ss", "DD-MM-YYYY HH:mm", "DD-MM-YYYY hh:mm:ss A", "DD-MM-YYYY hh:mm A", "DD/MM/YYYY HH:mm:ss", "DD/MM/YYYY HH:mm", "DD/MM/YYYY hh:mm:ss A", "DD/MM/YYYY hh:mm A", "MMM D YYYY HH:mm:ss", "MMM D YYYY HH:mm", "MMM D YYYY hh:mm:ss A", "MMM D YYYY hh:mm A", "D MMM YYYY HH:mm:ss", "D MMM YYYY HH:mm", "D MMM YYYY hh:mm:ss A", "D MMM YYYY hh:mm A"];
 var DEPARTURE_TIME_ONLY_FORMATS = ["HH:mm:ss", "HH:mm", "hh:mm:ss A", "hh:mm A", "h:mm:ss A", "h:mm A"];
-var DEFAULT_DEPARTURE_DATE_KEYS = ["departure_date", "schedule_date", "date", "new_departure_date", "old_departure_date"];
-var DEFAULT_DEPARTURE_TIME_KEYS = ["departure_time", "departure_city_time", "time"];
-var DEFAULT_DEPARTURE_COMBINED_KEYS = ["departure_datetime", "departureDateTime", "schedule_datetime", "scheduleDateTime", "departure_at", "bus_time", "new_bus_time", "old_bus_time"];
 
 var normalizeDateTimeCandidate = function normalizeDateTimeCandidate(candidate) {
   if (candidate === undefined || candidate === null || candidate === "") {
@@ -144819,168 +144758,6 @@ var parseDateTimeCandidate = function parseDateTimeCandidate(candidate) {
 
   return null;
 };
-
-var parseDepartureMoment = function parseDepartureMoment(payload) {
-  var _mergedDateKeys$map$f, _mergedTimeKeys$map$f;
-
-  var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-      _ref$dateKeys = _ref.dateKeys,
-      dateKeys = _ref$dateKeys === void 0 ? [] : _ref$dateKeys,
-      _ref$timeKeys = _ref.timeKeys,
-      timeKeys = _ref$timeKeys === void 0 ? [] : _ref$timeKeys,
-      _ref$combinedKeys = _ref.combinedKeys,
-      combinedKeys = _ref$combinedKeys === void 0 ? [] : _ref$combinedKeys,
-      _ref$fallbackDate = _ref.fallbackDate,
-      fallbackDate = _ref$fallbackDate === void 0 ? null : _ref$fallbackDate,
-      _ref$fallbackTime = _ref.fallbackTime,
-      fallbackTime = _ref$fallbackTime === void 0 ? null : _ref$fallbackTime;
-
-  if (!payload && !fallbackDate && !fallbackTime) {
-    return null;
-  }
-
-  if (moment__WEBPACK_IMPORTED_MODULE_1___default().isMoment(payload) || payload instanceof Date || typeof payload === "string" || typeof payload === "number") {
-    var directValue = parseDateTimeCandidate(payload);
-
-    if (directValue) {
-      return directValue;
-    }
-  }
-
-  var row = payload && _typeof(payload) === "object" ? payload : {};
-  var mergedDateKeys = [].concat(_toConsumableArray(dateKeys), DEFAULT_DEPARTURE_DATE_KEYS);
-  var mergedTimeKeys = [].concat(_toConsumableArray(timeKeys), DEFAULT_DEPARTURE_TIME_KEYS);
-  var mergedCombinedKeys = [].concat(_toConsumableArray(combinedKeys), DEFAULT_DEPARTURE_COMBINED_KEYS);
-  var departureDate = (_mergedDateKeys$map$f = mergedDateKeys.map(function (key) {
-    return row === null || row === void 0 ? void 0 : row[key];
-  }).find(function (value) {
-    return value !== undefined && value !== null && value !== "";
-  })) !== null && _mergedDateKeys$map$f !== void 0 ? _mergedDateKeys$map$f : fallbackDate;
-
-  var _iterator = _createForOfIteratorHelper(mergedCombinedKeys),
-      _step;
-
-  try {
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var key = _step.value;
-      var combinedValue = row === null || row === void 0 ? void 0 : row[key];
-
-      if (combinedValue === undefined || combinedValue === null || combinedValue === "") {
-        continue;
-      }
-
-      var parsedCombined = parseDateTimeCandidate(combinedValue);
-
-      if (parsedCombined) {
-        return parsedCombined;
-      }
-
-      if (departureDate) {
-        var timeOnly = normalizeDateTimeCandidate(combinedValue);
-        var parsedWithDate = moment__WEBPACK_IMPORTED_MODULE_1___default()("".concat(departureDate, " ").concat(timeOnly), [].concat(DEPARTURE_DATE_TIME_FORMATS, DEPARTURE_TIME_ONLY_FORMATS), true);
-
-        if (parsedWithDate.isValid()) {
-          return parsedWithDate;
-        }
-      }
-    }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
-  }
-
-  var departureTime = (_mergedTimeKeys$map$f = mergedTimeKeys.map(function (key) {
-    return row === null || row === void 0 ? void 0 : row[key];
-  }).find(function (value) {
-    return value !== undefined && value !== null && value !== "";
-  })) !== null && _mergedTimeKeys$map$f !== void 0 ? _mergedTimeKeys$map$f : fallbackTime;
-
-  if (departureDate && departureTime) {
-    var combinedDateTime = moment__WEBPACK_IMPORTED_MODULE_1___default()("".concat(departureDate, " ").concat(departureTime), [].concat(DEPARTURE_DATE_TIME_FORMATS, DEPARTURE_TIME_ONLY_FORMATS), true);
-
-    if (combinedDateTime.isValid()) {
-      return combinedDateTime;
-    }
-  }
-
-  if (departureTime) {
-    var parsedTimeOnly = parseDateTimeCandidate(departureTime);
-
-    if (parsedTimeOnly) {
-      return parsedTimeOnly;
-    }
-  }
-
-  return null;
-};
-
-var formatRemainingTime = function formatRemainingTime(remainingMinutes) {
-  if (remainingMinutes < 1) {
-    return "Less than a minute remaining";
-  }
-
-  var hours = Math.floor(remainingMinutes / 60);
-  var minutes = remainingMinutes % 60;
-
-  if (!hours) {
-    return "".concat(minutes, " minute").concat(minutes === 1 ? "" : "s", " remaining");
-  }
-
-  if (!minutes) {
-    return "".concat(hours, " hour").concat(hours === 1 ? "" : "s", " remaining");
-  }
-
-  return "".concat(hours, " hour").concat(hours === 1 ? "" : "s", " ").concat(minutes, " minute").concat(minutes === 1 ? "" : "s", " remaining");
-};
-
-var buildDepartureStatusMeta = function buildDepartureStatusMeta(departureMoment) {
-  if (!departureMoment || !departureMoment.isValid()) {
-    return {
-      statusKey: "unknown",
-      toneClass: "",
-      statusLabel: "Departure time unavailable",
-      remainingMinutes: null,
-      remainingText: "",
-      departureMoment: null,
-      departureText: "",
-      isPast: false,
-      isValid: false
-    };
-  }
-
-  var now = moment__WEBPACK_IMPORTED_MODULE_1___default()();
-  var remainingMinutes = Math.ceil(departureMoment.diff(now, "minutes", true));
-  var isPast = now.isAfter(departureMoment);
-  var statusKey = "";
-  var statusLabel = "More than 6 hours remaining";
-
-  if (isPast) {
-    statusKey = "red";
-    statusLabel = "Departed";
-  } else if (remainingMinutes <= 30) {
-    statusKey = "yellow";
-    statusLabel = "30 minutes or less remaining";
-  } else if (remainingMinutes <= 120) {
-    statusKey = "green";
-    statusLabel = "2 hours or less remaining";
-  } else if (remainingMinutes <= 360) {
-    statusKey = "white";
-    statusLabel = "6 hours or less remaining";
-  }
-
-  return {
-    statusKey: statusKey,
-    toneClass: statusKey ? "departure-status--".concat(statusKey) : "",
-    statusLabel: statusLabel,
-    remainingMinutes: Math.max(remainingMinutes, 0),
-    remainingText: isPast ? "Departure time has passed" : formatRemainingTime(Math.max(remainingMinutes, 0)),
-    departureMoment: departureMoment,
-    departureText: departureMoment.format("DD-MMM-YYYY hh:mm A"),
-    isPast: isPast,
-    isValid: true
-  };
-};
 /*
     this function will work on input text field
     all parameter are optional except first one that is event
@@ -144995,15 +144772,15 @@ var buildDepartureStatusMeta = function buildDepartureStatusMeta(departureMoment
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   numberValidate: function numberValidate(event) {
-    var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-        _ref2$dot = _ref2.dot,
-        dot = _ref2$dot === void 0 ? false : _ref2$dot,
-        _ref2$maxLen = _ref2.maxLen,
-        maxLen = _ref2$maxLen === void 0 ? null : _ref2$maxLen,
-        _ref2$negative = _ref2.negative,
-        negative = _ref2$negative === void 0 ? false : _ref2$negative,
-        _ref2$comma = _ref2.comma,
-        comma = _ref2$comma === void 0 ? false : _ref2$comma;
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref$dot = _ref.dot,
+        dot = _ref$dot === void 0 ? false : _ref$dot,
+        _ref$maxLen = _ref.maxLen,
+        maxLen = _ref$maxLen === void 0 ? null : _ref$maxLen,
+        _ref$negative = _ref.negative,
+        negative = _ref$negative === void 0 ? false : _ref$negative,
+        _ref$comma = _ref.comma,
+        comma = _ref$comma === void 0 ? false : _ref$comma;
 
     var charCode = event.charCode;
     var value = event.target.value.toString().replace(/,/g, ''); // Allow numbers (48-57), dot (46), and control keys (0)
@@ -145137,10 +144914,33 @@ var buildDepartureStatusMeta = function buildDepartureStatusMeta(departureMoment
       return "".concat(day, "-").concat(month, "-").concat(year);
     }
   },
-  getDepartureStatusMeta: function getDepartureStatusMeta(payload) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    var departureMoment = parseDepartureMoment(payload, options);
-    return buildDepartureStatusMeta(departureMoment);
+  getBusStatusColor: function getBusStatusColor(departureDateTime, actionDateTime) {
+    var departureMoment = parseDateTimeCandidate(departureDateTime);
+    var actionMoment = parseDateTimeCandidate(actionDateTime);
+
+    if (!departureMoment || !actionMoment) {
+      return "white";
+    }
+
+    if (actionMoment.isAfter(departureMoment)) {
+      return "red";
+    }
+
+    var differenceInMinutes = departureMoment.diff(actionMoment, "minutes", true);
+
+    if (differenceInMinutes <= 30) {
+      return "yellow";
+    }
+
+    if (differenceInMinutes <= 120) {
+      return "green";
+    }
+
+    if (differenceInMinutes <= 360) {
+      return "white";
+    }
+
+    return "white";
   },
   getFileType: function getFileType(filePath) {
     if (!filePath || typeof filePath !== 'string') {
