@@ -9,7 +9,6 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class RescheduleReportController extends Controller
@@ -195,8 +194,8 @@ class RescheduleReportController extends Controller
 
             $q->badge = ($rescheduleSeat && $oldBusTime)
                 ? getRowBadgeColor(
-                    Carbon::parse($q->schedule_date . ' ' . $oldBusTime)->format('d-m-Y h:i A'),
-                    Carbon::parse($rescheduleSeat->created_at)->format('d-m-Y h:i A')
+                    date('Y-m-d', strtotime($q->schedule_date)) . ' ' . date('H:i:s', strtotime($oldBusTime)),
+                    $rescheduleSeat->created_at
                 )
                 : '';
 
