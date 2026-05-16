@@ -214,7 +214,7 @@
                                                                     <td v-if="isColumnVisible('net_cash')">
                                                                         <!-- Net Cash -->
                                                                         {{ $insertComma((data.seat_fare - data.discount) +
-                                                                            (data.refund ?? 0) - (data.comsn ?? 0)) }}
+                                                                            (data.refund ?? 0) - (data.seat_commission ?? 0)) }}
                                                                     </td>
                                                                 </tr>
                                                                 <tr v-if="filters.record.length > 0">
@@ -456,14 +456,27 @@ export default {
             return 0;
         },
         totalNetCash() {
-            return this.filters.record.reduce((sum, data) => {
-                let sale = data.type != 'canceled' ? (data.seat_fare - data.discount) : 0;
-                let refund = data.type == 'canceled' ? data.refund : 0;
-                let comsn = data.type == 'canceled' ? 0 : data.comsn ?? 0;
-                return sum + sale + refund - comsn;
-            }, 0);
-        },
-        totalCommission: function () {
+
+    const totalCommission = this.totalCommission();
+    const totalSeatCommission = this.totalSeatCommission();
+
+    return this.filters.record.reduce((sum, data) => {
+
+        const sale =
+            data.type !== 'canceled'
+                ? (Number(data.seat_fare) || 0) - (Number(data.discount) || 0)
+                : 0;
+
+        const refund =
+            data.type === 'canceled'
+                ? (Number(data.refund) || 0)
+                : 0;
+
+        return sum + sale - refund;
+
+    }, 0) - totalCommission - totalSeatCommission;
+},
+      totalCommission: function () {
     if (this.filters.record && Array.isArray(this.filters.record)) {
 
         const seen = new Set();
@@ -475,13 +488,17 @@ export default {
             }
 
             const terminalId = data.terminal_id;
+            const routeId = data.route_id;
 
-            // agar terminal already count ho chuka hai
-            if (seen.has(terminalId)) {
+            // unique combination of terminal + route
+            const uniqueKey = `${terminalId}_${routeId}`;
+
+            // agar already count ho chuka hai
+            if (seen.has(uniqueKey)) {
                 return sum;
             }
 
-            seen.add(terminalId);
+            seen.add(uniqueKey);
 
             const comsn = Number(data.comsn) || 0;
 

@@ -154,9 +154,11 @@
                                                                     <th>Terminal Name</th>
                                                                     <th>Status</th>
                                                                     <th>Remarks</th>
+                                                                    <th>Sale</th>
                                                                     <th>Discount</th>
                                                                     <th>Schedule Discount</th>
                                                                     <th>Terminal Discount</th>
+                                                                    <th>Net Sale</th>
                                                                 </tr>
                                                             </thead>
 
@@ -176,17 +178,24 @@
                                                                     <td>{{ data.terminal.name }}</td>
                                                                     <td>{{ data.type }}</td>
                                                                     <td>{{ data.remarks }}</td>
+                                                                    <td>{{ data.seat_fare }}</td>
                                                                     <td>{{ data.discount }}</td>
                                                                     <td>{{ data.schedule_discount }}</td>
                                                                     <td>{{ data.terminal_discount }}</td>
+                                                                    <td>
+                                                                         {{ $insertComma((data.seat_fare) - (data.schedule_discount) -
+                                                                            (data.terminal_discount ?? 0) - (data.discount ?? 0)) }}
+                                                                        </td>
                                                                 </tr>
                                                                 <tr v-if="filters.record.length > 0">
-                                                                    <th colspan="5"></th>
+                                                                    <th colspan="6"></th>
                                                                     <th>{{ filters.record.length }}</th>
-                                                                    <th colspan="5"></th>
+                                                                    <th colspan="4"></th>
+                                                                    <th>{{ totalSeatFare() }}</th>
                                                                     <th>{{ totalDiscount() }}</th>
                                                                     <th>{{ totalScheduleDiscount() }}</th>
                                                                     <th>{{ totalTerminalDiscount() }}</th>
+                                                                    <th>{{  totalNetSale() }}</th>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -349,6 +358,16 @@ export default {
                 return 0;
             }
         },
+        totalSeatFare: function () {
+            if (this.filters.record && Array.isArray(this.filters.record)) {
+                return this.filters.record.reduce((sum, data) => {
+                    const seatFare = Number(data.seat_fare) || 0;
+                    return sum + (seatFare);
+                }, 0);
+            } else {
+                return 0;
+            }
+        },
         totalScheduleDiscount: function () {
             if (this.filters.record && Array.isArray(this.filters.record)) {
                 return this.filters.record.reduce((sum, data) => {
@@ -369,6 +388,23 @@ export default {
                 return 0;
             }
         },
+     totalNetSale() {
+    return this.filters.record.reduce((sum, data) => {
+
+        if (data.type === 'canceled') {
+            return sum;
+        }
+
+        const netSale =
+            (Number(data.seat_fare) || 0)
+            - (Number(data.schedule_discount) || 0)
+            - (Number(data.terminal_discount) || 0)
+            - (Number(data.discount) || 0);
+
+        return sum + netSale;
+
+    }, 0);
+},
 
     },
 
