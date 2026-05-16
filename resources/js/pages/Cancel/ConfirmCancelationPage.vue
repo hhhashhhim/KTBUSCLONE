@@ -218,7 +218,7 @@
                                                                         filter.bus_time }}</td>
                                                                     <td v-if="isColumnVisible('cancel_date')">{{
                                                                         filter.cancel_date }}</td>
-                                                                    <td v-if="isColumnVisible('remarks')">{{
+                                                                      <td v-if="isColumnVisible('remarks')">{{
                                                                         filter.cancel_reason ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('terminal_name')">{{
                                                                         filter?.terminal?.name }}</td>
