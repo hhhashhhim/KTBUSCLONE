@@ -488,10 +488,9 @@ export default {
             }
 
             const terminalId = data.terminal_id;
-            const routeId = data.route_id;
 
             // unique combination of terminal + route
-            const uniqueKey = `${terminalId}_${routeId}`;
+            const uniqueKey = `${terminalId}`;
 
             // agar already count ho chuka hai
             if (seen.has(uniqueKey)) {

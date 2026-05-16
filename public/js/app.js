@@ -31550,10 +31550,9 @@ var COLUMN_OPTIONS = [{
             return sum;
           }
 
-          var terminalId = data.terminal_id;
-          var routeId = data.route_id; // unique combination of terminal + route
+          var terminalId = data.terminal_id; // unique combination of terminal + route
 
-          var uniqueKey = "".concat(terminalId, "_").concat(routeId); // agar already count ho chuka hai
+          var uniqueKey = "".concat(terminalId); // agar already count ho chuka hai
 
           if (seen.has(uniqueKey)) {
             return sum;
