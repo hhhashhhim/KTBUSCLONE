@@ -174,7 +174,7 @@
                                                             <tbody>
                                                                 <tr v-for="(filter, i) in filters" :key="i"
                                                                     :class="filter.badge">
-                                                                    <td v-if="isColumnVisible('terminal_name')">{{ filter.terminal_name ? filter.terminal_name :
+                                                                     <td v-if="isColumnVisible('terminal_name')">{{ filter.terminal_name ? filter.terminal_name :
                                                                         'Not Fetched' }}</td>
                                                                     <td v-if="isColumnVisible('passenger_name')">{{ filter.passenger_name }}</td>
                                                                     <td v-if="isColumnVisible('passenger_contact')">{{ filter.passenger_contact }}</td>

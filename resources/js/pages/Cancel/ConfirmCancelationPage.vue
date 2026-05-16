@@ -210,7 +210,7 @@
                                                                         Cancellation Charges</th>
                                                                 </tr>
                                                             </thead>
-
+ 
                                                             <tbody>
                                                                 <tr v-for="(filter, i) in filters" :key="i"
                                                                     :class="filter.cancellation_status_color || filter.badge">
