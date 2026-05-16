@@ -28929,8 +28929,6 @@ var COLUMN_OPTIONS = [{
         return column.key;
       }),
       showColumnDropdown: false,
-      departureStatusTick: Date.now(),
-      departureStatusIntervalId: null,
       tableLoading: true,
       filterCancel: {
         terminal: 0,
@@ -28998,27 +28996,11 @@ var COLUMN_OPTIONS = [{
   },
   mounted: function mounted() {
     document.addEventListener('click', this.handleDocumentClick);
-    this.startDepartureStatusTicker();
   },
   beforeUnmount: function beforeUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
-    this.stopDepartureStatusTicker();
   },
   methods: {
-    startDepartureStatusTicker: function startDepartureStatusTicker() {
-      var _this2 = this;
-
-      this.stopDepartureStatusTicker();
-      this.departureStatusIntervalId = window.setInterval(function () {
-        _this2.departureStatusTick = Date.now();
-      }, 30000);
-    },
-    stopDepartureStatusTicker: function stopDepartureStatusTicker() {
-      if (this.departureStatusIntervalId) {
-        window.clearInterval(this.departureStatusIntervalId);
-        this.departureStatusIntervalId = null;
-      }
-    },
     toggleColumnDropdown: function toggleColumnDropdown() {
       this.showColumnDropdown = !this.showColumnDropdown;
     },
@@ -29030,15 +29012,8 @@ var COLUMN_OPTIONS = [{
     isColumnVisible: function isColumnVisible(columnKey) {
       return this.visibleColumns.includes(columnKey);
     },
-    getCancellationRowClass: function getCancellationRowClass(filter) {
-      this.departureStatusTick;
-      var departureStatus = this.$getDepartureStatusMeta(filter, {
-        combinedKeys: ["bus_time"]
-      });
-      return ["departure-status-row", departureStatus.toneClass || filter.cancellation_status_color || filter.badge || ""];
-    },
     fetchRoutes: function fetchRoutes() {
-      var _this3 = this;
+      var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var resRoute;
@@ -29047,13 +29022,13 @@ var COLUMN_OPTIONS = [{
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this3.callApi("post", "confirm/cancellation/routes");
+                return _this2.callApi("post", "confirm/cancellation/routes");
 
               case 2:
                 resRoute = _context2.sent;
 
                 if (resRoute.status == 200) {
-                  _this3.routes = resRoute.data;
+                  _this2.routes = resRoute.data;
                 }
 
               case 4:
@@ -29065,7 +29040,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     fetchFilters: function fetchFilters() {
-      var _this4 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var resTerminals;
@@ -29074,13 +29049,13 @@ var COLUMN_OPTIONS = [{
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return _this4.callApi("post", 'confirm/cancellation/getTerminals');
+                return _this3.callApi("post", 'confirm/cancellation/getTerminals');
 
               case 2:
                 resTerminals = _context3.sent;
 
                 if (resTerminals.status == 200) {
-                  _this4.terminals = resTerminals.data;
+                  _this3.terminals = resTerminals.data;
                 }
 
               case 4:
@@ -29092,7 +29067,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     fetchFilterBuses: function fetchFilterBuses() {
-      var _this5 = this;
+      var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var resBuses;
@@ -29101,13 +29076,13 @@ var COLUMN_OPTIONS = [{
             switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.next = 2;
-                return _this5.callApi("post", 'confirm/cancellation/getBuses');
+                return _this4.callApi("post", 'confirm/cancellation/getBuses');
 
               case 2:
                 resBuses = _context4.sent;
 
                 if (resBuses.status == 200) {
-                  _this5.buses = resBuses.data;
+                  _this4.buses = resBuses.data;
                 }
 
               case 4:
@@ -29119,7 +29094,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     CancelFilter: function CancelFilter() {
-      var _this6 = this;
+      var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var resFetchData;
@@ -29127,16 +29102,16 @@ var COLUMN_OPTIONS = [{
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _this6.tableLoading = true;
+                _this5.tableLoading = true;
                 _context5.next = 3;
-                return _this6.callApi("post", 'confirm/cancellation/fetchFilterData', _this6.filterCancel);
+                return _this5.callApi("post", 'confirm/cancellation/fetchFilterData', _this5.filterCancel);
 
               case 3:
                 resFetchData = _context5.sent;
 
                 if (resFetchData.status == 200) {
-                  _this6.filters = resFetchData.data;
-                  _this6.tableLoading = false;
+                  _this5.filters = resFetchData.data;
+                  _this5.tableLoading = false;
                 }
 
               case 5:
@@ -29543,8 +29518,6 @@ var COLUMN_OPTIONS = [{
         return column.key;
       }),
       showColumnDropdown: false,
-      departureStatusTick: Date.now(),
-      departureStatusIntervalId: null,
       tableLoading: true,
       filterCancel: {
         terminal: 0,
@@ -29605,27 +29578,11 @@ var COLUMN_OPTIONS = [{
   },
   mounted: function mounted() {
     document.addEventListener('click', this.handleDocumentClick);
-    this.startDepartureStatusTicker();
   },
   beforeUnmount: function beforeUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
-    this.stopDepartureStatusTicker();
   },
   methods: {
-    startDepartureStatusTicker: function startDepartureStatusTicker() {
-      var _this2 = this;
-
-      this.stopDepartureStatusTicker();
-      this.departureStatusIntervalId = window.setInterval(function () {
-        _this2.departureStatusTick = Date.now();
-      }, 30000);
-    },
-    stopDepartureStatusTicker: function stopDepartureStatusTicker() {
-      if (this.departureStatusIntervalId) {
-        window.clearInterval(this.departureStatusIntervalId);
-        this.departureStatusIntervalId = null;
-      }
-    },
     toggleColumnDropdown: function toggleColumnDropdown() {
       this.showColumnDropdown = !this.showColumnDropdown;
     },
@@ -29641,15 +29598,8 @@ var COLUMN_OPTIONS = [{
     isColumnVisible: function isColumnVisible(columnKey) {
       return this.visibleColumns.includes(columnKey);
     },
-    getRescheduleRowClass: function getRescheduleRowClass(filter) {
-      this.departureStatusTick;
-      var departureStatus = this.$getDepartureStatusMeta(filter, {
-        combinedKeys: ["old_bus_time"]
-      });
-      return ["departure-status-row", departureStatus.toneClass || filter.badge || ""];
-    },
     fetchFilters: function fetchFilters() {
-      var _this3 = this;
+      var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var resTerminals;
@@ -29658,13 +29608,13 @@ var COLUMN_OPTIONS = [{
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this3.callApi("post", 'reschedule/getTerminals');
+                return _this2.callApi("post", 'reschedule/getTerminals');
 
               case 2:
                 resTerminals = _context2.sent;
 
                 if (resTerminals.status == 200) {
-                  _this3.terminals = resTerminals.data;
+                  _this2.terminals = resTerminals.data;
                 }
 
               case 4:
@@ -29676,7 +29626,7 @@ var COLUMN_OPTIONS = [{
       }))();
     },
     overissueFilter: function overissueFilter() {
-      var _this4 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var resFetchData;
@@ -29684,17 +29634,17 @@ var COLUMN_OPTIONS = [{
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _this4.tableLoading = true;
+                _this3.tableLoading = true;
                 _context3.next = 3;
-                return _this4.callApi("post", 'reschedule/fetchFilterData', _this4.filterCancel);
+                return _this3.callApi("post", 'reschedule/fetchFilterData', _this3.filterCancel);
 
               case 3:
                 resFetchData = _context3.sent;
                 console.log(resFetchData);
 
                 if (resFetchData.status == 200) {
-                  _this4.filters = resFetchData.data;
-                  _this4.tableLoading = false;
+                  _this3.filters = resFetchData.data;
+                  _this3.tableLoading = false;
                 }
 
               case 6:
@@ -84600,7 +84550,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i,
-      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.getCancellationRowClass(filter))
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(filter.cancellation_status_color || filter.badge)
     }, [$options.isColumnVisible('bus_time') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_88, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter.bus_time), 1
     /* TEXT */
     )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('cancel_date') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_89, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter.cancel_date), 1
@@ -85794,7 +85744,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   , _hoisted_58)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("table", _hoisted_59, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [$options.isColumnVisible('terminal_name') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_60, "Terminal Name")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('passenger_name') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_61, "Passenger Name")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('passenger_contact') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_62, "Cell NO")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('passenger_cnic') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_63, "Cnic NO")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('status') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_64, "Status")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('current_status') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_65, "Current Status")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('from_bus_time') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_66, "From Bus Time")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('to_bus_time') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_67, "To Bus Time")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('reschedule_time') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_68, "Reschedule Time")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('reschedule_from') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_69, "Reschedule From")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('reschedule_to') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_70, "Reschedule To")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('from_seat') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_71, "From Seat")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('to_seat') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_72, "To Seat")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('old_fare') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_73, "Old Fare")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('new_fare') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_74, "New Fare")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('remarks') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_75, "Remarks")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('reschedule_by') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_76, "Reschedule By")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.filters, function (filter, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i,
-      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.getRescheduleRowClass(filter))
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(filter.badge)
     }, [$options.isColumnVisible('terminal_name') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_77, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter.terminal_name ? filter.terminal_name : 'Not Fetched'), 1
     /* TEXT */
     )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('passenger_name') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_78, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter.passenger_name), 1
@@ -151803,7 +151753,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-b3c0c3b4],\r\nth[data-v-b3c0c3b4],\r\ntd[data-v-b3c0c3b4] {\r\n    border: 1px solid #b9b9b9;\r\n    border-collapse: collapse;\n}\n.red[data-v-b3c0c3b4] {\r\n    background-color: #ec3030;\n}\n.yellow[data-v-b3c0c3b4] {\r\n    background-color: #bdbd02;\n}\n.white[data-v-b3c0c3b4] {\r\n    background-color: #FFFFFF;\n}\n.green[data-v-b3c0c3b4] {\r\n    background-color: #03b203;\n}\n.loading-spinner[data-v-b3c0c3b4] {\r\n    display: block;\r\n    margin: 0 auto;\r\n    padding: 2em;\n}\n.report-actions[data-v-b3c0c3b4] {\r\n    display: flex;\r\n    flex-wrap: wrap;\r\n    gap: 1rem;\r\n    align-items: flex-end;\r\n    justify-content: space-between;\n}\n.column-dropdown-wrapper[data-v-b3c0c3b4] {\r\n    position: relative;\r\n    min-width: 280px;\r\n    max-width: 320px;\n}\n.column-dropdown-toggle[data-v-b3c0c3b4] {\r\n    width: 100%;\r\n    text-align: left;\n}\n.column-dropdown-menu[data-v-b3c0c3b4] {\r\n    position: absolute;\r\n    top: calc(100% + 0.5rem);\r\n    left: 0;\r\n    z-index: 20;\r\n    width: 100%;\r\n    max-height: 260px;\r\n    overflow-y: auto;\r\n    padding: 0.75rem;\r\n    background: #fff;\r\n    border: 1px solid #d7dce3;\r\n    border-radius: 0.5rem;\r\n    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.column-option[data-v-b3c0c3b4] {\r\n    display: flex;\r\n    align-items: center;\r\n    gap: 0.5rem;\r\n    margin-bottom: 0.5rem;\r\n    cursor: pointer;\n}\n.column-option[data-v-b3c0c3b4]:last-child {\r\n    margin-bottom: 0;\n}\n.print-btn[data-v-b3c0c3b4] {\r\n    min-width: 160px;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-b3c0c3b4],\nth[data-v-b3c0c3b4],\ntd[data-v-b3c0c3b4] {\n    border: 1px solid #b9b9b9;\n    border-collapse: collapse;\n}\n.red[data-v-b3c0c3b4] {\n    background-color: #ec3030;\n}\n.yellow[data-v-b3c0c3b4] {\n    background-color: #bdbd02;\n}\n.white[data-v-b3c0c3b4] {\n    background-color: #FFFFFF;\n}\n.green[data-v-b3c0c3b4] {\n    background-color: #03b203;\n}\n.loading-spinner[data-v-b3c0c3b4] {\n    display: block;\n    margin: 0 auto;\n    padding: 2em;\n}\n.report-actions[data-v-b3c0c3b4] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 1rem;\n    align-items: flex-end;\n    justify-content: space-between;\n}\n.column-dropdown-wrapper[data-v-b3c0c3b4] {\n    position: relative;\n    min-width: 280px;\n    max-width: 320px;\n}\n.column-dropdown-toggle[data-v-b3c0c3b4] {\n    width: 100%;\n    text-align: left;\n}\n.column-dropdown-menu[data-v-b3c0c3b4] {\n    position: absolute;\n    top: calc(100% + 0.5rem);\n    left: 0;\n    z-index: 20;\n    width: 100%;\n    max-height: 260px;\n    overflow-y: auto;\n    padding: 0.75rem;\n    background: #fff;\n    border: 1px solid #d7dce3;\n    border-radius: 0.5rem;\n    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.column-option[data-v-b3c0c3b4] {\n    display: flex;\n    align-items: center;\n    gap: 0.5rem;\n    margin-bottom: 0.5rem;\n    cursor: pointer;\n}\n.column-option[data-v-b3c0c3b4]:last-child {\n    margin-bottom: 0;\n}\n.print-btn[data-v-b3c0c3b4] {\n    min-width: 160px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -151851,7 +151801,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-e95aa1d6],\r\nth[data-v-e95aa1d6],\r\ntd[data-v-e95aa1d6] {\r\n    border: 1px solid #b9b9b9;\r\n    border-collapse: collapse;\n}\n.red[data-v-e95aa1d6] {\r\n    background-color: #ec3030;\n}\n.yellow[data-v-e95aa1d6] {\r\n    background-color: #bdbd02;\n}\n.white[data-v-e95aa1d6] {\r\n    background-color: #FFFFFF;\n}\n.green[data-v-e95aa1d6] {\r\n    background-color: #03b203;\n}\n.loading-spinner[data-v-e95aa1d6] {\r\n    display: block;\r\n    margin: 0 auto;\r\n    padding: 2em;\n}\n.report-actions[data-v-e95aa1d6] {\r\n    display: flex;\r\n    flex-wrap: wrap;\r\n    gap: 1rem;\r\n    align-items: flex-end;\r\n    justify-content: space-between;\n}\n.column-dropdown-wrapper[data-v-e95aa1d6] {\r\n    position: relative;\r\n    min-width: 280px;\r\n    max-width: 320px;\n}\n.column-dropdown-toggle[data-v-e95aa1d6] {\r\n    width: 100%;\r\n    text-align: left;\n}\n.column-dropdown-menu[data-v-e95aa1d6] {\r\n    position: absolute;\r\n    top: calc(100% + 0.5rem);\r\n    left: 0;\r\n    z-index: 20;\r\n    width: 100%;\r\n    max-height: 260px;\r\n    overflow-y: auto;\r\n    padding: 0.75rem;\r\n    background: #fff;\r\n    border: 1px solid #d7dce3;\r\n    border-radius: 0.5rem;\r\n    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.column-option[data-v-e95aa1d6] {\r\n    display: flex;\r\n    align-items: center;\r\n    gap: 0.5rem;\r\n    margin-bottom: 0.5rem;\r\n    cursor: pointer;\n}\n.column-option[data-v-e95aa1d6]:last-child {\r\n    margin-bottom: 0;\n}\n.print-btn[data-v-e95aa1d6] {\r\n    min-width: 160px;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-e95aa1d6],\nth[data-v-e95aa1d6],\ntd[data-v-e95aa1d6] {\n    border: 1px solid #b9b9b9;\n    border-collapse: collapse;\n}\n.red[data-v-e95aa1d6] {\n    background-color: #ec3030;\n}\n.yellow[data-v-e95aa1d6] {\n    background-color: #bdbd02;\n}\n.white[data-v-e95aa1d6] {\n    background-color: #FFFFFF;\n}\n.green[data-v-e95aa1d6] {\n    background-color: #03b203;\n}\n.loading-spinner[data-v-e95aa1d6] {\n    display: block;\n    margin: 0 auto;\n    padding: 2em;\n}\n.report-actions[data-v-e95aa1d6] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 1rem;\n    align-items: flex-end;\n    justify-content: space-between;\n}\n.column-dropdown-wrapper[data-v-e95aa1d6] {\n    position: relative;\n    min-width: 280px;\n    max-width: 320px;\n}\n.column-dropdown-toggle[data-v-e95aa1d6] {\n    width: 100%;\n    text-align: left;\n}\n.column-dropdown-menu[data-v-e95aa1d6] {\n    position: absolute;\n    top: calc(100% + 0.5rem);\n    left: 0;\n    z-index: 20;\n    width: 100%;\n    max-height: 260px;\n    overflow-y: auto;\n    padding: 0.75rem;\n    background: #fff;\n    border: 1px solid #d7dce3;\n    border-radius: 0.5rem;\n    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.column-option[data-v-e95aa1d6] {\n    display: flex;\n    align-items: center;\n    gap: 0.5rem;\n    margin-bottom: 0.5rem;\n    cursor: pointer;\n}\n.column-option[data-v-e95aa1d6]:last-child {\n    margin-bottom: 0;\n}\n.print-btn[data-v-e95aa1d6] {\n    min-width: 160px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
