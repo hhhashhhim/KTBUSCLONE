@@ -145,7 +145,7 @@
 {{--Table for passenger list--}}
 <table border="2" id="table2">
     <tr>
-        <th style="width: 5% !important;">SR #</th>
+        <th>SR #</th>
         <th>Seat #</th>
         <th>Passenger Name</th>
         <th>CNIC</th>
@@ -153,6 +153,7 @@
         <th>Terminal Name</th>
         <th>Departure City Name</th>
         <th>Destination City Name</th>
+        <th style="width: 15% !important;">Remarks</th>
     </tr>
     @if($data)
         @php $count = 1; @endphp
@@ -167,6 +168,7 @@
                 <td>{{$item->terminal->city->name}} - {{$item->terminal->name}}</td>
                 <td>{{ $item->departure_city->name}}</td>
                 <td>{{ $item->destination_city->name }}</td>
+                <td>{{ $item->remarks }}</td>
             </tr>
         @endforeach
     @endif
