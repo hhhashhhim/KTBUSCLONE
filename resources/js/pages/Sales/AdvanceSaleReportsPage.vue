@@ -24,7 +24,7 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3"
-                                                         v-if="checkForSubmenuButtons('terminal-filter')">
+                                                         v-if="checkForSubmenuButtons('terminal-sale-terminal-filter')">
                                                         <div class="filter-field">
                                                             <label class="filter-label" for="terminalFilter">Terminals</label>
                                                             <select id="terminalFilter" class="form-control filter-control"
@@ -37,7 +37,8 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3"
+                                                         v-if="checkForSubmenuButtons('terminal-sale-user-filter')">
                                                         <div class="filter-field">
                                                             <label class="filter-label" for="usernameFilter">Users</label>
                                                             <select id="usernameFilter" class="form-control filter-control"
@@ -50,7 +51,8 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+                                                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3"
+                                                         v-if="checkForSubmenuButtons('terminal-sale-route-filter')">
                                                         <div class="filter-field">
                                                             <label class="filter-label" for="routeIds">Routes</label>
                                                             <select id="routeIds" class="form-control filter-control filter-select2" multiple
