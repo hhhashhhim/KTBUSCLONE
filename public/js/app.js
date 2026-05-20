@@ -45753,6 +45753,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     cnicFormat: function cnicFormat(string) {
       return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
     },
+    normalizeAssignedCard: function normalizeAssignedCard(card) {
+      var customer = card.customer || {};
+      var rawCnic = customer.cnic || card.cnic || "";
+      var rawPhone = customer.contact || card.phone || "";
+      var cleanCnic = rawCnic.toString().replace(/\D/g, "");
+      var cleanPhone = rawPhone.toString().replace(/\D/g, "");
+      return _objectSpread(_objectSpread({}, card), {}, {
+        cnic: cleanCnic.length === 13 ? this.cnicFormat(cleanCnic) : rawCnic,
+        phone: cleanPhone.length === 11 ? this.phoneFormat(cleanPhone) : rawPhone,
+        name: customer.name || card.name || ""
+      });
+    },
     isNumber: function isNumber(evt) {
       evt = evt ? evt : window.event;
       var charCode = evt.which ? evt.which : evt.keyCode;
@@ -45805,7 +45817,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context2.sent;
 
                 if (res.status == 200) {
-                  _this2.cardsAssign = res.data;
+                  _this2.cardsAssign = res.data.map(function (card) {
+                    return _this2.normalizeAssignedCard(card);
+                  });
                 } else {
                   console.log(res);
                 }
@@ -46195,7 +46209,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     edit: function edit(cardAssign) {
-      this.dataEdit = cardAssign;
+      this.dataEdit = _objectSpread({}, this.normalizeAssignedCard(cardAssign));
     }
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(['getDeletingObj'])),
@@ -58751,6 +58765,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     cnicFormat: function cnicFormat(string) {
       return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
     },
+    normalizeAssignedCard: function normalizeAssignedCard(card) {
+      var customer = card.customer || {};
+      var rawCnic = customer.cnic || card.cnic || "";
+      var rawPhone = customer.contact || card.phone || "";
+      var cleanCnic = rawCnic.toString().replace(/\D/g, "");
+      var cleanPhone = rawPhone.toString().replace(/\D/g, "");
+      return _objectSpread(_objectSpread({}, card), {}, {
+        cnic: cleanCnic.length === 13 ? this.cnicFormat(cleanCnic) : rawCnic,
+        phone: cleanPhone.length === 11 ? this.phoneFormat(cleanPhone) : rawPhone,
+        name: customer.name || card.name || ""
+      });
+    },
     isNumber: function isNumber(evt) {
       evt = evt ? evt : window.event;
       var charCode = evt.which ? evt.which : evt.keyCode;
@@ -58803,7 +58829,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context2.sent;
 
                 if (res.status == 200) {
-                  _this2.cardsAssign = res.data;
+                  _this2.cardsAssign = res.data.map(function (card) {
+                    return _this2.normalizeAssignedCard(card);
+                  });
                 } else {
                   console.log(res);
                 }
@@ -59193,7 +59221,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     edit: function edit(cardAssign) {
-      this.dataEdit = cardAssign;
+      this.dataEdit = _objectSpread({}, this.normalizeAssignedCard(cardAssign));
     }
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(['getDeletingObj'])),

@@ -309,6 +309,20 @@ export default {
         cnicFormat: function (string) {
             return string.replace(/(\d{5})(\d{7})(\d{1})/, "$1-$2-$3");
         },
+        normalizeAssignedCard(card) {
+            const customer = card.customer || {};
+            const rawCnic = customer.cnic || card.cnic || "";
+            const rawPhone = customer.contact || card.phone || "";
+            const cleanCnic = rawCnic.toString().replace(/\D/g, "");
+            const cleanPhone = rawPhone.toString().replace(/\D/g, "");
+
+            return {
+                ...card,
+                cnic: cleanCnic.length === 13 ? this.cnicFormat(cleanCnic) : rawCnic,
+                phone: cleanPhone.length === 11 ? this.phoneFormat(cleanPhone) : rawPhone,
+                name: customer.name || card.name || "",
+            };
+        },
         isNumber: function (evt) {
             evt = (evt) ? evt : window.event;
             var charCode = (evt.which) ? evt.which : evt.keyCode;
@@ -342,7 +356,7 @@ export default {
 
             const res = await this.callApi("post", 'discountCardAssign');
             if (res.status == 200) {
-                this.cardsAssign = res.data
+                this.cardsAssign = res.data.map((card) => this.normalizeAssignedCard(card))
             } else {
                 console.log(res);
             }
@@ -590,7 +604,9 @@ export default {
 
 
         edit(cardAssign) {
-            this.dataEdit = cardAssign;
+            this.dataEdit = {
+                ...this.normalizeAssignedCard(cardAssign),
+            };
         },
     },
     computed: {
