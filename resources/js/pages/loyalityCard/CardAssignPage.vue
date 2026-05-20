@@ -276,8 +276,13 @@ export default {
             error: false,
             dataEdit: {},
             addForm: {
+                rfId: "",
+                contact: "",
+                customerName: "",
+                customerCNIC: "",
                 cardCategory: '0',
                 startingPoints: "0",
+                expiryDate: "",
             },
         };
     },
@@ -369,21 +374,27 @@ export default {
                         status: flag,
 
                     });
-                    if ((this.addForm.contact == '' || typeof this.addForm.contact == 'undefined') && (this.addForm.customerName == '' || typeof this.addForm.customerName == 'undefined')) {
-                        this.addForm.contact = resCnic.data.contact;
-                        this.addForm.customerName = resCnic.data.name;
+                    if (resCnic.data) {
+                        this.addForm.contact = resCnic.data.contact || "";
+                        this.addForm.customerName = resCnic.data.name || "";
+                    } else {
+                        this.addForm.contact = "";
+                        this.addForm.customerName = "";
                     }
                 }
             }
-            if (flag == 'addFormContact' && this.addForm.customerCNIC == '' && this.addForm.customerName == '') {
+            if (flag == 'addFormContact') {
                 if (this.addForm.contact != '' && this.addForm.contact != 'undefined') {
                     const resCnic = await this.callApi("post", "loyaltyCardAssign/getCNIC", {
                         phoneNumber: this.addForm.contact,
                         status: flag,
                     });
-                    if ((this.addForm.customerName == '' || typeof this.addForm.customerName == 'undefined') && (this.addForm.customerCNIC == '' || typeof this.addForm.customerCNIC == 'undefined')) {
-                        this.addForm.customerCNIC = resCnic.data.cnic;
-                        this.addForm.customerName = resCnic.data.name;
+                    if (resCnic.data) {
+                        this.addForm.customerCNIC = resCnic.data.cnic || "";
+                        this.addForm.customerName = resCnic.data.name || "";
+                    } else {
+                        this.addForm.customerCNIC = "";
+                        this.addForm.customerName = "";
                     }
                 }
             }

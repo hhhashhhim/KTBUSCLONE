@@ -45704,8 +45704,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       error: false,
       dataEdit: {},
       addForm: {
-        cardCategory: '0' // startingPoints: "0",
-
+        rfId: "",
+        contact: "",
+        customerName: "",
+        customerCNIC: "",
+        cardCategory: '0',
+        // startingPoints: "0",
+        expiryDate: ""
       }
     };
   },
@@ -45860,13 +45865,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 4:
                 resCnic = _context3.sent;
 
-                if ((_this3.addForm.contact == '' || typeof _this3.addForm.contact == 'undefined') && (_this3.addForm.customerName == '' || typeof _this3.addForm.customerName == 'undefined')) {
-                  _this3.addForm.contact = resCnic.data.contact;
-                  _this3.addForm.customerName = resCnic.data.name;
+                if (resCnic.data) {
+                  _this3.addForm.contact = resCnic.data.contact || "";
+                  _this3.addForm.customerName = resCnic.data.name || "";
+                } else {
+                  _this3.addForm.contact = "";
+                  _this3.addForm.customerName = "";
                 }
 
               case 6:
-                if (!(flag == 'addFormContact' && _this3.addForm.customerCNIC == '' && _this3.addForm.customerName == '')) {
+                if (!(flag == 'addFormContact')) {
                   _context3.next = 12;
                   break;
                 }
@@ -45885,9 +45893,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 10:
                 _resCnic = _context3.sent;
 
-                if ((_this3.addForm.customerName == '' || typeof _this3.addForm.customerName == 'undefined') && (_this3.addForm.customerCNIC == '' || typeof _this3.addForm.customerCNIC == 'undefined')) {
-                  _this3.addForm.customerCNIC = _resCnic.data.cnic;
-                  _this3.addForm.customerName = _resCnic.data.name;
+                if (_resCnic.data) {
+                  _this3.addForm.customerCNIC = _resCnic.data.cnic || "";
+                  _this3.addForm.customerName = _resCnic.data.name || "";
+                } else {
+                  _this3.addForm.customerCNIC = "";
+                  _this3.addForm.customerName = "";
                 }
 
               case 12:
@@ -58691,8 +58702,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       error: false,
       dataEdit: {},
       addForm: {
+        rfId: "",
+        contact: "",
+        customerName: "",
+        customerCNIC: "",
         cardCategory: '0',
-        startingPoints: "0"
+        startingPoints: "0",
+        expiryDate: ""
       }
     };
   },
@@ -58847,13 +58863,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 4:
                 resCnic = _context3.sent;
 
-                if ((_this3.addForm.contact == '' || typeof _this3.addForm.contact == 'undefined') && (_this3.addForm.customerName == '' || typeof _this3.addForm.customerName == 'undefined')) {
-                  _this3.addForm.contact = resCnic.data.contact;
-                  _this3.addForm.customerName = resCnic.data.name;
+                if (resCnic.data) {
+                  _this3.addForm.contact = resCnic.data.contact || "";
+                  _this3.addForm.customerName = resCnic.data.name || "";
+                } else {
+                  _this3.addForm.contact = "";
+                  _this3.addForm.customerName = "";
                 }
 
               case 6:
-                if (!(flag == 'addFormContact' && _this3.addForm.customerCNIC == '' && _this3.addForm.customerName == '')) {
+                if (!(flag == 'addFormContact')) {
                   _context3.next = 12;
                   break;
                 }
@@ -58872,9 +58891,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 10:
                 _resCnic = _context3.sent;
 
-                if ((_this3.addForm.customerName == '' || typeof _this3.addForm.customerName == 'undefined') && (_this3.addForm.customerCNIC == '' || typeof _this3.addForm.customerCNIC == 'undefined')) {
-                  _this3.addForm.customerCNIC = _resCnic.data.cnic;
-                  _this3.addForm.customerName = _resCnic.data.name;
+                if (_resCnic.data) {
+                  _this3.addForm.customerCNIC = _resCnic.data.cnic || "";
+                  _this3.addForm.customerName = _resCnic.data.name || "";
+                } else {
+                  _this3.addForm.customerCNIC = "";
+                  _this3.addForm.customerName = "";
                 }
 
               case 12:
