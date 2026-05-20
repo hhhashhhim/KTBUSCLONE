@@ -92,8 +92,54 @@ class CardAssignController extends Controller
         }
         try {
                 DB::beginTransaction();
-                $assignCard =  CardAssign::where(['id' => $request->id, 'company_id' => Auth::user()->company_id])->first();
+                $assignCard = CardAssign::where(['id' => $request->id, 'company_id' => Auth::user()->company_id])->first();
+                if (!$assignCard) {
+                    DB::rollBack();
+                    return response()->json(["errors" => ["Error" => ['Assigned loyalty card not found.']]], 404);
+                }
+
+                $cleanCnic = plainContactAndCnic($request->cnic);
+                $cleanPhone = plainContactAndCnic($request->phone);
+
+                $duplicateCard = CardAssign::where('company_id', Auth::user()->company_id)
+                    ->where('cnic', $cleanCnic)
+                    ->where('id', '!=', $assignCard->id)
+                    ->first();
+
+                if ($duplicateCard) {
+                    DB::rollBack();
+                    return response()->json(["errors" => ["Error" => ["Loyalty Card Already Against Given CNIC Number "]]], 422);
+                }
+
+                $customer = Customer::where([
+                    'id' => $assignCard->customer_id,
+                    'company_id' => Auth::user()->company_id,
+                ])->first();
+
+                if ($customer) {
+                    $duplicateCustomer = Customer::where('company_id', Auth::user()->company_id)
+                        ->where('cnic', $cleanCnic)
+                        ->where('id', '!=', $customer->id)
+                        ->first();
+
+                    if ($duplicateCustomer) {
+                        DB::rollBack();
+                        return response()->json(["errors" => ["Error" => ["Another customer already exists against given CNIC Number "]]], 422);
+                    }
+
+                    $customer->update([
+                        'name' => $request->name,
+                        'cnic' => $cleanCnic,
+                        'contact' => $cleanPhone,
+                        'updated_by' => Auth::user()->id,
+                    ]);
+                }
+
                 $assignCard->update([
+                    'rfId' => $request->rfId,
+                    'cnic' => $cleanCnic,
+                    'phone' => $cleanPhone,
+                    'name' => $request->name,
                     'card_category_id' => $request->card_category_id,
                     'expiry_date' => $request->expiry_date,
                     'starting_points' => $request->starting_points,
@@ -106,7 +152,7 @@ class CardAssignController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
-                return $assignCard;
+                return $assignCard->fresh(['addedBy:id,name', 'updatedBy:id,name', 'customer', 'cardCategory:id,name']);
             
             } catch (\Exception $e) {
                 DB::rollBack();
