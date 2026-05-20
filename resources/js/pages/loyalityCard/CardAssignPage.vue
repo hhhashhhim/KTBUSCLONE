@@ -176,7 +176,7 @@
                 <div class="row">
                     <div class="form-group col-md-3">
                         <label for="CardName">RF-ID<span class="text-danger ml-1">*</span></label>
-                        <input type="text" class="form-control" v-model="dataEdit.rfId" readonly
+                        <input type="text" class="form-control" v-model="dataEdit.rfId" 
                                @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-3">
@@ -186,19 +186,19 @@
                             v-model="dataEdit.cnic"
                             mask="00000-0000000-0"
                             :raw="false"
-                            readonly
+
                             :options="options"
                         >
                         </vue-mask>
                     </div>
                     <div class="form-group col-md-3">
                         <label for="CardName">Customer Name<span class="text-danger ml-1">*</span></label>
-                        <input readonly type="text" class="form-control" v-model="dataEdit.name"
+                        <input  type="text" class="form-control" v-model="dataEdit.name"
                                @keypress="isAlphabet($event)"/>
                     </div>
                     <div class="form-group col-md-3">
                         <label for="CardName">Phone<span class="text-danger ml-1">*</span></label>
-                        <vue-mask readonly
+                        <vue-mask
                                   class="form-control"
                                   v-model="dataEdit.phone"
                                   mask="0000-0000000"

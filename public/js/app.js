@@ -103486,7 +103486,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addForm.cardCategory]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"form-group col-md-4\">\r\n                        <label for=\"startPoint\">Card Starting Points</label>\r\n                        <input type=\"text\" id=\"startPoint\" class=\"form-control\" @keypress=\"isNumber($event)\"\r\n                               v-model=\"addForm.startingPoints\">\r\n                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.addForm.cardCategory]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"form-group col-md-4\">\n                        <label for=\"startPoint\">Card Starting Points</label>\n                        <input type=\"text\" id=\"startPoint\" class=\"form-control\" @keypress=\"isNumber($event)\"\n                               v-model=\"addForm.startingPoints\">\n                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "date",
         "class": "form-control",
         id: "expiryDate",
@@ -103528,7 +103528,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
           return $data.dataEdit.rfId = $event;
         }),
-        readonly: "",
         onKeypress: _cache[14] || (_cache[14] = function ($event) {
           return $options.isNumber($event);
         })
@@ -103542,12 +103541,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }),
         mask: "00000-0000000-0",
         raw: false,
-        readonly: "",
         options: $data.options
       }, null, 8
       /* PROPS */
       , ["modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_57, [_hoisted_58, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        readonly: "",
         type: "text",
         "class": "form-control",
         "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
@@ -103559,7 +103556,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_59, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
-        readonly: "",
         "class": "form-control",
         modelValue: $data.dataEdit.phone,
         "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
@@ -103586,7 +103582,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* KEYED_FRAGMENT */
       ))], 512
       /* NEED_PATCH */
-      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataEdit.card_type_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"form-group col-md-4\">\r\n                        <label for=\"startPoint\">Card Starting Points</label>\r\n                        <input type=\"text\" id=\"startPoint\" class=\"form-control\" @keypress=\"isNumber($event)\"\r\n                               v-model=\"dataEdit.starting_points\">\r\n                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_65, [_hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.dataEdit.card_type_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"form-group col-md-4\">\n                        <label for=\"startPoint\">Card Starting Points</label>\n                        <input type=\"text\" id=\"startPoint\" class=\"form-control\" @keypress=\"isNumber($event)\"\n                               v-model=\"dataEdit.starting_points\">\n                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_65, [_hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "date",
         "class": "form-control",
         id: "expiryDate",
@@ -121901,7 +121897,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
           return $data.dataEdit.rfId = $event;
         }),
-        readonly: "",
         onKeypress: _cache[16] || (_cache[16] = function ($event) {
           return $options.isNumber($event);
         })
@@ -121915,12 +121910,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }),
         mask: "00000-0000000-0",
         raw: false,
-        readonly: "",
         options: $data.options
       }, null, 8
       /* PROPS */
       , ["modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [_hoisted_61, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        readonly: "",
         type: "text",
         "class": "form-control",
         "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
@@ -121932,7 +121925,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, null, 544
       /* HYDRATE_EVENTS, NEED_PATCH */
       ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dataEdit.name]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_62, [_hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
-        readonly: "",
         "class": "form-control",
         modelValue: $data.dataEdit.phone,
         "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
@@ -152142,7 +152134,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-589ad22a],\r\ntable *[data-v-589ad22a] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-589ad22a] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-589ad22a] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-589ad22a] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-589ad22a] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-589ad22a],\r\n.fade-leave-active[data-v-589ad22a] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-589ad22a], .fade-leave-to[data-v-589ad22a] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-589ad22a], tr[data-v-589ad22a], th[data-v-589ad22a], td[data-v-589ad22a], option[data-v-589ad22a], select[data-v-589ad22a], label[data-v-589ad22a], button[data-v-589ad22a], a[data-v-589ad22a], div[data-v-589ad22a], p[data-v-589ad22a] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-589ad22a] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-589ad22a],\ntable *[data-v-589ad22a] {\n    font-size: 10px;\n}\n.modal-cell[data-v-589ad22a] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-589ad22a] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-589ad22a] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-589ad22a] {\n    width: 35%;\n}\n.fade-enter-active[data-v-589ad22a],\n.fade-leave-active[data-v-589ad22a] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-589ad22a], .fade-leave-to[data-v-589ad22a] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-589ad22a], tr[data-v-589ad22a], th[data-v-589ad22a], td[data-v-589ad22a], option[data-v-589ad22a], select[data-v-589ad22a], label[data-v-589ad22a], button[data-v-589ad22a], a[data-v-589ad22a], div[data-v-589ad22a], p[data-v-589ad22a] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-589ad22a] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -152382,7 +152374,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-69405f27],\r\ntable *[data-v-69405f27] {\r\n    font-size: 10px;\n}\n.modal-cell[data-v-69405f27] {\r\n    padding: 0 !important;\r\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-69405f27] {\r\n    height: 100%;\r\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-69405f27] {\r\n    position: absolute;\r\n    z-index: 20;\r\n    transform: scale(1.3) translateY(-20px);\r\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-69405f27] {\r\n    width: 35%;\n}\n.fade-enter-active[data-v-69405f27],\r\n.fade-leave-active[data-v-69405f27] {\r\n    transition: opacity 1s;\n}\n.fade-enter[data-v-69405f27], .fade-leave-to[data-v-69405f27] /* .fade-leave-active below version 2.1.8 */\r\n{\r\n    opacity: 0;\n}\ntable[data-v-69405f27], tr[data-v-69405f27], th[data-v-69405f27], td[data-v-69405f27], option[data-v-69405f27], select[data-v-69405f27], label[data-v-69405f27], button[data-v-69405f27], a[data-v-69405f27], div[data-v-69405f27], p[data-v-69405f27] {\r\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-69405f27] {\r\n    position: relative;\r\n    bottom: 10px;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-69405f27],\ntable *[data-v-69405f27] {\n    font-size: 10px;\n}\n.modal-cell[data-v-69405f27] {\n    padding: 0 !important;\n    position: relative;\n}\n.modal-cell .modal-btn[data-v-69405f27] {\n    height: 100%;\n    transition: 0.5s transform;\n}\n.modal-cell:hover .modal-btn[data-v-69405f27] {\n    position: absolute;\n    z-index: 20;\n    transform: scale(1.3) translateY(-20px);\n    box-shadow: 0px 0px 10px black;\n}\n.header-select[data-v-69405f27] {\n    width: 35%;\n}\n.fade-enter-active[data-v-69405f27],\n.fade-leave-active[data-v-69405f27] {\n    transition: opacity 1s;\n}\n.fade-enter[data-v-69405f27], .fade-leave-to[data-v-69405f27] /* .fade-leave-active below version 2.1.8 */\n{\n    opacity: 0;\n}\ntable[data-v-69405f27], tr[data-v-69405f27], th[data-v-69405f27], td[data-v-69405f27], option[data-v-69405f27], select[data-v-69405f27], label[data-v-69405f27], button[data-v-69405f27], a[data-v-69405f27], div[data-v-69405f27], p[data-v-69405f27] {\n    font-size: 14px !important;\n}\n.checkbox-inputs[data-v-69405f27] {\n    position: relative;\n    bottom: 10px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
