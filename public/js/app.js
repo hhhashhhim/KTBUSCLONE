@@ -27922,7 +27922,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return _this14.callApi("post", "expenses/categories/reportHeaderLinkGet");
+                return _this14.callApi("post", "expenses/categories/reportsHeaderExpense");
 
               case 2:
                 res = _context3.sent;

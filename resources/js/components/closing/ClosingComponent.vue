@@ -1114,7 +1114,7 @@ export default {
             }
         },
         async fetchReportsHeaders() {
-            const res = await this.callApi("post", "expenses/categories/reportHeaderLinkGet");
+            const res = await this.callApi("post", "expenses/categories/reportsHeaderExpense");
 
             if (res.status == 200) {
                 this.reportsHeaders = res.data.headers;
