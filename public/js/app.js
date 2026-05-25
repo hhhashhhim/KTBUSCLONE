@@ -29122,6 +29122,28 @@ var COLUMN_OPTIONS = [{
         }, _callee5);
       }))();
     },
+    formatDate: function formatDate(timestamp) {
+      var date = new Date(timestamp);
+
+      if (Number.isNaN(date.getTime())) {
+        return 'N/A';
+      }
+
+      var hours = date.getHours() % 12 || 12;
+      var minutes = ('0' + date.getMinutes()).slice(-2);
+      var ampm = date.getHours() < 12 ? 'AM' : 'PM';
+      var formattedDate = ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear();
+      return "".concat(hours, ":").concat(minutes, " ").concat(ampm, " | ").concat(formattedDate);
+    },
+    formatCancellationDate: function formatCancellationDate(filter) {
+      var _filter$cancel_date;
+
+      if (filter !== null && filter !== void 0 && filter.created_at) {
+        return this.formatDate(filter.created_at);
+      }
+
+      return (_filter$cancel_date = filter === null || filter === void 0 ? void 0 : filter.cancel_date) !== null && _filter$cancel_date !== void 0 ? _filter$cancel_date : 'N/A';
+    },
     getPdfPrint: function getPdfPrint() {
       this.$refs.refConfirmCancle.submit();
     }
@@ -84550,7 +84572,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(filter.cancellation_status_color || filter.badge)
     }, [$options.isColumnVisible('bus_time') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_88, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter.bus_time), 1
     /* TEXT */
-    )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('cancel_date') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_89, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(filter.created_at), 1
+    )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('cancel_date') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_89, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatCancellationDate(filter)), 1
     /* TEXT */
     )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('remarks') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", _hoisted_90, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_filter$cancel_reason = filter.cancel_reason) !== null && _filter$cancel_reason !== void 0 ? _filter$cancel_reason : 'N/A'), 1
     /* TEXT */

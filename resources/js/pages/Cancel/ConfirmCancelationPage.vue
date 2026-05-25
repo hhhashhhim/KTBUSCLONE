@@ -217,7 +217,7 @@
                                                                     <td v-if="isColumnVisible('bus_time')">{{
                                                                         filter.bus_time }}</td>
                                                                     <td v-if="isColumnVisible('cancel_date')">{{
-                                                                        filter.created_at }}</td>
+                                                                        formatCancellationDate(filter) }}</td>
                                                                       <td v-if="isColumnVisible('remarks')">{{
                                                                         filter.cancel_reason ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('terminal_name')">{{
@@ -390,6 +390,27 @@ export default {
                 this.tableLoading = false;
             }
 
+        },
+        formatDate(timestamp) {
+            const date = new Date(timestamp);
+
+            if (Number.isNaN(date.getTime())) {
+                return 'N/A';
+            }
+
+            const hours = date.getHours() % 12 || 12;
+            const minutes = ('0' + date.getMinutes()).slice(-2);
+            const ampm = date.getHours() < 12 ? 'AM' : 'PM';
+            const formattedDate = ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear();
+
+            return `${hours}:${minutes} ${ampm} | ${formattedDate}`;
+        },
+        formatCancellationDate(filter) {
+            if (filter?.created_at) {
+                return this.formatDate(filter.created_at);
+            }
+
+            return filter?.cancel_date ?? 'N/A';
         },
         getPdfPrint: function () {
             this.$refs.refConfirmCancle.submit();
