@@ -405,9 +405,24 @@ export default {
 
             return `${hours}:${minutes} ${ampm} | ${formattedDate}`;
         },
+        formatUtcDateTime(timestamp) {
+            if (!timestamp) {
+                return 'N/A';
+            }
+
+            const normalizedTimestamp = String(timestamp).includes('T')
+                ? String(timestamp)
+                : String(timestamp).replace(' ', 'T') + 'Z';
+
+            return this.formatDate(normalizedTimestamp);
+        },
         formatCancellationDate(filter) {
             if (filter?.created_at) {
                 return this.formatDate(filter.created_at);
+            }
+
+            if (filter?.cancellation_datetime) {
+                return this.formatUtcDateTime(filter.cancellation_datetime);
             }
 
             return filter?.cancel_date ?? 'N/A';

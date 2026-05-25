@@ -29135,11 +29135,23 @@ var COLUMN_OPTIONS = [{
       var formattedDate = ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear();
       return "".concat(hours, ":").concat(minutes, " ").concat(ampm, " | ").concat(formattedDate);
     },
+    formatUtcDateTime: function formatUtcDateTime(timestamp) {
+      if (!timestamp) {
+        return 'N/A';
+      }
+
+      var normalizedTimestamp = String(timestamp).includes('T') ? String(timestamp) : String(timestamp).replace(' ', 'T') + 'Z';
+      return this.formatDate(normalizedTimestamp);
+    },
     formatCancellationDate: function formatCancellationDate(filter) {
       var _filter$cancel_date;
 
       if (filter !== null && filter !== void 0 && filter.created_at) {
         return this.formatDate(filter.created_at);
+      }
+
+      if (filter !== null && filter !== void 0 && filter.cancellation_datetime) {
+        return this.formatUtcDateTime(filter.cancellation_datetime);
       }
 
       return (_filter$cancel_date = filter === null || filter === void 0 ? void 0 : filter.cancel_date) !== null && _filter$cancel_date !== void 0 ? _filter$cancel_date : 'N/A';
