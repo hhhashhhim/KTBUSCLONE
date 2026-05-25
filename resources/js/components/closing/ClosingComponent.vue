@@ -1117,8 +1117,9 @@ export default {
             const res = await this.callApi("post", "expenses/categories/reportsHeaderExpense");
 
             if (res.status == 200) {
-                this.reportsHeaders = res.data.headers;
-                console.log("reportsHeaders loaded:", this.reportsHeaders);
+                this.reportsHeaders = Array.isArray(res.data)
+                    ? res.data
+                    : (res.data?.headers || []);
             }
         },
  handleCategoryChange(index) {

@@ -27916,7 +27916,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       var _this14 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var res;
+        var res, _res$data;
+
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -27928,8 +27929,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                 res = _context3.sent;
 
                 if (res.status == 200) {
-                  _this14.reportsHeaders = res.data.headers;
-                  console.log("reportsHeaders loaded:", _this14.reportsHeaders);
+                  _this14.reportsHeaders = Array.isArray(res.data) ? res.data : ((_res$data = res.data) === null || _res$data === void 0 ? void 0 : _res$data.headers) || [];
                 }
 
               case 4:
