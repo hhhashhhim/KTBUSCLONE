@@ -210,14 +210,14 @@
                                                                         Cancellation Charges</th>
                                                                 </tr>
                                                             </thead>
- 
+
                                                             <tbody>
                                                                 <tr v-for="(filter, i) in filters" :key="i"
                                                                     :class="filter.cancellation_status_color || filter.badge">
                                                                     <td v-if="isColumnVisible('bus_time')">{{
                                                                         filter.bus_time }}</td>
                                                                     <td v-if="isColumnVisible('cancel_date')">{{
-                                                                        filter.cancel_date }}</td>
+                                                                        filter.created_at }}</td>
                                                                       <td v-if="isColumnVisible('remarks')">{{
                                                                         filter.cancel_reason ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('terminal_name')">{{
