@@ -19,6 +19,7 @@ class AdvanceSalesReportController extends Controller
         'date',
         'bus_number',
         'bus_class',
+        'route',
         'seats',
         'terminal',
         'user',
@@ -28,7 +29,9 @@ class AdvanceSalesReportController extends Controller
         'passenger_contact',
         'passenger_cnic',
         'sales',
+        'discount',
         'elt',
+        'net_sale',
     ];
 
     public function getUserNames()
@@ -82,7 +85,7 @@ class AdvanceSalesReportController extends Controller
         $isCounterSale = filter_var($request->counterSale, FILTER_VALIDATE_BOOLEAN);
         $selectedTerminalId = $request->filled('terminal') ? $request->terminal : Auth::user()->terminal_id;
 
-        $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number", 'customer:id,name,contact,cnic')
+        $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'route:id,name,via', 'schedule:id,name,time',"bus:id,bus_number", 'customer:id,name,contact,cnic')
             ->withTrashed()
             ->where('company_id', Auth::user()->company_id)
              ->where(function ($query) {
@@ -154,10 +157,12 @@ class AdvanceSalesReportController extends Controller
                     $single = [];
                     $single['bus_number'] = $inner[0]->bus->bus_number??'N/A';
                     $single['bus_class'] = $inner[0]->busClass->name;
+                    $single['route'] = $inner[0]->route->name??'N/A';
                     $single['seats'] = $inner->count();
                     $single['terminal'] = $inner[0]->terminal->name;
                     $single['user'] = $inner[0]->updated_name->name??'N/A';
-                    $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
+                    $single['sales'] = $inner->sum('seat_fare');
+                    $single['discount'] = $inner->sum('discount');
                     $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
                     $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
                     $single['invoice_id'] = $inner->pluck('invoice_id')
@@ -203,6 +208,7 @@ class AdvanceSalesReportController extends Controller
 
                     }
                     $single['elt'] = $eltSum;
+                    $single['net_sale'] = $single['sales'] - $single['discount'] + $single['elt'];
                     array_push($sortData, $single);
                 }
             }
@@ -277,7 +283,7 @@ class AdvanceSalesReportController extends Controller
         $isCounterSale = filter_var($request->counterSale, FILTER_VALIDATE_BOOLEAN);
         $selectedTerminalId = $request->filled('terminal') ? $request->terminal : Auth::user()->terminal_id;
 
-        $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'schedule:id,name,time',"bus:id,bus_number", 'customer:id,name,contact,cnic')
+        $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'route:id,name,via', 'schedule:id,name,time',"bus:id,bus_number", 'customer:id,name,contact,cnic')
             ->withTrashed()
             ->where('company_id', Auth::user()->company_id)
              ->where(function ($query) {
@@ -349,10 +355,12 @@ class AdvanceSalesReportController extends Controller
                     $single = [];
                     $single['bus_number'] = $inner[0]->bus->bus_number??'N/A';
                     $single['bus_class'] = $inner[0]->busClass->name;
+                    $single['route'] = $inner[0]->route->name??'N/A';
                     $single['seats'] = $inner->count();
                     $single['terminal'] = $inner[0]->terminal->name;
                     $single['user'] = $inner[0]->updated_name->name??'N/A';
-                    $single['sales'] = $inner->sum('seat_fare') - $inner->sum('discount');
+                    $single['sales'] = $inner->sum('seat_fare');
+                    $single['discount'] = $inner->sum('discount');
                     $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
                     $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
                     $single['invoice_id'] = $inner->pluck('invoice_id')
@@ -398,6 +406,7 @@ class AdvanceSalesReportController extends Controller
 
                     }
                     $single['elt'] = $eltSum;
+                    $single['net_sale'] = $single['sales'] - $single['discount'] + $single['elt'];
                     array_push($sortData, $single);
                 }
             }

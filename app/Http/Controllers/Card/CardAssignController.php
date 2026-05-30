@@ -15,13 +15,37 @@ use Illuminate\Support\Facades\Log;
 
 class CardAssignController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         if(!checkForSubmenu("loyaltyCardAssign"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return CardAssign::with('addedBy:id,name', 'updatedBy:id,name', 'customer', 'cardCategory:id,name')->where('company_id', Auth::user()->company_id)->get();
+
+        return CardAssign::with('addedBy:id,name', 'updatedBy:id,name', 'customer', 'cardCategory:id,name')
+            ->where('company_id', Auth::user()->company_id)
+            ->when($request->filled('rfId'), function ($query) use ($request) {
+                $query->where('rfId', 'like', '%' . $request->rfId . '%');
+            })
+            ->when($request->filled('cnic'), function ($query) use ($request) {
+                $query->where('cnic', 'like', '%' . plainContactAndCnic($request->cnic) . '%');
+            })
+            ->when($request->filled('name'), function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->name . '%');
+            })
+            ->when($request->filled('phone'), function ($query) use ($request) {
+                $query->where('phone', 'like', '%' . plainContactAndCnic($request->phone) . '%');
+            })
+            ->when($request->filled('card_category_id') && $request->card_category_id != 0, function ($query) use ($request) {
+                $query->where('card_category_id', $request->card_category_id);
+            })
+            ->when($request->filled('expiry_from'), function ($query) use ($request) {
+                $query->whereDate('expiry_date', '>=', $request->expiry_from);
+            })
+            ->when($request->filled('expiry_to'), function ($query) use ($request) {
+                $query->whereDate('expiry_date', '<=', $request->expiry_to);
+            })
+            ->get();
     }
 
     public function cardCategories()

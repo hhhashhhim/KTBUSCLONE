@@ -68,6 +68,9 @@
             @if(!empty($visibleColumnsLookup['bus_class']))
                 <th>Bus Class</th>
             @endif
+            @if(!empty($visibleColumnsLookup['route']))
+                <th>Route</th>
+            @endif
             @if(!empty($visibleColumnsLookup['seats']))
                 <th>No of Seat</th>
             @endif
@@ -95,8 +98,14 @@
             @if(!empty($visibleColumnsLookup['sales']))
                 <th>Sale Amount</th>
             @endif
+            @if(!empty($visibleColumnsLookup['discount']))
+                <th>Discount</th>
+            @endif
             @if(!empty($visibleColumnsLookup['elt']))
-                <th>Elt Amount</th>
+                <th>ELT Amount</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['net_sale']))
+                <th>Net Sale</th>
             @endif
         </tr>
         @foreach($record as $data)
@@ -109,6 +118,9 @@
             @endif
             @if(!empty($visibleColumnsLookup['bus_class']))
                 <td>{{$data['bus_class']}}</td>
+            @endif
+            @if(!empty($visibleColumnsLookup['route']))
+                <td>{{$data['route']}}</td>
             @endif
             @if(!empty($visibleColumnsLookup['seats']))
                 <td>{{$data['seats']}}</td>
@@ -167,8 +179,14 @@
             @if(!empty($visibleColumnsLookup['sales']))
                 <td>{{$data['sales']}}</td>
             @endif
+            @if(!empty($visibleColumnsLookup['discount']))
+                <td>{{$data['discount']}}</td>
+            @endif
             @if(!empty($visibleColumnsLookup['elt']))
                 <td>{{$data['elt']}}</td>
+            @endif
+            @if(!empty($visibleColumnsLookup['net_sale']))
+                <td>{{$data['net_sale']}}</td>
             @endif
         </tr>
         @endforeach
@@ -181,6 +199,9 @@
                 <th></th>
             @endif
             @if(!empty($visibleColumnsLookup['bus_class']))
+                <th></th>
+            @endif
+            @if(!empty($visibleColumnsLookup['route']))
                 <th></th>
             @endif
             @if(!empty($visibleColumnsLookup['seats']))
@@ -210,8 +231,14 @@
             @if(!empty($visibleColumnsLookup['sales']))
                 <th>{{ array_sum(array_column($record, 'sales'))}}</th>
             @endif
+            @if(!empty($visibleColumnsLookup['discount']))
+                <th>{{ array_sum(array_column($record, 'discount'))}}</th>
+            @endif
             @if(!empty($visibleColumnsLookup['elt']))
                 <th>{{ array_sum(array_column($record, 'elt'))}}</th>
+            @endif
+            @if(!empty($visibleColumnsLookup['net_sale']))
+                <th>{{ array_sum(array_column($record, 'sales')) - array_sum(array_column($record, 'discount')) + array_sum(array_column($record, 'elt'))}}</th>
             @endif
         </tr>
     </table>
