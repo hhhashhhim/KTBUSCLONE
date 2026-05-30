@@ -18,6 +18,91 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="my-2 col-md-3">
+                                            <label>RF ID No</label>
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                placeholder="RF ID No"
+                                                v-model="filterAssign.rfId"
+                                            >
+                                        </div>
+                                        <div class="my-2 col-md-3">
+                                            <label>Customer Cnic</label>
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                placeholder="Customer Cnic"
+                                                v-model="filterAssign.cnic"
+                                            >
+                                        </div>
+                                        <div class="my-2 col-md-3">
+                                            <label>Customer Name</label>
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                placeholder="Customer Name"
+                                                v-model="filterAssign.name"
+                                            >
+                                        </div>
+                                        <div class="my-2 col-md-3">
+                                            <label>Customer Phone</label>
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                placeholder="Customer Phone"
+                                                v-model="filterAssign.phone"
+                                            >
+                                        </div>
+                                        <div class="my-2 col-md-4">
+                                            <label>Card Category Name</label>
+                                            <select class="form-control" v-model="filterAssign.card_category_id">
+                                                <option value="0">All</option>
+                                                <option v-for="(single, i) in categories" :key="i" :value="single.id">
+                                                    {{ single.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="my-2 col-md-3">
+                                            <label>Expiry From</label>
+                                            <input
+                                                type="date"
+                                                class="form-control"
+                                                v-model="filterAssign.expiry_from"
+                                            >
+                                        </div>
+                                        <div class="my-2 col-md-3">
+                                            <label>Expiry To</label>
+                                            <input
+                                                type="date"
+                                                class="form-control"
+                                                v-model="filterAssign.expiry_to"
+                                            >
+                                        </div>
+                                        <div class="my-2 col-md-2 d-flex align-items-end">
+                                            <button
+                                                class="btn btn-primary mr-2"
+                                                type="button"
+                                                @click="fetchAssignedCard()"
+                                                :disabled="loadingTable"
+                                            >
+                                                {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
+                                            </button>
+                                            <button
+                                                class="btn btn-outline-secondary"
+                                                type="button"
+                                                @click="resetFilters()"
+                                                :disabled="loadingTable"
+                                            >
+                                                Reset
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <transition name="fade">
                                 <div
                                     class="alert alert-danger alert-dismissible fade show"
@@ -265,6 +350,7 @@ export default {
                 placeholder: "03xx-xxxxxxx",
             },
             loading: false,
+            loadingTable: false,
             cardsAssign: [],
             categories: [],
             permissions: [],
@@ -275,6 +361,15 @@ export default {
             success: false,
             error: false,
             dataEdit: {},
+            filterAssign: {
+                rfId: "",
+                cnic: "",
+                name: "",
+                phone: "",
+                card_category_id: "0",
+                expiry_from: "",
+                expiry_to: "",
+            },
             addForm: {
                 rfId: "",
                 contact: "",
@@ -297,6 +392,7 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
 
+        this.fetchFilters();
         this.fetchAssignedCard();
         this.permissions = this.$store.state.permissions;
     },
@@ -345,7 +441,7 @@ export default {
             }
 
         },
-        async fetchAssignedCard() {
+        async fetchFilters() {
             const resCategories = await this.callApi("post", 'loyaltyCardAssign/categories');
             if (resCategories.status == 200) {
                 $(".modal").click();
@@ -353,17 +449,49 @@ export default {
             } else {
                 console.log(resCategories);
             }
+        },
+        destroyCardAssignTable() {
+            if (!$.fn.DataTable) {
+                return;
+            }
 
-            const res = await this.callApi("post", 'loyaltyCardAssign');
+            if ($.fn.DataTable.isDataTable("#cardAssignTable")) {
+                $("#cardAssignTable").DataTable().destroy();
+            }
+        },
+        initCardAssignTable() {
+            setTimeout(() => {
+                if (!$.fn.DataTable) {
+                    return;
+                }
+
+                this.destroyCardAssignTable();
+                $("#cardAssignTable").DataTable();
+            }, 300);
+        },
+        async fetchAssignedCard() {
+            this.loadingTable = true;
+            this.destroyCardAssignTable();
+            const res = await this.callApi("post", 'loyaltyCardAssign', this.filterAssign);
             if (res.status == 200) {
                 this.cardsAssign = res.data.map((card) => this.normalizeAssignedCard(card))
+                this.initCardAssignTable();
             } else {
                 console.log(res);
             }
-
-            setTimeout(() => {
-                $("#cardAssignTable").DataTable();
-            }, 300);
+            this.loadingTable = false;
+        },
+        resetFilters() {
+            this.filterAssign = {
+                rfId: "",
+                cnic: "",
+                name: "",
+                phone: "",
+                card_category_id: "0",
+                expiry_from: "",
+                expiry_to: "",
+            };
+            this.fetchAssignedCard();
         },
         clearForm: function () {
             this.addForm.cardCategory = "0";

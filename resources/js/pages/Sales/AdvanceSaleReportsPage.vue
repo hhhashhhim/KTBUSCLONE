@@ -146,6 +146,7 @@
                                                                         <th>Date</th>
                                                                         <th>Bus No</th>
                                                                         <th>Bus Class</th>
+                                                                        <th>Route</th>
                                                                         <th>No of Seat</th>
                                                                         <th>Terminal Name</th>
                                                                         <th>User Name</th>
@@ -155,7 +156,9 @@
                                                                         <th>Cell No</th>
                                                                         <th>CNIC No</th>
                                                                         <th>Sale Amount</th>
+                                                                        <th>Discount</th>
                                                                         <th>ELT Amount</th>
+                                                                        <th>Net Sale</th>
                                                                     </tr>
                                                                 </thead>
 
@@ -164,6 +167,7 @@
                                                                         <td>{{ data.date }}<br>{{ data.time }}</td>
                                                                         <td>{{ data.bus_number }}</td>
                                                                         <td>{{ data.bus_class }}</td>
+                                                                        <td>{{ data.route }}</td>
                                                                         <td>{{ data.seats }}</td>
                                                                         <td>{{ data.terminal }}</td>
                                                                         <td>{{ data.user }}</td>
@@ -172,16 +176,20 @@
                                                                         <td>{{ data.passenger_name ?? 'N/A' }}</td>
                                                                         <td>{{ data.passenger_contact ?? 'N/A' }}</td>
                                                                         <td>{{ data.passenger_cnic ?? 'N/A' }}</td>
-                                                                        <td>{{ data.sales }}</td>
-                                                                        <td>{{ data.elt }}</td>
+                                                                        <td class="amount-column">{{ formatAmount(data.sales) }}</td>
+                                                                        <td class="amount-column">{{ formatAmount(data.discount) }}</td>
+                                                                        <td class="amount-column">{{ formatAmount(data.elt) }}</td>
+                                                                        <td class="amount-column">{{ formatAmount(data.net_sale) }}</td>
                                                                     </tr>
 
                                                                     <tr>
-                                                                        <th colspan="3"></th>
+                                                                        <th colspan="4"></th>
                                                                         <th>{{ totalSeats() ?? 0 }}</th>
                                                                         <th colspan="7"></th>
-                                                                        <th>{{ totalSeatFare() ?? 0 }}</th>
-                                                                        <th>{{ totalEltFare() ?? 0 }}</th>
+                                                                        <th class="amount-column">{{ formatAmount(totalSeatFare()) }}</th>
+                                                                        <th class="amount-column">{{ formatAmount(totalDiscount()) }}</th>
+                                                                        <th class="amount-column">{{ formatAmount(totalEltFare()) }}</th>
+                                                                        <th class="amount-column">{{ formatAmount(totalNetSale()) }}</th>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>
@@ -339,7 +347,11 @@ export default {
             users: [],
             permissions: [],
             routes: [],
-            filters: [],
+            filters: {
+                record: [],
+                refund: [],
+                counterExpenses: [],
+            },
             refundFilters: [],
             filterSales: {
                 terminal: 0,
@@ -489,16 +501,35 @@ export default {
         totalSeatFare: function () {
             if (this.filters.record) {
                 return this.filters.record.reduce((sum, single) => {
-                    return sum += single.sales;
+                    return sum + this.toAmount(single.sales);
                 }, 0)
             }
+            return 0;
+        },
+        totalDiscount: function () {
+            if (this.filters.record) {
+                return this.filters.record.reduce((sum, single) => {
+                    return sum + this.toAmount(single.discount);
+                }, 0)
+            }
+            return 0;
         },
         totalEltFare: function () {
             if (this.filters.record) {
                 return this.filters.record.reduce((sum, single) => {
-                    return sum += single.elt;
+                    return sum + this.toAmount(single.elt);
                 }, 0)
             }
+            return 0;
+        },
+        totalNetSale: function () {
+            return this.totalSeatFare() - this.totalDiscount() + this.totalEltFare();
+        },
+        toAmount: function (value) {
+            return Number(value) || 0;
+        },
+        formatAmount: function (value) {
+            return this.toAmount(value).toLocaleString();
         },
         // refund Table
         refundTotalCharges: function () {
@@ -560,5 +591,11 @@ td {
     display: block;
     margin: 0 auto;
     padding: 2em;
+}
+
+.amount-column {
+    min-width: 95px;
+    text-align: right;
+    white-space: nowrap;
 }
 </style>
