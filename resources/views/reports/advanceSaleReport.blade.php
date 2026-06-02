@@ -52,7 +52,7 @@
         <tr>
             <td>Terminal : {{$filterData->terminal}}</td>
             <td>User : {{$filterData->user}}</td>
-            <td>Route : {{count($filterData->route) > 0 ? implode(",",$filterData->route) : "All"}}</td>
+            {{-- <td>Route : {{count($filterData->route) > 0 ? implode(",",$filterData->route) : "All"}}</td> --}}
             <td>{{$filterData->from}} -- {{$filterData->to}}</td>
         </tr>
     </table>
