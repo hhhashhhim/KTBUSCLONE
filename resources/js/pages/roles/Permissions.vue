@@ -59,7 +59,7 @@
                                                                                     class="text-capitalize text-bold ml-1"
                                                                                     :for="menus.name"
                                                                                     style="color: black">{{
-                                                                                        menus.name
+                                                                                        displayPermissionName(menus.name)
                                                                                     }}</label>
                                                                             </div>
                                                                             <div class="col-md-10" v-if="menus.allow">
@@ -190,6 +190,9 @@ export default {
     },
 
     methods: {
+        displayPermissionName(name) {
+            return name === 'sales' ? 'Advance Sale' : name;
+        },
         async save() {
             const res = await this.callApi("post", "role/update", {
                 ...this.role,

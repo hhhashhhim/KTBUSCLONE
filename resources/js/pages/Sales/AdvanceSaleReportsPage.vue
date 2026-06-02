@@ -42,7 +42,7 @@
                                                         v-model="filterSales.transaction_id">
                                                 </div>
                                                 <div class="my-2 col-md-4"
-                                                    v-if="checkForSubmenuButtons('terminal-filter')">
+                                                    v-if="canUseReportFilter('terminal-filter')">
                                                     <label for="terminalFilter">Terminals</label>
                                                     <select id="terminalFilter" class="form-control"
                                                         v-model="filterSales.terminal">
@@ -54,7 +54,7 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="my-2 col-md-4">
+                                                <div class="my-2 col-md-4" v-if="canUseReportFilter('route-filter')">
                                                     <label for="routeIds">Routes</label>
                                                     <select id="routeIds" class="form-control" multiple
                                                         v-model="filterSales.route">
@@ -64,7 +64,7 @@
                                                         </option>
                                                     </select>
                                                 </div>
-                                                <div class="my-2 col-md-3">
+                                                <div class="my-2 col-md-3" v-if="canUseReportFilter('user-filter')">
                                                     <label for="usernameFilter">Users</label>
                                                     <select id="usernameFilter" class="form-control"
                                                         v-model="filterSales.user">

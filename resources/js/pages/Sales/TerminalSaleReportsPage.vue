@@ -46,7 +46,7 @@
 
 
                                                 <div class="my-2 col-md-4"
-                                                    v-if="checkForSubmenuButtons('terminal-sale-terminal-filter')">
+                                                    v-if="canUseReportFilter('terminal-sale-terminal-filter')">
                                                     <label for="terminalFilter">Terminals</label>
                                                     <select id="terminalFilter" class="form-control"
                                                         v-model="filterSales.terminal">
@@ -59,7 +59,7 @@
                                                 </div>
 
                                                 <div class="my-2 col-md-4"
-                                                    v-if="checkForSubmenuButtons('terminal-sale-route-filter')">
+                                                    v-if="canUseReportFilter('terminal-sale-route-filter')">
                                                     <label for="routeIds">Routes</label>
                                                     <select id="routeIds" class="form-control" multiple
                                                         v-model="filterSales.route">
@@ -70,7 +70,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="my-2 col-md-3"
-                                                    v-if="checkForSubmenuButtons('terminal-sale-user-filter')">
+                                                    v-if="canUseReportFilter('terminal-sale-user-filter')">
                                                     <label for="usernameFilter">Users</label>
                                                     <select id="usernameFilter" class="form-control"
                                                         v-model="filterSales.user">
@@ -370,9 +370,9 @@ export default {
             return this.visibleColumns.includes(columnKey);
         },
         async fetchFilters() {
-            const resTerminals = await this.callApi("post", 'advance/sales/getTerminals');
-            const resUserNames = await this.callApi("post", 'advance/sales/getUserNames');
-            const resRoutes = await this.callApi("post", 'advance/sales/getRoutes');
+            const resTerminals = await this.callApi("post", 'terminals/sales/getTerminals');
+            const resUserNames = await this.callApi("post", 'terminals/sales/getUsers');
+            const resRoutes = await this.callApi("post", 'terminals/sales/getRoutes');
             if (resTerminals.status == 200 && resUserNames.status == 200 && resRoutes.status == 200) {
                 this.terminals = resTerminals.data;
                 this.users = resUserNames.data;

@@ -45,7 +45,7 @@
                                                                     v-model="filterCancel.invoice_id"
                                                                     @keyup="CancelFilter()" placeholder="Invoice ID">
                                                             </div>
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-4" v-if="canUseReportFilter('confirm-cancel-route-filter')">
                                                                 <div class="form-group">
                                                                     <label for="routeFilter">Route</label>
                                                                     <select id="routeFilter" class="form-control"
@@ -60,7 +60,7 @@
                                                                 </div>
                                                             </div>
                                                             <!-- Terminal -->
-                                                            <div class="col-md-4 mb-3">
+                                                            <div class="col-md-4 mb-3" v-if="canUseReportFilter('confirm-cancel-terminal-filter')">
                                                                 <label class="filter-label">Terminal</label>
                                                                 <select class="form-control filter-input"
                                                                     v-model="filterCancel.terminal"
@@ -69,6 +69,18 @@
                                                                     <option v-for="(terminal, i) in terminals" :key="i"
                                                                         :value="terminal.id">
                                                                         {{ terminal.name }}
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-4 mb-3" v-if="canUseReportFilter('confirm-cancel-user-filter')">
+                                                                <label class="filter-label">User</label>
+                                                                <select class="form-control filter-input"
+                                                                    v-model="filterCancel.user"
+                                                                    @change="CancelFilter()">
+                                                                    <option value="0">All</option>
+                                                                    <option v-for="(user, i) in users" :key="i"
+                                                                        :value="user.id">
+                                                                        {{ user.name }}
                                                                     </option>
                                                                 </select>
                                                             </div>
@@ -147,6 +159,7 @@
 
                                                     <!-- Existing -->
                                                     <input type="hidden" name="terminal" :value="filterCancel.terminal">
+                                                    <input type="hidden" name="user" :value="filterCancel.user">
                                                     <input type="hidden" name="bus_id" :value="filterCancel.bus_id">
                                                     <input type="hidden" name="fromDate" :value="filterCancel.fromDate">
                                                     <input type="hidden" name="toDate" :value="filterCancel.toDate">
@@ -293,6 +306,7 @@ export default {
         return {
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             terminals: [],
+            users: [],
             buses: [],
             routes: [],
             filters: [],
@@ -303,6 +317,7 @@ export default {
             tableLoading: true,
             filterCancel: {
                 terminal: 0,
+                user: 0,
                 route: 0,
                 invoice_id: '',
                 transaction_id: '',
@@ -370,8 +385,12 @@ export default {
         },
         async fetchFilters() {
             const resTerminals = await this.callApi("post", 'confirm/cancellation/getTerminals');
+            const resUsers = await this.callApi("post", 'confirm/cancellation/getUsers');
             if (resTerminals.status == 200) {
                 this.terminals = resTerminals.data;
+            }
+            if (resUsers.status == 200) {
+                this.users = resUsers.data;
             }
 
         },

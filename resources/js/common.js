@@ -119,11 +119,13 @@ export default {
             });
         },
         checkForSubmenuButtons(ButtonName) {
-            let permissions = this.permissions;
+            const permissions = Array.isArray(this.permissions)
+                ? this.permissions
+                : (Array.isArray(this.$store?.state?.permissions) ? this.$store.state.permissions : []);
             for (let i = 0; i < permissions.length; i++) {
-                let innerChildren = permissions[i].childs;
+                const innerChildren = Array.isArray(permissions[i]?.childs) ? permissions[i].childs : [];
                 for (let j = 0; j < innerChildren.length; j++) {
-                    if (innerChildren[j].buttons) {
+                    if (Array.isArray(innerChildren[j].buttons)) {
                         for (let k = 0; k < innerChildren[j].buttons.length; k++) {
                             let innerButtons = innerChildren[j].buttons;
                             if (innerButtons[k].name == ButtonName) {
@@ -133,6 +135,9 @@ export default {
                     }
                 }
             }
+        },
+        canUseReportFilter(permission) {
+            return this.$store?.state?.user?.is_super_admin == 1 || this.checkForSubmenuButtons(permission);
         },
     }
 }

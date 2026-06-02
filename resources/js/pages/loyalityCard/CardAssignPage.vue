@@ -143,8 +143,7 @@
                                                         <th>Card Starting Points</th>
                                                         <th>Card Expiry Date</th>
                                                         <th>Added By</th>
-                                                        <th v-if="checkForSubmenuButtons('edit-assign-card')">Action
-                                                        </th>
+                                                        <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -158,12 +157,17 @@
                                                         <td>{{ card.starting_points }}</td>
                                                         <td>{{ card.expiry_date }}</td>
                                                         <td class="text-capitalize">{{ card.added_by.name }}</td>
-                                                        <td v-if="checkForSubmenuButtons('edit-assign-card')">
+                                                        <td>
                                                             <button v-if="checkForSubmenuButtons('edit-assign-card')"
                                                                     :data-target="'#' + editFormID" data-toggle="modal"
                                                                     @click="edit(card)"
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
+                                                            </button>
+                                                            <button type="button"
+                                                                    class="btn btn-info mx-1"
+                                                                    @click="showCardHistory(card)">
+                                                              <i class="fas fa-tag"></i>
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -261,7 +265,7 @@
                 <div class="row">
                     <div class="form-group col-md-3">
                         <label for="CardName">RF-ID<span class="text-danger ml-1">*</span></label>
-                        <input type="text" class="form-control" v-model="dataEdit.rfId" 
+                        <input type="text" class="form-control" v-model="dataEdit.rfId"
                                @keypress="isNumber($event)"/>
                     </div>
                     <div class="form-group col-md-3">
@@ -318,6 +322,104 @@
                 </template>
             </Edit>
             <!--            Edit MOdel End-->
+            <div class="modal fade" id="cardHistoryModal" tabindex="-1" role="dialog"
+                 aria-labelledby="cardHistoryModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="cardHistoryModalLabel">
+                                Card History - {{ cardHistoryCustomerName }}
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div v-if="historyLoading" class="text-center py-4">
+                                <img class="loading-spinner"
+                                     :src="$store.state.main_url + 'assets/img/loading-spinner.gif'" alt="Loading..."
+                                     style="width: 20px; height: 20px" />
+                                Loading card history...
+                            </div>
+                            <div v-else-if="cardHistory.length === 0" class="text-center py-4">
+                                No card history found
+                            </div>
+                            <div v-else class="table-responsive">
+                                <table id="loyaltyCardHistoryTable" class="table table-striped table-hover">
+                                    <thead>
+                                    <tr>
+                                       <th>Customer Name</th>
+                                            <th>Customer CNIC</th>
+                                            <th>Customer Contact</th>
+                                        <th>Invoice ID</th>
+                                        <th>Schedule Date</th>
+                                        <th>Schedule Time</th>
+                                        <th>Seat No</th>
+                                        <th>Seat Fare</th>
+                                        <th>Discount</th>
+                                        <th>Terminal Discount</th>
+                                        <th>Schedule Discount</th>
+                                        <th>Total Discount</th>
+                                        <th>Route</th>
+                                        <th>From City</th>
+                                        <th>To City</th>
+                                        <th>Terminal</th>
+                                        <th>Booked Time</th>
+                                        <th>Added By</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="history in cardHistory" :key="history.id">
+                                       <td>{{ history.customer_name ?? '-' }}</td>
+                                            <td>{{ history.customer_cnic ?? '-' }}</td>
+                                            <td>{{ history.customer_contact ?? '-' }}</td>
+                                        <td>{{ history.invoice_id ?? '-' }}</td>
+                                        <td>{{ history.schedule_date ?? '-' }}</td>
+                                        <td>{{ history.schedule_time ?? '-' }}</td>
+                                        <td>{{ history.seat_no ?? '-' }}</td>
+                                        <td>{{ history.seat_fare ?? 0 }}</td>
+                                        <td>{{ history.discount ?? 0 }}</td>
+                                        <td>{{ history.terminal_discount ?? 0 }}</td>
+                                        <td>{{ history.schedule_discount ?? 0 }}</td>
+                                        <td>{{ history.total_discount ?? 0 }}</td>
+                                        <td>{{ history.route_name ?? '-' }}</td>
+                                        <td>{{ history.departure_city_name ?? '-' }}</td>
+                                        <td>{{ history.destination_city_name ?? '-' }}</td>
+                                        <td>{{ history.terminal_name ?? '-' }}</td>
+                                        <td>{{ history.booked_time ?? '-' }}</td>
+                                        <td>{{ history.added_by_name ?? '-' }}</td>
+                                    </tr>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr class="font-weight-bold">
+                                        <td colspan="5">Totals</td>
+                                        <td>{{ cardHistoryTotals.seatFare.toFixed(2) }}</td>
+                                        <td>{{ cardHistoryTotals.discount.toFixed(2) }}</td>
+                                        <td>{{ cardHistoryTotals.terminalDiscount.toFixed(2) }}</td>
+                                        <td>{{ cardHistoryTotals.scheduleDiscount.toFixed(2) }}</td>
+                                        <td>{{ cardHistoryTotals.totalDiscount.toFixed(2) }}</td>
+                                        <td colspan="6"></td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary"
+                                    :disabled="historyLoading || !cardHistoryCustomerId"
+                                    @click="printCardHistory()">
+                                Print PDF
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <form :action="$store.state.api_url + 'api/web/v1/print/pdf/loyalty-card/history'"
+                  method="POST" ref="refCardHistoryPdf" target="_blank">
+                <input type="hidden" name="token" :value="$store.state.token">
+                <input type="hidden" name="customer_id" :value="cardHistoryCustomerId">
+            </form>
             <!--            <Delete :deleteForm="deleteFormID"-->
             <!--                    confirmationMessage='Are You Sure You want To Delete This Surcharge ???'-->
             <!--            />-->
@@ -351,6 +453,10 @@ export default {
             },
             loading: false,
             loadingTable: false,
+            historyLoading: false,
+            cardHistory: [],
+            cardHistoryCustomerName: "",
+            cardHistoryCustomerId: "",
             cardsAssign: [],
             categories: [],
             permissions: [],
@@ -480,6 +586,57 @@ export default {
                 console.log(res);
             }
             this.loadingTable = false;
+        },
+        async showCardHistory(card) {
+            this.destroyCardHistoryTable();
+            this.cardHistory = [];
+            this.cardHistoryCustomerName = card.name || card.customer?.name || "";
+            this.cardHistoryCustomerId = card.customer_id || card.customer?.id || "";
+            this.historyLoading = true;
+            $("#cardHistoryModal").modal("show");
+
+            const customerId = this.cardHistoryCustomerId;
+            if (!customerId) {
+                this.historyLoading = false;
+                return;
+            }
+
+            const res = await this.callApi("get", `loyalty-card/customer/${customerId}/card-history`);
+            if (res.status === 200) {
+                this.cardHistory = res.data.history || [];
+            } else {
+                console.log(res);
+            }
+            this.historyLoading = false;
+            this.initCardHistoryTable();
+        },
+        destroyCardHistoryTable() {
+            if ($.fn.DataTable && $.fn.DataTable.isDataTable("#loyaltyCardHistoryTable")) {
+                $("#loyaltyCardHistoryTable").DataTable().destroy();
+            }
+        },
+        initCardHistoryTable() {
+            this.$nextTick(() => {
+                if (!$.fn.DataTable || this.cardHistory.length === 0) {
+                    return;
+                }
+
+                this.destroyCardHistoryTable();
+                $("#loyaltyCardHistoryTable").DataTable({
+                    order: [],
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    info: true,
+                    lengthChange: true,
+                    pageLength: 10,
+                    scrollX: true,
+                    responsive: false,
+                });
+            });
+        },
+        printCardHistory() {
+            this.$refs.refCardHistoryPdf.submit();
         },
         resetFilters() {
             this.filterAssign = {
@@ -738,7 +895,24 @@ export default {
         },
     },
     computed: {
-        ...mapGetters(['getDeletingObj'])
+        ...mapGetters(['getDeletingObj']),
+        cardHistoryTotals() {
+            return this.cardHistory.reduce((totals, history) => {
+                totals.seatFare += Number(history.seat_fare) || 0;
+                totals.discount += Number(history.discount) || 0;
+                totals.terminalDiscount += Number(history.terminal_discount) || 0;
+                totals.scheduleDiscount += Number(history.schedule_discount) || 0;
+                totals.totalDiscount += Number(history.total_discount) || 0;
+
+                return totals;
+            }, {
+                seatFare: 0,
+                discount: 0,
+                terminalDiscount: 0,
+                scheduleDiscount: 0,
+                totalDiscount: 0,
+            });
+        },
     },
     watch: {
         getDeletingObj(obj) {

@@ -1782,31 +1782,41 @@
         <!-- Close Schedule -->
         <Add heading="Close Schedule" :errors="this.validationErrors" :success="success" :formID="formAddID">
             <div class="row">
-                <div class=" form-group col-md-6">
+                <div class=" form-group col-md-4">
+                    <label for="city_id">Schedule <span class="text-danger ml-1">*</span></label>
+                    <input type="text" class="form-control" placeholder="N/A" readonly
+                        v-model="dataForClose.schedule_detail" />
+                </div>
+
+                <div class=" form-group col-md-4">
+                    <label for="city_id">Route</label>
+                    <input type="text" class="form-control" placeholder="N/A" readonly
+                        v-model="dataForClose.route_name" />
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="name">Date <span class="text-danger ml-1">*</span></label>
+                    <input type="date" class="form-control" placeholder="Enter Bus Name" readonly
+                        v-model="dataForClose.date" />
+                </div>
+    <div class=" form-group col-md-3">
                     <label for="city_id">Bus <span class="text-danger ml-1">*</span></label>
-                    <select class="form-control" v-model="dataForClose.bus">
+                    <select class="form-control rounded-0" id="assignBus" v-model="dataForClose.bus">
                         <option value="">Select Bus Class</option>
                         <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
                             {{ bus.bus_number }}
                         </option>
                     </select>
                 </div>
-                <div class=" form-group col-md-6">
-                    <label for="city_id">Route</label>
-                    <input type="text" class="form-control" placeholder="N/A" readonly
-                        v-model="dataForClose.route_name" />
+                  <div class="form-group col-md-3">
+                    <label for="assignTerminal">Terminal</label>
+                    <select class="form-control rounded-0" id="assignTerminal" v-model="dataForClose.terminal_id">
+                        <option value="">Select Terminal</option>
+                        <option v-for="(terminal, i) in closingTerminals" :key="i" :value="terminal.id">
+                            {{ terminal.name }}
+                        </option>
+                    </select>
                 </div>
-                <div class="form-group col-md-6">
-                    <label for="name">Date <span class="text-danger ml-1">*</span></label>
-                    <input type="date" class="form-control" placeholder="Enter Bus Name" readonly
-                        v-model="dataForClose.date" />
-                </div>
-                <div class=" form-group col-md-6">
-                    <label for="city_id">Schedule <span class="text-danger ml-1">*</span></label>
-                    <input type="text" class="form-control" placeholder="N/A" readonly
-                        v-model="dataForClose.schedule_detail" />
-                </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-3">
                     <label for="name">Bus Driver <span class="text-danger ml-1">*</span></label>
                     <select class="form-control rounded-0" id="assignDriver" v-model="dataForClose.drivers" multiple>
                         <option v-for="(driver, i) in drivers" :key="i" :value="driver.id">
@@ -1814,7 +1824,7 @@
                         </option>
                     </select>
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-3">
                     <label for="name">Bus Host <span class="text-danger ml-1">*</span></label>
                     <select class="form-control rounded-0" id="assignHost" v-model="dataForClose.hosts" multiple>
                         <option v-for="(host, i) in hosts" :key="i" :value="host.user_id">
@@ -1822,6 +1832,7 @@
                         </option>
                     </select>
                 </div>
+
                 <div class="form-group col-md-12">
                     <label for="location">Description</label>
                     <textarea class="form-control" placeholder="Enter Description" id="location"
@@ -1942,6 +1953,7 @@ export default {
             permissions: [],
             drivers: [],
             hosts: [],
+            closingTerminals: [],
             assignBus: 0,
             auth_terminal: [],
             shiftingFormId: "shifting-modal",
@@ -1971,6 +1983,7 @@ export default {
                 schedule_detail: '',
                 drivers: [],
                 hosts: [],
+                terminal_id: '',
                 description: '',
                 ticket_closing_id: '',
                 alreadyAssigned: '',
@@ -2105,6 +2118,12 @@ export default {
                 discountOtp: "",
                 discount_otp_valid: false,
                 discountOtpCnic: "",
+                usagePoints: false,
+                usageDiscount: false,
+                points_usage: 0,
+                discount_usage: 0,
+                pointsCardId: "",
+                discountCardId: "",
                 transaction_id: "",
             },
             advanceCash: {
@@ -2179,6 +2198,16 @@ export default {
         assignHost.on('change', function () {
             const selectedValues = $(this).val();
             self.dataForClose.hosts = selectedValues;
+        });
+        // assignTerminal
+        const assignTerminal = $('#assignTerminal');
+        assignTerminal.on('change', function () {
+            self.dataForClose.terminal_id = $(this).val();
+        });
+        // assignBus
+        const assignBus = $('#assignBus');
+        assignBus.on('change', function () {
+            self.dataForClose.bus = $(this).val();
         });
 
         setTimeout(() => {
@@ -2658,6 +2687,7 @@ export default {
                 this.buses = resData.data.buses;
                 this.drivers = resData.data.drivers;
                 this.hosts = resData.data.hosts;
+                this.closingTerminals = resData.data.terminals;
                 this.BusNo = resData.data.infoData.bus_no;
                 this.dataForClose.date = resData.data.infoData.schedule_date;
                 this.dataForClose.ticket_closing_id = resData.data.infoData.ticket_closing_id;
@@ -2669,12 +2699,23 @@ export default {
                 this.dataForClose.bus = resData.data.infoData.bus;
                 this.dataForClose.drivers = resData.data.infoData.drivers;
                 this.dataForClose.hosts = resData.data.infoData.hosts;
+                this.dataForClose.terminal_id = resData.data.infoData.terminal_id;
                 this.dataForClose.description = resData.data.infoData.description;
                 this.checkCloseData = resData.data.infoData.bus == "" ? false : true;
                 $(`#${this.formAddID}`).modal('show');
                 setTimeout(() => {
+                    $("#assignBus").select2({
+                        dropdownParent: $(`#${this.formAddID}`),
+                        minimumResultsForSearch: 0,
+                        width: "100%",
+                    });
                     $("#assignDriver").select2();
                     $("#assignHost").select2();
+                    $("#assignTerminal").select2({
+                        dropdownParent: $(`#${this.formAddID}`),
+                        minimumResultsForSearch: 0,
+                        width: "100%",
+                    });
                 }, 200);
             }
         },
@@ -2836,6 +2877,7 @@ export default {
                 this.dataForClose.schedule = "";
                 this.dataForClose.drivers = [];
                 this.dataForClose.hosts = [];
+                this.dataForClose.terminal_id = "";
                 this.dataForClose.description = "";
                 this.closingData();
                 setTimeout(() => this.closeModal(), 1500);
@@ -2919,6 +2961,7 @@ export default {
                 this.dataForClose.schedule = "";
                 this.dataForClose.drivers = [];
                 this.dataForClose.hosts = [];
+                this.dataForClose.terminal_id = "";
                 this.dataForClose.description = "";
                 this.closingData();
                 setTimeout(() => this.closeModal(), 1500);
@@ -4117,7 +4160,13 @@ export default {
                 });
             }
             this.addForm.pointsCardId = this.pointsCardId;
-            this.addForm.usagePoints = this.checkedUsagePoints;
+            this.addForm.discountCardId = this.discountCardId;
+            const usesDiscount = this.selectedOption === "discount" || this.discountUsage === true || this.addForm.discount_otp_valid === true;
+            const usesPoints = !usesDiscount && (this.selectedOption === "points" || this.checkedUsagePoints === true);
+            this.addForm.usagePoints = usesPoints;
+            this.addForm.usageDiscount = usesDiscount;
+            this.addForm.points_usage = usesPoints ? 1 : 0;
+            this.addForm.discount_usage = usesDiscount ? 1 : 0;
 
 
 
@@ -4137,6 +4186,22 @@ export default {
                     timer: 2000
                 });
             }
+            if (this.addForm.usageDiscount == true && this.addForm.discount_otp_valid == false) {
+                return swal({
+                    title: "OOPS!",
+                    text: "Please verify otp to use discount card otherwise uncheck the box",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (this.addForm.usageDiscount == true && this.addForm.discount_otp_valid == true && this.addForm.discountOtpCnic != this.addForm.customerCNIC) {
+                return swal({
+                    title: "OOPS!",
+                    text: "Cnic changed please verify discount otp",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
             if (this.bookingLoading) {
                 return swal({
                     title: "OOPS!",
@@ -4146,7 +4211,9 @@ export default {
                 });
             }
             this.bookingLoading = true;
-            const resTicket = await this.callApi("post", "booking/store", this.addForm);
+            const payload = { ...this.addForm };
+            console.log('booking payload discount debug', payload);
+            const resTicket = await this.callApi("post", "booking/store", payload);
             if (resTicket.status == 200) {
                 iziToast.success({
                     title: 'Success!',
@@ -4173,6 +4240,9 @@ export default {
                 this.hideCheckBox = false;
                 this.haveLabel = false;
                 this.pointsUsage = false;
+                this.discountUsage = false;
+                this.checkedUsagePoints = false;
+                this.selectedOption = null;
                 this.ticketsIds = resTicket.data.ids;
                 this.addForm.date = date;
                 this.addForm.terminalId = resTicket.data.authTerminalId;

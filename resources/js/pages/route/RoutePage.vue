@@ -134,6 +134,17 @@
                         <label for="name">Online Seats</label>
                         <input type="number" class="form-control" v-model="routeSeat"/>
                     </div>
+                    <div class="form-group col-md-12">
+                        <label for="onlineTerminals">Online Terminals</label>
+                        <button class="btn btn-success btn-sm m-1" @click="selectAllOnlineTerminals">Select All</button>
+                        <button class="btn btn-danger btn-sm" @click="deselectAllOnlineTerminals">Deselect All</button>
+                        <select class="form-control" id="onlineTerminals" multiple v-model="addTerminalsOnClick">
+                            <option v-if="terminals.length === 0" disabled>No Online Terminal Available</option>
+                            <option v-for="terminal in terminals" :value="terminal.id" :key="terminal.id">
+                                {{ terminal.name }}
+                            </option>
+                        </select>
+                    </div>
                     <div class="col-md-12 d-flex align-items-center">
                         <div class="col-md-6">
                             <h5>Select Cities</h5>
@@ -236,7 +247,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="modal fade" id="terminalVisibility" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                  aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
@@ -256,11 +267,11 @@
                                 <div class="form-group col-md-3">
                                     <label for="name">Destination City</label>
                                 </div>
-                                
+
                                 <div class="form-group col-md-2">
                                     <label for="name" class="d-block">Minutes for advance booking</label>
                                 </div>
-                                
+
                                 <div class="form-group col-md-2">
                                     <label for="name" class="d-block">Hide Subroute</label>
                                 </div>
@@ -280,7 +291,7 @@
                                         <option :value="subroute.destination_id" selected>{{subroute.destination_name}}</option>
                                     </select>
                                 </div>
-                                
+
                                 <div class="form-group col-md-2">
                                     <input type="number" class="form-control" min="0" v-model="subroutes[i].booking_minutes"/>
                                 </div>
@@ -317,7 +328,7 @@
                         <label for="name">Route End Point Name <span class="text-danger ml-1">*</span></label>
                         <input type="text" class="form-control" v-model="dataEdit.routeEndName"/>
                     </div>
-                    
+
                     <div class="form-group col-md-3">
                         <label for="name">Via</label>
                         <input type="text" class="form-control" v-model="dataEdit.routeVia"/>
@@ -326,7 +337,18 @@
                         <label for="name">Online Seats</label>
                         <input type="number" class="form-control" v-model="dataEdit.routeSeat"/>
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
+                        <label for="editOnlineTerminals">Online Terminals</label>
+                        <button class="btn btn-success btn-sm m-1" @click="selectAllEditOnlineTerminals">Select All</button>
+                        <button class="btn btn-danger btn-sm" @click="deselectAllEditOnlineTerminals">Deselect All</button>
+                        <select class="form-control" id="editOnlineTerminals" multiple v-model="dataEdit.terminals">
+                            <option v-if="terminals.length === 0" disabled>No Online Terminal Available</option>
+                            <option v-for="terminal in terminals" :value="terminal.id" :key="terminal.id">
+                                {{ terminal.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-5">
                         <label for="available_seats">Online Allowed Seats</label>
                         <vue-mask
                             class="form-control"
@@ -378,7 +400,7 @@
                     </button>
                 </template>
             </Edit>
-            
+
             <!--Daily Summery Report Form-->
             <form :action="$store.state.api_url + 'api/web/v1/fare-table/fare/print'" method="POST"
                   ref="farePrint"
@@ -464,7 +486,46 @@ export default {
         this.permissions = this.$store.state.permissions;
 
     },
+    mounted() {
+        this.initializeOnlineTerminalSelects();
+    },
     methods: {
+        initializeOnlineTerminalSelects() {
+            this.$nextTick(() => {
+                const self = this;
+                const onlineTerminals = $('#onlineTerminals');
+                const editOnlineTerminals = $('#editOnlineTerminals');
+
+                onlineTerminals.select2({ closeOnSelect: false });
+                editOnlineTerminals.select2({ closeOnSelect: false });
+
+                onlineTerminals.off('change.routeOnlineTerminals').on('change.routeOnlineTerminals', function () {
+                    self.addTerminalsOnClick = $(this).val() || [];
+                });
+                editOnlineTerminals.off('change.routeOnlineTerminals').on('change.routeOnlineTerminals', function () {
+                    self.dataEdit.terminals = $(this).val() || [];
+                });
+
+                onlineTerminals.val(this.addTerminalsOnClick).trigger('change.select2');
+                editOnlineTerminals.val(this.dataEdit.terminals || []).trigger('change.select2');
+            });
+        },
+        selectAllOnlineTerminals() {
+            this.addTerminalsOnClick = this.terminals.map(terminal => terminal.id);
+            $('#onlineTerminals').val(this.addTerminalsOnClick).trigger('change');
+        },
+        deselectAllOnlineTerminals() {
+            this.addTerminalsOnClick = [];
+            $('#onlineTerminals').val([]).trigger('change');
+        },
+        selectAllEditOnlineTerminals() {
+            this.dataEdit.terminals = this.terminals.map(terminal => terminal.id);
+            $('#editOnlineTerminals').val(this.dataEdit.terminals).trigger('change');
+        },
+        deselectAllEditOnlineTerminals() {
+            this.dataEdit.terminals = [];
+            $('#editOnlineTerminals').val([]).trigger('change');
+        },
         closeModal(){
             $(".modal").click();
         },
@@ -473,6 +534,8 @@ export default {
             this.reverseRoute = 1;
             this.loop = 1;
             this.addCities = [0];
+            this.addTerminalsOnClick = [];
+            $('#onlineTerminals').val([]).trigger('change.select2');
             $("select#selectCities").prop('selectedIndex', 0);
         },
         fareClassValue(data, className) {
@@ -491,7 +554,7 @@ export default {
                 id: route.id
             });
             if (routeData.status === 200) {
-                
+
                 this.dataEdit = {
                     id: routeData.data.route.id,
                     routeStartName: routeData.data.route.name.split('-')[0],
@@ -500,8 +563,12 @@ export default {
                     routeSeat: routeData.data.route.online_seats,
                     commissionRoute: routeData.data.route.commission_route == 1 ? true : false,
                     cityIds: routeData.data.cityIds,
-                    online_seat_choices: routeData.data.route.online_seat_choices
+                    online_seat_choices: routeData.data.route.online_seat_choices,
+                    terminals: routeData.data.terminalIds
                 }
+                this.$nextTick(() => {
+                    $('#editOnlineTerminals').val(this.dataEdit.terminals).trigger('change.select2');
+                });
             }
         },
         async editVisibility(id) {
@@ -514,9 +581,9 @@ export default {
                 const seatData = routeVisibilities.data.limitedSeats;
                 for (let i = 0; i < data.length; i++) {
                     this.subroutes.push(
-                        { 
-                            subroute_id:data[i].id , 
-                            departure_name:data[i].departure.name , 
+                        {
+                            subroute_id:data[i].id ,
+                            departure_name:data[i].departure.name ,
                             destination_name:data[i].destination.name,
                             booking_minutes:data[i].booking_minutes??null,
                             visibility:data[i].online_visibilty==0 ? false : true,
@@ -723,7 +790,7 @@ export default {
                     timer: 2000
                 });
             }
-            
+
             this.editLoading = true;
             const res = await this.callApi("post", "routes/update", this.dataEdit);
             if (res.status == 200) {
@@ -795,15 +862,15 @@ export default {
         // },
         updateRow(event, index) {
             this.addCities[index] = parseInt(event.target.value);
-        },  
+        },
         updateEditRow(event, index) {
             this.dataEdit.cityIds[index] = parseInt(event.target.value);
-        },  
+        },
 
         addEditRow(index) {
             this.dataEdit.cityIds.splice(index+1, 0, 0);
         },
-        
+
         removeEditRow(index) {
             this.dataEdit.cityIds.splice(index, 1);
         },
@@ -813,6 +880,8 @@ export default {
             if (cityRes.status === 200) {
                 this.cities = cityRes.data.cities;
                 this.routes = cityRes.data.routes;
+                this.terminals = cityRes.data.terminals;
+                this.initializeOnlineTerminalSelects();
             }
 
             setTimeout(() => {

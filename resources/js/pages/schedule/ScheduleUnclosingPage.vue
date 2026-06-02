@@ -17,23 +17,13 @@
                                                 <div class="row px-2 mb-4 align-items-end">
                                                     <div class="col-md-3">
                                                         <label for="terminalFilter">Select Bus</label>
-                                                        <select id="terminalFilter" class="form-control"
-                                                            v-model="filterData.bus_number">
-                                                            <option value="">Select Bus</option>
-                                                            <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
-                                                                {{ bus.bus_number }}
-                                                            </option>
-                                                        </select>
+                                                        <select2 v-model="filterData.bus_number" :options="busOptions"
+                                                            :settings="{ width: '100%', placeholder: 'Select Bus', allowClear: true }" />
                                                     </div>
                                                     <div class="col-md-3">
-                                                        <label for="terminalFilter">Select Route</label>
-                                                        <select id="terminalFilter" class="form-control"
-                                                           v-model="filterData.dropdownRoute">
-                                                            <option value="" selected>Select Route</option>
-                                                            <option v-for="(singleRoute, i) in dropdownRoute" :key="i" :value="singleRoute.id">
-                                                                {{ singleRoute.name }}
-                                                            </option>
-                                                        </select>
+                                                        <label>Select Route</label>
+                                                        <select2 v-model="filterData.dropdownRoute" :options="routeOptions"
+                                                            :settings="{ width: '100%', placeholder: 'Select Route', allowClear: true }" />
                                                     </div>
                                                     <!-- <div class="col-md-3">
                                                         <label>Route</label>
@@ -52,7 +42,7 @@
                                                             v-model="filterData.to_date">
                                                     </div>
 
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-12 mt-3">
                                                         <div class="row">
                                                             <div class="col-6 pr-1">
                                                                 <button type="submit" class="btn btn-primary w-100">
@@ -434,7 +424,8 @@ export default {
             this.filterData = {
                 bus_number: "",
                 from_date: "",
-                to_date: ""
+                to_date: "",
+                dropdownRoute: "",
             };
             this.fetchData();
         },
@@ -532,6 +523,18 @@ export default {
     },
     computed: {
         ...mapGetters(["getDeletingObj"]),
+        busOptions() {
+            return this.buses.map(bus => ({
+                id: bus.id,
+                text: bus.bus_number,
+            }));
+        },
+        routeOptions() {
+            return this.dropdownRoute.map(route => ({
+                id: route.id,
+                text: route.name,
+            }));
+        },
     },
     watch: {
         getDeletingObj(obj) {

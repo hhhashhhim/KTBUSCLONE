@@ -151,7 +151,7 @@
                                                                v-model="menus.allow" :id="menus.name"/>
                                                         <label class="text-capitalize text-bold ml-1" :for="menus.name"
                                                                style="color: black"> {{
-                                                                menus.name
+                                                                displayPermissionName(menus.name)
                                                             }}</label>
                                                     </div>
                                                     <div class="col-md-10" v-if="menus.allow">
@@ -267,7 +267,7 @@
                                                                v-model="menus.allow" :id="menus.name"/>
                                                         <label class="text-capitalize text-bold ml-1" :for="menus.name"
                                                                style="color: black"> {{
-                                                                menus.name
+                                                                displayPermissionName(menus.name)
                                                             }}</label>
                                                     </div>
                                                     <div class="col-md-10" v-if="menus.allow">
@@ -451,12 +451,19 @@ export default {
                         {
                             name: "confirm-cancel",
                             allow: true,
+                            buttons: [
+                                {name: "confirm-cancel-terminal-filter", allow: true},
+                                {name: "confirm-cancel-user-filter", allow: true},
+                                {name: "confirm-cancel-route-filter", allow: true},
+                            ],
                         },
                         {
                             name: "sales",
                             allow: true,
                             buttons: [
                                 {name: "terminal-filter", allow: true},
+                                {name: "user-filter", allow: true},
+                                {name: "route-filter", allow: true},
                             ],
                         },
                         {
@@ -487,6 +494,11 @@ export default {
                         {
                             name: "over-issue",
                             allow: true,
+                            buttons: [
+                                {name: "over-issue-terminal-filter", allow: true},
+                                {name: "over-issue-user-filter", allow: true},
+                                {name: "over-issue-route-filter", allow: true},
+                            ],
                         },
                         {
                             name: "expenses",
@@ -985,6 +997,9 @@ export default {
     },
 
     methods: {
+        displayPermissionName(name) {
+            return name === 'sales' ? 'Advance-Sale' : name;
+        },
         close() {
             $(`#${this.formID}`).click();
         },

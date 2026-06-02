@@ -44,7 +44,7 @@
                                                                 v-model="filterCancel.invoice_id"
                                                                 @keyup="overissueFilter()" placeholder="Invoice ID">
                                                         </div>
-                                                        <div class="col-md-4">
+                                                        <div class="col-md-4" v-if="canUseReportFilter('over-issue-route-filter')">
                                                             <div class="form-group">
                                                                 <label for="routeFilter">Route</label>
                                                                 <select id="routeFilter" class="form-control"
@@ -59,7 +59,7 @@
                                                             </div>
                                                         </div>
                                                         <!-- Terminal -->
-                                                        <div class="col-md-4 mb-3">
+                                                        <div class="col-md-4 mb-3" v-if="canUseReportFilter('over-issue-terminal-filter')">
                                                             <label class="filter-label">Terminal</label>
                                                             <select class="form-control filter-input"
                                                                 v-model="filterCancel.terminal"
@@ -68,6 +68,18 @@
                                                                 <option v-for="(terminal, i) in terminals" :key="i"
                                                                     :value="terminal.id">
                                                                     {{ terminal.name }}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-4 mb-3" v-if="canUseReportFilter('over-issue-user-filter')">
+                                                            <label class="filter-label">User</label>
+                                                            <select class="form-control filter-input"
+                                                                v-model="filterCancel.user"
+                                                                @change="overissueFilter()">
+                                                                <option value="0">All</option>
+                                                                <option v-for="(user, i) in users" :key="i"
+                                                                    :value="user.id">
+                                                                    {{ user.name }}
                                                                 </option>
                                                             </select>
                                                         </div>
@@ -141,6 +153,7 @@
 
                                                 <input type="hidden" name="token" :value="$store.state.token">
                                                 <input type="hidden" name="terminal" :value="filterCancel.terminal">
+                                                <input type="hidden" name="user" :value="filterCancel.user">
                                                 <input type="hidden" name="route" :value="filterCancel.route">
                                                 <input type="hidden" name="invoice_id" :value="filterCancel.invoice_id">
                                                 <input type="hidden" name="transaction_id"
@@ -270,6 +283,7 @@ export default {
         return {
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             terminals: [],
+            users: [],
             filters: [],
             routes: [],
             refundFilters: [],
@@ -279,6 +293,7 @@ export default {
             tableLoading: true,
             filterCancel: {
                 terminal: 0,
+                user: 0,
                 route: 0,
                 invoice_id: '',
                 transaction_id: '',
@@ -349,8 +364,12 @@ export default {
         },
         async fetchFilters() {
             const resTerminals = await this.callApi("post", 'over-issue/getTerminals');
+            const resUsers = await this.callApi("post", 'over-issue/getUsers');
             if (resTerminals.status == 200) {
                 this.terminals = resTerminals.data;
+            }
+            if (resUsers.status == 200) {
+                this.users = resUsers.data;
             }
 
         },

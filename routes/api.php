@@ -13,6 +13,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Api\BookingApiController;
 use App\Http\Controllers\Api\TicketingApiController;
 use App\Http\Middleware\CustomMiddleware;
+use App\Http\Controllers\LoyaltyCardHistoryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,4 +34,11 @@ use Illuminate\Support\Facades\Route;
 //
 
 // Route::post('register', [RegisterController::class, 'register']);
+
+Route::prefix('web/v1')->group(function () {
+    Route::get(
+        'loyalty-card/customer/{customerId}/card-history',
+        [LoyaltyCardHistoryController::class, 'customerCardHistory']
+    );
+});
 
