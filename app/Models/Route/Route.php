@@ -3,6 +3,7 @@
 namespace App\Models\Route;
 
 use App\Models\Company;
+use App\Models\Terminal;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,12 @@ class Route extends Model
     }
     public function terminals(){
         return $this->hasMany(RouteTerminal::class, 'route_id', 'id');
+    }
+    public function onlineTerminals(){
+        return $this->belongsToMany(Terminal::class, 'route_online_terminals', 'route_id', 'terminal_id')->withTimestamps();
+    }
+    public function onlineTerminalAssignments(){
+        return $this->hasMany(RouteOnlineTerminal::class, 'route_id', 'id');
     }
     public function company(){
         return $this->hasOne( Company::class,'id','company_id' );

@@ -22,6 +22,7 @@ use App\Models\User;
 use App\Models\FareClass;
 use App\Models\ActivityLog;
 use App\Models\TerminalDiscount;
+use App\Models\Route\RouteOnlineTerminal;
 use App\Models\Route\RouteFare;
 use App\Models\Ticket;
 use App\Models\Invoice;
@@ -378,16 +379,32 @@ class BookingApiController extends Controller
             //     're' => $request->all(),
             // ];
             // }
-            // Getting Already Booked Tickets
-            $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
-                ->where('company_id', $companyId)->where('schedule_id', $request->schedule_id)
-                ->whereDate('schedule_date', $scheduleDetail->schedule_date)->get();
-            $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
             $schedule = Schedule::where('id', $request->schedule_id)
                 ->where('company_id', $companyId)
                 ->select('id', 'route_id', 'bus_class_id', 'time', 'discount_id', 'surcharge_id')
                 ->with('route:id,name,online_seat_choices,online_seats', 'route.fares:id,route_id,departure_city_id,destination_city_id')
                 ->first();
+
+            // Restrict route preview only when route-specific online terminal mappings exist.
+            $currentTerminalId = $terminalId;
+            $terminalAllowedForRoute = true;
+            $hasOnlineTerminalMappings = RouteOnlineTerminal::where([
+                'route_id' => $schedule->route_id,
+                'company_id' => $companyId,
+            ])->exists();
+            if ($hasOnlineTerminalMappings) {
+                $terminalAllowedForRoute = RouteOnlineTerminal::where([
+                    'route_id' => $schedule->route_id,
+                    'terminal_id' => $currentTerminalId,
+                    'company_id' => $companyId,
+                ])->exists();
+            }
+
+            // Getting Already Booked Tickets
+            $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
+                ->where('company_id', $companyId)->where('schedule_id', $request->schedule_id)
+                ->whereDate('schedule_date', $scheduleDetail->schedule_date)->get();
+            $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
             $scheduleDiscount = Discount::where('id', $schedule->discount_id)
                 ->where('is_active', 1)
                 ->whereHas("discount_terminals", function ($q) use ($terminalId) {
@@ -474,6 +491,11 @@ class BookingApiController extends Controller
 
                         // check midway quota route base seats
                         if ($checkLimitedSeat && ($quota < 1)) {
+                            $column['terminal_allow'] = false;
+                        }
+
+                        // If route online terminal mappings exist, unmapped terminals can preview seats but cannot book them.
+                        if (!$terminalAllowedForRoute) {
                             $column['terminal_allow'] = false;
                         }
 

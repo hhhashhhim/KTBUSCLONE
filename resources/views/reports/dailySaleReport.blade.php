@@ -49,6 +49,11 @@
             font-weight: 100 !important;
         }
     </style>
+    <script type="text/javascript">
+        window.addEventListener('load', function () {
+            window.print();
+        });
+    </script>
 
     <title> Daily Summary Report</title>
 </head>

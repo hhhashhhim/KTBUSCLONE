@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class ScheduleClosingController extends Controller
 {
@@ -1642,6 +1643,18 @@ class ScheduleClosingController extends Controller
         if (!checkPermissionButtons("assign-bus")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+        $request->validate([
+            'terminal_id' => [
+                'nullable',
+                Rule::exists('terminals', 'id')->where(function ($query) {
+                    return $query->where([
+                        'company_id' => Auth::user()->company_id,
+                        'is_online_terminal' => 0,
+                        'hide' => 0,
+                    ])->whereNull('deleted_at');
+                }),
+            ],
+        ]);
         try {
             DB::beginTransaction();
 
@@ -1695,6 +1708,7 @@ class ScheduleClosingController extends Controller
                 "commission_route" => $route->commission_route,
                 "schedule_return" => 0,
                 "description" => $request->description,
+                "terminal_id" => $request->terminal_id ?: null,
                 'company_id' => Auth::user()->company_id,
                 'added_by' => Auth::user()->id,
             ]);
@@ -1750,6 +1764,18 @@ class ScheduleClosingController extends Controller
         if (!checkPermissionButtons("edit-close-booking")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+        $request->validate([
+            'terminal_id' => [
+                'nullable',
+                Rule::exists('terminals', 'id')->where(function ($query) {
+                    return $query->where([
+                        'company_id' => Auth::user()->company_id,
+                        'is_online_terminal' => 0,
+                        'hide' => 0,
+                    ])->whereNull('deleted_at');
+                }),
+            ],
+        ]);
         try {
             DB::beginTransaction();
             // delete old members
@@ -1757,6 +1783,9 @@ class ScheduleClosingController extends Controller
             // for
             $closing = TicketClosing::find($request->closingId);
             $merge = TicketClosingMerge::find($closing->ticket_merge_id);
+            $closing->update([
+                "terminal_id" => $request->terminal_id ?: null,
+            ]);
             if ($merge->schedule_complete == 0) {
                 $closing->update([
                     "bus_id" => $request->bus

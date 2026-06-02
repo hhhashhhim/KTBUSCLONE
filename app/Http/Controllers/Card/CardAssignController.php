@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\LoyaltyCard\CardAssign;
 use App\Models\LoyaltyCard\CardCategory;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
@@ -197,5 +198,109 @@ class CardAssignController extends Controller
         if ($request->status == 'addFormContact') {
             return Customer::where('company_id', Auth::user()->company_id)->where('contact', plainContactAndCnic($request['phoneNumber']))->first();
         }
+    }
+
+    public function discountHistory($customerId)
+    {
+        if(!checkForSubmenu("loyaltyCardAssign"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        return response()->json(['history' => $this->getCardHistory($customerId)]);
+    }
+
+    public function cardHistory($customerId)
+    {
+        return $this->discountHistory($customerId);
+    }
+
+    public function cardHistoryPdf(Request $request)
+    {
+        $request->validate([
+            'customer_id' => ['required'],
+        ]);
+
+        return view('reports.cardHistoryReport', [
+            'customer' => Customer::where('company_id', Auth::user()->company_id)
+                ->where('id', $request->customer_id)
+                ->first(),
+            'history' => $this->getCardHistory($request->customer_id),
+        ]);
+    }
+
+    private function getCardHistory($customerId)
+    {
+        return Ticket::with([
+            'customer:id,name,cnic,contact',
+            'route:id,name',
+            'departure_city:id,name',
+            'destination_city:id,name',
+            'terminal:id,name',
+            'addedBy:id,name',
+        ])
+            ->where('company_id', Auth::user()->company_id)
+            ->whereIn('customer_id', $this->matchingCustomerIds($customerId))
+            ->where('discount_type', 'card')
+            ->orderByDesc('id')
+            ->get()
+            ->map(function ($ticket) {
+                $discount = (float) ($ticket->discount ?? 0);
+                $terminalDiscount = (float) ($ticket->terminal_discount ?? 0);
+                $scheduleDiscount = (float) ($ticket->schedule_discount ?? 0);
+
+                return [
+                    'id' => $ticket->id,
+                    'customer_id' => $ticket->customer_id,
+                    'customer_name' => $ticket->customer?->name,
+                    'customer_cnic' => $ticket->customer?->cnic,
+                    'customer_contact' => $ticket->customer?->contact,
+                    'booking_no' => $ticket->booking_no,
+                    'invoice_id' => $ticket->invoice_id,
+                    'transaction_id' => $ticket->transaction_id,
+                    'schedule_date' => $ticket->schedule_date,
+                    'schedule_time' => $ticket->schedule_time,
+                    'seat_no' => $ticket->seat_no,
+                    'seat_fare' => $ticket->seat_fare,
+                    'discount' => $discount,
+                    'terminal_discount' => $terminalDiscount,
+                    'schedule_discount' => $scheduleDiscount,
+                    'total_discount' => $discount + $terminalDiscount + $scheduleDiscount,
+                    'route_name' => $ticket->route?->name,
+                    'departure_city_name' => $ticket->departure_city?->name,
+                    'destination_city_name' => $ticket->destination_city?->name,
+                    'terminal_name' => $ticket->terminal?->name ?? $ticket->terminal_name,
+                    'booked_time' => $ticket->booked_time,
+                    'added_by_name' => $ticket->addedBy?->name,
+                ];
+            });
+    }
+
+    private function matchingCustomerIds($customerId)
+    {
+        $customer = Customer::where('company_id', Auth::user()->company_id)
+            ->where('id', $customerId)
+            ->first();
+
+        if (!$customer) {
+            return collect([$customerId]);
+        }
+
+        $cnic = $customer->cnic;
+        $contact = $customer->contact;
+
+        return Customer::where('company_id', Auth::user()->company_id)
+            ->where(function ($query) use ($customerId, $cnic, $contact) {
+                $query->where('id', $customerId);
+
+                if (!empty($cnic) && $cnic != 0) {
+                    $query->orWhere('cnic', $cnic);
+                }
+
+                if (!empty($contact) && $contact != 0) {
+                    $query->orWhere('contact', $contact);
+                }
+            })
+            ->pluck('id');
     }
 }

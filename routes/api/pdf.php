@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Booking\BookingController;
+use App\Http\Controllers\Card\CardAssignController;
+use App\Http\Controllers\DiscountType\DiscountCardAssignController;
 use App\Http\Controllers\Expense\ExpenseController;
 use App\Http\Controllers\Account\Pdf\TransactionPdfController;
 use App\Http\Controllers\Report\ConfirmCancellationReportController;
@@ -18,6 +20,8 @@ Route::group(['middleware' => ['custom.sanctum.token.verify']], function () {
     Route::post('web/v1/print/pdf/passenger/list', [BookingController::class, 'passengerListPdf']);
     Route::post('web/v1/print/ticket/duplicate', [BookingController::class, 'duplicatePdf']);
     Route::post('web/v1/print/pdf/customer/ticket', [BookingController::class, 'ticketPdf']);
+    Route::post('web/v1/print/pdf/discount-card/history', [DiscountCardAssignController::class, 'discountHistoryPdf']);
+    Route::post('web/v1/print/pdf/loyalty-card/history', [CardAssignController::class, 'cardHistoryPdf']);
     Route::post('web/v1/print/pdf/customer/elt', [BookingController::class, 'eltPdf']);
     Route::post('web/v1/print/pdf/daily/summary/report', [ExpenseController::class, 'dailySummery']);
     Route::post('web/v1/print/pdf/confirm/cancellation/report', [ConfirmCancellationReportController::class, 'getPrintPdf']);

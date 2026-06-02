@@ -8,7 +8,9 @@ use App\Models\FareTable;
 use App\Models\Terminal\TerminalVisibility;
 use App\Models\ActivityLog;
 use App\Models\LimitedSeat;
+use App\Models\Terminal;
 use App\Models\Route\Route;
+use App\Models\Route\RouteOnlineTerminal;
 use App\Models\Schedule\Schedule;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Route\RouteFare;
@@ -16,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class RouteController extends Controller
 {
@@ -48,11 +51,20 @@ class RouteController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         try {
-            DB::beginTransaction();
             $request->validate([
                 'routeStart' => 'required',
                 'routeEnd' => 'required',
                 'cities' => 'required',
+                'terminals' => 'nullable|array',
+                'terminals.*' => [
+                    'distinct',
+                    Rule::exists('terminals', 'id')->where(function ($query) {
+                        $query->where('company_id', Auth::user()->company_id)
+                            ->where('is_online_terminal', 1)
+                            ->where('hide', 0)
+                            ->whereNull('deleted_at');
+                    }),
+                ],
             ], [
                 'route.required' => 'Route Name is Required !!!!'
             ]);
@@ -78,6 +90,7 @@ class RouteController extends Controller
                     }
                 }
             }
+            DB::beginTransaction();
             $route = Route::create([
                 'name' => $request['routeStart'] . '-' . $request['routeEnd'],
                 'via' => $request['routeVia'],
@@ -86,6 +99,7 @@ class RouteController extends Controller
                 'company_id' => Auth::user()->company_id,
                 'added_by' => auth()->user()->id
             ]);
+            $this->storeOnlineTerminals($route->id, $request->input('terminals', []));
             $used_cities = [];//key can't be same
             foreach ($request['cities'] as $index => $city) {
                 $used_cities[] = $city;
@@ -131,6 +145,7 @@ class RouteController extends Controller
                     'company_id' => Auth::user()->company_id,
                     'added_by' => auth()->user()->id
                 ]);
+                $this->storeOnlineTerminals($route->id, $request->input('terminals', []));
                 $used_cities = [];//key can't be same
                 foreach (array_reverse($request['cities']) as $index => $city) {
                     $used_cities[] = $city;
@@ -174,7 +189,9 @@ class RouteController extends Controller
             DB::commit();
             return ['message' => 'success'];
         } catch (\Exception $e) {
-            DB::rollBack();
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
             Log::error('Database transaction error: ' . $e->getMessage());
             return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
         }
@@ -186,7 +203,10 @@ class RouteController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $route = Route::find($request->id);
+        $route = Route::with('onlineTerminals')->where([
+            'id' => $request->id,
+            'company_id' => Auth::user()->company_id,
+        ])->firstOrFail();
 
         $lastFare = $route->fares->last();
         $allCityRoute = $route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
@@ -195,6 +215,7 @@ class RouteController extends Controller
         return [
             "route" => $route,
             "cityIds" => $allCityRoute,
+            "terminalIds" => $route->onlineTerminals->pluck('id')->toArray(),
         ];
     }
     public function update(Request $request)
@@ -207,18 +228,44 @@ class RouteController extends Controller
     set_time_limit(300);
 
     try {
-        DB::beginTransaction();
-
         $request->validate([
             'routeStartName' => 'required',
             'routeEndName' => 'required',
-            'id' => 'required',
-            'cityIds' => 'required|array'
+            'id' => [
+                'required',
+                Rule::exists('routes', 'id')->where(function ($query) {
+                    $query->where('company_id', Auth::user()->company_id)
+                        ->where('hide', 0)
+                        ->whereNull('deleted_at');
+                }),
+            ],
+            'cityIds' => 'required|array',
+            'terminals' => 'nullable|array',
+            'terminals.*' => [
+                'distinct',
+                Rule::exists('terminals', 'id')->where(function ($query) {
+                    $query->where('company_id', Auth::user()->company_id)
+                        ->where('is_online_terminal', 1)
+                        ->where('hide', 0)
+                        ->whereNull('deleted_at');
+                }),
+            ],
         ]);
 
         $companyId = Auth::user()->company_id;
         $userId = Auth::user()->id;
         $routeId = $request->id;
+        $existingRouteFares = RouteFare::where([
+            'route_id' => $routeId,
+            'company_id' => $companyId,
+        ])->orderBy('id')->get(['departure_city_id', 'destination_city_id']);
+        $currentCityIds = $existingRouteFares->pluck('departure_city_id')->unique()->values()->toArray();
+        if ($existingRouteFares->isNotEmpty()) {
+            $currentCityIds[] = $existingRouteFares->last()->destination_city_id;
+        }
+        $citiesChanged = array_map('intval', $currentCityIds) !== array_map('intval', $request->cityIds);
+
+        DB::beginTransaction();
 
         // 1. Update Main Route
         Route::where(['company_id' => $companyId, 'id' => $routeId])->update([
@@ -228,35 +275,41 @@ class RouteController extends Controller
             'commission_route' => $request['commissionRoute'],
             'online_seat_choices' => $request['online_seat_choices'],
         ]);
+        RouteOnlineTerminal::where([
+            'route_id' => $routeId,
+            'company_id' => $companyId,
+        ])->delete();
+        $this->storeOnlineTerminals($routeId, $request->input('terminals', []));
 
-        // 2. Clear Old Route Data
-        RouteFare::where("route_id", $routeId)->delete();
+        if ($citiesChanged) {
+            // 2. Clear Old Route Data
+            RouteFare::where("route_id", $routeId)->delete();
 
-        // Pre-fetch all possible fares for the cities provided to avoid queries in the loop
-        $allFares = FareTable::whereIn('from_city_id', $request->cityIds)
-            ->whereIn('to_city_id', $request->cityIds)
-            ->get()
-            ->groupBy(['from_city_id', 'to_city_id']);
+            // Pre-fetch all possible fares for the cities provided to avoid queries in the loop
+            $allFares = FareTable::whereIn('from_city_id', $request->cityIds)
+                ->whereIn('to_city_id', $request->cityIds)
+                ->get()
+                ->groupBy(['from_city_id', 'to_city_id']);
 
-        // Pre-fetch visibility settings to preserve them
-        $existingVis = TerminalVisibility::where("route_id", $routeId)
-            ->where("company_id", $companyId)
-            ->get()
-            ->keyBy(fn($item) => $item->departure_city_id . '-' . $item->destination_city_id);
+            // Pre-fetch visibility settings to preserve them
+            $existingVis = TerminalVisibility::where("route_id", $routeId)
+                ->where("company_id", $companyId)
+                ->get()
+                ->keyBy(fn($item) => $item->departure_city_id . '-' . $item->destination_city_id);
 
-        $routeFareData = [];
-        $visibilityData = [];
-        $used_cities = [];
+            $routeFareData = [];
+            $visibilityData = [];
+            $used_cities = [];
 
-        foreach ($request->cityIds as $city) {
-            $used_cities[] = $city;
-            foreach ($request->cityIds as $innerCity) {
-                if (in_array($innerCity, $used_cities)) continue;
+            foreach ($request->cityIds as $city) {
+                $used_cities[] = $city;
+                foreach ($request->cityIds as $innerCity) {
+                    if (in_array($innerCity, $used_cities)) continue;
 
-                // Map Fares from Memory
-                if (isset($allFares[$city][$innerCity])) {
-                    foreach ($allFares[$city][$innerCity] as $fare) {
-                        $routeFareData[] = [
+                    // Map Fares from Memory
+                    if (isset($allFares[$city][$innerCity])) {
+                        foreach ($allFares[$city][$innerCity] as $fare) {
+                            $routeFareData[] = [
                             'route_id' => $routeId,
                             'fare_id' => $fare->id,
                             'fare_class_id' => $fare->fare_class,
@@ -264,41 +317,41 @@ class RouteController extends Controller
                             'destination_city_id' => $innerCity,
                             'company_id' => $companyId,
                             'added_by' => $userId
-                        ];
+                            ];
+                        }
                     }
-                }
 
-                // Map Visibility from Memory
-                $visKey = "$city-$innerCity";
-                $visibilityData[] = [
+                    // Map Visibility from Memory
+                    $visKey = "$city-$innerCity";
+                    $visibilityData[] = [
                     'route_id' => $routeId,
                     'departure_city_id' => $city,
                     'destination_city_id' => $innerCity,
                     'online_visibilty' => $existingVis->has($visKey) ? $existingVis[$visKey]->online_visibilty : 0,
                     'company_id' => $companyId,
                     'added_by' => $userId
-                ];
+                    ];
+                }
             }
-        }
 
-        // Bulk Insert Route Fares and Visibility
-        if (!empty($routeFareData)) {
-            foreach (array_chunk($routeFareData, 500) as $chunk) RouteFare::insert($chunk);
-        }
+            // Bulk Insert Route Fares and Visibility
+            if (!empty($routeFareData)) {
+                foreach (array_chunk($routeFareData, 500) as $chunk) RouteFare::insert($chunk);
+            }
 
-        TerminalVisibility::where("route_id", $routeId)->delete();
-        if (!empty($visibilityData)) {
-            foreach (array_chunk($visibilityData, 500) as $chunk) TerminalVisibility::insert($chunk);
-        }
+            TerminalVisibility::where("route_id", $routeId)->delete();
+            if (!empty($visibilityData)) {
+                foreach (array_chunk($visibilityData, 500) as $chunk) TerminalVisibility::insert($chunk);
+            }
 
-        // 3. Update Schedules
-        $schedules = Schedule::where(["company_id" => $companyId, "route_id" => $routeId])->get();
-        $routeDetails = RouteFare::where('route_id', $routeId)->get()->groupBy('fare_class_id')->first();
+            // 3. Update Schedules
+            $schedules = Schedule::where(["company_id" => $companyId, "route_id" => $routeId])->get();
+            $routeDetails = RouteFare::where('route_id', $routeId)->get()->groupBy('fare_class_id')->first();
 
-        if ($schedules->isNotEmpty() && $routeDetails) {
-            $newScheduleDetails = [];
+            if ($schedules->isNotEmpty() && $routeDetails) {
+                $newScheduleDetails = [];
 
-            foreach ($schedules as $schedule) {
+                foreach ($schedules as $schedule) {
                 // Get unique dates that need updating
                 $existingDates = ScheduleDetail::where([
                         "company_id" => $companyId,
@@ -353,9 +406,10 @@ class RouteController extends Controller
                         }
                     }
                 }
+                }
+                // Final chunk insert
+                if (!empty($newScheduleDetails)) ScheduleDetail::insert($newScheduleDetails);
             }
-            // Final chunk insert
-            if (!empty($newScheduleDetails)) ScheduleDetail::insert($newScheduleDetails);
         }
 
         ActivityLog::create([
@@ -369,7 +423,9 @@ class RouteController extends Controller
         return ['message' => 'success'];
 
     } catch (\Exception $e) {
-        DB::rollBack();
+        if (DB::transactionLevel() > 0) {
+            DB::rollBack();
+        }
         Log::error('Route Update Error: ' . $e->getMessage());
         return response()->json(["errors" => ["Error" => [$e->getMessage()]]], 422);
     }
@@ -451,7 +507,12 @@ class RouteController extends Controller
         }
         return [
             'cities' => City::orderBy('id')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->select('name', 'id')->get(),
-            'routes' => Route::with('addedBy')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get()
+            'routes' => Route::with('addedBy')->where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(),
+            'terminals' => Terminal::orderBy('name')->where([
+                'company_id' => Auth::user()->company_id,
+                'is_online_terminal' => 1,
+                'hide' => 0,
+            ])->select('id', 'name')->get(),
         ];
     }
     public function details(Request $request){
@@ -479,5 +540,16 @@ class RouteController extends Controller
     public function getDays($start, $end)
     {
         return (strtotime(date("Y-m-d", strtotime($end))) - strtotime(date("Y-m-d", strtotime($start)))) / 86400;
+    }
+
+    private function storeOnlineTerminals($routeId, array $terminalIds)
+    {
+        foreach ($terminalIds as $terminalId) {
+            RouteOnlineTerminal::create([
+                'route_id' => $routeId,
+                'terminal_id' => $terminalId,
+                'company_id' => Auth::user()->company_id,
+            ]);
+        }
     }
 }

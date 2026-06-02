@@ -28,6 +28,7 @@ use App\Models\TerminalCommission;
 use App\Models\ActivityLog;
 use App\Models\Customer;
 use App\Models\DiscountType\DiscountAssign;
+use App\Models\DiscountType\DiscountType;
 use App\Models\FareClass;
 use App\Models\Terminal\TerminalVisibility;
 use App\Models\FareTable;
@@ -93,6 +94,7 @@ class BookingController extends Controller
     }
     public function store(Request $request)
     {
+        \Log::info('booking request discount debug', $request->all());
 
         if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
@@ -152,7 +154,7 @@ class BookingController extends Controller
 
                 $finalAmountDiscount = 0;
                 if ((isset($request->flag) && $request->flag == 1) || $request->type == 'booked') {
-                    if ($request->usagePoints == true && $request->otp_valid == true) {
+                    if (bookingUsesPoints($request) && $request->boolean('otp_valid')) {
                         //                  Get Customer's Loyalty Card
                         $cardAssign = CardAssign::where(['id' => $request->pointsCardId, 'company_id' => Auth::user()->company_id])->first();
                         $card = CardCategory::where(['id' => $cardAssign->card_category_id, 'company_id' => Auth::user()->company_id])->first();
@@ -218,19 +220,21 @@ class BookingController extends Controller
                 // -----------------------------
                 // Discount Card application (after OTP verification)
                 // -----------------------------
-                if (!empty($request->usageDiscount) && !empty($request->discount_otp_valid) && $request->discount_otp_valid == true) {
-                    // Find assigned card (you must pass discountCardId from frontend)
-                    $discountAssign = CardAssign::where([
-                        'id' => $request->discountCardId ?? 0,
-                        'company_id' => Auth::user()->company_id
-                    ])->first();
+                if (bookingUsesDiscount($request) && $request->boolean('discount_otp_valid')) {
+                    $discountAssign = DiscountAssign::where('company_id', Auth::user()->company_id)
+                        ->when($request->discountCardId, function ($query) use ($request) {
+                            $query->where('id', $request->discountCardId);
+                        }, function ($query) use ($request) {
+                            $query->where('cnic', plainContactAndCnic($request->customerCNIC));
+                        })
+                        ->first();
 
                     if (!$discountAssign) {
                         return response()->json(["errors" => ["Error" => ["Discount card not found"]]], 422);
                     }
 
-                    $discountCard = CardCategory::where([
-                        'id' => $discountAssign->card_category_id,
+                    $discountCard = DiscountType::where([
+                        'id' => $discountAssign->card_type_id,
                         'company_id' => Auth::user()->company_id
                     ])->first();
 
@@ -422,14 +426,14 @@ class BookingController extends Controller
                             'remarks'             => $request->remarks,
                             'gender'              => $request->gender,
                             'type'                => $request->type,
-                            'discount_type'       => $request->usagePoints ? 'card' : null,
+                            'discount_type'       => ticketDiscountType($request),
                             'booked_time'         => date("Y-m-d H:i:s"),
                             'added_by'            => Auth::user()->id,
                             'updated_by'          => Auth::user()->id,
-                            'discount'            => ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($request->usagePoints ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
+                            'discount'            => ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($finalAmountDiscount ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
                             'schedule_discount'   => $checkDiscount->schedule_discount,
                             'terminal_discount'   => $checkDiscount->terminal_discount,
-                            'points_usage'        => $request->pointsUseInput / count($request->selectedSeats),
+                            'points_usage'        => bookingUsesPoints($request) ? (($request->pointsUseInput ?? 0) / count($request->selectedSeats)) : 0,
                         ]);
                         if ($isPartial == 1) {
                             TicketIsPartial::create([
@@ -1500,14 +1504,21 @@ class BookingController extends Controller
         $infoData->bus_no = $checkAssign ? Bus::find($checkAssign->bus_id)->bus_number : 'N/A';
         $infoData->drivers = $checkAssign ? $checkAssign->members->where("type", 1)->pluck('user_id') : [];
         $infoData->hosts = $checkAssign ? $checkAssign->members->where("type", 2)->pluck('user_id') : [];
+        $infoData->terminal_id = $checkAssign ? $checkAssign->terminal_id : '';
         $buses = Bus::where('company_id', Auth::user()->company_id)->orderBy('id')->get();
         $hosts = Employee::where(['employee_type' => 2, 'company_id' => Auth::user()->company_id, "hide" => 0, "status" => "w"])->orderBy('id')->where("user_id", '!=', 0)->get(["user_id", "name", "cnic"]);
         $drivers = Employee::where(['employee_type' => 1, 'company_id' => Auth::user()->company_id, "hide" => 0, "status" => "w"])->orderBy('id')->get(["id", "user_id", "name", "cnic"]);
+        $terminals = Terminal::where([
+            'company_id' => Auth::user()->company_id,
+            'is_online_terminal' => 0,
+            'hide' => 0,
+        ])->orderBy('name')->get(['id', 'name']);
 
         $data = [
             "buses" => $buses,
             "hosts" => $hosts,
             "drivers" => $drivers,
+            "terminals" => $terminals,
             "infoData" => $infoData,
         ];
         return $data;

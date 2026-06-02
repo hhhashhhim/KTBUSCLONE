@@ -18,6 +18,9 @@ Route::group(['prefix' => 'web/v1/terminals','middleware' => ['auth:sanctum']], 
     Route::post('hide', [TerminalController::class, 'hideTerminal']);
     Route::post('permissions', [TerminalController::class, 'permissions']);
     Route::post('/sales/fetchFilterData', [TerminalController::class, 'filterData']);
+    Route::post('/sales/getTerminals', [TerminalController::class, 'terminalSalesTerminals']);
+    Route::post('/sales/getUsers', [TerminalController::class, 'terminalSalesUsers']);
+    Route::post('/sales/getRoutes', [TerminalController::class, 'terminalSalesRoutes']);
     Route::post('/discount/fetchFilterData', [TerminalController::class, 'filterDataDiscount']);
 
     Route::post('/routes', [TerminalController::class, 'getRoutes']); 

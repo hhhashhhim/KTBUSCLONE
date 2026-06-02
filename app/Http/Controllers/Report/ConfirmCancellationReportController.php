@@ -8,6 +8,7 @@ use App\Models\Route\Route;
 use App\Models\Terminal;
 use App\Models\Terminal\TerminalTimeDifference;
 use App\Models\Ticket;
+use App\Support\ReportFilterScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -44,7 +45,14 @@ class ConfirmCancellationReportController extends Controller
         if (!checkForSubmenu("confirm-cancel")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return Terminal::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
+        return ReportFilterScope::terminals('confirm-cancel-terminal-filter');
+    }
+    public function getUsers()
+    {
+        if (!checkForSubmenu("confirm-cancel")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        return ReportFilterScope::users('confirm-cancel-user-filter');
     }
 public function buses()
 {
@@ -69,7 +77,7 @@ public function buses()
         if (!checkForSubmenu("confirm-cancel")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return Route::where(['company_id' => Auth::user()->company_id, "hide" => 0])->get();
+        return ReportFilterScope::routes('confirm-cancel-route-filter');
     }
     public function filterData(Request $request)
 {
@@ -134,6 +142,9 @@ public function buses()
     private function buildFilteredTicketsQuery(Request $request)
     {
         $selectedCancellationTypes = $this->getSelectedCancellationTypes($request);
+        $terminalId = ReportFilterScope::terminalId($request, 'confirm-cancel-terminal-filter');
+        $routeIds = ReportFilterScope::routeIds($request, 'confirm-cancel-route-filter');
+        $userId = ReportFilterScope::userId($request, 'confirm-cancel-user-filter');
 
         return Ticket::with([
             'cancel_ticket:id,ticket_id,percentage,reason,type,added_by,time,created_at',
@@ -146,11 +157,11 @@ public function buses()
             ->where('company_id', Auth::user()->company_id)
             ->where('type', 'canceled')
             ->onlyTrashed()
-            ->when($request->terminal != 0, function ($query) use ($request) {
-                return $query->where('terminal_id', $request->terminal);
+            ->when($terminalId, function ($query) use ($terminalId) {
+                return $query->where('terminal_id', $terminalId);
             })
-            ->when($request->route != 0, function ($query) use ($request) {
-                return $query->where('route_id', $request->route);
+            ->when($routeIds !== null, function ($query) use ($routeIds) {
+                return empty($routeIds) ? $query->whereRaw('1 = 0') : $query->whereIn('route_id', $routeIds);
             })
             ->when($request->invoice_id, function ($query) use ($request) {
                 return $query->where('invoice_id', 'LIKE', '%' . $request->invoice_id . '%');
@@ -164,13 +175,16 @@ public function buses()
             ->when($request->toDate != '', function ($query) use ($request) {
                 return $query->where('schedule_date', '<=', $request->toDate);
             })
-            ->whereHas('cancel_ticket', function ($query) use ($selectedCancellationTypes) {
+            ->whereHas('cancel_ticket', function ($query) use ($selectedCancellationTypes, $userId) {
                 if (empty($selectedCancellationTypes)) {
                     $query->whereRaw('1 = 0');
                     return;
                 }
 
                 $query->whereIn('type', $selectedCancellationTypes);
+                if ($userId) {
+                    $query->where('added_by', $userId);
+                }
             })
             ->whereHas('customer', function ($query) use ($request) {
                 if ($request->passenger_name) {

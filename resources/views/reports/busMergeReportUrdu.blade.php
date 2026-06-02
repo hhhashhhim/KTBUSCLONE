@@ -92,6 +92,11 @@
             font-size: 12px !important;
         }
     </style>
+    <script type="text/javascript">
+        window.addEventListener('load', function () {
+            window.print();
+        });
+    </script>
     <title>روزانہ سمری رپورٹ</title>
 </head>
 

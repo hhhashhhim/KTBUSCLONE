@@ -14,6 +14,7 @@ use App\Models\Ticket;
 use App\Models\User;
 use App\Models\TerminalDiscount;
 use App\Models\Route\Route;
+use App\Support\ReportFilterScope;
 use Illuminate\Http\Request;
 use App\Models\ActivityLog;
 use App\Models\Schedule\DropSchedule;
@@ -505,6 +506,10 @@ public function filterData(Request $request)
         ], 403);
     }
 
+    $terminalId = ReportFilterScope::terminalId($request, 'terminal-sale-terminal-filter');
+    $routeIds = ReportFilterScope::routeIds($request, 'terminal-sale-route-filter');
+    $userId = ReportFilterScope::userId($request, 'terminal-sale-user-filter');
+
     // Load all commissions once
     $commissions = TerminalCommission::select(
         'id',
@@ -562,16 +567,16 @@ public function filterData(Request $request)
                 });
         })
 
-        ->when($request->terminal && $request->terminal != 0, function ($query) use ($request) {
-            $query->where('terminal_id', $request->terminal);
+        ->when($terminalId, function ($query) use ($terminalId) {
+            $query->where('terminal_id', $terminalId);
         })
 
-        ->when($request->user && $request->user != 0, function ($query) use ($request) {
-            $query->where('updated_by', $request->user);
+        ->when($userId, function ($query) use ($userId) {
+            $query->where('updated_by', $userId);
         })
 
-        ->when(!empty($request->route) && count($request->route) > 0, function ($query) use ($request) {
-            $query->whereIn('route_id', $request->route);
+        ->when($routeIds !== null, function ($query) use ($routeIds) {
+            empty($routeIds) ? $query->whereRaw('1 = 0') : $query->whereIn('route_id', $routeIds);
         })
 
         ->when($request->invoice_id != '', function ($query) use ($request) {
@@ -680,6 +685,30 @@ public function filterData(Request $request)
         'record' => $tickets->sortBy('schedule_date_time')->values()
     ];
 }
+
+    public function terminalSalesTerminals()
+    {
+        if (!checkForSubmenu("terminal-sale")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        return ReportFilterScope::terminals('terminal-sale-terminal-filter');
+    }
+
+    public function terminalSalesUsers()
+    {
+        if (!checkForSubmenu("terminal-sale")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        return ReportFilterScope::users('terminal-sale-user-filter');
+    }
+
+    public function terminalSalesRoutes()
+    {
+        if (!checkForSubmenu("terminal-sale")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        return ReportFilterScope::routes('terminal-sale-route-filter');
+    }
     public function terminalSalesPdf(Request $request)
     {
         if (!checkForSubmenu("terminal-sale")) {

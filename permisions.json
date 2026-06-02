@@ -175,7 +175,21 @@
             },
             {
                 "name": "confirm-cancel",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "confirm-cancel-terminal-filter",
+                        "allow": true
+                    },
+                    {
+                        "name": "confirm-cancel-user-filter",
+                        "allow": true
+                    },
+                    {
+                        "name": "confirm-cancel-route-filter",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "sales",
@@ -183,6 +197,14 @@
                 "buttons": [
                     {
                         "name": "terminal-filter",
+                        "allow": true
+                    },
+                    {
+                        "name": "user-filter",
+                        "allow": true
+                    },
+                    {
+                        "name": "route-filter",
                         "allow": true
                     }
                 ]
@@ -223,7 +245,21 @@
             },
             {
                 "name": "over-issue",
-                "allow": true
+                "allow": true,
+                "buttons": [
+                    {
+                        "name": "over-issue-terminal-filter",
+                        "allow": true
+                    },
+                    {
+                        "name": "over-issue-user-filter",
+                        "allow": true
+                    },
+                    {
+                        "name": "over-issue-route-filter",
+                        "allow": true
+                    }
+                ]
             },
             {
                 "name": "expenses",
@@ -409,7 +445,7 @@
                     },
                     {
                         "name": "message-bus",
-                        "allow": false
+                        "allow": true
                     },
                     {
                         "name": "bus-class",
@@ -461,7 +497,7 @@
                     },
                     {
                         "name": "time-lock",
-                        "allow": false
+                        "allow": true
                     }
                 ]
             },

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Hrm\Department\Department;
 use App\Models\Hrm\Employee\Employee;
+use App\Models\Route\Route;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -47,6 +48,11 @@ class Terminal extends Model
     public function tickets()
     {
         return $this->hasMany(Ticket::class, 'terminal_id', 'id');
+    }
+
+    public function onlineRoutes()
+    {
+        return $this->belongsToMany(Route::class, 'route_online_terminals', 'terminal_id', 'route_id')->withTimestamps();
     }
 
 }

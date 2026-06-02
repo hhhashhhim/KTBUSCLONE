@@ -543,6 +543,38 @@ if (!function_exists('updateFare')) {
     }
 }
 
+if (!function_exists('bookingUsesDiscount')) {
+    function bookingUsesDiscount($request)
+    {
+        return $request->boolean('discount_usage')
+            || $request->boolean('usageDiscount')
+            || $request->boolean('discount_otp_valid');
+    }
+}
+
+if (!function_exists('bookingUsesPoints')) {
+    function bookingUsesPoints($request)
+    {
+        return $request->boolean('points_usage')
+            || $request->boolean('usagePoints');
+    }
+}
+
+if (!function_exists('ticketDiscountType')) {
+    function ticketDiscountType($request)
+    {
+        if (bookingUsesDiscount($request)) {
+            return 'discount';
+        }
+
+        if (bookingUsesPoints($request)) {
+            return 'card';
+        }
+
+        return null;
+    }
+}
+
 //Updated Already advanced Booked Seat
 if (!function_exists('updateAdvancedSeat')) {
     function updateAdvancedSeat($request, $invoice, $finalAmountDiscount)
@@ -589,8 +621,8 @@ if (!function_exists('updateAdvancedSeat')) {
                 'customer_id' => $customerData->id,
                 'updated_by' => Auth::user()->id,
                 'booked_time' => date("Y-m-d H:i:s"),
-                'discount_type'       => $request->usagePoints ? 'card' : null,
-                'points_usage' => $request->pointsUseInput / count($request->alreadyBookedId),
+                'discount_type'       => ticketDiscountType($request),
+                'points_usage' => bookingUsesPoints($request) ? (($request->pointsUseInput ?? 0) / count($request->alreadyBookedId)) : 0,
             ]);
 
             // online terminal request will be differrent so it is in if condition

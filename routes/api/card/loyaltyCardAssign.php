@@ -13,6 +13,10 @@ Route::group(['prefix' => 'web/v1/loyaltyCardAssign','middleware' => ['auth:sanc
     Route::post('/getCNIC', [CardAssignController::class, 'getCNIC']);
 
 });
+Route::get('web/v1/loyalty-card/customer/{customer_id}/discount-history', [CardAssignController::class, 'discountHistory'])
+    ->middleware('auth:sanctum');
+Route::get('web/v1/loyalty-card/customer/{customer_id}/card-history', [CardAssignController::class, 'cardHistory'])
+    ->middleware('auth:sanctum');
 Route::group(['prefix' => 'web/v1/discountCardAssign','middleware' => ['auth:sanctum']], function () {
     Route::post('/', [DiscountCardAssignController::class, 'index']);
     Route::post('/store', [DiscountCardAssignController::class, 'store']);
@@ -21,3 +25,5 @@ Route::group(['prefix' => 'web/v1/discountCardAssign','middleware' => ['auth:san
     Route::post('/getCNIC', [DiscountCardAssignController::class, 'getCNIC']);
 
 });
+Route::get('web/v1/discount-card/customer/{customer_id}/discount-history', [DiscountCardAssignController::class, 'discountHistory'])
+    ->middleware('auth:sanctum');

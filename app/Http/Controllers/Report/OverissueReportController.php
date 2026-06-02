@@ -8,6 +8,7 @@ use App\Models\Route\Route;
 use App\Models\Terminal;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Support\ReportFilterScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -37,14 +38,22 @@ class OverissueReportController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return Terminal::where('company_id', Auth::user()->company_id)->get(['id', 'name']);
+        return ReportFilterScope::terminals('over-issue-terminal-filter');
+    }
+    public function getUsers()
+    {
+        if(!checkForSubmenu("confirm-cancel"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+        return ReportFilterScope::users('over-issue-user-filter');
     }
 public function routes()
     {
         if (!checkForSubmenu("confirm-cancel")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return Route::where(['company_id' => Auth::user()->company_id, "hide" => 0])->get();
+        return ReportFilterScope::routes('over-issue-route-filter');
     }
     public function filterData(Request $request)
 {
@@ -52,15 +61,24 @@ public function routes()
         return response()->json(["Error" => ['You are not authorized to access this url']], 403);
     }
 
+    $terminalId = ReportFilterScope::terminalId($request, 'over-issue-terminal-filter');
+    $routeIds = ReportFilterScope::routeIds($request, 'over-issue-route-filter');
+    $userId = ReportFilterScope::userId($request, 'over-issue-user-filter');
+
     $tickets = Ticket::with(['overIssueSeats', 'schedule:id,time', 'terminal:id,name', 'customer:id,name,contact,cnic', 'route:id,name'])
         ->where('company_id', Auth::user()->company_id)
         ->where('type', 'over-issue')
         ->onlyTrashed()
-        ->when($request->terminal != 0, function ($query) use ($request) {
-            return $query->where('terminal_id', $request->terminal);
+        ->when($terminalId, function ($query) use ($terminalId) {
+            return $query->where('terminal_id', $terminalId);
         })
-        ->when($request->route != 0, function ($query) use ($request) {
-            return $query->where('route_id', $request->route);
+        ->when($routeIds !== null, function ($query) use ($routeIds) {
+            return empty($routeIds) ? $query->whereRaw('1 = 0') : $query->whereIn('route_id', $routeIds);
+        })
+        ->whereHas('overIssueSeats', function ($query) use ($userId) {
+            if ($userId) {
+                $query->where('added_by', $userId);
+            }
         })
         ->when($request->invoice_id != '', function ($query) use ($request) {
             return $query->where('invoice_id', 'LIKE', '%' . $request->invoice_id . '%');
@@ -147,15 +165,24 @@ public function routes()
         return response()->json(["Error" => ['You are not authorized to access this url']], 403);
     }
 
+    $terminalId = ReportFilterScope::terminalId($request, 'over-issue-terminal-filter');
+    $routeIds = ReportFilterScope::routeIds($request, 'over-issue-route-filter');
+    $userId = ReportFilterScope::userId($request, 'over-issue-user-filter');
+
     $tickets = Ticket::with(['overIssueSeats', 'schedule:id,time', 'terminal:id,name', 'customer:id,name,contact,cnic'])
         ->where('company_id', Auth::user()->company_id)
         ->where('type', 'over-issue')
         ->onlyTrashed()
-        ->when($request->terminal != 0, function ($query) use ($request) {
-            return $query->where('terminal_id', $request->terminal);
+        ->when($terminalId, function ($query) use ($terminalId) {
+            return $query->where('terminal_id', $terminalId);
         })
-        ->when($request->route != 0, function ($query) use ($request) {
-            return $query->where('route_id', $request->route);
+        ->when($routeIds !== null, function ($query) use ($routeIds) {
+            return empty($routeIds) ? $query->whereRaw('1 = 0') : $query->whereIn('route_id', $routeIds);
+        })
+        ->whereHas('overIssueSeats', function ($query) use ($userId) {
+            if ($userId) {
+                $query->where('added_by', $userId);
+            }
         })
         ->when($request->invoice_id != '', function ($query) use ($request) {
             return $query->where('invoice_id', 'LIKE', '%' . $request->invoice_id . '%');

@@ -10,6 +10,7 @@ use App\Models\Schedule\Schedule;
 use App\Models\Terminal;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Support\ReportFilterScope;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -40,7 +41,7 @@ class AdvanceSalesReportController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return User::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
+        return ReportFilterScope::users('user-filter');
     }
 
     public function getSchedules()
@@ -58,7 +59,7 @@ class AdvanceSalesReportController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return Terminal::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name']);
+        return ReportFilterScope::terminals('terminal-filter');
     }
 
     public function getRoutes()
@@ -67,7 +68,7 @@ class AdvanceSalesReportController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return Route::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get(['id', 'name',"via"]);
+        return ReportFilterScope::routes('route-filter');
     }
 
     public function filterData(Request $request)
@@ -76,14 +77,13 @@ class AdvanceSalesReportController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $routeIds = is_array($request->route)
-            ? array_values(array_filter($request->route, fn ($routeId) => $routeId != 0 && $routeId !== ''))
-            : [];
+        $routeIds = ReportFilterScope::routeIds($request, 'route-filter');
         $passengerName = trim($request->passenger_name ?? '');
         $passengerContact = preg_replace('/[^0-9]/', '', $request->passenger_contact ?? '');
         $passengerCnic = preg_replace('/[^0-9]/', '', $request->passenger_cnic ?? '');
         $isCounterSale = filter_var($request->counterSale, FILTER_VALIDATE_BOOLEAN);
-        $selectedTerminalId = $request->filled('terminal') ? $request->terminal : Auth::user()->terminal_id;
+        $selectedTerminalId = ReportFilterScope::terminalId($request, 'terminal-filter');
+        $selectedUserId = ReportFilterScope::userId($request, 'user-filter');
 
         $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'route:id,name,via', 'schedule:id,name,time',"bus:id,bus_number", 'customer:id,name,contact,cnic')
             ->withTrashed()
@@ -93,14 +93,14 @@ class AdvanceSalesReportController extends Controller
                       ->orWhere("type", "over-issue");
                 })
 
-            ->where(function($query) use ($selectedTerminalId){
+            ->when($selectedTerminalId, function($query) use ($selectedTerminalId){
                 return $query->where('terminal_id', $selectedTerminalId);
             })
-            ->when($request->user, function ($query) use ($request) {
-                return $query->where('updated_by', $request->user);
+            ->when($selectedUserId, function ($query) use ($selectedUserId) {
+                return $query->where('updated_by', $selectedUserId);
             })
-            ->when(!empty($routeIds), function ($query) use ($routeIds) {
-                return $query->whereIn('route_id', $routeIds);
+            ->when($routeIds !== null, function ($query) use ($routeIds) {
+                return empty($routeIds) ? $query->whereRaw('1 = 0') : $query->whereIn('route_id', $routeIds);
             })
             ->when($request->invoice_id, function ($query) use ($request) {
                 return $query->where('invoice_id', 'LIKE', '%' . trim($request->invoice_id) . '%');
@@ -276,12 +276,13 @@ class AdvanceSalesReportController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $route_ids = $request->route ? array_values(array_filter(explode(",",$request->route), fn ($routeId) => $routeId != 0 && $routeId !== '')) : [];
+        $route_ids = ReportFilterScope::routeIds($request, 'route-filter');
         $passengerName = trim($request->passenger_name ?? '');
         $passengerContact = preg_replace('/[^0-9]/', '', $request->passenger_contact ?? '');
         $passengerCnic = preg_replace('/[^0-9]/', '', $request->passenger_cnic ?? '');
         $isCounterSale = filter_var($request->counterSale, FILTER_VALIDATE_BOOLEAN);
-        $selectedTerminalId = $request->filled('terminal') ? $request->terminal : Auth::user()->terminal_id;
+        $selectedTerminalId = ReportFilterScope::terminalId($request, 'terminal-filter');
+        $selectedUserId = ReportFilterScope::userId($request, 'user-filter');
 
         $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'route:id,name,via', 'schedule:id,name,time',"bus:id,bus_number", 'customer:id,name,contact,cnic')
             ->withTrashed()
@@ -291,14 +292,14 @@ class AdvanceSalesReportController extends Controller
                       ->orWhere("type", "over-issue");
                 })
 
-            ->where(function($query) use ($selectedTerminalId){
+            ->when($selectedTerminalId, function($query) use ($selectedTerminalId){
                 return $query->where('terminal_id', $selectedTerminalId);
             })
-            ->when($request->user, function ($query) use ($request) {
-                return $query->where('updated_by', $request->user);
+            ->when($selectedUserId, function ($query) use ($selectedUserId) {
+                return $query->where('updated_by', $selectedUserId);
             })
-            ->when(!empty($route_ids), function ($query) use ($route_ids) {
-                return $query->whereIn('route_id', $route_ids);
+            ->when($route_ids !== null, function ($query) use ($route_ids) {
+                return empty($route_ids) ? $query->whereRaw('1 = 0') : $query->whereIn('route_id', $route_ids);
             })
             ->when($request->invoice_id, function ($query) use ($request) {
                 return $query->where('invoice_id', 'LIKE', '%' . trim($request->invoice_id) . '%');
@@ -415,8 +416,8 @@ class AdvanceSalesReportController extends Controller
 
         $filterData = (object)[];
         $filterData->terminal = Terminal::find($selectedTerminalId)->name??"N/A";
-        $filterData->user = User::find($request->user)->name??"All";
-        $filterData->route = Route::whereIn("id",$route_ids)->pluck("name")->toArray();
+        $filterData->user = User::find($selectedUserId)->name??"All";
+        $filterData->route = Route::whereIn("id",$route_ids ?? [])->pluck("name")->toArray();
         $filterData->from = date("Y/m/d H:i A",strtotime($request->fromDateTime));
         $filterData->to = date("Y/m/d h:i A",strtotime($request->toDateTime));
         $filterData->invoice_id = trim($request->invoice_id ?? '') ?: 'All';

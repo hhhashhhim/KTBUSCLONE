@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'web/v1/confirm/cancellation','middleware' => ['auth:sanctum']], function () {
     Route::post('/getTerminals', [ConfirmCancellationReportController::class, 'getTerminals']);
+    Route::post('/getUsers', [ConfirmCancellationReportController::class, 'getUsers']);
     Route::post('/getBuses', [ConfirmCancellationReportController::class, 'buses']);
      Route::post('/routes', [ConfirmCancellationReportController::class, 'routes']);
      Route::post('/fetchFilterData', [ConfirmCancellationReportController::class, 'filterData']);
@@ -17,6 +18,7 @@ Route::group(['prefix' => 'web/v1/confirm/cancellation','middleware' => ['auth:s
      Route::group(['prefix' => 'web/v1/over-issue','middleware' => ['auth:sanctum']], function () {
     Route::post('/routes', [OverissueReportController::class, 'routes']);
     Route::post('/getTerminals', [OverissueReportController::class, 'getTerminals']);
+    Route::post('/getUsers', [OverissueReportController::class, 'getUsers']);
     Route::post('/fetchFilterData', [OverissueReportController::class, 'filterData']);
 });
 
