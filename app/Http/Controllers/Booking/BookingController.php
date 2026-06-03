@@ -1228,22 +1228,30 @@ class BookingController extends Controller
                 }
                 $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
                 if ($result !== false) {   /*&& $leavingIn30Min != true*/
-                    $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
-                    $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
-                    $seatMap[$i][$j]['partial'] = $tickets[$result]['is_partial'];
-                    $seatMap[$i][$j]['type'] = $tickets[$result]['type'];
-                    $seatMap[$i][$j]['terminal'] = $tickets[$result]['terminal_id'];
-                    $seatMap[$i][$j]['remarks'] = $tickets[$result]['remarks'] == null ? 'N/A' : $tickets[$result]['remarks'];
-                    $seatMap[$i][$j]['customer_cnic'] = $tickets[$result]['customer']['cnic'];
-                    $seatMap[$i][$j]['customer_name'] = $tickets[$result]['customer']['name'];
-                    $seatMap[$i][$j]['seat_fare'] = $tickets[$result]['seat_fare'] - $tickets[$result]['discount'];
-                    $seatMap[$i][$j]['customer_phone'] = $tickets[$result]['customer']['contact'];
-                    $seatMap[$i][$j]['online_terminal'] = $tickets[$result]['online_terminal'];
-                    $seatMap[$i][$j]['booked_by'] = $tickets[$result]['updated_name']['name'] ?? "N/A";
-                    $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
-                    $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
-                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
-                    $seatMap[$i][$j]['fare'] = 0;
+                    $ticket = $tickets[$result] ?? [];
+
+$seatMap[$i][$j]['id'] = $ticket['id'] ?? null;
+$seatMap[$i][$j]['gender'] = $ticket['gender'] ?? null;
+$seatMap[$i][$j]['partial'] = $ticket['is_partial'] ?? 0;
+$seatMap[$i][$j]['type'] = $ticket['type'] ?? null;
+$seatMap[$i][$j]['terminal'] = $ticket['terminal_id'] ?? null;
+$seatMap[$i][$j]['remarks'] = $ticket['remarks'] ?? 'N/A';
+
+$seatMap[$i][$j]['customer_cnic'] = $ticket['customer']['cnic'] ?? 'N/A';
+$seatMap[$i][$j]['customer_name'] = $ticket['customer']['name'] ?? 'N/A';
+$seatMap[$i][$j]['customer_phone'] = $ticket['customer']['contact'] ?? 'N/A';
+
+$seatMap[$i][$j]['seat_fare'] = ($ticket['seat_fare'] ?? 0) - ($ticket['discount'] ?? 0);
+$seatMap[$i][$j]['online_terminal'] = $ticket['online_terminal'] ?? null;
+$seatMap[$i][$j]['booked_by'] = $ticket['updated_name']['name'] ?? 'N/A';
+
+$seatMap[$i][$j]['departure_city_name'] = $ticket['departure_city']['name'] ?? 'N/A';
+$seatMap[$i][$j]['destination_city_name'] = $ticket['destination_city']['name'] ?? 'N/A';
+
+$fareClass = $fareClasses->where('id', $column['class'] ?? null)->first();
+$seatMap[$i][$j]['class_name'] = $fareClass->name ?? 'N/A';
+
+$seatMap[$i][$j]['fare'] = 0;
                     if ($tickets[$result]['is_partial'] == 1) {
                         $resultPartials = isset($column['seatNo']) ? array_keys($ticketSeatNumbers, $column['seatNo']) : false;
                         foreach ($resultPartials as $singlePartial) {
