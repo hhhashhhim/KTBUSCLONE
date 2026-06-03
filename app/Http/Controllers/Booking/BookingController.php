@@ -1227,74 +1227,107 @@ class BookingController extends Controller
                     }
                 }
                 $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
-                if ($result !== false) {   /*&& $leavingIn30Min != true*/
-                    $ticket = $tickets[$result] ?? [];
+               if ($result !== false) {   /*&& $leavingIn30Min != true*/
 
-$seatMap[$i][$j]['id'] = $ticket['id'] ?? null;
-$seatMap[$i][$j]['gender'] = $ticket['gender'] ?? null;
-$seatMap[$i][$j]['partial'] = $ticket['is_partial'] ?? 0;
-$seatMap[$i][$j]['type'] = $ticket['type'] ?? null;
-$seatMap[$i][$j]['terminal'] = $ticket['terminal_id'] ?? null;
-$seatMap[$i][$j]['remarks'] = $ticket['remarks'] ?? 'N/A';
+    $ticket = $tickets[$result] ?? [];
 
-$seatMap[$i][$j]['customer_cnic'] = $ticket['customer']['cnic'] ?? 'N/A';
-$seatMap[$i][$j]['customer_name'] = $ticket['customer']['name'] ?? 'N/A';
-$seatMap[$i][$j]['customer_phone'] = $ticket['customer']['contact'] ?? 'N/A';
+    $seatMap[$i][$j]['id'] = $ticket['id'] ?? null;
+    $seatMap[$i][$j]['gender'] = $ticket['gender'] ?? null;
+    $seatMap[$i][$j]['partial'] = $ticket['is_partial'] ?? 0;
+    $seatMap[$i][$j]['type'] = $ticket['type'] ?? null;
+    $seatMap[$i][$j]['terminal'] = $ticket['terminal_id'] ?? null;
+    $seatMap[$i][$j]['remarks'] = $ticket['remarks'] ?? 'N/A';
 
-$seatMap[$i][$j]['seat_fare'] = ($ticket['seat_fare'] ?? 0) - ($ticket['discount'] ?? 0);
-$seatMap[$i][$j]['online_terminal'] = $ticket['online_terminal'] ?? null;
-$seatMap[$i][$j]['booked_by'] = $ticket['updated_name']['name'] ?? 'N/A';
+    $seatMap[$i][$j]['customer_cnic'] = $ticket['customer']['cnic'] ?? 'N/A';
+    $seatMap[$i][$j]['customer_name'] = $ticket['customer']['name'] ?? 'N/A';
+    $seatMap[$i][$j]['customer_phone'] = $ticket['customer']['contact'] ?? 'N/A';
 
-$seatMap[$i][$j]['departure_city_name'] = $ticket['departure_city']['name'] ?? 'N/A';
-$seatMap[$i][$j]['destination_city_name'] = $ticket['destination_city']['name'] ?? 'N/A';
+    $seatMap[$i][$j]['seat_fare'] = ($ticket['seat_fare'] ?? 0) - ($ticket['discount'] ?? 0);
+    $seatMap[$i][$j]['online_terminal'] = $ticket['online_terminal'] ?? null;
+    $seatMap[$i][$j]['booked_by'] = $ticket['updated_name']['name'] ?? 'N/A';
 
-$fareClass = $fareClasses->where('id', $column['class'] ?? null)->first();
-$seatMap[$i][$j]['class_name'] = $fareClass->name ?? 'N/A';
+    $seatMap[$i][$j]['departure_city_name'] = $ticket['departure_city']['name'] ?? 'N/A';
+    $seatMap[$i][$j]['destination_city_name'] = $ticket['destination_city']['name'] ?? 'N/A';
 
-$seatMap[$i][$j]['fare'] = 0;
-                    if ($tickets[$result]['is_partial'] == 1) {
-                        $resultPartials = isset($column['seatNo']) ? array_keys($ticketSeatNumbers, $column['seatNo']) : false;
-                        foreach ($resultPartials as $singlePartial) {
-                            $seatMap[$i][$j]['id'] = $tickets[$singlePartial]['id'];
-                            $seatMap[$i][$j]['gender'] = $tickets[$singlePartial]['gender'];
-                            $seatMap[$i][$j]['partial'] = $tickets[$singlePartial]['is_partial'];
-                            $seatMap[$i][$j]['type'] = $tickets[$singlePartial]['type'];
-                            $seatMap[$i][$j]['terminal'] = $tickets[$result]['terminal_id'];
-                            $seatMap[$i][$j]['remarks'] = $tickets[$singlePartial]['remarks'] == null ? 'N/A' : $tickets[$singlePartial]['remarks'];
-                            $seatMap[$i][$j]['customer_cnic'] = $tickets[$singlePartial]['customer']['cnic'];
-                            $seatMap[$i][$j]['customer_name'] = $tickets[$singlePartial]['customer']['name'];
-                            $seatMap[$i][$j]['seat_fare'] = $tickets[$result]['seat_fare'] - $tickets[$result]['discount'];
-                            $seatMap[$i][$j]['customer_phone'] = $tickets[$singlePartial]['customer']['contact'];
-                            $seatMap[$i][$j]['online_terminal'] = $tickets[$singlePartial]['online_terminal'];
-                            $seatMap[$i][$j]['booked_by'] = $tickets[$singlePartial]['updated_name']['name'] ?? 'N/A';
-                            $seatMap[$i][$j]['departure_city_name'] = $tickets[$singlePartial]['departure_city']['name'];
-                            $seatMap[$i][$j]['destination_city_name'] = $tickets[$singlePartial]['destination_city']['name'];
-                            $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
-                            $seatMap[$i][$j]['fare'] = 0;
+    $fareClass = $fareClasses->where('id', $column['class'] ?? null)->first();
+    $seatMap[$i][$j]['class_name'] = $fareClass->name ?? 'N/A';
 
-                            $before = (array_search($request->departureCity, $allFaresOfRoute, false) < array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
-                                array_search($request->departureCity, $allFaresOfRoute, false) < array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false) &&
-                                array_search($request->destinationCity, $allFaresOfRoute, false) <= array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
-                                array_search($request->destinationCity, $allFaresOfRoute, false) < array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false));
+    $seatMap[$i][$j]['fare'] = 0;
 
-                            // Condition for validation that departure city and destination city in the request should be "After" the partial seat's targeted cities
-                            $after = (array_search($request->departureCity, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
-                                array_search($request->departureCity, $allFaresOfRoute, false) >= array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false) &&
-                                array_search($request->destinationCity, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
-                                array_search($request->destinationCity, $allFaresOfRoute, false) > array_search($tickets[$singlePartial]['destination_city_id'], $allFaresOfRoute, false)
-                            );
+    if (($ticket['is_partial'] ?? 0) == 1) {
 
-                            if ($before || $after) {
-                                // removing partial tag for that seats which fulfill the conditions
-                                unset($seatMap[$i][$j]['partial'], $seatMap[$i][$j]['type'], $seatMap[$i][$j]['gender']);
-                            } else {
-                                break;
-                            }
-                            $seatMap[$i][$j]['departure_city'] = $tickets[$singlePartial]['departure_city']->name;
-                            $seatMap[$i][$j]['destination_city'] = $tickets[$singlePartial]['destination_city']->name;
-                        }
-                    }
-                }
+        $resultPartials = isset($column['seatNo'])
+            ? array_keys($ticketSeatNumbers, $column['seatNo'])
+            : [];
+
+        foreach ($resultPartials as $singlePartial) {
+
+            $partialTicket = $tickets[$singlePartial] ?? [];
+
+            $seatMap[$i][$j]['id'] = $partialTicket['id'] ?? null;
+            $seatMap[$i][$j]['gender'] = $partialTicket['gender'] ?? null;
+            $seatMap[$i][$j]['partial'] = $partialTicket['is_partial'] ?? 0;
+            $seatMap[$i][$j]['type'] = $partialTicket['type'] ?? null;
+            $seatMap[$i][$j]['terminal'] = $partialTicket['terminal_id'] ?? null;
+            $seatMap[$i][$j]['remarks'] = $partialTicket['remarks'] ?? 'N/A';
+
+            $seatMap[$i][$j]['customer_cnic'] = $partialTicket['customer']['cnic'] ?? 'N/A';
+            $seatMap[$i][$j]['customer_name'] = $partialTicket['customer']['name'] ?? 'N/A';
+            $seatMap[$i][$j]['customer_phone'] = $partialTicket['customer']['contact'] ?? 'N/A';
+
+            $seatMap[$i][$j]['seat_fare'] = ($partialTicket['seat_fare'] ?? 0) - ($partialTicket['discount'] ?? 0);
+            $seatMap[$i][$j]['online_terminal'] = $partialTicket['online_terminal'] ?? null;
+            $seatMap[$i][$j]['booked_by'] = $partialTicket['updated_name']['name'] ?? 'N/A';
+
+            $seatMap[$i][$j]['departure_city_name'] = $partialTicket['departure_city']['name'] ?? 'N/A';
+            $seatMap[$i][$j]['destination_city_name'] = $partialTicket['destination_city']['name'] ?? 'N/A';
+
+            $seatMap[$i][$j]['class_name'] = $fareClass->name ?? 'N/A';
+            $seatMap[$i][$j]['fare'] = 0;
+
+            $requestDepartureIndex = array_search($request->departureCity, $allFaresOfRoute, false);
+            $requestDestinationIndex = array_search($request->destinationCity, $allFaresOfRoute, false);
+            $ticketDepartureIndex = array_search($partialTicket['departure_city_id'] ?? null, $allFaresOfRoute, false);
+            $ticketDestinationIndex = array_search($partialTicket['destination_city_id'] ?? null, $allFaresOfRoute, false);
+
+            if (
+                $requestDepartureIndex === false ||
+                $requestDestinationIndex === false ||
+                $ticketDepartureIndex === false ||
+                $ticketDestinationIndex === false
+            ) {
+                continue;
+            }
+
+            $before = (
+                $requestDepartureIndex < $ticketDepartureIndex &&
+                $requestDepartureIndex < $ticketDestinationIndex &&
+                $requestDestinationIndex <= $ticketDepartureIndex &&
+                $requestDestinationIndex < $ticketDestinationIndex
+            );
+
+            $after = (
+                $requestDepartureIndex > $ticketDepartureIndex &&
+                $requestDepartureIndex >= $ticketDestinationIndex &&
+                $requestDestinationIndex > $ticketDepartureIndex &&
+                $requestDestinationIndex > $ticketDestinationIndex
+            );
+
+            if ($before || $after) {
+                unset(
+                    $seatMap[$i][$j]['partial'],
+                    $seatMap[$i][$j]['type'],
+                    $seatMap[$i][$j]['gender']
+                );
+            } else {
+                break;
+            }
+
+            $seatMap[$i][$j]['departure_city'] = $partialTicket['departure_city']['name'] ?? 'N/A';
+            $seatMap[$i][$j]['destination_city'] = $partialTicket['destination_city']['name'] ?? 'N/A';
+        }
+    }
+}
                 if (isset($column['class'])) {
                     $class = $fareClasses->where('id', $column['class'])->first();
                     $seatMap[$i][$j]['color'] = $class ? $class->color : '';
