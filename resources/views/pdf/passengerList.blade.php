@@ -190,7 +190,7 @@
         @if($terminalData)
             @foreach ($terminalData as $single)
                 <tr>
-                    <td>{{$single->terminal->city->name}} - {{$single->terminal->name}}</td>
+                    <td> {{ optional(optional($item->terminal)->city)->name ?? 'N/A' }} - {{ optional($item->terminal)->name ?? 'N/A' }}</td>
                     <td>{{ $single->terminalPassengerCount }}</td>
                 </tr>
             @endforeach
