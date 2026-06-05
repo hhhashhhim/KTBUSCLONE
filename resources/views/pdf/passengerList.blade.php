@@ -165,7 +165,9 @@
                 <td>{{ $item->customer->name }}</td>
                 <td>{{ formatCNIC($item->customer->cnic) }}</td>
                 <td>{{formatContact($item->customer->contact)}}</td>
-                <td>{{$item->terminal->city->name}} - {{$item->terminal->name}}</td>
+                <td>
+    {{ optional(optional($item->terminal)->city)->name ?? 'N/A' }} - {{ optional($item->terminal)->name ?? 'N/A' }}
+</td>
                 <td>{{ $item->departure_city->name}}</td>
                 <td>{{ $item->destination_city->name }}</td>
                 <td>{{ $item->remarks }}</td>
