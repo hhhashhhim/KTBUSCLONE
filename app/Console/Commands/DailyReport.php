@@ -115,7 +115,7 @@ class DailyReport extends Command
         });
 
         $url = "https://whatsapp.sarzone.com/api/send-messages";
-        $mobile = "923203948283"; //abdul rehma
+       // $mobile = "923203948283"; //abdul rehma
         $mobile2 = "923360111140"; //hashim sb
         $mobile3 = "923108886288"; // qasim sb
         $mobile4 = "923143136767"; // farhan ali
@@ -137,14 +137,14 @@ This is automated generated report.
 (E&EO)
 ";
 
-        $response = Http::withHeaders([
-            'X-Api-Key' => $auth_key,
-        ])->post($url, [
-            "session" => $session,
-            "message_type" =>  'text',
-            "receiver_number" => $mobile,
-            "message_body" => $messageConfirmed
-        ]);
+        // $response = Http::withHeaders([
+        //     'X-Api-Key' => $auth_key,
+        // ])->post($url, [
+        //     "session" => $session,
+        //     "message_type" =>  'text',
+        //     "receiver_number" => $mobile,
+        //     "message_body" => $messageConfirmed
+        // ]);
         $response2 = Http::withHeaders([
             'X-Api-Key' => $auth_key,
         ])->post($url, [
