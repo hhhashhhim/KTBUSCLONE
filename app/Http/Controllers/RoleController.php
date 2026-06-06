@@ -59,6 +59,8 @@ class RoleController extends Controller
 
             }
 
+            $modules = $this->stripUserWisePermissions($this->addMissingReportPermissions($modules));
+
             return response()->json([
                 'role' => $role,
                 'permissions' => $modules,
@@ -143,6 +145,69 @@ class RoleController extends Controller
                 'delete' => false,
             ]
         ];
+    }
+
+    private function addMissingReportPermissions(array $modules): array
+    {
+        $permissionsBySubmenu = [
+            'confirm-cancel' => ['all-user-filter'],
+            'sales' => ['all-user-filter'],
+            'terminal-sale' => ['all-user-filter'],
+        ];
+
+        foreach ($modules as &$module) {
+            if (!isset($module['childs']) || !is_array($module['childs'])) {
+                continue;
+            }
+
+            foreach ($module['childs'] as &$submenu) {
+                if (!isset($permissionsBySubmenu[$submenu['name'] ?? null])) {
+                    continue;
+                }
+
+                $submenu['buttons'] = $submenu['buttons'] ?? [];
+                $existingNames = array_column($submenu['buttons'], 'name');
+
+                foreach ($permissionsBySubmenu[$submenu['name']] as $permission) {
+                    if (!in_array($permission, $existingNames, true)) {
+                        $submenu['buttons'][] = [
+                            'name' => $permission,
+                            'allow' => false,
+                        ];
+                    }
+                }
+            }
+            unset($submenu);
+        }
+        unset($module);
+
+        return $modules;
+    }
+
+    private function stripUserWisePermissions(array $modules): array
+    {
+        $userWisePermissions = ['assign-bus'];
+
+        foreach ($modules as &$module) {
+            if (!isset($module['childs']) || !is_array($module['childs'])) {
+                continue;
+            }
+
+            foreach ($module['childs'] as &$submenu) {
+                if (!isset($submenu['buttons']) || !is_array($submenu['buttons'])) {
+                    continue;
+                }
+
+                $submenu['buttons'] = array_values(array_filter(
+                    $submenu['buttons'],
+                    fn ($button) => !in_array($button['name'] ?? null, $userWisePermissions, true)
+                ));
+            }
+            unset($submenu);
+        }
+        unset($module);
+
+        return $modules;
     }
 }
 // :checked="mod"

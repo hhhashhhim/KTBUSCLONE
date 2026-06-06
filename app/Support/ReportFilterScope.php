@@ -80,9 +80,61 @@ class ReportFilterScope
         return $query->get(['id', 'name']);
     }
 
+    public static function terminalUsers(string $permission, bool $allowAllUserFilter = true)
+    {
+        $query = \App\Models\User::where([
+            'company_id' => Auth::user()->company_id,
+            'hide' => 0,
+        ]);
+
+        if (!self::canUseFilter($permission)) {
+            $query->where('id', Auth::user()->id);
+        } elseif (!$allowAllUserFilter || !self::canUseAllUserFilter()) {
+            $terminalId = self::normalizeId(Auth::user()->terminal_id);
+
+            if (!$terminalId) {
+                return collect();
+            }
+
+            $query->where('terminal_id', $terminalId);
+        }
+
+        return $query->get(['id', 'name']);
+    }
+
+    public static function terminalUserId(Request $request, string $permission, bool $allowAllUserFilter = true): ?int
+    {
+        if (!self::canUseFilter($permission)) {
+            return (int) Auth::user()->id;
+        }
+
+        $userId = self::normalizeId($request->user);
+
+        if (!$userId) {
+            return null;
+        }
+
+        $query = \App\Models\User::where([
+            'id' => $userId,
+            'company_id' => Auth::user()->company_id,
+            'hide' => 0,
+        ]);
+
+        if (!$allowAllUserFilter || !self::canUseAllUserFilter()) {
+            $query->where('terminal_id', Auth::user()->terminal_id);
+        }
+
+        return $query->exists() ? $userId : -1;
+    }
+
     public static function canUseFilter(string $permission): bool
     {
         return (bool) Auth::user()->is_super_admin || (bool) checkPermissionButtons($permission);
+    }
+
+    private static function canUseAllUserFilter(): bool
+    {
+        return (bool) Auth::user()->is_super_admin || (bool) checkPermissionButtons('all-user-filter');
     }
 
     private static function assignedRouteIds(): ?array

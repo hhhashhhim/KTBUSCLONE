@@ -186,6 +186,10 @@
                         "allow": true
                     },
                     {
+                        "name": "all-user-filter",
+                        "allow": true
+                    },
+                    {
                         "name": "confirm-cancel-route-filter",
                         "allow": true
                     }
@@ -204,6 +208,10 @@
                         "allow": true
                     },
                     {
+                        "name": "all-user-filter",
+                        "allow": true
+                    },
+                    {
                         "name": "route-filter",
                         "allow": true
                     }
@@ -219,6 +227,10 @@
                     },
                     {
                         "name": "terminal-sale-user-filter",
+                        "allow": true
+                    },
+                    {
+                        "name": "all-user-filter",
                         "allow": true
                     },
                     {
@@ -413,10 +425,6 @@
                 "buttons": [
                     {
                         "name": "previous-date",
-                        "allow": true
-                    },
-                    {
-                        "name": "assign-bus",
                         "allow": true
                     },
                     {

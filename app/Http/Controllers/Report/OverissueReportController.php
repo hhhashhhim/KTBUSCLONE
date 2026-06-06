@@ -46,7 +46,7 @@ class OverissueReportController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return ReportFilterScope::users('over-issue-user-filter');
+        return ReportFilterScope::terminalUsers('over-issue-user-filter', false);
     }
 public function routes()
     {
@@ -63,7 +63,7 @@ public function routes()
 
     $terminalId = ReportFilterScope::terminalId($request, 'over-issue-terminal-filter');
     $routeIds = ReportFilterScope::routeIds($request, 'over-issue-route-filter');
-    $userId = ReportFilterScope::userId($request, 'over-issue-user-filter');
+    $userId = ReportFilterScope::terminalUserId($request, 'over-issue-user-filter', false);
 
     $tickets = Ticket::with(['overIssueSeats', 'schedule:id,time', 'terminal:id,name', 'customer:id,name,contact,cnic', 'route:id,name'])
         ->where('company_id', Auth::user()->company_id)
@@ -167,7 +167,7 @@ public function routes()
 
     $terminalId = ReportFilterScope::terminalId($request, 'over-issue-terminal-filter');
     $routeIds = ReportFilterScope::routeIds($request, 'over-issue-route-filter');
-    $userId = ReportFilterScope::userId($request, 'over-issue-user-filter');
+    $userId = ReportFilterScope::terminalUserId($request, 'over-issue-user-filter', false);
 
     $tickets = Ticket::with(['overIssueSeats', 'schedule:id,time', 'terminal:id,name', 'customer:id,name,contact,cnic'])
         ->where('company_id', Auth::user()->company_id)

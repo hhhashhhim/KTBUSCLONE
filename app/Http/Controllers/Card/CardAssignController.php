@@ -141,7 +141,13 @@ class CardAssignController extends Controller
                     'company_id' => Auth::user()->company_id,
                 ])->first();
 
-                if ($customer) {
+                if (!$customer) {
+                    $customer = Customer::where('company_id', Auth::user()->company_id)
+                        ->where('cnic', $cleanCnic)
+                        ->first();
+                }
+
+                if ($customer && (string) plainContactAndCnic($customer->cnic) !== (string) $cleanCnic) {
                     $duplicateCustomer = Customer::where('company_id', Auth::user()->company_id)
                         ->where('cnic', $cleanCnic)
                         ->where('id', '!=', $customer->id)
@@ -151,12 +157,22 @@ class CardAssignController extends Controller
                         DB::rollBack();
                         return response()->json(["errors" => ["Error" => ["Another customer already exists against given CNIC Number "]]], 422);
                     }
+                }
 
+                if ($customer) {
                     $customer->update([
                         'name' => $request->name,
                         'cnic' => $cleanCnic,
                         'contact' => $cleanPhone,
                         'updated_by' => Auth::user()->id,
+                    ]);
+                } else {
+                    $customer = Customer::create([
+                        'company_id' => Auth::user()->company_id,
+                        'added_by' => Auth::user()->id,
+                        'name' => $request->name,
+                        'cnic' => $cleanCnic,
+                        'contact' => $cleanPhone,
                     ]);
                 }
 
@@ -166,6 +182,7 @@ class CardAssignController extends Controller
                     'phone' => $cleanPhone,
                     'name' => $request->name,
                     'card_category_id' => $request->card_category_id,
+                    'customer_id' => $customer->id,
                     'expiry_date' => $request->expiry_date,
                     'starting_points' => $request->starting_points,
                     'updated_by' => Auth::user()->id,

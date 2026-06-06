@@ -41,7 +41,7 @@ class AdvanceSalesReportController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return ReportFilterScope::users('user-filter');
+        return ReportFilterScope::terminalUsers('user-filter');
     }
 
     public function getSchedules()
@@ -83,7 +83,7 @@ class AdvanceSalesReportController extends Controller
         $passengerCnic = preg_replace('/[^0-9]/', '', $request->passenger_cnic ?? '');
         $isCounterSale = filter_var($request->counterSale, FILTER_VALIDATE_BOOLEAN);
         $selectedTerminalId = ReportFilterScope::terminalId($request, 'terminal-filter');
-        $selectedUserId = ReportFilterScope::userId($request, 'user-filter');
+        $selectedUserId = ReportFilterScope::terminalUserId($request, 'user-filter');
 
         $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'route:id,name,via', 'schedule:id,name,time',"bus:id,bus_number", 'customer:id,name,contact,cnic')
             ->withTrashed()
@@ -147,72 +147,7 @@ class AdvanceSalesReportController extends Controller
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
         // return $tickets;
-        $tickets = $tickets->sortBy('schedule_date_time')->groupBy(['schedule_date_time','route_id', 'updated_by']);
-
-        $sortData = [];
-        foreach ($tickets as $time) {
-            foreach ($time as $route) {
-                foreach ($route as $inner) {
-
-                    $single = [];
-                    $single['bus_number'] = $inner[0]->bus->bus_number??'N/A';
-                    $single['bus_class'] = $inner[0]->busClass->name;
-                    $single['route'] = $inner[0]->route->name??'N/A';
-                    $single['seats'] = $inner->count();
-                    $single['terminal'] = $inner[0]->terminal->name;
-                    $single['user'] = $inner[0]->updated_name->name??'N/A';
-                    $single['sales'] = $inner->sum('seat_fare');
-                    $single['discount'] = $inner->sum('discount');
-                    $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
-                    $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
-                    $single['invoice_id'] = $inner->pluck('invoice_id')
-                        ->filter(fn ($invoiceId) => !empty($invoiceId))
-                        ->unique()
-                        ->values()
-                        ->toArray();
-                    $single['transaction_id'] = $inner->pluck('transaction_id')
-                        ->filter(fn ($transactionId) => !empty($transactionId))
-                        ->unique()
-                        ->values()
-                        ->toArray();
-                    $single['passenger_name'] = $inner->map(fn ($ticket) => $ticket->customer->name ?? null)
-                        ->filter()
-                        ->unique()
-                        ->values()
-                        ->toArray();
-                    $single['passenger_contact'] = $inner->map(function ($ticket) {
-                        return !empty($ticket->customer?->contact)
-                            ? formatContact($ticket->customer->contact)
-                            : null;
-                    })
-                        ->filter()
-                        ->unique()
-                        ->values()
-                        ->toArray();
-                    $single['passenger_cnic'] = $inner->map(function ($ticket) {
-                        return !empty($ticket->customer?->cnic)
-                            ? formatCNIC($ticket->customer->cnic)
-                            : null;
-                    })
-                        ->filter()
-                        ->unique()
-                        ->values()
-                        ->toArray();
-                    $eltSum = 0;
-                    foreach ($inner as $tkt) {
-                        if ($tkt->ticketElt) {
-                            $eltSum += $tkt->ticketElt->elt_price;
-                        } else {
-                            $eltSum += 0;
-                        }
-
-                    }
-                    $single['elt'] = $eltSum;
-                    $single['net_sale'] = $single['sales'] - $single['discount'] + $single['elt'];
-                    array_push($sortData, $single);
-                }
-            }
-        }
+        $sortData = $this->buildTicketRows($tickets);
 
 //        Refund Data Details
 
@@ -282,7 +217,7 @@ class AdvanceSalesReportController extends Controller
         $passengerCnic = preg_replace('/[^0-9]/', '', $request->passenger_cnic ?? '');
         $isCounterSale = filter_var($request->counterSale, FILTER_VALIDATE_BOOLEAN);
         $selectedTerminalId = ReportFilterScope::terminalId($request, 'terminal-filter');
-        $selectedUserId = ReportFilterScope::userId($request, 'user-filter');
+        $selectedUserId = ReportFilterScope::terminalUserId($request, 'user-filter');
 
         $tickets = Ticket::with('updated_name:id,name', 'ticketElt:id,ticket_id,elt_price', 'terminal:id,name', 'busClass:id,name', 'route:id,name,via', 'schedule:id,name,time',"bus:id,bus_number", 'customer:id,name,contact,cnic')
             ->withTrashed()
@@ -346,72 +281,7 @@ class AdvanceSalesReportController extends Controller
             $tickets = $tickets->where('schedule_date_time', '<=', date("Y-m-d H:i:s",strtotime($request->toDateTime)));
         }
         // return $tickets;
-        $tickets = $tickets->sortBy('schedule_date_time')->groupBy(['schedule_date_time','route_id', 'updated_by']);
-
-        $sortData = [];
-        foreach ($tickets as $time) {
-            foreach ($time as $route) {
-                foreach ($route as $inner) {
-
-                    $single = [];
-                    $single['bus_number'] = $inner[0]->bus->bus_number??'N/A';
-                    $single['bus_class'] = $inner[0]->busClass->name;
-                    $single['route'] = $inner[0]->route->name??'N/A';
-                    $single['seats'] = $inner->count();
-                    $single['terminal'] = $inner[0]->terminal->name;
-                    $single['user'] = $inner[0]->updated_name->name??'N/A';
-                    $single['sales'] = $inner->sum('seat_fare');
-                    $single['discount'] = $inner->sum('discount');
-                    $single['date'] = date("Y-m-d",strtotime($inner[0]->schedule_date_time));
-                    $single['time'] = date("h:i A",strtotime($inner[0]->schedule_date_time));
-                    $single['invoice_id'] = $inner->pluck('invoice_id')
-                        ->filter(fn ($invoiceId) => !empty($invoiceId))
-                        ->unique()
-                        ->values()
-                        ->toArray();
-                    $single['transaction_id'] = $inner->pluck('transaction_id')
-                        ->filter(fn ($transactionId) => !empty($transactionId))
-                        ->unique()
-                        ->values()
-                        ->toArray();
-                    $single['passenger_name'] = $inner->map(fn ($ticket) => $ticket->customer->name ?? null)
-                        ->filter()
-                        ->unique()
-                        ->values()
-                        ->toArray();
-                    $single['passenger_contact'] = $inner->map(function ($ticket) {
-                        return !empty($ticket->customer?->contact)
-                            ? formatContact($ticket->customer->contact)
-                            : null;
-                    })
-                        ->filter()
-                        ->unique()
-                        ->values()
-                        ->toArray();
-                    $single['passenger_cnic'] = $inner->map(function ($ticket) {
-                        return !empty($ticket->customer?->cnic)
-                            ? formatCNIC($ticket->customer->cnic)
-                            : null;
-                    })
-                        ->filter()
-                        ->unique()
-                        ->values()
-                        ->toArray();
-                    $eltSum = 0;
-                    foreach ($inner as $tkt) {
-                        if ($tkt->ticketElt) {
-                            $eltSum += $tkt->ticketElt->elt_price;
-                        } else {
-                            $eltSum += 0;
-                        }
-
-                    }
-                    $single['elt'] = $eltSum;
-                    $single['net_sale'] = $single['sales'] - $single['discount'] + $single['elt'];
-                    array_push($sortData, $single);
-                }
-            }
-        }
+        $sortData = $this->buildTicketRows($tickets);
 
 
         $filterData = (object)[];
@@ -455,6 +325,44 @@ class AdvanceSalesReportController extends Controller
         }
 
         return array_values(array_intersect(self::ADVANCE_SALES_COLUMNS, $visibleColumns));
+    }
+
+    private function buildTicketRows($tickets): array
+    {
+        return $tickets
+            ->sortBy('schedule_date_time')
+            ->values()
+            ->map(function ($ticket) {
+                $elt = $ticket->ticketElt?->elt_price ?? 0;
+                $sales = $ticket->seat_fare ?? 0;
+                $discount = $ticket->discount ?? 0;
+
+                return [
+                    'bus_number' => $ticket->bus?->bus_number ?? 'N/A',
+                    'bus_class' => $ticket->busClass?->name ?? 'N/A',
+                    'route' => $ticket->route?->name ?? 'N/A',
+                    'seats' => 1,
+                    'seat_no' => $ticket->seat_no,
+                    'terminal' => $ticket->terminal?->name ?? 'N/A',
+                    'user' => $ticket->updated_name?->name ?? 'N/A',
+                    'sales' => $sales,
+                    'discount' => $discount,
+                    'date' => date("Y-m-d", strtotime($ticket->schedule_date_time)),
+                    'time' => date("h:i A", strtotime($ticket->schedule_date_time)),
+                    'invoice_id' => $ticket->invoice_id ?: 'N/A',
+                    'transaction_id' => $ticket->transaction_id ?: 'N/A',
+                    'passenger_name' => $ticket->customer->name ?? 'N/A',
+                    'passenger_contact' => !empty($ticket->customer?->contact)
+                        ? formatContact($ticket->customer->contact)
+                        : 'N/A',
+                    'passenger_cnic' => !empty($ticket->customer?->cnic)
+                        ? formatCNIC($ticket->customer->cnic)
+                        : 'N/A',
+                    'elt' => $elt,
+                    'net_sale' => $sales - $discount + $elt,
+                ];
+            })
+            ->toArray();
     }
 
 }

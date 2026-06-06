@@ -100,7 +100,7 @@ class AuthController extends Controller
             return new ValidationResource($validator->errors());
         }
 
-        $user= User::where(['email'=> $request->email,"hide"=>0])->with("role")->first(["id","name","email","contact","password","is_super_admin","role_id","company_id"]);
+        $user= User::where(['email'=> $request->email,"hide"=>0])->with("role")->first(["id","name","email","contact","password","is_super_admin","role_id","company_id","terminal_id","allow_assign_bus"]);
         
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response([

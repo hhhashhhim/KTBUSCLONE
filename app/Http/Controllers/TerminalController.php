@@ -508,7 +508,7 @@ public function filterData(Request $request)
 
     $terminalId = ReportFilterScope::terminalId($request, 'terminal-sale-terminal-filter');
     $routeIds = ReportFilterScope::routeIds($request, 'terminal-sale-route-filter');
-    $userId = ReportFilterScope::userId($request, 'terminal-sale-user-filter');
+    $userId = ReportFilterScope::terminalUserId($request, 'terminal-sale-user-filter');
 
     // Load all commissions once
     $commissions = TerminalCommission::select(
@@ -699,7 +699,7 @@ public function filterData(Request $request)
         if (!checkForSubmenu("terminal-sale")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return ReportFilterScope::users('terminal-sale-user-filter');
+        return ReportFilterScope::terminalUsers('terminal-sale-user-filter');
     }
 
     public function terminalSalesRoutes()

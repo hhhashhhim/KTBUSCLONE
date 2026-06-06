@@ -93,6 +93,7 @@ class UserController extends Controller
             'destination.*' => 'integer',
             'routes' => 'required|array',
             'routes.*' => 'integer',
+            'allow_assign_bus' => 'nullable|boolean',
         ]);
 
         $departure = array_map('intval', $request->departure ?? []);
@@ -110,6 +111,7 @@ class UserController extends Controller
             'destination_city_ids' => json_encode($destination),
             'departure_city_ids' => json_encode($departure),
             'route_ids' => json_encode($routes),
+            'allow_assign_bus' => $request->boolean('allow_assign_bus'),
             'company_id' => Auth::user()->company_id,
             'previous_days' => $request->previous_days
         ]);
@@ -177,6 +179,7 @@ class UserController extends Controller
                     'email' => 'bail|required|email|unique:users,email,' . $request->id,
                     'role_id' => 'required',
                     'contact' => 'required',
+                    'allow_assign_bus' => 'nullable|boolean',
                 ]);
                 $user = User::find($request->id)->update([
                     'name' => $request->name,
@@ -189,6 +192,7 @@ class UserController extends Controller
                     'destination_city_ids' => json_encode($destination),
                     'departure_city_ids' => json_encode($departure),
                     'route_ids' => json_encode($routes),
+                    'allow_assign_bus' => $request->boolean('allow_assign_bus'),
                     'check_allowed_seats' => $request->check_allowed_seats,
                     'company_id' => Auth::user()->company_id,
                     'previous_days' => $request->previous_days

@@ -222,18 +222,24 @@ if (!function_exists('countSeatFromMap')) {
 if (!function_exists('checkPermissionButtons')) {
     function checkPermissionButtons($name)
     {
+        if ($name === 'assign-bus') {
+            return (bool) Auth::user()->allow_assign_bus;
+        }
+
         $permissions = Role::find(Auth::user()->role_id)->permissions;
         foreach ($permissions as $menu) {
             foreach ($menu['childs'] as $submenu) {
                 if (isset($submenu['buttons'])) {
                     foreach ($submenu['buttons'] as $button) {
-                        if ($button['name'] == $name) {
-                            return $button['allow'];
+                        if ($button['name'] == $name && $button['allow']) {
+                            return true;
                         }
                     }
                 }
             }
         }
+
+        return false;
     }
 }
 if (!function_exists('storeFare')) {

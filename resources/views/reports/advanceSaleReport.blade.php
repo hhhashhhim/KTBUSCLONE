@@ -134,7 +134,7 @@
             @if(!empty($visibleColumnsLookup['invoice_id']))
                 <td>
                 @if(!empty($data['invoice_id']))
-                    {!! implode('<br>', $data['invoice_id']) !!}
+                    {!! is_array($data['invoice_id']) ? implode('<br>', $data['invoice_id']) : $data['invoice_id'] !!}
                 @else
                     N/A
                 @endif
@@ -143,7 +143,7 @@
             @if(!empty($visibleColumnsLookup['transaction_id']))
                 <td>
                 @if(!empty($data['transaction_id']))
-                    {!! implode('<br>', $data['transaction_id']) !!}
+                    {!! is_array($data['transaction_id']) ? implode('<br>', $data['transaction_id']) : $data['transaction_id'] !!}
                 @else
                     N/A
                 @endif
@@ -152,7 +152,7 @@
             @if(!empty($visibleColumnsLookup['passenger_name']))
                 <td>
                 @if(!empty($data['passenger_name']))
-                    {!! implode('<br>', $data['passenger_name']) !!}
+                    {!! is_array($data['passenger_name']) ? implode('<br>', $data['passenger_name']) : $data['passenger_name'] !!}
                 @else
                     N/A
                 @endif
@@ -161,7 +161,7 @@
             @if(!empty($visibleColumnsLookup['passenger_contact']))
                 <td>
                 @if(!empty($data['passenger_contact']))
-                    {!! implode('<br>', $data['passenger_contact']) !!}
+                    {!! is_array($data['passenger_contact']) ? implode('<br>', $data['passenger_contact']) : $data['passenger_contact'] !!}
                 @else
                     N/A
                 @endif
@@ -170,7 +170,7 @@
             @if(!empty($visibleColumnsLookup['passenger_cnic']))
                 <td>
                 @if(!empty($data['passenger_cnic']))
-                    {!! implode('<br>', $data['passenger_cnic']) !!}
+                    {!! is_array($data['passenger_cnic']) ? implode('<br>', $data['passenger_cnic']) : $data['passenger_cnic'] !!}
                 @else
                     N/A
                 @endif

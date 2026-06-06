@@ -305,11 +305,47 @@ class ScheduleController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+        $this->validate($request, [
+            'schedules.id' => 'required|integer',
+            'schedules.name' => 'required',
+            'schedules.start_date' => 'required',
+            'schedules.end_date' => 'required',
+            'schedules.time' => 'required',
+            'schedules.route_id' => 'required|integer',
+            'schedules.bus_class_id' => 'required|integer',
+        ], [
+            'schedules.name.required' => 'Schedule Name is Required',
+            'schedules.start_date.required' => 'Start Date is Required',
+            'schedules.end_date.required' => 'End Date is Required',
+            'schedules.time.required' => 'Time Field is Required',
+            'schedules.route_id.required' => 'Route is Required',
+            'schedules.bus_class_id.required' => 'Bus Class is Required',
+        ]);
+
         try {
                 DB::beginTransaction();
                 $req = $request->schedules;
-        //        dd($req);
-                $update = Schedule::where('id', $req['id'])->update([
+
+                $schedule = Schedule::where('id', $req['id'])
+                    ->where('company_id', Auth::user()->company_id)
+                    ->first();
+
+                if (!$schedule) {
+                    DB::rollBack();
+                    return response()->json(["errors" => ["Error" => ['Schedule not found.']]], 404);
+                }
+
+                $busClass = BusClass::where('id', $req['bus_class_id'])
+                    ->where('company_id', Auth::user()->company_id)
+                    ->where('hide', 0)
+                    ->first();
+
+                if (!$busClass) {
+                    DB::rollBack();
+                    return response()->json(["errors" => ["Bus Class" => ['Selected bus class was not found.']]], 422);
+                }
+
+                $update = $schedule->update([
                     'name' => $req['name'],
                     'start_date' => $req['start_date'],
                     'end_date' => $req['end_date'],
@@ -319,6 +355,13 @@ class ScheduleController extends Controller
                     'route_id' => $req['route_id'],
                     'bus_class_id' => $req['bus_class_id'],
                     'route_city_terminal' => $req['route_city_terminal'] ?? [],
+                ]);
+
+                ScheduleDetail::where([
+                    'company_id' => Auth::user()->company_id,
+                    'schedule_id' => $schedule->id,
+                ])->update([
+                    'bus_class_id' => $req['bus_class_id'],
                 ]);
                 
                 
@@ -350,7 +393,7 @@ class ScheduleController extends Controller
 
 
                 // and after addition route detail we will update schedule detail also so that it will implent all schedules
-                $schedule = Schedule::where('id', $req['id'])->first();
+                $schedule->refresh();
                 // getting schedule detail from today or upcoming schedule to get schedule start date
                 $start_date = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$schedule->id])->where("schedule_date", '>=' , date("Y-m-d"))->orderBy("id","ASC")->first();
                 // getting schedule detail from today or upcoming schedule to get schedule end date

@@ -122,6 +122,8 @@ class DiscountCardAssignController extends Controller
 
             $cleanCnic = plainContactAndCnic($request->cnic);
             $cleanPhone = plainContactAndCnic($request->phone);
+            $previousCnic = plainContactAndCnic($assignCard->customer?->cnic ?? $assignCard->cnic);
+            $previousContact = plainContactAndCnic($assignCard->customer?->contact ?? $assignCard->phone);
 
             $duplicateCard = DiscountAssign::where('company_id', Auth::user()->company_id)
                 ->where('cnic', $cleanCnic)
@@ -138,7 +140,13 @@ class DiscountCardAssignController extends Controller
                 'company_id' => Auth::user()->company_id,
             ])->first();
 
-            if ($customer) {
+            if (!$customer) {
+                $customer = Customer::where('company_id', Auth::user()->company_id)
+                    ->where('cnic', $cleanCnic)
+                    ->first();
+            }
+
+            if ($customer && (string) plainContactAndCnic($customer->cnic) !== (string) $cleanCnic) {
                 $duplicateCustomer = Customer::where('company_id', Auth::user()->company_id)
                     ->where('cnic', $cleanCnic)
                     ->where('id', '!=', $customer->id)
@@ -148,12 +156,22 @@ class DiscountCardAssignController extends Controller
                     DB::rollBack();
                     return response()->json(["errors" => ["Error" => ["Another customer already exists against given CNIC Number "]]], 422);
                 }
+            }
 
+            if ($customer) {
                 $customer->update([
                     'name' => $request->name,
                     'cnic' => $cleanCnic,
                     'contact' => $cleanPhone,
                     'updated_by' => Auth::user()->id,
+                ]);
+            } else {
+                $customer = Customer::create([
+                    'company_id' => Auth::user()->company_id,
+                    'added_by' => Auth::user()->id,
+                    'name' => $request->name,
+                    'cnic' => $cleanCnic,
+                    'contact' => $cleanPhone,
                 ]);
             }
 
@@ -163,9 +181,13 @@ class DiscountCardAssignController extends Controller
                 'phone' => $cleanPhone,
                 'name' => $request->name,
                 'card_type_id' => $request->card_type_id,
+                'customer_id' => $customer->id,
                 'expiry_date' => $request->expiry_date,
                 'updated_by' => Auth::user()->id,
             ]);
+
+            $this->syncMatchingCustomerRecords($previousCnic, $previousContact, $cleanCnic, $cleanPhone);
+
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
                 "message" => Auth::user()->name . " | updated card assignation of customer (" . $assignCard->name . ")",
@@ -179,6 +201,31 @@ class DiscountCardAssignController extends Controller
             Log::error('Database transaction error: ' . $e->getMessage());
             return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
         }
+    }
+
+    private function syncMatchingCustomerRecords($previousCnic, $previousContact, $newCnic, $newContact): void
+    {
+        if (!$previousCnic || !$previousContact || ($previousCnic === $newCnic && $previousContact === $newContact)) {
+            return;
+        }
+
+        Customer::where('company_id', Auth::user()->company_id)
+            ->where('cnic', $previousCnic)
+            ->where('contact', $previousContact)
+            ->update([
+                'cnic' => $newCnic,
+                'contact' => $newContact,
+                'updated_by' => Auth::user()->id,
+            ]);
+
+        DiscountAssign::where('company_id', Auth::user()->company_id)
+            ->where('cnic', $previousCnic)
+            ->where('phone', $previousContact)
+            ->update([
+                'cnic' => $newCnic,
+                'phone' => $newContact,
+                'updated_by' => Auth::user()->id,
+            ]);
     }
 
     public function getCnic(Request $request)

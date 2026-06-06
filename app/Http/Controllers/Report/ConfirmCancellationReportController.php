@@ -52,7 +52,7 @@ class ConfirmCancellationReportController extends Controller
         if (!checkForSubmenu("confirm-cancel")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return ReportFilterScope::users('confirm-cancel-user-filter');
+        return ReportFilterScope::terminalUsers('confirm-cancel-user-filter');
     }
 public function buses()
 {
@@ -144,7 +144,7 @@ public function buses()
         $selectedCancellationTypes = $this->getSelectedCancellationTypes($request);
         $terminalId = ReportFilterScope::terminalId($request, 'confirm-cancel-terminal-filter');
         $routeIds = ReportFilterScope::routeIds($request, 'confirm-cancel-route-filter');
-        $userId = ReportFilterScope::userId($request, 'confirm-cancel-user-filter');
+        $userId = ReportFilterScope::terminalUserId($request, 'confirm-cancel-user-filter');
 
         return Ticket::with([
             'cancel_ticket:id,ticket_id,percentage,reason,type,added_by,time,created_at',
