@@ -674,7 +674,6 @@
                             class="form-control"
                             id="busClassEdit"
                             v-model="dataEdit.schedules.bus_class_id"
-                            disabled
                         >
                             <option value="0" selected>Select Bus Class</option>
                             <option
@@ -1258,6 +1257,13 @@ export default {
                 return swal({
                     title: "Required!",
                     text: "Schedule Time is Required",
+                    icon: "error",
+                    timer: 2000
+                });
+            if (this.dataEdit.schedules.bus_class_id == 0 || this.dataEdit.schedules.bus_class_id == "" || typeof this.dataEdit.schedules.bus_class_id == "undefined")
+                return swal({
+                    title: "Required!",
+                    text: "Bus Class is Required",
                     icon: "error",
                     timer: 2000
                 });

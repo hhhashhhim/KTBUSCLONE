@@ -209,6 +209,14 @@
                             <label class="custom-control-label" for="femaleCheckBox">Online User</label>
                         </div>
                     </div>
+                    <div class="form-group col-md-6">
+                        <label for="allowAssignBus">Allow Assign Bus</label>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="allowAssignBus"
+                                v-model="data.allow_assign_bus" :true-value="1" :false-value="0">
+                            <label class="custom-control-label" for="allowAssignBus">Allow Assign Bus</label>
+                        </div>
+                    </div>
                 </div>
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="this.loading" @click="add()">
@@ -377,7 +385,7 @@
                             <option value="1">Checked</option>
                         </select>
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-2">
                         <label for="role">User Type</label>
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="femaleCheckBoxEdit"
@@ -385,13 +393,21 @@
                             <label class="custom-control-label" for="femaleCheckBoxEdit">Online User</label>
                         </div>
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-md-2">
                         <label for="role">Apply Time Validation</label>
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="bookinMinute"
                                 v-bind:checked="dataEdit.check_booking_minutes == 1" @click="changeEditMinute($event)"
                                 name="">
                             <label class="custom-control-label" for="bookinMinute">Yes</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="allowAssignBusEdit">Allow Assign Bus</label>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="allowAssignBusEdit"
+                                v-model="dataEdit.allow_assign_bus" :true-value="1" :false-value="0">
+                            <label class="custom-control-label" for="allowAssignBusEdit">Yes</label>
                         </div>
                     </div>
                 </div>
@@ -462,6 +478,7 @@ export default {
                 company_id: "",
                 terminal_id: 0,
                 online_user: 0,
+                allow_assign_bus: 0,
                 destination: [],
                 departure: [],
                 routes: [],
@@ -473,6 +490,7 @@ export default {
                 destination_city_ids: [],
                 role_id: 0,
                 routes: [],
+                allow_assign_bus: 0,
             },
 
             terminals: [],
@@ -627,6 +645,7 @@ export default {
             this.data.departure = 0;
             this.data.routes = 0;
             this.data.destination = 0;
+            this.data.allow_assign_bus = 0;
             this.roleName = '';
         },
 

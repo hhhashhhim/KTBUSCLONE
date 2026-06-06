@@ -454,6 +454,7 @@ export default {
                             buttons: [
                                 {name: "confirm-cancel-terminal-filter", allow: true},
                                 {name: "confirm-cancel-user-filter", allow: true},
+                                {name: "all-user-filter", allow: true},
                                 {name: "confirm-cancel-route-filter", allow: true},
                             ],
                         },
@@ -463,6 +464,7 @@ export default {
                             buttons: [
                                 {name: "terminal-filter", allow: true},
                                 {name: "user-filter", allow: true},
+                                {name: "all-user-filter", allow: true},
                                 {name: "route-filter", allow: true},
                             ],
                         },
@@ -472,6 +474,7 @@ export default {
                             buttons: [
                                 {name: "terminal-sale-terminal-filter", allow: true},
                                 {name: "terminal-sale-user-filter", allow: true},
+                                {name: "all-user-filter", allow: true},
                                 {name: "terminal-sale-route-filter", allow: true},
                             ],
                         },
@@ -588,7 +591,6 @@ export default {
                             allow: true,
                             buttons: [
                                 {name: "previous-date", allow: true},
-                                {name: "assign-bus", allow: true},
                                 {name: "terminal-invoice", allow: true},
                                 {name: "terminal-id", allow: true},
                                 {name: "discount-field", allow: true},

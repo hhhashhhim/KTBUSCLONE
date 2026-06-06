@@ -148,6 +148,7 @@
                                                                         <th>Bus Class</th>
                                                                         <th>Route</th>
                                                                         <th>No of Seat</th>
+                                                                        <th>Seat No</th>
                                                                         <th>Terminal Name</th>
                                                                         <th>User Name</th>
                                                                         <th>Invoice</th>
@@ -169,13 +170,34 @@
                                                                         <td>{{ data.bus_class }}</td>
                                                                         <td>{{ data.route }}</td>
                                                                         <td>{{ data.seats }}</td>
+                                                                        <td>{{ data.seat_no }}</td>
                                                                         <td>{{ data.terminal }}</td>
                                                                         <td>{{ data.user }}</td>
-                                                                        <td>{{ data.invoice_id ?? 'N/A' }}</td>
-                                                                        <td>{{ data.transaction_id ?? 'N/A' }}</td>
-                                                                        <td>{{ data.passenger_name ?? 'N/A' }}</td>
-                                                                        <td>{{ data.passenger_contact ?? 'N/A' }}</td>
-                                                                        <td>{{ data.passenger_cnic ?? 'N/A' }}</td>
+                                                                        <td>
+                                                                            <div v-for="(item, index) in reportItems(data.invoice_id)" :key="`invoice-${i}-${index}`">
+                                                                                {{ item }}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div v-for="(item, index) in reportItems(data.transaction_id)" :key="`transaction-${i}-${index}`">
+                                                                                {{ item }}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div v-for="(item, index) in reportItems(data.passenger_name)" :key="`passenger-${i}-${index}`">
+                                                                                {{ item }}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div v-for="(item, index) in reportItems(data.passenger_contact)" :key="`contact-${i}-${index}`">
+                                                                                {{ item }}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div v-for="(item, index) in reportItems(data.passenger_cnic)" :key="`cnic-${i}-${index}`">
+                                                                                {{ item }}
+                                                                            </div>
+                                                                        </td>
                                                                         <td class="amount-column">{{ formatAmount(data.sales) }}</td>
                                                                         <td class="amount-column">{{ formatAmount(data.discount) }}</td>
                                                                         <td class="amount-column">{{ formatAmount(data.elt) }}</td>
@@ -183,7 +205,7 @@
                                                                     </tr>
 
                                                                     <tr>
-                                                                        <th colspan="4"></th>
+                                                                        <th colspan="5"></th>
                                                                         <th>{{ totalSeats() ?? 0 }}</th>
                                                                         <th colspan="7"></th>
                                                                         <th class="amount-column">{{ formatAmount(totalSeatFare()) }}</th>
@@ -530,6 +552,33 @@ export default {
         },
         formatAmount: function (value) {
             return this.toAmount(value).toLocaleString();
+        },
+        reportItems: function (value) {
+            if (value === null || value === undefined || value === '') {
+                return ['N/A'];
+            }
+
+            let items = value;
+
+            if (typeof value === 'string') {
+                const trimmedValue = value.trim();
+
+                if (trimmedValue.startsWith('[') && trimmedValue.endsWith(']')) {
+                    try {
+                        items = JSON.parse(trimmedValue);
+                    } catch (error) {
+                        items = value;
+                    }
+                }
+            }
+
+            if (!Array.isArray(items)) {
+                return [items];
+            }
+
+            const filteredItems = items.filter(item => item !== null && item !== undefined && item !== '');
+
+            return filteredItems.length ? filteredItems : ['N/A'];
         },
         // refund Table
         refundTotalCharges: function () {

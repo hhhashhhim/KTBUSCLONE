@@ -119,6 +119,10 @@ export default {
             });
         },
         checkForSubmenuButtons(ButtonName) {
+            if (ButtonName === 'assign-bus') {
+                return this.$store?.state?.user?.allow_assign_bus == 1;
+            }
+
             const permissions = Array.isArray(this.permissions)
                 ? this.permissions
                 : (Array.isArray(this.$store?.state?.permissions) ? this.$store.state.permissions : []);
