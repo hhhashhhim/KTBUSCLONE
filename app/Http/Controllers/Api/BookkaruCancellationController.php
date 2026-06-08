@@ -231,10 +231,14 @@ class BookkaruCancellationController extends Controller
         $invoiceId = trim((string) $invoiceId);
 
         if (preg_match('/^INV-\s*(\d+)$/i', $invoiceId, $matches)) {
-            return $matches[1];
+            return (int) $matches[1];
         }
 
-        return $invoiceId;
+        if (is_numeric($invoiceId)) {
+            return (int) $invoiceId;
+        }
+
+        return null;
     }
 
     private function normalizeBookingReference($bookingReference)
@@ -259,7 +263,7 @@ class BookkaruCancellationController extends Controller
     {
         BookkaruApiLog::create([
             'request_id' => $request->input('request_id'),
-            'invoice_id' => $request->input('invoice_id'),
+            'invoice_id' => $this->safeNormalizeInvoiceIdForLog($request->input('invoice_id')),
             'normalized_invoice_id' => $this->safeNormalizeInvoiceIdForLog($request->input('invoice_id')),
             'booking_reference' => $request->input('booking_reference'),
             'seat_numbers' => $request->input('seat_numbers'),

@@ -12,6 +12,8 @@ class BookkaruApiLog extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'invoice_id' => 'integer',
+        'normalized_invoice_id' => 'integer',
         'seat_numbers' => 'array',
         'request_payload' => 'array',
         'response_payload' => 'array',
