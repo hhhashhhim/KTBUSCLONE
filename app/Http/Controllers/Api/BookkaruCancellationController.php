@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Sanctum\Sanctum;
 
 class BookkaruCancellationController extends Controller
 {
@@ -195,7 +196,27 @@ class BookkaruCancellationController extends Controller
         $configuredKey = config('services.bookkaru.api_key');
         $providedKey = $request->header('X-BOOKKARU-API-KEY');
 
-        return $configuredKey && $providedKey && hash_equals($configuredKey, $providedKey);
+        if ($configuredKey && $providedKey && hash_equals($configuredKey, $providedKey)) {
+            return true;
+        }
+
+        $bearerToken = $request->bearerToken();
+
+        if (!$bearerToken) {
+            return false;
+        }
+
+        $accessTokenModel = Sanctum::personalAccessTokenModel();
+        $accessToken = $accessTokenModel::findToken($bearerToken);
+
+        if (!$accessToken || !$accessToken->tokenable) {
+            return false;
+        }
+
+        $allowedEmail = config('services.bookkaru.user_email');
+
+        return $allowedEmail
+            && strcasecmp($accessToken->tokenable->email, $allowedEmail) === 0;
     }
 
     private function normalizeInvoiceId($invoiceId)
