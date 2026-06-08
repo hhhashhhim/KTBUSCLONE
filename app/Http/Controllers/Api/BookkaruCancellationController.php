@@ -118,8 +118,11 @@ class BookkaruCancellationController extends Controller
 
                 if ($request->filled('booking_reference')) {
                     $bookingReference = $this->normalizeBookingReference($request->booking_reference);
-                    $mismatchedBooking = $requestedTickets->contains(function ($ticket) use ($bookingReference) {
-                        return (string) $ticket->booking_no !== (string) $bookingReference;
+                    $rawBookingReference = trim((string) $request->booking_reference);
+                    $mismatchedBooking = $requestedTickets->contains(function ($ticket) use ($bookingReference, $rawBookingReference) {
+                        return (string) $ticket->booking_no !== (string) $bookingReference
+                            && (string) $ticket->transaction_id !== (string) $rawBookingReference
+                            && (string) $ticket->transaction_id !== (string) $bookingReference;
                     });
 
                     if ($mismatchedBooking) {
