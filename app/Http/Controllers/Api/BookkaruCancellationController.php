@@ -44,7 +44,14 @@ class BookkaruCancellationController extends Controller
 
         $validator = Validator::make($request->all(), [
             'request_id' => ['required', 'string', 'max:191'],
-            'invoice_id' => ['required', 'string', 'max:191'],
+            'invoice_id' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if (!is_string($value) && !is_numeric($value)) {
+                        $fail('The invoice id must be a string or number.');
+                    }
+                },
+            ],
             'booking_reference' => ['nullable', 'string', 'max:191'],
             'seat_numbers' => ['required', 'array', 'min:1'],
             'seat_numbers.*' => ['required', 'string', 'max:20'],
@@ -221,7 +228,9 @@ class BookkaruCancellationController extends Controller
 
     private function normalizeInvoiceId($invoiceId)
     {
-        if (preg_match('/^INV-(\d+)$/i', $invoiceId, $matches)) {
+        $invoiceId = trim((string) $invoiceId);
+
+        if (preg_match('/^INV-\s*(\d+)$/i', $invoiceId, $matches)) {
             return $matches[1];
         }
 
@@ -251,6 +260,7 @@ class BookkaruCancellationController extends Controller
         BookkaruApiLog::create([
             'request_id' => $request->input('request_id'),
             'invoice_id' => $request->input('invoice_id'),
+            'normalized_invoice_id' => $this->safeNormalizeInvoiceIdForLog($request->input('invoice_id')),
             'booking_reference' => $request->input('booking_reference'),
             'seat_numbers' => $request->input('seat_numbers'),
             'request_payload' => $request->all(),
@@ -263,5 +273,14 @@ class BookkaruCancellationController extends Controller
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
+    }
+
+    private function safeNormalizeInvoiceIdForLog($invoiceId)
+    {
+        if (!is_string($invoiceId) && !is_numeric($invoiceId)) {
+            return null;
+        }
+
+        return $this->normalizeInvoiceId($invoiceId);
     }
 }
