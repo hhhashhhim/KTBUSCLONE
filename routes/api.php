@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\Api\BookkaruCancellationController;
 use App\Http\Controllers\Api\BookingApiController;
 use App\Http\Controllers\Api\TicketingApiController;
 /*
@@ -20,6 +21,7 @@ use App\Http\Controllers\Api\TicketingApiController;
 //     return $request->user();
 // });
 
+Route::post('bookkaru/cancel-seat', [BookkaruCancellationController::class, 'cancelSeat']);
 
 require_once('api/main.php');
 

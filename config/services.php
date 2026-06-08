@@ -30,4 +30,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'bookkaru' => [
+        'api_key' => env('BOOKKARU_API_KEY'),
+    ],
+
 ];
