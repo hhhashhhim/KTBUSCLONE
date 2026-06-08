@@ -14,7 +14,7 @@ class BreakResource extends JsonResource
      */
     public function toResponse($request)
     {
-        Log::error('Er->: ' . $this->resource);
+        Log::error('Er->: ' . json_encode($this->resource, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
         return response([
             "status" => 'break',
             "message" => "Internal Server Error",

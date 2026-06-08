@@ -55,9 +55,10 @@ class BookkaruCancellationController extends Controller
 
         if ($validator->fails()) {
             $response = [
-                'status' => false,
-                'message' => 'Validation failed.',
-                'errors' => $validator->errors()->toArray(),
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'data' => null,
+                'error' => $validator->errors()->toArray(),
             ];
 
             $this->writeLog($request, $response, 'validation_failed');
