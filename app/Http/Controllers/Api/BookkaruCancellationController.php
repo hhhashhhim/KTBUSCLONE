@@ -9,6 +9,7 @@ use App\Models\Ticket;
 use App\Services\TicketCancellationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -32,7 +33,8 @@ class BookkaruCancellationController extends Controller
                 'error_code' => 'UNAUTHORIZED',
             ];
 
-            $this->writeLog($request, $response, 'unauthorized', false, false, true);
+            $this->storeUnauthorizedLog($request, $response);
+
             Log::warning('Unauthorized Bookkaru cancellation request', [
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent(),
@@ -69,120 +71,83 @@ class BookkaruCancellationController extends Controller
                 'error' => $validator->errors()->toArray(),
             ];
 
-            $this->writeLog($request, $response, 'validation_failed');
+            $this->writeLog($request, $response, 'validation_failed', false, false, false);
 
             return response()->json($response, 422);
         }
 
-        $previousLog = BookkaruApiLog::where('request_id', $request->request_id)
-            ->where('duplicate', false)
-            ->where('unauthorized', false)
-            ->whereNotNull('response_payload')
-            ->oldest()
-            ->first();
+        $requestId = trim((string) $request->request_id);
+        $invoiceId = $this->normalizeInvoiceId($request->invoice_id);
+        $seatNumbers = $this->normalizeSeatNumbers($request->seat_numbers);
+        $bookingReference = $this->normalizeBookingReference($request->booking_reference);
+        $source = trim((string) $request->source);
 
-        if ($previousLog) {
-            $response = $previousLog->response_payload;
-            $this->writeLog($request, $response, 'duplicate', (bool) $previousLog->success, true);
+        if ($invoiceId === null) {
+            $response = $this->businessError('Invalid invoice.', 'INVALID_INVOICE');
+            $this->storeFailureLog($request, $requestId, null, $seatNumbers, $bookingReference, $source, $response, 'failed');
 
-            return response()->json($response, $previousLog->status == 'success' ? 200 : 422);
+            return response()->json($response, 422);
+        }
+
+        $existing = BookkaruApiLog::where('request_id', $requestId)->first();
+        if ($existing) {
+            $existing->duplicate = true;
+            $existing->save();
+
+            $response = $this->buildResponseFromLog($existing);
+            $existing->response_payload = $response;
+            $existing->save();
+
+            ActivityLog::create([
+                'activity_by' => 0,
+                'message' => 'Bookkaru | duplicate cancellation request received | request id: ' . $requestId,
+                'requested_host' => $request->ip(),
+                'company_id' => $existing->company_id,
+            ]);
+
+            return response()->json($response, 200);
         }
 
         try {
-            $response = DB::transaction(function () use ($request) {
-                $invoiceId = $this->normalizeInvoiceId($request->invoice_id);
-                $seatNumbers = collect($request->seat_numbers)->map(function ($seat) {
-                    return (string) $seat;
-                })->unique()->values()->all();
+            $ticketValidation = $this->validateTicketsForRequest($invoiceId, $seatNumbers, $bookingReference);
+            if ($ticketValidation !== true) {
+                $this->storeFailureLog($request, $requestId, $invoiceId, $seatNumbers, $bookingReference, $source, $ticketValidation, 'failed');
 
-                if (!ctype_digit((string) $invoiceId)) {
-                    return $this->businessError('Invalid invoice.', 'INVALID_INVOICE');
-                }
+                return response()->json($ticketValidation, 422);
+            }
 
-                $invoiceExists = Ticket::withTrashed()
-                    ->where('invoice_id', $invoiceId)
-                    ->exists();
+            $pendingResponse = $this->buildPendingResponse($requestId, $invoiceId, $seatNumbers, $bookingReference, $source);
 
-                if (!$invoiceExists) {
-                    return $this->businessError('Invalid invoice.', 'INVALID_INVOICE');
-                }
+            $log = BookkaruApiLog::create([
+                'request_id' => $requestId,
+                'invoice_id' => $invoiceId,
+                'normalized_invoice_id' => $invoiceId,
+                'booking_reference' => $bookingReference,
+                'seat_numbers' => $seatNumbers,
+                'request_payload' => $request->all(),
+                'response_payload' => $pendingResponse,
+                'status' => 'pending',
+                'approval_status' => 'pending',
+                'cancellation_status' => 'pending',
+                'success' => true,
+                'duplicate' => false,
+                'unauthorized' => false,
+                'exception_message' => null,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
 
-                $requestedTickets = Ticket::withTrashed()
-                    ->where('invoice_id', $invoiceId)
-                    ->whereIn('seat_no', $seatNumbers)
-                    ->get();
+            ActivityLog::create([
+                'activity_by' => 0,
+                'message' => 'Bookkaru | cancellation request received | invoice id: ' . $invoiceId . ' | seats: ' . implode(',', $seatNumbers),
+                'requested_host' => $request->ip(),
+                'company_id' => $this->getCompanyIdForRequest($invoiceId, $seatNumbers),
+            ]);
 
-                if ($requestedTickets->count() != count($seatNumbers)) {
-                    return $this->businessError('Requested seat not found for this invoice.', 'SEAT_NOT_FOUND');
-                }
-
-                if ($request->filled('booking_reference')) {
-                    $rawBookingReference = trim((string) $request->booking_reference);
-                    $mismatchedBooking = $requestedTickets->contains(function ($ticket) use ($rawBookingReference) {
-                        return (string) $ticket->transaction_id !== (string) $rawBookingReference;
-                    });
-
-                    if ($mismatchedBooking) {
-                        return $this->businessError('Invalid booking reference.', 'INVALID_BOOKING_REFERENCE');
-                    }
-                }
-
-                $alreadyCancelled = $requestedTickets->contains(function ($ticket) {
-                    return $ticket->trashed() || $ticket->type == 'canceled';
-                });
-
-                if ($alreadyCancelled) {
-                    return $this->businessError('Ticket or seat is already cancelled.', 'ALREADY_CANCELLED');
-                }
-
-                $tickets = Ticket::where('invoice_id', $invoiceId)
-                    ->whereIn('seat_no', $seatNumbers)
-                    ->lockForUpdate()
-                    ->get();
-
-                if ($tickets->count() != count($seatNumbers)) {
-                    return $this->businessError('Ticket or seat is already cancelled.', 'ALREADY_CANCELLED');
-                }
-
-                foreach ($tickets as $ticket) {
-                    $this->cancellationService->cancelTicket(
-                        $ticket,
-                        0,
-                        $request->cancellation_reason ?: 'Cancelled from Bookkaru',
-                        null
-                    );
-                }
-
-                $firstTicket = $tickets->first();
-                ActivityLog::create([
-                    'activity_by' => 0,
-                    'message' => 'Bookkaru | canceled booking. seat no ' . implode(',', $seatNumbers) . ' | invoice id: ' . $invoiceId,
-                    'requested_host' => request()->ip(),
-                    'company_id' => $firstTicket ? $firstTicket->company_id : null,
-                ]);
-
-                $cancelledAt = Carbon::now()->format('Y-m-d H:i:s');
-
-                return [
-                    'status' => true,
-                    'message' => 'Seat cancellation successful.',
-                    'data' => [
-                        'request_id' => $request->request_id,
-                        'invoice_id' => $request->invoice_id,
-                        'booking_reference' => $request->booking_reference,
-                        'cancelled_seats' => $seatNumbers,
-                        'cancelled_at' => $cancelledAt,
-                    ],
-                ];
-            });
-
-            $success = isset($response['status']) && $response['status'] === true;
-            $this->writeLog($request, $response, $success ? 'success' : 'failed', $success);
-
-            return response()->json($response, $success ? 200 : 422);
-        } catch (\Exception $e) {
-            Log::error('Bookkaru cancellation exception: ' . $e->getMessage(), [
-                'request_id' => $request->input('request_id'),
+            return response()->json($pendingResponse, 202);
+        } catch (\Throwable $e) {
+            Log::error('Bookkaru cancellation request exception: ' . $e->getMessage(), [
+                'request_id' => $requestId,
                 'trace' => $e->getTraceAsString(),
             ]);
 
@@ -192,10 +157,231 @@ class BookkaruCancellationController extends Controller
                 'error_code' => 'SERVER_ERROR',
             ];
 
-            $this->writeLog($request, $response, 'exception', false, false, false, $e->getMessage());
+            $this->storeFailureLog($request, $requestId, $invoiceId, $seatNumbers, $bookingReference, $source, $response, 'failed', $e->getMessage());
 
             return response()->json($response, 500);
         }
+    }
+
+    public function requests(Request $request)
+    {
+        if (!checkForSubmenu('bookkaru-cancellation')) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $query = BookkaruApiLog::with(['approvedBy:id,name', 'rejectedBy:id,name'])
+            ->when($request->request_id, function ($builder) use ($request) {
+                $builder->where('request_id', 'like', '%' . trim((string) $request->request_id) . '%');
+            })
+            ->when($request->invoice_id !== null && $request->invoice_id !== '', function ($builder) use ($request) {
+                $invoiceId = $this->normalizeInvoiceId($request->invoice_id);
+                if ($invoiceId !== null) {
+                    $builder->where('invoice_id', $invoiceId);
+                }
+            })
+            ->when($request->booking_reference, function ($builder) use ($request) {
+                $builder->where('booking_reference', 'like', '%' . trim((string) $request->booking_reference) . '%');
+            })
+            ->when($request->status, function ($builder) use ($request) {
+                $builder->where('status', trim((string) $request->status));
+            })
+            ->when($request->from_date, function ($builder) use ($request) {
+                $builder->whereDate('created_at', '>=', $request->from_date);
+            })
+            ->when($request->to_date, function ($builder) use ($request) {
+                $builder->whereDate('created_at', '<=', $request->to_date);
+            })
+            ->orderByDesc('id');
+
+        $requests = $query->limit(200)->get()->map(function (BookkaruApiLog $log) {
+            return $this->formatPortalRow($log);
+        });
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Bookkaru cancellation requests fetched successfully.',
+            'data' => [
+                'requests' => $requests,
+            ],
+        ]);
+    }
+
+    public function approveRequest(Request $request)
+    {
+        if (!checkPermissionButtons('approve-request')) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'id' => ['required', 'integer'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'data' => null,
+                'error' => $validator->errors()->toArray(),
+            ], 422);
+        }
+
+        $log = BookkaruApiLog::with(['approvedBy:id,name', 'rejectedBy:id,name'])->find($request->id);
+        if (!$log) {
+            return response()->json($this->businessError('Request not found.', 'NOT_FOUND'), 404);
+        }
+
+        if (in_array($log->status, ['approved', 'cancelled', 'rejected'], true)) {
+            return response()->json($this->buildResponseFromLog($log), 200);
+        }
+
+        $invoiceId = (int) $log->normalized_invoice_id;
+        $seatNumbers = collect($log->seat_numbers ?? [])->map(function ($seat) {
+            return trim((string) $seat);
+        })->filter()->values()->all();
+        $bookingReference = trim((string) $log->booking_reference);
+
+        $ticketValidation = $this->validateTicketsForRequest($invoiceId, $seatNumbers, $bookingReference ?: null);
+        if ($ticketValidation !== true) {
+            $response = $this->businessError('Cancellation approval failed.', 'CANCELLATION_FAILED');
+            $this->applyFailureState($log, $response, auth()->id(), 'approve');
+
+            return response()->json($response, 422);
+        }
+
+        try {
+            $now = Carbon::now();
+            $cancelledSeats = [];
+            $response = null;
+
+            DB::transaction(function () use ($invoiceId, $seatNumbers, $log, $now, &$cancelledSeats, &$response) {
+                $tickets = Ticket::where('invoice_id', $invoiceId)
+                    ->whereIn('seat_no', $seatNumbers)
+                    ->lockForUpdate()
+                    ->get();
+
+                if ($tickets->count() !== count($seatNumbers)) {
+                    throw new \RuntimeException('CANCELLATION_FAILED');
+                }
+
+                foreach ($tickets as $ticket) {
+                    $this->cancellationService->cancelTicket(
+                        $ticket,
+                        0,
+                        $log->request_payload['cancellation_reason'] ?? 'Cancelled from Bookkaru',
+                        auth()->id()
+                    );
+                    $cancelledSeats[] = (string) $ticket->seat_no;
+                }
+
+                $response = [
+                    'status' => true,
+                    'message' => 'Seat cancellation successful.',
+                    'data' => [
+                        'request_id' => $log->request_id,
+                        'invoice_id' => $log->invoice_id,
+                        'booking_reference' => $log->booking_reference,
+                        'cancelled_seats' => $cancelledSeats,
+                        'approved_at' => $now->format('Y-m-d H:i:s'),
+                        'cancelled_at' => $now->format('Y-m-d H:i:s'),
+                    ],
+                ];
+
+                $log->update([
+                    'status' => 'cancelled',
+                    'approval_status' => 'approved',
+                    'approved_by' => auth()->id(),
+                    'approved_at' => $now,
+                    'cancellation_status' => 'cancelled',
+                    'cancelled_at' => $now,
+                    'success' => true,
+                    'response_payload' => $response,
+                ]);
+            });
+
+            ActivityLog::create([
+                'activity_by' => auth()->id() ?? 0,
+                'message' => Auth::user()->name . ' | approved Bookkaru cancellation request | request id: ' . $log->request_id,
+                'requested_host' => request()->ip(),
+                'company_id' => Auth::user()->company_id,
+            ]);
+
+            return response()->json($response, 200);
+        } catch (\Throwable $e) {
+            Log::error('Bookkaru approval exception: ' . $e->getMessage(), [
+                'request_id' => $log->request_id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            $response = $this->businessError('Cancellation approval failed.', 'CANCELLATION_FAILED');
+            $this->applyFailureState($log, $response, auth()->id(), 'approve', $e->getMessage());
+
+            return response()->json($response, 500);
+        }
+    }
+
+    public function rejectRequest(Request $request)
+    {
+        if (!checkPermissionButtons('reject-request')) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'id' => ['required', 'integer'],
+            'rejection_reason' => ['required', 'string', 'max:1000'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'data' => null,
+                'error' => $validator->errors()->toArray(),
+            ], 422);
+        }
+
+        $log = BookkaruApiLog::find($request->id);
+        if (!$log) {
+            return response()->json($this->businessError('Request not found.', 'NOT_FOUND'), 404);
+        }
+
+        if (in_array($log->status, ['rejected', 'cancelled'], true)) {
+            return response()->json($this->buildResponseFromLog($log), 200);
+        }
+
+        $now = Carbon::now();
+        $response = [
+            'status' => true,
+            'message' => 'Cancellation request rejected.',
+            'data' => [
+                'request_id' => $log->request_id,
+                'invoice_id' => $log->invoice_id,
+                'booking_reference' => $log->booking_reference,
+                'rejection_reason' => $request->rejection_reason,
+                'rejected_at' => $now->format('Y-m-d H:i:s'),
+                'approval_status' => 'rejected',
+                'cancellation_status' => 'rejected',
+            ],
+        ];
+
+        $log->update([
+            'status' => 'rejected',
+            'approval_status' => 'rejected',
+            'rejected_by' => auth()->id(),
+            'rejected_at' => $now,
+            'rejection_reason' => $request->rejection_reason,
+            'cancellation_status' => 'rejected',
+            'success' => true,
+            'response_payload' => $response,
+        ]);
+
+        ActivityLog::create([
+            'activity_by' => auth()->id() ?? 0,
+            'message' => Auth::user()->name . ' | rejected Bookkaru cancellation request | request id: ' . $log->request_id,
+            'requested_host' => request()->ip(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        return response()->json($response, 200);
     }
 
     private function isAuthorized(Request $request)
@@ -241,13 +427,147 @@ class BookkaruCancellationController extends Controller
         return null;
     }
 
+    private function normalizeSeatNumbers($seatNumbers)
+    {
+        return collect($seatNumbers)
+            ->map(function ($seat) {
+                return trim((string) $seat);
+            })
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+    }
+
     private function normalizeBookingReference($bookingReference)
     {
-        if (preg_match('/^PNR(\d+)$/i', $bookingReference, $matches)) {
-            return $matches[1];
+        $bookingReference = trim((string) $bookingReference);
+
+        return $bookingReference === '' ? null : $bookingReference;
+    }
+
+    private function validateTicketsForRequest($invoiceId, array $seatNumbers, $bookingReference = null)
+    {
+        $invoiceExists = Ticket::withTrashed()
+            ->where('invoice_id', $invoiceId)
+            ->exists();
+
+        if (!$invoiceExists) {
+            return $this->businessError('Invalid invoice.', 'INVALID_INVOICE');
         }
 
-        return $bookingReference;
+        $requestedTickets = Ticket::withTrashed()
+            ->where('invoice_id', $invoiceId)
+            ->whereIn('seat_no', $seatNumbers)
+            ->get();
+
+        if ($requestedTickets->count() !== count($seatNumbers)) {
+            return $this->businessError('Requested seat not found for this invoice.', 'SEAT_NOT_FOUND');
+        }
+
+        if ($bookingReference !== null) {
+            $mismatchedBooking = $requestedTickets->contains(function ($ticket) use ($bookingReference) {
+                return trim((string) $ticket->transaction_id) !== trim((string) $bookingReference);
+            });
+
+            if ($mismatchedBooking) {
+                return $this->businessError('Invalid booking reference.', 'INVALID_BOOKING_REFERENCE');
+            }
+        }
+
+        $alreadyCancelled = $requestedTickets->contains(function ($ticket) {
+            return $ticket->trashed() || $ticket->type === 'canceled';
+        });
+
+        if ($alreadyCancelled) {
+            return $this->businessError('Ticket or seat is already cancelled.', 'ALREADY_CANCELLED');
+        }
+
+        return true;
+    }
+
+    private function buildPendingResponse($requestId, $invoiceId, array $seatNumbers, $bookingReference, $source)
+    {
+        return [
+            'status' => true,
+            'message' => 'Cancellation request received and is pending approval.',
+            'data' => [
+                'request_id' => $requestId,
+                'invoice_id' => $invoiceId,
+                'booking_reference' => $bookingReference,
+                'seat_numbers' => $seatNumbers,
+                'approval_status' => 'pending',
+                'cancellation_status' => 'pending',
+                'source' => $source,
+            ],
+        ];
+    }
+
+    private function buildResponseFromLog(BookkaruApiLog $log)
+    {
+        if (is_array($log->response_payload) && !empty($log->response_payload)) {
+            return $log->response_payload;
+        }
+
+        return [
+            'status' => $log->status !== 'failed',
+            'message' => $this->messageForStatus($log->current_status),
+            'data' => [
+                'request_id' => $log->request_id,
+                'invoice_id' => $log->invoice_id,
+                'booking_reference' => $log->booking_reference,
+                'seat_numbers' => $log->seat_numbers ?? [],
+                'approval_status' => $log->approval_status ?? 'pending',
+                'cancellation_status' => $log->cancellation_status ?? 'pending',
+                'source' => data_get($log->request_payload, 'source', 'Bookkaru'),
+                'approved_at' => optional($log->approved_at)->format('Y-m-d H:i:s'),
+                'rejected_at' => optional($log->rejected_at)->format('Y-m-d H:i:s'),
+                'cancelled_at' => optional($log->cancelled_at)->format('Y-m-d H:i:s'),
+                'rejection_reason' => $log->rejection_reason,
+            ],
+        ];
+    }
+
+    private function messageForStatus($status)
+    {
+        switch ($status) {
+            case 'cancelled':
+                return 'Seat cancellation successful.';
+            case 'approved':
+                return 'Cancellation request approved.';
+            case 'rejected':
+                return 'Cancellation request rejected.';
+            case 'failed':
+                return 'Cancellation request failed.';
+            default:
+                return 'Cancellation request received and is pending approval.';
+        }
+    }
+
+    private function formatPortalRow(BookkaruApiLog $log)
+    {
+        return [
+            'id' => $log->id,
+            'request_id' => $log->request_id,
+            'invoice_id' => $log->invoice_id,
+            'normalized_invoice_id' => $log->normalized_invoice_id,
+            'booking_reference' => $log->booking_reference,
+            'seat_numbers' => $log->seat_numbers ?? [],
+            'cancellation_reason' => data_get($log->request_payload, 'cancellation_reason'),
+            'source' => data_get($log->request_payload, 'source', 'Bookkaru'),
+            'status' => $log->current_status,
+            'approval_status' => $log->approval_status,
+            'cancellation_status' => $log->cancellation_status,
+            'request_payload' => $log->request_payload,
+            'response_payload' => $log->response_payload,
+            'request_date' => optional($log->created_at)->format('Y-m-d H:i:s'),
+            'approved_at' => optional($log->approved_at)->format('Y-m-d H:i:s'),
+            'rejected_at' => optional($log->rejected_at)->format('Y-m-d H:i:s'),
+            'cancelled_at' => optional($log->cancelled_at)->format('Y-m-d H:i:s'),
+            'rejection_reason' => $log->rejection_reason,
+            'approved_by' => optional($log->approvedBy)->name,
+            'rejected_by' => optional($log->rejectedBy)->name,
+        ];
     }
 
     private function businessError($message, $errorCode)
@@ -259,32 +579,79 @@ class BookkaruCancellationController extends Controller
         ];
     }
 
-    private function writeLog(Request $request, array $response, $status, $success = false, $duplicate = false, $unauthorized = false, $exceptionMessage = null)
+    private function storeUnauthorizedLog(Request $request, array $response)
     {
         BookkaruApiLog::create([
             'request_id' => $request->input('request_id'),
-            'invoice_id' => $this->safeNormalizeInvoiceIdForLog($request->input('invoice_id')),
-            'normalized_invoice_id' => $this->safeNormalizeInvoiceIdForLog($request->input('invoice_id')),
-            'booking_reference' => $request->input('booking_reference'),
-            'seat_numbers' => $request->input('seat_numbers'),
+            'invoice_id' => $this->normalizeInvoiceId($request->input('invoice_id')),
+            'normalized_invoice_id' => $this->normalizeInvoiceId($request->input('invoice_id')),
+            'booking_reference' => $this->normalizeBookingReference($request->input('booking_reference')),
+            'seat_numbers' => $this->normalizeSeatNumbers($request->input('seat_numbers', [])),
+            'request_payload' => $request->all(),
+            'response_payload' => $response,
+            'status' => 'unauthorized',
+            'approval_status' => 'unauthorized',
+            'cancellation_status' => 'unauthorized',
+            'success' => false,
+            'duplicate' => false,
+            'unauthorized' => true,
+            'exception_message' => null,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+    }
+
+    private function storeFailureLog(Request $request, $requestId, $invoiceId, array $seatNumbers, $bookingReference, $source, array $response, $status, $exceptionMessage = null)
+    {
+        if (!$requestId) {
+            return;
+        }
+
+        BookkaruApiLog::create([
+            'request_id' => $requestId,
+            'invoice_id' => $invoiceId,
+            'normalized_invoice_id' => $invoiceId,
+            'booking_reference' => $bookingReference,
+            'seat_numbers' => $seatNumbers,
             'request_payload' => $request->all(),
             'response_payload' => $response,
             'status' => $status,
-            'success' => $success,
-            'duplicate' => $duplicate,
-            'unauthorized' => $unauthorized,
+            'approval_status' => $status,
+            'cancellation_status' => $status,
+            'success' => false,
+            'duplicate' => false,
+            'unauthorized' => false,
             'exception_message' => $exceptionMessage,
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
     }
 
-    private function safeNormalizeInvoiceIdForLog($invoiceId)
+    private function applyFailureState(BookkaruApiLog $log, array $response, $userId = null, $action = 'approve', $exceptionMessage = null)
     {
-        if (!is_string($invoiceId) && !is_numeric($invoiceId)) {
-            return null;
+        $attrs = [
+            'status' => 'failed',
+            'approval_status' => $log->approval_status === 'rejected' ? 'rejected' : 'approved',
+            'cancellation_status' => 'failed',
+            'success' => false,
+            'response_payload' => $response,
+            'exception_message' => $exceptionMessage,
+        ];
+
+        if ($action === 'approve') {
+            $attrs['approved_by'] = $userId;
+            $attrs['approved_at'] = Carbon::now();
         }
 
-        return $this->normalizeInvoiceId($invoiceId);
+        $log->update($attrs);
+    }
+
+    private function getCompanyIdForRequest($invoiceId, array $seatNumbers)
+    {
+        $ticket = Ticket::where('invoice_id', $invoiceId)
+            ->whereIn('seat_no', $seatNumbers)
+            ->first();
+
+        return $ticket ? $ticket->company_id : null;
     }
 }
