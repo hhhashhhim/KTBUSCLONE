@@ -43,7 +43,7 @@
                                     <img class="loading-spinner"
                                          :src="$store.state.main_url + 'assets/img/loading-spinner.gif'">
                                 </div>
-                                <table class="table table-bordered table-striped text-center" v-else>
+                                <table class="table table-bordered table-striped text-center"  id="bookkaru_table" v-else>
                                     <thead>
                                         <tr>
                                             <th>Request ID</th>
@@ -103,7 +103,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                            </div>
+                            </div> 
                         </div>
                     </div>
                 </div>
@@ -170,6 +170,9 @@ export default {
                 this.requests = res.data.data.requests;
             }
             this.loading = false;
+             setTimeout(function () {
+                $("#bookkaru_table").DataTable();
+            }, 300);
         },
         resetFilters() {
             this.filters = {
@@ -199,6 +202,7 @@ export default {
 
             if (res.status === 200 && res.data.status === true) {
                 swal("Approved", res.data.message, "success");
+                $("#bookkaru_table").DataTable().destroy();
                 this.fetchRequests();
             } else {
                 swal("Error", res.data.message || "Approval failed.", "error");
@@ -225,6 +229,7 @@ export default {
             if (res.status === 200 && res.data.status === true) {
                 $('#bookkaruRejectModal').modal('hide');
                 swal("Rejected", res.data.message, "success");
+                 $("#bookkaru_table").DataTable().destroy();
                 this.fetchRequests();
             } else {
                 swal("Error", res.data.message || "Rejection failed.", "error");

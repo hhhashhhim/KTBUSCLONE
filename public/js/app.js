@@ -41429,8 +41429,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _this.loading = false;
+                setTimeout(function () {
+                  $("#bookkaru_table").DataTable();
+                }, 300);
 
-              case 6:
+              case 7:
               case "end":
                 return _context.stop();
             }
@@ -41488,6 +41491,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (res.status === 200 && res.data.status === true) {
                   swal("Approved", res.data.message, "success");
+                  $("#bookkaru_table").DataTable().destroy();
 
                   _this2.fetchRequests();
                 } else {
@@ -41539,6 +41543,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 if (res.status === 200 && res.data.status === true) {
                   $('#bookkaruRejectModal').modal('hide');
                   swal("Rejected", res.data.message, "success");
+                  $("#bookkaru_table").DataTable().destroy();
 
                   _this3.fetchRequests();
                 } else {
@@ -98815,7 +98820,8 @@ var _hoisted_26 = {
 var _hoisted_27 = ["src"];
 var _hoisted_28 = {
   key: 1,
-  "class": "table table-bordered table-striped text-center"
+  "class": "table table-bordered table-striped text-center",
+  id: "bookkaru_table"
 };
 
 var _hoisted_29 = /*#__PURE__*/_withScopeId(function () {
