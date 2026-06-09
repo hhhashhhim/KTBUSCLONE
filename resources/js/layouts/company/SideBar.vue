@@ -306,6 +306,11 @@
                                 <i class="fas fa-bookmark"></i> All Booking
                             </router-link>
                         </li>
+                        <li class="dropdown" v-if="checkForSubmenu('bookkaru-cancellation')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'bookkaru-cancellation-requests' }">
+                                <i class="fas fa-bookmark"></i> Bookkaru Cancellations
+                            </router-link>
+                        </li>
                         <li class="dropdown" v-if="checkForSubmenu('counter-expenses')">
                             <router-link class="nav-link text-capitalize" :to="{ name: 'counter-expenses-page' }">
                                 <i class="fas fa-bookmark"></i> Counter Inc / Exp
