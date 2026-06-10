@@ -154,7 +154,7 @@
                     </div>
                     <div class="row">
                         <div class="label">URL</div>
-                        <div><code>https://api.kainattravels.net/api/bookkaru/cancel-seat</code></div>
+                        <div><code>https://api.kainattravels.net/api/v1/bookkaru/cancel-seat</code></div>
                     </div>
                 </div>
             </div>
