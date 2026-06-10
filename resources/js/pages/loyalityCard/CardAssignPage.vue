@@ -164,6 +164,12 @@
                                                                     class="btn btn-primary mx-1">
                                                                 <i class="far fa-edit"></i>
                                                             </button>
+                                                            <button v-if="checkForSubmenuButtons('delete-assign-card')"
+                                                                    type="button"
+                                                                    class="btn btn-danger mx-1"
+                                                                    @click="deleteAssignedCard(card)">
+                                                                <i class="far fa-trash-alt"></i>
+                                                            </button>
                                                             <button type="button"
                                                                     class="btn btn-info mx-1"
                                                                     @click="showCardHistory(card)">
@@ -884,6 +890,42 @@ export default {
                     }
 
                 }
+            }
+        },
+
+        async deleteAssignedCard(card) {
+            const willDelete = await swal({
+                title: "Are you sure?",
+                text: "This will unassign the selected loyalty card.",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            });
+
+            if (!willDelete) {
+                return;
+            }
+
+            this.loadingTable = true;
+            const res = await this.callApi("post", "loyaltyCardAssign/delete", { id: card.id });
+
+            if (res.status == 200) {
+                swal({
+                    title: "Success",
+                    text: "Loyalty Card Unassigned Successfully",
+                    icon: "success",
+                    timer: 2000
+                });
+                this.fetchAssignedCard();
+            } else {
+                this.loadingTable = false;
+                const message = res.data?.errors?.Error?.[0] || res.data?.Error?.[0] || "Unable to delete assigned loyalty card.";
+                swal({
+                    title: "Error",
+                    text: message,
+                    icon: "error",
+                    timer: 2000
+                });
             }
         },
 

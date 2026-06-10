@@ -307,7 +307,7 @@
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('bookkaru-cancellation')">
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'bookkaru-cancellation-requests' }">
+                            <router-link class="nav-link text-capitalize bookkaru-text" :to="{ name: 'bookkaru-cancellation-requests' }">
                                 <i class="fas fa-bookmark"></i> Bookkaru Cancellations
                             </router-link>
                         </li>

@@ -13,7 +13,9 @@
 .m-b--125 {
     margin-bottom: -125px
 }
-
+.bookkaru-text{
+    font-size: 12px !important;
+}
 .m-l--120 {
     margin-left: -120px
 }

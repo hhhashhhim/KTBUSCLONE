@@ -671,6 +671,10 @@ export default {
                                 {
                                     name: "edit-assign-card",
                                     allow: true,
+                                },
+                                {
+                                    name: "delete-assign-card",
+                                    allow: true,
                                 }
                             ]
                         }
@@ -704,6 +708,10 @@ export default {
                                 },
                                 {
                                     name: "edit-assign-discount",
+                                    allow: true,
+                                },
+                                {
+                                    name: "delete-assign-discount",
                                     allow: true,
                                 }
                             ]
