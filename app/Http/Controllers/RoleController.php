@@ -59,7 +59,7 @@ class RoleController extends Controller
 
             }
 
-            $modules = $this->stripUserWisePermissions($this->addMissingReportPermissions($modules));
+            $modules = $this->stripUserWisePermissions($this->addMissingPermissions($modules));
 
             return response()->json([
                 'role' => $role,
@@ -147,12 +147,14 @@ class RoleController extends Controller
         ];
     }
 
-    private function addMissingReportPermissions(array $modules): array
+    private function addMissingPermissions(array $modules): array
     {
         $permissionsBySubmenu = [
             'confirm-cancel' => ['all-user-filter'],
             'sales' => ['all-user-filter'],
             'terminal-sale' => ['all-user-filter'],
+            'loyaltyCardAssign' => ['delete-assign-card'],
+            'discountCardAssign' => ['delete-assign-discount'],
         ];
 
         foreach ($modules as &$module) {

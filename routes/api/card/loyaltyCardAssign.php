@@ -10,6 +10,7 @@ Route::group(['prefix' => 'web/v1/loyaltyCardAssign','middleware' => ['auth:sanc
     Route::post('/store', [CardAssignController::class, 'store']);
     Route::post('/categories', [CardAssignController::class, 'cardCategories']);
     Route::post('/update', [CardAssignController::class, 'update']);
+    Route::post('/delete', [CardAssignController::class, 'delete']);
     Route::post('/getCNIC', [CardAssignController::class, 'getCNIC']);
 
 });
@@ -22,6 +23,7 @@ Route::group(['prefix' => 'web/v1/discountCardAssign','middleware' => ['auth:san
     Route::post('/store', [DiscountCardAssignController::class, 'store']);
     Route::post('/categories', [DiscountCardAssignController::class, 'cardCategories']);
     Route::post('/update', [DiscountCardAssignController::class, 'update']);
+    Route::post('/delete', [DiscountCardAssignController::class, 'delete']);
     Route::post('/getCNIC', [DiscountCardAssignController::class, 'getCNIC']);
 
 });

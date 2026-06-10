@@ -203,6 +203,46 @@ class DiscountCardAssignController extends Controller
         }
     }
 
+    public function delete(Request $request)
+    {
+        if (!checkPermissionButtons("delete-assign-discount")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $request->validate([
+            'id' => 'required|integer',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $assignCard = DiscountAssign::where([
+                'id' => $request->id,
+                'company_id' => Auth::user()->company_id,
+            ])->first();
+
+            if (!$assignCard) {
+                DB::rollBack();
+                return response()->json(["errors" => ["Error" => ['Assigned discount card not found.']]], 404);
+            }
+
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name . " | deleted discount card assignation of customer (" . $assignCard->name . ")",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
+
+            $assignCard->delete();
+            DB::commit();
+
+            return response()->json(['message' => 'Assigned discount card deleted successfully.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
+    }
+
     private function syncMatchingCustomerRecords($previousCnic, $previousContact, $newCnic, $newContact): void
     {
         if (!$previousCnic || !$previousContact || ($previousCnic === $newCnic && $previousContact === $newContact)) {

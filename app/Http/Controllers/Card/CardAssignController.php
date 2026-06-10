@@ -203,6 +203,47 @@ class CardAssignController extends Controller
             }
     }
 
+    public function delete(Request $request)
+    {
+        if(!checkPermissionButtons("delete-assign-card"))
+        {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $request->validate([
+            'id' => 'required|integer',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $assignCard = CardAssign::where([
+                'id' => $request->id,
+                'company_id' => Auth::user()->company_id,
+            ])->first();
+
+            if (!$assignCard) {
+                DB::rollBack();
+                return response()->json(["errors" => ["Error" => ['Assigned loyalty card not found.']]], 404);
+            }
+
+            ActivityLog::create([
+                "activity_by" => Auth::user()->id,
+                "message" => Auth::user()->name." | deleted card assignation of customer (".$assignCard->name.")",
+                "requested_host" => $request->ip(),
+                "company_id" => Auth::user()->company_id
+            ]);
+
+            $assignCard->delete();
+            DB::commit();
+
+            return response()->json(['message' => 'Assigned loyalty card deleted successfully.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction error: ' . $e->getMessage());
+            return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        }
+    }
+
     public function getCnic(Request $request)
     {
         if(!checkForSubmenu("loyaltyCardAssign"))
