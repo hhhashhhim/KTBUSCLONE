@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ValidationResource;
 use App\Models\ActivityLog;
 use App\Models\BookkaruApiLog;
-use App\Models\Schedule\ScheduleDetail;
 use App\Models\Ticket;
 use App\Services\TicketCancellationService;
 use Carbon\Carbon;
@@ -367,138 +366,32 @@ class BookkaruCancellationController extends Controller
 
     private function cancelSeatValidationRules(Request $request)
     {
-        if ($this->isLegacyCancelSeatPayload($request)) {
-            return [
-                'request_id' => ['required', 'string', 'max:191'],
-                'invoice_id' => [
-                    'required',
-                    function ($attribute, $value, $fail) {
-                        if (!is_string($value) && !is_numeric($value)) {
-                            $fail('The invoice id must be a string or number.');
-                        }
-                    },
-                ],
-                'booking_reference' => ['nullable', 'string', 'max:191'],
-                'seat_numbers' => ['required', 'array', 'min:1'],
-                'seat_numbers.*' => ['required', 'string', 'max:20'],
-                'cancellation_reason' => ['nullable', 'string', 'max:500'],
-                'source' => ['required', 'string', 'in:Bookkaru'],
-            ];
-        }
-
         return [
-            'departure_city_id' => ['required'],
-            'destination_city_id' => ['required'],
-            'date' => ['required'],
-            'gender' => ['required'],
-            'book_type' => ['required'],
-            'selected_seats' => ['required', 'array', 'min:1'],
-            'selected_seats.*' => ['required'],
-            'selected_seats_class' => ['required'],
-            'selected_seats_fare' => ['required'],
-            'customer_name' => ['required'],
-            'customer_cnic' => ['required'],
-            'contact' => ['required'],
-            'schedule_id' => ['required'],
-            'departure_time' => ['required'],
+            'request_id' => ['required', 'string', 'max:191'],
+            'invoice_id' => ['required'],
+            'booking_reference' => ['required', 'string', 'max:191'],
+            'seat_numbers' => ['required', 'array', 'min:1'],
+            'seat_numbers.*' => ['required', 'string', 'max:20'],
+            'cancellation_reason' => ['required', 'string', 'max:500'],
+            'source' => ['required', 'string', 'in:Bookkaru'],
         ];
     }
 
     private function cancelSeatValidationMessages(Request $request)
     {
-        if (!$this->isLegacyCancelSeatPayload($request)) {
-            return [];
-        }
-
-        return [
-            'invoice_id.required' => 'Invoice ID is required.',
-        ];
-    }
-
-    private function isLegacyCancelSeatPayload(Request $request)
-    {
-        foreach (['request_id', 'invoice_id', 'seat_numbers', 'source', 'booking_reference', 'cancellation_reason'] as $field) {
-            if ($request->has($field)) {
-                return true;
-            }
-        }
-
-        return false;
+        return [];
     }
 
     private function normalizeCancelSeatPayload(Request $request)
     {
-        if ($this->isLegacyCancelSeatPayload($request)) {
-            return [
-                'request_id' => trim((string) $request->request_id),
-                'invoice_id' => $this->normalizeInvoiceId($request->invoice_id),
-                'seat_numbers' => $this->normalizeSeatNumbers($request->seat_numbers),
-                'booking_reference' => $this->normalizeBookingReference($request->booking_reference),
-                'source' => trim((string) $request->source),
-            ];
-        }
-
-        $seatNumbers = $this->normalizeSeatNumbers($request->selected_seats);
-        $ticket = $this->findTicketForBookkaruPayload($request, $seatNumbers);
-
         return [
-            'request_id' => $request->input('request_id') ?: $this->buildBookkaruRequestId($request, $seatNumbers),
-            'invoice_id' => $ticket ? $this->normalizeInvoiceId($ticket->invoice_id) : null,
-            'seat_numbers' => $seatNumbers,
-            'booking_reference' => $this->normalizeBookingReference($request->booking_reference),
-            'source' => $request->input('source', 'Bookkaru'),
+            'request_id' => trim((string) $request->request_id),
+            'invoice_id' => $this->normalizeInvoiceId($request->invoice_id),
+            'seat_numbers' => $this->normalizeSeatNumbers($request->seat_numbers),
+            'booking_reference' => trim((string) $request->booking_reference),
+            'cancellation_reason' => trim((string) $request->cancellation_reason),
+            'source' => trim((string) $request->source),
         ];
-    }
-
-    private function findTicketForBookkaruPayload(Request $request, array $seatNumbers)
-    {
-        $detail = ScheduleDetail::where('departure_id', $request->departure_city_id)
-            ->where('destination_id', $request->destination_city_id)
-            ->where('schedule_id', $request->schedule_id)
-            ->where('departure_date', date('Y-m-d', strtotime($request->date)))
-            ->where('departure_time', date('H:i:s', strtotime($request->departure_time)))
-            ->first();
-
-        if (!$detail) {
-            return null;
-        }
-
-        $cleanCnic = plainContactAndCnic($request->customer_cnic);
-        $cleanContact = plainContactAndCnic($request->contact);
-
-        $tickets = Ticket::withTrashed()
-            ->where('schedule_id', $request->schedule_id)
-            ->where('schedule_date', $detail->schedule_date)
-            ->where('departure_city_id', $request->departure_city_id)
-            ->where('destination_city_id', $request->destination_city_id)
-            ->whereIn('seat_no', $seatNumbers)
-            ->whereHas('customer', function ($query) use ($cleanCnic, $cleanContact) {
-                $query->where('cnic', $cleanCnic)
-                    ->orWhere('contact', $cleanContact);
-            })
-            ->get();
-
-        if ($tickets->count() !== count($seatNumbers)) {
-            return null;
-        }
-
-        $invoiceIds = $tickets->pluck('invoice_id')->filter()->unique()->values();
-
-        return $invoiceIds->count() === 1 ? $tickets->first() : null;
-    }
-
-    private function buildBookkaruRequestId(Request $request, array $seatNumbers)
-    {
-        return 'bookkaru-' . md5(json_encode([
-            'departure_city_id' => $request->departure_city_id,
-            'destination_city_id' => $request->destination_city_id,
-            'date' => $request->date,
-            'schedule_id' => $request->schedule_id,
-            'departure_time' => $request->departure_time,
-            'selected_seats' => $seatNumbers,
-            'customer_cnic' => plainContactAndCnic($request->customer_cnic),
-            'contact' => plainContactAndCnic($request->contact),
-        ]));
     }
 
     private function isAuthorized(Request $request)
