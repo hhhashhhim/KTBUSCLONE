@@ -17,15 +17,20 @@ class TicketCancellationService
         $this->deleteElt($ticket);
 
         $previousType = $ticket->type;
+        $refundPercentage = $this->normalizePercentage($percentage);
+        $refundAmount = round(((float) $ticket->seat_fare * $refundPercentage) / 100, 2);
 
         $ticket->update([
             'type' => 'canceled',
+            'refund_reason' => $reason,
+            'refund_percentage' => $refundPercentage,
+            'refund_amount' => $refundAmount,
         ]);
 
         BookingCancel::create([
             'company_id' => $ticket->company_id,
             'ticket_id' => $ticket->id,
-            'percentage' => $percentage,
+            'percentage' => $refundPercentage,
             'reason' => $reason,
             'type' => $previousType,
             'added_by' => $addedBy,
@@ -34,6 +39,21 @@ class TicketCancellationService
         $ticket->delete();
 
         return $previousType;
+    }
+
+    private function normalizePercentage($percentage)
+    {
+        $percentage = is_numeric($percentage) ? (float) $percentage : 0;
+
+        if ($percentage < 0) {
+            return 0;
+        }
+
+        if ($percentage > 100) {
+            return 100;
+        }
+
+        return round($percentage, 2);
     }
 
     private function deleteElt(Ticket $ticket)

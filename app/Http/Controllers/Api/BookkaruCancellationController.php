@@ -39,9 +39,10 @@ class BookkaruCancellationController extends Controller
 
         if (!$this->isAuthorized($request)) {
             $response = [
-                'status' => false,
+                'status' => 'error',
                 'message' => 'Unauthorized Bookkaru request.',
-                'error_code' => 'UNAUTHORIZED',
+                'data' => null,
+                'error' => ['code' => 'UNAUTHORIZED'],
             ];
 
             $this->storeUnauthorizedLog($request, $response);
@@ -61,6 +62,7 @@ class BookkaruCancellationController extends Controller
         $seatNumbers = $payload['seat_numbers'];
         $bookingReference = $payload['booking_reference'];
         $source = $payload['source'];
+        $refundPercentage = $payload['refund_percentage'];
 
         if ($invoiceId === null) {
             $response = $this->businessError('Invalid invoice.', 'INVALID_INVOICE');
@@ -96,7 +98,10 @@ class BookkaruCancellationController extends Controller
                 return response()->json($ticketValidation, 422);
             }
 
-            $pendingResponse = $this->buildPendingResponse($requestId, $invoiceId, $seatNumbers, $bookingReference, $source);
+            $requestPayload = array_merge($request->all(), [
+                'refund_percentage' => $refundPercentage,
+            ]);
+            $pendingResponse = $this->buildPendingResponse($requestId, $invoiceId, $seatNumbers, $bookingReference, $source, $refundPercentage);
 
             $log = BookkaruApiLog::create([
                 'request_id' => $requestId,
@@ -104,7 +109,7 @@ class BookkaruCancellationController extends Controller
                 'normalized_invoice_id' => $invoiceId,
                 'booking_reference' => $bookingReference,
                 'seat_numbers' => $seatNumbers,
-                'request_payload' => $request->all(),
+                'request_payload' => $requestPayload,
                 'response_payload' => $pendingResponse,
                 'status' => 'pending',
                 'approval_status' => 'pending',
@@ -132,9 +137,10 @@ class BookkaruCancellationController extends Controller
             ]);
 
             $response = [
-                'status' => false,
+                'status' => 'error',
                 'message' => 'Unable to process cancellation request.',
-                'error_code' => 'SERVER_ERROR',
+                'data' => null,
+                'error' => ['code' => 'SERVER_ERROR'],
             ];
 
             $this->storeFailureLog($request, $requestId, $invoiceId, $seatNumbers, $bookingReference, $source, $response, 'failed', $e->getMessage());
@@ -219,6 +225,7 @@ class BookkaruCancellationController extends Controller
             return trim((string) $seat);
         })->filter()->values()->all();
         $bookingReference = trim((string) $log->booking_reference);
+        $refundPercentage = $this->normalizeRefundPercentage(data_get($log->request_payload, 'refund_percentage', config('services.bookkaru.refund_percentage', 0)));
 
         $ticketValidation = $this->validateTicketsForRequest($invoiceId, $seatNumbers, $bookingReference ?: null);
         if ($ticketValidation !== true) {
@@ -231,9 +238,10 @@ class BookkaruCancellationController extends Controller
         try {
             $now = Carbon::now();
             $cancelledSeats = [];
+            $refunds = [];
             $response = null;
 
-            DB::transaction(function () use ($invoiceId, $seatNumbers, $log, $now, &$cancelledSeats, &$response) {
+            DB::transaction(function () use ($invoiceId, $seatNumbers, $log, $now, $refundPercentage, &$cancelledSeats, &$refunds, &$response) {
                 $tickets = Ticket::where('invoice_id', $invoiceId)
                     ->whereIn('seat_no', $seatNumbers)
                     ->lockForUpdate()
@@ -246,24 +254,35 @@ class BookkaruCancellationController extends Controller
                 foreach ($tickets as $ticket) {
                     $this->cancellationService->cancelTicket(
                         $ticket,
-                        0,
+                        $refundPercentage,
                         $log->request_payload['cancellation_reason'] ?? 'Cancelled from Bookkaru',
                         auth()->id()
                     );
                     $cancelledSeats[] = (string) $ticket->seat_no;
+                    $refunds[] = [
+                        'ticket_id' => $ticket->id,
+                        'seat_no' => (string) $ticket->seat_no,
+                        'seat_fare' => (float) $ticket->seat_fare,
+                        'refund_percentage' => $refundPercentage,
+                        'refund_amount' => round(((float) $ticket->seat_fare * $refundPercentage) / 100, 2),
+                        'refund_reason' => $log->request_payload['cancellation_reason'] ?? 'Cancelled from Bookkaru',
+                    ];
                 }
 
                 $response = [
-                    'status' => true,
+                    'status' => 'success',
                     'message' => 'Seat cancellation successful.',
                     'data' => [
                         'request_id' => $log->request_id,
                         'invoice_id' => $log->invoice_id,
                         'booking_reference' => $log->booking_reference,
                         'cancelled_seats' => $cancelledSeats,
+                        'refund_percentage' => $refundPercentage,
+                        'refunds' => $refunds,
                         'approved_at' => $now->format('Y-m-d H:i:s'),
                         'cancelled_at' => $now->format('Y-m-d H:i:s'),
                     ],
+                    'error' => null,
                 ];
 
                 $log->update([
@@ -374,6 +393,7 @@ class BookkaruCancellationController extends Controller
             'seat_numbers.*' => ['required', 'string', 'max:20'],
             'cancellation_reason' => ['required', 'string', 'max:500'],
             'source' => ['required', 'string', 'in:Bookkaru'],
+            'refund_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ];
     }
 
@@ -391,7 +411,32 @@ class BookkaruCancellationController extends Controller
             'booking_reference' => trim((string) $request->booking_reference),
             'cancellation_reason' => trim((string) $request->cancellation_reason),
             'source' => trim((string) $request->source),
+            'refund_percentage' => $this->resolveRefundPercentage($request),
         ];
+    }
+
+    private function resolveRefundPercentage(Request $request)
+    {
+        if ($request->filled('refund_percentage')) {
+            return $this->normalizeRefundPercentage($request->refund_percentage);
+        }
+
+        return $this->normalizeRefundPercentage(config('services.bookkaru.refund_percentage', 0));
+    }
+
+    private function normalizeRefundPercentage($percentage)
+    {
+        $percentage = is_numeric($percentage) ? (float) $percentage : 0;
+
+        if ($percentage < 0) {
+            return 0;
+        }
+
+        if ($percentage > 100) {
+            return 100;
+        }
+
+        return round($percentage, 2);
     }
 
     private function isAuthorized(Request $request)
@@ -496,20 +541,22 @@ class BookkaruCancellationController extends Controller
         return true;
     }
 
-    private function buildPendingResponse($requestId, $invoiceId, array $seatNumbers, $bookingReference, $source)
+    private function buildPendingResponse($requestId, $invoiceId, array $seatNumbers, $bookingReference, $source, $refundPercentage)
     {
         return [
-            'status' => true,
+            'status' => 'success',
             'message' => 'Cancellation request received and is pending approval.',
             'data' => [
                 'request_id' => $requestId,
                 'invoice_id' => $invoiceId,
                 'booking_reference' => $bookingReference,
                 'seat_numbers' => $seatNumbers,
+                'refund_percentage' => $refundPercentage,
                 'approval_status' => 'pending',
                 'cancellation_status' => 'pending',
                 'source' => $source,
             ],
+            'error' => null,
         ];
     }
 
@@ -520,7 +567,7 @@ class BookkaruCancellationController extends Controller
         }
 
         return [
-            'status' => $log->status !== 'failed',
+            'status' => $log->status !== 'failed' ? 'success' : 'error',
             'message' => $this->messageForStatus($log->current_status),
             'data' => [
                 'request_id' => $log->request_id,
@@ -535,6 +582,7 @@ class BookkaruCancellationController extends Controller
                 'cancelled_at' => optional($log->cancelled_at)->format('Y-m-d H:i:s'),
                 'rejection_reason' => $log->rejection_reason,
             ],
+            'error' => null,
         ];
     }
 
@@ -583,9 +631,10 @@ class BookkaruCancellationController extends Controller
     private function businessError($message, $errorCode)
     {
         return [
-            'status' => false,
+            'status' => 'error',
             'message' => $message,
-            'error_code' => $errorCode,
+            'data' => null,
+            'error' => ['code' => $errorCode],
         ];
     }
 
