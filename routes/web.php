@@ -17,6 +17,10 @@ Route::get('/test-view', function(){
     return view('test-view');
 });
 
+Route::get('/bookkaru/cancel-seat/documentation', function () {
+    return view('bookkaru-cancel-seat-doc');
+});
+
 Route::get('/', function () {
     return view('welcome');
 });

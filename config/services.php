@@ -33,6 +33,7 @@ return [
     'bookkaru' => [
         'api_key' => env('BOOKKARU_API_KEY'),
         'user_email' => env('BOOKKARU_USER_EMAIL', 'bookkaru@kt.com'),
+        'deduction_percentage' => env('BOOKKARU_DEDUCTION_PERCENTAGE', env('BOOKKARU_REFUND_PERCENTAGE', 0)),
         'refund_percentage' => env('BOOKKARU_REFUND_PERCENTAGE', 0),
     ],
 

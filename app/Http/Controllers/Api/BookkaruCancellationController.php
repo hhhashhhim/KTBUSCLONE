@@ -60,13 +60,14 @@ class BookkaruCancellationController extends Controller
         $requestId = $payload['request_id'];
         $invoiceId = $payload['invoice_id'];
         $seatNumbers = $payload['seat_numbers'];
-        $bookingReference = $payload['booking_reference'];
+        $transactionId = $payload['transaction_id'];
         $source = $payload['source'];
+        $deductionPercentage = $payload['deduction_percentage'];
         $refundPercentage = $payload['refund_percentage'];
 
         if ($invoiceId === null) {
             $response = $this->businessError('Invalid invoice.', 'INVALID_INVOICE');
-            $this->storeFailureLog($request, $requestId, null, $seatNumbers, $bookingReference, $source, $response, 'failed');
+            $this->storeFailureLog($request, $requestId, null, $seatNumbers, $transactionId, $source, $response, 'failed');
 
             return response()->json($response, 422);
         }
@@ -91,23 +92,26 @@ class BookkaruCancellationController extends Controller
         }
 
         try {
-            $ticketValidation = $this->validateTicketsForRequest($invoiceId, $seatNumbers, $bookingReference);
+            $ticketValidation = $this->validateTicketsForRequest($invoiceId, $seatNumbers, $transactionId);
             if ($ticketValidation !== true) {
-                $this->storeFailureLog($request, $requestId, $invoiceId, $seatNumbers, $bookingReference, $source, $ticketValidation, 'failed');
+                $this->storeFailureLog($request, $requestId, $invoiceId, $seatNumbers, $transactionId, $source, $ticketValidation, 'failed');
 
                 return response()->json($ticketValidation, 422);
             }
 
             $requestPayload = array_merge($request->all(), [
+                'transaction_id' => $transactionId,
+                'booking_reference' => $transactionId,
+                'deduction_percentage' => $deductionPercentage,
                 'refund_percentage' => $refundPercentage,
             ]);
-            $pendingResponse = $this->buildPendingResponse($requestId, $invoiceId, $seatNumbers, $bookingReference, $source, $refundPercentage);
+            $pendingResponse = $this->buildPendingResponse($requestId, $invoiceId, $seatNumbers, $transactionId, $source, $deductionPercentage, $refundPercentage);
 
             $log = BookkaruApiLog::create([
                 'request_id' => $requestId,
                 'invoice_id' => $invoiceId,
                 'normalized_invoice_id' => $invoiceId,
-                'booking_reference' => $bookingReference,
+                'booking_reference' => $transactionId,
                 'seat_numbers' => $seatNumbers,
                 'request_payload' => $requestPayload,
                 'response_payload' => $pendingResponse,
@@ -143,7 +147,7 @@ class BookkaruCancellationController extends Controller
                 'error' => ['code' => 'SERVER_ERROR'],
             ];
 
-            $this->storeFailureLog($request, $requestId, $invoiceId, $seatNumbers, $bookingReference, $source, $response, 'failed', $e->getMessage());
+            $this->storeFailureLog($request, $requestId, $invoiceId, $seatNumbers, $transactionId, $source, $response, 'failed', $e->getMessage());
 
             return response()->json($response, 500);
         }
@@ -167,6 +171,9 @@ class BookkaruCancellationController extends Controller
             })
             ->when($request->booking_reference, function ($builder) use ($request) {
                 $builder->where('booking_reference', 'like', '%' . trim((string) $request->booking_reference) . '%');
+            })
+            ->when($request->transaction_id, function ($builder) use ($request) {
+                $builder->where('booking_reference', 'like', '%' . trim((string) $request->transaction_id) . '%');
             })
             ->when($request->status, function ($builder) use ($request) {
                 $builder->where('status', trim((string) $request->status));
@@ -224,10 +231,11 @@ class BookkaruCancellationController extends Controller
         $seatNumbers = collect($log->seat_numbers ?? [])->map(function ($seat) {
             return trim((string) $seat);
         })->filter()->values()->all();
-        $bookingReference = trim((string) $log->booking_reference);
-        $refundPercentage = $this->normalizeRefundPercentage(data_get($log->request_payload, 'refund_percentage', config('services.bookkaru.refund_percentage', 0)));
+        $transactionId = trim((string) data_get($log->request_payload, 'transaction_id', $log->booking_reference));
+        $deductionPercentage = $this->resolveLogDeductionPercentage($log);
+        $refundPercentage = $this->refundPercentageFromDeduction($deductionPercentage);
 
-        $ticketValidation = $this->validateTicketsForRequest($invoiceId, $seatNumbers, $bookingReference ?: null);
+        $ticketValidation = $this->validateTicketsForRequest($invoiceId, $seatNumbers, $transactionId ?: null);
         if ($ticketValidation !== true) {
             $response = $this->businessError('Cancellation approval failed.', 'CANCELLATION_FAILED');
             $this->applyFailureState($log, $response, auth()->id(), 'approve');
@@ -241,7 +249,7 @@ class BookkaruCancellationController extends Controller
             $refunds = [];
             $response = null;
 
-            DB::transaction(function () use ($invoiceId, $seatNumbers, $log, $now, $refundPercentage, &$cancelledSeats, &$refunds, &$response) {
+            DB::transaction(function () use ($invoiceId, $seatNumbers, $log, $now, $transactionId, $deductionPercentage, $refundPercentage, &$cancelledSeats, &$refunds, &$response) {
                 $tickets = Ticket::where('invoice_id', $invoiceId)
                     ->whereIn('seat_no', $seatNumbers)
                     ->lockForUpdate()
@@ -252,6 +260,10 @@ class BookkaruCancellationController extends Controller
                 }
 
                 foreach ($tickets as $ticket) {
+                    $seatFare = (float) $ticket->seat_fare;
+                    $deductionAmount = $this->calculatePercentageAmount($seatFare, $deductionPercentage);
+                    $refundAmount = $this->calculatePercentageAmount($seatFare, $refundPercentage);
+
                     $this->cancellationService->cancelTicket(
                         $ticket,
                         $refundPercentage,
@@ -262,9 +274,12 @@ class BookkaruCancellationController extends Controller
                     $refunds[] = [
                         'ticket_id' => $ticket->id,
                         'seat_no' => (string) $ticket->seat_no,
-                        'seat_fare' => (float) $ticket->seat_fare,
+                        'transaction_id' => $transactionId,
+                        'seat_fare' => $seatFare,
+                        'deduction_percentage' => $deductionPercentage,
+                        'deduction_amount' => $deductionAmount,
                         'refund_percentage' => $refundPercentage,
-                        'refund_amount' => round(((float) $ticket->seat_fare * $refundPercentage) / 100, 2),
+                        'refund_amount' => $refundAmount,
                         'refund_reason' => $log->request_payload['cancellation_reason'] ?? 'Cancelled from Bookkaru',
                     ];
                 }
@@ -275,9 +290,12 @@ class BookkaruCancellationController extends Controller
                     'data' => [
                         'request_id' => $log->request_id,
                         'invoice_id' => $log->invoice_id,
-                        'booking_reference' => $log->booking_reference,
+                        'transaction_id' => $transactionId,
                         'cancelled_seats' => $cancelledSeats,
+                        'deduction_percentage' => $deductionPercentage,
+                        'deduction_amount' => round(collect($refunds)->sum('deduction_amount'), 2),
                         'refund_percentage' => $refundPercentage,
+                        'refund_amount' => round(collect($refunds)->sum('refund_amount'), 2),
                         'refunds' => $refunds,
                         'approved_at' => $now->format('Y-m-d H:i:s'),
                         'cancelled_at' => $now->format('Y-m-d H:i:s'),
@@ -354,7 +372,7 @@ class BookkaruCancellationController extends Controller
             'data' => [
                 'request_id' => $log->request_id,
                 'invoice_id' => $log->invoice_id,
-                'booking_reference' => $log->booking_reference,
+                'transaction_id' => data_get($log->request_payload, 'transaction_id', $log->booking_reference),
                 'rejection_reason' => $request->rejection_reason,
                 'rejected_at' => $now->format('Y-m-d H:i:s'),
                 'approval_status' => 'rejected',
@@ -388,43 +406,73 @@ class BookkaruCancellationController extends Controller
         return [
             'request_id' => ['required', 'string', 'max:191'],
             'invoice_id' => ['required'],
-            'booking_reference' => ['required', 'string', 'max:191'],
+            'transaction_id' => ['required_without:booking_reference', 'string', 'max:191'],
+            'booking_reference' => ['nullable', 'string', 'max:191'],
             'seat_numbers' => ['required', 'array', 'min:1'],
             'seat_numbers.*' => ['required', 'string', 'max:20'],
             'cancellation_reason' => ['required', 'string', 'max:500'],
             'source' => ['required', 'string', 'in:Bookkaru'],
+            'deduction_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'refund_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ];
     }
 
     private function cancelSeatValidationMessages(Request $request)
     {
-        return [];
+        return [
+            'transaction_id.required_without' => 'The transaction id field is required.',
+        ];
     }
 
     private function normalizeCancelSeatPayload(Request $request)
     {
+        $deductionPercentage = $this->resolveDeductionPercentage($request);
+
         return [
             'request_id' => trim((string) $request->request_id),
             'invoice_id' => $this->normalizeInvoiceId($request->invoice_id),
             'seat_numbers' => $this->normalizeSeatNumbers($request->seat_numbers),
-            'booking_reference' => trim((string) $request->booking_reference),
+            'transaction_id' => $this->normalizeTransactionId($request->input('transaction_id', $request->input('booking_reference'))),
             'cancellation_reason' => trim((string) $request->cancellation_reason),
             'source' => trim((string) $request->source),
-            'refund_percentage' => $this->resolveRefundPercentage($request),
+            'deduction_percentage' => $deductionPercentage,
+            'refund_percentage' => $this->refundPercentageFromDeduction($deductionPercentage),
         ];
     }
 
-    private function resolveRefundPercentage(Request $request)
+    private function resolveDeductionPercentage(Request $request)
     {
-        if ($request->filled('refund_percentage')) {
-            return $this->normalizeRefundPercentage($request->refund_percentage);
+        if ($request->filled('deduction_percentage')) {
+            return $this->normalizePercentage($request->deduction_percentage);
         }
 
-        return $this->normalizeRefundPercentage(config('services.bookkaru.refund_percentage', 0));
+        if ($request->filled('refund_percentage')) {
+            return $this->normalizePercentage($request->refund_percentage);
+        }
+
+        return $this->normalizePercentage(config('services.bookkaru.deduction_percentage', config('services.bookkaru.refund_percentage', 0)));
     }
 
-    private function normalizeRefundPercentage($percentage)
+    private function resolveLogDeductionPercentage(BookkaruApiLog $log)
+    {
+        return $this->normalizePercentage(data_get(
+            $log->request_payload,
+            'deduction_percentage',
+            data_get($log->request_payload, 'refund_percentage', config('services.bookkaru.deduction_percentage', config('services.bookkaru.refund_percentage', 0)))
+        ));
+    }
+
+    private function refundPercentageFromDeduction($deductionPercentage)
+    {
+        return $this->normalizePercentage(100 - $this->normalizePercentage($deductionPercentage));
+    }
+
+    private function calculatePercentageAmount($amount, $percentage)
+    {
+        return round(((float) $amount * $this->normalizePercentage($percentage)) / 100, 2);
+    }
+
+    private function normalizePercentage($percentage)
     {
         $percentage = is_numeric($percentage) ? (float) $percentage : 0;
 
@@ -494,14 +542,14 @@ class BookkaruCancellationController extends Controller
             ->all();
     }
 
-    private function normalizeBookingReference($bookingReference)
+    private function normalizeTransactionId($transactionId)
     {
-        $bookingReference = trim((string) $bookingReference);
+        $transactionId = trim((string) $transactionId);
 
-        return $bookingReference === '' ? null : $bookingReference;
+        return $transactionId === '' ? null : $transactionId;
     }
 
-    private function validateTicketsForRequest($invoiceId, array $seatNumbers, $bookingReference = null)
+    private function validateTicketsForRequest($invoiceId, array $seatNumbers, $transactionId = null)
     {
         $invoiceExists = Ticket::withTrashed()
             ->where('invoice_id', $invoiceId)
@@ -520,13 +568,13 @@ class BookkaruCancellationController extends Controller
             return $this->businessError('Requested seat not found for this invoice.', 'SEAT_NOT_FOUND');
         }
 
-        if ($bookingReference !== null) {
-            $mismatchedBooking = $requestedTickets->contains(function ($ticket) use ($bookingReference) {
-                return trim((string) $ticket->transaction_id) !== trim((string) $bookingReference);
+        if ($transactionId !== null) {
+            $mismatchedTransaction = $requestedTickets->contains(function ($ticket) use ($transactionId) {
+                return trim((string) $ticket->transaction_id) !== trim((string) $transactionId);
             });
 
-            if ($mismatchedBooking) {
-                return $this->businessError('Invalid booking reference.', 'INVALID_BOOKING_REFERENCE');
+            if ($mismatchedTransaction) {
+                return $this->businessError('Invalid transaction id.', 'INVALID_TRANSACTION_ID');
             }
         }
 
@@ -541,7 +589,7 @@ class BookkaruCancellationController extends Controller
         return true;
     }
 
-    private function buildPendingResponse($requestId, $invoiceId, array $seatNumbers, $bookingReference, $source, $refundPercentage)
+    private function buildPendingResponse($requestId, $invoiceId, array $seatNumbers, $transactionId, $source, $deductionPercentage, $refundPercentage)
     {
         return [
             'status' => 'success',
@@ -549,8 +597,9 @@ class BookkaruCancellationController extends Controller
             'data' => [
                 'request_id' => $requestId,
                 'invoice_id' => $invoiceId,
-                'booking_reference' => $bookingReference,
+                'transaction_id' => $transactionId,
                 'seat_numbers' => $seatNumbers,
+                'deduction_percentage' => $deductionPercentage,
                 'refund_percentage' => $refundPercentage,
                 'approval_status' => 'pending',
                 'cancellation_status' => 'pending',
@@ -563,8 +612,11 @@ class BookkaruCancellationController extends Controller
     private function buildResponseFromLog(BookkaruApiLog $log)
     {
         if (is_array($log->response_payload) && !empty($log->response_payload)) {
-            return $log->response_payload;
+            return $this->normalizeStoredResponsePayload($log->response_payload);
         }
+
+        $deductionPercentage = $this->resolveLogDeductionPercentage($log);
+        $refundPercentage = $this->refundPercentageFromDeduction($deductionPercentage);
 
         return [
             'status' => $log->status !== 'failed' ? 'success' : 'error',
@@ -572,8 +624,10 @@ class BookkaruCancellationController extends Controller
             'data' => [
                 'request_id' => $log->request_id,
                 'invoice_id' => $log->invoice_id,
-                'booking_reference' => $log->booking_reference,
+                'transaction_id' => data_get($log->request_payload, 'transaction_id', $log->booking_reference),
                 'seat_numbers' => $log->seat_numbers ?? [],
+                'deduction_percentage' => $deductionPercentage,
+                'refund_percentage' => $refundPercentage,
                 'approval_status' => $log->approval_status ?? 'pending',
                 'cancellation_status' => $log->cancellation_status ?? 'pending',
                 'source' => data_get($log->request_payload, 'source', 'Bookkaru'),
@@ -584,6 +638,27 @@ class BookkaruCancellationController extends Controller
             ],
             'error' => null,
         ];
+    }
+
+    private function normalizeStoredResponsePayload(array $response)
+    {
+        if (!isset($response['data']) || !is_array($response['data'])) {
+            return $response;
+        }
+
+        if (!isset($response['data']['transaction_id']) && isset($response['data']['booking_reference'])) {
+            $response['data']['transaction_id'] = $response['data']['booking_reference'];
+        }
+
+        unset($response['data']['booking_reference']);
+
+        if (!isset($response['data']['deduction_percentage']) && isset($response['data']['refund_percentage'])) {
+            $deductionPercentage = $this->normalizePercentage($response['data']['refund_percentage']);
+            $response['data']['deduction_percentage'] = $deductionPercentage;
+            $response['data']['refund_percentage'] = $this->refundPercentageFromDeduction($deductionPercentage);
+        }
+
+        return $response;
     }
 
     private function messageForStatus($status)
@@ -610,6 +685,7 @@ class BookkaruCancellationController extends Controller
             'invoice_id' => $log->invoice_id,
             'normalized_invoice_id' => $log->normalized_invoice_id,
             'booking_reference' => $log->booking_reference,
+            'transaction_id' => data_get($log->request_payload, 'transaction_id', $log->booking_reference),
             'seat_numbers' => $log->seat_numbers ?? [],
             'cancellation_reason' => data_get($log->request_payload, 'cancellation_reason'),
             'source' => data_get($log->request_payload, 'source', 'Bookkaru'),
@@ -644,7 +720,7 @@ class BookkaruCancellationController extends Controller
             'request_id' => $request->input('request_id'),
             'invoice_id' => $this->normalizeInvoiceId($request->input('invoice_id')),
             'normalized_invoice_id' => $this->normalizeInvoiceId($request->input('invoice_id')),
-            'booking_reference' => $this->normalizeBookingReference($request->input('booking_reference')),
+            'booking_reference' => $this->normalizeTransactionId($request->input('transaction_id', $request->input('booking_reference'))),
             'seat_numbers' => $this->normalizeSeatNumbers($request->input('seat_numbers', [])),
             'request_payload' => $request->all(),
             'response_payload' => $response,
@@ -660,7 +736,7 @@ class BookkaruCancellationController extends Controller
         ]);
     }
 
-    private function storeFailureLog(Request $request, $requestId, $invoiceId, array $seatNumbers, $bookingReference, $source, array $response, $status, $exceptionMessage = null)
+    private function storeFailureLog(Request $request, $requestId, $invoiceId, array $seatNumbers, $transactionId, $source, array $response, $status, $exceptionMessage = null)
     {
         if (!$requestId) {
             return;
@@ -670,7 +746,7 @@ class BookkaruCancellationController extends Controller
             'request_id' => $requestId,
             'invoice_id' => $invoiceId,
             'normalized_invoice_id' => $invoiceId,
-            'booking_reference' => $bookingReference,
+            'booking_reference' => $transactionId,
             'seat_numbers' => $seatNumbers,
             'request_payload' => $request->all(),
             'response_payload' => $response,
