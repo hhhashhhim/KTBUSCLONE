@@ -37,4 +37,10 @@ return [
         'refund_percentage' => env('BOOKKARU_REFUND_PERCENTAGE', 0),
     ],
 
+    'online_terminals' => [
+        'api_key' => env('ONLINE_TERMINAL_API_KEY', env('BOOKKARU_API_KEY')),
+        'user_email' => env('ONLINE_TERMINAL_USER_EMAIL', env('BOOKKARU_USER_EMAIL', 'bookkaru@kt.com')),
+        'deduction_percentage' => env('ONLINE_TERMINAL_DEDUCTION_PERCENTAGE', env('BOOKKARU_DEDUCTION_PERCENTAGE', env('BOOKKARU_REFUND_PERCENTAGE', 0))),
+    ],
+
 ];

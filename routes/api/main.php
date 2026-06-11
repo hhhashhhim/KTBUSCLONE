@@ -3,8 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthApiController;
-use App\Http\Controllers\Api\BookkaruCancellationController;
 use App\Http\Controllers\Api\BookingApiController;
+use App\Http\Controllers\Api\OnlineTerminalCancellationController;
 use App\Http\Controllers\Api\TicketingApiController;
 /*
 |--------------------------------------------------------------------------
@@ -25,8 +25,12 @@ use App\Http\Controllers\Api\TicketingApiController;
 // Route::post('register', [RegisterController::class, 'register']);
 Route::post('v1/login', [AuthApiController::class, 'login']);
 
+Route::group(['prefix' => 'v1/online-terminals'], function () {
+   Route::post('/cancel-seat', [OnlineTerminalCancellationController::class, 'cancelSeat']);
+});
+
 Route::group(['prefix' => 'v1/bookkaru'], function () {
-   Route::post('/cancel-seat', [BookkaruCancellationController::class, 'cancelSeat']);
+   Route::post('/cancel-seat', [OnlineTerminalCancellationController::class, 'cancelSeat']);
 });
 
 Route::group(['middleware' => 'auth:sanctum'], function(){

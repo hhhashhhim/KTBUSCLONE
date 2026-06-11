@@ -40,17 +40,18 @@ class BookkaruCancellationController extends Controller
         if (!$this->isAuthorized($request)) {
             $response = [
                 'status' => 'error',
-                'message' => 'Unauthorized Bookkaru request.',
+                'message' => 'Unauthorized online terminal request.',
                 'data' => null,
                 'error' => ['code' => 'UNAUTHORIZED'],
             ];
 
             $this->storeUnauthorizedLog($request, $response);
 
-            Log::warning('Unauthorized Bookkaru cancellation request', [
+            Log::warning('Unauthorized online terminal cancellation request', [
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent(),
                 'request_id' => $request->input('request_id'),
+                'source' => $request->input('source'),
             ]);
 
             return response()->json($response, 401);
@@ -83,7 +84,7 @@ class BookkaruCancellationController extends Controller
 
             ActivityLog::create([
                 'activity_by' => 0,
-                'message' => 'Bookkaru | duplicate cancellation request received | request id: ' . $requestId,
+                'message' => $source . ' | duplicate cancellation request received | request id: ' . $requestId,
                 'requested_host' => $request->ip(),
                 'company_id' => $existing->company_id,
             ]);
@@ -92,6 +93,14 @@ class BookkaruCancellationController extends Controller
         }
 
         try {
+            $existingSeatRequest = $this->findExistingSeatRequest($requestId, $invoiceId, $transactionId, $seatNumbers);
+            if ($existingSeatRequest) {
+                $response = $this->businessError('Cancellation request already exists for this seat.', 'DUPLICATE_SEAT_CANCELLATION');
+                $this->storeFailureLog($request, $requestId, $invoiceId, $seatNumbers, $transactionId, $source, $response, 'failed');
+
+                return response()->json($response, 409);
+            }
+
             $ticketValidation = $this->validateTicketsForRequest($invoiceId, $seatNumbers, $transactionId);
             if ($ticketValidation !== true) {
                 $this->storeFailureLog($request, $requestId, $invoiceId, $seatNumbers, $transactionId, $source, $ticketValidation, 'failed');
@@ -104,6 +113,7 @@ class BookkaruCancellationController extends Controller
                 'booking_reference' => $transactionId,
                 'deduction_percentage' => $deductionPercentage,
                 'refund_percentage' => $refundPercentage,
+                'source' => $source,
             ]);
             $pendingResponse = $this->buildPendingResponse($requestId, $invoiceId, $seatNumbers, $transactionId, $source, $deductionPercentage, $refundPercentage);
 
@@ -128,15 +138,16 @@ class BookkaruCancellationController extends Controller
 
             ActivityLog::create([
                 'activity_by' => 0,
-                'message' => 'Bookkaru | cancellation request received | invoice id: ' . $invoiceId . ' | seats: ' . implode(',', $seatNumbers),
+                'message' => $source . ' | cancellation request received | invoice id: ' . $invoiceId . ' | seats: ' . implode(',', $seatNumbers),
                 'requested_host' => $request->ip(),
                 'company_id' => $this->getCompanyIdForRequest($invoiceId, $seatNumbers),
             ]);
 
             return response()->json($pendingResponse, 202);
         } catch (\Throwable $e) {
-            Log::error('Bookkaru cancellation request exception: ' . $e->getMessage(), [
+            Log::error('Online terminal cancellation request exception: ' . $e->getMessage(), [
                 'request_id' => $requestId,
+                'source' => $source,
                 'trace' => $e->getTraceAsString(),
             ]);
 
@@ -192,7 +203,7 @@ class BookkaruCancellationController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Bookkaru cancellation requests fetched successfully.',
+            'message' => 'Online terminal cancellation requests fetched successfully.',
             'data' => [
                 'requests' => $requests,
             ],
@@ -267,7 +278,7 @@ class BookkaruCancellationController extends Controller
                     $this->cancellationService->cancelTicket(
                         $ticket,
                         $refundPercentage,
-                        $log->request_payload['cancellation_reason'] ?? 'Cancelled from Bookkaru',
+                        $log->request_payload['cancellation_reason'] ?? 'Cancelled from online terminal',
                         auth()->id()
                     );
                     $cancelledSeats[] = (string) $ticket->seat_no;
@@ -280,7 +291,7 @@ class BookkaruCancellationController extends Controller
                         'deduction_amount' => $deductionAmount,
                         'refund_percentage' => $refundPercentage,
                         'refund_amount' => $refundAmount,
-                        'refund_reason' => $log->request_payload['cancellation_reason'] ?? 'Cancelled from Bookkaru',
+                        'refund_reason' => $log->request_payload['cancellation_reason'] ?? 'Cancelled from online terminal',
                     ];
                 }
 
@@ -317,15 +328,16 @@ class BookkaruCancellationController extends Controller
 
             ActivityLog::create([
                 'activity_by' => auth()->id() ?? 0,
-                'message' => Auth::user()->name . ' | approved Bookkaru cancellation request | request id: ' . $log->request_id,
+                'message' => Auth::user()->name . ' | approved ' . data_get($log->request_payload, 'source', 'online terminal') . ' cancellation request | request id: ' . $log->request_id,
                 'requested_host' => request()->ip(),
                 'company_id' => Auth::user()->company_id,
             ]);
 
             return response()->json($response, 200);
         } catch (\Throwable $e) {
-            Log::error('Bookkaru approval exception: ' . $e->getMessage(), [
+            Log::error('Online terminal approval exception: ' . $e->getMessage(), [
                 'request_id' => $log->request_id,
+                'source' => data_get($log->request_payload, 'source'),
                 'trace' => $e->getTraceAsString(),
             ]);
 
@@ -393,7 +405,7 @@ class BookkaruCancellationController extends Controller
 
         ActivityLog::create([
             'activity_by' => auth()->id() ?? 0,
-            'message' => Auth::user()->name . ' | rejected Bookkaru cancellation request | request id: ' . $log->request_id,
+            'message' => Auth::user()->name . ' | rejected ' . data_get($log->request_payload, 'source', 'online terminal') . ' cancellation request | request id: ' . $log->request_id,
             'requested_host' => request()->ip(),
             'company_id' => Auth::user()->company_id,
         ]);
@@ -411,7 +423,7 @@ class BookkaruCancellationController extends Controller
             'seat_numbers' => ['required', 'array', 'min:1'],
             'seat_numbers.*' => ['required', 'string', 'max:20'],
             'cancellation_reason' => ['required', 'string', 'max:500'],
-            'source' => ['required', 'string', 'in:Bookkaru'],
+            'source' => ['required', 'string', 'max:100'],
             'deduction_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'refund_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ];
@@ -450,7 +462,7 @@ class BookkaruCancellationController extends Controller
             return $this->normalizePercentage($request->refund_percentage);
         }
 
-        return $this->normalizePercentage(config('services.bookkaru.deduction_percentage', config('services.bookkaru.refund_percentage', 0)));
+        return $this->normalizePercentage(config('services.online_terminals.deduction_percentage', config('services.bookkaru.deduction_percentage', config('services.bookkaru.refund_percentage', 0))));
     }
 
     private function resolveLogDeductionPercentage(BookkaruApiLog $log)
@@ -458,7 +470,7 @@ class BookkaruCancellationController extends Controller
         return $this->normalizePercentage(data_get(
             $log->request_payload,
             'deduction_percentage',
-            data_get($log->request_payload, 'refund_percentage', config('services.bookkaru.deduction_percentage', config('services.bookkaru.refund_percentage', 0)))
+            data_get($log->request_payload, 'refund_percentage', config('services.online_terminals.deduction_percentage', config('services.bookkaru.deduction_percentage', config('services.bookkaru.refund_percentage', 0))))
         ));
     }
 
@@ -489,8 +501,8 @@ class BookkaruCancellationController extends Controller
 
     private function isAuthorized(Request $request)
     {
-        $configuredKey = config('services.bookkaru.api_key');
-        $providedKey = $request->header('X-BOOKKARU-API-KEY');
+        $configuredKey = config('services.online_terminals.api_key', config('services.bookkaru.api_key'));
+        $providedKey = $request->header('X-ONLINE-TERMINAL-API-KEY') ?: $request->header('X-BOOKKARU-API-KEY');
 
         if ($configuredKey && $providedKey && hash_equals($configuredKey, $providedKey)) {
             return true;
@@ -509,7 +521,7 @@ class BookkaruCancellationController extends Controller
             return false;
         }
 
-        $allowedEmail = config('services.bookkaru.user_email');
+        $allowedEmail = config('services.online_terminals.user_email', config('services.bookkaru.user_email'));
 
         return $allowedEmail
             && strcasecmp($accessToken->tokenable->email, $allowedEmail) === 0;
@@ -587,6 +599,18 @@ class BookkaruCancellationController extends Controller
         }
 
         return true;
+    }
+
+    private function findExistingSeatRequest($requestId, $invoiceId, $transactionId, array $seatNumbers)
+    {
+        return BookkaruApiLog::where('request_id', '!=', $requestId)
+            ->where('normalized_invoice_id', $invoiceId)
+            ->where('booking_reference', $transactionId)
+            ->whereNotIn('status', ['failed', 'rejected', 'unauthorized'])
+            ->get()
+            ->first(function (BookkaruApiLog $log) use ($seatNumbers) {
+                return count(array_intersect($seatNumbers, $log->seat_numbers ?? [])) > 0;
+            });
     }
 
     private function buildPendingResponse($requestId, $invoiceId, array $seatNumbers, $transactionId, $source, $deductionPercentage, $refundPercentage)

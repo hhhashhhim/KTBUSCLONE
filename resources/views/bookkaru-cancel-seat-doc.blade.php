@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bookkaru Cancel Seat API Documentation</title>
+    <title>Online Terminal Cancel Seat API Documentation</title>
     <style>
         :root {
             --bg: #f4f7fb;
@@ -139,7 +139,7 @@
 <body>
 <div class="page">
     <div class="header">
-        <h1 class="title">Bookkaru Cancel Seat API Documentation</h1>
+        <h1 class="title">Online Terminal Cancel Seat API Documentation</h1>
         <p class="subtitle">Seat cancellation is created first as pending approval. Deduction is applied during approval and the remaining amount is refunded.</p>
     </div>
 
@@ -154,7 +154,15 @@
                     </div>
                     <div class="row">
                         <div class="label">URL</div>
+                        <div><code>https://api.kainattravels.net/api/v1/online-terminals/cancel-seat</code></div>
+                    </div>
+                    <div class="row">
+                        <div class="label">Legacy URL</div>
                         <div><code>https://api.kainattravels.net/api/v1/bookkaru/cancel-seat</code></div>
+                    </div>
+                    <div class="row">
+                        <div class="label">API Key Header</div>
+                        <div><code>X-ONLINE-TERMINAL-API-KEY</code> <span class="small">(legacy <code>X-BOOKKARU-API-KEY</code> is also accepted)</span></div>
                     </div>
                 </div>
             </div>
@@ -166,7 +174,7 @@
   "invoice_id": 865127,
   "transaction_id": "123456789",
   "seat_numbers": ["6 up"],
-  "cancellation_reason": "Cancelled from Bookkaru API",
+  "cancellation_reason": "Cancelled from online terminal API",
   "deduction_percentage": 25,
   "source": "Bookkaru"
 }</code></pre>
@@ -178,7 +186,7 @@
                     <tbody>
                     <tr>
                         <th>request_id</th>
-                        <td>string, required, unique request ID from Bookkaru</td>
+                        <td>string, required, unique request ID from the online terminal</td>
                     </tr>
                     <tr>
                         <th>invoice_id</th>
@@ -198,11 +206,11 @@
                     </tr>
                     <tr>
                         <th>deduction_percentage</th>
-                        <td>numeric, optional, 0 to 100. If omitted, backend uses <code>BOOKKARU_DEDUCTION_PERCENTAGE</code>. Legacy <code>refund_percentage</code> is temporarily accepted as an alias for deduction percentage.</td>
+                        <td>numeric, optional, 0 to 100. If omitted, backend uses <code>ONLINE_TERMINAL_DEDUCTION_PERCENTAGE</code>. Legacy <code>refund_percentage</code> is temporarily accepted as an alias for deduction percentage.</td>
                     </tr>
                     <tr>
                         <th>source</th>
-                        <td>string, required, request source, example Bookkaru</td>
+                        <td>string, required, request source. Supported examples: <code>Bookkaru</code>, <code>SastaTicket</code>, <code>Bookme</code>, and future online terminals.</td>
                     </tr>
                     </tbody>
                 </table>
@@ -270,7 +278,7 @@
         "deduction_amount": 625,
         "refund_percentage": 75,
         "refund_amount": 1875,
-        "refund_reason": "Cancelled from Bookkaru API"
+        "refund_reason": "Cancelled from online terminal API"
       }
     ],
     "approved_at": "2026-06-10 15:33:00",
@@ -314,7 +322,8 @@
                 <h2>Notes</h2>
                 <p class="small">
                     If <code>deduction_percentage</code> is not sent by a legacy integration, the backend uses the default
-                    <code>BOOKKARU_DEDUCTION_PERCENTAGE</code> setting. Duplicate <code>request_id</code> values return the existing response and do not process cancellation or refund again.
+                    <code>ONLINE_TERMINAL_DEDUCTION_PERCENTAGE</code> setting. Duplicate <code>request_id</code> values return the existing response and do not process cancellation or refund again.
+                    A new <code>request_id</code> for the same <code>invoice_id</code>, <code>transaction_id</code>, and seat is blocked while an active cancellation request already exists.
                     The cancellation request is created first as pending approval, then the approved flow cancels the seat and stores refund details per ticket.
                 </p>
             </div>

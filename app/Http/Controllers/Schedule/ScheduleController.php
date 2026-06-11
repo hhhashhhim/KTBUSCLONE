@@ -232,62 +232,77 @@ class ScheduleController extends Controller
                 $rules = [
                     'start_date' => 'required',
                     'end_date' => 'required',
-                    'time' => 'required',
+                    'time' => 'required|date_format:H:i',
+                    'schedule_id' => 'required|integer',
                 ];
 
                 $customMessages = [
                     'start_date.required' => 'Start Date is Required',
                     'end_date.required' => 'End Date is Required',
                     'time.required' => 'time is Required',
+                    'time.date_format' => 'Time must be in HH:MM format',
+                    'schedule_id.required' => 'Schedule is Required',
                 ];
                 $this->validate($request, $rules, $customMessages);
 
-                $detailGroup = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$request->schedule_id])->whereBetween("schedule_date",[$request->start_date,$request->end_date])->get()->groupBy("schedule_date");
-                
-                foreach($detailGroup as $detail)
-                {
-                    foreach($detail as $key => $single)
-                    {
-                        $updatedTime = date("Y-m-d H:i:s",strtotime(($single->departure_date.' '.$single->departure_time)) + ($request->time*60));
-                        if($key==0)
-                        {
-                            $schedule_date = date("Y-m-d",strtotime($updatedTime));
-                        }
-                        $single->update([
-                            "departure_date" => date("Y-m-d",strtotime($updatedTime)),
-                            "departure_time" => date("H:i:s",strtotime($updatedTime)),
-                            // "schedule_date" => $schedule_date,
-                        ]);
-                        
-                    }
+                $schedule = Schedule::where('id', $request->schedule_id)
+                    ->where('company_id', Auth::user()->company_id)
+                    ->first();
+
+                if (!$schedule) {
+                    DB::rollBack();
+                    return response()->json(["errors" => ["Schedule" => ['Schedule not found.']]], 404);
                 }
 
-                // DB::table('tickets')
-                // ->where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$request->schedule_id])
-                // ->whereBetween("schedule_date",[$request->start_date,$request->end_date])
-                // ->update([
-                //     'schedule_time' => DB::raw("DATE_ADD(schedule_time, INTERVAL $request->time MINUTE)"),
-                //     'schedule_time_exact' => DB::raw("DATE_ADD(schedule_time_exact, INTERVAL $request->time MINUTE)")
-                // ]);
+                $detailGroup = ScheduleDetail::where([
+                        "company_id" => Auth::user()->company_id,
+                        "schedule_id" => $request->schedule_id,
+                    ])
+                    ->whereBetween("schedule_date", [$request->start_date, $request->end_date])
+                    ->orderBy("schedule_date")
+                    ->orderBy("id")
+                    ->get()
+                    ->groupBy("schedule_date");
 
-                // Add minutes to schedule_time and get new date and time
-                $scheduleTimeWithInterval = DB::raw("DATE_ADD(CONCAT(`date`, ' ', `schedule_time`), INTERVAL $request->time MINUTE)");
-                $scheduleTimeExactWithInterval = DB::raw("DATE_ADD(CONCAT(`date`, ' ', `schedule_time_exact`), INTERVAL $request->time MINUTE)");
-                $updateData = [
-                    'date' => DB::raw("DATE($scheduleTimeWithInterval)"), // Extract the date part
-                    'schedule_time' => DB::raw("TIME($scheduleTimeWithInterval)"), // Extract the time part
-                    'schedule_time_exact' => DB::raw("TIME($scheduleTimeExactWithInterval)")
-                ];
-                // Use the update array in your query
-                Ticket::
-                where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$request->schedule_id])
-                ->whereBetween("schedule_date",[$request->start_date,$request->end_date])
-                ->withTrashed()
-                ->update($updateData);
+                foreach ($detailGroup as $scheduleDate => $detail) {
+                    $firstDeparture = $detail->first();
+                    $currentFirstDeparture = strtotime($firstDeparture->departure_date . ' ' . $firstDeparture->departure_time);
+                    $newFirstDeparture = strtotime($scheduleDate . ' ' . $request->time);
+                    $timeDifferenceSeconds = $newFirstDeparture - $currentFirstDeparture;
+
+                    foreach ($detail as $single) {
+                        $updatedTime = date("Y-m-d H:i:s", strtotime($single->departure_date . ' ' . $single->departure_time) + $timeDifferenceSeconds);
+                        $single->update([
+                            "departure_date" => date("Y-m-d", strtotime($updatedTime)),
+                            "departure_time" => date("H:i:s", strtotime($updatedTime)),
+                        ]);
+                    }
+
+                    $scheduleTimeWithInterval = DB::raw("DATE_ADD(CONCAT(`date`, ' ', `schedule_time`), INTERVAL $timeDifferenceSeconds SECOND)");
+                    $scheduleTimeExactWithInterval = DB::raw("DATE_ADD(CONCAT(`date`, ' ', `schedule_time_exact`), INTERVAL $timeDifferenceSeconds SECOND)");
+                    Ticket::where([
+                            "company_id" => Auth::user()->company_id,
+                            "schedule_id" => $request->schedule_id,
+                            "schedule_date" => $scheduleDate,
+                        ])
+                        ->withTrashed()
+                        ->update([
+                            'date' => DB::raw("DATE($scheduleTimeWithInterval)"),
+                            'schedule_time' => DB::raw("TIME($scheduleTimeWithInterval)"),
+                            'schedule_time_exact' => DB::raw("TIME($scheduleTimeExactWithInterval)"),
+                        ]);
+                }
+
+                if ($request->start_date <= $schedule->start_date && $request->end_date >= $schedule->start_date) {
+                    $schedule->update([
+                        'time' => $request->time,
+                        'updated_by' => Auth::user()->id,
+                    ]);
+                }
 
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | updated schedule time from $request->start_date to $request->end_date time ($request->time) | $request->schedule_id",
+                    "message" => Auth::user()->name." | updated schedule departure time from $request->start_date to $request->end_date time ($request->time) | $request->schedule_id",
                     "requested_host" => $request->ip(),
                     "company_id" => Auth::user()->company_id
                 ]);
