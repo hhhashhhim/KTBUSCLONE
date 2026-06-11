@@ -70836,8 +70836,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context9.prev = _context9.next) {
               case 0:
-                if (!(_this10.dataEditTime.start_date == "" || typeof _this10.dataEditTime.start_date == "undefined")) {
+                if (!_this10.loading) {
                   _context9.next = 2;
+                  break;
+                }
+
+                return _context9.abrupt("return");
+
+              case 2:
+                if (!(_this10.dataEditTime.start_date == "" || typeof _this10.dataEditTime.start_date == "undefined")) {
+                  _context9.next = 4;
                   break;
                 }
 
@@ -70848,9 +70856,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 2:
+              case 4:
                 if (!(_this10.dataEditTime.end_date == "" || typeof _this10.dataEditTime.end_date == "undefined")) {
-                  _context9.next = 4;
+                  _context9.next = 6;
                   break;
                 }
 
@@ -70861,9 +70869,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 4:
+              case 6:
                 if (!(_this10.dataEditTime.time == "" || typeof _this10.dataEditTime.time == "undefined")) {
-                  _context9.next = 6;
+                  _context9.next = 8;
                   break;
                 }
 
@@ -70874,12 +70882,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 6:
+              case 8:
                 _this10.loading = true;
-                _context9.next = 9;
+                _context9.next = 11;
                 return _this10.callApi("post", "schedule/time/update", _this10.dataEditTime);
 
-              case 9:
+              case 11:
                 resEdit = _context9.sent;
 
                 if (resEdit.status == 200) {
@@ -70895,6 +70903,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                   _this10.fetchSchedule();
                 } else {
+                  _this10.loading = false;
+
                   if (resEdit.status == 422) {
                     (function () {
                       _this10.cloneDone = false;
@@ -70917,9 +70927,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                       }
                     })();
                   }
+
+                  if (resEdit.status != 422) {
+                    swal({
+                      title: "Error",
+                      text: "Unable to update schedule time. Please try again.",
+                      icon: "error",
+                      timer: 2000
+                    });
+                  }
                 }
 
-              case 11:
+              case 13:
               case "end":
                 return _context9.stop();
             }

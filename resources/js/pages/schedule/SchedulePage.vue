@@ -1306,6 +1306,9 @@ export default {
         },
         
         async updateScheduleTime() {
+            if (this.loading) {
+                return;
+            }
             if (this.dataEditTime.start_date == "" || typeof this.dataEditTime.start_date == "undefined")
                 return swal({
                     title: "Required!",
@@ -1341,6 +1344,7 @@ export default {
                 this.loading = false;
                 this.fetchSchedule();
             } else {
+                this.loading = false;
                 if (resEdit.status == 422) {
                     this.cloneDone = false;
                     let errorContent = "";
@@ -1361,6 +1365,14 @@ export default {
                         });
 
                     }
+                }
+                if (resEdit.status != 422) {
+                    swal({
+                        title: "Error",
+                        text: "Unable to update schedule time. Please try again.",
+                        icon: "error",
+                        timer: 2000
+                    });
                 }
             }
         },
