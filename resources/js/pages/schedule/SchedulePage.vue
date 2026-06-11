@@ -207,6 +207,7 @@
                                         id="start"
                                         class="form-control"
                                         v-model="dataEditTime.start_date"
+                                        :min="todayDate"
                                         
                                     />
                                 </div>
@@ -219,6 +220,7 @@
                                         id="end"
                                         class="form-control"
                                         v-model="dataEditTime.end_date"
+                                        :min="dataEditTime.start_date || todayDate"
                                         
                                     />
                                 </div>
@@ -744,6 +746,7 @@ export default {
                 placeholder: '00',
             },
             loading: false,
+            todayDate: new Date().toISOString().slice(0, 10),
             schedules: [],
             fareClasses: [],
             busClasses: [],
@@ -1396,9 +1399,13 @@ export default {
         },
         
         async editTime(schedule) {
+            const today = new Date().toISOString().slice(0, 10);
+            const startDate = schedule.schedule_date || schedule.schedule.start_date;
+            const endDate = schedule.schedule.end_date || startDate;
+
             this.dataEditTime.schedule_id = schedule.schedule.id;
-            this.dataEditTime.start_date = schedule.schedule.start_date;
-            this.dataEditTime.end_date = schedule.schedule.end_date;
+            this.dataEditTime.start_date = startDate && startDate > today ? startDate : today;
+            this.dataEditTime.end_date = endDate && endDate >= this.dataEditTime.start_date ? endDate : this.dataEditTime.start_date;
             this.dataEditTime.time = schedule.departure_time ? schedule.departure_time.substring(0, 5) : "";
         },
 
