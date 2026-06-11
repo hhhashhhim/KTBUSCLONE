@@ -252,13 +252,21 @@ class ScheduleController extends Controller
             return response()->json(["errors" => ["Schedule" => ['Schedule not found.']]], 404);
         }
 
+        $today = date('Y-m-d');
+        $effectiveStartDate = $request->start_date < $today ? $today : $request->start_date;
+        $effectiveEndDate = $request->end_date;
+
+        if ($effectiveEndDate < $today || $effectiveStartDate > $effectiveEndDate) {
+            return response()->json(["errors" => ["Date" => ['Please select current date or a future date.']]], 422);
+        }
+
         try {
-            DB::transaction(function () use ($request, $schedule) {
+            DB::transaction(function () use ($request, $schedule, $effectiveStartDate, $effectiveEndDate) {
                 $firstDepartures = ScheduleDetail::where([
                         "company_id" => Auth::user()->company_id,
                         "schedule_id" => $request->schedule_id,
                     ])
-                    ->whereBetween("schedule_date", [$request->start_date, $request->end_date])
+                    ->whereBetween("schedule_date", [$effectiveStartDate, $effectiveEndDate])
                     ->orderBy("schedule_date")
                     ->orderBy("id")
                     ->get(["id", "schedule_date", "departure_date", "departure_time"])
@@ -300,7 +308,7 @@ class ScheduleController extends Controller
                         ]);
                 }
 
-                if ($request->start_date <= $schedule->start_date && $request->end_date >= $schedule->start_date) {
+                if ($effectiveStartDate <= $schedule->start_date && $effectiveEndDate >= $schedule->start_date) {
                     $schedule->update([
                         'time' => $request->time,
                         'updated_by' => Auth::user()->id,
@@ -309,7 +317,7 @@ class ScheduleController extends Controller
 
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
-                    "message" => Auth::user()->name." | updated schedule departure time from $request->start_date to $request->end_date time ($request->time) | $request->schedule_id",
+                    "message" => Auth::user()->name." | updated schedule departure time from $effectiveStartDate to $effectiveEndDate time ($request->time) | $request->schedule_id",
                     "requested_host" => $request->ip(),
                     "company_id" => Auth::user()->company_id
                 ]);
@@ -319,8 +327,8 @@ class ScheduleController extends Controller
         } catch (\Exception $e) {
             Log::error('Schedule time update error: ' . $e->getMessage(), [
                 'schedule_id' => $request->schedule_id,
-                'start_date' => $request->start_date,
-                'end_date' => $request->end_date,
+                'start_date' => $effectiveStartDate,
+                'end_date' => $effectiveEndDate,
                 'time' => $request->time,
             ]);
 
