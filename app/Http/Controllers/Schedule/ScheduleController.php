@@ -227,7 +227,7 @@ class ScheduleController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        try {
+        // try {
                 DB::beginTransaction();
                 $rules = [
                     'start_date' => 'required',
@@ -307,11 +307,11 @@ class ScheduleController extends Controller
                     "company_id" => Auth::user()->company_id
                 ]);
                 DB::commit();
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Database transaction error: ' . $e->getMessage());
-                return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            }
+            // } catch (\Exception $e) {
+            //     DB::rollBack();
+            //     Log::error('Database transaction error: ' . $e->getMessage());
+            //     return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+            // }
         
     }
     public function updateSchedule(Request $request)
