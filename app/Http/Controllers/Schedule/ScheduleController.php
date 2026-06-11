@@ -227,59 +227,66 @@ class ScheduleController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        // try {
-                DB::beginTransaction();
-                $rules = [
-                    'start_date' => 'required',
-                    'end_date' => 'required',
-                    'time' => 'required|date_format:H:i',
-                    'schedule_id' => 'required|integer',
-                ];
 
-                $customMessages = [
-                    'start_date.required' => 'Start Date is Required',
-                    'end_date.required' => 'End Date is Required',
-                    'time.required' => 'time is Required',
-                    'time.date_format' => 'Time must be in HH:MM format',
-                    'schedule_id.required' => 'Schedule is Required',
-                ];
-                $this->validate($request, $rules, $customMessages);
+        $rules = [
+            'start_date' => 'required',
+            'end_date' => 'required',
+            'time' => 'required|date_format:H:i',
+            'schedule_id' => 'required|integer',
+        ];
 
-                $schedule = Schedule::where('id', $request->schedule_id)
-                    ->where('company_id', Auth::user()->company_id)
-                    ->first();
+        $customMessages = [
+            'start_date.required' => 'Start Date is Required',
+            'end_date.required' => 'End Date is Required',
+            'time.required' => 'time is Required',
+            'time.date_format' => 'Time must be in HH:MM format',
+            'schedule_id.required' => 'Schedule is Required',
+        ];
+        $this->validate($request, $rules, $customMessages);
 
-                if (!$schedule) {
-                    DB::rollBack();
-                    return response()->json(["errors" => ["Schedule" => ['Schedule not found.']]], 404);
-                }
+        $schedule = Schedule::where('id', $request->schedule_id)
+            ->where('company_id', Auth::user()->company_id)
+            ->first();
 
-                $detailGroup = ScheduleDetail::where([
+        if (!$schedule) {
+            return response()->json(["errors" => ["Schedule" => ['Schedule not found.']]], 404);
+        }
+
+        try {
+            DB::transaction(function () use ($request, $schedule) {
+                $firstDepartures = ScheduleDetail::where([
                         "company_id" => Auth::user()->company_id,
                         "schedule_id" => $request->schedule_id,
                     ])
                     ->whereBetween("schedule_date", [$request->start_date, $request->end_date])
                     ->orderBy("schedule_date")
                     ->orderBy("id")
-                    ->get()
-                    ->groupBy("schedule_date");
+                    ->get(["id", "schedule_date", "departure_date", "departure_time"])
+                    ->unique("schedule_date");
 
-                foreach ($detailGroup as $scheduleDate => $detail) {
-                    $firstDeparture = $detail->first();
+                foreach ($firstDepartures as $firstDeparture) {
+                    $scheduleDate = $firstDeparture->schedule_date;
                     $currentFirstDeparture = strtotime($firstDeparture->departure_date . ' ' . $firstDeparture->departure_time);
                     $newFirstDeparture = strtotime($scheduleDate . ' ' . $request->time);
                     $timeDifferenceSeconds = $newFirstDeparture - $currentFirstDeparture;
 
-                    foreach ($detail as $single) {
-                        $updatedTime = date("Y-m-d H:i:s", strtotime($single->departure_date . ' ' . $single->departure_time) + $timeDifferenceSeconds);
-                        $single->update([
-                            "departure_date" => date("Y-m-d", strtotime($updatedTime)),
-                            "departure_time" => date("H:i:s", strtotime($updatedTime)),
-                        ]);
+                    if ($timeDifferenceSeconds === 0) {
+                        continue;
                     }
 
-                    $scheduleTimeWithInterval = DB::raw("DATE_ADD(CONCAT(`date`, ' ', `schedule_time`), INTERVAL $timeDifferenceSeconds SECOND)");
-                    $scheduleTimeExactWithInterval = DB::raw("DATE_ADD(CONCAT(`date`, ' ', `schedule_time_exact`), INTERVAL $timeDifferenceSeconds SECOND)");
+                    $scheduleDetailDateTime = DB::raw("DATE_ADD(CONCAT(`departure_date`, ' ', `departure_time`), INTERVAL $timeDifferenceSeconds SECOND)");
+                    ScheduleDetail::where([
+                            "company_id" => Auth::user()->company_id,
+                            "schedule_id" => $request->schedule_id,
+                            "schedule_date" => $scheduleDate,
+                        ])
+                        ->update([
+                            "departure_date" => DB::raw("DATE($scheduleDetailDateTime)"),
+                            "departure_time" => DB::raw("TIME($scheduleDetailDateTime)"),
+                        ]);
+
+                    $ticketScheduleTime = DB::raw("DATE_ADD(CONCAT(`date`, ' ', `schedule_time`), INTERVAL $timeDifferenceSeconds SECOND)");
+                    $ticketScheduleTimeExact = DB::raw("DATE_ADD(CONCAT(`date`, ' ', `schedule_time_exact`), INTERVAL $timeDifferenceSeconds SECOND)");
                     Ticket::where([
                             "company_id" => Auth::user()->company_id,
                             "schedule_id" => $request->schedule_id,
@@ -287,9 +294,9 @@ class ScheduleController extends Controller
                         ])
                         ->withTrashed()
                         ->update([
-                            'date' => DB::raw("DATE($scheduleTimeWithInterval)"),
-                            'schedule_time' => DB::raw("TIME($scheduleTimeWithInterval)"),
-                            'schedule_time_exact' => DB::raw("TIME($scheduleTimeExactWithInterval)"),
+                            'date' => DB::raw("DATE($ticketScheduleTime)"),
+                            'schedule_time' => DB::raw("TIME($ticketScheduleTime)"),
+                            'schedule_time_exact' => DB::raw("TIME($ticketScheduleTimeExact)"),
                         ]);
                 }
 
@@ -306,13 +313,19 @@ class ScheduleController extends Controller
                     "requested_host" => $request->ip(),
                     "company_id" => Auth::user()->company_id
                 ]);
-                DB::commit();
-            // } catch (\Exception $e) {
-            //     DB::rollBack();
-            //     Log::error('Database transaction error: ' . $e->getMessage());
-            //     return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
-            // }
-        
+            }, 3);
+
+            return response()->json(true);
+        } catch (\Exception $e) {
+            Log::error('Schedule time update error: ' . $e->getMessage(), [
+                'schedule_id' => $request->schedule_id,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'time' => $request->time,
+            ]);
+
+            return response()->json(["errors" => ["Error" => ['Unable to update schedule time. Please try again.']]], 422);
+        }
     }
     public function updateSchedule(Request $request)
     {
