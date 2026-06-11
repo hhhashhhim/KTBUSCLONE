@@ -89,7 +89,7 @@
                                                         <th>Route</th>
                                                         <th>Bus Class</th>
                                                         <th>Added By</th>
-                                                        <th v-if="checkForSubmenuButtons('edit-schedule') || checkForSubmenuButtons('extend-schedule') || checkForSubmenuButtons('delete-schedule')">
+                                                        <th v-if="checkForSubmenuButtons('edit-schedule') || checkForSubmenuButtons('extend-schedule') || checkForSubmenuButtons('update-time') || checkForSubmenuButtons('delete-schedule')">
                                                             Action
                                                         </th>
                                                     </tr>
@@ -124,7 +124,7 @@
                                                             </button>
                                                             <button class="btn btn-success btn-sm mr-1"
                                                                     v-if="checkForSubmenuButtons('update-time')"
-                                                                    @click="editTime(schedule.schedule)"
+                                                                    @click="editTime(schedule)"
                                                                     data-target="#editTimeModal" data-toggle="modal"
                                                                     title="Edit Time"><i
                                                                 class="fas fa-clock"></i></button>
@@ -223,8 +223,8 @@
                                     />
                                 </div>
                                 <div class="col-md-12 class form-group">
-                                    <label for="time">Time<span class="text-danger ml-1">*</span></label>
-                                    <input type="number" id="time" class="form-control" v-model="dataEditTime.time"
+                                    <label for="time">Departure Time<span class="text-danger ml-1">*</span></label>
+                                    <input type="time" id="time" class="form-control" v-model="dataEditTime.time"
                                     />
                                 </div>
                             </div>
@@ -1330,7 +1330,7 @@ export default {
             this.loading = true;
             const resEdit = await this.callApi("post", "schedule/time/update", this.dataEditTime);
             if (resEdit.status == 200) {
-                $(`#${this.editFormID}`).modal('hide');
+                $("#editTimeModal").modal('hide');
                 swal({
                     title: "Success",
                     text: "Schedule Updated Successfully",
@@ -1384,7 +1384,10 @@ export default {
         },
         
         async editTime(schedule) {
-            this.dataEditTime.schedule_id = schedule.id
+            this.dataEditTime.schedule_id = schedule.schedule.id;
+            this.dataEditTime.start_date = schedule.schedule.start_date;
+            this.dataEditTime.end_date = schedule.schedule.end_date;
+            this.dataEditTime.time = schedule.departure_time ? schedule.departure_time.substring(0, 5) : "";
         },
 
         async genericData() {
