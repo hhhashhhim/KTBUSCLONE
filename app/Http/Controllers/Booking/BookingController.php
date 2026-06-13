@@ -1185,13 +1185,13 @@ class BookingController extends Controller
         $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
         array_push($allFaresOfRoute, $lastFare->destination_city_id);
         $fareClasses = FareClass::where('company_id', Auth::user()->company_id)->get();
-        // if (count($fareClasses) != count($fareForAllClasses)) {
-        //     return response()->json([
-        //         "errors" => [
-        //             "Fare Error" => ["Please Fill the Fare Table Completely First ( For All Fare Classes ) !!!"]
-        //         ]
-        //     ], 422);
-        // }
+        if (count($fareClasses) != count($fareForAllClasses)) {
+            return response()->json([
+                "errors" => [
+                    "Fare Error" => ["Please Fill the Fare Table Completely First ( For All Fare Classes ) !!!"]
+                ]
+            ], 422);
+        }
         //        //Apply terminal discount
         $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->dropTerminal ?? 0, "route_id" => $schedule->route_id])->where('start_date', '<=', $request->date)
             ->where('end_date', '>=', $request->date)->first();
