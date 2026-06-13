@@ -1142,9 +1142,9 @@ class BookingController extends Controller
         return response()->json([], 204);
     }
 
-    public
-    function selected(Request $request)
+    public function selected(Request $request)
     {
+        return "test";
         if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
@@ -1184,7 +1184,7 @@ class BookingController extends Controller
         $lastFare = $schedule->route->fares->last();
         $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
         array_push($allFaresOfRoute, $lastFare->destination_city_id);
-       return $fareClasses = FareClass::where('company_id', Auth::user()->company_id)->get();
+        $fareClasses = FareClass::where('company_id', Auth::user()->company_id)->get();
         if (count($fareClasses) != count($fareForAllClasses)) {
             return response()->json([
                 "errors" => [
