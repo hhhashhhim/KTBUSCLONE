@@ -1177,14 +1177,14 @@ class BookingController extends Controller
             })
             ->first();
         $scheduleSurcharge = Surcharge::where('id', $schedule->surcharge_id)->where('is_active', 1)->first();
-        $fareForAllClasses = FareTable::where('from_city_id', $request->departureCity)->where('to_city_id', $request->destinationCity)
+        return $fareForAllClasses = FareTable::where('from_city_id', $request->departureCity)->where('to_city_id', $request->destinationCity)
             ->where('company_id', Auth::user()->company_id)
             ->get()->unique('fare_class');
         // getting cities sequence for checking which city will be after other one
         $lastFare = $schedule->route->fares->last();
         $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
         array_push($allFaresOfRoute, $lastFare->destination_city_id);
-       return $fareClasses = FareClass::where('company_id', Auth::user()->company_id)->get();
+        $fareClasses = FareClass::where('company_id', Auth::user()->company_id)->get();
         if (count($fareClasses) != count($fareForAllClasses)) {
             return response()->json([
                 "errors" => [
