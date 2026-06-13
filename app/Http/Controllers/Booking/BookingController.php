@@ -1144,7 +1144,7 @@ class BookingController extends Controller
 
     public function selected(Request $request)
     {
-        return "test";
+        
         if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
@@ -1152,7 +1152,7 @@ class BookingController extends Controller
             echo "Error";
             return [];
         }
-        $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
+       return $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->id,
             'departure_date' => $request->date,
