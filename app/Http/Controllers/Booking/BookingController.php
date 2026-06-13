@@ -1152,7 +1152,7 @@ class BookingController extends Controller
             echo "Error";
             return [];
         }
-       return $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
+        $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->id,
             'departure_date' => $request->date,
