@@ -1184,7 +1184,7 @@ class BookingController extends Controller
         $lastFare = $schedule->route->fares->last();
         $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
         array_push($allFaresOfRoute, $lastFare->destination_city_id);
-        $fareClasses = FareClass::where('company_id', Auth::user()->company_id)->get();
+       return $fareClasses = FareClass::where('company_id', Auth::user()->company_id)->get();
         if (count($fareClasses) != count($fareForAllClasses)) {
             return response()->json([
                 "errors" => [
