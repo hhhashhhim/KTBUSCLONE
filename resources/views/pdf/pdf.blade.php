@@ -1,4 +1,8 @@
 @foreach($data['tickets']  as $key => $single)
+    @php
+        $departureDate = $data['tickets'][$key]['date'] ?? $data['tickets'][$key]['acutal_time'];
+        $departureTime = $data['tickets'][$key]['schedule_time'] ?? $data['tickets'][$key]['acutal_time'];
+    @endphp
     <!DOCTYPE html>
 <html>
 
@@ -133,12 +137,12 @@
 
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Departure Date :</p>
-                <p class="my-5 float-right">{{ date('d/m/Y', strtotime($data['tickets'][$key]['acutal_time'])) }}</p>
+                <p class="my-5 float-right">{{ date('d/m/Y', strtotime($departureDate)) }}</p>
             </div>
 
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Departure Time :</p>
-                <p class="my-5 float-right">{{ date('h:i A', strtotime($data['tickets'][$key]['acutal_time'])) }}</p>
+                <p class="my-5 float-right">{{ date('h:i A', strtotime($departureTime)) }}</p>
             </div>
 
             <div class="clear-both">
@@ -193,11 +197,11 @@
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Departure Date :</p>
-                <p class="my-5 float-right">{{ date('d/m/Y', strtotime($data['tickets'][$key]['date'])) }}</p>
+                <p class="my-5 float-right">{{ date('d/m/Y', strtotime($departureDate)) }}</p>
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Departure Time :</p>
-                <p class="my-5 float-right">{{ date('h:i A', strtotime($data['tickets'][$key]['acutal_time'])) }}</p>
+                <p class="my-5 float-right">{{ date('h:i A', strtotime($departureTime)) }}</p>
             </div>
             <div class="clear-both">
                 <p class="my-5 font-weight-bold float-left">Customer Name :</p>

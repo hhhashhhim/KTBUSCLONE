@@ -1968,17 +1968,7 @@ class BookingController extends Controller
         // return $ids;
         $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city', 'terminal')->where('company_id', Auth::user()->company_id)->withTrashed()->whereIn('id', $ids)->get();
         $tickets->map(function ($item) {
-
-
-            $item->acutal_time = $item->date . " " . $item->schedule_time; //if ticket booked from another terminal
-
-            $sub = 0;
-            $terminalTime = TerminalTimeDifference::where(['company_id' => $item->company_id, 'terminal_id' => $item->terminal_id, 'route_id' => $item->route_id])->first();
-            if ($terminalTime) {
-                $sub = $terminalTime->time_difference * 60;
-            }
-
-            $item->acutal_time = date("Y-m-d H:i:00", strtotime($item->date . " " . $item->schedule_time) + $sub);
+            $item->acutal_time = $item->date . " " . $item->schedule_time;
         });
         $format = TicketsTemplate::with("terminal")
             ->join("ticket_template_terminals", "ticket_template_terminals.ticket_template_id", "tickets_templates.id")
