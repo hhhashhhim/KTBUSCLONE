@@ -47918,7 +47918,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   data: function data() {
     return {
-      API_URL: "https://demoapi.kainattravels.net/",
+      API_URL: "https://api.kainattravels.net/",
       validationErrors: [],
       counterExpenses: [],
       permissions: [],
@@ -148376,9 +148376,9 @@ var initialState = function initialState() {
     token: persistedState.token,
     permissions: persistedState.permissions,
     companyModules: persistedState.companyModules,
-    main_url: "https://demo.kainattravels.net/",
-    api_url: "https://demoapi.kainattravels.net/",
-    app_url: "https://demo.kainattravels.net/",
+    main_url: "https://portal.kainattravels.net/",
+    api_url: "https://api.kainattravels.net/",
+    app_url: "https://portal.kainattravels.net/",
     appStateReady: false
   };
 };
