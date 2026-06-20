@@ -1966,9 +1966,10 @@ class BookingController extends Controller
             $ids = [$request->ticket_id];
         }
         // return $ids;
-        $tickets = Ticket::with('customer', 'schedule', 'seatClass', 'destination_city', 'departure_city', 'terminal')->where('company_id', Auth::user()->company_id)->withTrashed()->whereIn('id', $ids)->get();
+        $tickets = Ticket::with('customer', 'schedule', 'scheduleDetail', 'seatClass', 'destination_city', 'departure_city', 'terminal')->where('company_id', Auth::user()->company_id)->withTrashed()->whereIn('id', $ids)->get();
         $tickets->map(function ($item) {
             $item->acutal_time = $item->date . " " . $item->schedule_time;
+            $item->pdf_departure_time = optional($item->scheduleDetail)->departure_time ?? $item->schedule_time;
         });
         $format = TicketsTemplate::with("terminal")
             ->join("ticket_template_terminals", "ticket_template_terminals.ticket_template_id", "tickets_templates.id")
