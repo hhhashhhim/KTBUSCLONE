@@ -1968,8 +1968,30 @@ class BookingController extends Controller
         // return $ids;
         $tickets = Ticket::with('customer', 'schedule', 'scheduleDetail', 'seatClass', 'destination_city', 'departure_city', 'terminal')->where('company_id', Auth::user()->company_id)->withTrashed()->whereIn('id', $ids)->get();
         $tickets->map(function ($item) {
+            $departureDate = optional($item->scheduleDetail)->departure_date ?? $item->date;
+            $departureTime = optional($item->scheduleDetail)->departure_time ?? $item->schedule_time;
+            $sub = 0;
+            $terminalTime = TerminalTimeDifference::where([
+                'company_id' => Auth::user()->company_id,
+                'terminal_id' => $item->terminal_id,
+                'route_id' => $item->route_id,
+            ])->first();
+
+            if ($terminalTime) {
+                $sub = $terminalTime->time_difference * 60;
+            }
+
+            $departureDateTime = strtotime($departureDate . ' ' . $departureTime);
             $item->acutal_time = $item->date . " " . $item->schedule_time;
-            $item->pdf_departure_time = optional($item->scheduleDetail)->departure_time ?? $item->schedule_time;
+            if ($departureDateTime === false) {
+                $item->pdf_departure_date = $departureDate;
+                $item->pdf_departure_time = $departureTime;
+                return;
+            }
+
+            $departureDateTime += $sub;
+            $item->pdf_departure_date = date("Y-m-d", $departureDateTime);
+            $item->pdf_departure_time = date("h:i A", $departureDateTime);
         });
         $format = TicketsTemplate::with("terminal")
             ->join("ticket_template_terminals", "ticket_template_terminals.ticket_template_id", "tickets_templates.id")

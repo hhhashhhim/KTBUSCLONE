@@ -1,6 +1,6 @@
 @foreach($data['tickets']  as $key => $single)
     @php
-        $departureDate = $data['tickets'][$key]['date'] ?? $data['tickets'][$key]['acutal_time'];
+        $departureDate = $data['tickets'][$key]['pdf_departure_date'] ?? $data['tickets'][$key]['date'] ?? $data['tickets'][$key]['acutal_time'];
         $departureTime = $data['tickets'][$key]['pdf_departure_time'] ?? $data['tickets'][$key]['schedule_time'] ?? '';
     @endphp
     <!DOCTYPE html>
