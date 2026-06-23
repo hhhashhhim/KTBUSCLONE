@@ -728,7 +728,7 @@ class BookkaruCancellationController extends Controller
 
     private function buildTerminalPendingResponse($requestId, $invoiceId, array $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage, $refundReason)
     {
-        $refunds = $this->buildPendingRefundPreview($invoiceId, $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage, $refundReason);
+        $this->buildPendingRefundPreview($invoiceId, $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage, $refundReason);
 
         return [
             'status' => 'success',
@@ -737,14 +737,8 @@ class BookkaruCancellationController extends Controller
                 'request_id' => $requestId,
                 'invoice_id' => $invoiceId,
                 'transaction_id' => $transactionId,
-                'cancelled_seats' => collect($refunds)->pluck('seat_no')->values()->all(),
+                'cancelled_seats' => $seatNumbers,
                 'deduction_percentage' => $deductionPercentage,
-                'deduction_amount' => round(collect($refunds)->sum('deduction_amount'), 2),
-                'refund_percentage' => $refundPercentage,
-                'refund_amount' => round(collect($refunds)->sum('refund_amount'), 2),
-                'refunds' => $refunds,
-                'approved_at' => null,
-                'cancelled_at' => null,
             ],
             'error' => null,
         ];
