@@ -115,7 +115,7 @@ class BookkaruCancellationController extends Controller
                 'refund_percentage' => $refundPercentage,
                 'source' => $source,
             ]);
-            $pendingResponse = $this->buildPendingResponse($requestId, $invoiceId, $seatNumbers, $transactionId, $source, $deductionPercentage, $refundPercentage);
+            $pendingResponse = $this->buildPendingResponse($requestId, $invoiceId, $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage);
 
             $log = BookkaruApiLog::create([
                 'request_id' => $requestId,
@@ -143,7 +143,7 @@ class BookkaruCancellationController extends Controller
                 'company_id' => $this->getCompanyIdForRequest($invoiceId, $seatNumbers),
             ]);
 
-            return response()->json($pendingResponse, 202);
+            return response()->json($pendingResponse, 200);
         } catch (\Throwable $e) {
             Log::error('Online terminal cancellation request exception: ' . $e->getMessage(), [
                 'request_id' => $requestId,
@@ -613,23 +613,20 @@ class BookkaruCancellationController extends Controller
             });
     }
 
-    private function buildPendingResponse($requestId, $invoiceId, array $seatNumbers, $transactionId, $source, $deductionPercentage, $refundPercentage)
+    private function buildPendingResponse($requestId, $invoiceId, array $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage)
     {
         return [
             'status' => 'success',
-            'message' => 'Cancellation request received and is pending approval.',
+            'message' => 'Seat cancellation successful.',
             'data' => [
                 'request_id' => $requestId,
                 'invoice_id' => $invoiceId,
                 'transaction_id' => $transactionId,
-                'seat_numbers' => $seatNumbers,
+                'cancelled_seats' => $seatNumbers,
                 'deduction_percentage' => $deductionPercentage,
                 'refund_percentage' => $refundPercentage,
-                'approval_status' => 'pending',
                 'cancellation_status' => 'pending',
-                'source' => $source,
             ],
-            'error' => null,
         ];
     }
 
@@ -675,6 +672,17 @@ class BookkaruCancellationController extends Controller
         }
 
         unset($response['data']['booking_reference']);
+
+        if (($response['data']['cancellation_status'] ?? null) === 'pending') {
+            $response['status'] = 'success';
+            $response['message'] = 'Seat cancellation successful.';
+
+            if (!isset($response['data']['cancelled_seats']) && isset($response['data']['seat_numbers'])) {
+                $response['data']['cancelled_seats'] = $response['data']['seat_numbers'];
+            }
+
+            unset($response['data']['seat_numbers'], $response['data']['approval_status'], $response['data']['source'], $response['error']);
+        }
 
         if (!isset($response['data']['deduction_percentage']) && isset($response['data']['refund_percentage'])) {
             $deductionPercentage = $this->normalizePercentage($response['data']['refund_percentage']);
