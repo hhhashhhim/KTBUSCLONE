@@ -115,7 +115,7 @@ class BookkaruCancellationController extends Controller
                 'refund_percentage' => $refundPercentage,
                 'source' => $source,
             ]);
-            $pendingResponse = $this->buildPendingResponse($requestId, $invoiceId, $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage);
+            $pendingResponse = $this->buildPendingResponse($requestId, $invoiceId, $seatNumbers, $transactionId, $source, $deductionPercentage, $refundPercentage);
 
             $log = BookkaruApiLog::create([
                 'request_id' => $requestId,
@@ -438,13 +438,14 @@ class BookkaruCancellationController extends Controller
 
     private function normalizeCancelSeatPayload(Request $request)
     {
+        $invoiceId = $this->normalizeInvoiceId($request->invoice_id);
         $deductionPercentage = $this->resolveDeductionPercentage($request);
 
         return [
             'request_id' => trim((string) $request->request_id),
-            'invoice_id' => $this->normalizeInvoiceId($request->invoice_id),
+            'invoice_id' => $invoiceId,
             'seat_numbers' => $this->normalizeSeatNumbers($request->seat_numbers),
-            'transaction_id' => $this->normalizeTransactionId($request->input('transaction_id', $request->input('booking_reference'))),
+            'transaction_id' => $this->resolveRequestTransactionId($request, $invoiceId),
             'cancellation_reason' => trim((string) $request->cancellation_reason),
             'source' => trim((string) $request->source),
             'deduction_percentage' => $deductionPercentage,
@@ -511,20 +512,67 @@ class BookkaruCancellationController extends Controller
         $bearerToken = $request->bearerToken();
 
         if (!$bearerToken) {
-            return false;
+            return $this->isAllowedTerminalBookingRequest($request);
         }
 
         $accessTokenModel = Sanctum::personalAccessTokenModel();
         $accessToken = $accessTokenModel::findToken($bearerToken);
 
         if (!$accessToken || !$accessToken->tokenable) {
-            return false;
+            return $this->isAllowedTerminalBookingRequest($request);
         }
 
         $allowedEmail = config('services.online_terminals.user_email', config('services.bookkaru.user_email'));
 
-        return $allowedEmail
-            && strcasecmp($accessToken->tokenable->email, $allowedEmail) === 0;
+        if ($allowedEmail && strcasecmp($accessToken->tokenable->email, $allowedEmail) === 0) {
+            return true;
+        }
+
+        return $this->isAllowedTerminalBookingRequest($request);
+    }
+
+    private function isAllowedTerminalBookingRequest(Request $request)
+    {
+        if (!$this->isAllowedTerminalSource($request->input('source'))) {
+            return false;
+        }
+
+        $invoiceId = $this->normalizeInvoiceId($request->input('invoice_id'));
+        if ($invoiceId === null) {
+            return false;
+        }
+
+        $transactionIds = $this->requestTransactionIdCandidates($request);
+
+        if (empty($transactionIds)) {
+            return false;
+        }
+
+        return Ticket::withTrashed()
+            ->where('invoice_id', $invoiceId)
+            ->whereIn('transaction_id', $transactionIds)
+            ->exists();
+    }
+
+    private function isAllowedTerminalSource($source)
+    {
+        $source = $this->normalizeSourceName($source);
+        if ($source === '') {
+            return false;
+        }
+
+        $allowedSources = config('services.online_terminals.allowed_sources', []);
+
+        return collect($allowedSources)
+            ->map(function ($allowedSource) {
+                return $this->normalizeSourceName($allowedSource);
+            })
+            ->contains($source);
+    }
+
+    private function normalizeSourceName($source)
+    {
+        return strtolower(preg_replace('/[^a-z0-9]/i', '', trim((string) $source)));
     }
 
     private function normalizeInvoiceId($invoiceId)
@@ -559,6 +607,34 @@ class BookkaruCancellationController extends Controller
         $transactionId = trim((string) $transactionId);
 
         return $transactionId === '' ? null : $transactionId;
+    }
+
+    private function resolveRequestTransactionId(Request $request, $invoiceId)
+    {
+        $transactionIds = $this->requestTransactionIdCandidates($request);
+
+        if ($invoiceId !== null && !empty($transactionIds)) {
+            $matchingTransactionId = Ticket::withTrashed()
+                ->where('invoice_id', $invoiceId)
+                ->whereIn('transaction_id', $transactionIds)
+                ->value('transaction_id');
+
+            if ($matchingTransactionId) {
+                return $matchingTransactionId;
+            }
+        }
+
+        return $transactionIds[0] ?? null;
+    }
+
+    private function requestTransactionIdCandidates(Request $request)
+    {
+        return collect([
+            $request->input('transaction_id'),
+            $request->input('booking_reference'),
+        ])->map(function ($transactionId) {
+            return $this->normalizeTransactionId($transactionId);
+        })->filter()->unique()->values()->all();
     }
 
     private function validateTicketsForRequest($invoiceId, array $seatNumbers, $transactionId = null)
@@ -613,19 +689,20 @@ class BookkaruCancellationController extends Controller
             });
     }
 
-    private function buildPendingResponse($requestId, $invoiceId, array $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage)
+    private function buildPendingResponse($requestId, $invoiceId, array $seatNumbers, $transactionId, $source, $deductionPercentage, $refundPercentage)
     {
         return [
             'status' => 'success',
-            'message' => 'Seat cancellation successful.',
+            'message' => 'Cancellation request received and is pending approval.',
             'data' => [
                 'request_id' => $requestId,
                 'invoice_id' => $invoiceId,
                 'transaction_id' => $transactionId,
-                'cancelled_seats' => $seatNumbers,
+                'seat_numbers' => $seatNumbers,
                 'deduction_percentage' => $deductionPercentage,
                 'refund_percentage' => $refundPercentage,
                 'cancellation_status' => 'pending',
+                'source' => $source,
             ],
         ];
     }
@@ -675,13 +752,13 @@ class BookkaruCancellationController extends Controller
 
         if (($response['data']['cancellation_status'] ?? null) === 'pending') {
             $response['status'] = 'success';
-            $response['message'] = 'Seat cancellation successful.';
+            $response['message'] = 'Cancellation request received and is pending approval.';
 
-            if (!isset($response['data']['cancelled_seats']) && isset($response['data']['seat_numbers'])) {
-                $response['data']['cancelled_seats'] = $response['data']['seat_numbers'];
+            if (!isset($response['data']['seat_numbers']) && isset($response['data']['cancelled_seats'])) {
+                $response['data']['seat_numbers'] = $response['data']['cancelled_seats'];
             }
 
-            unset($response['data']['seat_numbers'], $response['data']['approval_status'], $response['data']['source'], $response['error']);
+            unset($response['data']['cancelled_seats'], $response['data']['approval_status'], $response['error']);
         }
 
         if (!isset($response['data']['deduction_percentage']) && isset($response['data']['refund_percentage'])) {

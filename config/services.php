@@ -41,6 +41,7 @@ return [
         'api_key' => env('ONLINE_TERMINAL_API_KEY', env('BOOKKARU_API_KEY')),
         'user_email' => env('ONLINE_TERMINAL_USER_EMAIL', env('BOOKKARU_USER_EMAIL', 'bookkaru@kt.com')),
         'deduction_percentage' => env('ONLINE_TERMINAL_DEDUCTION_PERCENTAGE', env('BOOKKARU_DEDUCTION_PERCENTAGE', env('BOOKKARU_REFUND_PERCENTAGE', 0))),
+        'allowed_sources' => array_filter(array_map('trim', explode(',', env('ONLINE_TERMINAL_ALLOWED_SOURCES', 'Bookkaru,SastaTicket,Sasta Ticket,Bookme')))),
     ],
 
 ];
