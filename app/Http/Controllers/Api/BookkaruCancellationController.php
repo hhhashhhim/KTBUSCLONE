@@ -115,7 +115,16 @@ class BookkaruCancellationController extends Controller
                 'refund_percentage' => $refundPercentage,
                 'source' => $source,
             ]);
-            $pendingResponse = $this->buildPendingResponse($requestId, $invoiceId, $seatNumbers, $transactionId, $source, $deductionPercentage, $refundPercentage);
+            $pendingResponse = $this->buildPendingResponse(
+                $requestId,
+                $invoiceId,
+                $seatNumbers,
+                $transactionId,
+                $source,
+                $deductionPercentage,
+                $refundPercentage,
+                $payload['cancellation_reason']
+            );
 
             $log = BookkaruApiLog::create([
                 'request_id' => $requestId,
@@ -689,7 +698,16 @@ class BookkaruCancellationController extends Controller
             });
     }
 
-    private function buildPendingResponse($requestId, $invoiceId, array $seatNumbers, $transactionId, $source, $deductionPercentage, $refundPercentage)
+    private function buildPendingResponse($requestId, $invoiceId, array $seatNumbers, $transactionId, $source, $deductionPercentage, $refundPercentage, $refundReason)
+    {
+        if ($this->isAllowedTerminalSource($source)) {
+            return $this->buildTerminalPendingResponse($requestId, $invoiceId, $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage, $refundReason);
+        }
+
+        return $this->buildDefaultPendingResponse($requestId, $invoiceId, $seatNumbers, $transactionId, $source, $deductionPercentage, $refundPercentage);
+    }
+
+    private function buildDefaultPendingResponse($requestId, $invoiceId, array $seatNumbers, $transactionId, $source, $deductionPercentage, $refundPercentage)
     {
         return [
             'status' => 'success',
@@ -704,12 +722,70 @@ class BookkaruCancellationController extends Controller
                 'cancellation_status' => 'pending',
                 'source' => $source,
             ],
+            'error' => null,
         ];
+    }
+
+    private function buildTerminalPendingResponse($requestId, $invoiceId, array $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage, $refundReason)
+    {
+        $refunds = $this->buildPendingRefundPreview($invoiceId, $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage, $refundReason);
+
+        return [
+            'status' => 'success',
+            'message' => 'Seat cancellation successful.',
+            'data' => [
+                'request_id' => $requestId,
+                'invoice_id' => $invoiceId,
+                'transaction_id' => $transactionId,
+                'cancelled_seats' => collect($refunds)->pluck('seat_no')->values()->all(),
+                'deduction_percentage' => $deductionPercentage,
+                'deduction_amount' => round(collect($refunds)->sum('deduction_amount'), 2),
+                'refund_percentage' => $refundPercentage,
+                'refund_amount' => round(collect($refunds)->sum('refund_amount'), 2),
+                'refunds' => $refunds,
+                'approved_at' => null,
+                'cancelled_at' => null,
+            ],
+            'error' => null,
+        ];
+    }
+
+    private function buildPendingRefundPreview($invoiceId, array $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage, $refundReason)
+    {
+        return Ticket::where('invoice_id', $invoiceId)
+            ->whereIn('seat_no', $seatNumbers)
+            ->get()
+            ->map(function (Ticket $ticket) use ($transactionId, $deductionPercentage, $refundPercentage, $refundReason) {
+                $seatFare = (float) $ticket->seat_fare;
+                $deductionAmount = $this->calculatePercentageAmount($seatFare, $deductionPercentage);
+
+                return [
+                    'ticket_id' => $ticket->id,
+                    'seat_no' => (string) $ticket->seat_no,
+                    'transaction_id' => $transactionId,
+                    'seat_fare' => $seatFare,
+                    'deduction_percentage' => $deductionPercentage,
+                    'deduction_amount' => $deductionAmount,
+                    'refund_percentage' => $refundPercentage,
+                    'refund_amount' => round($seatFare - $deductionAmount, 2),
+                    'refund_reason' => $refundReason,
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     private function buildResponseFromLog(BookkaruApiLog $log)
     {
+        if ($log->current_status === 'pending') {
+            return $this->buildPendingResponseFromLog($log);
+        }
+
         if (is_array($log->response_payload) && !empty($log->response_payload)) {
+            if ($this->isStoredPendingAcknowledgement($log->response_payload)) {
+                return $this->buildPendingResponseFromLog($log);
+            }
+
             return $this->normalizeStoredResponsePayload($log->response_payload);
         }
 
@@ -736,6 +812,29 @@ class BookkaruCancellationController extends Controller
             ],
             'error' => null,
         ];
+    }
+
+    private function isStoredPendingAcknowledgement(array $response)
+    {
+        return data_get($response, 'data.cancellation_status') === 'pending'
+            || isset($response['data']['seat_numbers']);
+    }
+
+    private function buildPendingResponseFromLog(BookkaruApiLog $log)
+    {
+        $deductionPercentage = $this->resolveLogDeductionPercentage($log);
+        $refundPercentage = $this->refundPercentageFromDeduction($deductionPercentage);
+
+        return $this->buildPendingResponse(
+            $log->request_id,
+            $log->invoice_id,
+            $log->seat_numbers ?? [],
+            data_get($log->request_payload, 'transaction_id', $log->booking_reference),
+            data_get($log->request_payload, 'source', 'Bookkaru'),
+            $deductionPercentage,
+            $refundPercentage,
+            data_get($log->request_payload, 'cancellation_reason', 'Cancelled from online terminal')
+        );
     }
 
     private function normalizeStoredResponsePayload(array $response)
