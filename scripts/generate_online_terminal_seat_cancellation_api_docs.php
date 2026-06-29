@@ -28,25 +28,7 @@ $successJson = <<<'JSON'
     "invoice_id": 878700,
     "transaction_id": "123456789",
     "cancelled_seats": ["5 up"],
-    "deduction_percentage": 25,
-    "deduction_amount": 2250,
-    "refund_percentage": 75,
-    "refund_amount": 6750,
-    "refunds": [
-      {
-        "ticket_id": 1513061,
-        "seat_no": "5 up",
-        "transaction_id": "123456789",
-        "seat_fare": 9000,
-        "deduction_percentage": 25,
-        "deduction_amount": 2250,
-        "refund_percentage": 75,
-        "refund_amount": 6750,
-        "refund_reason": "Cancelled from sasta ticket API"
-      }
-    ],
-    "approved_at": null,
-    "cancelled_at": null
+    "deduction_percentage": 25
   },
   "error": null
 }
@@ -301,16 +283,16 @@ $html = '
     <div class="page-break"></div>
 
     <h2>4. Response Behavior</h2>
-    <h3>Online Terminal Response: Success Format</h3>
-    <p>For approved online terminal sources, the API returns a final-style success response for a better terminal user experience.</p>
+    <h3>Online Terminal Response: New Simplified Format</h3>
+    <p>For approved online terminal sources, the API returns a simplified success response optimized for external terminal integrations.</p>
     <div class="note">
         <strong>Important:</strong> This response is an API acknowledgment only. Internally, the cancellation remains pending approval.
     </div>
     <ul>
         <li>Message is returned as <code class="inline">Seat cancellation successful.</code></li>
-        <li>Response includes <code class="inline">deduction_amount</code>, <code class="inline">refund_amount</code>, <code class="inline">cancelled_seats</code>, and a <code class="inline">refunds</code> array.</li>
-        <li><code class="inline">approved_at</code> is returned as <code class="inline">null</code>.</li>
-        <li><code class="inline">cancelled_at</code> is returned as <code class="inline">null</code>.</li>
+        <li>Response includes only essential fields: <code class="inline">request_id</code>, <code class="inline">invoice_id</code>, <code class="inline">transaction_id</code>, <code class="inline">cancelled_seats</code>, and <code class="inline">deduction_percentage</code>.</li>
+        <li>Response is optimized for external terminals to reduce payload size.</li>
+        <li>Full refund breakdown is available only in internal/admin systems.</li>
     </ul>
 
     <h3>Internal System Behavior</h3>
@@ -321,6 +303,8 @@ $html = '
     <ul>
         <li>No actual seat cancellation happens when this API responds.</li>
         <li>Seat remains active until approved in the portal.</li>
+        <li>Online terminals receive a simplified response only.</li>
+        <li>Refund calculation and breakdown are handled internally.</li>
         <li>Final refund processing is performed after approval only.</li>
         <li>Approval workflow remains unchanged.</li>
     </ul>
@@ -337,7 +321,8 @@ $html = '
         <li>A seat cannot be cancelled twice.</li>
         <li>The approval system remains unchanged.</li>
         <li>Final refund is calculated and processed after portal approval.</li>
-        <li>The online terminal API response is only an acknowledgment/preview for external terminals.</li>
+        <li>The online terminal API response is only a simplified acknowledgment for external terminals.</li>
+        <li>Detailed refund calculation and breakdown remain available only to internal/admin systems.</li>
     </ul>
 
     <div class="footer">

@@ -728,7 +728,8 @@ class BookkaruCancellationController extends Controller
 
     private function buildTerminalPendingResponse($requestId, $invoiceId, array $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage, $refundReason)
     {
-        $this->buildPendingRefundPreview($invoiceId, $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage, $refundReason);
+        $refunds = $this->buildPendingRefundPreview($invoiceId, $seatNumbers, $transactionId, $deductionPercentage, $refundPercentage, $refundReason);
+        $now = Carbon::now()->format('Y-m-d H:i:s');
 
         return [
             'status' => 'success',
@@ -739,6 +740,12 @@ class BookkaruCancellationController extends Controller
                 'transaction_id' => $transactionId,
                 'cancelled_seats' => $seatNumbers,
                 'deduction_percentage' => $deductionPercentage,
+                'deduction_amount' => round(collect($refunds)->sum('deduction_amount'), 2),
+                'refund_percentage' => $refundPercentage,
+                'refund_amount' => round(collect($refunds)->sum('refund_amount'), 2),
+                'refunds' => $refunds,
+                'approved_at' => $now,
+                'cancelled_at' => $now,
             ],
             'error' => null,
         ];
@@ -761,7 +768,7 @@ class BookkaruCancellationController extends Controller
                     'deduction_percentage' => $deductionPercentage,
                     'deduction_amount' => $deductionAmount,
                     'refund_percentage' => $refundPercentage,
-                    'refund_amount' => round($seatFare - $deductionAmount, 2),
+                    'refund_amount' => $this->calculatePercentageAmount($seatFare, $refundPercentage),
                     'refund_reason' => $refundReason,
                 ];
             })

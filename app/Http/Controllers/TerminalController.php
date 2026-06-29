@@ -648,8 +648,9 @@ public function filterData(Request $request)
 
     $ticket->commission = $commission;
 
-    // Seat commission (always calculated)
-    if ($commission->percentage_commission > 0) {
+    if ($ticket->type === 'canceled') {
+        $ticket->seat_commission = 0;
+    } elseif ($commission->percentage_commission > 0) {
         $ticket->seat_commission = round(($fare * $commission->percentage_commission) / 100);
     } elseif ($commission->flat_commission > 0) {
         $ticket->seat_commission = $commission->flat_commission;
@@ -678,11 +679,26 @@ public function filterData(Request $request)
             ) / 100;
         }
 
+        $ticket->sale = $ticket->type !== 'canceled' ? $fare : 0;
+        $ticket->terminal_commission = $ticket->type !== 'canceled' ? (float) ($ticket->comsn ?? 0) : 0;
+        $ticket->net_cash = $ticket->type === 'canceled'
+            ? $fare - $ticket->refund - $ticket->terminal_commission - $ticket->seat_commission
+            : $ticket->sale - $ticket->terminal_commission - $ticket->seat_commission;
+
         return $ticket;
     });
 
+    $sortedTickets = $tickets->sortBy('schedule_date_time')->values();
+
     return [
-        'record' => $tickets->sortBy('schedule_date_time')->values()
+        'record' => $sortedTickets,
+        'total' => [
+            'sale' => round($sortedTickets->sum('sale'), 2),
+            'refund' => round($sortedTickets->sum('refund'), 2),
+            'terminal_commission' => round($sortedTickets->sum('terminal_commission'), 2),
+            'seat_commission' => round($sortedTickets->sum('seat_commission'), 2),
+            'net_cash' => round($sortedTickets->sum('net_cash'), 2),
+        ],
     ];
 }
 

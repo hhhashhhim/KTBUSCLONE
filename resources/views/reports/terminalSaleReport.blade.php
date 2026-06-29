@@ -127,7 +127,10 @@
 
                         $seatCommission = $single->type !== 'canceled' ? (float) ($single->seat_commission ?? 0) : 0;
 
-                        $netCash = $sale + $refund - $terminalCommission;
+                        $netCash =
+                            $single->type === 'canceled'
+                                ? (float) $single->seat_fare - (float) $single->discount - $refund - $terminalCommission - $seatCommission
+                                : $sale - $terminalCommission - $seatCommission;
 
                         // totals
                         $totalSale += $sale;
