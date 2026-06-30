@@ -14,7 +14,7 @@ class AddBookkaruCancellationPermissionsToRoles extends Migration
                 return;
             }
 
-            $modules = $this->addBookkaruCancellationSubmenu($modules, true);
+            $modules = $this->addOnlineTerminalCancellationSubmenu($modules, true);
 
             DB::table('companies')->where('id', $company->id)->update([
                 'modules' => json_encode($modules),
@@ -28,7 +28,7 @@ class AddBookkaruCancellationPermissionsToRoles extends Migration
                 return;
             }
 
-            $permissions = $this->addBookkaruCancellationSubmenu($permissions, false);
+            $permissions = $this->addOnlineTerminalCancellationSubmenu($permissions, false);
 
             DB::table('roles')->where('id', $role->id)->update([
                 'permissions' => json_encode($permissions),
@@ -45,7 +45,7 @@ class AddBookkaruCancellationPermissionsToRoles extends Migration
                 return;
             }
 
-            $modules = $this->removeBookkaruCancellationSubmenu($modules);
+            $modules = $this->removeOnlineTerminalCancellationSubmenu($modules);
 
             DB::table('companies')->where('id', $company->id)->update([
                 'modules' => json_encode($modules),
@@ -59,7 +59,7 @@ class AddBookkaruCancellationPermissionsToRoles extends Migration
                 return;
             }
 
-            $permissions = $this->removeBookkaruCancellationSubmenu($permissions);
+            $permissions = $this->removeOnlineTerminalCancellationSubmenu($permissions);
 
             DB::table('roles')->where('id', $role->id)->update([
                 'permissions' => json_encode($permissions),
@@ -67,7 +67,7 @@ class AddBookkaruCancellationPermissionsToRoles extends Migration
         });
     }
 
-    private function addBookkaruCancellationSubmenu(array $permissions, bool $allow): array
+    private function addOnlineTerminalCancellationSubmenu(array $permissions, bool $allow): array
     {
         foreach ($permissions as &$menu) {
             if (($menu['name'] ?? null) !== 'ticketing') {
@@ -76,16 +76,16 @@ class AddBookkaruCancellationPermissionsToRoles extends Migration
 
             $menu['childs'] = $menu['childs'] ?? [];
 
-            $bookkaruIndex = null;
+            $onlineTerminalIndex = null;
             foreach ($menu['childs'] as $index => $submenu) {
-                if (($submenu['name'] ?? null) === 'bookkaru-cancellation') {
-                    $bookkaruIndex = $index;
+                if (($submenu['name'] ?? null) === 'online-terminal-cancellation') {
+                    $onlineTerminalIndex = $index;
                     break;
                 }
             }
 
-            $bookkaruSubmenu = [
-                'name' => 'bookkaru-cancellation',
+            $onlineTerminalSubmenu = [
+                'name' => 'online-terminal-cancellation',
                 'allow' => $allow,
                 'buttons' => [
                     ['name' => 'view-request', 'allow' => $allow],
@@ -94,17 +94,17 @@ class AddBookkaruCancellationPermissionsToRoles extends Migration
                 ],
             ];
 
-            if ($bookkaruIndex === null) {
-                $menu['childs'][] = $bookkaruSubmenu;
+            if ($onlineTerminalIndex === null) {
+                $menu['childs'][] = $onlineTerminalSubmenu;
                 continue;
             }
 
-            $menu['childs'][$bookkaruIndex]['buttons'] = $menu['childs'][$bookkaruIndex]['buttons'] ?? [];
-            $existingButtons = array_column($menu['childs'][$bookkaruIndex]['buttons'], 'name');
+            $menu['childs'][$onlineTerminalIndex]['buttons'] = $menu['childs'][$onlineTerminalIndex]['buttons'] ?? [];
+            $existingButtons = array_column($menu['childs'][$onlineTerminalIndex]['buttons'], 'name');
 
-            foreach ($bookkaruSubmenu['buttons'] as $button) {
+            foreach ($onlineTerminalSubmenu['buttons'] as $button) {
                 if (!in_array($button['name'], $existingButtons, true)) {
-                    $menu['childs'][$bookkaruIndex]['buttons'][] = $button;
+                    $menu['childs'][$onlineTerminalIndex]['buttons'][] = $button;
                 }
             }
         }
@@ -113,7 +113,7 @@ class AddBookkaruCancellationPermissionsToRoles extends Migration
         return $permissions;
     }
 
-    private function removeBookkaruCancellationSubmenu(array $permissions): array
+    private function removeOnlineTerminalCancellationSubmenu(array $permissions): array
     {
         foreach ($permissions as &$menu) {
             if (($menu['name'] ?? null) !== 'ticketing' || !isset($menu['childs']) || !is_array($menu['childs'])) {
@@ -121,7 +121,7 @@ class AddBookkaruCancellationPermissionsToRoles extends Migration
             }
 
             $menu['childs'] = array_values(array_filter($menu['childs'], function ($submenu) {
-                return ($submenu['name'] ?? null) !== 'bookkaru-cancellation';
+                return ($submenu['name'] ?? null) !== 'online-terminal-cancellation';
             }));
         }
         unset($menu);
