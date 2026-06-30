@@ -307,7 +307,7 @@
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('online-terminal-cancellation')">
-                            <router-link class="nav-link text-capitalize" :to="{ name: 'online-terminal-cancellation-requests' }">
+                            <router-link class="nav-link text-capitalize online-terminal" :to="{ name: 'online-terminal-cancellation-requests' }">
                                 <i class="fas fa-bookmark"></i> Online Terminal Cancellations
                             </router-link>
                         </li>

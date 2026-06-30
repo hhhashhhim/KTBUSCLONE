@@ -6582,7 +6582,9 @@ body.layout-3 .main-footer {
     padding-left: 50px;
     font-weight: 400
 }
-
+.main-sidebar .sidebar-menu li ul.dropdown-menu li .online-terminal{
+    font-size: 9px !important;
+}
 .main-sidebar .sidebar-menu li ul.dropdown-menu li a:hover {
     color: #6777ef;
     background-color: inherit
