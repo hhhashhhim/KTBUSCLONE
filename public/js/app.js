@@ -47969,7 +47969,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   data: function data() {
     return {
-      API_URL: "http://localhost/kt-api/",
+      API_URL: "https://api.kainattravels.net/",
       validationErrors: [],
       counterExpenses: [],
       permissions: [],
@@ -147946,7 +147946,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
  // const url = "/kt-dev/";
 
-var url = "/kt-dev/";
+var url = "/";
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
@@ -148441,9 +148441,9 @@ var initialState = function initialState() {
     token: persistedState.token,
     permissions: persistedState.permissions,
     companyModules: persistedState.companyModules,
-    main_url: "http://localhost/kt-dev/",
-    api_url: "http://localhost/kt-api/",
-    app_url: "http://localhost/kt-dev/",
+    main_url: "https://portal.kainattravels.net/",
+    api_url: "https://api.kainattravels.net/",
+    app_url: "https://portal.kainattravels.net/",
     appStateReady: false
   };
 };
