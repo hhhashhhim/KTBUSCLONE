@@ -306,9 +306,9 @@
                                 <i class="fas fa-bookmark"></i> All Booking
                             </router-link>
                         </li>
-                        <li class="dropdown" v-if="checkForSubmenu('bookkaru-cancellation')">
-                            <router-link class="nav-link text-capitalize bookkaru-text" :to="{ name: 'bookkaru-cancellation-requests' }">
-                                <i class="fas fa-bookmark"></i> Bookkaru Cancellations
+                        <li class="dropdown" v-if="checkForSubmenu('online-terminal-cancellation')">
+                            <router-link class="nav-link text-capitalize" :to="{ name: 'online-terminal-cancellation-requests' }">
+                                <i class="fas fa-bookmark"></i> Online Terminal Cancellations
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('counter-expenses')">

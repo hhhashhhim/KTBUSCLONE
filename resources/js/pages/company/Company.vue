@@ -623,7 +623,7 @@ export default {
                         {name: "all-booking", allow: true},
                         {name: "jazz-cash-refund", allow: true},
                         {
-                            name: "bookkaru-cancellation",
+                            name: "online-terminal-cancellation",
                             allow: true,
                             buttons: [
                                 {name: "view-request", allow: true},

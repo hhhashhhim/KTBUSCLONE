@@ -20,7 +20,7 @@ import FareClass from "./pages/fareClass/FareClassPage.vue";
 import BusesPage from "./pages/buses/BusesPage.vue";
 import BusClassPage from "./pages/buses/BusClassPage.vue";
 import BookingPage from "./pages/booking/BookingPage.vue";
-import BookkaruCancellationRequestsPage from "./pages/booking/BookkaruCancellationRequestsPage.vue";
+import OnlineTerminalCancellationRequestsPage from "./pages/booking/OnlineTerminalCancellationRequestsPage.vue";
 import ScheduleClosingPage from "./pages/schedule/ScheduleClosingPage.vue";
 import ScheduleUnclosingPage from "./pages/schedule/ScheduleUnclosingPage.vue";
 import ScheduleCommissionClosingPage from "./pages/schedule/ScheduleCommissionClosingPage.vue";
@@ -194,9 +194,9 @@ const routes = [
         name: "booking-page",
     },
     {
-        path: url + "booking/bookkaru/cancellations",
-        component: BookkaruCancellationRequestsPage,
-        name: "bookkaru-cancellation-requests",
+        path: url + "booking/online-terminals/cancellations",
+        component: OnlineTerminalCancellationRequestsPage,
+        name: "online-terminal-cancellation-requests",
     },
     {
         path: url + "booking/jazzcashrefund",

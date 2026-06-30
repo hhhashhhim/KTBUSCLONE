@@ -41365,259 +41365,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=script&lang=js":
-/*!*****************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=script&lang=js ***!
-  \*****************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return generator._invoke = function (innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; }(innerFn, self, context), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; this._invoke = function (method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (object) { var keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  name: "BookkaruCancellationRequestsPage",
-  data: function data() {
-    return {
-      permissions: [],
-      requests: [],
-      loading: false,
-      actionLoadingId: null,
-      rejectLoading: false,
-      selectedRequest: null,
-      rejectionReason: '',
-      filters: {
-        request_id: '',
-        invoice_id: '',
-        booking_reference: '',
-        status: ''
-      }
-    };
-  },
-  created: function created() {
-    this.permissions = this.$store.state.permissions;
-    this.fetchRequests();
-  },
-  methods: {
-    fetchRequests: function fetchRequests() {
-      var _this = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var res;
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _this.loading = true;
-                _context.next = 3;
-                return _this.callApi('post', 'bookkaru/cancellations/requests', _this.filters);
-
-              case 3:
-                res = _context.sent;
-
-                if (res.status === 200 && res.data.status === true) {
-                  _this.requests = res.data.data.requests;
-                }
-
-                _this.loading = false;
-                setTimeout(function () {
-                  $("#bookkaru_table").DataTable();
-                }, 300);
-
-              case 7:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee);
-      }))();
-    },
-    resetFilters: function resetFilters() {
-      this.filters = {
-        request_id: '',
-        invoice_id: '',
-        booking_reference: '',
-        status: ''
-      };
-      this.fetchRequests();
-    },
-    approveRequest: function approveRequest(request) {
-      var _this2 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var confirmed, res;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                _context2.next = 2;
-                return swal({
-                  title: "Approve cancellation?",
-                  text: "This will cancel the requested seat(s).",
-                  icon: "warning",
-                  buttons: true,
-                  dangerMode: true
-                });
-
-              case 2:
-                confirmed = _context2.sent;
-
-                if (confirmed) {
-                  _context2.next = 5;
-                  break;
-                }
-
-                return _context2.abrupt("return");
-
-              case 5:
-                _this2.actionLoadingId = request.id;
-                _context2.next = 8;
-                return _this2.callApi('post', 'bookkaru/cancellations/approve', {
-                  id: request.id
-                });
-
-              case 8:
-                res = _context2.sent;
-                _this2.actionLoadingId = null;
-
-                if (res.status === 200 && res.data.status === true) {
-                  swal("Approved", res.data.message, "success");
-                  $("#bookkaru_table").DataTable().destroy();
-
-                  _this2.fetchRequests();
-                } else {
-                  swal("Error", res.data.message || "Approval failed.", "error");
-                }
-
-              case 11:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2);
-      }))();
-    },
-    openRejectModal: function openRejectModal(request) {
-      this.selectedRequest = request;
-      this.rejectionReason = '';
-      $('#bookkaruRejectModal').modal('show');
-    },
-    rejectRequest: function rejectRequest() {
-      var _this3 = this;
-
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var res;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                if (_this3.rejectionReason.trim()) {
-                  _context3.next = 3;
-                  break;
-                }
-
-                swal("Error", "Rejection reason is required.", "error");
-                return _context3.abrupt("return");
-
-              case 3:
-                _this3.rejectLoading = true;
-                _context3.next = 6;
-                return _this3.callApi('post', 'bookkaru/cancellations/reject', {
-                  id: _this3.selectedRequest.id,
-                  rejection_reason: _this3.rejectionReason
-                });
-
-              case 6:
-                res = _context3.sent;
-                _this3.rejectLoading = false;
-
-                if (res.status === 200 && res.data.status === true) {
-                  $('#bookkaruRejectModal').modal('hide');
-                  swal("Rejected", res.data.message, "success");
-                  $("#bookkaru_table").DataTable().destroy();
-
-                  _this3.fetchRequests();
-                } else {
-                  swal("Error", res.data.message || "Rejection failed.", "error");
-                }
-
-              case 9:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3);
-      }))();
-    },
-    formatSeats: function formatSeats(seats) {
-      return Array.isArray(seats) ? seats.join(', ') : 'N/A';
-    },
-    statusLabel: function statusLabel(status) {
-      if (!status) {
-        return 'Pending';
-      }
-
-      return String(status).replace(/_/g, ' ').replace(/\b\w/g, function (_char) {
-        return _char.toUpperCase();
-      });
-    },
-    statusClass: function statusClass(status) {
-      switch (status) {
-        case 'pending':
-          return 'badge badge-warning';
-
-        case 'approved':
-          return 'badge badge-info';
-
-        case 'cancelled':
-          return 'badge badge-success';
-
-        case 'rejected':
-          return 'badge badge-danger';
-
-        case 'failed':
-          return 'badge badge-dark';
-
-        default:
-          return 'badge badge-secondary';
-      }
-    },
-    canUseButton: function canUseButton(buttonName) {
-      for (var i = 0; i < this.permissions.length; i++) {
-        if (!Array.isArray(this.permissions[i].childs)) {
-          continue;
-        }
-
-        var submenu = this.permissions[i].childs.find(function (item) {
-          return item.name === 'bookkaru-cancellation';
-        });
-
-        if (!submenu || !Array.isArray(submenu.buttons)) {
-          continue;
-        }
-
-        var button = submenu.buttons.find(function (item) {
-          return item.name === buttonName;
-        });
-        return button ? button.allow : false;
-      }
-
-      return false;
-    }
-  }
-});
-
-/***/ }),
-
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/JazzCashRefund.vue?vue&type=script&lang=js":
 /*!***********************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/JazzCashRefund.vue?vue&type=script&lang=js ***!
@@ -42042,6 +41789,310 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (obj.isDeleted) {
         this.discounts.splice(obj.index, 1);
       }
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=script&lang=js":
+/*!***********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=script&lang=js ***!
+  \***********************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return generator._invoke = function (innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; }(innerFn, self, context), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; this._invoke = function (method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (object) { var keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: "OnlineTerminalCancellationRequestsPage",
+  data: function data() {
+    return {
+      permissions: [],
+      requests: [],
+      loading: false,
+      actionLoadingId: null,
+      rejectLoading: false,
+      selectedRequest: null,
+      rejectionReason: '',
+      filters: {
+        request_id: '',
+        invoice_id: '',
+        booking_reference: '',
+        status: ''
+      }
+    };
+  },
+  created: function created() {
+    this.permissions = this.$store.state.permissions;
+    this.fetchRequests();
+  },
+  methods: {
+    fetchRequests: function fetchRequests() {
+      var _this = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _this.destroyDataTable();
+
+                _this.loading = true;
+                _context.next = 4;
+                return _this.callApi('post', 'online-terminals/cancellations/requests', _this.filters);
+
+              case 4:
+                res = _context.sent;
+
+                if (res.status === 200 && res.data.status === true) {
+                  _this.requests = res.data.data.requests;
+                }
+
+                _this.loading = false;
+                setTimeout(function () {
+                  $("#online_terminal_cancellation_table").DataTable();
+                }, 300);
+
+              case 8:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }))();
+    },
+    resetFilters: function resetFilters() {
+      this.filters = {
+        request_id: '',
+        invoice_id: '',
+        booking_reference: '',
+        status: ''
+      };
+      this.fetchRequests();
+    },
+    approveRequest: function approveRequest(request) {
+      var _this2 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var confirmed, res;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return swal({
+                  title: "Approve cancellation?",
+                  text: "This will cancel the requested seat(s).",
+                  icon: "warning",
+                  buttons: true,
+                  dangerMode: true
+                });
+
+              case 2:
+                confirmed = _context2.sent;
+
+                if (confirmed) {
+                  _context2.next = 5;
+                  break;
+                }
+
+                return _context2.abrupt("return");
+
+              case 5:
+                _this2.actionLoadingId = request.id;
+                _context2.next = 8;
+                return _this2.callApi('post', 'online-terminals/cancellations/approve', {
+                  id: request.id
+                });
+
+              case 8:
+                res = _context2.sent;
+                _this2.actionLoadingId = null;
+
+                if (res.status === 200 && _this2.isApiSuccess(res.data)) {
+                  swal("Approved", res.data.message, "success");
+
+                  _this2.fetchRequests();
+                } else {
+                  swal("Error", res.data.message || "Approval failed.", "error");
+                }
+
+              case 11:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2);
+      }))();
+    },
+    openRejectModal: function openRejectModal(request) {
+      this.selectedRequest = request;
+      this.rejectionReason = '';
+      $('#onlineTerminalRejectModal').modal('show');
+    },
+    rejectRequest: function rejectRequest() {
+      var _this3 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var res;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (_this3.rejectionReason.trim()) {
+                  _context3.next = 3;
+                  break;
+                }
+
+                swal("Error", "Rejection reason is required.", "error");
+                return _context3.abrupt("return");
+
+              case 3:
+                _this3.rejectLoading = true;
+                _context3.next = 6;
+                return _this3.callApi('post', 'online-terminals/cancellations/reject', {
+                  id: _this3.selectedRequest.id,
+                  rejection_reason: _this3.rejectionReason
+                });
+
+              case 6:
+                res = _context3.sent;
+                _this3.rejectLoading = false;
+
+                if (res.status === 200 && _this3.isApiSuccess(res.data)) {
+                  $('#onlineTerminalRejectModal').modal('hide');
+                  swal("Rejected", res.data.message, "success");
+
+                  _this3.fetchRequests();
+                } else {
+                  swal("Error", res.data.message || "Rejection failed.", "error");
+                }
+
+              case 9:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }))();
+    },
+    destroyDataTable: function destroyDataTable() {
+      if ($.fn.DataTable.isDataTable("#online_terminal_cancellation_table")) {
+        $("#online_terminal_cancellation_table").DataTable().destroy();
+      }
+    },
+    isApiSuccess: function isApiSuccess(data) {
+      return data && (data.status === true || data.status === 'success');
+    },
+    formatSeats: function formatSeats(seats) {
+      return Array.isArray(seats) && seats.length ? seats.join(', ') : 'N/A';
+    },
+    formatFare: function formatFare(fare) {
+      if (fare === null || fare === undefined || fare === 'N/A') {
+        return 'N/A';
+      }
+
+      return Number(fare);
+    },
+    timeDifference: function timeDifference(request) {
+      if (!request.bus_date || !request.bus_time || !request.request_date) {
+        return 'N/A';
+      }
+
+      var busDateTime = new Date("".concat(request.bus_date, " ").concat(request.bus_time));
+      var requestDateTime = new Date(request.request_date);
+
+      if (Number.isNaN(busDateTime.getTime()) || Number.isNaN(requestDateTime.getTime())) {
+        return 'N/A';
+      }
+
+      var seconds = Math.floor((busDateTime.getTime() - requestDateTime.getTime()) / 1000);
+      var prefix = seconds < 0 ? '-' : '';
+      seconds = Math.abs(seconds);
+      var days = Math.floor(seconds / 86400);
+      seconds %= 86400;
+      var hours = Math.floor(seconds / 3600);
+      seconds %= 3600;
+      var minutes = Math.floor(seconds / 60);
+      var parts = [];
+
+      if (days) {
+        parts.push("".concat(days, " day").concat(days > 1 ? 's' : ''));
+      }
+
+      if (hours) {
+        parts.push("".concat(hours, "h"));
+      }
+
+      if (minutes || !parts.length) {
+        parts.push("".concat(minutes, "m"));
+      }
+
+      return prefix + parts.join(' ');
+    },
+    statusLabel: function statusLabel(status) {
+      if (!status) {
+        return 'Pending';
+      }
+
+      return String(status).replace(/_/g, ' ').replace(/\b\w/g, function (_char) {
+        return _char.toUpperCase();
+      });
+    },
+    statusClass: function statusClass(status) {
+      switch (status) {
+        case 'pending':
+          return 'badge badge-warning';
+
+        case 'approved':
+          return 'badge badge-info';
+
+        case 'cancelled':
+          return 'badge badge-success';
+
+        case 'rejected':
+          return 'badge badge-danger';
+
+        case 'failed':
+          return 'badge badge-dark';
+
+        default:
+          return 'badge badge-secondary';
+      }
+    },
+    canUseButton: function canUseButton(buttonName) {
+      for (var i = 0; i < this.permissions.length; i++) {
+        if (!Array.isArray(this.permissions[i].childs)) {
+          continue;
+        }
+
+        var submenu = this.permissions[i].childs.find(function (item) {
+          return item.name === 'online-terminal-cancellation';
+        });
+
+        if (!submenu || !Array.isArray(submenu.buttons)) {
+          continue;
+        }
+
+        var button = submenu.buttons.find(function (item) {
+          return item.name === buttonName;
+        });
+        return button ? button.allow : false;
+      }
+
+      return false;
     }
   }
 });
@@ -45250,7 +45301,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           name: "jazz-cash-refund",
           allow: true
         }, {
-          name: "bookkaru-cancellation",
+          name: "online-terminal-cancellation",
           allow: true,
           buttons: [{
             name: "view-request",
@@ -47918,7 +47969,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   data: function data() {
     return {
-      API_URL: "https://api.kainattravels.net/",
+      API_URL: "http://localhost/kt-api/",
       validationErrors: [],
       counterExpenses: [],
       permissions: [],
@@ -84614,14 +84665,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('bookkaru-cancellation') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_114, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
-    "class": "nav-link text-capitalize bookkaru-text",
+  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.checkForSubmenu('online-terminal-cancellation') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_114, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+    "class": "nav-link text-capitalize",
     to: {
-      name: 'bookkaru-cancellation-requests'
+      name: 'online-terminal-cancellation-requests'
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_115, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Bookkaru Cancellations ")];
+      return [_hoisted_115, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Online Terminal Cancellations ")];
     }),
     _: 1
     /* STABLE */
@@ -98883,327 +98934,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=template&id=73e8ea37&scoped=true":
-/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=template&id=73e8ea37&scoped=true ***!
-  \*********************************************************************************************************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "render": () => (/* binding */ render)
-/* harmony export */ });
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
-
-
-var _withScopeId = function _withScopeId(n) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-73e8ea37"), n = n(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(), n;
-};
-
-var _hoisted_1 = {
-  "class": "section"
-};
-var _hoisted_2 = {
-  "class": "section-body"
-};
-var _hoisted_3 = {
-  "class": "row"
-};
-var _hoisted_4 = {
-  "class": "col-12"
-};
-var _hoisted_5 = {
-  "class": "card card-primary"
-};
-
-var _hoisted_6 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "card-header"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Bookkaru Cancellation Requests")], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_7 = {
-  "class": "card-body"
-};
-var _hoisted_8 = {
-  "class": "row align-items-end mb-3"
-};
-var _hoisted_9 = {
-  "class": "col-md-3 mb-2"
-};
-
-var _hoisted_10 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Request ID", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_11 = {
-  "class": "col-md-2 mb-2"
-};
-
-var _hoisted_12 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Invoice ID", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_13 = {
-  "class": "col-md-3 mb-2"
-};
-
-var _hoisted_14 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Booking Reference", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_15 = {
-  "class": "col-md-2 mb-2"
-};
-
-var _hoisted_16 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Status", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"\" data-v-73e8ea37>All</option><option value=\"pending\" data-v-73e8ea37>Pending</option><option value=\"cancelled\" data-v-73e8ea37>Cancelled</option><option value=\"rejected\" data-v-73e8ea37>Rejected</option><option value=\"failed\" data-v-73e8ea37>Failed</option><option value=\"unauthorized\" data-v-73e8ea37>Unauthorized</option>", 6);
-
-var _hoisted_23 = [_hoisted_17];
-var _hoisted_24 = {
-  "class": "col-md-2 mb-2"
-};
-var _hoisted_25 = {
-  "class": "table-responsive"
-};
-var _hoisted_26 = {
-  key: 0,
-  "class": "text-center py-4"
-};
-var _hoisted_27 = ["src"];
-var _hoisted_28 = {
-  key: 1,
-  "class": "table table-bordered table-striped text-center",
-  id: "bookkaru_table"
-};
-
-var _hoisted_29 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Request ID"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Invoice"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Booking Reference"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Seats"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Reason"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Request Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Source"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Approved By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Rejected By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cancelled At"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Actions")])], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_30 = {
-  key: 0
-};
-
-var _hoisted_31 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
-    colspan: "12",
-    "class": "text-muted py-4"
-  }, "No Bookkaru cancellation requests found.", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_32 = [_hoisted_31];
-var _hoisted_33 = {
-  key: 0,
-  "class": "small text-muted"
-};
-var _hoisted_34 = {
-  key: 0,
-  "class": "btn-group"
-};
-var _hoisted_35 = ["disabled", "onClick"];
-var _hoisted_36 = ["disabled", "onClick"];
-var _hoisted_37 = {
-  key: 1,
-  "class": "text-muted"
-};
-var _hoisted_38 = {
-  "class": "modal fade",
-  id: "bookkaruRejectModal",
-  tabindex: "-1",
-  role: "dialog",
-  "aria-labelledby": "bookkaruRejectModalLabel",
-  "aria-hidden": "true"
-};
-var _hoisted_39 = {
-  "class": "modal-dialog",
-  role: "document"
-};
-var _hoisted_40 = {
-  "class": "modal-content"
-};
-
-var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "modal-header"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
-    "class": "modal-title",
-    id: "bookkaruRejectModalLabel"
-  }, "Reject Bookkaru Request"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    type: "button",
-    "class": "close",
-    "data-dismiss": "modal",
-    "aria-label": "Close"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "aria-hidden": "true"
-  }, "×")])], -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_42 = {
-  "class": "modal-body"
-};
-
-var _hoisted_43 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Rejection Reason", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_44 = {
-  "class": "modal-footer"
-};
-
-var _hoisted_45 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    type: "button",
-    "class": "btn btn-secondary",
-    "data-dismiss": "modal"
-  }, "Cancel", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_46 = ["disabled"];
-function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [_hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    type: "text",
-    "class": "form-control",
-    "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
-      return $data.filters.request_id = $event;
-    })
-  }, null, 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.request_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [_hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    type: "text",
-    "class": "form-control",
-    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
-      return $data.filters.invoice_id = $event;
-    })
-  }, null, 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.invoice_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    type: "text",
-    "class": "form-control",
-    "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
-      return $data.filters.booking_reference = $event;
-    })
-  }, null, 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.booking_reference]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [_hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
-    "class": "form-control",
-    "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
-      return $data.filters.status = $event;
-    })
-  }, _hoisted_23, 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.status]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    "class": "btn btn-primary mr-2",
-    onClick: _cache[4] || (_cache[4] = function ($event) {
-      return $options.fetchRequests();
-    })
-  }, "Search"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    "class": "btn btn-secondary",
-    onClick: _cache[5] || (_cache[5] = function ($event) {
-      return $options.resetFilters();
-    })
-  }, "Reset")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [$data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    "class": "loading-spinner",
-    src: _ctx.$store.state.main_url + 'assets/img/loading-spinner.gif'
-  }, null, 8
-  /* PROPS */
-  , _hoisted_27)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("table", _hoisted_28, [_hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [$data.requests.length === 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_30, _hoisted_32)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.requests, function (request) {
-    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
-      key: request.id
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.request_id), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.invoice_id), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.booking_reference || 'N/A'), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatSeats(request.seat_numbers)), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.cancellation_reason || 'N/A'), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.request_date || 'N/A'), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.source || 'Bookkaru'), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.statusClass(request.status))
-    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusLabel(request.status)), 3
-    /* TEXT, CLASS */
-    ), request.cancellation_status ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_33, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusLabel(request.cancellation_status)), 1
-    /* TEXT */
-    )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.approved_by || 'N/A'), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.rejected_by || 'N/A'), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.cancelled_at || 'N/A'), 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [request.status === 'pending' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_34, [$options.canUseButton('approve-request') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-      key: 0,
-      "class": "btn btn-success btn-sm",
-      disabled: $data.actionLoadingId === request.id,
-      onClick: function onClick($event) {
-        return $options.approveRequest(request);
-      }
-    }, " Approve ", 8
-    /* PROPS */
-    , _hoisted_35)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canUseButton('reject-request') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-      key: 1,
-      "class": "btn btn-danger btn-sm",
-      disabled: $data.actionLoadingId === request.id,
-      onClick: function onClick($event) {
-        return $options.openRejectModal(request);
-      }
-    }, " Reject ", 8
-    /* PROPS */
-    , _hoisted_36)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_37, "No action"))])]);
-  }), 128
-  /* KEYED_FRAGMENT */
-  ))])]))])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [_hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
-    "class": "form-control",
-    rows: "4",
-    "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
-      return $data.rejectionReason = $event;
-    }),
-    placeholder: "Enter rejection reason"
-  }, null, 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.rejectionReason]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [_hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    type: "button",
-    "class": "btn btn-danger",
-    onClick: _cache[7] || (_cache[7] = function ($event) {
-      return $options.rejectRequest();
-    }),
-    disabled: $data.rejectLoading
-  }, " Reject Request ", 8
-  /* PROPS */
-  , _hoisted_46)])])])])])]);
-}
-
-/***/ }),
-
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/JazzCashRefund.vue?vue&type=template&id=6785e3e1&scoped=true":
 /*!***************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/JazzCashRefund.vue?vue&type=template&id=6785e3e1&scoped=true ***!
@@ -100279,6 +100009,341 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $options.closeRefundViewModal();
     })
   }, " Close ")])])])])]);
+}
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=template&id=1614d8e4&scoped=true":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=template&id=1614d8e4&scoped=true ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+
+var _withScopeId = function _withScopeId(n) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-1614d8e4"), n = n(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(), n;
+};
+
+var _hoisted_1 = {
+  "class": "section"
+};
+var _hoisted_2 = {
+  "class": "section-body"
+};
+var _hoisted_3 = {
+  "class": "row"
+};
+var _hoisted_4 = {
+  "class": "col-12"
+};
+var _hoisted_5 = {
+  "class": "card card-primary"
+};
+
+var _hoisted_6 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "card-header"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Online Terminal Cancellation Requests")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_7 = {
+  "class": "card-body"
+};
+var _hoisted_8 = {
+  "class": "row align-items-end mb-3"
+};
+var _hoisted_9 = {
+  "class": "col-md-3 mb-2"
+};
+
+var _hoisted_10 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Request ID", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_11 = {
+  "class": "col-md-2 mb-2"
+};
+
+var _hoisted_12 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Invoice ID", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_13 = {
+  "class": "col-md-3 mb-2"
+};
+
+var _hoisted_14 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Booking Reference", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_15 = {
+  "class": "col-md-2 mb-2"
+};
+
+var _hoisted_16 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Status", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"\" data-v-1614d8e4>All</option><option value=\"pending\" data-v-1614d8e4>Pending</option><option value=\"cancelled\" data-v-1614d8e4>Cancelled</option><option value=\"rejected\" data-v-1614d8e4>Rejected</option><option value=\"failed\" data-v-1614d8e4>Failed</option><option value=\"unauthorized\" data-v-1614d8e4>Unauthorized</option>", 6);
+
+var _hoisted_23 = [_hoisted_17];
+var _hoisted_24 = {
+  "class": "col-md-2 mb-2"
+};
+var _hoisted_25 = {
+  "class": "table-responsive"
+};
+var _hoisted_26 = {
+  key: 0,
+  "class": "text-center py-4"
+};
+var _hoisted_27 = ["src"];
+var _hoisted_28 = {
+  key: 1,
+  "class": "table table-bordered table-striped text-center",
+  id: "online_terminal_cancellation_table"
+};
+
+var _hoisted_29 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Invoice"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Booking Reference"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Route"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Seats"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Reason"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Passenger Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "CNIC"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Contact"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fare"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Booking Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Request Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Time Difference"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Source"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Decision By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cancelled At"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Actions")])], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_30 = {
+  key: 0
+};
+
+var _hoisted_31 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+    colspan: "19",
+    "class": "text-muted py-4"
+  }, "No online terminal cancellation requests found.", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_32 = [_hoisted_31];
+var _hoisted_33 = {
+  key: 0,
+  "class": "small text-muted"
+};
+var _hoisted_34 = {
+  key: 0,
+  "class": "btn-group"
+};
+var _hoisted_35 = ["disabled", "onClick"];
+var _hoisted_36 = ["disabled", "onClick"];
+var _hoisted_37 = {
+  key: 1,
+  "class": "text-muted"
+};
+var _hoisted_38 = {
+  "class": "modal fade",
+  id: "onlineTerminalRejectModal",
+  tabindex: "-1",
+  role: "dialog",
+  "aria-labelledby": "onlineTerminalRejectModalLabel",
+  "aria-hidden": "true"
+};
+var _hoisted_39 = {
+  "class": "modal-dialog",
+  role: "document"
+};
+var _hoisted_40 = {
+  "class": "modal-content"
+};
+
+var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "modal-header"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
+    "class": "modal-title",
+    id: "onlineTerminalRejectModalLabel"
+  }, "Reject Online Terminal Request"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "close",
+    "data-dismiss": "modal",
+    "aria-label": "Close"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "aria-hidden": "true"
+  }, "×")])], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_42 = {
+  "class": "modal-body"
+};
+
+var _hoisted_43 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Rejection Reason", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_44 = {
+  "class": "modal-footer"
+};
+
+var _hoisted_45 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-secondary",
+    "data-dismiss": "modal"
+  }, "Cancel", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_46 = ["disabled"];
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [_hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
+      return $data.filters.request_id = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.request_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [_hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+      return $data.filters.invoice_id = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.invoice_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+      return $data.filters.booking_reference = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.booking_reference]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [_hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
+      return $data.filters.status = $event;
+    })
+  }, _hoisted_23, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.status]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    "class": "btn btn-primary mr-2",
+    onClick: _cache[4] || (_cache[4] = function ($event) {
+      return $options.fetchRequests();
+    })
+  }, "Search"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    "class": "btn btn-secondary",
+    onClick: _cache[5] || (_cache[5] = function ($event) {
+      return $options.resetFilters();
+    })
+  }, "Reset")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [$data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    "class": "loading-spinner",
+    src: _ctx.$store.state.main_url + 'assets/img/loading-spinner.gif'
+  }, null, 8
+  /* PROPS */
+  , _hoisted_27)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("table", _hoisted_28, [_hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [$data.requests.length === 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_30, _hoisted_32)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.requests, function (request) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
+      key: request.id
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.invoice_id), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.booking_reference || 'N/A'), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.route || 'N/A'), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatSeats(request.seat_numbers)), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.cancellation_reason || 'N/A'), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.bus_date || 'N/A'), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.bus_time || 'N/A'), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.passenger_name || 'N/A'), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.cnic || 'N/A'), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.contact || 'N/A'), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatFare(request.fare)), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.booking_time || 'N/A'), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.request_date || 'N/A'), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.time_difference || $options.timeDifference(request)), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.source || 'Online Terminal'), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.statusClass(request.status))
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusLabel(request.status)), 3
+    /* TEXT, CLASS */
+    ), request.cancellation_status ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_33, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusLabel(request.cancellation_status)), 1
+    /* TEXT */
+    )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.decision_by || 'N/A'), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.cancelled_at || 'N/A'), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [request.status === 'pending' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_34, [$options.canUseButton('approve-request') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      key: 0,
+      "class": "btn btn-success btn-sm",
+      disabled: $data.actionLoadingId === request.id,
+      onClick: function onClick($event) {
+        return $options.approveRequest(request);
+      }
+    }, " Approve ", 8
+    /* PROPS */
+    , _hoisted_35)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canUseButton('reject-request') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      key: 1,
+      "class": "btn btn-danger btn-sm",
+      disabled: $data.actionLoadingId === request.id,
+      onClick: function onClick($event) {
+        return $options.openRejectModal(request);
+      }
+    }, " Reject ", 8
+    /* PROPS */
+    , _hoisted_36)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_37, "No action"))])]);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))])]))])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [_hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+    "class": "form-control",
+    rows: "4",
+    "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+      return $data.rejectionReason = $event;
+    }),
+    placeholder: "Enter rejection reason"
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.rejectionReason]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [_hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-danger",
+    onClick: _cache[7] || (_cache[7] = function ($event) {
+      return $options.rejectRequest();
+    }),
+    disabled: $data.rejectLoading
+  }, " Reject Request ", 8
+  /* PROPS */
+  , _hoisted_46)])])])])])]);
 }
 
 /***/ }),
@@ -147712,7 +147777,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _pages_buses_BusesPage_vue__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./pages/buses/BusesPage.vue */ "./resources/js/pages/buses/BusesPage.vue");
 /* harmony import */ var _pages_buses_BusClassPage_vue__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./pages/buses/BusClassPage.vue */ "./resources/js/pages/buses/BusClassPage.vue");
 /* harmony import */ var _pages_booking_BookingPage_vue__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./pages/booking/BookingPage.vue */ "./resources/js/pages/booking/BookingPage.vue");
-/* harmony import */ var _pages_booking_BookkaruCancellationRequestsPage_vue__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./pages/booking/BookkaruCancellationRequestsPage.vue */ "./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue");
+/* harmony import */ var _pages_booking_OnlineTerminalCancellationRequestsPage_vue__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./pages/booking/OnlineTerminalCancellationRequestsPage.vue */ "./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue");
 /* harmony import */ var _pages_schedule_ScheduleClosingPage_vue__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./pages/schedule/ScheduleClosingPage.vue */ "./resources/js/pages/schedule/ScheduleClosingPage.vue");
 /* harmony import */ var _pages_schedule_ScheduleUnclosingPage_vue__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./pages/schedule/ScheduleUnclosingPage.vue */ "./resources/js/pages/schedule/ScheduleUnclosingPage.vue");
 /* harmony import */ var _pages_schedule_ScheduleCommissionClosingPage_vue__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./pages/schedule/ScheduleCommissionClosingPage.vue */ "./resources/js/pages/schedule/ScheduleCommissionClosingPage.vue");
@@ -147881,7 +147946,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
  // const url = "/kt-dev/";
 
-var url = "/";
+var url = "/kt-dev/";
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
@@ -147963,9 +148028,9 @@ var routes = [{
   component: _pages_booking_BookingPage_vue__WEBPACK_IMPORTED_MODULE_20__["default"],
   name: "booking-page"
 }, {
-  path: url + "booking/bookkaru/cancellations",
-  component: _pages_booking_BookkaruCancellationRequestsPage_vue__WEBPACK_IMPORTED_MODULE_21__["default"],
-  name: "bookkaru-cancellation-requests"
+  path: url + "booking/online-terminals/cancellations",
+  component: _pages_booking_OnlineTerminalCancellationRequestsPage_vue__WEBPACK_IMPORTED_MODULE_21__["default"],
+  name: "online-terminal-cancellation-requests"
 }, {
   path: url + "booking/jazzcashrefund",
   component: _pages_booking_JazzCashRefund_vue__WEBPACK_IMPORTED_MODULE_87__["default"],
@@ -148376,9 +148441,9 @@ var initialState = function initialState() {
     token: persistedState.token,
     permissions: persistedState.permissions,
     companyModules: persistedState.companyModules,
-    main_url: "https://portal.kainattravels.net/",
-    api_url: "https://api.kainattravels.net/",
-    app_url: "https://portal.kainattravels.net/",
+    main_url: "http://localhost/kt-dev/",
+    api_url: "http://localhost/kt-api/",
+    app_url: "http://localhost/kt-dev/",
     appStateReady: false
   };
 };
@@ -154203,30 +154268,6 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.image-span[data-v-03b302d9] {\n    
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=style&index=0&id=73e8ea37&scoped=true&lang=css":
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=style&index=0&id=73e8ea37&scoped=true&lang=css ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
-// Imports
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.loading-spinner[data-v-73e8ea37] {\n    display: block;\n    margin: 0 auto;\n    padding: 2em;\n}\n", ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/JazzCashRefund.vue?vue&type=style&index=0&id=6785e3e1&scoped=true&lang=css":
 /*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/JazzCashRefund.vue?vue&type=style&index=0&id=6785e3e1&scoped=true&lang=css ***!
@@ -154245,6 +154286,30 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.loading-spinner[data-v-6785e3e1] {\n    display: block;\n    margin: 0 auto;\n    padding: 2em;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=style&index=0&id=1614d8e4&scoped=true&lang=css":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=style&index=0&id=1614d8e4&scoped=true&lang=css ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.loading-spinner[data-v-1614d8e4] {\n    display: block;\n    margin: 0 auto;\n    padding: 2em;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -212968,36 +213033,6 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
-/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=style&index=0&id=73e8ea37&scoped=true&lang=css":
-/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=style&index=0&id=73e8ea37&scoped=true&lang=css ***!
-  \**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_BookkaruCancellationRequestsPage_vue_vue_type_style_index_0_id_73e8ea37_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./BookkaruCancellationRequestsPage.vue?vue&type=style&index=0&id=73e8ea37&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=style&index=0&id=73e8ea37&scoped=true&lang=css");
-
-            
-
-var options = {};
-
-options.insert = "head";
-options.singleton = false;
-
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_BookkaruCancellationRequestsPage_vue_vue_type_style_index_0_id_73e8ea37_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
-
-
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_BookkaruCancellationRequestsPage_vue_vue_type_style_index_0_id_73e8ea37_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
-
-/***/ }),
-
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/JazzCashRefund.vue?vue&type=style&index=0&id=6785e3e1&scoped=true&lang=css":
 /*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/JazzCashRefund.vue?vue&type=style&index=0&id=6785e3e1&scoped=true&lang=css ***!
@@ -213025,6 +213060,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_JazzCashRefund_vue_vue_type_style_index_0_id_6785e3e1_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=style&index=0&id=1614d8e4&scoped=true&lang=css":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=style&index=0&id=1614d8e4&scoped=true&lang=css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_OnlineTerminalCancellationRequestsPage_vue_vue_type_style_index_0_id_1614d8e4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./OnlineTerminalCancellationRequestsPage.vue?vue&type=style&index=0&id=1614d8e4&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=style&index=0&id=1614d8e4&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_OnlineTerminalCancellationRequestsPage_vue_vue_type_style_index_0_id_1614d8e4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_OnlineTerminalCancellationRequestsPage_vue_vue_type_style_index_0_id_1614d8e4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -220753,37 +220818,6 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue":
-/*!*************************************************************************!*\
-  !*** ./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue ***!
-  \*************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _BookkaruCancellationRequestsPage_vue_vue_type_template_id_73e8ea37_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BookkaruCancellationRequestsPage.vue?vue&type=template&id=73e8ea37&scoped=true */ "./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=template&id=73e8ea37&scoped=true");
-/* harmony import */ var _BookkaruCancellationRequestsPage_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BookkaruCancellationRequestsPage.vue?vue&type=script&lang=js */ "./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=script&lang=js");
-/* harmony import */ var _BookkaruCancellationRequestsPage_vue_vue_type_style_index_0_id_73e8ea37_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./BookkaruCancellationRequestsPage.vue?vue&type=style&index=0&id=73e8ea37&scoped=true&lang=css */ "./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=style&index=0&id=73e8ea37&scoped=true&lang=css");
-/* harmony import */ var F_xampp_htdocs_kt_dev_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
-
-
-
-
-;
-
-
-const __exports__ = /*#__PURE__*/(0,F_xampp_htdocs_kt_dev_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_BookkaruCancellationRequestsPage_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_BookkaruCancellationRequestsPage_vue_vue_type_template_id_73e8ea37_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-73e8ea37"],['__file',"resources/js/pages/booking/BookkaruCancellationRequestsPage.vue"]])
-/* hot reload */
-if (false) {}
-
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
-
-/***/ }),
-
 /***/ "./resources/js/pages/booking/JazzCashRefund.vue":
 /*!*******************************************************!*\
   !*** ./resources/js/pages/booking/JazzCashRefund.vue ***!
@@ -220807,6 +220841,37 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const __exports__ = /*#__PURE__*/(0,F_xampp_htdocs_kt_dev_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_JazzCashRefund_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_JazzCashRefund_vue_vue_type_template_id_6785e3e1_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-6785e3e1"],['__file',"resources/js/pages/booking/JazzCashRefund.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
+/***/ "./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue":
+/*!*******************************************************************************!*\
+  !*** ./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _OnlineTerminalCancellationRequestsPage_vue_vue_type_template_id_1614d8e4_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./OnlineTerminalCancellationRequestsPage.vue?vue&type=template&id=1614d8e4&scoped=true */ "./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=template&id=1614d8e4&scoped=true");
+/* harmony import */ var _OnlineTerminalCancellationRequestsPage_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OnlineTerminalCancellationRequestsPage.vue?vue&type=script&lang=js */ "./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=script&lang=js");
+/* harmony import */ var _OnlineTerminalCancellationRequestsPage_vue_vue_type_style_index_0_id_1614d8e4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./OnlineTerminalCancellationRequestsPage.vue?vue&type=style&index=0&id=1614d8e4&scoped=true&lang=css */ "./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=style&index=0&id=1614d8e4&scoped=true&lang=css");
+/* harmony import */ var F_xampp_htdocs_kt_dev_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+
+
+const __exports__ = /*#__PURE__*/(0,F_xampp_htdocs_kt_dev_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_OnlineTerminalCancellationRequestsPage_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_OnlineTerminalCancellationRequestsPage_vue_vue_type_template_id_1614d8e4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-1614d8e4"],['__file',"resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue"]])
 /* hot reload */
 if (false) {}
 
@@ -223814,22 +223879,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=script&lang=js":
-/*!*************************************************************************************************!*\
-  !*** ./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=script&lang=js ***!
-  \*************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_BookkaruCancellationRequestsPage_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
-/* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_BookkaruCancellationRequestsPage_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./BookkaruCancellationRequestsPage.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=script&lang=js");
- 
-
-/***/ }),
-
 /***/ "./resources/js/pages/booking/JazzCashRefund.vue?vue&type=script&lang=js":
 /*!*******************************************************************************!*\
   !*** ./resources/js/pages/booking/JazzCashRefund.vue?vue&type=script&lang=js ***!
@@ -223842,6 +223891,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_JazzCashRefund_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_JazzCashRefund_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./JazzCashRefund.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/JazzCashRefund.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
+/***/ "./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=script&lang=js":
+/*!*******************************************************************************************************!*\
+  !*** ./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=script&lang=js ***!
+  \*******************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_OnlineTerminalCancellationRequestsPage_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_OnlineTerminalCancellationRequestsPage_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./OnlineTerminalCancellationRequestsPage.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=script&lang=js");
  
 
 /***/ }),
@@ -225910,22 +225975,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=template&id=73e8ea37&scoped=true":
-/*!*******************************************************************************************************************!*\
-  !*** ./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=template&id=73e8ea37&scoped=true ***!
-  \*******************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "render": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_BookkaruCancellationRequestsPage_vue_vue_type_template_id_73e8ea37_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render)
-/* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_BookkaruCancellationRequestsPage_vue_vue_type_template_id_73e8ea37_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./BookkaruCancellationRequestsPage.vue?vue&type=template&id=73e8ea37&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=template&id=73e8ea37&scoped=true");
-
-
-/***/ }),
-
 /***/ "./resources/js/pages/booking/JazzCashRefund.vue?vue&type=template&id=6785e3e1&scoped=true":
 /*!*************************************************************************************************!*\
   !*** ./resources/js/pages/booking/JazzCashRefund.vue?vue&type=template&id=6785e3e1&scoped=true ***!
@@ -225938,6 +225987,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "render": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_JazzCashRefund_vue_vue_type_template_id_6785e3e1_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render)
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_JazzCashRefund_vue_vue_type_template_id_6785e3e1_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./JazzCashRefund.vue?vue&type=template&id=6785e3e1&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/JazzCashRefund.vue?vue&type=template&id=6785e3e1&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=template&id=1614d8e4&scoped=true":
+/*!*************************************************************************************************************************!*\
+  !*** ./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=template&id=1614d8e4&scoped=true ***!
+  \*************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_OnlineTerminalCancellationRequestsPage_vue_vue_type_template_id_1614d8e4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_OnlineTerminalCancellationRequestsPage_vue_vue_type_template_id_1614d8e4_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./OnlineTerminalCancellationRequestsPage.vue?vue&type=template&id=1614d8e4&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=template&id=1614d8e4&scoped=true");
 
 
 /***/ }),
@@ -227280,19 +227345,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=style&index=0&id=73e8ea37&scoped=true&lang=css":
-/*!*********************************************************************************************************************************!*\
-  !*** ./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=style&index=0&id=73e8ea37&scoped=true&lang=css ***!
-  \*********************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_BookkaruCancellationRequestsPage_vue_vue_type_style_index_0_id_73e8ea37_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./BookkaruCancellationRequestsPage.vue?vue&type=style&index=0&id=73e8ea37&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/BookkaruCancellationRequestsPage.vue?vue&type=style&index=0&id=73e8ea37&scoped=true&lang=css");
-
-
-/***/ }),
-
 /***/ "./resources/js/pages/booking/JazzCashRefund.vue?vue&type=style&index=0&id=6785e3e1&scoped=true&lang=css":
 /*!***************************************************************************************************************!*\
   !*** ./resources/js/pages/booking/JazzCashRefund.vue?vue&type=style&index=0&id=6785e3e1&scoped=true&lang=css ***!
@@ -227302,6 +227354,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_JazzCashRefund_vue_vue_type_style_index_0_id_6785e3e1_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./JazzCashRefund.vue?vue&type=style&index=0&id=6785e3e1&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/JazzCashRefund.vue?vue&type=style&index=0&id=6785e3e1&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=style&index=0&id=1614d8e4&scoped=true&lang=css":
+/*!***************************************************************************************************************************************!*\
+  !*** ./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=style&index=0&id=1614d8e4&scoped=true&lang=css ***!
+  \***************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_OnlineTerminalCancellationRequestsPage_vue_vue_type_style_index_0_id_1614d8e4_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./OnlineTerminalCancellationRequestsPage.vue?vue&type=style&index=0&id=1614d8e4&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue?vue&type=style&index=0&id=1614d8e4&scoped=true&lang=css");
 
 
 /***/ }),
