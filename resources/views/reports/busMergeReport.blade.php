@@ -114,11 +114,11 @@
         <div id="info">
             <div class="companyName">
                 <span>
-CLOSING SUMMARY 
-({{ date('d M Y', strtotime($data['closing_from_date'])) }}
-- 
-{{ date('d M Y', strtotime($data['closing_to_date'])) }})
-</span>
+                    CLOSING SUMMARY
+                    ({{ date('d M Y', strtotime($data['closing_from_date'])) }}
+                    -
+                    {{ date('d M Y', strtotime($data['closing_to_date'])) }})
+                </span>
             </div>
         </div>
         <br>
@@ -135,7 +135,7 @@ CLOSING SUMMARY
                     <th>Received Bank</th>
                     {{-- Dynamic Headers for Portals --}}
                     @foreach ($data['dynamicTypes'] as $type)
-                    <th>{{ $type }}</th>
+                        <th>{{ $type }}</th>
                     @endforeach
                     <th>Net Cash</th>
                 </tr>
@@ -153,9 +153,9 @@ CLOSING SUMMARY
                         <td>{{ number_format($item['total_received_bank']) }}</td>
                         {{-- Dynamic Values for Portals --}}
                         @foreach ($data['dynamicTypes'] as $type)
-                        <td class="text-center">
-                            {{ number_format($item['types'][$type] ?? 0) }}
-                        </td>
+                            <td class="text-center">
+                                {{ number_format($item['types'][$type] ?? 0) }}
+                            </td>
                         @endforeach
                         <td>{{ number_format($item['net_cash']) }}</td>
                     </tr>
@@ -210,59 +210,99 @@ CLOSING SUMMARY
             </div>
             <div class="summary-box">
                 <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
-                    GRAND SUMMARY
-                </div>
-
-                <div class="summary-row">
-                    <span>Total Gross Sale:</span>
-                    <span>{{ number_format($data['merges']->sum('sale')) }}</span>
-                </div>
-
-                <div class="summary-row">
-                    <span>Total Expenses:</span>
-                    <span style="color: red;">- {{ number_format($data['merges']->sum('expense')) }}</span>
+                   GROSS PROFIT SUMMARY
                 </div>
 
                 <div class="summary-row">
                     <span>Net Sale:</span>
+                    <span>{{ number_format($data['merges']->sum('sale')) }}</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Voucher Expenses:</span>
+                    <span style="color: red;">- {{ number_format($data['merges']->sum('expense')) }}</span>
+                </div>
+
+                <div class="summary-row"
+                style="border-top: 2px solid black; border-bottom: 2px solid black; font-weight: bold; margin: 10px 0px; background-color: #f2f2f2;">
+                    <span>Gross Profit:</span>
                     <span>{{ number_format($data['merges']->sum('net_sale')) }}</span>
                 </div>
+           
+                <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
+                    ONLINE SALES SUMMARY
+                </div>
+                @php
+                    $totalOnlineSale = 0;
+                @endphp
+
+                @foreach ($data['dynamicTypes'] as $type)
+                    @php
+                        $typeTotal = $data['merges']->sum(fn($m) => $m['types'][$type] ?? 0);
+                        $totalOnlineSale += $typeTotal;
+                    @endphp
+
+                    <div class="summary-row">
+                        <span>Total {{ $type }}:</span>
+                        <span style="color: red;">- {{ number_format($typeTotal) }}</span>
+                    </div>
+                @endforeach
+
+                <div class="summary-row" style="border-top: 2px solid black; border-bottom: 2px solid black; font-weight: bold; margin: 10px 0px; background-color: #f2f2f2;">
+                    <span>Total Online Sale:</span>
+                    <span style="color: red;">- {{ number_format($totalOnlineSale) }}</span>
+                </div>
+
+           
+                <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
+                    GRAND SUMMARY
+                </div>
+
+                @php
+                    $total = $data['totalKtCommission']
+                        + $data['totalCounterIncome']
+                        - $data['totalCounterExpense']
+                        - $data['totalReceivedBank']
+                        + $data['expenses']->sum('amount');
+                    // $total = $data['totalCounterExpense']
+                    //        + $data['totalReceivedBank']
+                    //        + $data['totalKtCommission']
+                    //        + $data['totalCounterIncome']
+                    //        + $data['expenses']->sum('amount');
+                @endphp
+
                 <div class="summary-row">
                     <span>General Expenses:</span>
                     <span style="color: red;">- {{ number_format($data['totalCounterExpense']) }}</span>
                 </div>
 
-                @foreach ($data['dynamicTypes'] as $type)
-                    <div class="summary-row">
-                        <span>Total {{ $type }}:</span>
-                        <span style="color: red;">-
-                            {{ number_format($data['merges']->sum(fn($m) => $m['types'][$type] ?? 0)) }}</span>
-                    </div>
-                @endforeach
                 <div class="summary-row" style="background-color: #eee;">
-                    <span>BANK CASH:</span>
+                    <span>Total Sale at Bank:</span>
                     <span style="color: red;">- {{ number_format($data['totalReceivedBank']) }}</span>
-                </div>
-                <div class="summary-row"
-                    style="border-top: 2px solid black; font-weight: bold; margin-top: 5px; background-color: #f2f2f2;">
-                    <span>Total Credit:</span> 
-                    <span>{{ number_format($data['expenses']->sum('amount')) }}</span>
-                </div>
-                <div class="summary-row" style="background-color: #eee;">
-                    <span>NET CASH:</span>
-                    <span>{{ number_format($data['merges']->sum('net_cash') - ($data['totalCounterExpense'] + $data['totalReceivedBank'])) }}</span>
                 </div>
 
                 <div class="summary-row" style="background-color: #eee;">
                     <span>KT Commission:</span>
                     <span>{{ number_format($data['totalKtCommission']) }}</span>
                 </div>
+
                 <div class="summary-row" style="background-color: #eee;">
                     <span>Other Commission:</span>
-                    <span> {{ number_format($data['totalCounterIncome']) }}</span>
+                    <span>{{ number_format($data['totalCounterIncome']) }}</span>
+                </div>
+
+                <div class="summary-row" style="background-color: #f2f2f2;">
+                    <span>Total Credit Diesel:</span>
+                    <span>{{ number_format($data['expenses']->sum('amount')) }}</span>
+                </div>
+
+                <div class="summary-row"
+                    style="border-top: 2px solid black; font-weight: bold; margin-top: 5px; background-color: #f2f2f2;">
+                    <span><strong>Total:</strong></span>
+                    <span><strong>{{ number_format($total) }}</strong></span>
                 </div>
                 <div class="summary-row" style="background-color: #eee;">
-                    <span>Net Payable:</span>
+                    <span>Cash in Hand:</span>
                     @php
                         $expenses = $data['expenses']->sum('amount');
                         $mergesMinusCounter =
@@ -273,8 +313,8 @@ CLOSING SUMMARY
 
                         $total =
                             $mergesMinusCounter >= 0
-                                ? $expenses + $mergesMinusCounter
-                                : $expenses - abs($mergesMinusCounter);
+                            ? $expenses + $mergesMinusCounter
+                            : $expenses - abs($mergesMinusCounter);
                     @endphp
 
 
@@ -286,7 +326,11 @@ CLOSING SUMMARY
             </div>
         </div>
     </div>
-
+    {{-- <div class="summary-row" style="background-color: #eee;">
+        <span>NET CASH:</span>
+        <span>{{ number_format($data['merges']->sum('net_cash') - ($data['totalCounterExpense'] +
+            $data['totalReceivedBank'])) }}</span>
+    </div> --}}
 </body>
 
 </html>

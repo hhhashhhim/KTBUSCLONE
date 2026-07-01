@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ValidationResource;
 use App\Models\ActivityLog;
 use App\Models\BookkaruApiLog;
+use App\Models\Bus\Bus;
+use App\Models\Route\Route as BusRoute;
+use App\Models\Terminal;
 use App\Models\Ticket;
 use App\Services\TicketCancellationService;
 use Carbon\Carbon;
@@ -179,12 +182,17 @@ class OnlineTerminalCancellationController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
 
+        $fromDateFilter = $this->normalizeFilterDate($request->fromDateFilter);
+        $toDateFilter = $this->normalizeFilterDate($request->toDateFilter);
+
         $query = BookkaruApiLog::with(['approvedBy:id,name', 'rejectedBy:id,name'])
             ->when($request->request_id, function ($builder) use ($request) {
                 $builder->where('request_id', 'like', '%' . trim((string) $request->request_id) . '%');
             })
-            ->when($request->invoice_id !== null && $request->invoice_id !== '', function ($builder) use ($request) {
-                $invoiceId = $this->normalizeInvoiceId($request->invoice_id);
+            ->when(
+                ($request->invoice_id !== null && $request->invoice_id !== '') || ($request->invoiceFilter !== null && $request->invoiceFilter !== ''),
+                function ($builder) use ($request) {
+                $invoiceId = $this->normalizeInvoiceId($request->invoice_id ?: $request->invoiceFilter);
                 if ($invoiceId !== null) {
                     $builder->where('invoice_id', $invoiceId);
                 }
@@ -192,11 +200,43 @@ class OnlineTerminalCancellationController extends Controller
             ->when($request->booking_reference, function ($builder) use ($request) {
                 $builder->where('booking_reference', 'like', '%' . trim((string) $request->booking_reference) . '%');
             })
-            ->when($request->transaction_id, function ($builder) use ($request) {
-                $builder->where('booking_reference', 'like', '%' . trim((string) $request->transaction_id) . '%');
+            ->when($request->transaction_id || $request->transactionFilter, function ($builder) use ($request) {
+                $builder->where('booking_reference', 'like', '%' . trim((string) ($request->transaction_id ?: $request->transactionFilter)) . '%');
             })
-            ->when($request->status, function ($builder) use ($request) {
-                $builder->where('status', trim((string) $request->status));
+            ->when($request->status || $request->statusFilter, function ($builder) use ($request) {
+                $builder->where('status', trim((string) ($request->status ?: $request->statusFilter)));
+            })
+            ->when($this->hasBookingFilters($request), function ($builder) use ($request, $fromDateFilter, $toDateFilter) {
+                $builder->whereExists(function ($query) use ($request, $fromDateFilter, $toDateFilter) {
+                    $query->select(DB::raw(1))
+                        ->from('tickets')
+                        ->join('customers', 'customers.id', '=', 'tickets.customer_id')
+                        ->whereColumn('tickets.invoice_id', 'bookkaru_api_logs.normalized_invoice_id')
+                        ->when($request->cnicFilter, function ($q) use ($request) {
+                            $q->where('customers.cnic', 'like', '%' . str_replace('-', '', $request->cnicFilter) . '%');
+                        })
+                        ->when($request->phoneFilter, function ($q) use ($request) {
+                            $q->where('customers.contact', 'like', '%' . str_replace('-', '', $request->phoneFilter) . '%');
+                        })
+                        ->when($request->nameFilter, function ($q) use ($request) {
+                            $q->where('customers.name', 'like', '%' . trim((string) $request->nameFilter) . '%');
+                        })
+                        ->when($request->routeFilter, function ($q) use ($request) {
+                            $q->where('tickets.route_id', $request->routeFilter);
+                        })
+                        ->when($request->terminalFilter, function ($q) use ($request) {
+                            $q->where('tickets.terminal_id', $request->terminalFilter);
+                        })
+                        ->when($request->busFilter, function ($q) use ($request) {
+                            $q->where('tickets.bus_id', $request->busFilter);
+                        })
+                        ->when($fromDateFilter, function ($q) use ($fromDateFilter) {
+                            $q->where('tickets.date', '>=', $fromDateFilter);
+                        })
+                        ->when($toDateFilter, function ($q) use ($toDateFilter) {
+                            $q->where('tickets.date', '<=', $toDateFilter);
+                        });
+                });
             })
             ->when($request->from_date, function ($builder) use ($request) {
                 $builder->whereDate('created_at', '>=', $request->from_date);
@@ -217,6 +257,33 @@ class OnlineTerminalCancellationController extends Controller
                 'requests' => $requests,
             ],
         ]);
+    }
+
+    public function routes()
+    {
+        if (!checkForSubmenu('online-terminal-cancellation')) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        return BusRoute::where(['company_id' => Auth::user()->company_id, 'hide' => 0])->get();
+    }
+
+    public function terminals()
+    {
+        if (!checkForSubmenu('online-terminal-cancellation')) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        return Terminal::where(['company_id' => Auth::user()->company_id, 'hide' => 0])->get();
+    }
+
+    public function buses()
+    {
+        if (!checkForSubmenu('online-terminal-cancellation')) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        return Bus::where('company_id', Auth::user()->company_id)->get();
     }
 
     public function approveRequest(Request $request)
@@ -883,6 +950,47 @@ class OnlineTerminalCancellationController extends Controller
                 return 'Cancellation request failed.';
             default:
                 return 'Cancellation request received and is pending approval.';
+        }
+    }
+
+    private function hasBookingFilters(Request $request)
+    {
+        return collect([
+            $request->cnicFilter,
+            $request->phoneFilter,
+            $request->nameFilter,
+            $request->routeFilter,
+            $request->terminalFilter,
+            $request->busFilter,
+            $request->fromDateFilter,
+            $request->toDateFilter,
+        ])->contains(function ($value) {
+            return $value !== null && $value !== '';
+        });
+    }
+
+    private function normalizeFilterDate($date)
+    {
+        $date = trim((string) $date);
+        if ($date === '') {
+            return null;
+        }
+
+        foreach (['Y-m-d', 'm/d/Y', 'd/m/Y'] as $format) {
+            try {
+                $parsed = Carbon::createFromFormat($format, $date);
+                if ($parsed && $parsed->format($format) === $date) {
+                    return $parsed->format('Y-m-d');
+                }
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
+
+        try {
+            return Carbon::parse($date)->format('Y-m-d');
+        } catch (\Throwable $e) {
+            return null;
         }
     }
 
