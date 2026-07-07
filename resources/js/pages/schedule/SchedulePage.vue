@@ -679,6 +679,13 @@
                         >
                             <option value="0" selected>Select Bus Class</option>
                             <option
+                                v-if="inactiveEditBusClass"
+                                :value="inactiveEditBusClass.id"
+                                disabled
+                            >
+                                {{ inactiveEditBusClass.name }} (Inactive)
+                            </option>
+                            <option
                                 v-for="(type, i) in busClasses"
                                 :value="type.id"
                                 :key="i"
@@ -798,6 +805,7 @@ export default {
             },
             dataEdit: {
                 schedules: [],
+                currentBusClass: null,
                 cities: [],
                 terminals: [],
                 discountTerminals: [],
@@ -1384,6 +1392,7 @@ export default {
             const resEditSchedule = await this.callApi("post", "schedule/edit", {id: schedule.id});
             if (resEditSchedule.status == 200) {
                 this.dataEdit.schedules = resEditSchedule.data.schedules;
+                this.dataEdit.currentBusClass = resEditSchedule.data.currentBusClass || null;
                 this.dataEdit.terminals = resEditSchedule.data.visibilities;
                 this.dataEdit.discountTerminals = resEditSchedule.data.discountTerminals;
                 setTimeout(() => {
@@ -1443,6 +1452,17 @@ export default {
                     this.loading = false
                 }, 3000);
             }
+        },
+    },
+    computed: {
+        inactiveEditBusClass() {
+            const currentBusClass = this.dataEdit.currentBusClass;
+
+            if (!currentBusClass || currentBusClass.is_active == 1) {
+                return null;
+            }
+
+            return currentBusClass;
         },
     },
     watch: {

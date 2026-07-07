@@ -13,7 +13,7 @@
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            <form @submit.prevent="fetchData">
+                                            <form @submit.prevent="fetchData(true)">
                                                 <div class="row px-2 mb-4 align-items-end">
                                                     <div class="col-md-3">
                                                         <label for="terminalFilter">Select Bus</label>
@@ -265,6 +265,7 @@ export default {
                 to_date: "",
                 dropdownRoute: [],
             },
+            applyDateFilter: false,
             dropdownRoute: [],
             closings: [],
             permissions: [],
@@ -402,12 +403,20 @@ export default {
             }
             console.log(this.addData);
         },
-        async fetchData() {
+        async fetchData(applyDateFilter = this.applyDateFilter) {
             try {
+                this.applyDateFilter = applyDateFilter;
+                const payload = { ...this.filterData };
+
+                if (!applyDateFilter) {
+                    payload.from_date = "";
+                    payload.to_date = "";
+                }
+
                 const res = await this.callApi(
                     "post",
                     "booking/close/schedule/unclosing",
-                    this.filterData // ✅ send filters
+                    payload
                 );
 
                 if (res.status === 200) {
@@ -427,7 +436,8 @@ export default {
                 to_date: "",
                 dropdownRoute: [],
             };
-            this.fetchData();
+            this.applyDateFilter = false;
+            this.fetchData(false);
         },
 
         async hideUnclosing() {
