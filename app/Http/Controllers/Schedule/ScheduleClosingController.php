@@ -157,7 +157,8 @@ class ScheduleClosingController extends Controller
                     ->where('commission_route', 0)
                     ->groupBy('ticket_merge_id')
                     ->havingRaw('COUNT(*) = 1');
-            })->first();
+            })
+            ->where('bus_id', $request->bus_number)->first();
 
         // Always apply allowed route filter
         if (!$user->is_super_admin) {
