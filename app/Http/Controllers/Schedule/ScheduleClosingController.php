@@ -133,6 +133,7 @@ class ScheduleClosingController extends Controller
 
         if (!empty($requestedRoutes)) {
             if (!$user->is_super_admin) {
+                return "super admin";
                 $finalRouteIds = array_values(array_intersect($requestedRoutes, $allowedRouteIds));
             } else {
                 $finalRouteIds = $requestedRoutes;
