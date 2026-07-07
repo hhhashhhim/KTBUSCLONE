@@ -244,9 +244,9 @@ class ScheduleClosingController extends Controller
         }
 
         // Get results
-        $closings = $query->get()
-            ->groupBy('ticket_merge_id')
-            ->filter(fn($group) => $group->count() == 1);
+        // $closings = $query->get()
+        //     ->groupBy('ticket_merge_id')
+        //     ->filter(fn($group) => $group->count() == 1);
 
         // Get buses list
         $buses = Bus::where('company_id', $user->company_id)
