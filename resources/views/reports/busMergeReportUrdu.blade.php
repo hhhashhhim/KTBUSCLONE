@@ -2,6 +2,7 @@
 <html lang="ur" dir="rtl">
 
 <head>
+    <meta charset="UTF-8">
     <style>
         @page {
             transform: rotate(-90deg);
@@ -10,12 +11,12 @@
         }
 
         body {
-            direction: rtl; /* Added for Urdu alignment */
+            direction: rtl;
             height: 10%;
             overflow: scroll;
             margin: 40px 30px 40px 30px;
             font-size: 6pt;
-            font-family: 'Noori Nastaleeq', Verdana, Arial, sans-serif; /* Added common Urdu font hint */
+            font-family: Verdana, Arial, sans-serif;
         }
 
         .companyName {
@@ -24,9 +25,11 @@
             text-transform: uppercase;
             margin-top: -15px;
             text-align: center;
+            font-family: sans-serif, Verdana, Arial;
         }
 
         table {
+            direction: rtl;
             padding: 10px;
             font-size: 10pt !important;
             border-collapse: collapse;
@@ -50,19 +53,11 @@
         }
 
         .summary-box {
-            float: left; /* Swapped for RTL */
+            float: left;
             width: 250px;
             border: 2px solid black;
             padding: 10px;
             background-color: #f9f9f9;
-        }
-
-        .summary-box-left {
-            float: right; /* Swapped for RTL */
-            width: 250px;
-            border: 2px solid black;
-            padding: 10px;
-            background-color: #ffffff;
         }
 
         .summary-row {
@@ -71,7 +66,6 @@
             padding: 3px 0;
             font-size: 11pt;
             border-bottom: 1px dotted #ccc;
-            flex-direction: row-reverse; /* Ensures numbers stay right and text left in RTL flex */
         }
 
         .summary-row:last-child {
@@ -82,10 +76,29 @@
             border-top: 2px solid black;
         }
 
+        /* Clearfix for the float */
         .clearfix::after {
             content: "";
             clear: both;
             display: table;
+        }
+
+        .summary-box-left {
+            float: right;
+            width: 250px;
+            border: 2px solid black;
+            padding: 10px;
+            background-color: #ffffff;
+        }
+
+        /* Maintain the existing summary-row styles for consistency */
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            flex-direction: row-reverse;
+            padding: 3px 0;
+            font-size: 11pt;
+            border-bottom: 1px dotted #ccc;
         }
 
         .summary-row span {
@@ -106,9 +119,9 @@
         <div id="info">
             <div class="companyName">
                 <span>
-                    کلوزنگ سمری 
+                    کلوزنگ سمری
                     ({{ date('d M Y', strtotime($data['closing_from_date'])) }}
-                    تا 
+                    تا
                     {{ date('d M Y', strtotime($data['closing_to_date'])) }})
                 </span>
             </div>
@@ -125,9 +138,9 @@
                     <th>اخراجات</th>
                     <th>نیٹ سیل</th>
                     <th>بینک وصولی</th>
-                    {{-- Dynamic Headers --}}
+                    {{-- Dynamic Headers for Portals --}}
                     @foreach ($data['dynamicTypes'] as $type)
-                    <th>{{ $type }}</th>
+                        <th>{{ $type }}</th>
                     @endforeach
                     <th>نیٹ کیش</th>
                 </tr>
@@ -138,14 +151,16 @@
                         <td class="text-center">{{ $key + 1 }}</td>
                         <td>{{ $item['bus_no'] }}</td>
                         <td>{{ $item['route'] }}</td>
+
                         <td>{{ number_format($item['sale']) }}</td>
                         <td>{{ number_format($item['expense']) }}</td>
                         <td>{{ number_format($item['net_sale']) }}</td>
                         <td>{{ number_format($item['total_received_bank']) }}</td>
+                        {{-- Dynamic Values for Portals --}}
                         @foreach ($data['dynamicTypes'] as $type)
-                        <td class="text-center">
-                            {{ number_format($item['types'][$type] ?? 0) }}
-                        </td>
+                            <td class="text-center">
+                                {{ number_format($item['types'][$type] ?? 0) }}
+                            </td>
                         @endforeach
                         <td>{{ number_format($item['net_cash']) }}</td>
                     </tr>
@@ -155,10 +170,12 @@
                 <tr style="font-weight: bold;">
                     <td colspan="2" class="text-center">کل ٹوٹل</td>
                     <td></td>
+
                     <td>{{ number_format($data['merges']->sum('sale')) }}</td>
                     <td>{{ number_format($data['merges']->sum('expense')) }}</td>
                     <td>{{ number_format($data['merges']->sum('net_sale')) }}</td>
                     <td>{{ number_format($data['merges']->sum('total_received_bank')) }}</td>
+                    {{-- Dynamic Totals for Portals --}}
                     @foreach ($data['dynamicTypes'] as $type)
                         <td>
                             {{ number_format($data['merges']->sum(fn($m) => $m['types'][$type] ?? 0)) }}
@@ -168,7 +185,6 @@
                 </tr>
             </tfoot>
         </table>
-
         <div class="summary-wrapper clearfix">
             <div class="summary-box-left">
                 <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
@@ -188,74 +204,110 @@
                     </div>
                 @endforeach
 
+
+                {{-- Total Row --}}
                 <div class="summary-row"
                     style="border-top: 2px solid black; font-weight: bold; margin-top: 5px; background-color: #f2f2f2;">
-                    <span>ٹوٹل ادھار:</span>
+                    <span>: ٹوٹل ادھار</span>
                     <span>{{ number_format($data['expenses']->sum('amount')) }}</span>
                 </div>
-            </div>
 
+            </div>
             <div class="summary-box">
                 <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
-                    گرینڈ سمری
+                  مجموعی منافع کا خلاصہ
                 </div>
 
                 <div class="summary-row">
-                    <span>ٹوٹل گراس سیل:</span>
+                    <span>: خالص فروخت</span>
                     <span>{{ number_format($data['merges']->sum('sale')) }}</span>
                 </div>
 
                 <div class="summary-row">
-                    <span>ٹوٹل اخراجات:</span>
-                    <span style="color: red;">- {{ number_format($data['merges']->sum('expense')) }}</span>
-                </div>
-
-                <div class="summary-row">
-                    <span>نیٹ سیل:</span>
-                    <span>{{ number_format($data['merges']->sum('net_sale')) }}</span>
-                </div>
-
-                <div class="summary-row">
-                    <span>جنرل اخراجات:</span>
-                    <span style="color: red;">- {{ number_format($data['totalCounterExpense']) }}</span>
-                </div>
-
-                @foreach ($data['dynamicTypes'] as $type)
-                    <div class="summary-row">
-                        <span>ٹوٹل {{ $type }}:</span>
-                        <span style="color: red;">-
-                            {{ number_format($data['merges']->sum(fn($m) => $m['types'][$type] ?? 0)) }}</span>
-                    </div>
-                @endforeach
-
-                <div class="summary-row" style="background-color: #eee;">
-                    <span>بینک کیش:</span>
-                    <span style="color: red;">- {{ number_format($data['totalReceivedBank']) }}</span>
+                    <span>: واؤچر کے اخراجات</span>
+                    <span style="color: red;"> {{ number_format($data['merges']->sum('expense')) }} -</span>
                 </div>
 
                 <div class="summary-row"
-                    style="border-top: 2px solid black; font-weight: bold; margin-top: 5px; background-color: #f2f2f2;">
-                    <span>ٹوٹل ادھار:</span> 
-                    <span>{{ number_format($data['expenses']->sum('amount')) }}</span>
+                style="border-top: 2px solid black; border-bottom: 2px solid black; font-weight: bold; margin: 10px 0px; background-color: #f2f2f2;">
+                    <span>: مجموعی منافع</span>
+                    <span>{{ number_format($data['merges']->sum('net_sale')) }}</span>
+                </div>
+           
+                <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
+                    آن لائن فروخت کا خلاصہ
+                </div>
+                @php
+                    $totalOnlineSale = 0;
+                @endphp
+
+                @foreach ($data['dynamicTypes'] as $type)
+                    @php
+                        $typeTotal = $data['merges']->sum(fn($m) => $m['types'][$type] ?? 0);
+                        $totalOnlineSale += $typeTotal;
+                    @endphp
+
+                    <div class="summary-row">
+                        <span>: ٹوٹل {{ $type }}</span>
+                        <span style="color: red;">{{ number_format($typeTotal) }} -</span>
+                    </div>
+                @endforeach
+
+                <div class="summary-row" style="border-top: 2px solid black; border-bottom: 2px solid black; font-weight: bold; margin: 10px 0px; background-color: #f2f2f2;">
+                    <span>: کل آن لائن فروخت</span>
+                    <span style="color: red;">{{ number_format($totalOnlineSale) }} -</span>
+                </div>
+
+           
+                <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">
+                   جامع خلاصہ
+                </div>
+
+                @php
+                    $total = $data['totalKtCommission']
+                        + $data['totalCounterIncome']
+                        - $data['totalCounterExpense']
+                        - $data['totalReceivedBank']
+                        + $data['expenses']->sum('amount');
+                    // $total = $data['totalCounterExpense']
+                    //        + $data['totalReceivedBank']
+                    //        + $data['totalKtCommission']
+                    //        + $data['totalCounterIncome']
+                    //        + $data['expenses']->sum('amount');
+                @endphp
+
+                <div class="summary-row">
+                    <span>: عام اخراجات</span>
+                    <span style="color: red;">{{ number_format($data['totalCounterExpense']) }} -</span>
                 </div>
 
                 <div class="summary-row" style="background-color: #eee;">
-                    <span>نیٹ کیش:</span>
-                    <span>{{ number_format($data['merges']->sum('net_cash') - ($data['totalCounterExpense'] + $data['totalReceivedBank'])) }}</span>
+                    <span>: بینک میں کل فروخت</span>
+                    <span style="color: red;">{{ number_format($data['totalReceivedBank']) }} -</span>
                 </div>
 
                 <div class="summary-row" style="background-color: #eee;">
-                    <span>کمیشن (KT):</span>
+                    <span>: کے ٹی کمیشن (KT)</span>
                     <span>{{ number_format($data['totalKtCommission']) }}</span>
                 </div>
 
                 <div class="summary-row" style="background-color: #eee;">
-                    <span>دیگر کمیشن:</span>
-                    <span> {{ number_format($data['totalCounterIncome']) }}</span>
+                    <span>: دیگر کمیشن</span>
+                    <span>{{ number_format($data['totalCounterIncome']) }}</span>
                 </div>
 
+                <div class="summary-row" style="background-color: #f2f2f2;">
+                    <span>: کل کریڈٹ ڈیزل</span>
+                    <span>{{ number_format($data['expenses']->sum('amount')) }}</span>
+                </div>
+
+                <div class="summary-row"
+                    style="border-top: 2px solid black; font-weight: bold; margin-top: 5px; background-color: #f2f2f2;">
+                    <span><strong>: خالص نقد رقم</strong></span>
+                    <span><strong>{{ number_format($total) }}</strong></span>
+                </div>
                 <div class="summary-row" style="background-color: #eee;">
-                    <span>نیٹ واجب الادا (Payable):</span>
+                    <span>: نیٹ واجب الادا (Payable)</span>
                     @php
                         $expenses = $data['expenses']->sum('amount');
                         $mergesMinusCounter =
@@ -264,16 +316,26 @@
                             $data['totalCounterExpense'] -
                             $data['totalReceivedBank'];
 
-                        $total = $mergesMinusCounter >= 0
-                                ? $expenses + $mergesMinusCounter
-                                : $expenses - abs($mergesMinusCounter);
+                        $total =
+                            $mergesMinusCounter >= 0
+                            ? $expenses + $mergesMinusCounter
+                            : $expenses - abs($mergesMinusCounter);
                     @endphp
+
+
                     <span>
                         {{ number_format($total + $data['totalKtCommission']) }}
                     </span>
+
                 </div>
             </div>
         </div>
     </div>
 </body>
+
 </html>
+{{-- <div class="summary-row" style="background-color: #eee;">
+    <span>NET CASH:</span>
+    <span>{{ number_format($data['merges']->sum('net_cash') - ($data['totalCounterExpense'] +
+        $data['totalReceivedBank'])) }}</span>
+</div> --}}

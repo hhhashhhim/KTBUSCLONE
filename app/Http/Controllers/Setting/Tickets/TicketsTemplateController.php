@@ -185,9 +185,36 @@ class TicketsTemplateController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+        $hasFilters = $request->filled('activity_by')
+            || $request->filled('message')
+            || $request->filled('requested_host')
+            || $request->filled('from_date')
+            || $request->filled('to_date');
+
         return ActivityLog::with("activity")
-            ->where("created_at" , '>', now()->subDays(3))
+            ->when(!$hasFilters, function ($query) {
+                $query->where("created_at", '>', now()->subDays(3));
+            })
             ->where("company_id",Auth::user()->company_id)
+            ->when($request->filled('activity_by'), function ($query) use ($request) {
+                $search = trim($request->activity_by);
+                $query->whereHas('activity', function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                        ->orWhere('email', 'LIKE', "%{$search}%");
+                });
+            })
+            ->when($request->filled('message'), function ($query) use ($request) {
+                $query->where('message', 'LIKE', '%' . trim($request->message) . '%');
+            })
+            ->when($request->filled('requested_host'), function ($query) use ($request) {
+                $query->where('requested_host', 'LIKE', '%' . trim($request->requested_host) . '%');
+            })
+            ->when($request->filled('from_date'), function ($query) use ($request) {
+                $query->whereDate('created_at', '>=', $request->from_date);
+            })
+            ->when($request->filled('to_date'), function ($query) use ($request) {
+                $query->whereDate('created_at', '<=', $request->to_date);
+            })
             ->select(['*', DB::raw('DATE_FORMAT(created_at, "%h:%i %p | %Y-%m-%d") as formatted_created_at')])
             ->orderBy("created_at","DESC")
             ->get();

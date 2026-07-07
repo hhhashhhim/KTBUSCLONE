@@ -34,12 +34,12 @@ class AuthApiController extends Controller
         }
     
 $token = $user->createToken('postman-token')->plainTextToken;        
-        // ActivityLog::create([
-        //     "activity_by" => $user->id,
-        //     "message" => $user->name." | login",
-        //     "requested_host" => $request->ip(),
-        //     "company_id" => $user->company_id
-        // ]);
+        ActivityLog::create([
+            "activity_by" => $user->id,
+            "message" => substr($user->name." | API Login | LOGIN | User logged in | Record ID: ".$user->id." | Agent: ".$request->userAgent(), 0, 1000),
+            "requested_host" => $request->ip(),
+            "company_id" => $user->company_id
+        ]);
 
         $response = [
             'user' => $user,

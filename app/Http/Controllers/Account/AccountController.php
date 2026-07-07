@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Account\Account;
 use App\Models\Account\AccountGroup;
 use App\Models\Expense\ExpenseCategory;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -67,6 +68,7 @@ class AccountController extends Controller
             ]);
 
             DB::commit();
+            ActivityLogger::log('Account Group', 'create', 'Account group created', $group->id, [], $group->toArray(), $request);
             return $group;
         // } catch (Exception $e) {
         //     DB::rollBack();
@@ -91,11 +93,14 @@ class AccountController extends Controller
             DB::beginTransaction();
 
                
-            AccountGroup::where('id', $request->id )->update([
+            $group = AccountGroup::findOrFail($request->id);
+            $oldValues = $group->only(['name']);
+            $group->update([
                 'name'       => strtoupper($request->name),
             ]);
 
             DB::commit();
+            ActivityLogger::log('Account Group', 'update', 'Account group updated', $group->id, $oldValues, $group->fresh()->only(['name']), $request);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Database transaction error: ' . $e->getMessage());

@@ -13,6 +13,7 @@ use App\Models\Inventory\ProductUnit;
 use App\Models\Inventory\PurchaseOrder;
 use App\Models\Inventory\PurchaseRequisitionNote;
 use App\Models\Inventory\StoreIssuanceNoteDetail;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -63,6 +64,8 @@ class ProductController extends Controller
 
         ]);
 
+        ActivityLogger::log('Inventory Product', 'create', 'Product created', $product->id, [], $product->toArray(), $request);
+
         return response()->json([
             'message' => 'Product created successfully!',
             'product' => $product->load(['unit', 'category']),
@@ -80,12 +83,15 @@ class ProductController extends Controller
         ]);
 
         $product = Product::findOrFail($validated['id']);
+        $oldValues = $product->only(['name', 'unit_id', 'category_id']);
 
         // Update only necessary fields
         $product->name        = $validated['name'];
         $product->unit_id     = $validated['unit_id'];
         $product->category_id = $validated['category_id'];
         $product->save();
+
+        ActivityLogger::log('Inventory Product', 'update', 'Product updated', $product->id, $oldValues, $product->only(['name', 'unit_id', 'category_id']), $request);
 
         return response()->json([
             'message' => 'Product updated successfully',
@@ -102,7 +108,10 @@ class ProductController extends Controller
         ]);
 
         $product = Product::findOrFail($validated['id']);
+        $oldValues = $product->toArray();
         $product->delete();
+
+        ActivityLogger::log('Inventory Product', 'delete', 'Product deleted', $product->id, $oldValues, [], $request);
 
         return response()->json([
             'message' => 'Product deleted successfully'

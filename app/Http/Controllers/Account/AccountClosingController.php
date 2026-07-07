@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\ActivityLog;
 use App\Models\Account\AccountTransaction;
+use App\Support\ActivityLogger;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
@@ -757,6 +758,11 @@ class AccountClosingController extends BaseController
             $ticket_merge_id //posting id
         );
        
+        ActivityLogger::log('Account Closing', 'create', 'Account closing ledger transactions generated', $ticket_merge_id, [], [
+            'ticket_merge_id' => $ticket_merge_id,
+            'document_id' => $document_id,
+        ], $request);
+
         return $data; 
     }
 

@@ -13,6 +13,7 @@ use App\Models\Inventory\Product;
 use App\Models\Inventory\PurchaseOrder;
 use App\Models\Inventory\PurchaseOrderDetail;
 use App\Models\Inventory\Supplier;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -192,6 +193,11 @@ class StockInwardController extends Controller
                 $mr->status = 6;
                 $mr->save();
             DB::commit();
+            ActivityLogger::log('Inventory Stock In', 'create', 'Goods receive note created', $grn->id, [], [
+                'po_id' => $po->id,
+                'supplier_id' => $po->supplier_id,
+                'total_net_amount' => $total_net_amount,
+            ], $request);
             return response()->json([
                 'success' => true,
                 'message' => 'Goods received and recorded successfully.',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inventory;
 use App\Http\Controllers\Controller;;
 
 use App\Models\Inventory\Supplier;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -48,6 +49,8 @@ class SupplierController extends Controller
             
         ]);
         
+        ActivityLogger::log('Inventory Supplier', 'create', 'Supplier created', $supplier->id, [], $supplier->toArray(), $request);
+
         return response()->json([
             'message' => 'Supplier created successfully.',
             'supplier' => $supplier
@@ -64,6 +67,7 @@ class SupplierController extends Controller
         ]);
     
         $supplier = Supplier::findOrFail($validated['id']);
+        $oldValues = $supplier->only(['name', 'contact', 'address', 'cnic']);
     
         // ✅ Update only fields that are provided
         $supplier->update(array_filter([
@@ -73,6 +77,8 @@ class SupplierController extends Controller
             'cnic' => $validated['cnic'] ?? $supplier->cnic,
         ]));
     
+        ActivityLogger::log('Inventory Supplier', 'update', 'Supplier updated', $supplier->id, $oldValues, $supplier->only(['name', 'contact', 'address', 'cnic']), $request);
+
         return response()->json([
             'message' => 'Supplier updated successfully.',
             'supplier' => $supplier
@@ -85,7 +91,9 @@ class SupplierController extends Controller
              'id' => 'required',
          ]);
          
-         $deleted = Supplier::destroy($request->input('id'));
+         $supplier = Supplier::findOrFail($request->input('id'));
+         $oldValues = $supplier->toArray();
+         $deleted = $supplier->delete();
          
          if (! $deleted) {
              return response()->json([
@@ -94,6 +102,8 @@ class SupplierController extends Controller
              ], 500);
          }
          
+         ActivityLogger::log('Inventory Supplier', 'delete', 'Supplier deleted', $supplier->id, $oldValues, [], $request);
+
          return response()->json([
              'success' => true,
              'message' => 'Supplier deleted successfully.',

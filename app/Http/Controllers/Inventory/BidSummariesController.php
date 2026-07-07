@@ -10,6 +10,7 @@ use App\Models\Inventory\MaterialRequest;
 use App\Models\Inventory\Product;
 use App\Models\Inventory\PurchaseRequisitionNote;
 use App\Models\Inventory\Supplier;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,7 @@ class BidSummariesController extends Controller
    public function store(Request $request){ 
     DB::beginTransaction();
         try {
+            $createdBidIds = [];
             foreach ($request->suppliers ?? [] as $supplier) {
                 $products = $supplier['products'] ?? [];
                 // Calculate total (subtotal) from all products
@@ -94,6 +96,7 @@ class BidSummariesController extends Controller
                     'company_id'              => Auth::user()->company_id,
                     'added_by'                => auth()->id(),
                 ]);
+                $createdBidIds[] = $summary->id;
                 // Now distribute discount, tax, and delivery proportionally per product
                 foreach ($products as $product) {
                     $rate  = (float) ($product['rate'] ?? 0);
@@ -128,6 +131,11 @@ class BidSummariesController extends Controller
                 PurchaseRequisitionNote::find($request->prn_id)?->update(['status' => 2]);
             }
             DB::commit();
+            ActivityLogger::log('Inventory Bid Summary', 'create', 'Bid summaries submitted', implode(',', $createdBidIds), [], [
+                'bid_ids' => $createdBidIds,
+                'prn_id' => $request->prn_id,
+                'mr_id' => $request->mr_id,
+            ], $request);
             return response()->json(['message' => 'Bids submitted successfully.']);
          } catch (\Exception $e) {
                 DB::rollBack();
@@ -205,6 +213,7 @@ class BidSummariesController extends Controller
         DB::beginTransaction();
         try {
              $summary = BidSummary::findOrFail($validated['id']); 
+            $oldValues = $summary->toArray();
             $products = $validated['details'];
             // Calculate subtotal
             $subTotal = collect($products)->reduce(function ($carry, $product) {
@@ -272,6 +281,7 @@ class BidSummariesController extends Controller
             }
 
             DB::commit();
+            ActivityLogger::log('Inventory Bid Summary', 'update', 'Bid summary updated', $summary->id, $oldValues, $summary->fresh()->toArray(), $request);
             return response()->json(['message' => 'Bid updated successfully.']);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -289,12 +299,14 @@ class BidSummariesController extends Controller
         DB::beginTransaction();
         try {
             $bid = BidSummary::findOrFail($request->id);
+            $oldValues = $bid->toArray();
             $prnId = $bid->prn_id;
 
             // Also delete related bid details if necessary
             $bid->details()->delete();
             $bid->delete();
             DB::commit();
+            ActivityLogger::log('Inventory Bid Summary', 'delete', 'Bid summary deleted', $bid->id, $oldValues, [], $request);
             return response()->json([
                 'message' => 'Bid deleted successfully.',
                 'prn_id' => $prnId,

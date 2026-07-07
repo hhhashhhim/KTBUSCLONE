@@ -13,6 +13,7 @@ use App\Models\Inventory\Product;
 use App\Models\Inventory\PurchaseRequisitionNote;
 use App\Models\Inventory\StoreIssuanceNote;
 use App\Models\User;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -101,6 +102,11 @@ class MaterialRequestController extends Controller
                 }
 
                 DB::commit();
+                ActivityLogger::log('Inventory Material Request', 'create', 'Direct store GRN and PRN created', $grn->id, [], [
+                    'grn_id' => $grn->id,
+                    'prn_id' => $prn->id,
+                    'details_count' => count($request->details),
+                ], $request);
                 return response()->json([
                     'success' => true,
                     'message' => 'Good Receive Note & Purchase Requisition Note created successfully (Direct Store).',
@@ -127,6 +133,10 @@ class MaterialRequestController extends Controller
             }
 
             DB::commit();
+            ActivityLogger::log('Inventory Material Request', 'create', 'Material request created', $mr->id, [], [
+                'bus_id' => $request->bus_id,
+                'details_count' => count($request->details),
+            ], $request);
             return response()->json([
                 'success' => true,
                 'message' => 'Material Request created successfully.',
@@ -151,11 +161,13 @@ class MaterialRequestController extends Controller
             'bus_id'      =>     'nullable',
         ]);
         $mr     = MaterialRequestDetail::findOrFail($validated['id']);
+        $oldValues = $mr->only(['qty', 'reason', 'bus_id']);
         $mr->update([
             'qty'    => $validated['qty'],
             'reason' => $validated['reason'],
             'bus_id' => $validated['bus_id'] ?? $mr->bus_id,
         ]);
+        ActivityLogger::log('Inventory Material Request', 'update', 'Material request detail updated', $mr->id, $oldValues, $mr->only(['qty', 'reason', 'bus_id']), $request);
         return response()->json([
             'success' => true,
             'message' => 'Material Request Detail updated successfully.',
@@ -168,7 +180,9 @@ class MaterialRequestController extends Controller
             'id' => 'required|integer|exists:material_requests,id',
         ]);
         $materialRequest = MaterialRequest::findOrFail($request->id);
+        $oldValues = $materialRequest->toArray();
         $materialRequest->delete();
+        ActivityLogger::log('Inventory Material Request', 'delete', 'Material request deleted', $materialRequest->id, $oldValues, [], $request);
         return response()->json([
             'success' => true,
             'message' => 'Material Request deleted successfully.',
@@ -180,7 +194,9 @@ class MaterialRequestController extends Controller
             'id' => 'required|integer|exists:material_request_details,id',
         ]);
         $detail = MaterialRequestDetail::findOrFail($request->id);
+        $oldValues = $detail->toArray();
         $detail->delete();
+        ActivityLogger::log('Inventory Material Request', 'delete', 'Material request detail deleted', $detail->id, $oldValues, [], $request);
         return response()->json([
             'success' => true,
             'message' => 'Material Request Detail deleted successfully.',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inventory;
 use App\Http\Controllers\Controller;;
 
 use App\Models\Inventory\ProductCategory;
+use App\Support\ActivityLogger;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,6 +38,8 @@ class ProductCategoryController extends Controller
             'company_id'=> Auth::user()->company_id,
         ]);
 
+        ActivityLogger::log('Inventory Product Category', 'create', 'Product category created', $category->id, [], $category->toArray(), $request);
+
         return response()->json([
             'success' => true,
             'message' => 'Category created successfully.',
@@ -56,8 +59,11 @@ class ProductCategoryController extends Controller
         ]);
         
         $category = ProductCategory::findOrFail($request->input('id'));
+        $oldValues = $category->only(['name']);
         $category->name = $request->input('name');
         $category->save();
+
+        ActivityLogger::log('Inventory Product Category', 'update', 'Product category updated', $category->id, $oldValues, $category->only(['name']), $request);
 
         return response()->json([
             'success' => true,
@@ -75,7 +81,9 @@ class ProductCategoryController extends Controller
             'id' => 'required|exists:product_categories,id',
         ]);
         
-        $deleted = ProductCategory::destroy($request->input('id'));
+        $category = ProductCategory::findOrFail($request->input('id'));
+        $oldValues = $category->toArray();
+        $deleted = $category->delete();
         
         if (! $deleted) {
             return response()->json([
@@ -83,6 +91,7 @@ class ProductCategoryController extends Controller
                 'message' => 'Failed to delete category.',
             ], 500);
         }
+        ActivityLogger::log('Inventory Product Category', 'delete', 'Product category deleted', $category->id, $oldValues, [], $request);
         return response()->json([
             'success' => true,
             'message' => 'Category deleted successfully.',

@@ -20,6 +20,7 @@ use App\Models\Maintenance\InspectionResult;
 use App\Models\Maintenance\InspectionResultPart;
 use App\Models\Maintenance\MaintenancePart;
 use App\Models\Maintenance\MaintenancePartLink;
+use App\Support\ActivityLogger;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -199,6 +200,12 @@ class FaultClaimController extends Controller
             }
 
             DB::commit();
+            ActivityLogger::log('Maintenance Fault Claim', 'create', 'Fault claim and dock request created', $fault->id, [], [
+                'fault_claim_id' => $fault->id,
+                'dock_request_id' => $dock->id,
+                'bus_id' => $request->bus_id,
+                'status' => $fault->status,
+            ], $request);
             return response()->json([
                 'message' => 'Fault & Dock Request Created Successfully',
                 'data'    => null
@@ -220,6 +227,7 @@ class FaultClaimController extends Controller
 
         try {
             $fault = FaultClaim::where("id", $request->claim_id)->first();
+            $oldValues = $fault ? $fault->only(['status']) : [];
 
             // CASE: Dock Required — only create DockRequest
             if ($request->status === 'dock_required') {
@@ -278,6 +286,10 @@ class FaultClaimController extends Controller
             }
 
             DB::commit();
+            ActivityLogger::log('Maintenance Fault Claim', 'status change', 'Fault claim result submitted', $fault->id, $oldValues, [
+                'status' => $fault->fresh()->status,
+                'result_status' => $request->status,
+            ], $request);
 
             return response()->json([
                 'message' => 'Result Submitted Successfully',
@@ -433,6 +445,7 @@ class FaultClaimController extends Controller
             if (!$dock) {
                 return response()->json(['message' => 'Dock request not found'], 404);
             }
+            $oldValues = $dock->only(['status', 'approved_by', 'approved_at', 'dock_start_time', 'comments']);
 
             // Update DockRequest with status, approver, dock time, and comment
             $dock->update([
@@ -450,6 +463,7 @@ class FaultClaimController extends Controller
             }
 
             DB::commit();
+            ActivityLogger::log('Maintenance Dock Request', 'approve', 'Dock request approved', $dock->id, $oldValues, $dock->fresh()->only(['status', 'approved_by', 'approved_at', 'dock_start_time', 'comments']), $request);
 
             return response()->json([
                 'message' => 'Dock request approved successfully.',

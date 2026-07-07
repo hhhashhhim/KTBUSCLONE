@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inventory;
 use App\Http\Controllers\Controller;;
 
 use App\Models\Inventory\ProductUnit;
+use App\Support\ActivityLogger;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,6 +37,7 @@ class ProductUnitController extends Controller
             'added_by' => Auth::user()->id,
             'company_id' => Auth::user()->company_id,
         ]);
+        ActivityLogger::log('Inventory Product Unit', 'create', 'Product unit created', $unit->id, [], $unit->toArray(), $request);
         return response()->json([
             'success' => true,
             'message' => 'Unit created successfully.',
@@ -55,8 +57,11 @@ class ProductUnitController extends Controller
         ]);
         
         $unit = ProductUnit::findOrFail($request->input('id'));
+        $oldValues = $unit->only(['name']);
         $unit->name = $request->input('name');
         $unit->save();
+
+        ActivityLogger::log('Inventory Product Unit', 'update', 'Product unit updated', $unit->id, $oldValues, $unit->only(['name']), $request);
 
         return response()->json([
             'success' => true,
@@ -74,7 +79,9 @@ class ProductUnitController extends Controller
             'id' => 'required',
         ]);
         
-        $deleted = ProductUnit::destroy($request->input('id'));
+        $unit = ProductUnit::findOrFail($request->input('id'));
+        $oldValues = $unit->toArray();
+        $deleted = $unit->delete();
         
         if (! $deleted) {
             return response()->json([
@@ -83,6 +90,8 @@ class ProductUnitController extends Controller
             ], 500);
         }
         
+        ActivityLogger::log('Inventory Product Unit', 'delete', 'Product unit deleted', $unit->id, $oldValues, [], $request);
+
         return response()->json([
             'success' => true,
             'message' => 'Unit deleted successfully.',

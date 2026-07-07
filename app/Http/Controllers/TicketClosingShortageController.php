@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Expense\TicketMergeExpense;
 use App\Models\TicketClosingShortage;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -60,6 +61,11 @@ class TicketClosingShortageController extends Controller
         }
     }
 
+    ActivityLogger::log('Ticket Closing Shortage', 'create', 'Ticket closing shortage saved', $request->ticket_closing_id, [], [
+        'ticket_closing_id' => $request->ticket_closing_id,
+        'records_count' => count($request->records),
+    ], $request);
+
     return response()->json([
         'message' => 'Ticket closing shortage saved successfully'
     ], 200);
@@ -75,6 +81,7 @@ class TicketClosingShortageController extends Controller
         ]);
 
         $shortageRow = TicketClosingShortage::findOrFail($request->id);
+        $oldValues = $shortageRow->only(['total_received_cash', 'bank_id', 'total_received_bank', 'received', 'shortage']);
 
         $cash = (float) ($request->total_received_cash ?? 0);
         $bank = (float) ($request->total_received_bank ?? 0);
@@ -98,6 +105,8 @@ class TicketClosingShortageController extends Controller
             'received' => $received,
             'shortage' => $shortage,
         ]);
+
+        ActivityLogger::log('Ticket Closing Shortage', 'update', 'Ticket closing shortage updated', $shortageRow->id, $oldValues, $shortageRow->fresh()->only(['total_received_cash', 'bank_id', 'total_received_bank', 'received', 'shortage']), $request);
 
         return response()->json([
             'message' => 'Updated successfully',

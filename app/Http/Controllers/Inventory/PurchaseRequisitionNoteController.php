@@ -9,6 +9,7 @@ use App\Models\Inventory\MaterialRequest;
 use App\Models\Inventory\PurchaseRequisitionNote;
 use App\Models\Inventory\PurchaseRequisitionNoteDetail;
 use App\Models\User;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -73,6 +74,10 @@ class PurchaseRequisitionNoteController extends Controller
                 ]);
             }
             DB::commit();
+            ActivityLogger::log('Inventory Purchase Requisition', 'create', 'Purchase requisition note created', $prn->id, [], [
+                'mr_id' => $validated['mr_id'],
+                'items_count' => count($validated['items']),
+            ], $request);
             return response()->json([
                 'success' => true,
                 'message' => 'PRN created successfully.',

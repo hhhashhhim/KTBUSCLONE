@@ -12,6 +12,7 @@ use App\Models\Inventory\Product;
 use App\Models\Inventory\StoreIssuanceNote;
 use App\Models\Inventory\StoreIssuanceNoteDetail;
 use App\Models\User;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -176,6 +177,12 @@ class StockOutwardController extends Controller
             $storeIssuance->save();
 
             DB::commit();
+
+            ActivityLogger::log('Inventory Stock Out', 'create', 'Store issuance note created', $storeIssuance->id, [], [
+                'mr_id' => $request->mr_id,
+                'total_net_amount' => $total_net_amount,
+                'status' => $storeIssuance->status,
+            ], $request);
 
             return response()->json([
                 'success' => true,

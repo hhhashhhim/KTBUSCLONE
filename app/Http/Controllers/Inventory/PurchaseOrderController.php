@@ -12,6 +12,7 @@ use App\Models\Inventory\Product;
 use App\Models\Inventory\PurchaseOrder;
 use App\Models\Inventory\PurchaseOrderDetail;
 use App\Models\Inventory\Supplier;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -148,6 +149,10 @@ class PurchaseOrderController extends Controller
             }
     
             DB::commit();
+            ActivityLogger::log('Inventory Purchase Order', 'create', 'Purchase orders created from bid details', implode(',', $createdPOs), [], [
+                'po_ids' => $createdPOs,
+                'bid_detail_ids' => $validated['bid_detail_ids'],
+            ], $request);
     
             return response()->json([
                 'message' => 'Purchase Orders created successfully.',

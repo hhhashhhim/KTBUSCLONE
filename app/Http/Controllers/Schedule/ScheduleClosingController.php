@@ -117,19 +117,24 @@ class ScheduleClosingController extends Controller
             $allowedRouteIds = json_decode($allowedRouteIds, true);
         }
 
-        $allowedRouteIds = is_array($allowedRouteIds) ? $allowedRouteIds : [];
+        $allowedRouteIds = is_array($allowedRouteIds) ? array_map('intval', $allowedRouteIds) : [];
 
         // Final route ids = user allowed routes
         $finalRouteIds = $allowedRouteIds;
 
         // If dropdownRoute exists then intersect with allowed routes
-        if ($request->filled('dropdownRoute')) {
-            $requestedRoute = (int) $request->dropdownRoute;
+        $requestedRoutes = collect((array) $request->input('dropdownRoute', []))
+            ->filter(fn($routeId) => $routeId !== null && $routeId !== '')
+            ->map(fn($routeId) => (int) $routeId)
+            ->unique()
+            ->values()
+            ->all();
 
+        if (!empty($requestedRoutes)) {
             if (!$user->is_super_admin) {
-                $finalRouteIds = in_array($requestedRoute, $allowedRouteIds) ? [$requestedRoute] : [];
+                $finalRouteIds = array_values(array_intersect($requestedRoutes, $allowedRouteIds));
             } else {
-                $finalRouteIds = [$requestedRoute];
+                $finalRouteIds = $requestedRoutes;
             }
         }
 
@@ -695,7 +700,7 @@ class ScheduleClosingController extends Controller
                     }
                 },
                 'bus:id,bus_number',
-                'shortage:id,ticket_closing_id,terminal_id,shortage,total_receivable',
+                'shortage:id,ticket_closing_id,elt,terminal_id,shortage,total_receivable',
                 'closing:id,ticket_merge_id,schedule_id',
                 'closing.schedule:id,name'
             ]);
@@ -746,6 +751,7 @@ class ScheduleClosingController extends Controller
             ->withSum('shortage', 'other_commission')
             ->withSum('shortage', 'kt_commission')
             ->withSum('expenses', 'amount')
+            ->withSum('shortage', 'elt')
             ->get()
             ->map(function ($item) {
                 $item->expenses_sum_amount =
