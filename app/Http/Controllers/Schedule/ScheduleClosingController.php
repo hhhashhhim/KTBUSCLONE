@@ -139,7 +139,7 @@ class ScheduleClosingController extends Controller
             }
         }
 
-        $query = TicketClosing::where('company_id', $user->company_id)
+        return $query = TicketClosing::where('company_id', $user->company_id)
             ->with([
                 "bus:id,bus_number",
                 "schedule:id,name,route_id",
@@ -157,7 +157,7 @@ class ScheduleClosingController extends Controller
                     ->where('commission_route', 0)
                     ->groupBy('ticket_merge_id')
                     ->havingRaw('COUNT(*) = 1');
-            });
+            })->first();
 
         // Always apply allowed route filter
         if (!$user->is_super_admin) {
