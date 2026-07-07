@@ -112,7 +112,7 @@ class ScheduleClosingController extends Controller
         $user = Auth::user();
 
         // User allowed route ids
-        $allowedRouteIds = $user->route_ids;
+       return $allowedRouteIds = $user->route_ids;
 
         if (is_string($allowedRouteIds)) {
             $allowedRouteIds = json_decode($allowedRouteIds, true);
