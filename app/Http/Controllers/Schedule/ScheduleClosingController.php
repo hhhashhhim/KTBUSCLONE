@@ -109,7 +109,7 @@ class ScheduleClosingController extends Controller
             ], 403);
         }
 
-        $user = Auth::user();
+        return $user = Auth::user();
 
         // User allowed route ids
         $allowedRouteIds = $user->route_ids;
