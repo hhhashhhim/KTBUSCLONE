@@ -160,21 +160,21 @@ class ScheduleClosingController extends Controller
             });
 
         // Always apply allowed route filter
-        if (!$user->is_super_admin) {
-            if (empty($finalRouteIds)) {
-                $query->whereRaw('1 = 0');
-            } else {
-                $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
-                    $q->whereIn('route_id', $finalRouteIds);
-                });
-            }
-        } elseif (!empty($finalRouteIds)) {
-            // Super admin + dropdownRoute filter
-            $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
-                $q->whereIn('route_id', $finalRouteIds);
-            });
-        }
-        return "ad";
+        // if (!$user->is_super_admin) {
+        //     if (empty($finalRouteIds)) {
+        //         $query->whereRaw('1 = 0');
+        //     } else {
+        //         $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
+        //             $q->whereIn('route_id', $finalRouteIds);
+        //         });
+        //     }
+        // } elseif (!empty($finalRouteIds)) {
+        //     // Super admin + dropdownRoute filter
+        //     $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
+        //         $q->whereIn('route_id', $finalRouteIds);
+        //     });
+        // }
+       
         $buses = Bus::where('company_id', $user->company_id)
             ->select('id', 'bus_number')
             ->orderBy('bus_number')
