@@ -138,7 +138,7 @@ class ScheduleClosingController extends Controller
             }
         }
 
-       $query = TicketClosing::where('company_id', $user->company_id)
+        $query = TicketClosing::where('company_id', $user->company_id)
             ->with([
                 "bus:id,bus_number",
                 "schedule:id,name,route_id",
@@ -163,7 +163,6 @@ class ScheduleClosingController extends Controller
             if (empty($finalRouteIds)) {
                 $query->whereRaw('1 = 0');
             } else {
-                 return $query->where('bus_id', $request->bus_number)->first();
                 $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
                     $q->whereIn('route_id', $finalRouteIds);
                 });
