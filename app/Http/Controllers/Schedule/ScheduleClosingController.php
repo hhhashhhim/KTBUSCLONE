@@ -166,7 +166,7 @@ class ScheduleClosingController extends Controller
                 return "1";
                 $query->whereRaw('1 = 0');
             } else {
-                return '2';
+                return '3';
                 $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
                     $q->whereIn('route_id', $finalRouteIds);
                 });
