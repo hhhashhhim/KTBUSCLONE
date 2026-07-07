@@ -102,6 +102,7 @@ class ScheduleClosingController extends Controller
 
     public function unclosing(Request $request)
     {
+        return "adnan";
         if (!checkForSubmenu("closing")) {
             return response()->json([
                 "Error" => ['You are not authorized to access this url']
