@@ -138,7 +138,7 @@ class ScheduleClosingController extends Controller
             }
         }
 
-       return  $query = TicketClosing::where('company_id', $user->company_id)
+       $query = TicketClosing::where('company_id', $user->company_id)
             ->with([
                 "bus:id,bus_number",
                 "schedule:id,name,route_id",
@@ -156,13 +156,14 @@ class ScheduleClosingController extends Controller
                     ->where('commission_route', 0)
                     ->groupBy('ticket_merge_id')
                     ->havingRaw('COUNT(*) = 1');
-            })->where('bus_id', $request->bus_number)->first();
+            });
 
         // Always apply allowed route filter
         if (!$user->is_super_admin) {
             if (empty($finalRouteIds)) {
                 $query->whereRaw('1 = 0');
             } else {
+                 return $query->where('bus_id', $request->bus_number)->first();
                 $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
                     $q->whereIn('route_id', $finalRouteIds);
                 });
