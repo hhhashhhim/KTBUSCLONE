@@ -167,18 +167,19 @@ class ScheduleClosingController extends Controller
                     ->havingRaw('COUNT(*) = 1');
             });
 
-        // Always apply allowed route filter
+        // Always apply allowed route filter using ticket route_id. A closing can share a
+        // schedule while its booked tickets carry the operational route segment.
         if (!$user->is_super_admin) {
             if (empty($finalRouteIds)) {
                 $query->whereRaw('1 = 0');
             } else {
-                $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
+                $query->whereHas('tickets', function ($q) use ($finalRouteIds) {
                     $q->whereIn('route_id', $finalRouteIds);
                 });
             }
         } elseif (!empty($finalRouteIds)) {
             // Super admin + dropdownRoute filter
-            $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
+            $query->whereHas('tickets', function ($q) use ($finalRouteIds) {
                 $q->whereIn('route_id', $finalRouteIds);
             });
         }
