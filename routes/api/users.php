@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'web/v1/user','middleware' => ['auth:sanctum']], function () {
     Route::post('/', [UserController::class, 'index']);
     Route::post('/cities', [UserController::class, 'getCities']);
+    Route::post('/routes', [UserController::class, 'routes']);
     Route::post('/store', [UserController::class, 'store']);
     Route::post('/edit', [UserController::class, 'edit']);
     Route::post('/update', [UserController::class, 'update']);

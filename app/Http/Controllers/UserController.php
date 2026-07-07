@@ -6,6 +6,7 @@ use App\Models\City;
 use App\Models\User;
 use App\Models\UserPassword;
 use Illuminate\Http\Request;
+use App\Models\Route\Route;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ActivityLog;
@@ -47,6 +48,25 @@ class UserController extends Controller
             'users' => $users,
             'authCheck' => is_null(Auth::user()->terminal_id) ? 0 : Auth::user()->terminal_id
         ];
+    }
+    public function routes()
+    {
+        if (!checkForSubmenu("users")) {
+            return response()->json(
+                ["Error" => ['You are not authorized to access this url']],
+                403
+            );
+        }
+
+        $routes = Route::where('company_id', Auth::user()->company_id)
+            ->where('hide', 0)
+            ->get(['id', 'name']);
+
+        foreach ($routes as $single) {
+            $single->name = ucfirst($single->name);
+        }
+
+        return $routes;
     }
 
  public function getCities()
