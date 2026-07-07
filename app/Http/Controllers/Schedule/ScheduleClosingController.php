@@ -41,6 +41,7 @@ class ScheduleClosingController extends Controller
 {
     public function closing(Request $request)
     {
+        
         if (!checkForSubmenu("closing")) {
             return response()->json([
                 "Error" => ['You are not authorized to access this url']
@@ -102,7 +103,6 @@ class ScheduleClosingController extends Controller
 
     public function unclosing(Request $request)
     {
-        
         if (!checkForSubmenu("closing")) {
             return response()->json([
                 "Error" => ['You are not authorized to access this url']
@@ -150,26 +150,27 @@ class ScheduleClosingController extends Controller
                 "commission_route" => 0
             ])
             ->whereIn('ticket_merge_id', function ($q) use ($user) {
-                $q->select('id')
-                    ->from('ticket_closing_merges')
+                $q->select('ticket_merge_id')
+                    ->from('ticket_closings')
                     ->where('company_id', $user->company_id)
-                    ->where('schedule_complete', 0)
-                    ->whereNull('deleted_at');
+                    ->where('hide', 0)
+                    ->where('commission_route', 0)
+                    ->groupBy('ticket_merge_id')
+                    ->havingRaw('COUNT(*) = 1');
             });
 
-        // Always apply allowed route filter using ticket route_id. A closing can share a
-        // schedule while its booked tickets carry the operational route segment.
+        // Always apply allowed route filter
         if (!$user->is_super_admin) {
             if (empty($finalRouteIds)) {
                 $query->whereRaw('1 = 0');
             } else {
-                $query->whereHas('tickets', function ($q) use ($finalRouteIds) {
+                $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
                     $q->whereIn('route_id', $finalRouteIds);
                 });
             }
         } elseif (!empty($finalRouteIds)) {
             // Super admin + dropdownRoute filter
-            $query->whereHas('tickets', function ($q) use ($finalRouteIds) {
+            $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
                 $q->whereIn('route_id', $finalRouteIds);
             });
         }
@@ -183,7 +184,7 @@ class ScheduleClosingController extends Controller
         if ($request->filled('bus_number')) {
             $query->where('bus_id', $request->bus_number);
         }
-
+        return $query->first();
         // Date range filter
         if ($request->filled('from_date')) {
             $query->whereDate('schedule_date', '>=', $request->from_date);
@@ -245,7 +246,8 @@ class ScheduleClosingController extends Controller
 
         // Get results
         $closings = $query->get()
-            ->groupBy('ticket_merge_id');
+            ->groupBy('ticket_merge_id')
+            ->filter(fn($group) => $group->count() == 1);
 
         // Get buses list
         $buses = Bus::where('company_id', $user->company_id)
@@ -1649,13 +1651,6 @@ class ScheduleClosingController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $request->validate([
-            'bus' => [
-                'required',
-                Rule::exists('buses', 'id')->where(function ($query) {
-                    return $query->where('company_id', Auth::user()->company_id)
-                        ->whereNull('deleted_at');
-                }),
-            ],
             'terminal_id' => [
                 'nullable',
                 Rule::exists('terminals', 'id')->where(function ($query) {
@@ -1749,19 +1744,11 @@ class ScheduleClosingController extends Controller
                 ]);
             }
 
-            Ticket::where([
-                "company_id" => Auth::user()->company_id,
-                "schedule_id" => $request->schedule,
-                "schedule_date" => $request->date,
-                "departure_city_id" => $request->departureCity,
-                "destination_city_id" => $request->destinationCity,
-            ])
-                ->whereTime("schedule_time", $depTime->departure_time)
+            Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, "schedule_date" => $request->date])
                 ->withTrashed()
                 ->update([
                     "bus_id" => $request->bus,
                     "ticket_closing_id" => $closingRecord->id,
-                    "ticket_merge_id" => $newRecord->id,
                 ]);
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
@@ -1785,13 +1772,6 @@ class ScheduleClosingController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $request->validate([
-            'bus' => [
-                'required',
-                Rule::exists('buses', 'id')->where(function ($query) {
-                    return $query->where('company_id', Auth::user()->company_id)
-                        ->whereNull('deleted_at');
-                }),
-            ],
             'terminal_id' => [
                 'nullable',
                 Rule::exists('terminals', 'id')->where(function ($query) {
@@ -1808,26 +1788,8 @@ class ScheduleClosingController extends Controller
             // delete old members
             TicketClosingMember::where(["company_id" => Auth::user()->company_id, "ticket_closing_id" => $request->closingId])->delete();
             // for
-            $closing = TicketClosing::where([
-                "id" => $request->closingId,
-                "company_id" => Auth::user()->company_id,
-            ])->first();
-
-            if (!$closing) {
-                DB::rollBack();
-                return response()->json(["errors" => ["Closing Error" => ["Closing record not found"]]], 404);
-            }
-
-            $merge = TicketClosingMerge::where([
-                "id" => $closing->ticket_merge_id,
-                "company_id" => Auth::user()->company_id,
-            ])->first();
-
-            if (!$merge) {
-                DB::rollBack();
-                return response()->json(["errors" => ["Closing Error" => ["Closing merge record not found"]]], 404);
-            }
-
+            $closing = TicketClosing::find($request->closingId);
+            $merge = TicketClosingMerge::find($closing->ticket_merge_id);
             $closing->update([
                 "terminal_id" => $request->terminal_id ?: null,
             ]);
@@ -1839,8 +1801,6 @@ class ScheduleClosingController extends Controller
                     "bus_id" => $request->bus
                 ]);
             }
-            $closing->refresh();
-
             foreach ($request->drivers as $value) {
                 TicketClosingMember::create([
                     "user_id" => $value,
@@ -1863,13 +1823,7 @@ class ScheduleClosingController extends Controller
                 ]);
             }
 
-            Ticket::where([
-                "company_id" => Auth::user()->company_id,
-                "ticket_closing_id" => $closing->id,
-            ])->withTrashed()->update([
-                "bus_id" => $closing->bus_id,
-                "ticket_merge_id" => $closing->ticket_merge_id,
-            ]);
+            Ticket::where("ticket_closing_id", $closing->id)->withTrashed()->update(["bus_id" => $request->bus]);
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
                 "message" => Auth::user()->name . " | updated closed schedule ($request->closingId)",
