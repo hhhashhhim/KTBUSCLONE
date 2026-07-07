@@ -41,7 +41,6 @@ class ScheduleClosingController extends Controller
 {
     public function closing(Request $request)
     {
-        
         if (!checkForSubmenu("closing")) {
             return response()->json([
                 "Error" => ['You are not authorized to access this url']
@@ -112,7 +111,7 @@ class ScheduleClosingController extends Controller
         $user = Auth::user();
 
         // User allowed route ids
-       return $allowedRouteIds = $user->route_ids;
+        $allowedRouteIds = $user->route_ids;
 
         if (is_string($allowedRouteIds)) {
             $allowedRouteIds = json_decode($allowedRouteIds, true);
@@ -133,14 +132,13 @@ class ScheduleClosingController extends Controller
 
         if (!empty($requestedRoutes)) {
             if (!$user->is_super_admin) {
-                return "super admin";
                 $finalRouteIds = array_values(array_intersect($requestedRoutes, $allowedRouteIds));
             } else {
                 $finalRouteIds = $requestedRoutes;
             }
         }
 
-        $query = TicketClosing::where('company_id', $user->company_id)
+       return  $query = TicketClosing::where('company_id', $user->company_id)
             ->with([
                 "bus:id,bus_number",
                 "schedule:id,name,route_id",
@@ -158,14 +156,13 @@ class ScheduleClosingController extends Controller
                     ->where('commission_route', 0)
                     ->groupBy('ticket_merge_id')
                     ->havingRaw('COUNT(*) = 1');
-            });
+            })->where('bus_id', $request->bus_number)->first();
 
         // Always apply allowed route filter
         if (!$user->is_super_admin) {
             if (empty($finalRouteIds)) {
                 $query->whereRaw('1 = 0');
             } else {
-                return ['routes' => $finalRouteIds, 'result' => $query->first()];
                 $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
                     $q->whereIn('route_id', $finalRouteIds);
                 });
@@ -176,7 +173,7 @@ class ScheduleClosingController extends Controller
                 $q->whereIn('route_id', $finalRouteIds);
             });
         }
-       
+
         $buses = Bus::where('company_id', $user->company_id)
             ->select('id', 'bus_number')
             ->orderBy('bus_number')
@@ -186,7 +183,7 @@ class ScheduleClosingController extends Controller
         if ($request->filled('bus_number')) {
             $query->where('bus_id', $request->bus_number);
         }
-        return $query->first();
+
         // Date range filter
         if ($request->filled('from_date')) {
             $query->whereDate('schedule_date', '>=', $request->from_date);
