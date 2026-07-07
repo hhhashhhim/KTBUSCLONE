@@ -155,16 +155,6 @@ class ScheduleClosingController extends Controller
                     ->where('company_id', $user->company_id)
                     ->where('schedule_complete', 0)
                     ->whereNull('deleted_at');
-            })
-            ->whereIn('ticket_merge_id', function ($q) use ($user) {
-                $q->select('ticket_merge_id')
-                    ->from('ticket_closings')
-                    ->where('company_id', $user->company_id)
-                    ->where('hide', 0)
-                    ->where('commission_route', 0)
-                    ->whereNull('deleted_at')
-                    ->groupBy('ticket_merge_id')
-                    ->havingRaw('COUNT(*) = 1');
             });
 
         // Always apply allowed route filter using ticket route_id. A closing can share a
