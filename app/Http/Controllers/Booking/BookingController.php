@@ -57,6 +57,49 @@ use Exception;
 
 class BookingController extends Controller
 {
+    private function assignedBus($scheduleId, $scheduleDate)
+    {
+        $closing = TicketClosing::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $scheduleId,
+            'schedule_date' => $scheduleDate,
+        ])
+            ->whereNotNull('bus_id')
+            ->first(['id', 'bus_id']);
+
+        if ($closing) {
+            return Bus::withTrashed()->find($closing->bus_id);
+        }
+
+        $ticket = Ticket::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $scheduleId,
+            'schedule_date' => $scheduleDate,
+        ])
+            ->whereNotNull('bus_id')
+            ->latest('id')
+            ->first(['bus_id']);
+
+        return $ticket ? Bus::withTrashed()->find($ticket->bus_id) : null;
+    }
+
+    private function hasAssignedBus($scheduleId, $scheduleDate)
+    {
+        if (TicketClosing::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $scheduleId,
+            'schedule_date' => $scheduleDate,
+        ])->whereNotNull('bus_id')->exists()) {
+            return true;
+        }
+
+        return Ticket::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $scheduleId,
+            'schedule_date' => $scheduleDate,
+        ])->whereNotNull('bus_id')->exists();
+    }
+
     public function index(Request $request)
     {
         if (!checkForSubmenu("bookings")) {
@@ -1103,8 +1146,7 @@ class BookingController extends Controller
             "departure_date" => $request->date,
             "company_id" => Auth::user()->company_id
         ])->first();
-        $checkBusAssigning = Ticket::where(["schedule_date" => $departureTime->schedule_date, "schedule_id" => $departureTime->schedule_id])->where("bus_id", '!=', null)->first();
-        if ($checkBusAssigning) {
+        if ($departureTime && $this->hasAssignedBus($departureTime->schedule_id, $departureTime->schedule_date)) {
             return response()->json([], 200);
         } else {
             return response()->json([], 204);
@@ -1395,7 +1437,8 @@ class BookingController extends Controller
             }
         }
         $schedule->bus_class->seat_map = $seatMap;
-        $schedule->bus_no = $tickets->count() > 0 && $tickets[0]->bus_id ? Bus::find($tickets[0]->bus_id)->bus_number : "N/A";
+        $assignedBus = $this->assignedBus($scheduleDetail->schedule_id, $scheduleDetail->schedule_date);
+        $schedule->bus_no = $assignedBus ? $assignedBus->bus_number : "N/A";
         unset($schedule->route);
         $schedule->auth_terminal = Auth::user()->terminal;
         return $schedule;
@@ -1824,7 +1867,8 @@ class BookingController extends Controller
         $routeName = routeName($request->schedule_id);
         $bus = (object)[];
         $bus->bus_class = BusClass::find($scheduleDetail->bus_class_id)->name ?? 'N/A';
-        $bus->bus_no = $passengerData->count() > 0 ? Bus::find($passengerData[0]->bus_id)->bus_number ?? 'N/A' : "N/A";
+        $assignedBus = $this->assignedBus($scheduleDetail->schedule_id, $scheduleDetail->schedule_date);
+        $bus->bus_no = $assignedBus ? $assignedBus->bus_number : "N/A";
 
         $date = date_format(date_create($scheduleDetail->schedule_date . ' ' . $scheduleDetail->departure_time), "l") . ' , ' . date_format(date_create($scheduleDetail->schedule_date . ' ' . $scheduleDetail->departure_time), "d F Y H:i:s A");
         $eltAmount = 0;

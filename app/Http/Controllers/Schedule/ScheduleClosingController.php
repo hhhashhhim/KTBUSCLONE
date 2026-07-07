@@ -149,11 +149,19 @@ class ScheduleClosingController extends Controller
                 "commission_route" => 0
             ])
             ->whereIn('ticket_merge_id', function ($q) use ($user) {
+                $q->select('id')
+                    ->from('ticket_closing_merges')
+                    ->where('company_id', $user->company_id)
+                    ->where('schedule_complete', 0)
+                    ->whereNull('deleted_at');
+            })
+            ->whereIn('ticket_merge_id', function ($q) use ($user) {
                 $q->select('ticket_merge_id')
                     ->from('ticket_closings')
                     ->where('company_id', $user->company_id)
                     ->where('hide', 0)
                     ->where('commission_route', 0)
+                    ->whereNull('deleted_at')
                     ->groupBy('ticket_merge_id')
                     ->havingRaw('COUNT(*) = 1');
             });
@@ -1748,6 +1756,7 @@ class ScheduleClosingController extends Controller
                 ->update([
                     "bus_id" => $request->bus,
                     "ticket_closing_id" => $closingRecord->id,
+                    "ticket_merge_id" => $newRecord->id,
                 ]);
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
@@ -1787,8 +1796,26 @@ class ScheduleClosingController extends Controller
             // delete old members
             TicketClosingMember::where(["company_id" => Auth::user()->company_id, "ticket_closing_id" => $request->closingId])->delete();
             // for
-            $closing = TicketClosing::find($request->closingId);
-            $merge = TicketClosingMerge::find($closing->ticket_merge_id);
+            $closing = TicketClosing::where([
+                "id" => $request->closingId,
+                "company_id" => Auth::user()->company_id,
+            ])->first();
+
+            if (!$closing) {
+                DB::rollBack();
+                return response()->json(["errors" => ["Closing Error" => ["Closing record not found"]]], 404);
+            }
+
+            $merge = TicketClosingMerge::where([
+                "id" => $closing->ticket_merge_id,
+                "company_id" => Auth::user()->company_id,
+            ])->first();
+
+            if (!$merge) {
+                DB::rollBack();
+                return response()->json(["errors" => ["Closing Error" => ["Closing merge record not found"]]], 404);
+            }
+
             $closing->update([
                 "terminal_id" => $request->terminal_id ?: null,
             ]);
@@ -1800,6 +1827,8 @@ class ScheduleClosingController extends Controller
                     "bus_id" => $request->bus
                 ]);
             }
+            $closing->refresh();
+
             foreach ($request->drivers as $value) {
                 TicketClosingMember::create([
                     "user_id" => $value,
@@ -1822,7 +1851,13 @@ class ScheduleClosingController extends Controller
                 ]);
             }
 
-            Ticket::where("ticket_closing_id", $closing->id)->withTrashed()->update(["bus_id" => $request->bus]);
+            Ticket::where([
+                "company_id" => Auth::user()->company_id,
+                "ticket_closing_id" => $closing->id,
+            ])->withTrashed()->update([
+                "bus_id" => $closing->bus_id,
+                "ticket_merge_id" => $closing->ticket_merge_id,
+            ]);
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
                 "message" => Auth::user()->name . " | updated closed schedule ($request->closingId)",

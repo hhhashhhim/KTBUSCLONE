@@ -115,6 +115,18 @@ class ScheduleController extends Controller
                     'busClass.required' => 'Bus Class is Required',
                 ];
                 $this->validate($request, $rules, $customMessages);
+
+                $busClass = BusClass::where('id', $request->busClass)
+                    ->where('company_id', Auth::user()->company_id)
+                    ->where('hide', 0)
+                    ->where('is_active', 1)
+                    ->first();
+
+                if (!$busClass) {
+                    DB::rollBack();
+                    return response()->json(["errors" => ["Bus Class" => ['Selected bus class is inactive or was not found.']]], 422);
+                }
+
                 $schedule = Schedule::create([
                     'name' => $request->name,
                     'start_date' => $request->StartDate,
@@ -211,11 +223,12 @@ class ScheduleController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $schedule = Schedule::find($request->id);
+        $schedule = Schedule::with('bus_class:id,name,is_active,hide')->find($request->id);
         $visibilities = ScheduleTerminalVisibility::where("schedule_id",$schedule->id)->pluck("terminal_id");
         $discountTerminals = ScheduleTerminalDiscount::where("schedule_id",$schedule->id)->pluck("terminal_id");
         return [
             'schedules' => $schedule,
+            'currentBusClass' => $schedule->bus_class,
             'visibilities' => $visibilities,
             'discountTerminals' => $discountTerminals,
         ];
@@ -374,11 +387,12 @@ class ScheduleController extends Controller
                 $busClass = BusClass::where('id', $req['bus_class_id'])
                     ->where('company_id', Auth::user()->company_id)
                     ->where('hide', 0)
+                    ->where('is_active', 1)
                     ->first();
 
                 if (!$busClass) {
                     DB::rollBack();
-                    return response()->json(["errors" => ["Bus Class" => ['Selected bus class was not found.']]], 422);
+                    return response()->json(["errors" => ["Bus Class" => ['Selected bus class is inactive or was not found.']]], 422);
                 }
 
                 $update = $schedule->update([
@@ -690,7 +704,14 @@ class ScheduleController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        return BusClass::with('addedBy')->orderBy('id')->where(['company_id'=> Auth::user()->company_id,"hide" => 0])->get();
+        return BusClass::with('addedBy')
+            ->orderBy('id')
+            ->where([
+                'company_id'=> Auth::user()->company_id,
+                'hide' => 0,
+                'is_active' => 1,
+            ])
+            ->get();
     }
 
     public function surchargeSelective()
