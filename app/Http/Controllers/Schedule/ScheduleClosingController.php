@@ -161,10 +161,11 @@ class ScheduleClosingController extends Controller
 
         // Always apply allowed route filter
         if (!$user->is_super_admin) {
-            return "Asdas";
             if (empty($finalRouteIds)) {
+                return "1";
                 $query->whereRaw('1 = 0');
             } else {
+                return '2';
                 $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
                     $q->whereIn('route_id', $finalRouteIds);
                 });
