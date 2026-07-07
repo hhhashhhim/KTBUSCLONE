@@ -8,33 +8,124 @@
                             <h4>Online Terminal Cancellation Requests</h4>
                         </div>
                         <div class="card-body">
-                            <div class="row align-items-end mb-3">
-                                <div class="col-md-3 mb-2">
-                                    <label>Request ID</label>
-                                    <input type="text" class="form-control" v-model="filters.request_id">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="cnicFilter">CNIC</label>
+                                        <vue-mask id="cnicFilter" class="form-control"
+                                                  v-model="filters.cnicFilter" mask="00000-0000000-0"
+                                                  @keyup="fetchRequests()" :raw="false"
+                                                  :options="options">
+                                        </vue-mask>
+                                    </div>
                                 </div>
-                                <div class="col-md-2 mb-2">
-                                    <label>Invoice ID</label>
-                                    <input type="text" class="form-control" v-model="filters.invoice_id">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="phoneFilter">Cell #</label>
+                                        <vue-mask id="phoneFilter" class="form-control"
+                                                  v-model="filters.phoneFilter" mask="0000-0000000"
+                                                  :raw="false" @keyup="fetchRequests()"
+                                                  :options="optionsContact">
+                                        </vue-mask>
+                                    </div>
                                 </div>
-                                <div class="col-md-3 mb-2">
-                                    <label>Booking Reference</label>
-                                    <input type="text" class="form-control" v-model="filters.booking_reference">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="nameFilter">Name</label>
+                                        <input id="nameFilter" type="text" class="form-control"
+                                               v-model="filters.nameFilter"
+                                               @keyup="fetchRequests()">
+                                    </div>
                                 </div>
-                                <div class="col-md-2 mb-2">
-                                    <label>Status</label>
-                                    <select class="form-control" v-model="filters.status">
-                                        <option value="">All</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="cancelled">Cancelled</option>
-                                        <option value="rejected">Rejected</option>
-                                        <option value="failed">Failed</option>
-                                        <option value="unauthorized">Unauthorized</option>
-                                    </select>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="invoiceFilter">Invoice</label>
+                                        <input id="invoiceFilter" type="text" class="form-control"
+                                               v-model="filters.invoiceFilter"
+                                               @keyup="fetchRequests()">
+                                    </div>
                                 </div>
-                                <div class="col-md-2 mb-2">
-                                    <button class="btn btn-primary mr-2" @click="fetchRequests()">Search</button>
-                                    <button class="btn btn-secondary" @click="resetFilters()">Reset</button>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="routeFilter">Route</label>
+                                        <select id="routeFilter" class="form-control"
+                                                v-model="filters.routeFilter"
+                                                @change="fetchRequests()">
+                                            <option value="">---Select Route---</option>
+                                            <option v-for="(route, i) in routes" :key="i" :value="route.id">
+                                                {{ route.name }}  ({{ route.via ?? 'n/a' }})
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="terminalFilter">Terminals</label>
+                                        <select id="terminalFilter" class="form-control"
+                                                v-model="filters.terminalFilter"
+                                                @change="fetchRequests()">
+                                            <option value="">---Select Terminal---</option>
+                                            <option v-for="(terminal, i) in terminals" :key="i" :value="terminal.id">
+                                                {{ terminal.name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="busFilter">Bus #</label>
+                                        <select id="busFilter" class="form-control"
+                                                v-model="filters.busFilter"
+                                                @change="fetchRequests()">
+                                            <option value="">---Select Bus #---</option>
+                                            <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
+                                                {{ bus.bus_number }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="statusFilter">Status</label>
+                                        <select id="statusFilter" class="form-control"
+                                                v-model="filters.statusFilter"
+                                                @change="fetchRequests()">
+                                            <option value="">---Select Status---</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="cancelled">Cancelled</option>
+                                            <option value="rejected">Rejected</option>
+                                            <option value="failed">Failed</option>
+                                            <option value="unauthorized">Unauthorized</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="fromDateFilter">Departure Date From</label>
+                                        <input type="date" class="form-control" id="fromDateFilter"
+                                               v-model="filters.fromDateFilter"
+                                               @change="fetchRequests()">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="toDateFilter">Departure Date To</label>
+                                        <input type="date" class="form-control" id="toDateFilter"
+                                               v-model="filters.toDateFilter"
+                                               @change="fetchRequests()">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="transactionFilter">Transaction #</label>
+                                        <input id="transactionFilter" type="text" class="form-control"
+                                               v-model="filters.transactionFilter"
+                                               @keyup="fetchRequests()">
+                                    </div>
                                 </div>
                             </div>
 
@@ -43,7 +134,7 @@
                                     <img class="loading-spinner"
                                          :src="$store.state.main_url + 'assets/img/loading-spinner.gif'">
                                 </div>
-                                <table class="table table-bordered table-striped text-center" id="online_terminal_cancellation_table" v-else>
+                                <table class="table table-bordered table-striped text-center" id="online_terminal_cancellation_table" v-show="!loading">
                                     <thead>
                                         <tr>
                                             <th>Invoice</th>
@@ -68,9 +159,6 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-if="requests.length === 0">
-                                            <td colspan="19" class="text-muted py-4">No online terminal cancellation requests found.</td>
-                                        </tr>
                                         <tr v-for="request in requests" :key="request.id">
                                             <td>{{ request.invoice_id }}</td>
                                             <td>{{ request.booking_reference || 'N/A' }}</td>
@@ -153,49 +241,106 @@
 </template>
 
 <script>
+import vueMask from "vue-jquery-mask";
+
 export default {
     name: "OnlineTerminalCancellationRequestsPage",
+    components: {
+        vueMask,
+    },
     data() {
         return {
+            options: {
+                placeholder: "xxxxx-xxxxxxx-x",
+            },
+            optionsContact: {
+                placeholder: "03xx-xxxxxxx",
+            },
             permissions: [],
             requests: [],
+            routes: [],
+            terminals: [],
+            buses: [],
             loading: false,
+            requestSequence: 0,
             actionLoadingId: null,
             rejectLoading: false,
             selectedRequest: null,
             rejectionReason: '',
             filters: {
-                request_id: '',
-                invoice_id: '',
-                booking_reference: '',
-                status: '',
+                cnicFilter: '',
+                phoneFilter: '',
+                nameFilter: '',
+                invoiceFilter: '',
+                routeFilter: '',
+                terminalFilter: '',
+                busFilter: '',
+                statusFilter: '',
+                fromDateFilter: '',
+                toDateFilter: '',
+                transactionFilter: '',
             },
         };
     },
     created() {
         this.permissions = this.$store.state.permissions;
+        this.fetchRoutes();
+        this.fetchTerminals();
+        this.fetchBus();
         this.fetchRequests();
     },
     methods: {
+        defaultFilters() {
+            return {
+                cnicFilter: '',
+                phoneFilter: '',
+                nameFilter: '',
+                invoiceFilter: '',
+                routeFilter: '',
+                terminalFilter: '',
+                busFilter: '',
+                statusFilter: '',
+                fromDateFilter: '',
+                toDateFilter: '',
+                transactionFilter: '',
+            };
+        },
+        async fetchRoutes() {
+            const resRoute = await this.callApi("post", "online-terminals/cancellations/routes");
+            if (resRoute.status === 200) {
+                this.routes = resRoute.data;
+            }
+        },
+        async fetchTerminals() {
+            const resTerminal = await this.callApi("post", "online-terminals/cancellations/terminals");
+            if (resTerminal.status === 200) {
+                this.terminals = resTerminal.data;
+            }
+        },
+        async fetchBus() {
+            const resBuses = await this.callApi("post", "online-terminals/cancellations/buses");
+            if (resBuses.status === 200) {
+                this.buses = resBuses.data;
+            }
+        },
         async fetchRequests() {
+            const sequence = ++this.requestSequence;
             this.destroyDataTable();
             this.loading = true;
             const res = await this.callApi('post', 'online-terminals/cancellations/requests', this.filters);
+            if (sequence !== this.requestSequence) {
+                return;
+            }
             if (res.status === 200 && res.data.status === true) {
                 this.requests = res.data.data.requests;
             }
             this.loading = false;
-            setTimeout(() => {
-                $("#online_terminal_cancellation_table").DataTable();
-            }, 300);
+            this.$nextTick(() => {
+                this.initDataTable();
+            });
         },
         resetFilters() {
-            this.filters = {
-                request_id: '',
-                invoice_id: '',
-                booking_reference: '',
-                status: '',
-            };
+            this.filters = this.defaultFilters();
             this.fetchRequests();
         },
         async approveRequest(request) {
@@ -249,8 +394,41 @@ export default {
             }
         },
         destroyDataTable() {
-            if ($.fn.DataTable.isDataTable("#online_terminal_cancellation_table")) {
-                $("#online_terminal_cancellation_table").DataTable().destroy();
+            const table = document.getElementById('online_terminal_cancellation_table');
+            if (!table || !window.$ || !$.fn.DataTable) {
+                return;
+            }
+
+            if (!table.parentNode) {
+                this.clearDataTableSettings(table);
+                return;
+            }
+
+            if ($.fn.DataTable.isDataTable(table)) {
+                try {
+                    $(table).DataTable().destroy(false);
+                } catch (error) {
+                    this.clearDataTableSettings(table);
+                    $(table).removeClass('dataTable no-footer');
+                }
+            }
+        },
+        initDataTable() {
+            const table = document.getElementById('online_terminal_cancellation_table');
+            if (table && table.parentNode && $.fn.DataTable && !$.fn.DataTable.isDataTable(table)) {
+                $(table).DataTable({
+                    language: {
+                        emptyTable: 'No online terminal cancellation requests found.',
+                    },
+                });
+            }
+        },
+        clearDataTableSettings(table) {
+            const settings = $.fn.dataTableSettings || [];
+            for (let i = settings.length - 1; i >= 0; i--) {
+                if (settings[i].nTable === table || settings[i].sTableId === table.id) {
+                    settings.splice(i, 1);
+                }
             }
         },
         isApiSuccess(data) {

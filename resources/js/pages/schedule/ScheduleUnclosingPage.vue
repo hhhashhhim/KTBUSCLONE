@@ -23,7 +23,7 @@
                                                     <div class="col-md-3">
                                                         <label>Select Route</label>
                                                         <select2 v-model="filterData.dropdownRoute" :options="routeOptions"
-                                                            :settings="{ width: '100%', placeholder: 'Select Route', allowClear: true }" />
+                                                            :settings="{ multiple: true, width: '100%', placeholder: 'Select Route', allowClear: true }" />
                                                     </div>
                                                     <!-- <div class="col-md-3">
                                                         <label>Route</label>
@@ -263,7 +263,7 @@ export default {
                 bus_number: "",
                 from_date: "",
                 to_date: "",
-                dropdownRoute: "",
+                dropdownRoute: [],
             },
             dropdownRoute: [],
             closings: [],
@@ -425,7 +425,7 @@ export default {
                 bus_number: "",
                 from_date: "",
                 to_date: "",
-                dropdownRoute: "",
+                dropdownRoute: [],
             };
             this.fetchData();
         },

@@ -242,8 +242,7 @@
                                                                 </td>
 
                                                                 <td class="bg-danger">
-                                                                    {{ $insertComma(merge.shortage_sum_total_receivable
-                                                                        - merge.expenses_sum_amount || 0) }}
+                                                                    {{ $insertComma(netSale(merge)) }}
                                                                 </td>
                                                                 <td>
                                                                     <span :class="{
@@ -289,7 +288,7 @@
                                                                 <td colspan="6"></td>
                                                                 <td><b>{{ $insertComma(totalSale) }}</b></td>
                                                                 <td><b>{{ $insertComma(totalExpense) }}</b></td>
-                                                                <td><b>{{ $insertComma(totalSale - totalExpense) }}</b>
+                                                                <td><b>{{ $insertComma(totalNetSale) }}</b>
                                                                 </td>
                                                                 <!-- Shortage status dot -->
                                                                 <!-- <td>
@@ -495,6 +494,14 @@ export default {
                 this.tableLoading = false; // ensures loader stops even on error
             }
         },
+        toAmount(value) {
+            return parseFloat(value) || 0;
+        },
+        netSale(merge) {
+            return this.toAmount(merge.shortage_sum_total_receivable)
+                + this.toAmount(merge.shortage_sum_elt)
+                - this.toAmount(merge.expenses_sum_amount);
+        },
 
         resetFilters() {
             this.filterData = {
@@ -558,6 +565,11 @@ export default {
             return this.merges.some(merge =>
                 merge.shortage.some(s => parseFloat(s.shortage || 0) > 0)
             );
+        },
+        totalNetSale() {
+            return this.merges.reduce((sum, merge) => {
+                return sum + this.netSale(merge);
+            }, 0);
         }
     },
     watch: {

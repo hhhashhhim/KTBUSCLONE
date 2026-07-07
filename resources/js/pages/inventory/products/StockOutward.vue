@@ -153,7 +153,9 @@
               </div>
 
               <div class="modal-footer table-light bg-light border-top">
-                <button class="btn btn-primary" @click="submitIssuance">Submit Issuance</button>
+                <button class="btn btn-primary" @click="submitIssuance" :disabled="loading">
+                  {{ loading ? 'Submitting...' : 'Submit Issuance' }}
+                </button>
                 <button class="btn btn-secondary" data-dismiss="modal">Close</button>
               </div>
             </div>
@@ -246,13 +248,20 @@ export default {
   watch: {
     activeTab(newTab) {
       this.$nextTick(() => {
-        // Destroy any existing DataTable instance before re-initializing
-        $('.dataTable2').DataTable().destroy();
-        $('.dataTable2').DataTable();
+        this.initDataTables();
       });
     },
   },
   methods: {
+    initDataTables() {
+      $('.dataTable2').each(function () {
+        if ($.fn.dataTable.isDataTable(this)) {
+          $(this).DataTable().destroy();
+        }
+
+        $(this).DataTable();
+      });
+    },
     async fetchMRAndOutwards() {
       try {
         const response = await this.callApi('post', 'outward');
@@ -260,7 +269,7 @@ export default {
           this.outwards = response.data.outwards || []; // Store Issuance Notes
           this.mrs = response.data.mrs || [];           // Material Requests, if included
           this.$nextTick(() => {
-            $('.dataTable2').DataTable(); // Initial setup after data load
+            this.initDataTables(); // Initial setup after data load
           });
         } else {
           console.error("Error loading data:", response?.data?.message || 'Unknown error');
@@ -285,6 +294,12 @@ export default {
       this.selectedOutward = item; // Store selected item for modal display
     },
     async submitIssuance() {
+      if (this.loading) {
+        return;
+      }
+
+      this.loading = true;
+
       // Prepare payload
       const payload = {
         mr_id: this.selectedMR.id,
@@ -301,34 +316,50 @@ export default {
 
       };
       if (payload.details.length === 0) {
+        this.loading = false;
         alert("Please enter at least one valid issuance quantity.");
         return;
       }
-      const response = await this.callApi("post", "outward/store", payload);
-      console.log(response);
-      if (response.status === 200 || response.status === 201) {
-        $(".dataTable2").DataTable().destroy();
-        this.loading = false;
-        $('#viewMRModal').modal('hide');
-        this.fetchMRAndOutwards(); // refresh your data
-        this.viewMR(this.selectedMR);
 
-        return Swal.fire({
-          icon: 'success',
-          title: 'Issuaed',
-          text: 'Stock Issued successfully!',
-        });
-      }
-      if (response.status == 422) {
-        this.loading = false;
+      try {
+        const response = await this.callApi("post", "outward/store", payload);
+
+        if (response.status === 200 || response.status === 201) {
+          this.selectedMR = null;
+          $('#viewMRModal').modal('hide');
+
+          await Swal.fire({
+            icon: 'success',
+            title: 'Issued',
+            text: response.data?.message || 'Stock issued successfully!',
+          });
+
+          await this.fetchMRAndOutwards(); // refresh your data
+          return;
+        }
+
+        if (response.status == 422) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: response.data?.message || 'Please fill all fields',
+          });
+          return;
+        }
+
         Swal.fire({
           icon: 'error',
-          title: 'Validation Error',
-          text: 'Please fill all field',
+          title: 'Error',
+          text: response.data?.message || 'Something went wrong while issuing stock.',
         });
-      }
-      else {
-        Swal.fire('Error', err.response?.data, 'error');
+      } catch (err) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: err.response?.data?.message || err.message || 'Something went wrong while issuing stock.',
+        });
+      } finally {
+        this.loading = false;
       }
     },
     remainingQty(item) {

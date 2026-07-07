@@ -41806,6 +41806,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var vue_jquery_mask__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-jquery-mask */ "./node_modules/vue-jquery-mask/dist/vue-jquery-mask.min.js");
+/* harmony import */ var vue_jquery_mask__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_jquery_mask__WEBPACK_IMPORTED_MODULE_0__);
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return generator._invoke = function (innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; }(innerFn, self, context), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; this._invoke = function (method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (object) { var keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
@@ -41814,58 +41816,89 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "OnlineTerminalCancellationRequestsPage",
+  components: {
+    vueMask: (vue_jquery_mask__WEBPACK_IMPORTED_MODULE_0___default())
+  },
   data: function data() {
     return {
+      options: {
+        placeholder: "xxxxx-xxxxxxx-x"
+      },
+      optionsContact: {
+        placeholder: "03xx-xxxxxxx"
+      },
       permissions: [],
       requests: [],
+      routes: [],
+      terminals: [],
+      buses: [],
       loading: false,
+      requestSequence: 0,
       actionLoadingId: null,
       rejectLoading: false,
       selectedRequest: null,
       rejectionReason: '',
       filters: {
-        request_id: '',
-        invoice_id: '',
-        booking_reference: '',
-        status: ''
+        cnicFilter: '',
+        phoneFilter: '',
+        nameFilter: '',
+        invoiceFilter: '',
+        routeFilter: '',
+        terminalFilter: '',
+        busFilter: '',
+        statusFilter: '',
+        fromDateFilter: '',
+        toDateFilter: '',
+        transactionFilter: ''
       }
     };
   },
   created: function created() {
     this.permissions = this.$store.state.permissions;
+    this.fetchRoutes();
+    this.fetchTerminals();
+    this.fetchBus();
     this.fetchRequests();
   },
   methods: {
-    fetchRequests: function fetchRequests() {
+    defaultFilters: function defaultFilters() {
+      return {
+        cnicFilter: '',
+        phoneFilter: '',
+        nameFilter: '',
+        invoiceFilter: '',
+        routeFilter: '',
+        terminalFilter: '',
+        busFilter: '',
+        statusFilter: '',
+        fromDateFilter: '',
+        toDateFilter: '',
+        transactionFilter: ''
+      };
+    },
+    fetchRoutes: function fetchRoutes() {
       var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var res;
+        var resRoute;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _this.destroyDataTable();
+                _context.next = 2;
+                return _this.callApi("post", "online-terminals/cancellations/routes");
 
-                _this.loading = true;
-                _context.next = 4;
-                return _this.callApi('post', 'online-terminals/cancellations/requests', _this.filters);
+              case 2:
+                resRoute = _context.sent;
 
-              case 4:
-                res = _context.sent;
-
-                if (res.status === 200 && res.data.status === true) {
-                  _this.requests = res.data.data.requests;
+                if (resRoute.status === 200) {
+                  _this.routes = resRoute.data;
                 }
 
-                _this.loading = false;
-                setTimeout(function () {
-                  $("#online_terminal_cancellation_table").DataTable();
-                }, 300);
-
-              case 8:
+              case 4:
               case "end":
                 return _context.stop();
             }
@@ -41873,25 +41906,120 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee);
       }))();
     },
-    resetFilters: function resetFilters() {
-      this.filters = {
-        request_id: '',
-        invoice_id: '',
-        booking_reference: '',
-        status: ''
-      };
-      this.fetchRequests();
-    },
-    approveRequest: function approveRequest(request) {
+    fetchTerminals: function fetchTerminals() {
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var confirmed, res;
+        var resTerminal;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
+                return _this2.callApi("post", "online-terminals/cancellations/terminals");
+
+              case 2:
+                resTerminal = _context2.sent;
+
+                if (resTerminal.status === 200) {
+                  _this2.terminals = resTerminal.data;
+                }
+
+              case 4:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2);
+      }))();
+    },
+    fetchBus: function fetchBus() {
+      var _this3 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var resBuses;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return _this3.callApi("post", "online-terminals/cancellations/buses");
+
+              case 2:
+                resBuses = _context3.sent;
+
+                if (resBuses.status === 200) {
+                  _this3.buses = resBuses.data;
+                }
+
+              case 4:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }))();
+    },
+    fetchRequests: function fetchRequests() {
+      var _this4 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var sequence, res;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                sequence = ++_this4.requestSequence;
+
+                _this4.destroyDataTable();
+
+                _this4.loading = true;
+                _context4.next = 5;
+                return _this4.callApi('post', 'online-terminals/cancellations/requests', _this4.filters);
+
+              case 5:
+                res = _context4.sent;
+
+                if (!(sequence !== _this4.requestSequence)) {
+                  _context4.next = 8;
+                  break;
+                }
+
+                return _context4.abrupt("return");
+
+              case 8:
+                if (res.status === 200 && res.data.status === true) {
+                  _this4.requests = res.data.data.requests;
+                }
+
+                _this4.loading = false;
+
+                _this4.$nextTick(function () {
+                  _this4.initDataTable();
+                });
+
+              case 11:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      }))();
+    },
+    resetFilters: function resetFilters() {
+      this.filters = this.defaultFilters();
+      this.fetchRequests();
+    },
+    approveRequest: function approveRequest(request) {
+      var _this5 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var confirmed, res;
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                _context5.next = 2;
                 return swal({
                   title: "Approve cancellation?",
                   text: "This will cancel the requested seat(s).",
@@ -41901,40 +42029,40 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
 
               case 2:
-                confirmed = _context2.sent;
+                confirmed = _context5.sent;
 
                 if (confirmed) {
-                  _context2.next = 5;
+                  _context5.next = 5;
                   break;
                 }
 
-                return _context2.abrupt("return");
+                return _context5.abrupt("return");
 
               case 5:
-                _this2.actionLoadingId = request.id;
-                _context2.next = 8;
-                return _this2.callApi('post', 'online-terminals/cancellations/approve', {
+                _this5.actionLoadingId = request.id;
+                _context5.next = 8;
+                return _this5.callApi('post', 'online-terminals/cancellations/approve', {
                   id: request.id
                 });
 
               case 8:
-                res = _context2.sent;
-                _this2.actionLoadingId = null;
+                res = _context5.sent;
+                _this5.actionLoadingId = null;
 
-                if (res.status === 200 && _this2.isApiSuccess(res.data)) {
+                if (res.status === 200 && _this5.isApiSuccess(res.data)) {
                   swal("Approved", res.data.message, "success");
 
-                  _this2.fetchRequests();
+                  _this5.fetchRequests();
                 } else {
                   swal("Error", res.data.message || "Approval failed.", "error");
                 }
 
               case 11:
               case "end":
-                return _context2.stop();
+                return _context5.stop();
             }
           }
-        }, _callee2);
+        }, _callee5);
       }))();
     },
     openRejectModal: function openRejectModal(request) {
@@ -41943,54 +42071,90 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       $('#onlineTerminalRejectModal').modal('show');
     },
     rejectRequest: function rejectRequest() {
-      var _this3 = this;
+      var _this6 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var res;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                if (_this3.rejectionReason.trim()) {
-                  _context3.next = 3;
+                if (_this6.rejectionReason.trim()) {
+                  _context6.next = 3;
                   break;
                 }
 
                 swal("Error", "Rejection reason is required.", "error");
-                return _context3.abrupt("return");
+                return _context6.abrupt("return");
 
               case 3:
-                _this3.rejectLoading = true;
-                _context3.next = 6;
-                return _this3.callApi('post', 'online-terminals/cancellations/reject', {
-                  id: _this3.selectedRequest.id,
-                  rejection_reason: _this3.rejectionReason
+                _this6.rejectLoading = true;
+                _context6.next = 6;
+                return _this6.callApi('post', 'online-terminals/cancellations/reject', {
+                  id: _this6.selectedRequest.id,
+                  rejection_reason: _this6.rejectionReason
                 });
 
               case 6:
-                res = _context3.sent;
-                _this3.rejectLoading = false;
+                res = _context6.sent;
+                _this6.rejectLoading = false;
 
-                if (res.status === 200 && _this3.isApiSuccess(res.data)) {
+                if (res.status === 200 && _this6.isApiSuccess(res.data)) {
                   $('#onlineTerminalRejectModal').modal('hide');
                   swal("Rejected", res.data.message, "success");
 
-                  _this3.fetchRequests();
+                  _this6.fetchRequests();
                 } else {
                   swal("Error", res.data.message || "Rejection failed.", "error");
                 }
 
               case 9:
               case "end":
-                return _context3.stop();
+                return _context6.stop();
             }
           }
-        }, _callee3);
+        }, _callee6);
       }))();
     },
     destroyDataTable: function destroyDataTable() {
-      if ($.fn.DataTable.isDataTable("#online_terminal_cancellation_table")) {
-        $("#online_terminal_cancellation_table").DataTable().destroy();
+      var table = document.getElementById('online_terminal_cancellation_table');
+
+      if (!table || !window.$ || !$.fn.DataTable) {
+        return;
+      }
+
+      if (!table.parentNode) {
+        this.clearDataTableSettings(table);
+        return;
+      }
+
+      if ($.fn.DataTable.isDataTable(table)) {
+        try {
+          $(table).DataTable().destroy(false);
+        } catch (error) {
+          this.clearDataTableSettings(table);
+          $(table).removeClass('dataTable no-footer');
+        }
+      }
+    },
+    initDataTable: function initDataTable() {
+      var table = document.getElementById('online_terminal_cancellation_table');
+
+      if (table && table.parentNode && $.fn.DataTable && !$.fn.DataTable.isDataTable(table)) {
+        $(table).DataTable({
+          language: {
+            emptyTable: 'No online terminal cancellation requests found.'
+          }
+        });
+      }
+    },
+    clearDataTableSettings: function clearDataTableSettings(table) {
+      var settings = $.fn.dataTableSettings || [];
+
+      for (var i = settings.length - 1; i >= 0; i--) {
+        if (settings[i].nTable === table || settings[i].sTableId === table.id) {
+          settings.splice(i, 1);
+        }
       }
     },
     isApiSuccess: function isApiSuccess(data) {
@@ -58572,16 +58736,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   watch: {
     activeTab: function activeTab(newTab) {
+      var _this = this;
+
       this.$nextTick(function () {
-        // Destroy any existing DataTable instance before re-initializing
-        $('.dataTable2').DataTable().destroy();
-        $('.dataTable2').DataTable();
+        _this.initDataTables();
       });
     }
   },
   methods: {
+    initDataTables: function initDataTables() {
+      $('.dataTable2').each(function () {
+        if ($.fn.dataTable.isDataTable(this)) {
+          $(this).DataTable().destroy();
+        }
+
+        $(this).DataTable();
+      });
+    },
     fetchMRAndOutwards: function fetchMRAndOutwards() {
-      var _this = this;
+      var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         var response, _response$data;
@@ -58592,18 +58765,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 0:
                 _context.prev = 0;
                 _context.next = 3;
-                return _this.callApi('post', 'outward');
+                return _this2.callApi('post', 'outward');
 
               case 3:
                 response = _context.sent;
 
                 if (response.data.success) {
-                  _this.outwards = response.data.outwards || []; // Store Issuance Notes
+                  _this2.outwards = response.data.outwards || []; // Store Issuance Notes
 
-                  _this.mrs = response.data.mrs || []; // Material Requests, if included
+                  _this2.mrs = response.data.mrs || []; // Material Requests, if included
 
-                  _this.$nextTick(function () {
-                    $('.dataTable2').DataTable(); // Initial setup after data load
+                  _this2.$nextTick(function () {
+                    _this2.initDataTables(); // Initial setup after data load
+
                   });
                 } else {
                   console.error("Error loading data:", (response === null || response === void 0 ? void 0 : (_response$data = response.data) === null || _response$data === void 0 ? void 0 : _response$data.message) || 'Unknown error');
@@ -58640,23 +58814,32 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.selectedOutward = item; // Store selected item for modal display
     },
     submitIssuance: function submitIssuance() {
-      var _this2 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var _this2$selectedMR$req;
+        var _this3$selectedMR$req;
 
-        var payload, response, _err$response;
+        var payload, _response$data4, response, _response$data2, _response$data3, _err$response, _err$response$data;
 
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                // Prepare payload
+                if (!_this3.loading) {
+                  _context2.next = 2;
+                  break;
+                }
+
+                return _context2.abrupt("return");
+
+              case 2:
+                _this3.loading = true; // Prepare payload
+
                 payload = {
-                  mr_id: _this2.selectedMR.id,
-                  requested_by: ((_this2$selectedMR$req = _this2.selectedMR.requested_by_user) === null || _this2$selectedMR$req === void 0 ? void 0 : _this2$selectedMR$req.name) || 'Unknown',
+                  mr_id: _this3.selectedMR.id,
+                  requested_by: ((_this3$selectedMR$req = _this3.selectedMR.requested_by_user) === null || _this3$selectedMR$req === void 0 ? void 0 : _this3$selectedMR$req.name) || 'Unknown',
                   // adjust if needed
-                  details: _this2.selectedMR.details.filter(function (item) {
+                  details: _this3.selectedMR.details.filter(function (item) {
                     return item.prnQty > 0;
                   }).map(function (item) {
                     var _item$product, _item$bus, _item$prnQty, _item$product2, _item$product3;
@@ -58672,59 +58855,85 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 };
 
                 if (!(payload.details.length === 0)) {
-                  _context2.next = 4;
+                  _context2.next = 8;
                   break;
                 }
 
+                _this3.loading = false;
                 alert("Please enter at least one valid issuance quantity.");
                 return _context2.abrupt("return");
 
-              case 4:
-                _context2.next = 6;
-                return _this2.callApi("post", "outward/store", payload);
+              case 8:
+                _context2.prev = 8;
+                _context2.next = 11;
+                return _this3.callApi("post", "outward/store", payload);
 
-              case 6:
+              case 11:
                 response = _context2.sent;
-                console.log(response);
 
                 if (!(response.status === 200 || response.status === 201)) {
-                  _context2.next = 15;
+                  _context2.next = 20;
                   break;
                 }
 
-                $(".dataTable2").DataTable().destroy();
-                _this2.loading = false;
+                _this3.selectedMR = null;
                 $('#viewMRModal').modal('hide');
-
-                _this2.fetchMRAndOutwards(); // refresh your data
-
-
-                _this2.viewMR(_this2.selectedMR);
-
-                return _context2.abrupt("return", Swal.fire({
+                _context2.next = 17;
+                return Swal.fire({
                   icon: 'success',
-                  title: 'Issuaed',
-                  text: 'Stock Issued successfully!'
-                }));
+                  title: 'Issued',
+                  text: ((_response$data2 = response.data) === null || _response$data2 === void 0 ? void 0 : _response$data2.message) || 'Stock issued successfully!'
+                });
 
-              case 15:
-                if (response.status == 422) {
-                  _this2.loading = false;
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    text: 'Please fill all field'
-                  });
-                } else {
-                  Swal.fire('Error', (_err$response = err.response) === null || _err$response === void 0 ? void 0 : _err$response.data, 'error');
+              case 17:
+                _context2.next = 19;
+                return _this3.fetchMRAndOutwards();
+
+              case 19:
+                return _context2.abrupt("return");
+
+              case 20:
+                if (!(response.status == 422)) {
+                  _context2.next = 23;
+                  break;
                 }
 
-              case 16:
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Validation Error',
+                  text: ((_response$data3 = response.data) === null || _response$data3 === void 0 ? void 0 : _response$data3.message) || 'Please fill all fields'
+                });
+                return _context2.abrupt("return");
+
+              case 23:
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: ((_response$data4 = response.data) === null || _response$data4 === void 0 ? void 0 : _response$data4.message) || 'Something went wrong while issuing stock.'
+                });
+                _context2.next = 29;
+                break;
+
+              case 26:
+                _context2.prev = 26;
+                _context2.t0 = _context2["catch"](8);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: ((_err$response = _context2.t0.response) === null || _err$response === void 0 ? void 0 : (_err$response$data = _err$response.data) === null || _err$response$data === void 0 ? void 0 : _err$response$data.message) || _context2.t0.message || 'Something went wrong while issuing stock.'
+                });
+
+              case 29:
+                _context2.prev = 29;
+                _this3.loading = false;
+                return _context2.finish(29);
+
+              case 32:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2);
+        }, _callee2, null, [[8, 26, 29, 32]]);
       }))();
     },
     remainingQty: function remainingQty(item) {
@@ -69905,6 +70114,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee5, null, [[0, 8, 11, 14]]);
       }))();
     },
+    toAmount: function toAmount(value) {
+      return parseFloat(value) || 0;
+    },
+    netSale: function netSale(merge) {
+      return this.toAmount(merge.shortage_sum_total_receivable) + this.toAmount(merge.shortage_sum_elt) - this.toAmount(merge.expenses_sum_amount);
+    },
     resetFilters: function resetFilters() {
       this.filterData = {
         bus_number: '',
@@ -69997,6 +70212,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           return parseFloat(s.shortage || 0) > 0;
         });
       });
+    },
+    totalNetSale: function totalNetSale() {
+      var _this7 = this;
+
+      return this.merges.reduce(function (sum, merge) {
+        return sum + _this7.netSale(merge);
+      }, 0);
     }
   }),
   watch: {
@@ -70015,7 +70237,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   mounted: function mounted() {
-    var _this7 = this;
+    var _this8 = this;
 
     return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
       return _regeneratorRuntime().wrap(function _callee7$(_context7) {
@@ -70023,15 +70245,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           switch (_context7.prev = _context7.next) {
             case 0:
               _context7.next = 2;
-              return _this7.fetchBuses();
+              return _this8.fetchBuses();
 
             case 2:
               _context7.next = 4;
-              return _this7.fetchRoute();
+              return _this8.fetchRoute();
 
             case 4:
               _context7.next = 6;
-              return _this7.fetchSchedule();
+              return _this8.fetchSchedule();
 
             case 6:
             case "end":
@@ -71236,7 +71458,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         bus_number: "",
         from_date: "",
         to_date: "",
-        dropdownRoute: ""
+        dropdownRoute: []
       },
       dropdownRoute: [],
       closings: [],
@@ -71493,7 +71715,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         bus_number: "",
         from_date: "",
         to_date: "",
-        dropdownRoute: ""
+        dropdownRoute: []
       };
       this.fetchData();
     },
@@ -71931,6 +72153,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       logs: [],
       loading: false,
       tableLoading: false,
+      filters: {
+        activity_by: '',
+        message: '',
+        requested_host: '',
+        from_date: '',
+        to_date: ''
+      },
       data: {
         start_from: 0
       },
@@ -71983,7 +72212,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 0:
                 _this2.tableLoading = true;
                 _context2.next = 3;
-                return _this2.callApi("post", 'settings/activity/logs');
+                return _this2.callApi("post", 'settings/activity/logs', _this2.filters);
 
               case 3:
                 resLogs = _context2.sent;
@@ -72008,6 +72237,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }
         }, _callee2);
       }))();
+    },
+    resetFilters: function resetFilters() {
+      this.filters = {
+        activity_by: '',
+        message: '',
+        requested_host: '',
+        from_date: '',
+        to_date: ''
+      };
+      this.fetchLogs();
     }
   }
 });
@@ -100059,103 +100298,243 @@ var _hoisted_7 = {
   "class": "card-body"
 };
 var _hoisted_8 = {
-  "class": "row align-items-end mb-3"
+  "class": "row"
 };
 var _hoisted_9 = {
-  "class": "col-md-3 mb-2"
+  "class": "col-md-3"
+};
+var _hoisted_10 = {
+  "class": "form-group"
 };
 
-var _hoisted_10 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Request ID", -1
+var _hoisted_11 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "cnicFilter"
+  }, "CNIC", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_11 = {
-  "class": "col-md-2 mb-2"
+var _hoisted_12 = {
+  "class": "col-md-3"
 };
-
-var _hoisted_12 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Invoice ID", -1
-  /* HOISTED */
-  );
-});
-
 var _hoisted_13 = {
-  "class": "col-md-3 mb-2"
+  "class": "form-group"
 };
 
 var _hoisted_14 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Booking Reference", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "phoneFilter"
+  }, "Cell #", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_15 = {
-  "class": "col-md-2 mb-2"
+  "class": "col-md-3"
+};
+var _hoisted_16 = {
+  "class": "form-group"
 };
 
-var _hoisted_16 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Status", -1
+var _hoisted_17 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "nameFilter"
+  }, "Name", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"\" data-v-1614d8e4>All</option><option value=\"pending\" data-v-1614d8e4>Pending</option><option value=\"cancelled\" data-v-1614d8e4>Cancelled</option><option value=\"rejected\" data-v-1614d8e4>Rejected</option><option value=\"failed\" data-v-1614d8e4>Failed</option><option value=\"unauthorized\" data-v-1614d8e4>Unauthorized</option>", 6);
-
-var _hoisted_23 = [_hoisted_17];
-var _hoisted_24 = {
-  "class": "col-md-2 mb-2"
+var _hoisted_18 = {
+  "class": "col-md-3"
 };
-var _hoisted_25 = {
+var _hoisted_19 = {
+  "class": "form-group"
+};
+
+var _hoisted_20 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "invoiceFilter"
+  }, "Invoice", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_21 = {
+  "class": "row"
+};
+var _hoisted_22 = {
+  "class": "col-md-4"
+};
+var _hoisted_23 = {
+  "class": "form-group"
+};
+
+var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "routeFilter"
+  }, "Route", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_25 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: ""
+  }, "---Select Route---", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_26 = ["value"];
+var _hoisted_27 = {
+  "class": "col-md-4"
+};
+var _hoisted_28 = {
+  "class": "form-group"
+};
+
+var _hoisted_29 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "terminalFilter"
+  }, "Terminals", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_30 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: ""
+  }, "---Select Terminal---", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_31 = ["value"];
+var _hoisted_32 = {
+  "class": "col-md-4"
+};
+var _hoisted_33 = {
+  "class": "form-group"
+};
+
+var _hoisted_34 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "busFilter"
+  }, "Bus #", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_35 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: ""
+  }, "---Select Bus #---", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_36 = ["value"];
+var _hoisted_37 = {
+  "class": "row"
+};
+var _hoisted_38 = {
+  "class": "col-md-4"
+};
+var _hoisted_39 = {
+  "class": "form-group"
+};
+
+var _hoisted_40 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "statusFilter"
+  }, "Status", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_41 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"\" data-v-1614d8e4>---Select Status---</option><option value=\"pending\" data-v-1614d8e4>Pending</option><option value=\"cancelled\" data-v-1614d8e4>Cancelled</option><option value=\"rejected\" data-v-1614d8e4>Rejected</option><option value=\"failed\" data-v-1614d8e4>Failed</option><option value=\"unauthorized\" data-v-1614d8e4>Unauthorized</option>", 6);
+
+var _hoisted_47 = [_hoisted_41];
+var _hoisted_48 = {
+  "class": "col-md-4"
+};
+var _hoisted_49 = {
+  "class": "form-group"
+};
+
+var _hoisted_50 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "fromDateFilter"
+  }, "Departure Date From", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_51 = {
+  "class": "col-md-4"
+};
+var _hoisted_52 = {
+  "class": "form-group"
+};
+
+var _hoisted_53 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "toDateFilter"
+  }, "Departure Date To", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_54 = {
+  "class": "col-md-3"
+};
+var _hoisted_55 = {
+  "class": "form-group"
+};
+
+var _hoisted_56 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "transactionFilter"
+  }, "Transaction #", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_57 = {
   "class": "table-responsive"
 };
-var _hoisted_26 = {
+var _hoisted_58 = {
   key: 0,
   "class": "text-center py-4"
 };
-var _hoisted_27 = ["src"];
-var _hoisted_28 = {
-  key: 1,
+var _hoisted_59 = ["src"];
+var _hoisted_60 = {
   "class": "table table-bordered table-striped text-center",
   id: "online_terminal_cancellation_table"
 };
 
-var _hoisted_29 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_61 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Invoice"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Booking Reference"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Route"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Seats"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Reason"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Passenger Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "CNIC"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Contact"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fare"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Booking Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Request Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Time Difference"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Source"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Decision By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cancelled At"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Actions")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_30 = {
-  key: 0
-};
-
-var _hoisted_31 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
-    colspan: "19",
-    "class": "text-muted py-4"
-  }, "No online terminal cancellation requests found.", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_32 = [_hoisted_31];
-var _hoisted_33 = {
+var _hoisted_62 = {
   key: 0,
   "class": "small text-muted"
 };
-var _hoisted_34 = {
+var _hoisted_63 = {
   key: 0,
   "class": "btn-group"
 };
-var _hoisted_35 = ["disabled", "onClick"];
-var _hoisted_36 = ["disabled", "onClick"];
-var _hoisted_37 = {
+var _hoisted_64 = ["disabled", "onClick"];
+var _hoisted_65 = ["disabled", "onClick"];
+var _hoisted_66 = {
   key: 1,
   "class": "text-muted"
 };
-var _hoisted_38 = {
+var _hoisted_67 = {
   "class": "modal fade",
   id: "onlineTerminalRejectModal",
   tabindex: "-1",
@@ -100163,15 +100542,15 @@ var _hoisted_38 = {
   "aria-labelledby": "onlineTerminalRejectModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_39 = {
+var _hoisted_68 = {
   "class": "modal-dialog",
   role: "document"
 };
-var _hoisted_40 = {
+var _hoisted_69 = {
   "class": "modal-content"
 };
 
-var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_70 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "modal-header"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
@@ -100189,21 +100568,21 @@ var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_42 = {
+var _hoisted_71 = {
   "class": "modal-body"
 };
 
-var _hoisted_43 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_72 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Rejection Reason", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_44 = {
+var _hoisted_73 = {
   "class": "modal-footer"
 };
 
-var _hoisted_45 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_74 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-secondary",
@@ -100213,55 +100592,179 @@ var _hoisted_45 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_46 = ["disabled"];
+var _hoisted_75 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [_hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    type: "text",
+  var _component_vue_mask = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("vue-mask");
+
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [_hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
+    id: "cnicFilter",
     "class": "form-control",
+    modelValue: $data.filters.cnicFilter,
     "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
-      return $data.filters.request_id = $event;
-    })
-  }, null, 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.request_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [_hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    type: "text",
+      return $data.filters.cnicFilter = $event;
+    }),
+    mask: "00000-0000000-0",
+    onKeyup: _cache[1] || (_cache[1] = function ($event) {
+      return $options.fetchRequests();
+    }),
+    raw: false,
+    options: $data.options
+  }, null, 8
+  /* PROPS */
+  , ["modelValue", "options"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
+    id: "phoneFilter",
     "class": "form-control",
-    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
-      return $data.filters.invoice_id = $event;
-    })
-  }, null, 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.invoice_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    type: "text",
-    "class": "form-control",
+    modelValue: $data.filters.phoneFilter,
     "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
-      return $data.filters.booking_reference = $event;
-    })
-  }, null, 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.booking_reference]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [_hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      return $data.filters.phoneFilter = $event;
+    }),
+    mask: "0000-0000000",
+    raw: false,
+    onKeyup: _cache[3] || (_cache[3] = function ($event) {
+      return $options.fetchRequests();
+    }),
+    options: $data.optionsContact
+  }, null, 8
+  /* PROPS */
+  , ["modelValue", "options"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    id: "nameFilter",
+    type: "text",
     "class": "form-control",
-    "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
-      return $data.filters.status = $event;
-    })
-  }, _hoisted_23, 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.status]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    "class": "btn btn-primary mr-2",
-    onClick: _cache[4] || (_cache[4] = function ($event) {
+    "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
+      return $data.filters.nameFilter = $event;
+    }),
+    onKeyup: _cache[5] || (_cache[5] = function ($event) {
       return $options.fetchRequests();
     })
-  }, "Search"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    "class": "btn btn-secondary",
-    onClick: _cache[5] || (_cache[5] = function ($event) {
-      return $options.resetFilters();
+  }, null, 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.nameFilter]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [_hoisted_20, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    id: "invoiceFilter",
+    type: "text",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+      return $data.filters.invoiceFilter = $event;
+    }),
+    onKeyup: _cache[7] || (_cache[7] = function ($event) {
+      return $options.fetchRequests();
     })
-  }, "Reset")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [$data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+  }, null, 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.invoiceFilter]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [_hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    id: "routeFilter",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
+      return $data.filters.routeFilter = $event;
+    }),
+    onChange: _cache[9] || (_cache[9] = function ($event) {
+      return $options.fetchRequests();
+    })
+  }, [_hoisted_25, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.routes, function (route, i) {
+    var _route$via;
+
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      key: i,
+      value: route.id
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(route.name) + " (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_route$via = route.via) !== null && _route$via !== void 0 ? _route$via : 'n/a') + ") ", 9
+    /* TEXT, PROPS */
+    , _hoisted_26);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))], 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.routeFilter]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [_hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    id: "terminalFilter",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+      return $data.filters.terminalFilter = $event;
+    }),
+    onChange: _cache[11] || (_cache[11] = function ($event) {
+      return $options.fetchRequests();
+    })
+  }, [_hoisted_30, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.terminals, function (terminal, i) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      key: i,
+      value: terminal.id
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(terminal.name), 9
+    /* TEXT, PROPS */
+    , _hoisted_31);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))], 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.terminalFilter]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [_hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    id: "busFilter",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
+      return $data.filters.busFilter = $event;
+    }),
+    onChange: _cache[13] || (_cache[13] = function ($event) {
+      return $options.fetchRequests();
+    })
+  }, [_hoisted_35, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.buses, function (bus, i) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      key: i,
+      value: bus.id
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.bus_number), 9
+    /* TEXT, PROPS */
+    , _hoisted_36);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))], 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.busFilter]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [_hoisted_40, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    id: "statusFilter",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
+      return $data.filters.statusFilter = $event;
+    }),
+    onChange: _cache[15] || (_cache[15] = function ($event) {
+      return $options.fetchRequests();
+    })
+  }, _hoisted_47, 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.statusFilter]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [_hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "date",
+    "class": "form-control",
+    id: "fromDateFilter",
+    "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
+      return $data.filters.fromDateFilter = $event;
+    }),
+    onChange: _cache[17] || (_cache[17] = function ($event) {
+      return $options.fetchRequests();
+    })
+  }, null, 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.fromDateFilter]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [_hoisted_53, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "date",
+    "class": "form-control",
+    id: "toDateFilter",
+    "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
+      return $data.filters.toDateFilter = $event;
+    }),
+    onChange: _cache[19] || (_cache[19] = function ($event) {
+      return $options.fetchRequests();
+    })
+  }, null, 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.toDateFilter]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_55, [_hoisted_56, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    id: "transactionFilter",
+    type: "text",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
+      return $data.filters.transactionFilter = $event;
+    }),
+    onKeyup: _cache[21] || (_cache[21] = function ($event) {
+      return $options.fetchRequests();
+    })
+  }, null, 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.transactionFilter]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_57, [$data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
     "class": "loading-spinner",
     src: _ctx.$store.state.main_url + 'assets/img/loading-spinner.gif'
   }, null, 8
   /* PROPS */
-  , _hoisted_27)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("table", _hoisted_28, [_hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [$data.requests.length === 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_30, _hoisted_32)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.requests, function (request) {
+  , _hoisted_59)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_60, [_hoisted_61, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.requests, function (request) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: request.id
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.invoice_id), 1
@@ -100298,13 +100801,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.statusClass(request.status))
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusLabel(request.status)), 3
     /* TEXT, CLASS */
-    ), request.cancellation_status ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_33, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusLabel(request.cancellation_status)), 1
+    ), request.cancellation_status ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusLabel(request.cancellation_status)), 1
     /* TEXT */
     )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.decision_by || 'N/A'), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.cancelled_at || 'N/A'), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [request.status === 'pending' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_34, [$options.canUseButton('approve-request') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [request.status === 'pending' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_63, [$options.canUseButton('approve-request') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 0,
       "class": "btn btn-success btn-sm",
       disabled: $data.actionLoadingId === request.id,
@@ -100313,7 +100816,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }
     }, " Approve ", 8
     /* PROPS */
-    , _hoisted_35)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canUseButton('reject-request') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    , _hoisted_64)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canUseButton('reject-request') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 1,
       "class": "btn btn-danger btn-sm",
       disabled: $data.actionLoadingId === request.id,
@@ -100322,28 +100825,30 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }
     }, " Reject ", 8
     /* PROPS */
-    , _hoisted_36)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_37, "No action"))])]);
+    , _hoisted_65)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_66, "No action"))])]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])]))])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [_hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+  ))])], 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, !$data.loading]])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_69, [_hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [_hoisted_72, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
     "class": "form-control",
     rows: "4",
-    "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+    "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
       return $data.rejectionReason = $event;
     }),
     placeholder: "Enter rejection reason"
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.rejectionReason]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [_hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.rejectionReason]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [_hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-danger",
-    onClick: _cache[7] || (_cache[7] = function ($event) {
+    onClick: _cache[23] || (_cache[23] = function ($event) {
       return $options.rejectRequest();
     }),
     disabled: $data.rejectLoading
   }, " Reject Request ", 8
   /* PROPS */
-  , _hoisted_46)])])])])])]);
+  , _hoisted_75)])])])])])]);
 }
 
 /***/ }),
@@ -121634,33 +122139,34 @@ var _hoisted_49 = {
 var _hoisted_50 = {
   "class": "modal-footer table-light bg-light border-top"
 };
+var _hoisted_51 = ["disabled"];
 
-var _hoisted_51 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+var _hoisted_52 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
   "class": "btn btn-secondary",
   "data-dismiss": "modal"
 }, "Close", -1
 /* HOISTED */
 );
 
-var _hoisted_52 = {
+var _hoisted_53 = {
   "class": "modal fade",
   id: "viewOutwardModal",
   tabindex: "-1"
 };
-var _hoisted_53 = {
+var _hoisted_54 = {
   "class": "modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
 };
-var _hoisted_54 = {
+var _hoisted_55 = {
   "class": "modal-content"
 };
-var _hoisted_55 = {
+var _hoisted_56 = {
   "class": "modal-header"
 };
-var _hoisted_56 = {
+var _hoisted_57 = {
   "class": "modal-title"
 };
 
-var _hoisted_57 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+var _hoisted_58 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
   type: "button",
   "class": "close",
   "data-dismiss": "modal"
@@ -121668,30 +122174,30 @@ var _hoisted_57 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_58 = {
+var _hoisted_59 = {
   key: 0,
   "class": "modal-body"
 };
 
-var _hoisted_59 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Requested By:", -1
+var _hoisted_60 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Requested By:", -1
 /* HOISTED */
 );
 
-var _hoisted_60 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Date:", -1
+var _hoisted_61 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Date:", -1
 /* HOISTED */
 );
 
-var _hoisted_61 = {
+var _hoisted_62 = {
   "class": "table table-bordered dataTable"
 };
 
-var _hoisted_62 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", {
+var _hoisted_63 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", {
   "class": "table-light bg-light border-top"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "#"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Number"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Product"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Qty")])], -1
 /* HOISTED */
 );
 
-var _hoisted_63 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_64 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "modal-footer table-light bg-light border-top"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
   "class": "btn btn-secondary",
@@ -121700,10 +122206,10 @@ var _hoisted_63 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_64 = ["action"];
-var _hoisted_65 = ["value"];
+var _hoisted_65 = ["action"];
+var _hoisted_66 = ["value"];
 
-var _hoisted_66 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+var _hoisted_67 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
   type: "hidden",
   name: "outward_id"
 }, null, -1
@@ -121837,14 +122343,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "btn btn-primary",
     onClick: _cache[2] || (_cache[2] = function () {
       return $options.submitIssuance && $options.submitIssuance.apply($options, arguments);
-    })
-  }, "Submit Issuance"), _hoisted_51])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Outward Details Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", _hoisted_56, "Outward Details - Invoice-" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$data$selectedOutwar = $data.selectedOutward) === null || _$data$selectedOutwar === void 0 ? void 0 : _$data$selectedOutwar.id), 1
+    }),
+    disabled: $data.loading
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Submitting...' : 'Submit Issuance'), 9
+  /* TEXT, PROPS */
+  , _hoisted_51), _hoisted_52])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Outward Details Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", _hoisted_57, "Outward Details - Invoice-" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_$data$selectedOutwar = $data.selectedOutward) === null || _$data$selectedOutwar === void 0 ? void 0 : _$data$selectedOutwar.id), 1
   /* TEXT */
-  ), _hoisted_57]), $data.selectedOutward ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [_hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.selectedOutward.requested_by), 1
+  ), _hoisted_58]), $data.selectedOutward ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_59, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.selectedOutward.requested_by), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(new Date($data.selectedOutward.created_at).toLocaleString()), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [_hoisted_61, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(new Date($data.selectedOutward.created_at).toLocaleString()), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_61, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedOutward.details, function (detail, index) {
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_62, [_hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedOutward.details, function (detail, index) {
     var _detail$bus$bus_numbe, _detail$bus, _detail$product;
 
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
@@ -121860,7 +122369,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     )]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_63])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_AddProductModal)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+  ))])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_64])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_AddProductModal)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     ref: "printOutwardPdfForm",
     action: "".concat(_ctx.$store.state.api_url, "api/web/v1/sin/pdf"),
     method: "POST",
@@ -121871,9 +122380,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: _ctx.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_65), _hoisted_66], 8
+  , _hoisted_66), _hoisted_67], 8
   /* PROPS */
-  , _hoisted_64)]);
+  , _hoisted_65)]);
 }
 
 /***/ }),
@@ -138657,7 +139166,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(parseInt(merge.expenses_sum_amount || 0)), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_75, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma(merge.shortage_sum_total_receivable - merge.expenses_sum_amount || 0)), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_75, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.netSale(merge))), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({
@@ -138728,7 +139237,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("b", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($data.totalExpense)), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("b", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($data.totalSale - $data.totalExpense)), 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("b", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.totalNetSale)), 1
   /* TEXT */
   )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Shortage status dot "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td>\n    <span\n      :class=\"{\n        'dot-green': !hasShortage,\n        'dot-red': hasShortage\n      }\"\n    ></span>\n  </td> ")])])])]))])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" closing date "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_82, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_83, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_84, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_85, [_hoisted_86, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
@@ -140617,6 +141126,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     options: $options.routeOptions,
     settings: {
+      multiple: true,
       width: '100%',
       placeholder: 'Select Route',
       allowClear: true
@@ -141037,26 +141547,50 @@ var _hoisted_7 = {
   "class": "card-body"
 };
 var _hoisted_8 = {
-  "class": "row"
+  "class": "row px-2 mb-4 align-items-end"
 };
 var _hoisted_9 = {
+  "class": "col-md-4"
+};
+
+var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Activity By", -1
+/* HOISTED */
+);
+
+var _hoisted_11 = {
+  "class": "col-md-4"
+};
+
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Message", -1
+/* HOISTED */
+);
+
+var _hoisted_13 = {
+  "class": "col-md-4 mt-3 d-flex justify-content-end"
+};
+var _hoisted_14 = ["disabled"];
+var _hoisted_15 = ["disabled"];
+var _hoisted_16 = {
+  "class": "row"
+};
+var _hoisted_17 = {
   "class": "col-12"
 };
-var _hoisted_10 = {
+var _hoisted_18 = {
   "class": "card"
 };
-var _hoisted_11 = {
+var _hoisted_19 = {
   "class": "card-body"
 };
-var _hoisted_12 = {
+var _hoisted_20 = {
   "class": "table-responsive"
 };
-var _hoisted_13 = {
+var _hoisted_21 = {
   "class": "table dataTables table-striped table-hover",
   id: "ticket_templates"
 };
 
-var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
   style: {
     "min-width": "200px"
   }
@@ -141064,17 +141598,21 @@ var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
   style: {
     "min-width": "200px"
   }
-}, "Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Message")])], -1
+}, "Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  style: {
+    "min-width": "140px"
+  }
+}, "Host/IP"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Message")])], -1
 /* HOISTED */
 );
 
-var _hoisted_15 = {
+var _hoisted_23 = {
   key: 0
 };
 
-var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
   "class": "text-center",
-  colspan: "3"
+  colspan: "4"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
   "class": "loading-spinner",
   src: "http://www.digitisingascent.com/cpadmin/assets/admin/layout/img/loading-spinner-blue.gif"
@@ -141082,21 +141620,62 @@ var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_17 = [_hoisted_16];
+var _hoisted_25 = [_hoisted_24];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.logs, function (log, i) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+    onSubmit: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.fetchLogs && $options.fetchLogs.apply($options, arguments);
+    }, ["prevent"]))
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [_hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
+      return $data.filters.activity_by = $event;
+    }),
+    placeholder: "Name or email"
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.activity_by]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [_hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+      return $data.filters.message = $event;
+    }),
+    placeholder: "Search message"
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.message]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"col-md-2\">\n                                        <label>Host/IP</label>\n                                        <input type=\"text\" class=\"form-control\" v-model=\"filters.requested_host\"\n                                            placeholder=\"Host/IP\">\n                                    </div>\n                                    <div class=\"col-md-2\">\n                                        <label>From Date</label>\n                                        <input type=\"date\" class=\"form-control\" v-model=\"filters.from_date\">\n                                    </div>\n                                    <div class=\"col-md-2\">\n                                        <label>To Date</label>\n                                        <input type=\"date\" class=\"form-control\" v-model=\"filters.to_date\">\n                                    </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "submit",
+    "class": "w-100 btn btn-primary mr-2",
+    disabled: $data.tableLoading
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.tableLoading ? 'Loading...' : 'Search'), 9
+  /* TEXT, PROPS */
+  , _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "w-100 btn btn-secondary",
+    onClick: _cache[2] || (_cache[2] = function () {
+      return $options.resetFilters && $options.resetFilters.apply($options, arguments);
+    }),
+    disabled: $data.tableLoading
+  }, " Reset ", 8
+  /* PROPS */
+  , _hoisted_15)])])], 32
+  /* HYDRATE_EVENTS */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_21, [_hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.logs, function (log, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: i
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(log.activity ? log.activity.email : 'N/A'), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(log.formatted_created_at), 1
     /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(log.requested_host || 'N/A'), 1
+    /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(log.message), 1
     /* TEXT */
     )]);
   }), 128
   /* KEYED_FRAGMENT */
-  )), $data.tableLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_15, _hoisted_17)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])])])]);
+  )), $data.tableLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_23, _hoisted_25)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])])])]);
 }
 
 /***/ }),
