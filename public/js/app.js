@@ -75739,7 +75739,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.data.password = "";
       this.data.role = 0;
       this.data.departure = 0;
-      this.data.routes = 0;
+      this.data.routes = [];
       this.data.destination = 0;
       this.data.allow_assign_bus = 0;
       this.roleName = '';
@@ -75837,17 +75837,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _context3.next = 13;
-                return _this6.callApi("post", "booking/close/schedule/merges/route", {
-                  id: _this6.data.company_id
-                });
+                return _this6.callApi("post", "user/routes");
 
               case 13:
                 routeRes = _context3.sent;
 
                 if (routeRes.status == 200) {
-                  _this6.routes = routeRes.data.routes;
+                  _this6.routes = Array.isArray(routeRes.data) ? routeRes.data : routeRes.data.routes || [];
                 } else {
-                  console.log(roleRes);
+                  console.log(routeRes);
                 }
 
                 _context3.next = 17;
@@ -76246,6 +76244,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 if (resEditUser.status == 200) {
                   _this10.dataEdit = resEditUser.data;
+                  _this10.dataEdit.routes = resEditUser.data.route_ids || [];
                   _this10.userPass = resEditUser.data.userpass ? resEditUser.data.userpass.user_password : 'N/A';
                   setTimeout(function () {
                     $("#editDeparture").select2({
@@ -76344,8 +76343,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 10:
+                _this11.dataEdit.routes = _this11.dataEdit.routes || _this11.dataEdit.route_ids || [];
+
                 if (!(!_this11.dataEdit.routes || _this11.dataEdit.routes.length === 0)) {
-                  _context8.next = 12;
+                  _context8.next = 13;
                   break;
                 }
 
@@ -76356,9 +76357,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 12:
+              case 13:
                 if (!(_this11.dataEdit.terminal_id == "0")) {
-                  _context8.next = 14;
+                  _context8.next = 15;
                   break;
                 }
 
@@ -76369,9 +76370,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 14:
+              case 15:
                 if (!(_this11.dataEdit.role_id == "0")) {
-                  _context8.next = 16;
+                  _context8.next = 17;
                   break;
                 }
 
@@ -76382,16 +76383,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 16:
+              case 17:
                 _this11.loadingUpdate = true;
-                _context8.next = 19;
+                _context8.next = 20;
                 return _this11.callApi("post", "user/update", _this11.dataEdit);
 
-              case 19:
+              case 20:
                 resUpdateUser = _context8.sent;
 
                 if (!(resUpdateUser.status == 201)) {
-                  _context8.next = 27;
+                  _context8.next = 28;
                   break;
                 }
 
@@ -76403,15 +76404,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 $("#users_table").DataTable().destroy();
-                _context8.next = 26;
+                _context8.next = 27;
                 return _this11.fetchUsers();
 
-              case 26:
+              case 27:
                 setTimeout(function () {
                   $("#users_table").DataTable();
                 }, 300);
 
-              case 27:
+              case 28:
                 if (resUpdateUser.status == 422) {
                   (function () {
                     _this11.loadingUpdate = false;
@@ -76433,7 +76434,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 28:
+              case 29:
               case "end":
                 return _context8.stop();
             }

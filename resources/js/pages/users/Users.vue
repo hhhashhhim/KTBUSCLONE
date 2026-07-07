@@ -643,7 +643,7 @@ export default {
             this.data.password = "";
             this.data.role = 0;
             this.data.departure = 0;
-            this.data.routes = 0;
+            this.data.routes = [];
             this.data.destination = 0;
             this.data.allow_assign_bus = 0;
             this.roleName = '';
@@ -726,11 +726,11 @@ export default {
             } else {
                 console.log(roleRes)
             }
-            const routeRes = await this.callApi("post", "booking/close/schedule/merges/route", { id: this.data.company_id });
+            const routeRes = await this.callApi("post", "user/routes");
             if (routeRes.status == 200) {
-                this.routes = routeRes.data.routes;
+                this.routes = Array.isArray(routeRes.data) ? routeRes.data : (routeRes.data.routes || []);
             } else {
-                console.log(roleRes)
+                console.log(routeRes)
             }
 
             const resDepart = await this.callApi("post", 'terminals/all');
@@ -956,7 +956,8 @@ export default {
             const resEditUser = await this.callApi("post", "user/edit", { 'id': user.id });
             if (resEditUser.status == 200) {
                 this.dataEdit = resEditUser.data;
-                    this.userPass = resEditUser.data.userpass ? resEditUser.data.userpass.user_password : 'N/A';
+                this.dataEdit.routes = resEditUser.data.route_ids || [];
+                this.userPass = resEditUser.data.userpass ? resEditUser.data.userpass.user_password : 'N/A';
                 setTimeout(() => {
                     $("#editDeparture").select2({
                         closeOnSelect: false
@@ -1012,6 +1013,7 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
+            this.dataEdit.routes = this.dataEdit.routes || this.dataEdit.route_ids || [];
             if (!this.dataEdit.routes || this.dataEdit.routes.length === 0) {
                 return swal({
                     title: "Required!!",
