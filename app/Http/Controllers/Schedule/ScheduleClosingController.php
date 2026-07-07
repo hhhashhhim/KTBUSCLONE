@@ -1658,6 +1658,13 @@ class ScheduleClosingController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $request->validate([
+            'bus' => [
+                'required',
+                Rule::exists('buses', 'id')->where(function ($query) {
+                    return $query->where('company_id', Auth::user()->company_id)
+                        ->whereNull('deleted_at');
+                }),
+            ],
             'terminal_id' => [
                 'nullable',
                 Rule::exists('terminals', 'id')->where(function ($query) {
@@ -1751,7 +1758,14 @@ class ScheduleClosingController extends Controller
                 ]);
             }
 
-            Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, "schedule_date" => $request->date])
+            Ticket::where([
+                "company_id" => Auth::user()->company_id,
+                "schedule_id" => $request->schedule,
+                "schedule_date" => $request->date,
+                "departure_city_id" => $request->departureCity,
+                "destination_city_id" => $request->destinationCity,
+            ])
+                ->whereTime("schedule_time", $depTime->departure_time)
                 ->withTrashed()
                 ->update([
                     "bus_id" => $request->bus,
@@ -1780,6 +1794,13 @@ class ScheduleClosingController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $request->validate([
+            'bus' => [
+                'required',
+                Rule::exists('buses', 'id')->where(function ($query) {
+                    return $query->where('company_id', Auth::user()->company_id)
+                        ->whereNull('deleted_at');
+                }),
+            ],
             'terminal_id' => [
                 'nullable',
                 Rule::exists('terminals', 'id')->where(function ($query) {

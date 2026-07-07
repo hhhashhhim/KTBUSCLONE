@@ -1593,6 +1593,9 @@ class BookingController extends Controller
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->scheduleId,
             'schedule_date' => $uniqueDate,
+            'schedule_start' => $request->departureCity,
+            'schedule_end' => $request->destinationCity,
+            'schedule_time' => date("H:i:s", strtotime($request->departure_time)),
         ])
             ->with("members")
             ->first();
