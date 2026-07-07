@@ -109,7 +109,7 @@ class ScheduleClosingController extends Controller
             ], 403);
         }
 
-        return $user = Auth::user();
+        $user = Auth::user();
 
         // User allowed route ids
         $allowedRouteIds = $user->route_ids;
@@ -163,16 +163,14 @@ class ScheduleClosingController extends Controller
         // Always apply allowed route filter
         if (!$user->is_super_admin) {
             if (empty($finalRouteIds)) {
-                return "1";
                 $query->whereRaw('1 = 0');
             } else {
-                return '3';
+                return ['routes' => $finalRouteIds, 'result' => $query->first()];
                 $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
                     $q->whereIn('route_id', $finalRouteIds);
                 });
             }
         } elseif (!empty($finalRouteIds)) {
-            return "down";
             // Super admin + dropdownRoute filter
             $query->whereHas('schedule', function ($q) use ($finalRouteIds) {
                 $q->whereIn('route_id', $finalRouteIds);
