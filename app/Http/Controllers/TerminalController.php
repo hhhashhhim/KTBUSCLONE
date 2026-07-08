@@ -717,7 +717,7 @@ public function filterData(Request $request)
             'cancellation_charges' => round($cancellationChargesTotal, 2),
             'terminal_commission' => round($terminalCommissionTotal, 2),
             'seat_commission' => round($seatCommissionTotal, 2),
-            'net_cash' => round($saleTotal - $seatCommissionTotal + $cancellationChargesTotal, 2),
+            'net_cash' => round($saleTotal - $terminalCommissionTotal - $seatCommissionTotal + $cancellationChargesTotal, 2),
         ],
     ];
 }

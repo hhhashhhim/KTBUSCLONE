@@ -163,7 +163,7 @@
                             $countedTerminalCommissionGroups[] = $terminalCommissionKey;
                         }
                         $totalSeatCommission += $seatCommission;
-                        $totalNetCash = $totalSale - $totalSeatCommission + $totalCancellationCharges;
+                        $totalNetCash = $totalSale - $totalCommission - $totalSeatCommission + $totalCancellationCharges;
                     @endphp
 
                     <tr>
