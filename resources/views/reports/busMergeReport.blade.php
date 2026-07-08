@@ -99,6 +99,9 @@
         .summary-row span {
             font-size: 12px !important;
         }
+          .amount-negative {
+            color: red;
+        }
     </style>
     <script type="text/javascript">
         window.addEventListener('load', function () {
