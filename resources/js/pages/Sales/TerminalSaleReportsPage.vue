@@ -177,6 +177,8 @@
                                                                     </th>
                                                                     <th v-if="isColumnVisible('sale')">Sale</th>
                                                                     <th v-if="isColumnVisible('refund')">Refund</th>
+                                                                    <th v-if="isColumnVisible('cancellation_charges')">
+                                                                        Cancellation Charges</th>
                                                                     <th v-if="isColumnVisible('terminal_commission')">
                                                                         Terminal Commission</th>
                                                                     <th v-if="isColumnVisible('seat_commission')">
@@ -227,6 +229,9 @@
                                                                         $insertComma(data.type == 'canceled' ?
                                                                         data.refund : 0) }}
                                                                     </td>
+                                                                    <td v-if="isColumnVisible('cancellation_charges')">
+                                                                        {{ $insertComma(data.cancellation_charges ?? 0) }}
+                                                                    </td>
                                                                     <td v-if="isColumnVisible('terminal_commission')">
                                                                         {{
                                                                             data.type != 'canceled'
@@ -242,8 +247,7 @@
                                                                         {{ $insertComma(data.seat_commission ?? 0) }}
                                                                     </td>
                                                                     <td v-if="isColumnVisible('net_cash')">
-                                                                        <!-- Net Cash -->
-                                                                        {{ $insertComma((data.seat_fare - data.discount) + (data.refund ?? 0) - (data.seat_commission ?? 0)) }}
+                                                                        {{ $insertComma(data.net_cash ?? 0) }}
                                                                     </td>
                                                                 </tr>
                                                                 <tr v-if="filters.record.length > 0">
@@ -266,6 +270,9 @@
                                                                         $insertComma(totalSaleAmount()) }}</th>
                                                                     <th v-if="isColumnVisible('refund')">{{
                                                                         $insertComma(totalRefundAmount()) }}</th>
+                                                                    <th v-if="isColumnVisible('cancellation_charges')">
+                                                                        {{ $insertComma(totalCancellationCharges()) }}
+                                                                    </th>
                                                                     <th v-if="isColumnVisible('terminal_commission')">{{
                                                                         $insertComma(totalCommission()) }}</th>
                                                                     <th v-if="isColumnVisible('seat_commission')">
@@ -308,6 +315,7 @@ const COLUMN_OPTIONS = [
     { key: 'action_by', label: 'Action By', checked: true },
     { key: 'sale', label: 'Sale', checked: true },
     { key: 'refund', label: 'Refund', checked: true },
+    { key: 'cancellation_charges', label: 'Cancellation Charges', checked: true },
     { key: 'terminal_commission', label: 'Terminal Commission', checked: true },
     { key: 'seat_commission', label: 'Seat Commission', checked: true },
     { key: 'net_cash', label: 'Net Cash', checked: true },
@@ -490,26 +498,18 @@ export default {
             }
             return 0;
         },
+        totalCancellationCharges: function () {
+            if (this.filters.record && Array.isArray(this.filters.record)) {
+                return this.filters.record.reduce((sum, data) => {
+                    return sum + (Number(data.cancellation_charges) || 0);
+                }, 0);
+            }
+            return 0;
+        },
         totalNetCash() {
-
-            const totalCommission = this.totalCommission();
-            const totalSeatCommission = this.totalSeatCommission();
-
-            return this.filters.record.reduce((sum, data) => {
-
-                const sale =
-                    data.type !== 'canceled'
-                        ? (Number(data.seat_fare) || 0) - (Number(data.discount) || 0)
-                        : 0;
-
-                const refund =
-                    data.type === 'canceled'
-                        ? (Number(data.refund) || 0)
-                        : 0;
-
-                return sum + sale + refund;
-
-            }, 0) - totalCommission - totalSeatCommission;
+            return this.totalSaleAmount()
+                - this.totalSeatCommission()
+                + this.totalCancellationCharges();
         },
         totalCommission: function () {
             if (this.filters.record && Array.isArray(this.filters.record)) {
@@ -522,11 +522,13 @@ export default {
                         return sum;
                     }
 
-                    const terminalId = data.terminal_id;
-                    const terminalBusId = data.bus_id;
-
-                    // unique combination of terminal + route
-                    const uniqueKey = `${terminalId}_${terminalBusId}`;
+                    const scheduleTime = data.schedule_time_exact || data.schedule_time || '';
+                    const uniqueKey = [
+                        data.terminal_id,
+                        data.bus_id,
+                        data.schedule_date,
+                        scheduleTime,
+                    ].join('_');
 
                     // agar already count ho chuka hai
                     if (seen.has(uniqueKey)) {
