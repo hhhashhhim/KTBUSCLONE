@@ -294,6 +294,9 @@ class OnlineTerminalCancellationController extends Controller
 
         $validator = Validator::make($request->all(), [
             'id' => ['required', 'integer'],
+            'deduction_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'remarks' => ['nullable', 'string', 'max:1000'],
+            'cancellation_reason' => ['nullable', 'string', 'max:1000'],
         ]);
 
         if ($validator->fails()) {
@@ -319,8 +322,12 @@ class OnlineTerminalCancellationController extends Controller
             return trim((string) $seat);
         })->filter()->values()->all();
         $transactionId = trim((string) data_get($log->request_payload, 'transaction_id', $log->booking_reference));
-        $deductionPercentage = $this->resolveLogDeductionPercentage($log);
+        $deductionPercentage = $request->filled('deduction_percentage')
+            ? $this->normalizePercentage($request->deduction_percentage)
+            : $this->resolveLogDeductionPercentage($log);
         $refundPercentage = $this->refundPercentageFromDeduction($deductionPercentage);
+        $approvalRemarks = trim((string) ($request->remarks ?? $request->cancellation_reason ?? ''));
+        $cancellationReason = data_get($log->request_payload, 'cancellation_reason', 'Cancelled from online terminal');
 
         $ticketValidation = $this->validateTicketsForRequest($invoiceId, $seatNumbers, $transactionId ?: null);
         if ($ticketValidation !== true) {
@@ -336,7 +343,7 @@ class OnlineTerminalCancellationController extends Controller
             $refunds = [];
             $response = null;
 
-            DB::transaction(function () use ($invoiceId, $seatNumbers, $log, $now, $transactionId, $deductionPercentage, $refundPercentage, &$cancelledSeats, &$refunds, &$response) {
+            DB::transaction(function () use ($invoiceId, $seatNumbers, $log, $now, $transactionId, $deductionPercentage, $refundPercentage, $approvalRemarks, $cancellationReason, &$cancelledSeats, &$refunds, &$response) {
                 $tickets = Ticket::where('invoice_id', $invoiceId)
                     ->whereIn('seat_no', $seatNumbers)
                     ->lockForUpdate()
@@ -354,9 +361,18 @@ class OnlineTerminalCancellationController extends Controller
                     $this->cancellationService->cancelTicket(
                         $ticket,
                         $refundPercentage,
-                        $log->request_payload['cancellation_reason'] ?? 'Cancelled from online terminal',
+                        $cancellationReason,
                         auth()->id()
                     );
+
+                    $cancelRecord = \App\Models\Booking\BookingCancel::where('ticket_id', $ticket->id)
+                        ->latest('id')
+                        ->first();
+
+                    if ($cancelRecord) {
+                        $cancelRecord->update(['percentage' => $deductionPercentage]);
+                    }
+
                     $cancelledSeats[] = (string) $ticket->seat_no;
                     $refunds[] = [
                         'ticket_id' => $ticket->id,
@@ -367,7 +383,7 @@ class OnlineTerminalCancellationController extends Controller
                         'deduction_amount' => $deductionAmount,
                         'refund_percentage' => $refundPercentage,
                         'refund_amount' => $refundAmount,
-                        'refund_reason' => $log->request_payload['cancellation_reason'] ?? 'Cancelled from online terminal',
+                        'refund_reason' => $cancellationReason,
                     ];
                 }
 
@@ -384,11 +400,17 @@ class OnlineTerminalCancellationController extends Controller
                         'refund_percentage' => $refundPercentage,
                         'refund_amount' => round(collect($refunds)->sum('refund_amount'), 2),
                         'refunds' => $refunds,
+                        'approval_remarks' => $approvalRemarks,
                         'approved_at' => $now->format('Y-m-d H:i:s'),
                         'cancelled_at' => $now->format('Y-m-d H:i:s'),
                     ],
                     'error' => null,
                 ];
+
+                $requestPayload = $log->request_payload ?? [];
+                $requestPayload['deduction_percentage'] = $deductionPercentage;
+                $requestPayload['refund_percentage'] = $refundPercentage;
+                $requestPayload['approval_remarks'] = $approvalRemarks;
 
                 $log->update([
                     'status' => 'cancelled',
@@ -398,6 +420,7 @@ class OnlineTerminalCancellationController extends Controller
                     'cancellation_status' => 'cancelled',
                     'cancelled_at' => $now,
                     'success' => true,
+                    'request_payload' => $requestPayload,
                     'response_payload' => $response,
                 ]);
             });
@@ -1000,6 +1023,16 @@ class OnlineTerminalCancellationController extends Controller
         $busDate = optional($ticket)->date;
         $busTime = optional($ticket)->schedule_time;
         $requestDate = optional($log->created_at)->format('Y-m-d H:i:s');
+        $fare = $ticket ? ((float) $ticket->seat_fare - (float) ($ticket->discount ?? 0)) : null;
+        $deductionPercentage = $this->resolveLogDeductionPercentage($log);
+        $refundPercentage = $this->refundPercentageFromDeduction($deductionPercentage);
+        $deductionAmount = data_get($log->response_payload, 'data.deduction_amount');
+        $refundAmount = data_get($log->response_payload, 'data.refund_amount');
+
+        if ($fare !== null) {
+            $deductionAmount = $deductionAmount ?? $this->calculatePercentageAmount($fare, $deductionPercentage);
+            $refundAmount = $refundAmount ?? $this->calculatePercentageAmount($fare, $refundPercentage);
+        }
 
         return [
             'id' => $log->id,
@@ -1017,7 +1050,11 @@ class OnlineTerminalCancellationController extends Controller
             'passenger_name' => data_get($ticket, 'customer.name', 'N/A'),
             'cnic' => data_get($ticket, 'customer.cnic', 'N/A'),
             'contact' => data_get($ticket, 'customer.contact', 'N/A'),
-            'fare' => $ticket ? ((float) $ticket->seat_fare - (float) ($ticket->discount ?? 0)) : 'N/A',
+            'fare' => $fare ?? 'N/A',
+            'deduction_percentage' => $deductionPercentage,
+            'deduction_amount' => $deductionAmount ?? 'N/A',
+            'refund_percentage' => $refundPercentage,
+            'refund_amount' => $refundAmount ?? 'N/A',
             'booking_time' => $ticket ? $this->formatBookingDateTime($ticket->created_at) : 'N/A',
             'time_difference' => $this->formatTimeDifference($busDate, $busTime, $log->created_at),
             'status' => $log->current_status,
@@ -1030,6 +1067,9 @@ class OnlineTerminalCancellationController extends Controller
             'rejected_at' => optional($log->rejected_at)->format('Y-m-d H:i:s'),
             'cancelled_at' => optional($log->cancelled_at)->format('Y-m-d H:i:s'),
             'rejection_reason' => $log->rejection_reason,
+            'decision_remarks' => data_get($log->response_payload, 'data.approval_remarks')
+                ?: data_get($log->request_payload, 'approval_remarks')
+                ?: $log->rejection_reason,
             'approved_by' => optional($log->approvedBy)->name,
             'rejected_by' => optional($log->rejectedBy)->name,
             'decision_by' => optional($log->approvedBy)->name ?: optional($log->rejectedBy)->name,
