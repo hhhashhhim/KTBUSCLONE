@@ -41852,8 +41852,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       loading: false,
       requestSequence: 0,
       actionLoadingId: null,
+      approveLoading: false,
       rejectLoading: false,
       selectedRequest: null,
+      approveForm: {
+        deduction_percentage: 0,
+        remarks: ''
+      },
       rejectionReason: '',
       filters: {
         cnicFilter: '',
@@ -41876,6 +41881,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     this.fetchTerminals();
     this.fetchBus();
     this.fetchRequests();
+  },
+  computed: {
+    approvePreview: function approvePreview() {
+      var _this$selectedRequest;
+
+      var fare = Number((_this$selectedRequest = this.selectedRequest) === null || _this$selectedRequest === void 0 ? void 0 : _this$selectedRequest.fare) || 0;
+      var deductionPercentage = Math.min(Math.max(Number(this.approveForm.deduction_percentage) || 0, 0), 100);
+      var refundPercentage = 100 - deductionPercentage;
+      var deductionAmount = this.calculatePercentAmount(fare, deductionPercentage);
+      var refundAmount = this.calculatePercentAmount(fare, refundPercentage);
+      return {
+        fare: fare,
+        deduction_percentage: deductionPercentage,
+        deduction_amount: deductionAmount,
+        refund_percentage: refundPercentage,
+        refund_amount: refundAmount
+      };
+    }
   },
   methods: {
     defaultFilters: function defaultFilters() {
@@ -42024,46 +42047,56 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.filters = this.defaultFilters();
       this.fetchRequests();
     },
-    approveRequest: function approveRequest(request) {
+    openApproveModal: function openApproveModal(request) {
+      this.selectedRequest = request;
+      this.approveForm = {
+        deduction_percentage: Number(request.deduction_percentage) || 0,
+        remarks: request.decision_remarks || ''
+      };
+      $('#onlineTerminalApproveModal').modal('show');
+    },
+    approveRequest: function approveRequest() {
       var _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var confirmed, res;
+        var res;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _context5.next = 2;
-                return swal({
-                  title: "Approve cancellation?",
-                  text: "This will cancel the requested seat(s).",
-                  icon: "warning",
-                  buttons: true,
-                  dangerMode: true
-                });
-
-              case 2:
-                confirmed = _context5.sent;
-
-                if (confirmed) {
-                  _context5.next = 5;
+                if (_this5.selectedRequest) {
+                  _context5.next = 2;
                   break;
                 }
 
                 return _context5.abrupt("return");
 
+              case 2:
+                if (!(_this5.approveForm.deduction_percentage < 0 || _this5.approveForm.deduction_percentage > 100)) {
+                  _context5.next = 5;
+                  break;
+                }
+
+                swal("Error", "Deduction percentage must be between 0 and 100.", "error");
+                return _context5.abrupt("return");
+
               case 5:
-                _this5.actionLoadingId = request.id;
-                _context5.next = 8;
+                _this5.approveLoading = true;
+                _this5.actionLoadingId = _this5.selectedRequest.id;
+                _context5.next = 9;
                 return _this5.callApi('post', 'online-terminals/cancellations/approve', {
-                  id: request.id
+                  id: _this5.selectedRequest.id,
+                  deduction_percentage: _this5.approveForm.deduction_percentage,
+                  remarks: _this5.approveForm.remarks
                 });
 
-              case 8:
+              case 9:
                 res = _context5.sent;
+                _this5.approveLoading = false;
                 _this5.actionLoadingId = null;
 
                 if (res.status === 200 && _this5.isApiSuccess(res.data)) {
+                  $('#onlineTerminalApproveModal').modal('hide');
                   swal("Approved", res.data.message, "success");
 
                   _this5.fetchRequests();
@@ -42071,7 +42104,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   swal("Error", res.data.message || "Approval failed.", "error");
                 }
 
-              case 11:
+              case 13:
               case "end":
                 return _context5.stop();
             }
@@ -42184,19 +42217,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       return Number(fare);
     },
+    formatPercentage: function formatPercentage(percentage) {
+      if (percentage === null || percentage === undefined || percentage === 'N/A') {
+        return 'N/A';
+      }
+
+      return "".concat(Number(percentage), "%");
+    },
+    calculatePercentAmount: function calculatePercentAmount(amount, percentage) {
+      return Math.round((Number(amount) || 0) * (Number(percentage) || 0) / 100 * 100) / 100;
+    },
     timeDifference: function timeDifference(request) {
       if (!request.bus_date || !request.bus_time || !request.request_date) {
         return 'N/A';
       }
 
-      var busDateTime = new Date("".concat(request.bus_date, " ").concat(request.bus_time));
-      var requestDateTime = new Date(request.request_date);
+      var differenceMinutes = this.timeDifferenceMinutes(request);
 
-      if (Number.isNaN(busDateTime.getTime()) || Number.isNaN(requestDateTime.getTime())) {
+      if (differenceMinutes === null) {
         return 'N/A';
       }
 
-      var seconds = Math.floor((busDateTime.getTime() - requestDateTime.getTime()) / 1000);
+      var seconds = differenceMinutes * 60;
       var prefix = seconds < 0 ? '-' : '';
       seconds = Math.abs(seconds);
       var days = Math.floor(seconds / 86400);
@@ -42219,6 +42261,41 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
 
       return prefix + parts.join(' ');
+    },
+    timeDifferenceMinutes: function timeDifferenceMinutes(request) {
+      if (!request.bus_date || !request.bus_time || !request.request_date) {
+        return null;
+      }
+
+      var busDateTime = new Date("".concat(request.bus_date, " ").concat(request.bus_time));
+      var requestDateTime = new Date(request.request_date);
+
+      if (Number.isNaN(busDateTime.getTime()) || Number.isNaN(requestDateTime.getTime())) {
+        return null;
+      }
+
+      return Math.floor((busDateTime.getTime() - requestDateTime.getTime()) / 60000);
+    },
+    timeDifferenceRowClass: function timeDifferenceRowClass(request) {
+      var minutes = this.timeDifferenceMinutes(request);
+
+      if (minutes === null) {
+        return '';
+      }
+
+      if (minutes < 180) {
+        return 'time-difference-red';
+      }
+
+      if (minutes < 360) {
+        return 'time-difference-yellow';
+      }
+
+      if (minutes < 1440) {
+        return 'time-difference-green';
+      }
+
+      return 'time-difference-white';
     },
     statusLabel: function statusLabel(status) {
       if (!status) {
@@ -48147,7 +48224,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   data: function data() {
     return {
-      API_URL: "https://api.kainattravels.net/",
+      API_URL: "http://localhost/kt-api/",
       validationErrors: [],
       counterExpenses: [],
       permissions: [],
@@ -100587,7 +100664,7 @@ var _hoisted_60 = {
 };
 
 var _hoisted_61 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Invoice"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Booking Reference"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Route"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Seats"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Reason"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Passenger Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "CNIC"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Contact"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fare"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Booking Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Request Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Time Difference"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Source"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Decision By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cancelled At"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Actions")])], -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Invoice"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Booking Reference"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Route"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Seats"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Reason"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Passenger Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "CNIC"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Contact"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fare"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Deduction %"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Deduction Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Refund %"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Refund Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Booking Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Request Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Time Difference"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Source"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Decision By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Decision Remarks"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cancelled At"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Actions")])], -1
   /* HOISTED */
   );
 });
@@ -100608,14 +100685,14 @@ var _hoisted_66 = {
 };
 var _hoisted_67 = {
   "class": "modal fade",
-  id: "onlineTerminalRejectModal",
+  id: "onlineTerminalApproveModal",
   tabindex: "-1",
   role: "dialog",
-  "aria-labelledby": "onlineTerminalRejectModalLabel",
+  "aria-labelledby": "onlineTerminalApproveModalLabel",
   "aria-hidden": "true"
 };
 var _hoisted_68 = {
-  "class": "modal-dialog",
+  "class": "modal-dialog modal-dialog-centered",
   role: "document"
 };
 var _hoisted_69 = {
@@ -100623,6 +100700,128 @@ var _hoisted_69 = {
 };
 
 var _hoisted_70 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "modal-header"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
+    "class": "modal-title",
+    id: "onlineTerminalApproveModalLabel"
+  }, "Approve Online Terminal Request"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "close",
+    "data-dismiss": "modal",
+    "aria-label": "Close"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "aria-hidden": "true"
+  }, "×")])], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_71 = {
+  "class": "modal-body"
+};
+var _hoisted_72 = {
+  "class": "row"
+};
+var _hoisted_73 = {
+  "class": "col-md-6"
+};
+
+var _hoisted_74 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Seat Fare", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_75 = ["value"];
+var _hoisted_76 = {
+  "class": "col-md-6"
+};
+
+var _hoisted_77 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Deduction Percentage", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_78 = {
+  "class": "row mt-3"
+};
+var _hoisted_79 = {
+  "class": "col-md-4"
+};
+
+var _hoisted_80 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Deduction Amount", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_81 = ["value"];
+var _hoisted_82 = {
+  "class": "col-md-4"
+};
+
+var _hoisted_83 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Refund Percentage", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_84 = ["value"];
+var _hoisted_85 = {
+  "class": "col-md-4"
+};
+
+var _hoisted_86 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Refund Amount", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_87 = ["value"];
+var _hoisted_88 = {
+  "class": "mt-3"
+};
+
+var _hoisted_89 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Approval Remarks", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_90 = {
+  "class": "modal-footer"
+};
+
+var _hoisted_91 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-secondary",
+    "data-dismiss": "modal"
+  }, "Cancel", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_92 = ["disabled"];
+var _hoisted_93 = {
+  "class": "modal fade",
+  id: "onlineTerminalRejectModal",
+  tabindex: "-1",
+  role: "dialog",
+  "aria-labelledby": "onlineTerminalRejectModalLabel",
+  "aria-hidden": "true"
+};
+var _hoisted_94 = {
+  "class": "modal-dialog modal-dialog-centered",
+  role: "document"
+};
+var _hoisted_95 = {
+  "class": "modal-content"
+};
+
+var _hoisted_96 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "modal-header"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
@@ -100640,21 +100839,21 @@ var _hoisted_70 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_71 = {
+var _hoisted_97 = {
   "class": "modal-body"
 };
 
-var _hoisted_72 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Rejection Reason", -1
+var _hoisted_98 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Rejection Remarks", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_73 = {
+var _hoisted_99 = {
   "class": "modal-footer"
 };
 
-var _hoisted_74 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_100 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-secondary",
@@ -100664,7 +100863,7 @@ var _hoisted_74 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_75 = ["disabled"];
+var _hoisted_101 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_vue_mask = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("vue-mask");
 
@@ -100838,7 +101037,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* PROPS */
   , _hoisted_59)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_60, [_hoisted_61, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.requests, function (request) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
-      key: request.id
+      key: request.id,
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.timeDifferenceRowClass(request))
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.invoice_id), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.booking_reference || 'N/A'), 1
@@ -100861,6 +101061,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatFare(request.fare)), 1
     /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatPercentage(request.deduction_percentage)), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatFare(request.deduction_amount)), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatPercentage(request.refund_percentage)), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatFare(request.refund_amount)), 1
+    /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.booking_time || 'N/A'), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.request_date || 'N/A'), 1
@@ -100877,6 +101085,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.decision_by || 'N/A'), 1
     /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.decision_remarks || 'N/A'), 1
+    /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.cancelled_at || 'N/A'), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [request.status === 'pending' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_63, [$options.canUseButton('approve-request') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
@@ -100884,7 +101094,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": "btn btn-success btn-sm",
       disabled: $data.actionLoadingId === request.id,
       onClick: function onClick($event) {
-        return $options.approveRequest(request);
+        return $options.openApproveModal(request);
       }
     }, " Approve ", 8
     /* PROPS */
@@ -100897,30 +101107,91 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }
     }, " Reject ", 8
     /* PROPS */
-    , _hoisted_65)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_66, "No action"))])]);
+    , _hoisted_65)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_66, "No action"))])], 2
+    /* CLASS */
+    );
   }), 128
   /* KEYED_FRAGMENT */
   ))])], 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, !$data.loading]])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_69, [_hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [_hoisted_72, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, !$data.loading]])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_69, [_hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [_hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
     "class": "form-control",
-    rows: "4",
+    value: $options.formatFare($options.approvePreview.fare),
+    disabled: ""
+  }, null, 8
+  /* PROPS */
+  , _hoisted_75)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_76, [_hoisted_77, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "number",
+    "class": "form-control",
+    min: "0",
+    max: "100",
+    step: "0.01",
     "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
-      return $data.rejectionReason = $event;
-    }),
-    placeholder: "Enter rejection reason"
+      return $data.approveForm.deduction_percentage = $event;
+    })
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.rejectionReason]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [_hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.approveForm.deduction_percentage, void 0, {
+    number: true
+  }]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_78, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_79, [_hoisted_80, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    "class": "form-control",
+    value: $options.formatFare($options.approvePreview.deduction_amount),
+    disabled: ""
+  }, null, 8
+  /* PROPS */
+  , _hoisted_81)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_82, [_hoisted_83, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    "class": "form-control",
+    value: $options.formatPercentage($options.approvePreview.refund_percentage),
+    disabled: ""
+  }, null, 8
+  /* PROPS */
+  , _hoisted_84)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_85, [_hoisted_86, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    "class": "form-control",
+    value: $options.formatFare($options.approvePreview.refund_amount),
+    disabled: ""
+  }, null, 8
+  /* PROPS */
+  , _hoisted_87)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_88, [_hoisted_89, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+    "class": "form-control",
+    rows: "4",
+    "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
+      return $data.approveForm.remarks = $event;
+    }),
+    placeholder: "Enter approval remarks"
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.approveForm.remarks]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_90, [_hoisted_91, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-success",
+    onClick: _cache[24] || (_cache[24] = function ($event) {
+      return $options.approveRequest();
+    }),
+    disabled: $data.approveLoading
+  }, " Approve Request ", 8
+  /* PROPS */
+  , _hoisted_92)])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_93, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_94, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_95, [_hoisted_96, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_97, [_hoisted_98, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+    "class": "form-control",
+    rows: "4",
+    "onUpdate:modelValue": _cache[25] || (_cache[25] = function ($event) {
+      return $data.rejectionReason = $event;
+    }),
+    placeholder: "Enter rejection remarks"
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.rejectionReason]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_99, [_hoisted_100, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-danger",
-    onClick: _cache[23] || (_cache[23] = function ($event) {
+    onClick: _cache[26] || (_cache[26] = function ($event) {
       return $options.rejectRequest();
     }),
     disabled: $data.rejectLoading
   }, " Reject Request ", 8
   /* PROPS */
-  , _hoisted_75)])])])])])]);
+  , _hoisted_101)])])])])])]);
 }
 
 /***/ }),
@@ -148604,7 +148875,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
  // const url = "/kt-dev/";
 
-var url = "/";
+var url = "/kt-dev/";
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
@@ -149099,9 +149370,9 @@ var initialState = function initialState() {
     token: persistedState.token,
     permissions: persistedState.permissions,
     companyModules: persistedState.companyModules,
-    main_url: "https://portal.kainattravels.net/",
-    api_url: "https://api.kainattravels.net/",
-    app_url: "https://portal.kainattravels.net/",
+    main_url: "http://localhost/kt-dev/",
+    api_url: "http://localhost/kt-api/",
+    app_url: "http://localhost/kt-dev/",
     appStateReady: false
   };
 };
@@ -154967,7 +155238,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.loading-spinner[data-v-1614d8e4] {\n    display: block;\n    margin: 0 auto;\n    padding: 2em;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.loading-spinner[data-v-1614d8e4] {\n    display: block;\n    margin: 0 auto;\n    padding: 2em;\n}\n\n/* #online_terminal_cancellation_table tr.time-difference-red > td {\n    background-color: #DC3545;\n}\n\n#online_terminal_cancellation_table tr.time-difference-yellow > td {\n    background-color: #FFC107;\n}\n\n#online_terminal_cancellation_table tr.time-difference-green > td {\n    background-color: #28A745;\n}\n\n#online_terminal_cancellation_table tr.time-difference-white > td {\n    background-color:transparent;\n} */\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

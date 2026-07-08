@@ -148,18 +148,24 @@
                                             <th>CNIC</th>
                                             <th>Contact</th>
                                             <th>Fare</th>
+                                            <th>Deduction %</th>
+                                            <th>Deduction Amount</th>
+                                            <th>Refund %</th>
+                                            <th>Refund Amount</th>
                                             <th>Booking Time</th>
                                             <th>Request Date</th>
                                             <th>Time Difference</th>
                                             <th>Source</th>
                                             <th>Status</th>
                                             <th>Decision By</th>
+                                            <th>Decision Remarks</th>
                                             <th>Cancelled At</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="request in requests" :key="request.id">
+                                        <tr v-for="request in requests" :key="request.id"
+                                            :class="timeDifferenceRowClass(request)">
                                             <td>{{ request.invoice_id }}</td>
                                             <td>{{ request.booking_reference || 'N/A' }}</td>
                                             <td>{{ request.route || 'N/A' }}</td>
@@ -171,6 +177,10 @@
                                             <td>{{ request.cnic || 'N/A' }}</td>
                                             <td>{{ request.contact || 'N/A' }}</td>
                                             <td>{{ formatFare(request.fare) }}</td>
+                                            <td>{{ formatPercentage(request.deduction_percentage) }}</td>
+                                            <td>{{ formatFare(request.deduction_amount) }}</td>
+                                            <td>{{ formatPercentage(request.refund_percentage) }}</td>
+                                            <td>{{ formatFare(request.refund_amount) }}</td>
                                             <td>{{ request.booking_time || 'N/A' }}</td>
                                             <td>{{ request.request_date || 'N/A' }}</td>
                                             <td>{{ request.time_difference || timeDifference(request) }}</td>
@@ -184,13 +194,14 @@
                                                 </div>
                                             </td>
                                             <td>{{ request.decision_by || 'N/A' }}</td>
+                                            <td>{{ request.decision_remarks || 'N/A' }}</td>
                                             <td>{{ request.cancelled_at || 'N/A' }}</td>
                                             <td>
                                                 <div class="btn-group" v-if="request.status === 'pending'">
                                                     <button class="btn btn-success btn-sm"
                                                             v-if="canUseButton('approve-request')"
                                                             :disabled="actionLoadingId === request.id"
-                                                            @click="approveRequest(request)">
+                                                            @click="openApproveModal(request)">
                                                         Approve
                                                     </button>
                                                     <button class="btn btn-danger btn-sm"
@@ -211,9 +222,62 @@
                 </div>
             </div>
 
+            <div class="modal fade" id="onlineTerminalApproveModal" tabindex="-1" role="dialog"
+                 aria-labelledby="onlineTerminalApproveModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="onlineTerminalApproveModalLabel">Approve Online Terminal Request</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Seat Fare</label>
+                                    <input type="text" class="form-control" :value="formatFare(approvePreview.fare)" disabled>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Deduction Percentage</label>
+                                    <input type="number" class="form-control" min="0" max="100" step="0.01"
+                                           v-model.number="approveForm.deduction_percentage">
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <label>Deduction Amount</label>
+                                    <input type="text" class="form-control" :value="formatFare(approvePreview.deduction_amount)" disabled>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Refund Percentage</label>
+                                    <input type="text" class="form-control" :value="formatPercentage(approvePreview.refund_percentage)" disabled>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Refund Amount</label>
+                                    <input type="text" class="form-control" :value="formatFare(approvePreview.refund_amount)" disabled>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <label>Approval Remarks</label>
+                                <textarea class="form-control" rows="4" v-model="approveForm.remarks"
+                                          placeholder="Enter approval remarks"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-success" @click="approveRequest()"
+                                    :disabled="approveLoading">
+                                Approve Request
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="modal fade" id="onlineTerminalRejectModal" tabindex="-1" role="dialog"
                  aria-labelledby="onlineTerminalRejectModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
+                <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="onlineTerminalRejectModalLabel">Reject Online Terminal Request</h5>
@@ -222,9 +286,9 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <label>Rejection Reason</label>
+                            <label>Rejection Remarks</label>
                             <textarea class="form-control" rows="4" v-model="rejectionReason"
-                                      placeholder="Enter rejection reason"></textarea>
+                                      placeholder="Enter rejection remarks"></textarea>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -264,8 +328,13 @@ export default {
             loading: false,
             requestSequence: 0,
             actionLoadingId: null,
+            approveLoading: false,
             rejectLoading: false,
             selectedRequest: null,
+            approveForm: {
+                deduction_percentage: 0,
+                remarks: '',
+            },
             rejectionReason: '',
             filters: {
                 cnicFilter: '',
@@ -280,7 +349,7 @@ export default {
                 toDateFilter: '',
                 transactionFilter: '',
             },
-        };
+        };  
     },
     created() {
         this.permissions = this.$store.state.permissions;
@@ -288,6 +357,23 @@ export default {
         this.fetchTerminals();
         this.fetchBus();
         this.fetchRequests();
+    },
+    computed: {
+        approvePreview() {
+            const fare = Number(this.selectedRequest?.fare) || 0;
+            const deductionPercentage = Math.min(Math.max(Number(this.approveForm.deduction_percentage) || 0, 0), 100);
+            const refundPercentage = 100 - deductionPercentage;
+            const deductionAmount = this.calculatePercentAmount(fare, deductionPercentage);
+            const refundAmount = this.calculatePercentAmount(fare, refundPercentage);
+
+            return {
+                fare,
+                deduction_percentage: deductionPercentage,
+                deduction_amount: deductionAmount,
+                refund_percentage: refundPercentage,
+                refund_amount: refundAmount,
+            };
+        },
     },
     methods: {
         defaultFilters() {
@@ -343,24 +429,36 @@ export default {
             this.filters = this.defaultFilters();
             this.fetchRequests();
         },
-        async approveRequest(request) {
-            const confirmed = await swal({
-                title: "Approve cancellation?",
-                text: "This will cancel the requested seat(s).",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            });
-
-            if (!confirmed) {
+        openApproveModal(request) {
+            this.selectedRequest = request;
+            this.approveForm = {
+                deduction_percentage: Number(request.deduction_percentage) || 0,
+                remarks: request.decision_remarks || '',
+            };
+            $('#onlineTerminalApproveModal').modal('show');
+        },
+        async approveRequest() {
+            if (!this.selectedRequest) {
                 return;
             }
 
-            this.actionLoadingId = request.id;
-            const res = await this.callApi('post', 'online-terminals/cancellations/approve', { id: request.id });
+            if (this.approveForm.deduction_percentage < 0 || this.approveForm.deduction_percentage > 100) {
+                swal("Error", "Deduction percentage must be between 0 and 100.", "error");
+                return;
+            }
+
+            this.approveLoading = true;
+            this.actionLoadingId = this.selectedRequest.id;
+            const res = await this.callApi('post', 'online-terminals/cancellations/approve', {
+                id: this.selectedRequest.id,
+                deduction_percentage: this.approveForm.deduction_percentage,
+                remarks: this.approveForm.remarks,
+            });
+            this.approveLoading = false;
             this.actionLoadingId = null;
 
             if (res.status === 200 && this.isApiSuccess(res.data)) {
+                $('#onlineTerminalApproveModal').modal('hide');
                 swal("Approved", res.data.message, "success");
                 this.fetchRequests();
             } else {
@@ -444,18 +542,27 @@ export default {
 
             return Number(fare);
         },
+        formatPercentage(percentage) {
+            if (percentage === null || percentage === undefined || percentage === 'N/A') {
+                return 'N/A';
+            }
+
+            return `${Number(percentage)}%`;
+        },
+        calculatePercentAmount(amount, percentage) {
+            return Math.round(((Number(amount) || 0) * (Number(percentage) || 0) / 100) * 100) / 100;
+        },
         timeDifference(request) {
             if (!request.bus_date || !request.bus_time || !request.request_date) {
                 return 'N/A';
             }
 
-            const busDateTime = new Date(`${request.bus_date} ${request.bus_time}`);
-            const requestDateTime = new Date(request.request_date);
-            if (Number.isNaN(busDateTime.getTime()) || Number.isNaN(requestDateTime.getTime())) {
+            const differenceMinutes = this.timeDifferenceMinutes(request);
+            if (differenceMinutes === null) {
                 return 'N/A';
             }
 
-            let seconds = Math.floor((busDateTime.getTime() - requestDateTime.getTime()) / 1000);
+            let seconds = differenceMinutes * 60;
             const prefix = seconds < 0 ? '-' : '';
             seconds = Math.abs(seconds);
             const days = Math.floor(seconds / 86400);
@@ -476,6 +583,39 @@ export default {
             }
 
             return prefix + parts.join(' ');
+        },
+        timeDifferenceMinutes(request) {
+            if (!request.bus_date || !request.bus_time || !request.request_date) {
+                return null;
+            }
+
+            const busDateTime = new Date(`${request.bus_date} ${request.bus_time}`);
+            const requestDateTime = new Date(request.request_date);
+            if (Number.isNaN(busDateTime.getTime()) || Number.isNaN(requestDateTime.getTime())) {
+                return null;
+            }
+
+            return Math.floor((busDateTime.getTime() - requestDateTime.getTime()) / 60000);
+        },
+        timeDifferenceRowClass(request) {
+            const minutes = this.timeDifferenceMinutes(request);
+            if (minutes === null) {
+                return '';
+            }
+
+            if (minutes < 180) {
+                return 'time-difference-red';
+            }
+
+            if (minutes < 360) {
+                return 'time-difference-yellow';
+            }
+
+            if (minutes < 1440) {
+                return 'time-difference-green';
+            }
+
+            return 'time-difference-white';
         },
         statusLabel(status) {
             if (!status) {
@@ -529,4 +669,20 @@ export default {
     margin: 0 auto;
     padding: 2em;
 }
+
+/* #online_terminal_cancellation_table tr.time-difference-red > td {
+    background-color: #DC3545;
+}
+
+#online_terminal_cancellation_table tr.time-difference-yellow > td {
+    background-color: #FFC107;
+}
+
+#online_terminal_cancellation_table tr.time-difference-green > td {
+    background-color: #28A745;
+}
+
+#online_terminal_cancellation_table tr.time-difference-white > td {
+    background-color:transparent;
+} */
 </style>
