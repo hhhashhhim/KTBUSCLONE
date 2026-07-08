@@ -42,6 +42,7 @@ class TerminalController extends Controller
         'action_by',
         'sale',
         'refund',
+        'cancellation_charges',
         'terminal_commission',
         'seat_commission',
         'net_cash',
@@ -671,33 +672,52 @@ public function filterData(Request $request)
 }
 
         $ticket->refund = 0;
+        $ticket->cancellation_charges = 0;
 
         if ($ticket->type === 'canceled' && $ticket->cancel_ticket) {
 
-            $ticket->refund = (
+            $ticket->cancellation_charges = (
                 $fare * $ticket->cancel_ticket->percentage
             ) / 100;
+
+            $ticket->refund = max($fare - $ticket->cancellation_charges, 0);
         }
 
         $ticket->sale = $ticket->type !== 'canceled' ? $fare : 0;
         $ticket->terminal_commission = $ticket->type !== 'canceled' ? (float) ($ticket->comsn ?? 0) : 0;
         $ticket->net_cash = $ticket->type === 'canceled'
-            ? $fare - $ticket->refund - $ticket->terminal_commission - $ticket->seat_commission
-            : $ticket->sale - $ticket->terminal_commission - $ticket->seat_commission;
+            ? $ticket->cancellation_charges
+            : $ticket->sale - $ticket->seat_commission;
 
         return $ticket;
     });
 
     $sortedTickets = $tickets->sortBy('schedule_date_time')->values();
+    $terminalCommissionTotal = $sortedTickets
+        ->filter(fn ($ticket) => $ticket->type !== 'canceled')
+        ->unique(function ($ticket) {
+            return implode('_', [
+                $ticket->terminal_id,
+                $ticket->bus_id,
+                $ticket->schedule_date,
+                $ticket->schedule_time_exact ?: $ticket->schedule_time,
+            ]);
+        })
+        ->sum('terminal_commission');
+
+    $saleTotal = $sortedTickets->sum('sale');
+    $cancellationChargesTotal = $sortedTickets->sum('cancellation_charges');
+    $seatCommissionTotal = $sortedTickets->sum('seat_commission');
 
     return [
         'record' => $sortedTickets,
         'total' => [
-            'sale' => round($sortedTickets->sum('sale'), 2),
+            'sale' => round($saleTotal, 2),
             'refund' => round($sortedTickets->sum('refund'), 2),
-            'terminal_commission' => round($sortedTickets->sum('terminal_commission'), 2),
-            'seat_commission' => round($sortedTickets->sum('seat_commission'), 2),
-            'net_cash' => round($sortedTickets->sum('net_cash'), 2),
+            'cancellation_charges' => round($cancellationChargesTotal, 2),
+            'terminal_commission' => round($terminalCommissionTotal, 2),
+            'seat_commission' => round($seatCommissionTotal, 2),
+            'net_cash' => round($saleTotal - $seatCommissionTotal + $cancellationChargesTotal, 2),
         ],
     ];
 }

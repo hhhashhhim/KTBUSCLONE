@@ -4,10 +4,11 @@
     $ticketCount = $tickets->count();
     $totalSale = 0;
     $totalRefund = 0;
+    $totalCancellationCharges = 0;
     $totalCommission = 0;
     $totalNetCash = 0;
     $totalSeatCommission = 0;
-    $countedTerminalIds = [];
+    $countedTerminalCommissionGroups = [];
 @endphp
 
 <!DOCTYPE html>
@@ -99,6 +100,9 @@
                     @if (!empty($visibleColumnsLookup['refund']))
                         <th>Refund</th>
                     @endif
+                    @if (!empty($visibleColumnsLookup['cancellation_charges']))
+                        <th>Cancellation Charges</th>
+                    @endif
 
                     @if (!empty($visibleColumnsLookup['terminal_commission']))
                         <th>Terminal Commission</th>
@@ -120,7 +124,15 @@
                         $sale =
                             $single->type !== 'canceled' ? (float) $single->seat_fare - (float) $single->discount : 0;
 
-                        $refund = $single->type === 'canceled' ? (float) ($single->refund ?? 0) : 0;
+                        $cancellationCharges =
+                            $single->type === 'canceled'
+                                ? ((float) $single->seat_fare - (float) $single->discount) *
+                                    ((float) ($single->cancel_ticket->percentage ?? 0) / 100)
+                                : 0;
+                        $refund =
+                            $single->type === 'canceled'
+                                ? max((float) $single->seat_fare - (float) $single->discount - $cancellationCharges, 0)
+                                : 0;
 
                         // ✅ FIXED COMMISSION LOGIC
                         $terminalCommission = $single->type !== 'canceled' ? (float) ($single->comsn ?? 0) : 0;
@@ -129,21 +141,29 @@
 
                         $netCash =
                             $single->type === 'canceled'
-                                ? (float) $single->seat_fare - (float) $single->discount - $refund - $terminalCommission - $seatCommission
-                                : $sale - $terminalCommission - $seatCommission;
+                                ? $cancellationCharges
+                                : $sale - $seatCommission;
 
                         // totals
                         $totalSale += $sale;
                         $totalRefund += $refund;
+                        $totalCancellationCharges = ($totalCancellationCharges ?? 0) + $cancellationCharges;
+                        $terminalCommissionKey = implode('_', [
+                            $single->terminal_id,
+                            $single->bus_id,
+                            $single->schedule_date,
+                            $single->schedule_time_exact ?: $single->schedule_time,
+                        ]);
+
                         if (
                             $single->type !== 'canceled' &&
-                            !in_array($single->terminal_id, $countedTerminalIds, true)
+                            !in_array($terminalCommissionKey, $countedTerminalCommissionGroups, true)
                         ) {
                             $totalCommission += $terminalCommission;
-                            $countedTerminalIds[] = $single->terminal_id;
+                            $countedTerminalCommissionGroups[] = $terminalCommissionKey;
                         }
                         $totalSeatCommission += $seatCommission;
-                        $totalNetCash += $netCash;
+                        $totalNetCash = $totalSale - $totalSeatCommission + $totalCancellationCharges;
                     @endphp
 
                     <tr>
@@ -205,6 +225,9 @@
 
                         @if (!empty($visibleColumnsLookup['refund']))
                             <td>{{ $refund }}</td>
+                        @endif
+                        @if (!empty($visibleColumnsLookup['cancellation_charges']))
+                            <td>{{ $cancellationCharges }}</td>
                         @endif
                         @if (!empty($visibleColumnsLookup['terminal_commission']))
                             <td>
@@ -284,6 +307,9 @@
 
                     @if (!empty($visibleColumnsLookup['refund']))
                         <th>{{ $totalRefund }}</th>
+                    @endif
+                    @if (!empty($visibleColumnsLookup['cancellation_charges']))
+                        <th>{{ $totalCancellationCharges ?? 0 }}</th>
                     @endif
 
                     @if (!empty($visibleColumnsLookup['terminal_commission']))

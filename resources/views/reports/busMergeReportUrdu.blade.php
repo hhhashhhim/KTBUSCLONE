@@ -104,6 +104,16 @@
         .summary-row span {
             font-size: 12px !important;
         }
+
+        .amount-ltr {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+        }
+
+        .amount-negative {
+            color: red;
+        }
     </style>
     <script type="text/javascript">
         window.addEventListener('load', function () {
@@ -304,7 +314,9 @@
                 <div class="summary-row"
                     style="border-top: 2px solid black; font-weight: bold; margin-top: 5px; background-color: #f2f2f2;">
                     <span><strong>: خالص نقد رقم</strong></span>
-                    <span><strong>{{ number_format($total) }}</strong></span>
+                    <span class="{{ $total < 0 ? 'amount-negative' : '' }}">
+                        <strong class="amount-ltr">{{ $total < 0 ? '-' . number_format(abs($total)) : number_format($total) }}</strong>
+                    </span>
                 </div>
                 <div class="summary-row" style="background-color: #eee;">
                     <span>: نیٹ واجب الادا (Payable)</span>
