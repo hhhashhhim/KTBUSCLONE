@@ -508,6 +508,7 @@ export default {
         },
         totalNetCash() {
             return this.totalSaleAmount()
+                - this.totalCommission()
                 - this.totalSeatCommission()
                 + this.totalCancellationCharges();
         },

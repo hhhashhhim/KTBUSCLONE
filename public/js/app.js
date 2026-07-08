@@ -31588,7 +31588,7 @@ var COLUMN_OPTIONS = [{
       return 0;
     },
     totalNetCash: function totalNetCash() {
-      return this.totalSaleAmount() - this.totalSeatCommission() + this.totalCancellationCharges();
+      return this.totalSaleAmount() - this.totalCommission() - this.totalSeatCommission() + this.totalCancellationCharges();
     },
     totalCommission: function totalCommission() {
       if (this.filters.record && Array.isArray(this.filters.record)) {
