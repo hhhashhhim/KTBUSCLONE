@@ -284,6 +284,18 @@
                                                             </tbody>
                                                         </table>
                                                     </div>
+                                                    <div v-if="filters.record.length > 0"
+                                                        class="net-cash-rows-card">
+                                                        <div>
+                                                            <div class="net-cash-rows-title">Net Cash Rows Total</div>
+                                                            <div class="net-cash-rows-formula">
+                                                                Sum of Net Cash column only. No extra plus or minus.
+                                                            </div>
+                                                        </div>
+                                                        <div class="net-cash-rows-value">
+                                                            {{ $insertComma(totalNetCashRowsOnly()) }}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -512,6 +524,14 @@ export default {
                 - this.totalSeatCommission()
                 + this.totalCancellationCharges();
         },
+        totalNetCashRowsOnly() {
+            if (this.filters.record && Array.isArray(this.filters.record)) {
+                return this.filters.record.reduce((sum, data) => {
+                    return sum + (Number(data.net_cash) || 0);
+                }, 0);
+            }
+            return 0;
+        },
         totalCommission: function () {
             if (this.filters.record && Array.isArray(this.filters.record)) {
 
@@ -620,5 +640,36 @@ td {
 
 .column-option:last-child {
     margin-bottom: 0;
+}
+
+.net-cash-rows-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid #d7dce3;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.net-cash-rows-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #2f3542;
+}
+
+.net-cash-rows-formula {
+    margin-top: 0.25rem;
+    font-size: 0.82rem;
+    color: #6b7280;
+}
+
+.net-cash-rows-value {
+    white-space: nowrap;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1f2a44;
 }
 </style>

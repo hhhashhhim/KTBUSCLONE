@@ -31590,6 +31590,15 @@ var COLUMN_OPTIONS = [{
     totalNetCash: function totalNetCash() {
       return this.totalSaleAmount() - this.totalCommission() - this.totalSeatCommission() + this.totalCancellationCharges();
     },
+    totalNetCashRowsOnly: function totalNetCashRowsOnly() {
+      if (this.filters.record && Array.isArray(this.filters.record)) {
+        return this.filters.record.reduce(function (sum, data) {
+          return sum + (Number(data.net_cash) || 0);
+        }, 0);
+      }
+
+      return 0;
+    },
     totalCommission: function totalCommission() {
       if (this.filters.record && Array.isArray(this.filters.record)) {
         var seen = new Set();
@@ -89565,6 +89574,24 @@ var _hoisted_122 = {
 var _hoisted_123 = {
   key: 18
 };
+var _hoisted_124 = {
+  key: 0,
+  "class": "net-cash-rows-card"
+};
+
+var _hoisted_125 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "net-cash-rows-title"
+  }, "Net Cash Rows Total"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "net-cash-rows-formula"
+  }, " Sum of Net Cash column only. No extra plus or minus. ")], -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_126 = {
+  "class": "net-cash-rows-value"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "text",
@@ -89868,7 +89895,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.isColumnVisible('net_cash') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_123, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.totalNetCash())), 1
   /* TEXT */
-  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])])])]);
+  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), $data.filters.record.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_124, [_hoisted_125, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_126, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.totalNetCashRowsOnly())), 1
+  /* TEXT */
+  )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END TABLE ")])])])])])]);
 }
 
 /***/ }),
@@ -154818,7 +154847,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-1940f9a2],\nth[data-v-1940f9a2],\ntd[data-v-1940f9a2] {\n    border: 1px solid #b9b9b9;\n    border-collapse: collapse;\n}\n.report-tools-bar[data-v-1940f9a2] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 1rem;\n    align-items: flex-end;\n    justify-content: flex-end;\n}\n.column-dropdown-wrapper[data-v-1940f9a2] {\n    position: relative;\n    min-width: 280px;\n    max-width: 320px;\n}\n.column-dropdown-toggle[data-v-1940f9a2] {\n    width: 100%;\n    text-align: left;\n}\n.column-dropdown-menu[data-v-1940f9a2] {\n    position: absolute;\n    top: calc(100% + 0.5rem);\n    left: 0;\n    z-index: 20;\n    width: 100%;\n    max-height: 260px;\n    overflow-y: auto;\n    padding: 0.75rem;\n    background: #fff;\n    border: 1px solid #d7dce3;\n    border-radius: 0.5rem;\n    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.column-option[data-v-1940f9a2] {\n    display: flex;\n    align-items: center;\n    gap: 0.5rem;\n    margin-bottom: 0.5rem;\n    cursor: pointer;\n}\n.column-option[data-v-1940f9a2]:last-child {\n    margin-bottom: 0;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ntable[data-v-1940f9a2],\nth[data-v-1940f9a2],\ntd[data-v-1940f9a2] {\n    border: 1px solid #b9b9b9;\n    border-collapse: collapse;\n}\n.report-tools-bar[data-v-1940f9a2] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 1rem;\n    align-items: flex-end;\n    justify-content: flex-end;\n}\n.column-dropdown-wrapper[data-v-1940f9a2] {\n    position: relative;\n    min-width: 280px;\n    max-width: 320px;\n}\n.column-dropdown-toggle[data-v-1940f9a2] {\n    width: 100%;\n    text-align: left;\n}\n.column-dropdown-menu[data-v-1940f9a2] {\n    position: absolute;\n    top: calc(100% + 0.5rem);\n    left: 0;\n    z-index: 20;\n    width: 100%;\n    max-height: 260px;\n    overflow-y: auto;\n    padding: 0.75rem;\n    background: #fff;\n    border: 1px solid #d7dce3;\n    border-radius: 0.5rem;\n    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.column-option[data-v-1940f9a2] {\n    display: flex;\n    align-items: center;\n    gap: 0.5rem;\n    margin-bottom: 0.5rem;\n    cursor: pointer;\n}\n.column-option[data-v-1940f9a2]:last-child {\n    margin-bottom: 0;\n}\n.net-cash-rows-card[data-v-1940f9a2] {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 1rem;\n    margin-top: 1rem;\n    padding: 1rem 1.25rem;\n    border: 1px solid #d7dce3;\n    border-radius: 8px;\n    background: #f8fafc;\n}\n.net-cash-rows-title[data-v-1940f9a2] {\n    font-size: 0.95rem;\n    font-weight: 700;\n    color: #2f3542;\n}\n.net-cash-rows-formula[data-v-1940f9a2] {\n    margin-top: 0.25rem;\n    font-size: 0.82rem;\n    color: #6b7280;\n}\n.net-cash-rows-value[data-v-1940f9a2] {\n    white-space: nowrap;\n    font-size: 1.25rem;\n    font-weight: 800;\n    color: #1f2a44;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
