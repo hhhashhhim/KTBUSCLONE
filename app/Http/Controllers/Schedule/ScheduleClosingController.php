@@ -1092,6 +1092,7 @@ class ScheduleClosingController extends Controller
                 });
 
                 $totalOnlineSale = $group->sum('total_receivable');
+                $totalEltSale = $group->sum('elt');
                 $totalReceivedBank = $offlineGroup->sum('total_received_bank');
                 $totalOtherCommission = $group->sum('other_commission');
                 $totalKtCommission = $group->sum('kt_commission');
@@ -1103,8 +1104,9 @@ class ScheduleClosingController extends Controller
                     'route'               => $first->route->name ?? 'N/A',
                     'total_received_bank' => $totalReceivedBank,
                     'sale'                => $totalOnlineSale,
+                    'elt_sale'            => $totalEltSale,
                     'expense'             => $totalExpense,
-                    'net_sale'            => $totalOnlineSale - $totalExpense,
+                    'net_sale'            => ( $totalOnlineSale + $totalEltSale ) - $totalExpense,
                 ];
 
                 $totalOnlinePortalsAmount = 0;
