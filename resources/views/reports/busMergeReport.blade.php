@@ -134,6 +134,7 @@
                     <th>Route</th>
                     <th>Sale</th>
                     <th>Expense</th>
+                    <th>Elt Sale</th>
                     <th>Net Sale</th>
                     <th>Received Bank</th>
                     {{-- Dynamic Headers for Portals --}}
@@ -152,6 +153,7 @@
 
                         <td>{{ number_format($item['sale']) }}</td>
                         <td>{{ number_format($item['expense']) }}</td>
+                        <td>{{ number_format($item['elt_sale']) }}</td>
                         <td>{{ number_format($item['net_sale']) }}</td>
                         <td>{{ number_format($item['total_received_bank']) }}</td>
                         {{-- Dynamic Values for Portals --}}

@@ -1091,8 +1091,8 @@ class ScheduleClosingController extends Controller
                     return optional($item->ticket_closing_merge)->expenses->sum('amount') ?? 0;
                 });
 
-                $totalOnlineSale = $group->sum('total_receivable');
                 $totalEltSale = $group->sum('elt');
+                $totalOnlineSale = $group->sum('total_receivable') + $totalEltSale;
                 $totalReceivedBank = $offlineGroup->sum('total_received_bank');
                 $totalOtherCommission = $group->sum('other_commission');
                 $totalKtCommission = $group->sum('kt_commission');
@@ -1106,7 +1106,8 @@ class ScheduleClosingController extends Controller
                     'sale'                => $totalOnlineSale,
                     'elt_sale'            => $totalEltSale,
                     'expense'             => $totalExpense,
-                    'net_sale'            => ( $totalOnlineSale + $totalEltSale ) - $totalExpense,
+                    'net_sale'            => $totalOnlineSale - $totalExpense,
+
                 ];
 
                 $totalOnlinePortalsAmount = 0;
