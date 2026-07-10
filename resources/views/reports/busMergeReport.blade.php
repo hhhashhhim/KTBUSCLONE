@@ -173,6 +173,7 @@
 
                     <td>{{ number_format($data['merges']->sum('sale')) }}</td>
                     <td>{{ number_format($data['merges']->sum('expense')) }}</td>
+                    <td>{{ number_format($data['merges']->sum('elt_sale')) }}</td>
                     <td>{{ number_format($data['merges']->sum('net_sale')) }}</td>
                     <td>{{ number_format($data['merges']->sum('total_received_bank')) }}</td>
                     {{-- Dynamic Totals for Portals --}}
