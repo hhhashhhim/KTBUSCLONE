@@ -1653,6 +1653,13 @@ class ScheduleClosingController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $request->validate([
+            'bus' => [
+                'required',
+                Rule::exists('buses', 'id')->where(function ($query) {
+                    return $query->where('company_id', Auth::user()->company_id)
+                        ->whereNull('deleted_at');
+                }),
+            ],
             'terminal_id' => [
                 'nullable',
                 Rule::exists('terminals', 'id')->where(function ($query) {
@@ -1774,6 +1781,13 @@ class ScheduleClosingController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         $request->validate([
+            'bus' => [
+                'required',
+                Rule::exists('buses', 'id')->where(function ($query) {
+                    return $query->where('company_id', Auth::user()->company_id)
+                        ->whereNull('deleted_at');
+                }),
+            ],
             'terminal_id' => [
                 'nullable',
                 Rule::exists('terminals', 'id')->where(function ($query) {
@@ -1789,20 +1803,44 @@ class ScheduleClosingController extends Controller
             DB::beginTransaction();
             // delete old members
             TicketClosingMember::where(["company_id" => Auth::user()->company_id, "ticket_closing_id" => $request->closingId])->delete();
-            // for
-            $closing = TicketClosing::find($request->closingId);
-            $merge = TicketClosingMerge::find($closing->ticket_merge_id);
-            $closing->update([
-                "terminal_id" => $request->terminal_id ?: null,
+
+            $closing = TicketClosing::where('company_id', Auth::user()->company_id)
+                ->findOrFail($request->closingId);
+            $merge = TicketClosingMerge::where('company_id', Auth::user()->company_id)
+                ->findOrFail($closing->ticket_merge_id);
+
+            // A completed merge represents the outbound and return legs of one bus.
+            // Keep all persisted copies of that bus in sync; otherwise getClosingData()
+            // reloads the old bus from ticket_closings and the UI appears to revert.
+            $closingIds = $merge->schedule_complete == 1
+                ? TicketClosing::where('company_id', Auth::user()->company_id)
+                    ->where('ticket_merge_id', $merge->id)
+                    ->pluck('id')
+                : collect([$closing->id]);
+
+            TicketClosing::whereIn('id', $closingIds)->update([
+                'bus_id' => $request->bus,
             ]);
-            if ($merge->schedule_complete == 0) {
-                $closing->update([
-                    "bus_id" => $request->bus
-                ]);
-                $merge->update([
-                    "bus_id" => $request->bus
+            TicketClosingMember::whereIn('ticket_closing_id', $closingIds)->update([
+                'bus_id' => $request->bus,
+            ]);
+            Ticket::whereIn('ticket_closing_id', $closingIds)->withTrashed()->update([
+                'bus_id' => $request->bus,
+            ]);
+            $merge->update([
+                'bus_id' => $request->bus,
+            ]);
+
+            if ($merge->schedule_complete == 1) {
+                TicketMergeExpense::where('ticket_merge_id', $merge->id)->update([
+                    'bus_id' => $request->bus,
                 ]);
             }
+
+            $closing->update([
+                "terminal_id" => $request->terminal_id ?: null,
+                "description" => $request->description,
+            ]);
             foreach ($request->drivers as $value) {
                 TicketClosingMember::create([
                     "user_id" => $value,
@@ -1825,7 +1863,6 @@ class ScheduleClosingController extends Controller
                 ]);
             }
 
-            Ticket::where("ticket_closing_id", $closing->id)->withTrashed()->update(["bus_id" => $request->bus]);
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
                 "message" => Auth::user()->name . " | updated closed schedule ($request->closingId)",
@@ -1833,6 +1870,7 @@ class ScheduleClosingController extends Controller
                 "company_id" => Auth::user()->company_id
             ]);
             DB::commit();
+            return response()->json(['message' => 'Close schedule updated successfully.']);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Database transaction error: ' . $e->getMessage());
