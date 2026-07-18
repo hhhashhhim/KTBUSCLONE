@@ -7,6 +7,7 @@ use App\Models\TicketClosingShortage;
 use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TicketClosingShortageController extends Controller
 {
@@ -33,33 +34,35 @@ class TicketClosingShortageController extends Controller
         'records.*.rows.*.bank_id' => 'nullable|integer',
     ]);
 
-    foreach ($request->records as $record) {
-        foreach ($record['rows'] as $row) {
-            TicketClosingShortage::updateOrCreate(
-                [
-                    'ticket_closing_id' => $request->ticket_closing_id,
-                    'terminal_id' => $row['terminal_id'],
-                    'type' => $record['type'],
-                ],
-                [
-                    'bus_id'              => $record['bus_id'] ?? 0,
-                    'route_id'            => $record['route'] ?? null,
-                    'passenger_count'     => round($row['passenger_count']),
-                    'kt_commission'       => round($row['kt_commission']),
-                    'elt'                 => round($row['elt']),
-                    'cancellation_amount' => round($row['cancellation_amount']),
-                    'other_commission'    => round($row['other_commission']),
-                    'total_receivable'    => round($row['total_receivable']),
-                    'total_received_cash' => round($row['total_received_cash']),
-                    'bank_id'             => $row['bank_id'] ?? null,
-                    'total_received_bank' => round($row['total_received_bank']),
-                    'shortage'            => round($row['shortage']),
-                    'received'            => round($row['received']),
-                    'company_id'          => Auth::user()->company_id,
-                ]
-            );
+    DB::transaction(function () use ($request) {
+        foreach ($request->records as $record) {
+            foreach ($record['rows'] as $row) {
+                TicketClosingShortage::updateOrCreate(
+                    [
+                        'ticket_closing_id' => $request->ticket_closing_id,
+                        'terminal_id' => $row['terminal_id'],
+                        'type' => $record['type'],
+                    ],
+                    [
+                        'bus_id'              => $record['bus_id'] ?? 0,
+                        'route_id'            => $record['route'] ?? null,
+                        'passenger_count'     => round($row['passenger_count']),
+                        'kt_commission'       => round($row['kt_commission']),
+                        'elt'                 => round($row['elt']),
+                        'cancellation_amount' => round($row['cancellation_amount']),
+                        'other_commission'    => round($row['other_commission']),
+                        'total_receivable'    => round($row['total_receivable']),
+                        'total_received_cash' => round($row['total_received_cash']),
+                        'bank_id'             => $row['bank_id'] ?? null,
+                        'total_received_bank' => round($row['total_received_bank']),
+                        'shortage'            => round($row['shortage']),
+                        'received'            => round($row['received']),
+                        'company_id'          => Auth::user()->company_id,
+                    ]
+                );
+            }
         }
-    }
+    });
 
     ActivityLogger::log('Ticket Closing Shortage', 'create', 'Ticket closing shortage saved', $request->ticket_closing_id, [], [
         'ticket_closing_id' => $request->ticket_closing_id,

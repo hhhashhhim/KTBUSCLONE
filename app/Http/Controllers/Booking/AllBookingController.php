@@ -44,6 +44,7 @@ class AllBookingController extends Controller
 
     public function filter(Request $request)
     {
+       
         if (!checkForSubmenu("all-booking")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
@@ -111,6 +112,7 @@ class AllBookingController extends Controller
                     "bus:id,bus_number",
                     "terminal:id,name",
                     "addedBy:id,name",
+                    "updated_by:id,name",
                     "scheduleDetail:id,departure_time",
                     "cancel_ticket:id,ticket_id,added_by,created_at",
                     "cancel_ticket.added_by_name:id,name",
