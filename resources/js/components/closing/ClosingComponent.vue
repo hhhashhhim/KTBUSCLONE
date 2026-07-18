@@ -62,7 +62,7 @@
                                                 <td>
                                                     <input type="text" class="form-control"
                                                         v-model="cashBankStart[terminalId].cash"
-                                                        @input="updateCash(terminalId, tickets)"
+                                                        @input="updateReceived('start', terminalId, tickets, 'cash')"
                                                         :disabled="totalFare(tickets) == 0"
                                                         @keypress="$numberValidate($event, { dot: true })" />
                                                 </td>
@@ -81,7 +81,7 @@
                                                 <td>
                                                     <input type="text" min="0" class="form-control"
                                                         v-model.number="cashBankStart[terminalId].bank"
-                                                        @input="updateBank(terminalId, tickets)"
+                                                        @input="updateBank('start', terminalId, tickets)"
                                                         :disabled="totalFare(tickets) == 0"
                                                         @keypress="$numberValidate($event, { dot: true })" />
                                                 </td>
@@ -181,7 +181,7 @@
                                                 <td>
                                                     <input type="text" min="0" class="form-control"
                                                         v-model.number="cashBankReturn[terminalId].cash"
-                                                        @input="editingField = 'cash'"
+                                                        @input="updateReceived('return', terminalId, tickets, 'cash')"
                                                         :disabled="totalFare(tickets) == 0"
                                                         @keypress="$numberValidate($event, { dot: true })" />
                                                 </td>
@@ -200,7 +200,7 @@
                                                 <td>
                                                     <input type="text" min="0" class="form-control"
                                                         v-model.number="cashBankReturn[terminalId].bank"
-                                                        @input="editingField = 'bank'"
+                                                        @input="updateBank('return', terminalId, tickets)"
                                                         :disabled="totalFare(tickets) == 0"
                                                         @keypress="$numberValidate($event, { dot: true })" />
                                                 </td>
@@ -619,7 +619,7 @@
 
 <script>
 export default {
-    props: ["data", "banks", "busIds", "mergeIds", 'routes'],
+    props: ["data", "banks", "busIds", "mergeIds", "routes", "addData"],
     data() {
         return {
             categories: [],
@@ -634,10 +634,6 @@ export default {
                 showExtra: [false],
                 extraCategory: [''],
             },
-            addData: {
-                busIds: [],
-                mergeIds: [],
-            },
             loop: 1,
             loading: false,
             cashBank: {},
@@ -649,68 +645,16 @@ export default {
         };
     },
     watch: {
-        cashBankStart: {
-            deep: true,
-            handler(val) {
-                this.validateCashBank(val);
-            },
-        },
-
-        cashBankReturn: {
-            deep: true,
-            handler(val) {
-                this.validateCashBank(val);
-            },
-        },
-
         "data.schedule_start": {
             immediate: true,
-            deep: true,
             handler(val) {
-                if (!val) return;
-
-                Object.entries(val).forEach(([terminalId, tickets]) => {
-                    if (this.cashBankStart[terminalId]) return;
-
-                    const rawTotal = this.totalFare(tickets) - this.totalOtherCommission(tickets);
-
-
-                    const commission = this.totalOtherCommission(tickets);
-                    const total = Math.round(rawTotal);
-                    const method = tickets[0].terminal.recovery_method;
-
-                    this.cashBankStart[terminalId] = {
-                        total,
-                        commission,
-                        cash: method === "cash" ? total : 0,
-                        bank: method === "bank" ? total : 0,
-                        shortage: 0,
-                    };
-                });
+                this.cashBankStart = this.buildCashBankRows(val);
             },
         },
         "data.schedule_return": {
             immediate: true,
-            deep: true,
             handler(val) {
-                if (!val) return;
-
-                Object.entries(val).forEach(([terminalId, tickets]) => {
-                    if (this.cashBankReturn[terminalId]) return;
-
-                    const rawTotal = this.totalFare(tickets) - this.totalOtherCommission(tickets);
-                    const total = Math.round(rawTotal);
-                    const commission = this.totalOtherCommission(tickets);
-                    const method = tickets[0].terminal.recovery_method;
-
-                    this.cashBankReturn[terminalId] = {
-                        total,
-                        commission,
-                        cash: method === "cash" ? total : 0,
-                        bank: method === "bank" ? total : 0,
-                        shortage: 0,
-                    };
-                });
+                this.cashBankReturn = this.buildCashBankRows(val);
             },
         },
     },
@@ -848,45 +792,55 @@ export default {
                 this.postData.extraCategory[index] = "";
             }
         },
-        updateCash(terminalId, tickets) {
-            const row = this.cashBankStart[terminalId];
-            const receivable = this.receivable(terminalId, tickets);
+        buildCashBankRows(schedule) {
+            return Object.entries(schedule || {}).reduce((rows, [terminalId, tickets]) => {
+                if (!Array.isArray(tickets) || !tickets.length) return rows;
 
-            row.cash = Math.max(0, Number(row.cash) || 0);
-            row.bank = Math.max(0, Number(row.bank) || 0);
+                const commission = this.totalOtherCommission(tickets);
+                const total = Math.round(this.totalFare(tickets) - commission);
+                const method = tickets[0]?.terminal?.recovery_method;
 
-            row.shortage = Math.max(0, receivable - (row.cash + row.bank));
+                rows[terminalId] = {
+                    total,
+                    commission,
+                    cash: method === "cash" ? total : 0,
+                    bank: method === "bank" ? total : 0,
+                    shortage: 0,
+                    selectedBankId: "",
+                };
+
+                return rows;
+            }, {});
         },
-        updateBank(value, terminalId, tickets) {
-            const otherCommission = this.totalOtherCommission(tickets);
+        updateReceived(direction, terminalId, tickets, editedField) {
+            const rows = direction === "start" ? this.cashBankStart : this.cashBankReturn;
+            const row = rows[terminalId];
+            if (!row) return;
 
-            this.cashBankStart[terminalId].bank =
-                Number(value || 0) - otherCommission;
+            const total = Math.round(this.totalFare(tickets) - this.totalOtherCommission(tickets));
+            let cash = Math.max(0, Number(row.cash) || 0);
+            let bank = Math.max(0, Number(row.bank) || 0);
+
+            if (cash + bank > total) {
+                if (editedField === "cash") {
+                    cash = Math.max(0, total - bank);
+                } else {
+                    bank = Math.max(0, total - cash);
+                }
+            }
+
+            row.total = total;
+            row.cash = cash;
+            row.bank = bank;
+            row.shortage = Math.max(0, total - cash - bank);
+        },
+        updateBank(direction, terminalId, tickets) {
+            this.updateReceived(direction, terminalId, tickets, "bank");
         },
         syncPaid(index) {
             // Auto-fill Paid when Amount changes
             this.postData.paid[index] = this.postData.amount[index];
         },
-        validateCashBank(obj) {
-            Object.values(obj).forEach((row) => {
-                const total = Number(row.total) || 0;
-                let cash = Number(row.cash) || 0;
-                let bank = Number(row.bank) || 0;
-
-                if (cash + bank > total) {
-                    if (this.editingField === "cash") {
-                        cash = total - bank;
-                    } else if (this.editingField === "bank") {
-                        bank = total - cash;
-                    }
-                }
-
-                row.cash = Math.max(0, cash);
-                row.bank = Math.max(0, bank);
-                row.shortage = total - (row.cash + row.bank);
-            });
-        },
-
         netAmountStart(id) {
             const row = this.cashBankStart[id];
             return row ? row.cash + row.bank : 0;
@@ -1001,7 +955,7 @@ export default {
         },
 
         close() {
-            $('#exampleModal').click();
+            $("#exampleModal").modal("hide");
         },
         sumReceived() {
             return Object.values(this.cashBankStart).reduce((sum, row) => {
@@ -1288,11 +1242,34 @@ export default {
 
             if (!headIds.length) return;
 
-            await this.callApi("post", "expenses/categories/expenseHeaderLink", {
+            const res = await this.callApi("post", "expenses/categories/expenseHeaderLink", {
                 ticket_merge_id: ticketMergeId,
                 headIds,
                 values
             });
+
+            this.ensureSuccessfulResponse(res, "Unable to save expense header links");
+        },
+        getApiError(response, fallback) {
+            const data = response?.data || response || {};
+            const errors = data.errors || data.Error;
+
+            if (Array.isArray(errors)) return errors.join("\n");
+
+            if (errors && typeof errors === "object") {
+                const messages = Object.values(errors)
+                    .flatMap((value) => Array.isArray(value) ? value : [value])
+                    .filter(Boolean);
+
+                if (messages.length) return messages.join("\n");
+            }
+
+            return data.message || fallback;
+        },
+        ensureSuccessfulResponse(response, fallback) {
+            if (!response || ![200, 201].includes(response.status)) {
+                throw new Error(this.getApiError(response, fallback));
+            }
         },
         //  // ===== Merge Schedule API =====
         async mergeScheduleApi(addData = {}) {
@@ -1325,10 +1302,6 @@ export default {
                     const mergedData = res.data || {};
                     this.mergedData = mergedData;
 
-                    // Update stored IDs if returned
-                    if (mergedData.busIds?.length) this.busIds = mergedData.busIds;
-                    if (mergedData.mergeIds?.length) this.mergeIds = mergedData.mergeIds;
-
                     return mergedData;
                 } else {
                     throw new Error(`Merge failed with status ${res.status}`);
@@ -1346,6 +1319,44 @@ export default {
     this.loading = true;
 
     try {
+        // Iterate over the currently displayed schedules so stale cache keys can
+        // never add, remove, or replace Start/Return rows in the API payload.
+        const mapRows = (schedule, cashBank) =>
+            Object.entries(schedule || {}).reduce((rows, [terminalId, tickets]) => {
+                if (!Array.isArray(tickets) || !tickets.length) return rows;
+
+                const fallbackRow = this.buildCashBankRows({ [terminalId]: tickets })[terminalId];
+                const row = cashBank[terminalId] || fallbackRow;
+                const commission = this.totalOtherCommission(tickets);
+                const total = Math.round(this.totalFare(tickets) - commission);
+                const cash = Math.max(0, Number(row.cash) || 0);
+                const bank = Math.max(0, Number(row.bank) || 0);
+                const received = cash + bank;
+
+                rows.push({
+                    terminal_id: Number(terminalId),
+                    passenger_count: tickets.filter(ticket => ticket.type !== "canceled").length,
+                    kt_commission: this.totalCommission(tickets),
+                    elt: this.totalELT(tickets),
+                    cancellation_amount: this.totalCancelAmount(tickets),
+                    total_receivable: total + commission,
+                    other_commission: commission,
+                    total_received_cash: cash,
+                    bank_id: row.selectedBankId || null,
+                    total_received_bank: bank,
+                    shortage: Math.max(0, total - received),
+                    received,
+                });
+
+                return rows;
+            }, []);
+
+        const startRows = mapRows(this.data?.schedule_start, this.cashBankStart);
+        const returnRows = mapRows(this.data?.schedule_return, this.cashBankReturn);
+
+        if (!startRows.length && !returnRows.length) {
+            throw new Error("No current start or return schedule rows are available to save");
+        }
         // ✅ STEP 1: Merge
         const mergedResult = await this.mergeScheduleApi(this.addData);
 
@@ -1360,32 +1371,11 @@ export default {
         // if this fails → it will automatically jump to catch
 
         // ✅ STEP 3: Prepare Data
-        const mapRows = (cashBank, schedule) =>
-            Object.entries(cashBank).map(([terminalId, row]) => {
-                const tickets = schedule[terminalId] || [];
-
-                return {
-                    terminal_id: Number(terminalId),
-                    passenger_count: tickets.filter(ticket => ticket.type != 'canceled').length,
-                    kt_commission: this.totalCommission(tickets),
-                    elt: this.totalELT(tickets),
-                    cancellation_amount: this.totalCancelAmount(tickets),
-                    total_receivable: row.total + row.commission,
-                    other_commission: row.commission || 0,
-                    total_received_cash: row.cash,
-                    bank_id: row.selectedBankId || null,
-                    total_received_bank: row.bank,
-                    shortage: row.shortage,
-                    received: row.cash + row.bank,
-                };
-            });
-
         const payload = {
             ticket_closing_id: mergedResult.id,
             records: []
         };
 
-        const startRows = mapRows(this.cashBankStart, this.data.schedule_start);
         if (startRows.length) {
             payload.records.push({
                 type: "start",
@@ -1395,7 +1385,6 @@ export default {
             });
         }
 
-        const returnRows = mapRows(this.cashBankReturn, this.data.schedule_return);
         if (returnRows.length) {
             payload.records.push({
                 type: "return",
@@ -1411,11 +1400,12 @@ export default {
         }
 
         // ✅ STEP 4: Final API
-        await this.callApi(
+        const saveResponse = await this.callApi(
             "post",
             "booking/close/schedule/closing/ticket-closing-shortage",
             payload
         );
+        this.ensureSuccessfulResponse(saveResponse, "Unable to save ticket closing entries");
 
         // ✅ SUCCESS
         Swal.fire({
@@ -1426,6 +1416,7 @@ export default {
             showConfirmButton: false,
         });
 
+        this.$emit('closingSaved');
         this.$emit('fetchData');
         this.closeexampleModal();
 
@@ -1503,7 +1494,7 @@ export default {
         //   }
         // },
         closeexampleModal() {
-            $("#exampleModal").click();
+            $("#exampleModal").modal("hide");
         },
     },
      mounted() {

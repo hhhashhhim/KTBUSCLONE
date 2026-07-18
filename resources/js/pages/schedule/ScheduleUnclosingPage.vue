@@ -243,7 +243,7 @@ close, j
         </div>
     </section>
     <Closing :data="closingData" :routes="routes" :banks="banks" :busIds="busIds" :mergeIds="mergeIds"
-        :addData="addData" @fetchData="fetchData($event)" />
+        :addData="addData" @closingSaved="resetClosingSelection" @fetchData="fetchData($event)" />
 </template>
 
 <script>
@@ -282,6 +282,9 @@ export default {
             errors: false,
             closingData: {},
             buses: [],
+            banks: [],
+            busIds: [],
+            mergeIds: [],
             routes: {
                 start: "",
                 return: ""
@@ -376,6 +379,15 @@ export default {
         },
         clearForm: function () {
             this.data = {};
+        },
+        resetClosingSelection() {
+            this.addData.mergeIds = [];
+            this.addData.busIds = [];
+            this.mergeIds = [];
+            this.busIds = [];
+            this.banks = [];
+            this.closingData = {};
+            this.routes = { start: "", return: "" };
         },
         changeClosingId: function (close) {
             if (this.addData.mergeIds.includes(close.ticket_merge_id)) {
