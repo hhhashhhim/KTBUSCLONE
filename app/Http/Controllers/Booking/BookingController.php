@@ -57,6 +57,38 @@ use Exception;
 
 class BookingController extends Controller
 {
+    private function closingForTrip($scheduleId, $scheduleDate, $departureCity, $destinationCity, $departureTime)
+    {
+        $exactClosing = TicketClosing::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $scheduleId,
+            'schedule_date' => $scheduleDate,
+            'schedule_start' => $departureCity,
+            'schedule_end' => $destinationCity,
+            'schedule_time' => $departureTime,
+        ])->latest('id')->first(['id', 'bus_id', 'ticket_merge_id']);
+
+        if ($exactClosing) {
+            return $exactClosing;
+        }
+
+        // A partial journey can share the same bus as a full-route closing. It
+        // is safe to inherit that closing only when the service has one bus.
+        // If several buses are assigned, leaving the ticket unassigned is safer
+        // than silently attaching it to whichever ticket was created last.
+        $closings = TicketClosing::where([
+            'company_id' => Auth::user()->company_id,
+            'schedule_id' => $scheduleId,
+            'schedule_date' => $scheduleDate,
+        ])->whereNotNull('bus_id')
+          ->latest('id')
+          ->get(['id', 'bus_id', 'ticket_merge_id']);
+
+        return $closings->pluck('bus_id')->unique()->count() === 1
+            ? $closings->first()
+            : null;
+    }
+
     private function assignedBus($scheduleId, $scheduleDate)
     {
         $closing = TicketClosing::where([
@@ -182,8 +214,15 @@ class BookingController extends Controller
                 $schedule_time_exact = ScheduleDetail::where(["schedule_id" => $detail->schedule_id, "schedule_date" => $detail->schedule_date])->first();
                 // $schedule To get Route Details ( Example Child City for example Karachi to RWP contains Karachi to Moro and more )
                 $schedule = Schedule::where('id', $request->schedule)->where('company_id', Auth::user()->company_id)->select('id', 'fare_class_id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
-                // $existingTicket Tickets which are already booked or reserved
-                $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule])->orderBy('id', 'desc')->first(['bus_id', 'ticket_closing_id', 'ticket_merge_id']);
+                // Resolve the closing from this exact trip. Looking at the latest
+                // ticket for only schedule/date can copy another bus's closing.
+                $assignedClosing = $this->closingForTrip(
+                    $request->schedule,
+                    $detail->schedule_date,
+                    $request->departureCity,
+                    $request->destinationCity,
+                    $detail->departure_time
+                );
 
                 //To create Invoice Number
                 $invoice = Invoice::create([
@@ -460,9 +499,9 @@ class BookingController extends Controller
                             'customer_id'         => $customer->id,
                             'schedule_id'         => $schedule->id,
                             'route_id'            => $schedule->route_id,
-                            'ticket_closing_id'   => $existingTicket ? $existingTicket->ticket_closing_id : null,
-                            'ticket_merge_id'     => $existingTicket ? $existingTicket->ticket_merge_id : null,
-                            'bus_id'              => $existingTicket ? $existingTicket->bus_id : null,
+                            'ticket_closing_id'   => $assignedClosing ? $assignedClosing->id : null,
+                            'ticket_merge_id'     => $assignedClosing ? $assignedClosing->ticket_merge_id : null,
+                            'bus_id'              => $assignedClosing ? $assignedClosing->bus_id : null,
                             'schedule_details_id' => $detail->id,
                             'terminal_id'         => $request->terminalId ?? Auth::user()->terminal_id,
                             'terminal_name'       => Terminal::find($request->terminalId ?? Auth::user()->terminal_id)->name,
@@ -715,7 +754,13 @@ class BookingController extends Controller
                 if ($item['dataDepartureCity'] != $departure_city_id || $item['dataDestination'] != $destination_city_id) {
                     $isPartial = 1;
                 }
-                $existingTicket = Ticket::where(['company_id' => Auth::user()->company_id, 'schedule_date' => $scheduleDetail->schedule_date, 'schedule_id' => $scheduleDetail->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id', 'ticket_merge_id', 'schedule_id']);
+                $assignedClosing = $this->closingForTrip(
+                    $scheduleDetail->schedule_id,
+                    $scheduleDetail->schedule_date,
+                    $item['dataDepartureCity'],
+                    $item['dataDestination'],
+                    $scheduleDetail->departure_time
+                );
                 if ($item['selected_seatFare'] != $item['dataAll']['seat_fare']) {
                     RescheduleExtraAmount::create([
                         'company_id' => Auth::user()->company_id,
@@ -746,9 +791,9 @@ class BookingController extends Controller
                     'terminal_id' => $ticket['terminal_id'],
                     'invoice_id' => $ticket['invoice_id'],
                     'transaction_id' => $ticket['transaction_id'],
-                    'ticket_closing_id' => $existingTicket ? $existingTicket->ticket_closing_id : null,
-                    'ticket_merge_id' => $existingTicket ? $existingTicket->ticket_merge_id : null,
-                    'bus_id' => $existingTicket ? $existingTicket->bus_id : null,
+                    'ticket_closing_id' => $assignedClosing ? $assignedClosing->id : null,
+                    'ticket_merge_id' => $assignedClosing ? $assignedClosing->ticket_merge_id : null,
+                    'bus_id' => $assignedClosing ? $assignedClosing->bus_id : null,
                     'bus_class_id' => $scheduleDetail->bus_class_id,
                     'seat_fare' => $item['selected_seatFare'],
                     'is_partial' => $isPartial,

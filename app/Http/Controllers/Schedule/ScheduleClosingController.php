@@ -1683,11 +1683,29 @@ class ScheduleClosingController extends Controller
                 "company_id" => Auth::user()->company_id
             ])->first();
 
+            if (!$depTime) {
+                DB::rollBack();
+                return response()->json(["errors" => ["Schedule Error" => ["The selected schedule departure could not be found."]]], 422);
+            }
+
+            // A booking form date can differ from the service date stored on the
+            // schedule detail (overnight/return trips).  Tickets are keyed to the
+            // latter, so every closing record and ticket assignment must use it.
+            $serviceDate = $depTime->schedule_date;
+
             $schedule = Schedule::where("id", $request->schedule)->first();
             $route = Route::where("id", $schedule->route_id)->first();
 
-            $bookingAvailable = Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, 'schedule_date' => $depTime->schedule_date])->get();
+            $bookingAvailable = Ticket::where([
+                "company_id" => Auth::user()->company_id,
+                "schedule_id" => $request->schedule,
+                'schedule_date' => $serviceDate,
+            ])->where(function ($query) use ($request) {
+                $query->whereNull('ticket_closing_id')
+                    ->orWhere('bus_id', $request->bus);
+            })->get();
             if (count($bookingAvailable) == 0) {
+                DB::rollBack();
                 return response()->json(["errors" => ["Tickets Error" => ["No Booking Found! \n\n Booked Any Single Seat First"]]], 422);
             }
             // if already assign
@@ -1695,18 +1713,19 @@ class ScheduleClosingController extends Controller
                 'company_id' => Auth::user()->company_id,
                 "bus_id" => $request->bus,
                 'schedule_id' => $request->schedule,
-                'schedule_date' => $depTime->schedule_date,
+                'schedule_date' => $serviceDate,
             ])
                 ->first();
 
             if ($checkAssign) {
+                DB::rollBack();
                 return response()->json(["errors" => ["Closing Error" => ["Already Closed"]]], 422);
             }
 
 
             $newRecord = TicketClosingMerge::create([
                 "bus_id" => $request->bus,
-                "schedule_departure_date" => $request->date,
+                "schedule_departure_date" => $serviceDate,
                 "schedule_complete" => 0,
                 'company_id' => Auth::user()->company_id,
                 'added_by' => Auth::user()->id,
@@ -1717,7 +1736,7 @@ class ScheduleClosingController extends Controller
                 "bus_id" => $request->bus,
                 "ticket_merge_id" => $newRecord->id,
                 "schedule_id" => $request->schedule,
-                "schedule_date" => $request->date,
+                "schedule_date" => $serviceDate,
                 "schedule_time" => $depTime->departure_time,
                 "schedule_start" => $request->departureCity,
                 "schedule_end" => $request->destinationCity,
@@ -1753,11 +1772,19 @@ class ScheduleClosingController extends Controller
                 ]);
             }
 
-            Ticket::where(["company_id" => Auth::user()->company_id, "schedule_id" => $request->schedule, "schedule_date" => $request->date])
+            Ticket::where([
+                "company_id" => Auth::user()->company_id,
+                "schedule_id" => $request->schedule,
+                "schedule_date" => $serviceDate,
+            ])->where(function ($query) use ($request) {
+                $query->whereNull('ticket_closing_id')
+                    ->orWhere('bus_id', $request->bus);
+            })
                 ->withTrashed()
                 ->update([
                     "bus_id" => $request->bus,
                     "ticket_closing_id" => $closingRecord->id,
+                    "ticket_merge_id" => $newRecord->id,
                 ]);
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
