@@ -363,7 +363,7 @@ class ScheduleClosingController extends Controller
             ->where('ticket_merge_id', $mergeIds[0])
             ->first();
 
-       return $closingPairsTwo = TicketClosing::with('schedule:id,route_id', 'schedule.route')
+        $closingPairsTwo = TicketClosing::with('schedule:id,route_id', 'schedule.route')
             ->where('company_id', $companyId)
             ->where('ticket_merge_id', $mergeIds[1])
             ->first();
@@ -382,9 +382,9 @@ class ScheduleClosingController extends Controller
         $routeIdReturn = $closingPairsTwo->schedule->route_id;
 
         // Fetch tickets
-        $ticketsStart = Ticket::withTrashed()
+       return $ticketsStart = Ticket::withTrashed()
             ->where('company_id', $companyId)
-            ->whereIn('ticket_closing_id', [$closingPairsOne->id, $closingPairsTwo->id])
+            ->whereIn('ticket_closing_id', [$closingPairsTwo->id])
             ->whereIn('type', ['booked', 'over-issue', 'canceled'])
 
             ->with([
