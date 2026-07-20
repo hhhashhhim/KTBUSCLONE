@@ -358,7 +358,7 @@ class ScheduleClosingController extends Controller
         $mergeIds = $request->mergeIds;
 
         // Get closing pairs with schedule in a single query
-         $closingPairsOne = TicketClosing::with('schedule:id,route_id')
+        $closingPairsOne = TicketClosing::with('schedule:id,route_id')
             ->where('company_id', $companyId)
             ->where('ticket_merge_id', $mergeIds[0])
             ->first();
@@ -382,9 +382,9 @@ class ScheduleClosingController extends Controller
         $routeIdReturn = $closingPairsTwo->schedule->route_id;
 
         // Fetch tickets
-       return $ticketsStart = Ticket::withTrashed()
+        $ticketsStart = Ticket::withTrashed()
             ->where('company_id', $companyId)
-            ->whereIn('ticket_closing_id', [$closingPairsTwo->id])
+            ->whereIn('ticket_closing_id', [$closingPairsOne->id, $closingPairsTwo->id])
             ->whereIn('type', ['booked', 'over-issue', 'canceled'])
 
             ->with([
@@ -397,9 +397,9 @@ class ScheduleClosingController extends Controller
             ])
             ->get();
 
-        $ticketsReturn = Ticket::withTrashed()
+        return $ticketsReturn = Ticket::withTrashed()
             ->where('company_id', $companyId)
-            ->whereIn('ticket_closing_id', [$closingPairsOne->id, $closingPairsTwo->id])
+            ->whereIn('ticket_closing_id', [$closingPairsTwo->id])
             ->whereIn('type', ['booked', 'over-issue', 'canceled'])
 
             ->with([
