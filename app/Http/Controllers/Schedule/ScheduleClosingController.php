@@ -358,12 +358,12 @@ class ScheduleClosingController extends Controller
         $mergeIds = $request->mergeIds;
 
         // Get closing pairs with schedule in a single query
-        return $closingPairsOne = TicketClosing::with('schedule:id,route_id')
+         $closingPairsOne = TicketClosing::with('schedule:id,route_id')
             ->where('company_id', $companyId)
             ->where('ticket_merge_id', $mergeIds[0])
             ->first();
 
-        $closingPairsTwo = TicketClosing::with('schedule:id,route_id', 'schedule.route')
+       return $closingPairsTwo = TicketClosing::with('schedule:id,route_id', 'schedule.route')
             ->where('company_id', $companyId)
             ->where('ticket_merge_id', $mergeIds[1])
             ->first();
