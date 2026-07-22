@@ -375,14 +375,8 @@ class ScheduleClosingController extends Controller
             ->where('ticket_merge_id', $mergeIds[1])
             ->first();
 
-        if (!$closingPairsOne || !$closingPairsTwo
-            || (int) $closingPairsOne->schedule_start !== (int) $closingPairsTwo->schedule_end
-            || (int) $closingPairsOne->schedule_end !== (int) $closingPairsTwo->schedule_start) {
-            return response()->json([
-                'errors' => [
-                    'mergeIds' => ['Selected schedules must cross-match: DEP → DES and DES → DEP.'],
-                ],
-            ], 422);
+        if (!$closingPairsOne || !$closingPairsTwo) {
+            return response()->json(['error' => 'Invalid merge pair data'], 400);
         }
 
         $closingPairs = TicketClosing::with('schedule:id,route_id', 'schedule.route')
