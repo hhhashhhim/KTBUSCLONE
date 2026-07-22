@@ -365,27 +365,6 @@ export default {
                 return;
             }
 
-            const selectedClosings = Object.values(this.closings || {})
-                .reduce((rows, group) => rows.concat(group), [])
-                .filter((closing) => this.addData.mergeIds.includes(closing.ticket_merge_id));
-
-            const firstClosing = selectedClosings[0];
-            const secondClosing = selectedClosings[1];
-            const citiesCrossMatch = firstClosing && secondClosing
-                && Number(firstClosing.schedule_start) === Number(secondClosing.schedule_end)
-                && Number(firstClosing.schedule_end) === Number(secondClosing.schedule_start);
-
-            if (!citiesCrossMatch) {
-                swal({
-                    title: "Route Mismatch",
-                    text: "Selected schedules must cross-match: DEP → DES and DES → DEP.",
-                    icon: "error",
-                    timer: 2500,
-                });
-                this.loading = false;
-                return;
-            }
-
             try {
                 const res = await this.callApi(
                     "post",

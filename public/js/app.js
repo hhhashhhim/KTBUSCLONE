@@ -72313,7 +72313,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var selectedClosings, firstClosing, secondClosing, citiesCrossMatch, res;
+        var res;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -72359,35 +72359,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _context3.abrupt("return");
 
               case 12:
-                selectedClosings = Object.values(_this3.closings || {}).reduce(function (rows, group) {
-                  return rows.concat(group);
-                }, []).filter(function (closing) {
-                  return _this3.addData.mergeIds.includes(closing.ticket_merge_id);
-                });
-                firstClosing = selectedClosings[0];
-                secondClosing = selectedClosings[1];
-                citiesCrossMatch = firstClosing && secondClosing && Number(firstClosing.schedule_start) === Number(secondClosing.schedule_end) && Number(firstClosing.schedule_end) === Number(secondClosing.schedule_start);
-
-                if (citiesCrossMatch) {
-                  _context3.next = 20;
-                  break;
-                }
-
-                swal({
-                  title: "Route Mismatch",
-                  text: "Selected schedules must cross-match: DEP → DES and DES → DEP.",
-                  icon: "error",
-                  timer: 2500
-                });
-                _this3.loading = false;
-                return _context3.abrupt("return");
-
-              case 20:
-                _context3.prev = 20;
-                _context3.next = 23;
+                _context3.prev = 12;
+                _context3.next = 15;
                 return _this3.callApi("post", "booking/close/schedule/unclosing/data", _this3.addData);
 
-              case 23:
+              case 15:
                 res = _context3.sent;
 
                 if (res.status === 200) {
@@ -72405,26 +72381,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   console.log(res);
                 }
 
-                _context3.next = 30;
+                _context3.next = 22;
                 break;
 
-              case 27:
-                _context3.prev = 27;
-                _context3.t0 = _context3["catch"](20);
+              case 19:
+                _context3.prev = 19;
+                _context3.t0 = _context3["catch"](12);
                 console.error(_context3.t0);
 
-              case 30:
-                _context3.prev = 30;
+              case 22:
+                _context3.prev = 22;
                 // ✅ Always stop loader
                 _this3.loading = false;
-                return _context3.finish(30);
+                return _context3.finish(22);
 
-              case 33:
+              case 25:
               case "end":
                 return _context3.stop();
             }
           }
-        }, _callee3, null, [[20, 27, 30, 33]]);
+        }, _callee3, null, [[12, 19, 22, 25]]);
       }))();
     },
     clearForm: function clearForm() {
