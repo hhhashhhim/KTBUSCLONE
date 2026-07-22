@@ -65,7 +65,7 @@
 <script>
     window.Laravel = {csrfToken: '{{ csrf_token() }}'}
 </script>
-<script src="{{ mix('js/app.js') }}"></script>
+<script src="{{ asset('js/app.js') }}"></script>
 <script>
     $(document).ready(function () {
         $(document).on('show.bs.modal', '.modal', function () {
