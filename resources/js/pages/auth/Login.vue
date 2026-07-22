@@ -66,7 +66,7 @@
                                     {{ success }}
                                 </div>
 
-                                <form @submit="login">
+                                <form @submit.prevent="login">
 
                                     <div class="form-group">
                                         <label for="email">Email</label>
@@ -89,13 +89,33 @@
                                                 </a>
                                               </div> -->
                                         </div>
-                                        <input
-                                            type="password"
-                                            class="form-control"
-                                            tabindex="2"
-
-                                            v-model="data.password"
-                                        />
+                                        <div class="input-group">
+                                            <input
+                                                :type="showPassword ? 'text' : 'password'"
+                                                class="form-control"
+                                                id="password"
+                                                tabindex="2"
+                                                autocomplete="current-password"
+                                                required
+                                                v-model="data.password"
+                                            />
+                                            <div class="input-group-append">
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-outline-secondary password-toggle"
+                                                    tabindex="3"
+                                                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                                                    :title="showPassword ? 'Hide password' : 'Show password'"
+                                                    @click="showPassword = !showPassword"
+                                                >
+                                                    <i
+                                                        class="fas"
+                                                        :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"
+                                                        aria-hidden="true"
+                                                    ></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                         <div class="invalid-feedback">
                                             please fill in your password
                                         </div>
@@ -104,6 +124,9 @@
                                         <button
                                             type="submit"
                                             class="btn btn-success btn-lg btn-block"
+                                            :class="{ 'btn-progress': isLoading }"
+                                            :disabled="isLoading"
+                                            :aria-busy="isLoading"
                                             tabindex="4"
                                         >
                                             Login
@@ -136,19 +159,32 @@ export default {
             success: false,
             errors: [],
             error: "",
+            isLoading: false,
+            showPassword: false,
         };
     },
 
     methods: {
-        async login(e) {
-            e.preventDefault();
+        async login() {
+            if (this.isLoading) return;
+
             this.validationErrors = [];
             if (this.data.email == "")
                 return this.errorsArray("Email is Required", "Email");
             if (this.data.password == "")
                 return this.errorsArray("Password is Required", "Password");
-            
-            const res = await this.callApi("post", "login", this.data);
+
+            this.error = "";
+            this.isLoading = true;
+
+            let res;
+            try {
+                res = await this.callApi("post", "login", this.data);
+            } catch (error) {
+                this.error = "Unable to sign in. Please try again.";
+                this.isLoading = false;
+                return;
+            }
           
             if (res.status == 201) {
                 
@@ -157,6 +193,7 @@ export default {
                     localStorage.setItem("token",res.data.token);
                     this.data.email = this.data.password = "";
                     window.location.href = this.$store.state.main_url + "admin/dashboard";
+                    return;
                 }
                
             } else if(res.status == 404){
@@ -173,7 +210,20 @@ export default {
                     this.errorsArray(res.data.message);
                 }
             }
+
+            this.isLoading = false;
         },
     }
 };
 </script>
+
+<style scoped>
+.password-toggle {
+    min-width: 46px;
+    border-color: #e4e6fc;
+}
+
+.password-toggle:focus {
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+</style>

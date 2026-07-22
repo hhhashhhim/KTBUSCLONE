@@ -89,8 +89,13 @@ import PR from "./pages/inventory/products/PurchaseRequisitionNote.vue";
 import JazzCashRefund from "./pages/booking/JazzCashRefund.vue";
 import DiscountCardAssignPage from "./pages/discountType/DiscountCardAssignPage.vue";
 import DiscountType from "./pages/discountType/DiscountCardTypePage.vue";
-// const url = "/kt-dev/";
- const url = process.env.MIX_API_URL_ROUTE 
+// Normalize the configured subdirectory so every Vue Router path is absolute.
+// This supports values such as "kainat-travel-front", "/kainat-travel-front",
+// or "/kainat-travel-front/" without producing invalid route paths.
+const configuredBasePath = (process.env.MIX_API_URL_ROUTE || "").trim();
+const url = configuredBasePath
+    ? `/${configuredBasePath.replace(/^\/+|\/+$/g, "")}/`
+    : "/";
 
 const routes = [
     {

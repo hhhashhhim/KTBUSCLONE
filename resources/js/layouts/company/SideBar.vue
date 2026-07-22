@@ -7,11 +7,13 @@
                     <!-- <img :src="$store.state.main_url + 'assets/img/sarlogo.png'" style="width:100px !important;" alt=""> -->
                 </a>
             </div>
+            <SidebarMenuSearch />
             <ul class="sidebar-menu">
                 <li class="menu-header">Main</li>
-                <li class="dropdown active">
-                    <a :href="$store.state.main_url + 'admin/dashboard'" class="nav-link">
-                        <i class="fas fa-desktop"></i><span>Dashboard</span></a>
+                <li class="dropdown">
+                    <router-link :to="{ name: 'admin-dashboard' }" class="nav-link">
+                        <i class="fas fa-desktop"></i><span>Dashboard</span>
+                    </router-link>
                 </li>
                 <!-- Admin Panel -->
                 <li class="dropdown" v-if="checkPermission('fleet-maintenance')">
@@ -581,12 +583,18 @@
                         </li>
                     </ul>
                 </li>
+                <li class="sidebar-menu-blank-space" aria-hidden="true">
+                    <span></span>
+                </li>
             </ul>
         </aside>
     </div>
 </template>
 <script>
+import SidebarMenuSearch from "../../components/SidebarMenuSearch.vue";
+
 export default {
+    components: { SidebarMenuSearch },
     data() {
         return {
             iconsClass: {
@@ -603,7 +611,73 @@ export default {
         this.permissions = this.$store.state.permissions;
         this.getPendingDockCount(); // 🚀 call on load
     },
+    mounted() {
+        this.syncActiveMenu();
+        this.$el.querySelector('.sidebar-menu')?.addEventListener('click', this.activateClickedMenu);
+    },
+    beforeUnmount() {
+        this.$el.querySelector('.sidebar-menu')?.removeEventListener('click', this.activateClickedMenu);
+    },
+    watch: {
+        '$route.fullPath'() {
+            this.syncActiveMenu();
+        },
+    },
     methods: {
+        activateClickedMenu(event) {
+            const link = event.target.closest('a.nav-link[href]');
+            const menu = this.$el.querySelector('.sidebar-menu');
+
+            if (!link || !menu || !menu.contains(link) || link.getAttribute('href') === '#') return;
+
+            menu.querySelectorAll('li.active').forEach((item) => item.classList.remove('active'));
+
+            let item = link.closest('li');
+            while (item && menu.contains(item)) {
+                item.classList.add('active', 'opened');
+
+                const submenu = Array.from(item.children).find((child) =>
+                    child.matches && child.matches('ul.dropdown-menu')
+                );
+                if (submenu) submenu.style.display = 'block';
+
+                const parentMenu = item.parentElement;
+                item = parentMenu ? parentMenu.closest('li.dropdown') : null;
+            }
+        },
+        syncActiveMenu() {
+            this.$nextTick(() => {
+                const menu = this.$el.querySelector('.sidebar-menu');
+                if (!menu) return;
+
+                menu.querySelectorAll('[data-route-active="true"]').forEach((item) => {
+                    item.classList.remove('active', 'opened');
+                    delete item.dataset.routeActive;
+
+                    const submenu = Array.from(item.children).find((child) =>
+                        child.matches && child.matches('ul.dropdown-menu')
+                    );
+                    if (submenu) submenu.style.display = '';
+                });
+
+                const activeLink = menu.querySelector('a.router-link-exact-active');
+                if (!activeLink) return;
+
+                let item = activeLink.closest('li');
+                while (item && menu.contains(item)) {
+                    item.classList.add('active', 'opened');
+                    item.dataset.routeActive = 'true';
+
+                    const submenu = Array.from(item.children).find((child) =>
+                        child.matches && child.matches('ul.dropdown-menu')
+                    );
+                    if (submenu) submenu.style.display = 'block';
+
+                    const parentMenu = item.parentElement;
+                    item = parentMenu ? parentMenu.closest('li.dropdown') : null;
+                }
+            });
+        },
         // main menu
         checkPermission(name) {
             let permissions = this.permissions;
@@ -637,3 +711,21 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.sidebar-menu {
+    padding-bottom: 170px !important;
+}
+
+.sidebar-menu-blank-space {
+    display: block !important;
+    height: 150px;
+    min-height: 150px;
+    pointer-events: none;
+}
+
+.sidebar-menu-blank-space > span {
+    display: block;
+    height: 100%;
+}
+</style>

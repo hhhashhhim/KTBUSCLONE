@@ -2,7 +2,7 @@
     <div>
         <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-dialog modal-xl merge-schedule-modal" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="text-center" id="busModalLabel">
@@ -30,14 +30,16 @@
                                     <h5 class="text-center">
                                         {{ data?.singleData?.city_one || "" }}
                                     </h5>
-                                    <table class="table table-sm table-hover">
+                                    <table class="table table-sm table-hover closing-detail-table">
                                         <thead class="table-light">
                                             <tr>
+                                                <th>Sr #</th>
                                                 <th>Terminal Name</th>
                                                 <th>Passenger Count</th>
                                                 <th>KT Commission</th>
                                                 <th>ELT</th>
                                                 <th>Cancellation Amount</th>
+                                                <th>Discount</th>
                                                 <th>Total Receivable</th>
                                                 <th>Other Commission</th>
                                                 <!-- <th>Receivable Cash</th>
@@ -50,13 +52,15 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="(tickets, terminalId) in data.schedule_start"
+                                            <tr v-for="(tickets, terminalId, rowIndex) in data.schedule_start"
                                                 :key="'start-' + terminalId">
+                                                <td>{{ rowIndex + 1 }}</td>
                                                 <td>{{ tickets[0].terminal.name }}</td>
                                                 <td>{{tickets.filter(t => t.type != 'canceled').length}}</td>
                                                 <td>{{ $insertComma(totalCommission(tickets)) }}</td>
                                                 <td>{{ $insertComma(totalELT(tickets)) }}</td>
                                                 <td>{{ $insertComma(totalCancelAmount(tickets)) }}</td>
+                                                <td>{{ $insertComma(totalDiscount(tickets)) }}</td>
                                                 <td>{{ $insertComma(totalFare(tickets)) }}</td>
                                                 <td>{{ $insertComma(totalOtherCommission(tickets)) }}</td>
                                                 <td>
@@ -97,6 +101,7 @@
 
                                         <tfoot class="table-light">
                                             <tr>
+                                                <th></th>
                                                 <th>Total</th>
 
                                                 <th>
@@ -111,6 +116,9 @@
                                                 </th>
                                                 <th>
                                                     {{ $insertComma(grandTotalCancel(data.schedule_start)) }}
+                                                </th>
+                                                <th>
+                                                    {{ $insertComma(grandTotalDiscount(data.schedule_start)) }}
                                                 </th>
 
                                                 <th>
@@ -150,14 +158,16 @@
                                     <h5 class="text-center">
                                         {{ data?.singleData?.city_two || "" }}
                                     </h5>
-                                    <table class="table table-sm table-hover">
+                                    <table class="table table-sm table-hover closing-detail-table">
                                         <thead class="table-light">
                                             <tr>
+                                                <th>Sr #</th>
                                                 <th>Terminal Name</th>
                                                 <th>Passenger Count</th>
                                                 <th>KT Commission</th>
                                                 <th>ELT</th>
                                                 <th>Cancellation Amount</th>
+                                                <th>Discount</th>
                                                 <th>Total Receivable</th>
                                                 <th>Other Commission</th>
                                                 <th>Total Received in Cash</th>
@@ -168,13 +178,15 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="(tickets, terminalId) in data.schedule_return"
+                                            <tr v-for="(tickets, terminalId, rowIndex) in data.schedule_return"
                                                 :key="'return-' + terminalId">
+                                                <td>{{ rowIndex + 1 }}</td>
                                                 <td>{{ tickets[0].terminal.name }}</td>
                                                 <td>{{tickets.filter(t => t.type != 'canceled').length}}</td>
                                                 <td>{{ $insertComma(totalCommission(tickets)) }}</td>
                                                 <td>{{ $insertComma(totalELT(tickets)) }}</td>
                                                 <td>{{ $insertComma(totalCancelAmount(tickets)) }}</td>
+                                                <td>{{ $insertComma(totalDiscount(tickets)) }}</td>
                                                 <td>{{ $insertComma(totalFare(tickets)) }}</td>
                                                 <td>{{ $insertComma(totalOtherCommission(tickets)) }}</td>
 
@@ -215,6 +227,7 @@
                                         </tbody>
                                         <tfoot class="table-light">
                                             <tr>
+                                                <th></th>
                                                 <th>Total</th>
 
                                                 <th>
@@ -229,6 +242,9 @@
                                                 </th>
                                                 <th>
                                                     {{ $insertComma(grandTotalCancel(data.schedule_return)) }}
+                                                </th>
+                                                <th>
+                                                    {{ $insertComma(grandTotalDiscount(data.schedule_return)) }}
                                                 </th>
 
                                                 <th>
@@ -887,6 +903,13 @@ export default {
             }, 0);
         },
 
+        totalDiscount(tickets) {
+            return tickets.reduce((sum, ticket) => {
+                if (ticket.type == 'canceled') return sum;
+                return sum + (parseFloat(ticket.discount) || 0);
+            }, 0);
+        },
+
         totalCancelAmount(tickets) {
             return tickets.reduce((sum, t) => {
                 const percentage = parseFloat(t?.cancel_ticket?.percentage) || 0;
@@ -1043,6 +1066,13 @@ export default {
             const groups = data || {};
             return Object.values(groups).reduce(
                 (sum, tickets) => sum + this.totalCancelAmount(tickets),
+                0
+            );
+        },
+        grandTotalDiscount(data) {
+            const groups = data || {};
+            return Object.values(groups).reduce(
+                (sum, tickets) => sum + this.totalDiscount(tickets),
                 0
             );
         },
@@ -1505,6 +1535,20 @@ export default {
 };
 </script>
 <style scoped>
+.merge-schedule-modal {
+    width: 90%;
+    max-width: 90%;
+}
+
+.closing-detail-table {
+    border-collapse: collapse;
+}
+
+.closing-detail-table th,
+.closing-detail-table td {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
 .add-btn {
     width: 138px;
 }

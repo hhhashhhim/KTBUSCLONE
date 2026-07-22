@@ -6,6 +6,7 @@
                     <img :src="$store.state.main_url+'assets/img/kt-logo.png'" style="width:250px !important;" alt="">
                 </a>
             </div>
+            <SidebarMenuSearch />
             <ul class="sidebar-menu">
                 <li class="menu-header">Main</li>
                 <li class="dropdown">
@@ -32,7 +33,10 @@
     </div>
 </template>
 <script>
+import SidebarMenuSearch from "../../components/SidebarMenuSearch.vue";
+
 export default {
+    components: { SidebarMenuSearch },
     data() {
         return {
             iconsClass: {
@@ -42,14 +46,38 @@ export default {
                 company: "fa-building",
             },
             permissions: [],
-            activeLink: "",
         }
     },
+    mounted() {
+        this.syncActiveMenu();
+        this.$el.querySelector('.sidebar-menu')?.addEventListener('click', this.activateClickedMenu);
+    },
+    beforeUnmount() {
+        this.$el.querySelector('.sidebar-menu')?.removeEventListener('click', this.activateClickedMenu);
+    },
+    watch: {
+        '$route.fullPath'() {
+            this.syncActiveMenu();
+        },
+    },
     methods: {
-        activeLink(link) {
-            console.log("Reaching");
-            this.activeLink = link;
-        }
+        activateClickedMenu(event) {
+            const link = event.target.closest('a.nav-link[href]');
+            const menu = this.$el.querySelector('.sidebar-menu');
+            if (!link || !menu || !menu.contains(link)) return;
+
+            menu.querySelectorAll('li.active').forEach((item) => item.classList.remove('active'));
+            link.closest('li')?.classList.add('active');
+        },
+        syncActiveMenu() {
+            this.$nextTick(() => {
+                const menu = this.$el.querySelector('.sidebar-menu');
+                if (!menu) return;
+
+                menu.querySelectorAll('li.active').forEach((item) => item.classList.remove('active'));
+                menu.querySelector('a.router-link-exact-active')?.closest('li')?.classList.add('active');
+            });
+        },
     }
 }
 </script>

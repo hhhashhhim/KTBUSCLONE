@@ -85,6 +85,8 @@
                                                         <tr>
                                                             <th>Bus Number</th>
                                                             <th>Schedule</th>
+                                                            <th>Departure City</th>
+                                                            <th>Destination City</th>
                                                             <th>Route Name</th>
                                                             <th>
                                                                 Schedule Date
@@ -136,6 +138,22 @@ close, j
                                                                             .schedule
                                                                             .name
                                                                     }}
+                                                                </td>
+                                                                <td class="h5" :class="data.length == 2
+                                                                    ? j == 1
+                                                                        ? 'border-bottom border-success'
+                                                                        : 'border-top border-success'
+                                                                    : 'border-bottom border-top border-danger'">
+                                                                    <span class="badge badge-success mr-1">DEP</span>
+                                                                    <span>{{ close.departure_city ? close.departure_city.name : '-' }}</span>
+                                                                </td>
+                                                                <td class="h5" :class="data.length == 2
+                                                                    ? j == 1
+                                                                        ? 'border-bottom border-success'
+                                                                        : 'border-top border-success'
+                                                                    : 'border-bottom border-top border-danger'">
+                                                                    <span class="badge badge-danger mr-1">DES</span>
+                                                                    <span>{{ close.destination_city ? close.destination_city.name : '-' }}</span>
                                                                 </td>
                                                                 <td class="h5" :class="data.length ==
                                                                     2
@@ -217,7 +235,7 @@ close, j
                                                             closings.length ==
                                                             0
                                                         ">
-                                                            <td class="text-center" colspan="6">
+                                                            <td class="text-center" :colspan="checkForSubmenuButtons('edit-close-booking') ? 9 : 8">
                                                                 No data found
                                                             </td>
                                                         </tr>
@@ -342,6 +360,27 @@ export default {
                     text: "Please select two schedules",
                     icon: "error",
                     timer: 2000,
+                });
+                this.loading = false;
+                return;
+            }
+
+            const selectedClosings = Object.values(this.closings || {})
+                .reduce((rows, group) => rows.concat(group), [])
+                .filter((closing) => this.addData.mergeIds.includes(closing.ticket_merge_id));
+
+            const firstClosing = selectedClosings[0];
+            const secondClosing = selectedClosings[1];
+            const citiesCrossMatch = firstClosing && secondClosing
+                && Number(firstClosing.schedule_start) === Number(secondClosing.schedule_end)
+                && Number(firstClosing.schedule_end) === Number(secondClosing.schedule_start);
+
+            if (!citiesCrossMatch) {
+                swal({
+                    title: "Route Mismatch",
+                    text: "Selected schedules must cross-match: DEP → DES and DES → DEP.",
+                    icon: "error",
+                    timer: 2500,
                 });
                 this.loading = false;
                 return;

@@ -40,17 +40,6 @@ const bootstrapApplication = async () => {
             }
         });
 
-        window.addEventListener("pageshow", () => {
-            syncPersistedState();
-        });
-    }
-
-    if (typeof document !== "undefined") {
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === "visible") {
-                syncPersistedState();
-            }
-        });
     }
 
     app.mount("#app");

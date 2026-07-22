@@ -42,27 +42,17 @@
                             <div class="row px-2 mb-4">
                                 <div class="col-md-4">
                                     <label for="terminalFilter">Bus Class</label>
-                                    <select id="terminalFilter" class="form-control"
-                                            v-model="filterData.bus_class"
-                                            @change="fetchSchedule()">
-                                        <option value="">Select Bus Class</option>
-                                        <option v-for="(item, i) in busClasses" :key="i"
-                                                :value="item.id">
-                                            {{ item.name }}
-                                        </option>
-                                    </select>
+                                    <select2 id="terminalFilter"
+                                             v-model="filterData.bus_class"
+                                             :options="busClassFilterOptions"
+                                             :settings="{ width: '100%', placeholder: 'Select Bus Class', allowClear: true }" />
                                 </div>
                                 <div class="col-md-4">
                                     <label for="routeFilter">Routes</label>
-                                    <select id="routeFilter" class="form-control"
-                                            v-model="filterData.route"
-                                            @change="fetchSchedule()">
-                                        <option value="">Select Route</option>
-                                        <option v-for="(route, i) in routes" :key="i"
-                                                :value="route.id">
-                                            {{ route.name }}  ({{ route.via??'n/a' }})
-                                        </option>
-                                    </select>
+                                    <select2 id="routeFilter"
+                                             v-model="filterData.route"
+                                             :options="routeFilterOptions"
+                                             :settings="{ width: '100%', placeholder: 'Select Route', allowClear: true }" />
                                 </div>
                                 <div class="col-md-4">
                                     <label for="fromDate">Departure Date</label>
@@ -89,9 +79,7 @@
                                                         <th>Route</th>
                                                         <th>Bus Class</th>
                                                         <th>Added By</th>
-                                                        <th v-if="checkForSubmenuButtons('edit-schedule') || checkForSubmenuButtons('extend-schedule') || checkForSubmenuButtons('update-time') || checkForSubmenuButtons('delete-schedule')">
-                                                            Action
-                                                        </th>
+                                                        <th>Action</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -104,12 +92,20 @@
                                                         <td> {{
                                                                 schedule.bus_class.name
                                                             }}
-                                                        </td>
-                                                        <td> {{
-                                                                "N/A"
-                                                            }}
+                                                          </td>
+                                                          <td> {{
+                                                                  schedule.schedule.added_by
+                                                                      ? schedule.schedule.added_by.name
+                                                                      : "Unknown User"
+                                                              }}
                                                         </td>
                                                         <td>
+                                                            <button class="btn btn-secondary btn-sm mr-1"
+                                                                    title="View Schedule Details"
+                                                                    :disabled="viewLoading"
+                                                                    @click="viewSchedule(schedule.schedule.id)">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
                                                             <button class="btn btn-info btn-sm mr-1"
                                                                     v-if="checkForSubmenuButtons('extend-schedule')"
                                                                     @click="addDays(schedule.schedule), this.extendDate.extended_days == ''"
@@ -145,6 +141,72 @@
                                 </div>
                             </div>
                             <!-- END TABLE -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule details -->
+            <div class="modal fade" id="scheduleDetailsModal" tabindex="-1"
+                 aria-labelledby="scheduleDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="scheduleDetailsModalLabel">Schedule Details</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div v-if="viewLoading" class="text-center py-5">
+                                <span class="spinner-border spinner-border-sm text-primary mr-2"></span>
+                                Loading schedule details...
+                            </div>
+                            <div v-else-if="viewError" class="alert alert-danger mb-0">
+                                {{ viewError }}
+                            </div>
+                            <template v-else-if="scheduleView.schedule">
+                                <div class="schedule-detail-grid mb-4">
+                                    <div><small>Schedule</small><strong>{{ scheduleView.schedule.name || '-' }}</strong></div>
+                                    <div><small>Route</small><strong>{{ scheduleView.schedule.route ? scheduleView.schedule.route.name : '-' }}</strong></div>
+                                    <div><small>Via</small><strong>{{ scheduleView.schedule.route && scheduleView.schedule.route.via ? scheduleView.schedule.route.via : '-' }}</strong></div>
+                                    <div><small>Bus Class</small><strong>{{ scheduleView.schedule.bus_class ? scheduleView.schedule.bus_class.name : '-' }}</strong></div>
+                                    <div><small>Start Date</small><strong>{{ scheduleView.schedule.start_date || '-' }}</strong></div>
+                                    <div><small>End Date</small><strong>{{ scheduleView.schedule.end_date || '-' }}</strong></div>
+                                    <div><small>Departure Time</small><strong>{{ scheduleView.schedule.time ? tConvert(scheduleView.schedule.time) : '-' }}</strong></div>
+                                    <div><small>Added By</small><strong>{{ scheduleView.schedule.added_by ? scheduleView.schedule.added_by.name : 'Unknown User' }}</strong></div>
+                                    <div><small>Discount</small><strong>{{ adjustmentLabel(scheduleView.schedule.discount) }}</strong></div>
+                                    <div><small>Surcharge</small><strong>{{ adjustmentLabel(scheduleView.schedule.surcharge) }}</strong></div>
+                                </div>
+
+                                <h6 class="font-weight-bold mb-2">Route Details</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover schedule-route-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Sr #</th>
+                                                <th>Departure City</th>
+                                                <th>Destination City</th>
+                                                <th>Departure Time</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(detail, index) in scheduleView.route_details" :key="detail.id">
+                                                <td>{{ index + 1 }}</td>
+                                                <td>{{ detail.departure_city ? detail.departure_city.name : '-' }}</td>
+                                                <td>{{ detail.destination_city ? detail.destination_city.name : '-' }}</td>
+                                                <td>{{ detail.departure_time ? tConvert(detail.departure_time) : '-' }}</td>
+                                            </tr>
+                                            <tr v-if="!scheduleView.route_details || !scheduleView.route_details.length">
+                                                <td colspan="4" class="text-center text-muted">No route details found.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
@@ -748,12 +810,17 @@ export default {
         vueMask,
     },
     data() {
+        const now = new Date();
+        const today = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
+            .toISOString()
+            .slice(0, 10);
+
         return {
             options: {
                 placeholder: '00',
             },
             loading: false,
-            todayDate: new Date().toISOString().slice(0, 10),
+            todayDate: today,
             schedules: [],
             fareClasses: [],
             busClasses: [],
@@ -769,6 +836,13 @@ export default {
             editDiscounts: [],
             editSurcharges: [],
             tableLoading: true,
+            scheduleRequestId: 0,
+            viewLoading: false,
+            viewError: "",
+            scheduleView: {
+                schedule: null,
+                route_details: [],
+            },
             editRoutes: [],
             success: false,
             error: false,
@@ -788,7 +862,7 @@ export default {
             filterData:{
                 bus_class: "",
                 route: "",
-                departure_date: ""
+                departure_date: today
             },
             data: {
                 name: "",
@@ -877,7 +951,76 @@ export default {
             });
         }, 1000);
     },
+    beforeUnmount() {
+        this.destroyScheduleTable();
+    },
     methods: {
+        destroyScheduleTable() {
+            if ($.fn.DataTable && $.fn.DataTable.isDataTable('#schedule_table')) {
+                $('#schedule_table').DataTable().destroy();
+            }
+        },
+        initializeScheduleTable() {
+            this.destroyScheduleTable();
+
+            const table = $('#schedule_table');
+            if (!table.length) return;
+
+            table.DataTable({
+                pageLength: 25,
+                lengthMenu: [10, 25, 50, 100],
+                order: [],
+                autoWidth: false,
+                columnDefs: [
+                    { orderable: false, searchable: false, targets: -1 },
+                ],
+                language: {
+                    emptyTable: 'No schedules found for the selected filters.',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ schedules',
+                    infoEmpty: 'No schedules found',
+                },
+            });
+        },
+        async viewSchedule(scheduleId) {
+            if (this.viewLoading) return;
+
+            this.viewLoading = true;
+            this.viewError = "";
+            this.scheduleView = { schedule: null, route_details: [] };
+            this.$nextTick(() => {
+                $("#scheduleDetailsModal").modal("show");
+            });
+
+            try {
+                const res = await this.callApi("post", "schedule/details", { id: scheduleId });
+                if (res.status === 200) {
+                    this.scheduleView = res.data;
+                } else {
+                    this.viewError = "Schedule details could not be loaded.";
+                    swal({
+                        title: "Error",
+                        text: "Schedule details could not be loaded.",
+                        icon: "error",
+                    });
+                }
+            } catch (error) {
+                this.viewError = "Schedule details could not be loaded.";
+                swal({
+                    title: "Error",
+                    text: "Schedule details could not be loaded.",
+                    icon: "error",
+                });
+            } finally {
+                this.viewLoading = false;
+            }
+        },
+        adjustmentLabel(adjustment) {
+            if (!adjustment) return "None";
+            if (adjustment.type === "percentage") {
+                return `${adjustment.name} - ${adjustment.percentage || 0}%`;
+            }
+            return `${adjustment.name} - ${adjustment.flat || 0}`;
+        },
         close() {
             $(".modal").click();
         },
@@ -992,22 +1135,27 @@ export default {
             this.discounts = resDiscount.data;
         },
         async fetchSchedule() {
+            const requestId = ++this.scheduleRequestId;
+            this.destroyScheduleTable();
+            this.tableLoading = true;
 
-            const res = await this.callApi("post", "schedule",this.filterData);
-            if (res.status == 200) {
+            try {
+                const res = await this.callApi("post", "schedule", this.filterData);
+                if (requestId !== this.scheduleRequestId) return;
+
+                this.schedules = res.status === 200 ? res.data : [];
                 this.tableLoading = false;
-                this.schedules = res.data;
-            } else {
-                console.log(res);
+                await this.$nextTick();
+                this.initializeScheduleTable();
+            } catch (error) {
+                if (requestId !== this.scheduleRequestId) return;
+
+                this.schedules = [];
+                this.tableLoading = false;
+                await this.$nextTick();
+                this.initializeScheduleTable();
+                console.error("Unable to load schedules:", error);
             }
-            // setTimeout(() => {
-            //     $('#schedule_table').DataTable({
-            //         language: {
-            //             info: '' // Set the 'info' language option to an empty string to hide the line
-            //         }
-            //     });
-            // }, 300);
-            
         },
 
         async getEntireForm() {
@@ -1214,7 +1362,7 @@ export default {
                     timer: 2000
                 });
                 this.clearForm();
-                $('#schedule_table').DataTable().destroy();
+                this.destroyScheduleTable();
                 this.loading = false;
                 this.fetchSchedule();
             } else {
@@ -1288,7 +1436,7 @@ export default {
                     icon: "success",
                     timer: 4000
                 });
-                $("#schedule_table").DataTable().destroy();
+                this.destroyScheduleTable();
                 this.loading = false;
                 this.fetchSchedule();
             } else {
@@ -1351,7 +1499,7 @@ export default {
                     icon: "success",
                     timer: 4000
                 });
-                $("#schedule_table").DataTable().destroy();
+                this.destroyScheduleTable();
                 this.loading = false;
                 this.fetchSchedule();
             } else {
@@ -1437,7 +1585,7 @@ export default {
                     timer: 2000
                 });
                 this.loading = false;
-                $('#schedule_table').DataTable().destroy();
+                this.destroyScheduleTable();
                 this.fetchSchedule();
             } else {
                 if (resHide.status == 422) {
@@ -1455,6 +1603,18 @@ export default {
         },
     },
     computed: {
+        busClassFilterOptions() {
+            return (Array.isArray(this.busClasses) ? this.busClasses : []).map(item => ({
+                id: item.id,
+                text: item.name,
+            }));
+        },
+        routeFilterOptions() {
+            return (Array.isArray(this.routes) ? this.routes : []).map(route => ({
+                id: route.id,
+                text: `${route.name} (${route.via || 'n/a'})`,
+            }));
+        },
         inactiveEditBusClass() {
             const currentBusClass = this.dataEdit.currentBusClass;
 
@@ -1466,6 +1626,12 @@ export default {
         },
     },
     watch: {
+        'filterData.bus_class'() {
+            this.fetchSchedule();
+        },
+        'filterData.route'() {
+            this.fetchSchedule();
+        },
         'data.addTerminalsOnClick': {
             handler() {
                 this.terminalNames = this.data.addTerminalsOnClick.map(item => {
@@ -1493,6 +1659,40 @@ export default {
 };
 </script>
 <style scoped>
+.schedule-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.schedule-detail-grid > div {
+    padding: 12px;
+    border: 1px solid #e8ebef;
+    border-radius: 6px;
+    background: #fafbfc;
+}
+
+.schedule-detail-grid small,
+.schedule-detail-grid strong {
+    display: block;
+}
+
+.schedule-detail-grid small {
+    margin-bottom: 4px;
+    color: #7b8490;
+}
+
+.schedule-route-table th,
+.schedule-route-table td {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 991.98px) {
+    .schedule-detail-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 .loading-spinner {
     display: block;
     margin: 0 auto;

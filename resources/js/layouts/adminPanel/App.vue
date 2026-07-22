@@ -14,9 +14,7 @@
             </div>
         </div>
         <div v-else>
-            <router-view>
-                <Login />
-            </router-view>
+            <Login />
         </div>
     </div>
 </template>
