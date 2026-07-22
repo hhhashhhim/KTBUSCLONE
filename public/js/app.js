@@ -98880,9 +98880,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addForm.totalAmount]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_135, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_136, [_ctx.checkForSubmenuButtons('assign-bus') && $data.hideDivButtonsDrop ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addForm.totalAmount]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_135, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_136, [_ctx.checkForSubmenuButtons('assign-bus') && $data.hideDivButtonsDrop ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 0,
-    href: "#",
+    type: "button",
     "class": "btn btn-primary btn-sm",
     onClick: _cache[34] || (_cache[34] = function ($event) {
       return $options.closingData();
@@ -150117,7 +150117,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 // or "/kainat-travel-front/" without producing invalid route paths.
 
 var configuredBasePath = ("/" || 0).trim();
-var url = configuredBasePath ? "/".concat(configuredBasePath.replace(/^\/+|\/+$/g, ""), "/") : "/";
+var normalizedBasePath = configuredBasePath.replace(/^\/+|\/+$/g, "");
+var url = normalizedBasePath ? "/".concat(normalizedBasePath, "/") : "/";
 var routes = [{
   path: url + "",
   component: _pages_users_Users_vue__WEBPACK_IMPORTED_MODULE_2__["default"],

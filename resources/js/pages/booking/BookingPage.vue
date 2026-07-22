@@ -353,10 +353,10 @@
                                         </div>
                                         <div class="my-2">
                                             <div class="form-group text-center mt-2 mb-2">
-                                                <a v-if="checkForSubmenuButtons('assign-bus') && hideDivButtonsDrop"
-                                                    href="#" class="btn btn-primary btn-sm" @click="closingData()">
+                                                <button v-if="checkForSubmenuButtons('assign-bus') && hideDivButtonsDrop"
+                                                    type="button" class="btn btn-primary btn-sm" @click="closingData()">
                                                     Assign Bus
-                                                </a>
+                                                </button>
                                                 <button v-if="checkForSubmenuButtons('terminal-invoice')"
                                                     class="btn btn-info ml-1 btn-sm" @click="getTerminalInvoice()">
                                                     Terminal Invoice

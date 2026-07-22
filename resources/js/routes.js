@@ -93,8 +93,9 @@ import DiscountType from "./pages/discountType/DiscountCardTypePage.vue";
 // This supports values such as "kainat-travel-front", "/kainat-travel-front",
 // or "/kainat-travel-front/" without producing invalid route paths.
 const configuredBasePath = (process.env.MIX_API_URL_ROUTE || "").trim();
-const url = configuredBasePath
-    ? `/${configuredBasePath.replace(/^\/+|\/+$/g, "")}/`
+const normalizedBasePath = configuredBasePath.replace(/^\/+|\/+$/g, "");
+const url = normalizedBasePath
+    ? `/${normalizedBasePath}/`
     : "/";
 
 const routes = [
