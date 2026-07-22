@@ -18,6 +18,31 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            <div class="ticket-label-setting mb-4">
+                                <div>
+                                    <h6 class="mb-1">Ticket Surcharge Label</h6>
+                                    <p class="text-muted mb-0">
+                                        Customize the label printed beside the surcharge amount on passenger tickets.
+                                    </p>
+                                </div>
+                                <div class="ticket-label-control">
+                                    <input type="text" class="form-control" maxlength="50"
+                                           v-model.trim="ticketSurchargeLabel"
+                                           placeholder="Surcharge"
+                                           @keyup.enter="saveTicketLabel">
+                                    <button v-if="checkForSubmenuButtons('edit-surcharge')"
+                                            type="button" class="btn btn-primary"
+                                            :disabled="ticketLabelLoading"
+                                            @click="saveTicketLabel">
+                                        <span v-if="ticketLabelLoading"
+                                              class="spinner-border spinner-border-sm mr-1"></span>
+                                        {{ ticketLabelLoading ? 'Saving...' : 'Save Label' }}
+                                    </button>
+                                </div>
+                                <small class="text-muted">
+                                    Ticket preview: <strong>{{ ticketSurchargeLabel || 'Surcharge' }}</strong>
+                                </small>
+                            </div>
                             <transition name="fade">
                                 <div
                                     class="alert alert-danger alert-dismissible fade show"
@@ -254,6 +279,8 @@ export default {
     data() {
         return {
             loading: false,
+            ticketLabelLoading: false,
+            ticketSurchargeLabel: "",
             surcharges: [],
             permissions: [],
             isActive: 1,
@@ -288,11 +315,60 @@ export default {
             window.removeEventListener('keydown', this.altM);
         }
 
-        await this.fetchSurcharges();
         this.permissions = this.$store.state.permissions;
+        await Promise.all([
+            this.fetchSurcharges(),
+            this.fetchTicketLabel(),
+        ]);
     },
 
     methods: {
+        async fetchTicketLabel() {
+            try {
+                const res = await this.callApi("post", "surcharge/ticket-label");
+                if (res.status === 200) {
+                    this.ticketSurchargeLabel = res.data.surcharge_label || "";
+                }
+            } catch (error) {
+                console.error("Unable to load the ticket surcharge label:", error);
+            }
+        },
+        async saveTicketLabel() {
+            if (this.ticketLabelLoading || !this.checkForSubmenuButtons('edit-surcharge')) return;
+
+            this.ticketLabelLoading = true;
+            try {
+                const res = await this.callApi("post", "surcharge/ticket-label/update", {
+                    surcharge_label: this.ticketSurchargeLabel,
+                });
+
+                if (res.status === 200) {
+                    this.ticketSurchargeLabel = res.data.surcharge_label || "";
+                    swal({
+                        title: "Success",
+                        text: "Ticket surcharge label updated successfully.",
+                        icon: "success",
+                        timer: 2000,
+                    });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: "Ticket surcharge label could not be updated.",
+                        icon: "error",
+                        timer: 2000,
+                    });
+                }
+            } catch (error) {
+                swal({
+                    title: "Error",
+                    text: "Ticket surcharge label could not be updated.",
+                    icon: "error",
+                    timer: 2000,
+                });
+            } finally {
+                this.ticketLabelLoading = false;
+            }
+        },
         numberRange: function (evt) {
             const val = parseInt(evt.target.value + evt.key);
             if (!isNaN(val) && val > 100) {
@@ -532,6 +608,35 @@ export default {
     }
 };
 </script>
+<style scoped>
+.ticket-label-setting {
+    padding: 18px;
+    border: 1px solid #e4e9ef;
+    border-radius: 8px;
+    background: #fafbfc;
+}
+
+.ticket-label-control {
+    display: flex;
+    gap: 10px;
+    max-width: 620px;
+    margin: 14px 0 8px;
+}
+
+.ticket-label-control .form-control {
+    flex: 1;
+}
+
+.ticket-label-control .btn {
+    min-width: 115px;
+}
+
+@media (max-width: 575.98px) {
+    .ticket-label-control {
+        flex-direction: column;
+    }
+}
+</style>
 <style scoped>
 table,
 table * {
