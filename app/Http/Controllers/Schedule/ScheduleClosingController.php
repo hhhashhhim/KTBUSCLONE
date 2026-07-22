@@ -142,7 +142,9 @@ class ScheduleClosingController extends Controller
             ->with([
                 "bus:id,bus_number",
                 "schedule:id,name,route_id",
-                "schedule.route:id,name"
+                "schedule.route:id,name",
+                "departureCity:id,name",
+                "destinationCity:id,name"
             ])
             ->where([
                 "hide" => 0,
@@ -354,6 +356,11 @@ class ScheduleClosingController extends Controller
 
     public function unclosingData(Request $request)
     {
+        $request->validate([
+            'mergeIds' => ['required', 'array', 'size:2'],
+            'mergeIds.*' => ['required', 'integer'],
+        ]);
+
         $companyId = Auth::user()->company_id;
         $mergeIds = $request->mergeIds;
 
@@ -363,10 +370,20 @@ class ScheduleClosingController extends Controller
             ->where('ticket_merge_id', $mergeIds[0])
             ->first();
 
-        return $closingPairsTwo = TicketClosing::with('schedule:id,route_id', 'schedule.route')
+        $closingPairsTwo = TicketClosing::with('schedule:id,route_id', 'schedule.route')
             ->where('company_id', $companyId)
             ->where('ticket_merge_id', $mergeIds[1])
             ->first();
+
+        if (!$closingPairsOne || !$closingPairsTwo
+            || (int) $closingPairsOne->schedule_start !== (int) $closingPairsTwo->schedule_end
+            || (int) $closingPairsOne->schedule_end !== (int) $closingPairsTwo->schedule_start) {
+            return response()->json([
+                'errors' => [
+                    'mergeIds' => ['Selected schedules must cross-match: DEP → DES and DES → DEP.'],
+                ],
+            ], 422);
+        }
 
         $closingPairs = TicketClosing::with('schedule:id,route_id', 'schedule.route')
             ->where('company_id', $companyId)
@@ -397,7 +414,7 @@ class ScheduleClosingController extends Controller
             ])
             ->get();
 
-        return $ticketsReturn = Ticket::withTrashed()
+        $ticketsReturn = Ticket::withTrashed()
             ->where('company_id', $companyId)
             ->whereIn('ticket_closing_id', [$closingPairsTwo->id])
             ->whereIn('type', ['booked', 'over-issue', 'canceled'])
@@ -1691,7 +1708,7 @@ class ScheduleClosingController extends Controller
             // A booking form date can differ from the service date stored on the
             // schedule detail (overnight/return trips).  Tickets are keyed to the
             // latter, so every closing record and ticket assignment must use it.
-            $serviceDate = $depTime->schedule_date;
+            $serviceDate = date("Y-m-d", strtotime($depTime->schedule_date));
 
             $schedule = Schedule::where("id", $request->schedule)->first();
             $route = Route::where("id", $schedule->route_id)->first();
@@ -1704,6 +1721,7 @@ class ScheduleClosingController extends Controller
                 $query->whereNull('ticket_closing_id')
                     ->orWhere('bus_id', $request->bus);
             })->get();
+
             if (count($bookingAvailable) == 0) {
                 DB::rollBack();
                 return response()->json(["errors" => ["Tickets Error" => ["No Booking Found! \n\n Booked Any Single Seat First"]]], 422);
@@ -1807,6 +1825,7 @@ class ScheduleClosingController extends Controller
         if (!checkPermissionButtons("edit-close-booking")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+
         $request->validate([
             'bus' => [
                 'required',

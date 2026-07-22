@@ -1252,7 +1252,7 @@ class BookingController extends Controller
 
     public function selected(Request $request)
     {
-        
+
         if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
@@ -2079,7 +2079,16 @@ class BookingController extends Controller
             $ids = [$request->ticket_id];
         }
         // return $ids;
-        $tickets = Ticket::with('customer', 'schedule', 'scheduleDetail', 'seatClass', 'destination_city', 'departure_city', 'terminal')->where('company_id', Auth::user()->company_id)->withTrashed()->whereIn('id', $ids)->get();
+        $tickets = Ticket::with(
+            'customer',
+            'schedule.bus_class:id,seat_map',
+            'schedule.surcharge:id,type,percentage,flat,is_active',
+            'scheduleDetail',
+            'seatClass',
+            'destination_city',
+            'departure_city',
+            'terminal'
+        )->where('company_id', Auth::user()->company_id)->withTrashed()->whereIn('id', $ids)->get();
         $tickets->map(function ($item) {
             $departureDate = optional($item->scheduleDetail)->departure_date ?? $item->date;
             $departureTime = optional($item->scheduleDetail)->departure_time ?? $item->schedule_time;
@@ -2099,12 +2108,62 @@ class BookingController extends Controller
             if ($departureDateTime === false) {
                 $item->pdf_departure_date = $departureDate;
                 $item->pdf_departure_time = $departureTime;
-                return;
+            } else {
+                $departureDateTime += $sub;
+                $item->pdf_departure_date = date("Y-m-d", $departureDateTime);
+                $item->pdf_departure_time = date("h:i A", $departureDateTime);
             }
 
-            $departureDateTime += $sub;
-            $item->pdf_departure_date = date("Y-m-d", $departureDateTime);
-            $item->pdf_departure_time = date("h:i A", $departureDateTime);
+            $scheduleDiscount = (float) ($item->schedule_discount ?? 0);
+            $terminalDiscount = (float) ($item->terminal_discount ?? 0);
+            $directDiscount = (float) ($item->discount ?? 0);
+            $grossFare = (float) $item->seat_fare + $scheduleDiscount + $terminalDiscount;
+            $baseFare = null;
+
+            $seatMap = optional(optional($item->schedule)->bus_class)->seat_map ?? [];
+            $seat = collect($seatMap)
+                ->flatten(1)
+                ->first(function ($seat) use ($item) {
+                    return is_array($seat)
+                        && isset($seat['seatNo'])
+                        && (string) $seat['seatNo'] === (string) $item->seat_no;
+                });
+
+            if (is_array($seat) && isset($seat['class'])) {
+                $baseFare = FareTable::where([
+                    'company_id' => $item->company_id,
+                    'from_city_id' => $item->departure_city_id,
+                    'to_city_id' => $item->destination_city_id,
+                    'fare_class' => $seat['class'],
+                ])->value('fare');
+            }
+
+            $surcharge = optional($item->schedule)->surcharge;
+            $surchargeAmount = 0;
+
+            if ($surcharge) {
+                if ($baseFare !== null) {
+                    // seat_fare already contains the rounded surcharge. The
+                    // difference gives the amount actually charged without
+                    // adding the surcharge to the ticket a second time.
+                    $surchargeAmount = max(0, $grossFare - (float) $baseFare);
+                } elseif ($surcharge->type === 'percentage') {
+                    $percentage = (float) $surcharge->percentage;
+                    $surchargeAmount = $percentage > 0
+                        ? $grossFare - ($grossFare / (1 + ($percentage / 100)))
+                        : 0;
+                } else {
+                    $surchargeAmount = (float) $surcharge->flat;
+                }
+            }
+
+            $surchargeAmount = round($surchargeAmount);
+            $item->pdf_surcharge = $surchargeAmount;
+            $item->pdf_base_fare = $grossFare - $surchargeAmount;
+            $item->pdf_discount = $directDiscount + $scheduleDiscount + $terminalDiscount;
+            $item->pdf_total_fare = $item->pdf_base_fare
+                + $item->pdf_surcharge
+                - $item->pdf_discount;
         });
         $format = TicketsTemplate::with("terminal")
             ->join("ticket_template_terminals", "ticket_template_terminals.ticket_template_id", "tickets_templates.id")

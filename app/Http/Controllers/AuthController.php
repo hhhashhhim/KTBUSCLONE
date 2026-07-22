@@ -108,6 +108,11 @@ class AuthController extends Controller
             ], 404);
         }
         
+        // Keep all sessions created today so the user can sign in from
+        // multiple devices. Revoke only tokens left from previous days.
+        $user->tokens()
+            ->where('created_at', '<', now()->startOfDay())
+            ->delete();
         $token = $user->createToken('my-app-token')->plainTextToken;
         
         ActivityLog::create([

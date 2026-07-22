@@ -894,95 +894,132 @@ public function filterData(Request $request)
 }
     public function dashboardData(Request $request)
     {
-        if (checkPermissionButtons("super-data")) {
-            $superdata = false;
-        } else {
-            $superdata = true;
+        $validated = $request->validate([
+            'from_date' => ['nullable', 'date'],
+            'to_date' => ['nullable', 'date', 'after_or_equal:from_date'],
+        ]);
+
+        $fromDate = isset($validated['from_date']) ? \Carbon\Carbon::parse($validated['from_date'])->startOfDay() : now()->startOfDay();
+        $toDate = isset($validated['to_date']) ? \Carbon\Carbon::parse($validated['to_date'])->startOfDay() : now()->startOfDay();
+        $limitToTerminal = !checkPermissionButtons("super-data");
+        $user = Auth::user();
+        $scopeTickets = function ($query) use ($limitToTerminal, $user) {
+            $query->where('company_id', $user->company_id);
+            if ($limitToTerminal) {
+                $query->where('terminal_id', $user->terminal_id);
+                }
+            };
+
+
+        // Load the selected period once, then calculate all ticket KPIs in memory.
+        $tickets = Ticket::withTrashed()
+            ->whereBetween('date', [$fromDate->format('Y-m-d'), $toDate->format('Y-m-d')])
+            ->get([
+                'company_id', 'terminal_id', 'type', 'customer_id',
+                'discount', 'terminal_discount', 'schedule_discount',
+                'seat_fare', 'deleted_at',
+            ])
+            ->where('company_id', $user->company_id);
+
+        if ($limitToTerminal) {
+            $tickets = $tickets->where('terminal_id', $user->terminal_id);
         }
 
-        $today = now()->format("Y-m-d");
-        $lastday = now()->subDays(1)->format("Y-m-d");
+        $tickets = $tickets->values();
 
-        // confirm | reserve | over issue | today | lastday tickets
-        $ticketData = Ticket::when($superdata, function ($query) {
-            $query->where('terminal_id', Auth::user()->terminal_id);
-        })
-            ->withTrashed()
-            ->whereBetween("date", [$lastday, $today])
-            ->get();
+        $activeCustomerIds = $tickets
+            ->whereNull('deleted_at')
+            ->pluck('customer_id')
+            ->filter()
+            ->unique()
+            ->values();
 
-        // today new customer
-        $newCustomer = Ticket::when($superdata, function ($query) {
-            $query->where('terminal_id', Auth::user()->terminal_id);
-        })
-            ->whereBetween("date", [$lastday, $today])
-            ->whereNotIn('customer_id', function ($query) use ($lastday) {
-                $query->select('customer_id')
-                    ->from('tickets')
-                    ->whereDate('date', '<', $lastday);
-            })
-            ->select('customer_id', 'date')
-            ->distinct()
-            ->get();
+        // One historical lookup classifies only customers present in the selected period.
+        $repeatCustomerIds = collect();
+        if ($activeCustomerIds->isNotEmpty()) {
+            $historyQuery = Ticket::query()
+                ->whereIn('customer_id', $activeCustomerIds)
+                ->where('date', '<', $fromDate->format('Y-m-d'));
+            $scopeTickets($historyQuery);
+            $repeatCustomerIds = $historyQuery->distinct()->pluck('customer_id');
+        }
 
-        // today customer repeat
-        $oldCustomer = Ticket::when($superdata, function ($query) {
-            $query->where('terminal_id', Auth::user()->terminal_id);
-        })
-            ->whereBetween("date", [$lastday, $today])
-            ->whereIn('customer_id', function ($query) use ($lastday) {
-                $query->select('customer_id')
-                    ->from('tickets')
-                    ->whereDate('date', '<', $lastday);
-            })
-            ->select('customer_id', 'date')
-            ->distinct()
-            ->get();
+        $cart = [
+            'today_confirm' => 0,
+            'today_reserve' => 0,
+            'today_cancel' => 0,
+            'today_overissue' => 0,
+            'today_discount' => 0.0,
+            'today_sale' => 0.0,
+        ];
 
+        foreach ($tickets as $ticket) {
+            if ($ticket->type === 'booked') {
+                $cart['today_confirm']++;
+                $cart['today_discount'] += (float) $ticket->discount
+                    + (float) $ticket->terminal_discount
+                    + (float) $ticket->schedule_discount;
+            } elseif ($ticket->type === 'advance booking') {
+                $cart['today_reserve']++;
+            } elseif ($ticket->type === 'canceled') {
+                $cart['today_cancel']++;
+            } elseif ($ticket->type === 'over-issue') {
+                $cart['today_overissue']++;
+            }
 
-        $schedule_ids = ScheduleDetail::where("schedule_date", $today)->pluck("schedule_id")->unique();
-        $schedules = Schedule::whereIn("id", $schedule_ids)->with("bus_class:id,seat_map")->get(["id", "name", "bus_class_id"]);
+            if (in_array($ticket->type, ['booked', 'over-issue'], true)) {
+                $cart['today_sale'] += (float) $ticket->seat_fare - (float) $ticket->discount;
+            }
+        }
 
-        $schedules->map(function ($schedule, $key) use ($schedules, $today) {
-            $schedule->total_seat = countSeatFromMap($schedule->bus_class->seat_map);
-            $schedule->booked_seats = Ticket::where(["schedule_id" => $schedule->id, "schedule_date" => $today, "type" => "booked"])->distinct('seat_no')->count();
-            $schedule->progress = intVal(($schedule->booked_seats / $schedule->total_seat) * 100);
-            $detail = ScheduleDetail::where(["schedule_id" => $schedule->id, "schedule_date" => $today])->first();
-            $schedule->departure_time = date("h:i A d/m/Y", strtotime($detail->departure_date . ' ' . $detail->departure_time));
-            $schedule->schedule_date = date("d/m/Y", strtotime($detail->schedule_date));
-            $checkDrop = DropSchedule::where(["schedule_id" => $schedule->id, "schedule_date" => $today])->first();
-            $schedule->drop = $checkDrop ? true : false;
-        });
+        $cart['today_new_customers'] = $activeCustomerIds->diff($repeatCustomerIds)->count();
+        $cart['today_old_customers'] = $repeatCustomerIds->count();
 
+        $scheduleDate = $toDate->format('Y-m-d');
+        $details = ScheduleDetail::where('company_id', $user->company_id)
+            ->where('schedule_date', $scheduleDate)
+            ->get()
+            ->unique('schedule_id')
+            ->keyBy('schedule_id');
+        $scheduleIds = $details->keys();
+        $bookedSeats = Ticket::where('schedule_date', $scheduleDate)
+            ->get(['company_id', 'schedule_id', 'seat_no', 'type'])
+            ->where('company_id', $user->company_id)
+            ->whereIn('schedule_id', $scheduleIds)
+            ->where('type', 'booked')
+            ->groupBy('schedule_id')
+            ->map(function ($tickets) {
+                return $tickets->pluck('seat_no')->unique()->count();
+            });
+        $droppedSchedules = DropSchedule::whereIn('schedule_id', $scheduleIds)
+            ->where('schedule_date', $scheduleDate)
+            ->pluck('schedule_id')
+            ->flip();
+        $schedules = Schedule::whereIn('id', $scheduleIds)
+            ->with('bus_class:id,seat_map')
+            ->get(['id', 'name', 'bus_class_id'])
+            ->map(function ($schedule) use ($details, $bookedSeats, $droppedSchedules) {
+                $detail = $details->get($schedule->id);
+                $schedule->total_seat = $schedule->bus_class ? countSeatFromMap($schedule->bus_class->seat_map) : 0;
+                $schedule->booked_seats = (int) ($bookedSeats[$schedule->id] ?? 0);
+                $schedule->progress = $schedule->total_seat > 0
+                    ? (int) round(($schedule->booked_seats / $schedule->total_seat) * 100)
+                    : 0;
+                $schedule->departure_time = $detail
+                    ? date('h:i A d/m/Y', strtotime($detail->departure_date . ' ' . $detail->departure_time))
+                    : '-';
+                $schedule->schedule_date = $detail ? date('d/m/Y', strtotime($detail->schedule_date)) : '-';
+                $schedule->drop = $droppedSchedules->has($schedule->id);
+                return $schedule;
+            })->values();
 
         return [
-            "cart" => [
-                "last_confirm" => $ticketData->where("date", $lastday)->where("type", "booked")->count(),
-                "today_confirm" => $ticketData->where("date", $today)->where("type", "booked")->count(),
-                "last_reserve" => $ticketData->where("date", $lastday)->where("type", "advance booking")->count(),
-                "today_reserve" => $ticketData->where("date", $today)->where("type", "advance booking")->count(),
-                "last_cancel" => $ticketData->where("date", $lastday)->where("type", "canceled")->count(),
-                "today_cancel" => $ticketData->where("date", $today)->where("type", "canceled")->count(),
-                "last_overissue" => $ticketData->where("date", $lastday)->where("type", "over-issue")->count(),
-                "today_overissue" => $ticketData->where("date", $today)->where("type", "over-issue")->count(),
-                "last_discount" => $ticketData->where("type", "booked")->where("date", $lastday)->sum(function ($ticket) {
-                    return $ticket->discount + $ticket->terminal_discount + $ticket->schedule_discount;
-                }),
-                "today_discount" => $ticketData->where("type", "booked")->where("date", $today)->sum(function ($ticket) {
-                    return $ticket->discount + $ticket->terminal_discount + $ticket->schedule_discount;
-                }),
-                "last_new_customers" => $newCustomer->where("date", $lastday)->count(),
-                "today_new_customers" => $newCustomer->where("date", $today)->count(),
-                "last_old_customers" => $oldCustomer->where("date", $lastday)->count(),
-                "today_old_customers" => $oldCustomer->where("date", $today)->count(),
-                "last_sale" => $ticketData->whereIn('type', ['booked', 'over-issue'])->where("date", $lastday)->sum(function ($ticket) {
-                    return $ticket->seat_fare - $ticket->discount;
-                }),
-                "today_sale" => $ticketData->whereIn('type', ['booked', 'over-issue'])->where("date", $today)->sum(function ($ticket) {
-                    return $ticket->seat_fare - $ticket->discount;
-                }),
+            'cart' => $cart,
+            'schedules' => $schedules,
+            'range' => [
+                'from' => $fromDate->format('Y-m-d'),
+                'to' => $toDate->format('Y-m-d'),
             ],
-            "schedules" => $schedules
         ];
     }
 }

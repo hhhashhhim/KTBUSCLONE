@@ -36,6 +36,14 @@ class TicketClosing extends Model
     {
         return $this->hasOne( Schedule::class, 'id', 'schedule_id' );
     }
+    public function departureCity()
+    {
+        return $this->belongsTo(City::class, 'schedule_start', 'id');
+    }
+    public function destinationCity()
+    {
+        return $this->belongsTo(City::class, 'schedule_end', 'id');
+    }
     public function members()
     {
         return $this->hasMany( TicketClosingMember::class, 'ticket_closing_id', 'id' );

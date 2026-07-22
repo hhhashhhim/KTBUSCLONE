@@ -35,7 +35,7 @@ class ScheduleController extends Controller
         }
         try {
             $schedules = ScheduleDetail::
-            with('schedule.route','bus_class')
+            with('schedule.route', 'schedule.addedBy:id,name', 'bus_class')
             ->whereHas('schedule', function($q)use($request){
                 $q->where("hide",0);
                 if($request->route)
@@ -151,7 +151,7 @@ class ScheduleController extends Controller
                         'added_by' => Auth::user()->id,
                     ]);
                 }
-                
+
                 if($request->discount != 0)
                 {
                     foreach ($request->discountTerminals??[] as $single) {
@@ -164,7 +164,7 @@ class ScheduleController extends Controller
                         ]);
                     }
                 }
-                
+
                 $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
                 $days = $this->getDays($schedule->start_date, $schedule->end_date);
 
@@ -232,6 +232,55 @@ class ScheduleController extends Controller
             'visibilities' => $visibilities,
             'discountTerminals' => $discountTerminals,
         ];
+    }
+
+    public function details(Request $request)
+    {
+        if (!checkForSubmenu("schedules")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $request->validate([
+            'id' => ['required', 'integer'],
+        ]);
+
+        $schedule = Schedule::with([
+            'route',
+            'bus_class',
+            'discount',
+            'surcharge',
+            'addedBy:id,name',
+        ])
+            ->where('company_id', Auth::user()->company_id)
+            ->where('id', $request->id)
+            ->firstOrFail();
+
+        $firstScheduleDate = ScheduleDetail::where('company_id', Auth::user()->company_id)
+            ->where('schedule_id', $schedule->id)
+            ->min('schedule_date');
+
+        $routeDetails = collect();
+        if ($firstScheduleDate) {
+            $routeDetails = ScheduleDetail::with([
+                'departure_city:id,name',
+                'destination_city:id,name',
+            ])
+                ->where('company_id', Auth::user()->company_id)
+                ->where('schedule_id', $schedule->id)
+                ->where('schedule_date', $firstScheduleDate)
+                ->orderBy('id')
+                ->get([
+                    'id', 'schedule_id', 'departure_id', 'destination_id',
+                    'departure_time', 'departure_date', 'schedule_date',
+                ])
+                ->unique(fn ($detail) => $detail->departure_id . ':' . $detail->destination_id)
+                ->values();
+        }
+
+        return response()->json([
+            'schedule' => $schedule,
+            'route_details' => $routeDetails,
+        ]);
     }
 
     public function updateScheduleTime(Request $request)
@@ -410,11 +459,13 @@ class ScheduleController extends Controller
                 ScheduleDetail::where([
                     'company_id' => Auth::user()->company_id,
                     'schedule_id' => $schedule->id,
-                ])->update([
+                ])
+                ->where('schedule_date', '>=', date('Y-m-d'))
+                ->update([
                     'bus_class_id' => $req['bus_class_id'],
                 ]);
-                
-                
+
+
                 ScheduleTerminalVisibility::where("schedule_id",$req['id'])->delete();
                 foreach ($request->terminals as $single) {
                     ScheduleTerminalVisibility::create([
@@ -454,16 +505,48 @@ class ScheduleController extends Controller
                     $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
                     // how many days schedule exist
                     $days = $this->getDays($start_date->schedule_date, $end_date->schedule_date);
-  
-                    // to run loop equal to schedule existing days
+
+                    $today = date('Y-m-d');
+
+                    // Update only current and future details. Past schedule details
+                    // are historical records and must never be changed.
                     for ($i = 0; $i <= $days; $i++) {
-                        $date_wise_departure = ScheduleDetail::where(["company_id"=>Auth::user()->company_id,"schedule_id"=>$schedule->id,"schedule_date"=>date("Y-m-d",strtotime(date("$start_date->schedule_date"))+($i * 86400))])->orderBy("id","ASC")->first();
-                        ScheduleDetail::where("schedule_id",$schedule->id)->where("schedule_date", date("Y-m-d",strtotime(date("$start_date->schedule_date"))+($i * 86400)))->delete();
+                        $scheduleDate = date("Y-m-d", strtotime($start_date->schedule_date) + ($i * 86400));
+
+                        if ($scheduleDate < $today) {
+                            continue;
+                        }
+
+                        $existingDetails = ScheduleDetail::withTrashed()
+                            ->where('company_id', Auth::user()->company_id)
+                            ->where('schedule_id', $schedule->id)
+                            ->where('schedule_date', $scheduleDate)
+                            ->orderBy('id')
+                            ->get();
+
+                        $date_wise_departure = $existingDetails
+                            ->whereNull('deleted_at')
+                            ->first();
+
+                        if (!$date_wise_departure) {
+                            continue;
+                        }
+
+                        // A detail used by any ticket is protected, including when
+                        // that ticket has been soft deleted.
+                        $referencedDetailIds = Ticket::withTrashed()
+                            ->whereIn('schedule_details_id', $existingDetails->pluck('id'))
+                            ->pluck('schedule_details_id')
+                            ->filter()
+                            ->unique()
+                            ->flip();
+
+                        $handledDetailIds = collect();
                         $lastDepId = $routeDetails[0]->departure_city_id;
                         $totalTime = strtotime(date("$start_date->schedule_date $date_wise_departure->departure_time")) + ($i * 86400);
                         $scheduleStartDate = date("Y-m-d", $totalTime);
-                        
-                        
+
+
                         foreach ($routeDetails as $detail) {
                             if ($lastDepId == $detail->departure_city_id) {
                                 $departureTime = date("Y-m-d H:i", $totalTime);
@@ -475,8 +558,8 @@ class ScheduleController extends Controller
                                 $departureTime = date("Y-m-d H:i", $totalTime);
                                 $lastDepId = $detail->departure_city_id;
                             }
-                          
-                            ScheduleDetail::create([
+
+                            $detailValues = [
                                 'company_id' => Auth::user()->company_id,
                                 'added_by' => Auth::user()->id,
                                 'schedule_id' => $schedule->id,
@@ -486,13 +569,47 @@ class ScheduleController extends Controller
                                 'departure_time' => date('H:i', strtotime($departureTime)),
                                 'departure_date' => date('Y-m-d', strtotime($departureTime)),
                                 'schedule_date' => $scheduleStartDate, // schedule departure date
-                            ]);
+                                'updated_by' => Auth::user()->id,
+                            ];
+
+                            // Match by the stable segment identity, not by time.
+                            // This lets a time change update the existing row while
+                            // preserving the schedule_details.id used by tickets.
+                            $matchingDetails = $existingDetails
+                                ->where('departure_id', $detail->departure_city_id)
+                                ->where('destination_id', $detail->destination_city_id)
+                                ->whereNotIn('id', $handledDetailIds);
+
+                            $existingDetail = $matchingDetails
+                                ->first(fn ($item) => $referencedDetailIds->has($item->id))
+                                ?? $matchingDetails->firstWhere('deleted_at', null)
+                                ?? $matchingDetails->first();
+
+                            if ($existingDetail) {
+                                if ($existingDetail->trashed()) {
+                                    $existingDetail->restore();
+                                }
+
+                                $existingDetail->update($detailValues);
+                                $handledDetailIds->push($existingDetail->id);
+                            } else {
+                                $createdDetail = ScheduleDetail::create($detailValues);
+                                $handledDetailIds->push($createdDetail->id);
+                            }
                         }
+
+                        // Remove only obsolete, unreferenced current/future rows.
+                        // Referenced rows remain available to their existing tickets.
+                        $existingDetails
+                            ->whereNull('deleted_at')
+                            ->whereNotIn('id', $handledDetailIds)
+                            ->each(function ($existingDetail) use ($referencedDetailIds) {
+                                if (!$referencedDetailIds->has($existingDetail->id)) {
+                                    $existingDetail->delete();
+                                }
+                            });
                     }
                 }
-
-
-
 
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
@@ -535,7 +652,7 @@ class ScheduleController extends Controller
         }
         return Route::where(['company_id'=> Auth::user()->company_id,"hide"=>0])->get();
     }
-    
+
     public function getTerminals()
     {
         if(!checkForSubmenu("schedules"))
@@ -613,16 +730,16 @@ class ScheduleController extends Controller
         try {
             DB::beginTransaction();
             $schedule = Schedule::where('id', $request->id)->where('company_id', Auth::user()->company_id)->first();
-            
+
             $scheduleDetail = ScheduleDetail::where(["schedule_id"=>$schedule->id])->orderBy("id",'desc')->first();
             $lastDayDepartureTime = ScheduleDetail::where(["schedule_id"=>$schedule->id,"schedule_date"=>$scheduleDetail->schedule_date])->first()->departure_time;
 
             $lastEndDate = date("Y-m-d", strtotime($scheduleDetail->schedule_date) + 86400);
 
-            
+
 
             $routeDetails = RouteFare::where('route_id', $schedule->route_id)->get()->groupBy('fare_class_id')->first();
-            
+
             $end_date = $schedule->end_date;
             for ($i = 0; $i < $request->extended_days; $i++) {
                 $lastDepId = $routeDetails[0]->departure_city_id;
@@ -655,7 +772,7 @@ class ScheduleController extends Controller
                     $end_date = $scheduleStartDate;
                 }
             };
-           
+
             $schedule->update([
                 "end_date" => $end_date
             ]);

@@ -8,6 +8,7 @@ Route::group(['prefix' => 'web/v1/schedule','middleware' => ['auth:sanctum']], f
     Route::post('/', [ScheduleController::class, 'index']);
     Route::post('/store', [ScheduleController::class, 'storeSchedule']);
     Route::post('/edit', [ScheduleController::class, 'editSchedule']);
+    Route::post('/details', [ScheduleController::class, 'details']);
     Route::post('/update', [ScheduleController::class, 'updateSchedule']);
     Route::post('/time/update', [ScheduleController::class, 'updateScheduleTime']);
     Route::post('/hide', [ScheduleController::class, 'hideSchedule']);

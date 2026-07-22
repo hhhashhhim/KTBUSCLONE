@@ -33,7 +33,12 @@ class AuthApiController extends Controller
             ], 404);
         }
     
-$token = $user->createToken('postman-token')->plainTextToken;        
+        // Keep all sessions created today so the user can sign in from
+        // multiple devices. Revoke only tokens left from previous days.
+        $user->tokens()
+            ->where('created_at', '<', now()->startOfDay())
+            ->delete();
+        $token = $user->createToken('postman-token')->plainTextToken;
         ActivityLog::create([
             "activity_by" => $user->id,
             "message" => substr($user->name." | API Login | LOGIN | User logged in | Record ID: ".$user->id." | Agent: ".$request->userAgent(), 0, 1000),

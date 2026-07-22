@@ -154,8 +154,6 @@ class BookingApiController extends Controller
             $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id" => Auth::user()->company_id, "terminal_id" => $request->terminal ?? Auth::user()->terminal_id, "visibility" => 1])->pluck("schedule_id");
             $advanceBookingDays = Terminal::where("id", Auth::user()->terminal_id)->first()->advance_booking;
 
-
-
             $data = ScheduleDetail::whereIn("schedule_id", $visibleScheduleIds)
                 ->whereHas('schedule', function ($q) {
                     $q->where("hide", 0);
