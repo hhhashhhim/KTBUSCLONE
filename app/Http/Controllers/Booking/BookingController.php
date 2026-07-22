@@ -39,6 +39,7 @@ use App\Models\Schedule\ScheduleDetail;
 use App\Models\Schedule\ScheduleTerminalVisibility;
 use App\Models\Schedule\TicketClosing;
 use App\Models\Setting\Tickets\TicketsTemplate;
+use App\Models\Setting\TicketLabelSetting;
 use App\Models\Hrm\Employee\Employee;
 use App\Models\Terminal;
 use App\Models\TerminalDiscount;
@@ -2175,6 +2176,7 @@ class BookingController extends Controller
             'tickets' => $tickets,
             'format' => $format,
             'duplicate' => (int)$request->duplicate,
+            'surcharge_label' => TicketLabelSetting::surchargeLabelForCompany(Auth::user()->company_id),
         ];
 
         return view('pdf/pdf', ['data' => $finalData]);

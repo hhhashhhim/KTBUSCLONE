@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Surcharge;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Surcharge\StoreSurchargeRequest;
 use App\Models\Surcharge\Surcharge;
+use App\Models\Setting\TicketLabelSetting;
 use Illuminate\Http\Request;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,56 @@ class SurchargeController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         return Surcharge::with('addedBy')->orderBy('id')->where('company_id', Auth::user()->company_id)->get();
+    }
+
+    public function ticketLabel()
+    {
+        if (!checkForSubmenu("surcharge")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $storedLabel = TicketLabelSetting::where('company_id', Auth::user()->company_id)
+            ->value('surcharge_label');
+
+        return response()->json([
+            'surcharge_label' => $storedLabel ?: '',
+            'effective_label' => filled($storedLabel) ? trim($storedLabel) : 'Surcharge',
+        ]);
+    }
+
+    public function updateTicketLabel(Request $request)
+    {
+        if (!checkPermissionButtons("edit-surcharge")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $validated = $request->validate([
+            'surcharge_label' => ['nullable', 'string', 'max:50'],
+        ]);
+
+        $label = trim($validated['surcharge_label'] ?? '');
+        $existing = TicketLabelSetting::where('company_id', Auth::user()->company_id)->first();
+
+        $setting = TicketLabelSetting::updateOrCreate(
+            ['company_id' => Auth::user()->company_id],
+            [
+                'surcharge_label' => $label !== '' ? $label : null,
+                'added_by' => $existing ? $existing->added_by : Auth::user()->id,
+                'updated_by' => Auth::user()->id,
+            ]
+        );
+
+        ActivityLog::create([
+            'activity_by' => Auth::user()->id,
+            'message' => Auth::user()->name . ' | updated ticket surcharge label (' . ($label ?: 'Surcharge') . ')',
+            'requested_host' => $request->ip(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        return response()->json([
+            'surcharge_label' => $setting->surcharge_label ?: '',
+            'effective_label' => $setting->surcharge_label ?: 'Surcharge',
+        ]);
     }
 
     public function storeSurcharge(Request $request)

@@ -155,7 +155,7 @@
                 <p class="my-5 float-right">{{ $data['tickets'][$key]['pdf_base_fare'] }}</p>
             </div>
             <div class="clear-both">
-                <p class="my-5 font-weight-bold float-left">Surcharge :</p>
+                <p class="my-5 font-weight-bold float-left">{{ $data['surcharge_label'] ?? 'Surcharge' }} :</p>
                 <p class="my-5 float-right">{{ $data['tickets'][$key]['pdf_surcharge'] }}</p>
             </div>
             <div class="clear-both">
