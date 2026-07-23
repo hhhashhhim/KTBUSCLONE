@@ -523,9 +523,11 @@ class ScheduleController extends Controller
                             'schedule_date' => $scheduleDate,
                         ])->orderBy('id')->first();
 
-                        if (!$date_wise_departure) {
-                            continue;
-                        }
+                        // If a current/future date is missing, rebuild it from the
+                        // submitted schedule time instead of skipping the date.
+                        $baseDepartureTime = $date_wise_departure
+                            ? $date_wise_departure->departure_time
+                            : ($req['time'] ?? $schedule->time);
 
                         ScheduleDetail::where([
                             'company_id' => Auth::user()->company_id,
@@ -534,7 +536,7 @@ class ScheduleController extends Controller
                         ])->delete();
 
                         $lastDepId = $routeDetails[0]->departure_city_id;
-                        $totalTime = strtotime(date("$start_date->schedule_date $date_wise_departure->departure_time")) + ($i * 86400);
+                        $totalTime = strtotime($scheduleDate . ' ' . $baseDepartureTime);
                         $scheduleStartDate = date("Y-m-d", $totalTime);
 
 
