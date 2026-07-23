@@ -453,6 +453,7 @@ class ScheduleController extends Controller
                     'updated_by' => Auth::user()->id,
                     'route_id' => $req['route_id'],
                     'bus_class_id' => $req['bus_class_id'],
+                    'time' => $req['time'],
                     'route_city_terminal' => $req['route_city_terminal'] ?? [],
                 ]);
 
@@ -517,17 +518,10 @@ class ScheduleController extends Controller
                             continue;
                         }
 
-                        $date_wise_departure = ScheduleDetail::where([
-                            'company_id' => Auth::user()->company_id,
-                            'schedule_id' => $schedule->id,
-                            'schedule_date' => $scheduleDate,
-                        ])->orderBy('id')->first();
-
-                        // If a current/future date is missing, rebuild it from the
-                        // submitted schedule time instead of skipping the date.
-                        $baseDepartureTime = $date_wise_departure
-                            ? $date_wise_departure->departure_time
-                            : ($req['time'] ?? $schedule->time);
+                        // Always rebuild from the master schedule time. Reusing an
+                        // existing detail can carry an incorrect intermediate-city
+                        // time into every regenerated route segment.
+                        $baseDepartureTime = $req['time'] ?? $schedule->time;
 
                         ScheduleDetail::where([
                             'company_id' => Auth::user()->company_id,
