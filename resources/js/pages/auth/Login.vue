@@ -89,33 +89,15 @@
                                                 </a>
                                               </div> -->
                                         </div>
-                                        <div class="input-group">
-                                            <input
-                                                :type="showPassword ? 'text' : 'password'"
-                                                class="form-control"
-                                                id="password"
-                                                tabindex="2"
-                                                autocomplete="current-password"
-                                                required
-                                                v-model="data.password"
-                                            />
-                                            <div class="input-group-append">
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-outline-secondary password-toggle"
-                                                    tabindex="3"
-                                                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                                                    :title="showPassword ? 'Hide password' : 'Show password'"
-                                                    @click="showPassword = !showPassword"
-                                                >
-                                                    <i
-                                                        class="fas"
-                                                        :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"
-                                                        aria-hidden="true"
-                                                    ></i>
-                                                </button>
-                                            </div>
-                                        </div>
+                                        <input
+                                            type="password"
+                                            class="form-control"
+                                            id="password"
+                                            tabindex="2"
+                                            autocomplete="current-password"
+                                            required
+                                            v-model="data.password"
+                                        />
                                         <div class="invalid-feedback">
                                             please fill in your password
                                         </div>
@@ -160,7 +142,6 @@ export default {
             errors: [],
             error: "",
             isLoading: false,
-            showPassword: false,
         };
     },
 
@@ -216,14 +197,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-.password-toggle {
-    min-width: 46px;
-    border-color: #e4e6fc;
-}
-
-.password-toggle:focus {
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-}
-</style>
