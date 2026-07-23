@@ -508,8 +508,8 @@ class ScheduleController extends Controller
 
                     $today = date('Y-m-d');
 
-                    // Update only current and future details. Past schedule details
-                    // are historical records and must never be changed.
+                    // Preserve historical details. Current and future details are
+                    // regenerated so only one active set remains for each date.
                     for ($i = 0; $i <= $days; $i++) {
                         $scheduleDate = date("Y-m-d", strtotime($start_date->schedule_date) + ($i * 86400));
 
@@ -517,31 +517,22 @@ class ScheduleController extends Controller
                             continue;
                         }
 
-                        $existingDetails = ScheduleDetail::withTrashed()
-                            ->where('company_id', Auth::user()->company_id)
-                            ->where('schedule_id', $schedule->id)
-                            ->where('schedule_date', $scheduleDate)
-                            ->orderBy('id')
-                            ->get();
-
-                        $date_wise_departure = $existingDetails
-                            ->whereNull('deleted_at')
-                            ->first();
+                        $date_wise_departure = ScheduleDetail::where([
+                            'company_id' => Auth::user()->company_id,
+                            'schedule_id' => $schedule->id,
+                            'schedule_date' => $scheduleDate,
+                        ])->orderBy('id')->first();
 
                         if (!$date_wise_departure) {
                             continue;
                         }
 
-                        // A detail used by any ticket is protected, including when
-                        // that ticket has been soft deleted.
-                        $referencedDetailIds = Ticket::withTrashed()
-                            ->whereIn('schedule_details_id', $existingDetails->pluck('id'))
-                            ->pluck('schedule_details_id')
-                            ->filter()
-                            ->unique()
-                            ->flip();
+                        ScheduleDetail::where([
+                            'company_id' => Auth::user()->company_id,
+                            'schedule_id' => $schedule->id,
+                            'schedule_date' => $scheduleDate,
+                        ])->delete();
 
-                        $handledDetailIds = collect();
                         $lastDepId = $routeDetails[0]->departure_city_id;
                         $totalTime = strtotime(date("$start_date->schedule_date $date_wise_departure->departure_time")) + ($i * 86400);
                         $scheduleStartDate = date("Y-m-d", $totalTime);
@@ -559,7 +550,7 @@ class ScheduleController extends Controller
                                 $lastDepId = $detail->departure_city_id;
                             }
 
-                            $detailValues = [
+                            ScheduleDetail::create([
                                 'company_id' => Auth::user()->company_id,
                                 'added_by' => Auth::user()->id,
                                 'schedule_id' => $schedule->id,
@@ -570,44 +561,8 @@ class ScheduleController extends Controller
                                 'departure_date' => date('Y-m-d', strtotime($departureTime)),
                                 'schedule_date' => $scheduleStartDate, // schedule departure date
                                 'updated_by' => Auth::user()->id,
-                            ];
-
-                            // Match by the stable segment identity, not by time.
-                            // This lets a time change update the existing row while
-                            // preserving the schedule_details.id used by tickets.
-                            $matchingDetails = $existingDetails
-                                ->where('departure_id', $detail->departure_city_id)
-                                ->where('destination_id', $detail->destination_city_id)
-                                ->whereNotIn('id', $handledDetailIds);
-
-                            $existingDetail = $matchingDetails
-                                ->first(fn ($item) => $referencedDetailIds->has($item->id))
-                                ?? $matchingDetails->firstWhere('deleted_at', null)
-                                ?? $matchingDetails->first();
-
-                            if ($existingDetail) {
-                                if ($existingDetail->trashed()) {
-                                    $existingDetail->restore();
-                                }
-
-                                $existingDetail->update($detailValues);
-                                $handledDetailIds->push($existingDetail->id);
-                            } else {
-                                $createdDetail = ScheduleDetail::create($detailValues);
-                                $handledDetailIds->push($createdDetail->id);
-                            }
+                            ]);
                         }
-
-                        // Remove only obsolete, unreferenced current/future rows.
-                        // Referenced rows remain available to their existing tickets.
-                        $existingDetails
-                            ->whereNull('deleted_at')
-                            ->whereNotIn('id', $handledDetailIds)
-                            ->each(function ($existingDetail) use ($referencedDetailIds) {
-                                if (!$referencedDetailIds->has($existingDetail->id)) {
-                                    $existingDetail->delete();
-                                }
-                            });
                     }
                 }
 
