@@ -665,7 +665,8 @@ class BookingApiController extends Controller
             try {
 
                 $companyId = Auth::user()->company_id;
-                $terminalId = $request->terminalId == 1 ? 14 : 25;
+                $terminalId = Auth::user()->terminal_id;
+                $terminalId = $request->terminalId ? $request->terminalId : $terminalId;
                 $pendingSeatTypes = ['advance booking', 'reserved', 'pending booking'];
 
                 // for reserved to confirm
@@ -916,7 +917,7 @@ if ($fareValidation) {
                 $invoice = Invoice::create([
                     "schedule_id" => $schedule->id,
                     "route_id" => $schedule->route_id,
-                    "terminal_id" => $request->terminalId ?? Auth::user()->terminal_id,
+                    "terminal_id" => $terminalId,
                     "schedule_date" => $detail->schedule_date,
                     "schedule_time" => $detail->departure_time,
                     "company_id" => Auth::user()->company_id,
@@ -925,6 +926,7 @@ if ($fareValidation) {
                 $allTicket = [];
                 foreach ($request->selected_seats as $i => $seat) {
                     $checkDiscount =  checkDiscountAmount($detail, $terminalId, $request->selected_seats_class[$i]);
+
                     $ticket = Ticket::create([
                         'company_id' => $companyId,
                         'departure_city_id' => $request->departure_city_id,
