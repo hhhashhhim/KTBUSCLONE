@@ -668,7 +668,7 @@ class BookingApiController extends Controller
                 $terminalId = Auth::user()->terminal_id;
                 $terminalId = $request->terminal_id ? $request->terminal_id : $terminalId;
                 $pendingSeatTypes = ['advance booking', 'reserved', 'pending booking'];
-                Log::info($request->all());
+              
                 // for reserved to confirm
                 if (isset($request->flag) && $request->flag == 1) {
                     $validator = Validator::make($request->all(), [
