@@ -665,7 +665,7 @@ class BookingApiController extends Controller
             try {
 
                 $companyId = Auth::user()->company_id;
-                $terminalId = Auth::user()->terminal_id;
+                $terminalId = $request->terminalId == 1 ? 14 : 25;
                 $pendingSeatTypes = ['advance booking', 'reserved', 'pending booking'];
 
                 // for reserved to confirm
