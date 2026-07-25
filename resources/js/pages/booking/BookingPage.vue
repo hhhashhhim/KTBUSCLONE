@@ -357,6 +357,17 @@
                                                     type="button" class="btn btn-primary btn-sm" @click="closingData()">
                                                     Assign Bus
                                                 </button>
+                                                <button
+                                                    v-if="checkForSubmenuButtons('assign-bus') && hideDivButtonsDrop && showBookingDiv"
+                                                    type="button"
+                                                    class="btn btn-warning btn-sm ml-1"
+                                                    :disabled="fixScheduleLoading"
+                                                    @click="fixLoadedTicketSchedule()">
+                                                    <span v-if="fixScheduleLoading"
+                                                        class="spinner-border spinner-border-sm mr-1"
+                                                        role="status" aria-hidden="true"></span>
+                                                    {{ fixScheduleLoading ? "Fixing..." : "Fix Schedule" }}
+                                                </button>
                                                 <button v-if="checkForSubmenuButtons('terminal-invoice')"
                                                     class="btn btn-info ml-1 btn-sm" @click="getTerminalInvoice()">
                                                     Terminal Invoice
@@ -2024,6 +2035,7 @@ export default {
             reScheduleDest: '',
             reScheduleDate: '',
             loading: false,
+            fixScheduleLoading: false,
             otpLoader: false,
             discountType: "",             // flat or percentage
             flatDiscount: 0,
@@ -3395,6 +3407,91 @@ export default {
         },
         changeToUpperCase: function (string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
+        },
+        loadedSeatTicketIds() {
+            const seatMap = this.schedule && this.schedule.bus_class
+                ? this.schedule.bus_class.seat_map
+                : [];
+            const ticketIds = new Set();
+
+            (seatMap || []).forEach(row => {
+                (row || []).forEach(seat => {
+                    const ticketId = Number(seat && seat.id);
+                    if (Number.isInteger(ticketId) && ticketId > 0) {
+                        ticketIds.add(ticketId);
+                    }
+                });
+            });
+
+            return Array.from(ticketIds);
+        },
+        async fixLoadedTicketSchedule() {
+            if (this.fixScheduleLoading) {
+                return;
+            }
+
+            const ticketIds = this.loadedSeatTicketIds();
+            if (!ticketIds.length) {
+                return swal({
+                    title: "No Tickets Found",
+                    text: "There are no occupied tickets on the currently loaded seat map.",
+                    icon: "info",
+                });
+            }
+
+            const confirmed = await swal({
+                title: "Fix Schedule Date & Time?",
+                text: `Only the ${ticketIds.length} ticket(s) currently loaded on this seat map will be checked. Seats, fares, passengers and ticket statuses will not change.`,
+                icon: "warning",
+                buttons: ["Cancel", "Fix Schedule"],
+                dangerMode: true,
+            });
+
+            if (!confirmed) {
+                return;
+            }
+
+            this.fixScheduleLoading = true;
+            try {
+                const response = await this.callApi("post", "booking/schedule/fix-tickets", {
+                    id: this.addForm.schedule,
+                    date: this.addForm.date,
+                    departureCity: this.addForm.departureCity,
+                    destinationCity: this.addForm.destinationCity,
+                    departure_time: this.addForm.departure_time,
+                    ticket_ids: ticketIds,
+                });
+
+                if (response && response.status === 200) {
+                    await swal({
+                        title: "Schedule Fixed",
+                        text: response.data.message,
+                        icon: "success",
+                    });
+                    await this.fetchScheduleData();
+                    return;
+                }
+
+                const message = response && response.data && response.data.message
+                    ? response.data.message
+                    : "The loaded tickets could not be updated.";
+                return swal({
+                    title: "Unable to Fix Schedule",
+                    text: message,
+                    icon: "error",
+                });
+            } catch (error) {
+                const message = error.response && error.response.data && error.response.data.message
+                    ? error.response.data.message
+                    : "The loaded tickets could not be updated.";
+                return swal({
+                    title: "Unable to Fix Schedule",
+                    text: message,
+                    icon: "error",
+                });
+            } finally {
+                this.fixScheduleLoading = false;
+            }
         },
         async fetchScheduleData() {
             if (this.addForm.terminalId == 0 && this.$store.state.user.terminal_id == null) {
