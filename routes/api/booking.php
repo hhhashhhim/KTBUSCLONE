@@ -47,6 +47,7 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
     Route::post('/revertDropSchedule', [BookingController::class, 'revertDropSchedule']);
     Route::post('/fare_class', [BookingController::class, 'getFareClass']);
     Route::post('/schedule/selected', [BookingController::class, 'selected']);
+    Route::post('/schedule/fix-tickets', [BookingController::class, 'fixLoadedTicketSchedule']);
     Route::post('/schedule/dropCheck', [BookingController::class, 'dropCheck']);
     Route::post('/terminal/seats', [BookingController::class, 'terminalSeats']);
     Route::post('/check/bus/assigned', [BookingController::class, 'checkAssignedBus']);

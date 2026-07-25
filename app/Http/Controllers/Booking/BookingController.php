@@ -1499,6 +1499,147 @@ class BookingController extends Controller
         return $schedule;
     }
 
+    public function fixLoadedTicketSchedule(Request $request)
+    {
+        if (!checkPermissionButtons("assign-bus")) {
+            return response()->json(["Error" => ['You are not authorized to perform this action']], 403);
+        }
+
+        $validated = $request->validate([
+            'id' => ['required', 'integer'],
+            'date' => ['required', 'date'],
+            'departureCity' => ['required', 'integer'],
+            'destinationCity' => ['required', 'integer', 'different:departureCity'],
+            'departure_time' => ['required'],
+            'ticket_ids' => ['required', 'array', 'min:1', 'max:200'],
+            'ticket_ids.*' => ['required', 'integer', 'distinct'],
+        ]);
+
+        $companyId = Auth::user()->company_id;
+        $selectedDetail = ScheduleDetail::where([
+            'company_id' => $companyId,
+            'schedule_id' => $validated['id'],
+            'departure_date' => $validated['date'],
+            'departure_id' => $validated['departureCity'],
+            'destination_id' => $validated['destinationCity'],
+            'departure_time' => date('H:i:s', strtotime($validated['departure_time'])),
+        ])->first();
+
+        if (!$selectedDetail) {
+            return response()->json([
+                'errors' => ['schedule' => ['The selected schedule detail could not be found. Nothing was changed.']],
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $tickets = Ticket::where('company_id', $companyId)
+                ->where('schedule_id', $selectedDetail->schedule_id)
+                ->whereDate('schedule_date', $selectedDetail->schedule_date)
+                ->whereIn('id', $validated['ticket_ids'])
+                ->lockForUpdate()
+                ->get([
+                    'id', 'departure_city_id', 'destination_city_id',
+                    'date', 'schedule_date', 'schedule_time', 'schedule_time_exact',
+                ]);
+
+            if ($tickets->count() !== count($validated['ticket_ids'])) {
+                DB::rollBack();
+                return response()->json([
+                    'errors' => ['tickets' => ['Some selected tickets no longer belong to the loaded seat map. Nothing was changed.']],
+                ], 422);
+            }
+
+            $serviceDetails = ScheduleDetail::where('company_id', $companyId)
+                ->where('schedule_id', $selectedDetail->schedule_id)
+                ->whereDate('schedule_date', $selectedDetail->schedule_date)
+                ->orderBy('id')
+                ->get([
+                    'id', 'departure_id', 'destination_id', 'departure_date',
+                    'departure_time', 'schedule_date',
+                ]);
+
+            $detailMap = $serviceDetails->keyBy(function ($detail) {
+                return $detail->departure_id . ':' . $detail->destination_id;
+            });
+            $serviceStart = $serviceDetails->first();
+
+            if (!$serviceStart) {
+                DB::rollBack();
+                return response()->json([
+                    'errors' => ['schedule' => ['The selected service has no schedule details. Nothing was changed.']],
+                ], 422);
+            }
+
+            $repairs = [];
+            foreach ($tickets as $ticket) {
+                $detail = $detailMap->get($ticket->departure_city_id . ':' . $ticket->destination_city_id);
+
+                if (!$detail) {
+                    DB::rollBack();
+                    return response()->json([
+                        'errors' => [
+                            'tickets' => ["Ticket {$ticket->id} could not be matched to the updated schedule. Nothing was changed."],
+                        ],
+                    ], 422);
+                }
+
+                $repairs[$ticket->id] = [
+                    'date' => $detail->departure_date,
+                    'schedule_date' => $detail->schedule_date,
+                    'schedule_time' => $detail->departure_time,
+                    'schedule_time_exact' => $serviceStart->departure_time,
+                ];
+            }
+
+            $updated = 0;
+            foreach ($tickets as $ticket) {
+                $repair = $repairs[$ticket->id];
+                $hasChanges = (string) $ticket->date !== (string) $repair['date']
+                    || (string) $ticket->schedule_date !== (string) $repair['schedule_date']
+                    || (string) $ticket->schedule_time !== (string) $repair['schedule_time']
+                    || (string) $ticket->schedule_time_exact !== (string) $repair['schedule_time_exact'];
+
+                if (!$hasChanges) {
+                    continue;
+                }
+
+                DB::table('tickets')->where('id', $ticket->id)->update($repair);
+                $updated++;
+            }
+
+            ActivityLog::create([
+                'activity_by' => Auth::user()->id,
+                'message' => Auth::user()->name
+                    . " | fixed schedule date/time for {$updated} of {$tickets->count()} loaded tickets"
+                    . " | schedule {$selectedDetail->schedule_id} service {$selectedDetail->schedule_date}",
+                'requested_host' => $request->ip(),
+                'company_id' => $companyId,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => $updated > 0
+                    ? "{$updated} ticket schedule(s) fixed successfully."
+                    : 'All loaded tickets already have the correct schedule date and time.',
+                'checked' => $tickets->count(),
+                'updated' => $updated,
+            ]);
+        } catch (\Throwable $error) {
+            DB::rollBack();
+            Log::error('Unable to fix loaded ticket schedules', [
+                'company_id' => $companyId,
+                'schedule_id' => $validated['id'],
+                'error' => $error->getMessage(),
+            ]);
+
+            return response()->json([
+                'errors' => ['tickets' => ['Unable to fix ticket schedules. Nothing was changed.']],
+            ], 422);
+        }
+    }
+
     public function dropSchedule(Request $request)
     {
         if (!checkPermissionButtons("drop-schedule")) {
