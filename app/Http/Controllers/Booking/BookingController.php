@@ -1270,9 +1270,12 @@ class BookingController extends Controller
             'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
         ])->first();
         // Getting Already Booked Tickets
-        $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy', 'updated_name', 'terminal:id,name')
+        $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy', 'updated_name')
             ->where('company_id', Auth::user()->company_id)->where('schedule_id', $request->id)
             ->whereDate('schedule_date', $scheduleDetail->schedule_date)->get();
+        $terminalNames = Terminal::withTrashed()
+            ->whereIn('id', $tickets->pluck('terminal_id')->filter()->unique())
+            ->pluck('name', 'id');
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
         $schedule = Schedule::where('id', $request->id)
             ->where('company_id', Auth::user()->company_id)
@@ -1354,7 +1357,9 @@ class BookingController extends Controller
 
     $seatMap[$i][$j]['seat_fare'] = ($ticket['seat_fare'] ?? 0) - ($ticket['discount'] ?? 0);
     $seatMap[$i][$j]['online_terminal'] = $ticket['online_terminal'] ?? null;
-    $seatMap[$i][$j]['terminal_name'] = $ticket['terminal']['name'] ?? $ticket['terminal_name'] ?? 'N/A';
+    $seatMap[$i][$j]['terminal_name'] = $terminalNames->get($ticket['terminal_id'] ?? null)
+        ?? $ticket['terminal_name']
+        ?? 'N/A';
     $seatMap[$i][$j]['booked_by'] = $ticket['updated_name']['name'] ?? 'N/A';
 
     $seatMap[$i][$j]['departure_city_name'] = $ticket['departure_city']['name'] ?? 'N/A';
@@ -1388,7 +1393,9 @@ class BookingController extends Controller
 
             $seatMap[$i][$j]['seat_fare'] = ($partialTicket['seat_fare'] ?? 0) - ($partialTicket['discount'] ?? 0);
             $seatMap[$i][$j]['online_terminal'] = $partialTicket['online_terminal'] ?? null;
-            $seatMap[$i][$j]['terminal_name'] = $partialTicket['terminal']['name'] ?? $partialTicket['terminal_name'] ?? 'N/A';
+            $seatMap[$i][$j]['terminal_name'] = $terminalNames->get($partialTicket['terminal_id'] ?? null)
+                ?? $partialTicket['terminal_name']
+                ?? 'N/A';
             $seatMap[$i][$j]['booked_by'] = $partialTicket['updated_name']['name'] ?? 'N/A';
 
             $seatMap[$i][$j]['departure_city_name'] = $partialTicket['departure_city']['name'] ?? 'N/A';

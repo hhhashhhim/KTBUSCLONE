@@ -223,7 +223,26 @@ class ScheduleController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $schedule = Schedule::with('bus_class:id,name,is_active,hide')->find($request->id);
+        $schedule = Schedule::with('bus_class:id,name,is_active,hide')
+            ->where('company_id', Auth::user()->company_id)
+            ->findOrFail($request->id);
+
+        // The master time can be older than the date-specific time changed through
+        // "Edit Time". Show the first current/future origin departure in the edit
+        // form so saving unrelated schedule fields cannot restore a stale time.
+        $currentDepartureTime = ScheduleDetail::where([
+                'company_id' => Auth::user()->company_id,
+                'schedule_id' => $schedule->id,
+            ])
+            ->where('schedule_date', '>=', date('Y-m-d'))
+            ->whereColumn('departure_date', 'schedule_date')
+            ->orderBy('schedule_date')
+            ->orderBy('departure_time')
+            ->value('departure_time');
+
+        if ($currentDepartureTime) {
+            $schedule->time = $currentDepartureTime;
+        }
         $visibilities = ScheduleTerminalVisibility::where("schedule_id",$schedule->id)->pluck("terminal_id");
         $discountTerminals = ScheduleTerminalDiscount::where("schedule_id",$schedule->id)->pluck("terminal_id");
         return [
@@ -370,12 +389,12 @@ class ScheduleController extends Controller
                         ]);
                 }
 
-                if ($effectiveStartDate <= $schedule->start_date && $effectiveEndDate >= $schedule->start_date) {
-                    $schedule->update([
-                        'time' => $request->time,
-                        'updated_by' => Auth::user()->id,
-                    ]);
-                }
+                // "Edit Time" defines the schedule's master departure time as well
+                // as updating the selected schedule-detail dates.
+                $schedule->update([
+                    'time' => $request->time,
+                    'updated_by' => Auth::user()->id,
+                ]);
 
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
@@ -518,10 +537,23 @@ class ScheduleController extends Controller
                             continue;
                         }
 
-                        // Always rebuild from the master schedule time. Reusing an
-                        // existing detail can carry an incorrect intermediate-city
-                        // time into every regenerated route segment.
-                        $baseDepartureTime = $req['time'] ?? $schedule->time;
+                        // Preserve the date-specific departure from the route's
+                        // origin. "Edit Time" may intentionally assign different
+                        // times to different date ranges.
+                        $routeOriginId = $routeDetails->first()->departure_city_id;
+                        $dateWiseOriginDeparture = ScheduleDetail::where([
+                                'company_id' => Auth::user()->company_id,
+                                'schedule_id' => $schedule->id,
+                                'schedule_date' => $scheduleDate,
+                                'departure_id' => $routeOriginId,
+                            ])
+                            ->orderBy('departure_date')
+                            ->orderBy('departure_time')
+                            ->first();
+
+                        $baseDepartureTime = $dateWiseOriginDeparture
+                            ? $dateWiseOriginDeparture->departure_time
+                            : ($req['time'] ?? $schedule->time);
 
                         ScheduleDetail::where([
                             'company_id' => Auth::user()->company_id,
