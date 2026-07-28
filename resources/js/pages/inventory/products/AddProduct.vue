@@ -218,7 +218,8 @@
           </div>
           <div class="col-md-12 text-right mb-4">
             <button type="button" class="btn btn-primary px-3" :disabled="loading" @click="createProduct">
-              {{ loading ? 'Loading...' : 'Add' }}
+              <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+              {{ loading ? 'Submitting...' : 'Add' }}
             </button>
           </div>
         </div>
@@ -264,8 +265,10 @@
                 <td>{{ product.qty }}</td>
                 <td>{{ product.avg_price }}</td>
                 <td>
-                  <button v-if="editId === product.id" class="btn btn-success btn-sm" @click="saveProduct(product)">
-                    Save
+                  <button v-if="editId === product.id" class="btn btn-success btn-sm"
+                    :disabled="loading" @click="saveProduct(product)">
+                    <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                    {{ loading ? 'Saving...' : 'Save' }}
                   </button>
                   <button v-else class="btn btn-primary btn-sm mx-1" @click="editProduct(product)">
                     <i class="far fa-edit"></i>
@@ -468,7 +471,9 @@ export default {
       }
     },
     async createProduct() {
+      if (this.loading) return;
       this.loading = true;
+      try {
       // Make sure qty and avg_price are numbers
       const response = await this.callApi('post', 'inventory-product/store', this.data);
       console.log(response);
@@ -483,12 +488,14 @@ export default {
         });
       }
       if (response.status == 422) {
-        this.loading = false;
         Swal.fire({
           icon: 'error',
           title: 'Validation Error',
           text: 'Please fill all field',
         });
+      }
+      } finally {
+        this.loading = false;
       }
     },
     editProduct(product) {
@@ -496,6 +503,7 @@ export default {
       this.fetchProducts();
     },
     async saveProduct(product) {
+      if (this.loading) return;
       try {
         this.loading = true;
         const payload = {

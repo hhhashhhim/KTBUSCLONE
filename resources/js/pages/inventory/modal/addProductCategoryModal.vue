@@ -18,7 +18,10 @@
                         </div>
                     </div>
                     <div class="modal-footer bg-whitesmoke br">
-                      <button type="submit" class="btn btn-primary" @click="createCategory">Add</button>
+                      <button type="button" class="btn btn-primary" :disabled="loading" @click="createCategory">
+                        <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                        {{ loading ? 'Adding...' : 'Add' }}
+                      </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">
                             close
                         </button>
@@ -44,7 +47,10 @@
                         </td>
                         <td>{{ formatDate(category.created_at) }}</td>
                         <td>
-                          <button v-if="editIndex === index" class="btn btn-success" @click="submitCategoryEdit()">Save</button>
+                          <button v-if="editIndex === index" class="btn btn-success" :disabled="loading" @click="submitCategoryEdit()">
+                            <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                            {{ loading ? 'Saving...' : 'Save' }}
+                          </button>
                           <button v-else class="btn btn-primary" @click="editCategoryRow(index, category)"><i class="far fa-edit"></i></button>
                           <button 
                             v-if="category.is_deletable && editIndex !== index" 
@@ -100,6 +106,7 @@ export default {
       editCategory: '',
       editIndex: null,
       editId: null,
+      loading: false,
     };
   },
   mounted() {
@@ -134,6 +141,8 @@ export default {
 
     async createCategory() {
     if (!this.newCategory) return;
+    if (this.loading) return;
+    this.loading = true;
     try {
       const response = await this.callApi('post', 'inventory-product-category/store', {
         category: this.newCategory,
@@ -162,6 +171,8 @@ export default {
     } catch (err) {
       console.error(err.response?.data || err);
       Swal.fire('Error', 'Could not add category.', 'error');
+    } finally {
+      this.loading = false;
     }
   },
 
@@ -172,6 +183,8 @@ export default {
 },
 
 async submitCategoryEdit() {
+  if (this.loading) return;
+  this.loading = true;
   try {
     const response = await this.callApi("post", "inventory-product-category/update", {
       id: this.editId,
@@ -210,6 +223,8 @@ async submitCategoryEdit() {
           } catch (err) {
             console.error(err.response?.data || err);
             Swal.fire('Error', 'Failed to update category.', 'error');
+          } finally {
+            this.loading = false;
           }
         },
 

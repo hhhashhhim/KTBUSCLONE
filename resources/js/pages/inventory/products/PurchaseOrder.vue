@@ -206,7 +206,8 @@
           </div>
           <template v-slot:button>
             <button type="button" class="btn btn-primary" :disabled="loading" @click="add">
-              {{ loading ? 'Loading...' : 'Add' }}
+              <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+              {{ loading ? 'Submitting...' : 'Add' }}
             </button>
           </template>
         </Add>
@@ -643,6 +644,7 @@
         ).toFixed(2);
       },
       async add() {
+        if (this.loading) return;
         this.selectedDetails = this.selectedDetails.filter(id => id); // clean nulls
         if (!this.selectedDetails.length) {
           this.$emit('error', 'Please select at least one bid detail.');
@@ -678,8 +680,9 @@
             });
           }
         } catch (err) {
-          this.loading = false;
           Swal.fire('Error', err.response?.data || 'Unexpected error', 'error');
+        } finally {
+          this.loading = false;
         }
       },
       async viewPODetail(po_id) {

@@ -18,7 +18,10 @@
                         </div>
                     </div>
                     <div class="modal-footer bg-whitesmoke br">
-                      <button type="submit" class="btn btn-primary" @click="createUnit">Add</button>
+                      <button type="button" class="btn btn-primary" :disabled="loading" @click="createUnit">
+                        <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                        {{ loading ? 'Adding...' : 'Add' }}
+                      </button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">
                             close
                         </button>
@@ -44,7 +47,10 @@
                               </td>
                               <td>{{ formatDate(unit.created_at) }}</td>
                               <td>
-                                <button v-if="editIndex === index" class="btn btn-success" @click="submitUnitEdit()">Save</button>
+                                <button v-if="editIndex === index" class="btn btn-success" :disabled="loading" @click="submitUnitEdit()">
+                                  <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                                  {{ loading ? 'Saving...' : 'Save' }}
+                                </button>
                                 <button v-else class="btn btn-primary" @click="editUnitRow(index, unit)"><i class="far fa-edit"></i></button>
                                 <button 
                                   v-if="unit.is_deletable && editIndex !== index" 
@@ -101,6 +107,7 @@ export default {
       editUnit: '',
       editIndex: null,
       editId: null,
+      loading: false,
     };
   },
   mounted() {
@@ -135,6 +142,9 @@ export default {
 
     async createUnit() {
     if (!this.newUnit) return;
+    if (this.loading) return;
+    this.loading = true;
+    try {
       const response = await this.callApi('post', 'inventory-product-unit/store', {
         unit: this.newUnit,
       });
@@ -162,8 +172,11 @@ export default {
             });
         }
         else{
-            Swal.fire('Error', err.response?.data , 'error');
+            Swal.fire('Error', response.data?.message || 'Unable to add unit.', 'error');
         }  
+    } finally {
+      this.loading = false;
+    }
   },
 
   editUnitRow(index, unit) {
@@ -173,6 +186,8 @@ export default {
 },
 
 async submitUnitEdit() {
+  if (this.loading) return;
+  this.loading = true;
   try {
     const response = await this.callApi("post", "inventory-product-unit/update", {
       id: this.editId,
@@ -212,6 +227,8 @@ async submitUnitEdit() {
   } catch (err) {
     console.error(err.response?.data || err);
     Swal.fire('Error', 'Failed to update unit.', 'error');
+  } finally {
+    this.loading = false;
   }
 },
 

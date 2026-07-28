@@ -178,7 +178,10 @@
 
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" @click="submitInward">Submit Inward</button>
+              <button type="button" class="btn btn-primary" :disabled="loading" @click="submitInward">
+                <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                {{ loading ? 'Submitting...' : 'Submit Inward' }}
+              </button>
             </div>
           </Add>
           <!-- POs Modal --> 
@@ -459,6 +462,9 @@ import Add from '../../../components/Add.vue';
             return product.received_qty_so_far >= product.total_qty;
         },
         async submitInward() { 
+              if (this.loading) return;
+              this.loading = true;
+              try {
               const payload = {
                 po_id: this.selectedPO.id,
                 products: this.selectedPO.products.map(p => ({
@@ -491,8 +497,11 @@ import Add from '../../../components/Add.vue';
                     });
                 }
                 else{
-                    Swal.fire('Error', err.response?.data , 'error');
+                    Swal.fire('Error', response.data?.message || 'Unable to add stock inward.', 'error');
                 } 
+              } finally {
+                this.loading = false;
+              }
         }, 
         async viewInward(grn) {
           try {

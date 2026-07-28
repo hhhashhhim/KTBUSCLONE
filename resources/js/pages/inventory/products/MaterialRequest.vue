@@ -206,6 +206,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-primary" :disabled="loading" @click="submitMR">
+                <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
                 {{ loading ? 'Submitting...' : 'Submit' }}
               </button>
               <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -283,7 +284,10 @@
                       <!-- Actions -->
                       <td v-if="selectedMR.status == 1">
                         <template v-if="editingIndex === index">
-                          <button class="btn btn-success btn-sm mx-1" @click="saveDetail(index)">Save</button>
+                          <button class="btn btn-success btn-sm mx-1" :disabled="loading" @click="saveDetail(index)">
+                            <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                            {{ loading ? 'Saving...' : 'Save' }}
+                          </button>
                           <button class="btn btn-secondary btn-sm" @click="cancelEdit()">Cancel</button>
                         </template>
                         <template v-else>
@@ -462,6 +466,7 @@ export default {
       this.productsList.splice(index, 1);
     },
     async submitMR() {
+      if (this.loading) return;
       if (this.productsList.length === 0) {
         Swal.fire('Error', 'Add products before submitting.', 'error');
         return;
@@ -516,8 +521,9 @@ export default {
           });
         }
       } catch (err) {
-        this.loading = false;
         Swal.fire('Error', err.response?.data || err.message, 'error');
+      } finally {
+        this.loading = false;
       }
     },
 
@@ -536,7 +542,9 @@ export default {
       this.editDetailData = {};
     },
     async saveDetail(index) {
-
+      if (this.loading) return;
+      this.loading = true;
+      try {
       if (!this.editDetailData || !this.editDetailData.id) {
         throw new Error('No detail selected for update.');
       }
@@ -567,7 +575,10 @@ export default {
         });
       }
       else {
-        Swal.fire('Error', err.response?.data, 'error');
+        Swal.fire('Error', response.data?.message || 'Unable to update MR.', 'error');
+      }
+      } finally {
+        this.loading = false;
       }
     },
     async deleteDetail(id, index) {

@@ -51,8 +51,9 @@
 
                       <td>
                         <button v-if="editId === supplier.id" required class="btn btn-success btn-sm"
-                          @click="updateSupplier(supplier)">
-                          Save
+                          :disabled="loading" @click="updateSupplier(supplier)">
+                          <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                          {{ loading ? 'Saving...' : 'Save' }}
                         </button>
                         <button v-else class="btn btn-primary btn-sm mx-1" @click="editSupplier(supplier)">
                           <i class="far fa-edit"></i>
@@ -95,7 +96,8 @@
           </div>
           <div class="col-md-12 text-right">
             <button type="button" class="btn btn-primary px-3" :disabled="loading" @click="addSupplier">
-              {{ loading ? 'Loading...' : 'Add' }}
+              <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+              {{ loading ? 'Submitting...' : 'Add' }}
             </button>
           </div>
         </div>
@@ -140,8 +142,9 @@
 
                   <td>
                     <button v-if="editId === supplier.id" required class="btn btn-success btn-sm"
-                      @click="updateSupplier(supplier)">
-                      Save
+                      :disabled="loading" @click="updateSupplier(supplier)">
+                      <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                      {{ loading ? 'Saving...' : 'Save' }}
                     </button>
                     <button v-else class="btn btn-primary btn-sm mx-1" @click="editSupplier(supplier)">
                       <i class="far fa-edit"></i>
@@ -284,6 +287,9 @@ export default {
     },
 
     async updateSupplier(supplier) {
+      if (this.loading) return;
+      this.loading = true;
+      try {
       const payload = {
         id: supplier.id, // 👈 must include id
         name: supplier.name,
@@ -314,7 +320,10 @@ export default {
         });
       }
       else {
-        Swal.fire('Error', err.response?.data, 'error');
+        Swal.fire('Error', response.data?.message || 'Unable to update supplier.', 'error');
+      }
+      } finally {
+        this.loading = false;
       }
     },
     confirmDelete(id) {

@@ -154,6 +154,7 @@
 
               <div class="modal-footer table-light bg-light border-top">
                 <button class="btn btn-primary" @click="submitIssuance" :disabled="loading">
+                  <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
                   {{ loading ? 'Submitting...' : 'Submit Issuance' }}
                 </button>
                 <button class="btn btn-secondary" data-dismiss="modal">Close</button>

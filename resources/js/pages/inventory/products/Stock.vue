@@ -104,7 +104,8 @@
                 
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="loading" @click="add">
-                        {{ loading ? 'Loading...' : 'Add' }}
+                        <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                        {{ loading ? 'Submitting...' : 'Add' }}
                     </button>
                 </template>
             </Add>
@@ -123,7 +124,8 @@
 
                 <template v-slot:button>
                     <button type="button" class="btn btn-primary" :disabled="loading" @click="update">
-                        {{ loading ? 'Loading...' : 'Update' }}
+                        <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                        {{ loading ? 'Updating...' : 'Update' }}
                     </button>
                 </template>
             </Edit>

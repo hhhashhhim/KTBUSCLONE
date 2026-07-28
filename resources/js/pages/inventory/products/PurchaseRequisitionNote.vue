@@ -163,7 +163,10 @@
             </div>
             <div class="modal-footer table-light bg-light border-top">
               <!-- <button class="btn btn-success" @click="issueSelectedItems(selectedMR)">Issue Selected Items</button> -->
-              <button class="btn btn-primary" @click="submitInlinePRN">Submit PRN</button>
+              <button class="btn btn-primary" :disabled="loading" @click="submitInlinePRN">
+                <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                {{ loading ? 'Submitting...' : 'Submit PRN' }}
+              </button>
               <button class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
           </div>
@@ -317,6 +320,7 @@ export default {
       $('#prnModal').modal('show');
     },
     async submitInlinePRN() {
+      if (this.loading) return;
       const prnItems = this.selectedMR.details
         .filter(item => item.prnQty && item.prnQty > 0)
         .map(item => ({
@@ -332,6 +336,8 @@ export default {
         mr_id: this.selectedMR.id,
         items: prnItems
       };
+      this.loading = true;
+      try {
       const response = await this.callApi('post', 'prn/store', payload);
       if (response.status === 200 || response.status === 201) {
         $(".dataTable1").DataTable().destroy();
@@ -352,7 +358,10 @@ export default {
         });
       }
       else {
-        Swal.fire('Error', err.response?.data, 'error');
+        Swal.fire('Error', response.data?.message || 'Unable to create PRN.', 'error');
+      }
+      } finally {
+        this.loading = false;
       }
     },
     submitPRNPdf(prnId) {

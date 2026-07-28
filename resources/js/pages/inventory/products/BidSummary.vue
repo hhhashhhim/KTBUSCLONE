@@ -306,6 +306,7 @@
         <!-- Submit Button -->
         <template v-slot:button>
           <button type="button" class="btn btn-primary" :disabled="loading" @click="createBid">
+            <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
             {{ loading ? 'Submitting...' : 'Submit Bid Summary' }}
           </button>
         </template>
@@ -442,8 +443,9 @@
                   </div>
                 </div>
                 <div v-if="newBidFormRows.length > 0" class="form-group col-md-12 d-flex justify-content-end">
-                  <button class="btn btn-success btn-sm mr-3" @click="createNewBid">
-                    <i class="fa fa-save"></i> Submit New Bidders
+                  <button class="btn btn-success btn-sm mr-3" :disabled="loading" @click="createNewBid">
+                    <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                    <i v-else class="fa fa-save"></i> {{ loading ? 'Submitting...' : 'Submit New Bidders' }}
                   </button>
                   <button v-if="selectedPRNStatus == '1'" class="btn btn-info btn-sm" @click="addNewBid">
                     <i class="fa fa-plus"></i> Add New Bidder
@@ -459,8 +461,9 @@
                       <button class="btn btn-sm btn-secondary mr-2" @click="item.isEditing = false">
                         <i class="fas fa-times"></i> Cancel
                       </button>
-                      <button class="btn btn-sm btn-success mr-2" @click="updateBid(item, bIndex)">
-                        <i class="fas fa-save"></i> Update
+                      <button class="btn btn-sm btn-success mr-2" :disabled="loading" @click="updateBid(item, bIndex)">
+                        <span v-if="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                        <i v-else class="fas fa-save"></i> {{ loading ? 'Updating...' : 'Update' }}
                       </button>
                     </template>
                     <template v-else>
@@ -802,6 +805,9 @@ export default {
      this.selectedPRN = this.prns.find(prn => prn.id === id);
      }, 
     async createBid() {  
+      if (this.loading) return;
+      this.loading = true;
+      try {
       const payload = {
         prn_id: this.selectedPRN?.id,
         mr_id : this.selectedPRN?.mr_id,
@@ -853,10 +859,16 @@ export default {
             });
         }
         else{
-            Swal.fire('Error', err.response?.data , 'error');
+            Swal.fire('Error', response.data?.message || 'Unable to submit bid summary.', 'error');
         }  
+      } finally {
+        this.loading = false;
+      }
      }, 
     async createNewBid() {
+        if (this.loading) return;
+        this.loading = true;
+        try {
         const payload = {
           prn_id: this.selectedPRNId,
           mr_id: this.selectedMRId,
@@ -913,8 +925,11 @@ export default {
             });
         }
         else{
-            Swal.fire('Error', err.response?.data , 'error');
+            Swal.fire('Error', response.data?.message || 'Unable to submit new bidders.', 'error');
         }  
+        } finally {
+          this.loading = false;
+        }
       },
     addRow() {
         if (!this.prnProducts || !this.prnProducts.length) {
@@ -1140,7 +1155,9 @@ export default {
        return details.reduce((sum, item) => sum + parseFloat(item.total || 0), 0);
      },
     async updateBid(item, index) {
-        
+          if (this.loading) return;
+          this.loading = true;
+          try {
           // Step 1: Calculate sub_total
           const sub_total = item.details.reduce((sum, detail) => {
             const qty = parseFloat(detail.qty) || 0;
@@ -1200,6 +1217,9 @@ export default {
               text: response.data?.message || 'Failed to update bid.',
             });
           } 
+          } finally {
+            this.loading = false;
+          }
      },
      calculateGrandTotal(item) {
         if (Array.isArray(item.details)) {
