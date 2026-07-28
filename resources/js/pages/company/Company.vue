@@ -610,6 +610,7 @@ export default {
                                 {name: "cancel-ticket", allow: true},
                                 {name: "reserved-cancel", allow: true},
                                 {name: "check-assign-bus", allow: true},
+                                {name: "re-assign-bus", allow: true},
                             ]
                         },
                         {

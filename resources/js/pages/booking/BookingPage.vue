@@ -1852,7 +1852,7 @@
             </div>
             <template v-slot:button>
                 <!-- v-if="!checkCloseData || !editAble" -->
-                <button v-if="checkCloseData" type="button" class="btn btn-primary" @click="updateCloseSchedule"
+                <button v-if="checkCloseData && checkForSubmenuButtons('re-assign-bus')" type="button" class="btn btn-primary" @click="updateCloseSchedule"
                     :disabled="loading">
                     {{ loading ? 'Loading...' : 'Update Schedule' }}
                 </button>
@@ -2958,7 +2958,7 @@ export default {
             this.loading = true;
             this.dataForClose.mergeId = this.dataForClose.ticket_merge_id
             this.dataForClose.closingId = this.dataForClose.ticket_closing_id
-            const res = await this.callApi("post", "booking/close/schedule/closing/update", this.dataForClose);
+            const res = await this.callApi("post", "booking/close/schedule/closing/reassign", this.dataForClose);
             if (res.status == 200) {
                 swal({
                     title: "Success",
