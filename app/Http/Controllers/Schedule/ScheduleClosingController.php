@@ -1821,6 +1821,20 @@ class ScheduleClosingController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
 
+        return $this->updateAssignedBus($request);
+    }
+
+    public function reassign(Request $request)
+    {
+        if (!checkPermissionButtons("re-assign-bus")) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        return $this->updateAssignedBus($request);
+    }
+
+    private function updateAssignedBus(Request $request)
+    {
         $request->validate([
             'bus' => [
                 'required',

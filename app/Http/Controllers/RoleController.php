@@ -150,6 +150,7 @@ class RoleController extends Controller
     private function addMissingPermissions(array $modules): array
     {
         $permissionsBySubmenu = [
+            'bookings' => ['re-assign-bus'],
             'confirm-cancel' => ['all-user-filter'],
             'sales' => ['all-user-filter'],
             'terminal-sale' => ['all-user-filter'],

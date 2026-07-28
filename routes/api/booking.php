@@ -84,6 +84,7 @@ Route::group(['prefix' => 'web/v1/booking','middleware' => ['auth:sanctum']], fu
             Route::post('/merge', [ScheduleClosingController::class, 'mergeClosing']);
             Route::post('/release', [ScheduleClosingController::class, 'releaseClosing']);
             Route::post('/update', [ScheduleClosingController::class, 'update']);
+            Route::post('/reassign', [ScheduleClosingController::class, 'reassign']);
             Route::post('/date/update', [ScheduleClosingController::class, 'updateClosingDate']);
             Route::post('/members', [ScheduleClosingController::class, 'getMembers']);
             Route::post('/ticket-closing-shortage', [TicketClosingShortageController::class, 'store']);
