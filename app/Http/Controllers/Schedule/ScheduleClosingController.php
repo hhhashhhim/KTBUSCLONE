@@ -1707,6 +1707,20 @@ class ScheduleClosingController extends Controller
             $schedule = Schedule::where("id", $request->schedule)->first();
             $route = Route::where("id", $schedule->route_id)->first();
 
+            // One closing owns the complete scheduled service, including tickets
+            // booked to different destinations. Detect it before checking for
+            // unassigned tickets so duplicate submissions return the correct error.
+            $checkAssign = TicketClosing::where([
+                'company_id' => Auth::user()->company_id,
+                'schedule_id' => $request->schedule,
+                'schedule_date' => $serviceDate,
+            ])->first();
+
+            if ($checkAssign) {
+                DB::rollBack();
+                return response()->json(["errors" => ["Closing Error" => ["Already Closed"]]], 422);
+            }
+
             $bookingAvailable = Ticket::where([
                 "company_id" => Auth::user()->company_id,
                 "schedule_id" => $request->schedule,
@@ -1719,19 +1733,6 @@ class ScheduleClosingController extends Controller
             if (count($bookingAvailable) == 0) {
                 DB::rollBack();
                 return response()->json(["errors" => ["Tickets Error" => ["No Booking Found! \n\n Booked Any Single Seat First"]]], 422);
-            }
-            // if already assign
-            $checkAssign = TicketClosing::where([
-                'company_id' => Auth::user()->company_id,
-                "bus_id" => $request->bus,
-                'schedule_id' => $request->schedule,
-                'schedule_date' => $serviceDate,
-            ])
-                ->first();
-
-            if ($checkAssign) {
-                DB::rollBack();
-                return response()->json(["errors" => ["Closing Error" => ["Already Closed"]]], 422);
             }
 
 

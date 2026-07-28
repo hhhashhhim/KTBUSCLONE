@@ -1767,14 +1767,24 @@ class BookingController extends Controller
         if (!checkPermissionButtons("assign-bus")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $uniqueDate = ScheduleDetail::where([
+        $scheduleDetail = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->scheduleId,
             'departure_date' => $request->date,
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
             'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
-        ])->first()->schedule_date;
+        ])->first();
+
+        if (!$scheduleDetail) {
+            return response()->json([
+                "errors" => [
+                    "Schedule Error" => ["The selected schedule departure could not be found."]
+                ]
+            ], 422);
+        }
+
+        $uniqueDate = $scheduleDetail->schedule_date;
 
         $schedule = ScheduleDetail::where([
             'company_id' => Auth::user()->company_id,
@@ -1789,9 +1799,6 @@ class BookingController extends Controller
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->scheduleId,
             'schedule_date' => $uniqueDate,
-            'schedule_start' => $request->departureCity,
-            'schedule_end' => $request->destinationCity,
-            'schedule_time' => date("H:i:s", strtotime($request->departure_time)),
         ])
             ->with("members")
             ->first();
