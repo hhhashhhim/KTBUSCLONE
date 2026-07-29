@@ -233,7 +233,25 @@ class BookingApiController extends Controller
                         'company_id' => $companyId,
                     ])
                         ->first()->fare;
-                    $original_fare[] = ["name" => $name, "fare" => (int)$fare];
+
+                    $scheduleSurcharge = Surcharge::where('id', $single->schedule->surcharge_id)
+                        ->where('is_active', 1)
+                        ->first();
+
+                    // total_fare represents the price before discounts, so include
+                    // the schedule surcharge just like the preview seat fare.
+                    $totalFare = (int)$fare;
+                    if ($scheduleSurcharge) {
+                        if ($scheduleSurcharge->type == "percentage") {
+                            $totalFare += round(((int)$fare * $scheduleSurcharge->percentage) / 100);
+                        } else {
+                            $totalFare += (int)$scheduleSurcharge->flat;
+                        }
+                    }
+                    $original_fare[] = [
+                        "name" => $name,
+                        "fare" => $scheduleSurcharge ? customRound($totalFare) : $totalFare,
+                    ];
 
                     // this is for discounted price
                     $scheduleDiscount = Discount::where('id', $single->schedule->discount_id)
@@ -242,7 +260,6 @@ class BookingApiController extends Controller
                             $q->where("terminal_id", $terminalId);
                         })
                         ->first();
-                    $scheduleSurcharge = Surcharge::where('id', $single->schedule->surcharge_id)->where('is_active', 1)->first();
                     $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $single->schedule->route_id])->where('start_date', '<=', date('Y-m-d', strtotime($request->date)))
                         ->where('end_date', '>=', date('Y-m-d', strtotime($request->date)))->first();
 
