@@ -463,29 +463,32 @@ class BookingApiController extends Controller
                     if ($column['reserved']) {
                         $count++;
                         $data = $fareForAllClasses->where('fare_class', $column['class'])->first();
-                        $seatMap[$i][$j]['fare'] = (int)$data->fare;
-                        $seatMap[$i][$j]['original_fare'] = (int)$data->fare;
+                        $baseFare = (int)$data->fare;
+                        $surchargeAmount = 0;
+                        if ($scheduleSurcharge) {
+                            $surchargeAmount = $scheduleSurcharge->type == "percentage"
+                                ? round(($baseFare * $scheduleSurcharge->percentage) / 100)
+                                : (int)$scheduleSurcharge->flat;
+                        }
+                        $seatMap[$i][$j]['fare'] = $baseFare;
+                        $seatMap[$i][$j]['original_fare'] = $scheduleSurcharge
+                            ? customRound($baseFare + $surchargeAmount)
+                            : $baseFare;
                         if ($scheduleDiscount) {
                             if ($scheduleDiscount->type == "percentage") {
                                 $number = $scheduleDiscount->percentage / 100;
-                                $percentage = (int)$data->fare * $number;
-                                $seatMap[$i][$j]['fare'] = round((int)$data->fare - $percentage);
+                                $percentage = $baseFare * $number;
+                                $seatMap[$i][$j]['fare'] = round($baseFare - $percentage);
                             } else {
-                                $seatMap[$i][$j]['fare'] = (int)$data->fare - (int)$scheduleDiscount->flat;
+                                $seatMap[$i][$j]['fare'] = $baseFare - (int)$scheduleDiscount->flat;
                             }
                         }
                         if ($terminalDiscount) {
-                            $tdiscount = ((int)$data->fare / 100) * (float)$terminalDiscount->discount;
+                            $tdiscount = ($baseFare / 100) * (float)$terminalDiscount->discount;
                             $seatMap[$i][$j]['fare'] = $seatMap[$i][$j]['fare'] - $tdiscount;
                         }
                         if ($scheduleSurcharge) {
-                            if ($scheduleSurcharge->type == "percentage") {
-                                $number = $scheduleSurcharge->percentage / 100;
-                                $percentage = (int)$data->fare * $number;
-                                $seatMap[$i][$j]['fare'] = round((int)$data->fare + $percentage);
-                            } else {
-                                $seatMap[$i][$j]['fare'] = (int)$data->fare + $scheduleSurcharge->flat;
-                            }
+                            $seatMap[$i][$j]['fare'] += $surchargeAmount;
                         }
 
                         // allow seat manage terminal wise
@@ -586,7 +589,16 @@ class BookingApiController extends Controller
                         }
                         if ($class) {
                             $fare = (int)$fareForAllClasses->where('fare_class', $class->id)->first()->fare;
+                            $surchargeAmount = 0;
+                            if ($scheduleSurcharge) {
+                                $surchargeAmount = $scheduleSurcharge->type == "percentage"
+                                    ? round(($fare * $scheduleSurcharge->percentage) / 100)
+                                    : (int)$scheduleSurcharge->flat;
+                            }
                             $seatMap[$i][$j]['fare'] = $fare;
+                            $seatMap[$i][$j]['original_fare'] = $scheduleSurcharge
+                                ? customRound($fare + $surchargeAmount)
+                                : $fare;
                             if ($scheduleDiscount) {
                                 if ($scheduleDiscount->type == "percentage") {
                                     $number = $scheduleDiscount->percentage / 100;
@@ -601,13 +613,7 @@ class BookingApiController extends Controller
                                 $seatMap[$i][$j]['fare'] = $seatMap[$i][$j]['fare'] - $tdiscount;
                             }
                             if ($scheduleSurcharge) {
-                                if ($scheduleSurcharge->type == "percentage") {
-                                    $number = $scheduleSurcharge->percentage / 100;
-                                    $percentage = $fare * $number;
-                                    $seatMap[$i][$j]['fare'] = round($fare + $percentage);
-                                } else {
-                                    $seatMap[$i][$j]['fare'] = $fare + $scheduleSurcharge->flat;
-                                }
+                                $seatMap[$i][$j]['fare'] += $surchargeAmount;
                             }
                             // check if any discount/surcharge apply then it should apply custom round other wise show fix fare
                             if ($fare != $seatMap[$i][$j]['fare']) {
