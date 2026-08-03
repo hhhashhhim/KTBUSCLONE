@@ -162,7 +162,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="routes">Routes <span class="text-danger ml-1">Options</span></label>
+                        <label for="routes">Routes <span class="text-muted ml-1">(Optional)</span></label>
                         <button class="btn btn-success btn-sm m-1" @click="selectAllRoute">Select All</button>
                         <button class="btn btn-danger btn-sm " @click="deselectAllRoute">Deselect All</button>
                         <select class="form-control" id="routes" multiple v-model="data.routes">
@@ -341,7 +341,7 @@
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="editRoutes">Routes <span class="text-danger ml-1">*</span></label>
+                        <label for="editRoutes">Routes <span class="text-muted ml-1">(Optional)</span></label>
                         <button type="button" class="btn btn-success btn-sm m-1" @click="selectAllEditRoute">Select
                             All</button>
                         <button type="button" class="btn btn-danger btn-sm" @click="deselectAllEditRoute">Deselect
@@ -812,13 +812,6 @@ export default {
                     icon: "error",
                     timer: 2000
                 });
-            if (!this.data.routes || this.data.routes.length === 0)
-                return swal({
-                    title: "Required!!",
-                    text: "Route is Required",
-                    icon: "error",
-                    timer: 2000
-                });
             if (this.data.terminal_id == 0)
                 return swal({
                     title: "Required!!",
@@ -1014,14 +1007,6 @@ export default {
                     timer: 2000
                 });
             this.dataEdit.routes = this.dataEdit.routes || this.dataEdit.route_ids || [];
-            if (!this.dataEdit.routes || this.dataEdit.routes.length === 0) {
-                return swal({
-                    title: "Required!!",
-                    text: "Route is Required",
-                    icon: "error",
-                    timer: 2000
-                });
-            }
             if (this.dataEdit.terminal_id == "0") {
                 return swal({
                     title: "Required!!!",

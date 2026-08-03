@@ -77250,21 +77250,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }));
 
               case 12:
-                if (!(!_this7.data.routes || _this7.data.routes.length === 0)) {
-                  _context4.next = 14;
-                  break;
-                }
-
-                return _context4.abrupt("return", swal({
-                  title: "Required!!",
-                  text: "Route is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 14:
                 if (!(_this7.data.terminal_id == 0)) {
-                  _context4.next = 16;
+                  _context4.next = 14;
                   break;
                 }
 
@@ -77275,9 +77262,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 16:
+              case 14:
                 if (!(_this7.data.role == 0)) {
-                  _context4.next = 18;
+                  _context4.next = 16;
                   break;
                 }
 
@@ -77288,16 +77275,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 18:
+              case 16:
                 _this7.loading = true;
-                _context4.next = 21;
+                _context4.next = 19;
                 return _this7.callApi("post", "user/store", _this7.data);
 
-              case 21:
+              case 19:
                 res = _context4.sent;
 
                 if (!(res.status == 200)) {
-                  _context4.next = 31;
+                  _context4.next = 29;
                   break;
                 }
 
@@ -77309,17 +77296,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 $("#users_table").DataTable().destroy();
-                _context4.next = 28;
+                _context4.next = 26;
                 return _this7.fetchUsers();
 
-              case 28:
+              case 26:
                 setTimeout(function () {
                   $("#users_table").DataTable();
                 }, 300);
-                _context4.next = 32;
+                _context4.next = 30;
                 break;
 
-              case 31:
+              case 29:
                 if (res.status == 422) {
                   (function () {
                     _this7.loading = false;
@@ -77340,7 +77327,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 32:
+              case 30:
               case "end":
                 return _context4.stop();
             }
@@ -77615,21 +77602,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 10:
                 _this11.dataEdit.routes = _this11.dataEdit.routes || _this11.dataEdit.route_ids || [];
 
-                if (!(!_this11.dataEdit.routes || _this11.dataEdit.routes.length === 0)) {
-                  _context8.next = 13;
-                  break;
-                }
-
-                return _context8.abrupt("return", swal({
-                  title: "Required!!",
-                  text: "Route is Required",
-                  icon: "error",
-                  timer: 2000
-                }));
-
-              case 13:
                 if (!(_this11.dataEdit.terminal_id == "0")) {
-                  _context8.next = 15;
+                  _context8.next = 13;
                   break;
                 }
 
@@ -77640,9 +77614,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 15:
+              case 13:
                 if (!(_this11.dataEdit.role_id == "0")) {
-                  _context8.next = 17;
+                  _context8.next = 15;
                   break;
                 }
 
@@ -77653,16 +77627,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 }));
 
-              case 17:
+              case 15:
                 _this11.loadingUpdate = true;
-                _context8.next = 20;
+                _context8.next = 18;
                 return _this11.callApi("post", "user/update", _this11.dataEdit);
 
-              case 20:
+              case 18:
                 resUpdateUser = _context8.sent;
 
                 if (!(resUpdateUser.status == 201)) {
-                  _context8.next = 28;
+                  _context8.next = 26;
                   break;
                 }
 
@@ -77674,15 +77648,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   timer: 2000
                 });
                 $("#users_table").DataTable().destroy();
-                _context8.next = 27;
+                _context8.next = 25;
                 return _this11.fetchUsers();
 
-              case 27:
+              case 25:
                 setTimeout(function () {
                   $("#users_table").DataTable();
                 }, 300);
 
-              case 28:
+              case 26:
                 if (resUpdateUser.status == 422) {
                   (function () {
                     _this11.loadingUpdate = false;
@@ -77704,7 +77678,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 }
 
-              case 29:
+              case 27:
               case "end":
                 return _context8.stop();
             }
@@ -148121,8 +148095,8 @@ var _hoisted_60 = {
 var _hoisted_61 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "routes"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Routes "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-  "class": "text-danger ml-1"
-}, "Options")], -1
+  "class": "text-muted ml-1"
+}, "(Optional)")], -1
 /* HOISTED */
 );
 
@@ -148438,8 +148412,8 @@ var _hoisted_126 = {
 var _hoisted_127 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "editRoutes"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Routes "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-  "class": "text-danger ml-1"
-}, "*")], -1
+  "class": "text-muted ml-1"
+}, "(Optional)")], -1
 /* HOISTED */
 );
 
