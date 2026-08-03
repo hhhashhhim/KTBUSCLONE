@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\UserPassword;
 use Illuminate\Http\Request;
 use App\Models\Route\Route;
+use App\Models\Schedule\Schedule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ActivityLog;
@@ -60,10 +61,30 @@ class UserController extends Controller
 
         $routes = Route::where('company_id', Auth::user()->company_id)
             ->where('hide', 0)
-            ->get(['id', 'name']);
+            ->get(['id', 'name', 'via']);
+
+        $schedulesByRoute = Schedule::with('bus_class:id,name')
+            ->where('company_id', Auth::user()->company_id)
+            ->whereIn('route_id', $routes->pluck('id'))
+            ->whereNull('deleted_at')
+            ->get(['id', 'route_id', 'bus_class_id'])
+            ->groupBy('route_id');
 
         foreach ($routes as $single) {
             $single->name = ucfirst($single->name);
+            $busClasses = $schedulesByRoute->get($single->id, collect())
+                ->pluck('bus_class.name')
+                ->filter()
+                ->unique()
+                ->values()
+                ->implode(', ');
+
+            $details = collect([
+                $single->via ? 'Via ' . $single->via : null,
+                $busClasses ? 'Bus Class: ' . $busClasses : null,
+            ])->filter()->implode(' — ');
+
+            $single->display_name = $single->name . ($details ? ' — ' . $details : '');
         }
 
         return $routes;
