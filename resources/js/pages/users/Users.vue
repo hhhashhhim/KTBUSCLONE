@@ -166,8 +166,8 @@
                         <button class="btn btn-success btn-sm m-1" @click="selectAllRoute">Select All</button>
                         <button class="btn btn-danger btn-sm " @click="deselectAllRoute">Deselect All</button>
                         <select class="form-control" id="routes" multiple v-model="data.routes">
-                            <option v-for="(singleRoute, i) in routes" :value="singleRoute.id" :key="i">{{
-                                singleRoute.name }}
+                            <option v-for="singleRoute in routes" :value="singleRoute.id" :key="singleRoute.id">{{
+                                singleRoute.display_name || singleRoute.name }}
                             </option>
                         </select>
                     </div>
@@ -348,8 +348,8 @@
                             All</button>
 
                         <select class="form-control" id="editRoutes" multiple v-model="dataEdit.route_ids">
-                            <option v-for="(singleRoute, i) in routes" :value="singleRoute.id" :key="i">
-                                {{ singleRoute.name }}
+                            <option v-for="singleRoute in routes" :value="singleRoute.id" :key="singleRoute.id">
+                                {{ singleRoute.display_name || singleRoute.name }}
                             </option>
                         </select>
                     </div>
