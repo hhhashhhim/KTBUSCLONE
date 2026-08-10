@@ -41,6 +41,7 @@ use App\Models\Terminal\TerminalTimeDifference;
 use Illuminate\Support\Facades\Cache;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use App\Support\SeatNumber;
 
 class BookingApiController extends Controller
 {
@@ -420,6 +421,7 @@ class BookingApiController extends Controller
                 ->where('company_id', $companyId)->where('schedule_id', $request->schedule_id)
                 ->whereDate('schedule_date', $scheduleDetail->schedule_date)->get();
             $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
+            $normalizedTicketSeatNumbers = array_map([SeatNumber::class, 'normalize'], $ticketSeatNumbers);
             $scheduleDiscount = Discount::where('id', $schedule->discount_id)
                 ->where('is_active', 1)
                 ->whereHas("discount_terminals", function ($q) use ($terminalId) {
@@ -521,7 +523,9 @@ class BookingApiController extends Controller
                             $quota--;
                         }
                     }
-                    $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
+                    $result = isset($column['seatNo'])
+                        ? array_search(SeatNumber::normalize($column['seatNo']), $normalizedTicketSeatNumbers, true)
+                        : false;
                     if ($result !== false) {   /*&& $leavingIn30Min != true*/
                         $seatMap[$i][$j]['id'] = $tickets[$result]['id'];
                         $seatMap[$i][$j]['gender'] = $tickets[$result]['gender'];
@@ -537,7 +541,9 @@ class BookingApiController extends Controller
                         $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
                         $seatMap[$i][$j]['fare'] = 0;
                         if ($tickets[$result]['is_partial'] == 1) {
-                            $resultPartials = isset($column['seatNo']) ? array_keys($ticketSeatNumbers, $column['seatNo']) : false;
+                            $resultPartials = isset($column['seatNo'])
+                                ? array_keys($normalizedTicketSeatNumbers, SeatNumber::normalize($column['seatNo']), true)
+                                : [];
                             foreach ($resultPartials as $singlePartial) {
                                 $seatMap[$i][$j]['id'] = $tickets[$singlePartial]['id'];
                                 $seatMap[$i][$j]['gender'] = $tickets[$singlePartial]['gender'];
@@ -844,6 +850,18 @@ if ($fareValidation) {
                     ->where('departure_time', date("H:i:s", strtotime($request->departure_time)))
                     ->first();
 
+                $busClass = BusClass::where('company_id', $companyId)->find($detail->bus_class_id);
+                $canonicalSeats = $busClass
+                    ? SeatNumber::canonicalizeMany((array) $request->selected_seats, (array) $busClass->seat_map)
+                    : null;
+
+                if ($canonicalSeats === null) {
+                    DB::rollBack();
+                    return new ConflictResource(["One or more selected seats do not exist in this bus class"]);
+                }
+
+                $request->merge(['selected_seats' => $canonicalSeats]);
+
                 $schedule_time_exact = ScheduleDetail::where(["schedule_id" => $detail->schedule_id, "schedule_date" => $detail->schedule_date])->first();
                 $existingTicket = Ticket::where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id', 'ticket_merge_id']);
 
@@ -867,7 +885,8 @@ if ($fareValidation) {
                 array_push($allFaresOfRoute, $lastFare->destination_city_id);
                 $scheduleDepIndex = array_search($request->departure_city_id, $allFaresOfRoute);
                 $scheduleDesIndex = array_search($request->destination_city_id, $allFaresOfRoute);
-                $checkAlreadyBooked = Ticket::whereIn("seat_no", $request->selected_seats)->where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->get();
+                $normalizedSelectedSeats = array_map([SeatNumber::class, 'normalize'], $request->selected_seats);
+                $checkAlreadyBooked = Ticket::whereIn(DB::raw('UPPER(TRIM(seat_no))'), $normalizedSelectedSeats)->where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->get();
                 foreach ($checkAlreadyBooked as $tkt) {
                     $ticketDepIndex = array_search($tkt->departure_city_id, $allFaresOfRoute);
                     $ticketDesIndex = array_search($tkt->destination_city_id, $allFaresOfRoute);

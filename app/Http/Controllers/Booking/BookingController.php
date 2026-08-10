@@ -54,6 +54,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use App\Support\SeatNumber;
 use Exception;
 
 class BookingController extends Controller
@@ -1277,6 +1278,7 @@ class BookingController extends Controller
             ->whereIn('id', $tickets->pluck('terminal_id')->filter()->unique())
             ->pluck('name', 'id');
         $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
+        $normalizedTicketSeatNumbers = array_map([SeatNumber::class, 'normalize'], $ticketSeatNumbers);
         $schedule = Schedule::where('id', $request->id)
             ->where('company_id', Auth::user()->company_id)
             ->select('id', 'route_id', 'bus_class_id', 'time', 'discount_id', 'surcharge_id')
@@ -1339,7 +1341,9 @@ class BookingController extends Controller
                         }
                     }
                 }
-                $result = isset($column['seatNo']) ? array_search($column['seatNo'], $ticketSeatNumbers) : false;
+                $result = isset($column['seatNo'])
+                    ? array_search(SeatNumber::normalize($column['seatNo']), $normalizedTicketSeatNumbers, true)
+                    : false;
                if ($result !== false) {   /*&& $leavingIn30Min != true*/
 
     $ticket = $tickets[$result] ?? [];
@@ -1373,7 +1377,7 @@ class BookingController extends Controller
     if (($ticket['is_partial'] ?? 0) == 1) {
 
         $resultPartials = isset($column['seatNo'])
-            ? array_keys($ticketSeatNumbers, $column['seatNo'])
+            ? array_keys($normalizedTicketSeatNumbers, SeatNumber::normalize($column['seatNo']), true)
             : [];
 
         foreach ($resultPartials as $singlePartial) {
