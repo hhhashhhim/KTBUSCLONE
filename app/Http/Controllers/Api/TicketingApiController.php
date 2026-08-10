@@ -416,9 +416,9 @@ class TicketingApiController extends Controller
                                 if ($scheduleSurcharge->type == "percentage") {
                                     $number = $scheduleSurcharge->percentage / 100;
                                     $percentage = (int)$data->fare * $number;
-                                    $seatMap[$i][$j]['fare'] = round((int)$data->fare + $percentage);
+                                    $seatMap[$i][$j]['fare'] = round($seatMap[$i][$j]['fare'] + $percentage);
                                 } else {
-                                    $seatMap[$i][$j]['fare'] = (int)$data->fare + $scheduleSurcharge->flat;
+                                    $seatMap[$i][$j]['fare'] += (int)$scheduleSurcharge->flat;
                                 }
                             }
 
@@ -540,9 +540,9 @@ class TicketingApiController extends Controller
                                     if ($scheduleSurcharge->type == "percentage") {
                                         $number = $scheduleSurcharge->percentage / 100;
                                         $percentage = $fare * $number;
-                                        $seatMap[$i][$j]['fare'] = round($fare + $percentage);
+                                        $seatMap[$i][$j]['fare'] = round($seatMap[$i][$j]['fare'] + $percentage);
                                     } else {
-                                        $seatMap[$i][$j]['fare'] = $fare + $scheduleSurcharge->flat;
+                                        $seatMap[$i][$j]['fare'] += (int)$scheduleSurcharge->flat;
                                     }
                                 }
                             }

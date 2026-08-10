@@ -509,9 +509,9 @@ if (!function_exists('seatFareIsWrong')) {
                 if ($scheduleSurcharge->type == "percentage") {
                     $number = $scheduleSurcharge->percentage / 100;
                     $percentage = (int)$data->fare * $number;
-                    $fare = round((int)$data->fare + $percentage);
+                    $fare = round($fare + $percentage);
                 } else {
-                    $fare = (int)$data->fare + $scheduleSurcharge->flat;
+                    $fare += (int)$scheduleSurcharge->flat;
                 }
             }
             if ($fare != $startFare) {
