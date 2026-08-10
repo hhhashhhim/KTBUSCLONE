@@ -490,6 +490,7 @@ class BookingController extends Controller
                     $allTicket = [];
                     foreach ($request->selectedSeats as $i => $seat) {
                         $checkDiscount =  checkDiscountAmount($detail, $request->terminalId, $request->selectedSeatsClass[$i]);
+                        $surcharge = checkSurchargeAmount($detail, $request->selectedSeatsClass[$i]);
                         $ticket = Ticket::create([
                             'company_id'          => Auth::user()->company_id,
                             'departure_city_id'   => $request->departureCity,
@@ -525,6 +526,7 @@ class BookingController extends Controller
                             'discount'            => ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($finalAmountDiscount ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
                             'schedule_discount'   => max(0, (float) ($checkDiscount->schedule_discount ?? 0)),
                             'terminal_discount'   => max(0, (float) ($checkDiscount->terminal_discount ?? 0)),
+                            'surcharge'            => $surcharge,
                             'points_usage'        => bookingUsesPoints($request) ? (($request->pointsUseInput ?? 0) / count($request->selectedSeats)) : 0,
                         ]);
                         if ($isPartial == 1) {

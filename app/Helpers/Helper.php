@@ -437,6 +437,38 @@ if (!function_exists('checkDiscountAmount')) {
     }
 }
 
+if (!function_exists('checkSurchargeAmount')) {
+    function checkSurchargeAmount($detail, $fareClass)
+    {
+        $schedule = $detail->schedule ?? Schedule::find($detail->schedule_id);
+        if (!$schedule || !$schedule->surcharge_id) {
+            return null;
+        }
+
+        $surcharge = Surcharge::where('id', $schedule->surcharge_id)
+            ->where('is_active', 1)
+            ->first();
+        if (!$surcharge) {
+            return null;
+        }
+
+        $fare = FareTable::where('from_city_id', $detail->departure_id)
+            ->where('to_city_id', $detail->destination_id)
+            ->where('fare_class', $fareClass)
+            ->where('company_id', Auth::user()->company_id)
+            ->value('fare');
+        if ($fare === null) {
+            return null;
+        }
+
+        $amount = $surcharge->type === 'percentage'
+            ? round(((float) $fare * (float) $surcharge->percentage) / 100)
+            : (float) $surcharge->flat;
+
+        return max(0, $amount);
+    }
+}
+
 if (!function_exists('seatFareIsWrong')) {
     function seatFareIsWrong($request)
     {

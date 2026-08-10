@@ -793,6 +793,7 @@ class TicketingApiController extends Controller
                     ]);
                     $allTicket = [];
                     foreach ($request->selected_seats as $i => $seat) {
+                        $surcharge = checkSurchargeAmount($detail, $request->selected_seats_class[$i]);
                         $ticket = Ticket::create([
                             'company_id' => $companyId,
                             'departure_city_id' => $request->departure_city_id,
@@ -825,6 +826,7 @@ class TicketingApiController extends Controller
                             'added_by' => Auth::user()->id,
                             'updated_by' => Auth::user()->id,
                             'discount' => 0,
+                            'surcharge' => $surcharge,
                             'points_usage' => 0,
                              'transaction_id' => $request->pp_TxnRefNo ?? null,
                         ]);

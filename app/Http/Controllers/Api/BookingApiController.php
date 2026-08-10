@@ -968,6 +968,7 @@ if ($fareValidation) {
                 $allTicket = [];
                 foreach ($request->selected_seats as $i => $seat) {
                     $checkDiscount =  checkDiscountAmount($detail, $terminalId, $request->selected_seats_class[$i]);
+                    $surcharge = checkSurchargeAmount($detail, $request->selected_seats_class[$i]);
 
                     $ticket = Ticket::create([
                         'company_id' => $companyId,
@@ -1003,6 +1004,7 @@ if ($fareValidation) {
                         'discount' => 0,
                         'schedule_discount'   => $checkDiscount->schedule_discount,
                         'terminal_discount'   => $checkDiscount->terminal_discount,
+                        'surcharge' => $surcharge,
                         'points_usage' => 0,
                         'transaction_id' => $request->pp_TxnRefNo ?? null,
                     ]);

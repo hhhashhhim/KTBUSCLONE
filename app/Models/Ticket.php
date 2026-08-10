@@ -56,6 +56,7 @@ class Ticket extends Model
         'discount', // Direct discount applied to the seat fare.
         'terminal_discount', // Discount configured by the terminal.
         'schedule_discount', // Discount configured for the schedule.
+        'surcharge', // Surcharge applied when the ticket was booked.
         'points_usage', // Loyalty points used for the booking.
         'discount_type', // Category or method of discount applied.
         'booked_time', // Time at which the booking was completed.
