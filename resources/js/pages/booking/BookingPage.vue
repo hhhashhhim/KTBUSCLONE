@@ -337,8 +337,8 @@
                                             <div class="col-md-2 pl-0">
                                                 <div class="form-group mb-0">
                                                     <label>Discount <span class="ml-2 text-muted"></span></label>
-                                                    <input type="text" class="form-control" id="fareDiscount"
-                                                        v-model.number="addForm.discount" @keyup="calculateTotal()"
+                                                    <input type="number" min="0" step="any" class="form-control" id="fareDiscount"
+                                                        v-model.number="addForm.discount" @input="calculateTotal()"
                                                         :readonly="addForm.discount_otp_valid || !checkForSubmenuButtons('discount-field')" />
                                                     <!-- always readonly since discount is applied via OTP -->
                                                 </div>
@@ -3366,7 +3366,19 @@ export default {
 
         calculateTotal() {
             const fare = Number(this.addForm.totalFare);
-            const discount = Number(this.addForm.discount || 0);
+            let discount = Number(this.addForm.discount || 0);
+
+            if (discount < 0) {
+                this.addForm.discount = 0;
+                discount = 0;
+
+                swal({
+                    title: "Invalid Discount",
+                    text: "Discount cannot be a negative amount",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
 
             if (discount > fare) {
                 this.addForm.discount = 0;
@@ -4252,6 +4264,16 @@ export default {
                 return swal({
                     title: "OOPS!",
                     text: "Enter Numbers of points must be less then the points Card have",
+                    icon: "error",
+                    timer: 2000
+                });
+            }
+            if (Number(this.addForm.discount || 0) < 0) {
+                this.addForm.discount = 0;
+                this.calculateTotal();
+                return swal({
+                    title: "Invalid Discount",
+                    text: "Discount cannot be a negative amount",
                     icon: "error",
                     timer: 2000
                 });

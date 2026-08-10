@@ -38749,6 +38749,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var fare = Number(this.addForm.totalFare);
       var discount = Number(this.addForm.discount || 0);
 
+      if (discount < 0) {
+        this.addForm.discount = 0;
+        discount = 0;
+        swal({
+          title: "Invalid Discount",
+          text: "Discount cannot be a negative amount",
+          icon: "error",
+          timer: 2000
+        });
+      }
+
       if (discount > fare) {
         this.addForm.discount = 0;
         this.addForm.totalAmount = fare;
@@ -39965,6 +39976,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }));
 
               case 20:
+                if (!(Number(_this32.addForm.discount || 0) < 0)) {
+                  _context31.next = 24;
+                  break;
+                }
+
+                _this32.addForm.discount = 0;
+
+                _this32.calculateTotal();
+
+                return _context31.abrupt("return", swal({
+                  title: "Invalid Discount",
+                  text: "Discount cannot be a negative amount",
+                  icon: "error",
+                  timer: 2000
+                }));
+
+              case 24:
                 _this32.addForm.pointsCardId = _this32.pointsCardId;
                 _this32.addForm.discountCardId = _this32.discountCardId;
                 usesDiscount = _this32.selectedOption === "discount" || _this32.discountUsage === true || _this32.addForm.discount_otp_valid === true;
@@ -39975,7 +40003,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this32.addForm.discount_usage = usesDiscount ? 1 : 0;
 
                 if (!(_this32.addForm.usagePoints == true && _this32.addForm.otp_valid == false)) {
-                  _context31.next = 30;
+                  _context31.next = 34;
                   break;
                 }
 
@@ -39986,9 +40014,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 30:
+              case 34:
                 if (!(_this32.addForm.usagePoints == true && _this32.addForm.otp_valid == false && _this32.addForm.otp_cnic != _this32.addForm.customerCNIC)) {
-                  _context31.next = 32;
+                  _context31.next = 36;
                   break;
                 }
 
@@ -39999,9 +40027,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 32:
+              case 36:
                 if (!(_this32.addForm.usageDiscount == true && _this32.addForm.discount_otp_valid == false)) {
-                  _context31.next = 34;
+                  _context31.next = 38;
                   break;
                 }
 
@@ -40012,9 +40040,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 34:
+              case 38:
                 if (!(_this32.addForm.usageDiscount == true && _this32.addForm.discount_otp_valid == true && _this32.addForm.discountOtpCnic != _this32.addForm.customerCNIC)) {
-                  _context31.next = 36;
+                  _context31.next = 40;
                   break;
                 }
 
@@ -40025,9 +40053,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 36:
+              case 40:
                 if (!_this32.bookingLoading) {
-                  _context31.next = 38;
+                  _context31.next = 42;
                   break;
                 }
 
@@ -40038,18 +40066,18 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 38:
+              case 42:
                 _this32.bookingLoading = true;
                 payload = _objectSpread({}, _this32.addForm);
                 console.log('booking payload discount debug', payload);
-                _context31.next = 43;
+                _context31.next = 47;
                 return _this32.callApi("post", "booking/store", payload);
 
-              case 43:
+              case 47:
                 resTicket = _context31.sent;
 
                 if (!(resTicket.status == 200)) {
-                  _context31.next = 79;
+                  _context31.next = 83;
                   break;
                 }
 
@@ -40106,18 +40134,18 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     _this32.$refs.refTicket.submit();
                   }
                 }, 700);
-                _context31.next = 76;
+                _context31.next = 80;
                 return _this32.callApi("post", "booking/whatsapp/message", {
                   invoice_id: resTicket.data.ticket[0].invoice_id,
                   type: bookType
                 });
 
-              case 76:
+              case 80:
                 resBookingDetail = _context31.sent;
-                _context31.next = 82;
+                _context31.next = 86;
                 break;
 
-              case 79:
+              case 83:
                 "";
 
                 if (resTicket.status == 422) {
@@ -40143,7 +40171,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   _this32.bookingLoading = false;
                 }, 1000);
 
-              case 82:
+              case 86:
               case "end":
                 return _context31.stop();
             }
@@ -99213,13 +99241,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 512
   /* NEED_PATCH */
   ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.addForm.totalFare]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_128, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_129, [_hoisted_130, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    type: "text",
+    type: "number",
+    min: "0",
+    step: "any",
     "class": "form-control",
     id: "fareDiscount",
     "onUpdate:modelValue": _cache[31] || (_cache[31] = function ($event) {
       return $data.addForm.discount = $event;
     }),
-    onKeyup: _cache[32] || (_cache[32] = function ($event) {
+    onInput: _cache[32] || (_cache[32] = function ($event) {
       return $options.calculateTotal();
     }),
     readonly: $data.addForm.discount_otp_valid || !_ctx.checkForSubmenuButtons('discount-field')
