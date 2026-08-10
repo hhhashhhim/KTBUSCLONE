@@ -139,6 +139,7 @@ class BookingController extends Controller
         if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+
         $bookings = Ticket::select('schedule_id', 'date', 'schedule_details_id', 'bus_class_id')->with('schedule:id,name', 'scheduleDetail', 'seatClass')->whereDate('date', isset($request->date) ? $request->date : date("Y-m-d"))
             ->where('company_id', Auth::user()->company_id)->get()->groupBy(['date', 'schedule_id']);
         $allBooking = [];
@@ -177,6 +178,12 @@ class BookingController extends Controller
         if (!checkForSubmenu("bookings")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+
+        $request->validate([
+            'discount' => ['nullable', 'numeric', 'min:0'],
+        ], [
+            'discount.min' => 'Discount cannot be a negative amount.',
+        ]);
         /*
         * Validation Types on Ticket Must be
         * 1) Target => Same ticket for same departure and designation must not be same
@@ -516,8 +523,8 @@ class BookingController extends Controller
                             'added_by'            => Auth::user()->id,
                             'updated_by'          => Auth::user()->id,
                             'discount'            => ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($finalAmountDiscount ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
-                            'schedule_discount'   => $checkDiscount->schedule_discount,
-                            'terminal_discount'   => $checkDiscount->terminal_discount,
+                            'schedule_discount'   => max(0, (float) ($checkDiscount->schedule_discount ?? 0)),
+                            'terminal_discount'   => max(0, (float) ($checkDiscount->terminal_discount ?? 0)),
                             'points_usage'        => bookingUsesPoints($request) ? (($request->pointsUseInput ?? 0) / count($request->selectedSeats)) : 0,
                         ]);
                         if ($isPartial == 1) {
