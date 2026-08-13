@@ -1319,8 +1319,44 @@ class BookingController extends Controller
         $terminalDiscount = TerminalDiscount::where(["terminal_id" => $request->dropTerminal ?? 0, "route_id" => $schedule->route_id])->where('start_date', '<=', $request->date)
             ->where('end_date', '>=', $request->date)->first();
 
-        // Looping Through the seat of the bus
+        // A bus-class layout can omit seat numbers that were present when tickets
+        // were sold. Keep those occupied seats in the returned map so changing the
+        // layout never makes an existing ticket disappear from Booking.
         $seatMap = $scheduleDetail->bus_class->seat_map;
+        $layoutSeatNumbers = [];
+        foreach ($seatMap as $seatRow) {
+            foreach ($seatRow as $seatColumn) {
+                if (isset($seatColumn['seatNo'])) {
+                    $layoutSeatNumbers[] = SeatNumber::normalize($seatColumn['seatNo']);
+                }
+            }
+        }
+
+        $missingSeatColumns = [];
+        foreach ($tickets->unique(function ($ticket) {
+            return SeatNumber::normalize($ticket->seat_no);
+        }) as $ticket) {
+            if (!in_array(SeatNumber::normalize($ticket->seat_no), $layoutSeatNumbers, true)) {
+                $missingSeatColumns[] = [
+                    'seatNo' => $ticket->seat_no,
+                    'class' => $ticket->bus_class_id,
+                    'reserved' => true,
+                    'selected' => false,
+                ];
+            }
+        }
+
+        if (!empty($missingSeatColumns)) {
+            $columnsPerRow = max(1, collect($seatMap)->map(function ($row) {
+                return count($row);
+            })->max() ?? 1);
+
+            foreach (array_chunk($missingSeatColumns, $columnsPerRow) as $missingSeatRow) {
+                $seatMap[] = $missingSeatRow;
+            }
+        }
+
+        // Looping Through the seats of the bus
         foreach ($seatMap as $i => $iValue) {
             foreach ($iValue as $j => $column) {
                 // adding fare to each seat
@@ -1868,21 +1904,55 @@ class BookingController extends Controller
         if (!checkPermissionButtons("bus-class")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+        $validated = $request->validate([
+            'id' => ['required', 'integer'],
+            'date' => ['required', 'date'],
+            'departureCity' => ['required', 'integer'],
+            'destinationCity' => ['required', 'integer', 'different:departureCity'],
+            'departure_time' => ['required'],
+            'bus_class' => ['required', 'integer'],
+        ]);
+
         try {
-            $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
+            $busClassExists = BusClass::where('company_id', Auth::user()->company_id)
+                ->where('id', $validated['bus_class'])
+                ->where('hide', 0)
+                ->exists();
+
+            if (!$busClassExists) {
+                return response()->json([
+                    'errors' => ['Bus Class' => ['The selected bus class is not available.']],
+                ], 422);
+            }
+
+            $scheduleDetail = ScheduleDetail::where([
                 'company_id' => Auth::user()->company_id,
-                'schedule_id' => $request->id,
-                'departure_date' => $request->date,
-                'departure_id' => $request->departureCity,
-                'destination_id' => $request->destinationCity,
-                'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
+                'schedule_id' => $validated['id'],
+                'departure_date' => $validated['date'],
+                'departure_id' => $validated['departureCity'],
+                'destination_id' => $validated['destinationCity'],
+                'departure_time' => date("H:i:s", strtotime($validated['departure_time'])),
             ])->first();
 
-            ScheduleDetail::where(['company_id' => Auth::user()->company_id, "schedule_id" => $scheduleDetail->schedule_id, "schedule_date" => $scheduleDetail->schedule_date])->update([
-                "bus_class_id" => $request->bus_class
+            if (!$scheduleDetail) {
+                return response()->json([
+                    'errors' => ['Schedule' => ['The selected schedule detail was not found.']],
+                ], 422);
+            }
+
+            $updated = ScheduleDetail::where([
+                'company_id' => Auth::user()->company_id,
+                'schedule_id' => $scheduleDetail->schedule_id,
+                'schedule_date' => $scheduleDetail->schedule_date,
+            ])->update([
+                'bus_class_id' => $validated['bus_class'],
+            ]);
+
+            return response()->json([
+                'message' => 'Bus class updated successfully.',
+                'updated_schedule_details' => $updated,
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Database transaction error: ' . $e->getMessage());
             return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
         }
