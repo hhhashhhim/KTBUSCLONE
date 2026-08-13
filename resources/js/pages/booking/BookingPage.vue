@@ -1782,8 +1782,11 @@
                         </div>
                     </div>
                     <div class="modal-footer bg-whitesmoke br">
-                        <button type="button" class="btn btn-primary" @click="updateBusClass()">
-                            Update
+                        <button type="button" class="btn btn-primary" @click="updateBusClass()"
+                            :disabled="busClassUpdating">
+                            <span v-if="busClassUpdating" class="spinner-border spinner-border-sm mr-1"
+                                role="status" aria-hidden="true"></span>
+                            {{ busClassUpdating ? 'Updating...' : 'Update' }}
                         </button>
                     </div>
                 </div>
@@ -1961,6 +1964,7 @@ export default {
             buses: [],
             BusNo: "N/A",
             bus_classes: [],
+            busClassUpdating: false,
             permissions: [],
             drivers: [],
             hosts: [],
@@ -3012,30 +3016,27 @@ export default {
                 });
             }
 
-            const res = await this.callApi("post", "booking/busclass/update", {
-                id: this.addForm.schedule,
-                date: this.addForm.date,
-                departureCity: this.addForm.departureCity,
-                destinationCity: this.addForm.destinationCity,
-                dropTerminal: this.addForm.terminalId,
-                departure_time: this.addForm.departure_time,
-                bus_class: this.busClassData.bus_class,
-            });
-            if (res.status == 200) {
-                swal({
-                    title: "Success",
-                    text: "Updated Successfully",
-                    icon: "success",
-                    timer: 2000
+            this.busClassUpdating = true;
+            try {
+                const res = await this.callApi("post", "booking/busclass/update", {
+                    id: this.addForm.schedule,
+                    date: this.addForm.date,
+                    departureCity: this.addForm.departureCity,
+                    destinationCity: this.addForm.destinationCity,
+                    dropTerminal: this.addForm.terminalId,
+                    departure_time: this.addForm.departure_time,
+                    bus_class: this.busClassData.bus_class,
                 });
-                this.fetchScheduleData();
-                this.closeModal();
-
-
-
-            } else {
-                if (res.status == 422) {
-                    this.loading = false;
+                if (res.status == 200) {
+                    swal({
+                        title: "Success",
+                        text: "Updated Successfully",
+                        icon: "success",
+                        timer: 2000
+                    });
+                    await this.fetchScheduleData();
+                    this.closeModal();
+                } else if (res.status == 422) {
                     let errorContent = "";
                     let count = 0;
                     for (const key in res.data.errors) {
@@ -3055,6 +3056,8 @@ export default {
 
                     }
                 }
+            } finally {
+                this.busClassUpdating = false;
             }
         },
 
