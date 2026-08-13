@@ -1251,7 +1251,7 @@ export default {
             this.netProfit = parseFloat(this.totalSale || 0) - parseFloat(this.totalAmount || 0);
         },
 
-        async saveHeaderLinks(ticketMergeId) {
+        buildHeaderLinks() {
             let headIds = [];
             let values = [];
 
@@ -1270,15 +1270,10 @@ export default {
                 }
             });
 
-            if (!headIds.length) return;
-
-            const res = await this.callApi("post", "expenses/categories/expenseHeaderLink", {
-                ticket_merge_id: ticketMergeId,
+            return {
                 headIds,
                 values
-            });
-
-            this.ensureSuccessfulResponse(res, "Unable to save expense header links");
+            };
         },
         getApiError(response, fallback) {
             const data = response?.data || response || {};
@@ -1388,26 +1383,9 @@ export default {
             throw new Error("No current start or return schedule rows are available to save");
         }
         // ✅ STEP 1: Merge
-        const mergedResult = await this.mergeScheduleApi(this.addData);
-
-        if (!mergedResult || !mergedResult.id) {
-            throw new Error("Merge failed: Invalid response");
-        }
-
-        this.closingData = mergedResult;
-
-        // ✅ STEP 2: Header Links
-        await this.saveHeaderLinks(mergedResult.id);
-        // if this fails → it will automatically jump to catch
-
-        // ✅ STEP 3: Prepare Data
-        const payload = {
-            ticket_closing_id: mergedResult.id,
-            records: []
-        };
-
+        const closingRecords = [];
         if (startRows.length) {
-            payload.records.push({
+            closingRecords.push({
                 type: "start",
                 route: this.routes.start,
                 bus_id: this.busIds[0] || 0,
@@ -1416,7 +1394,7 @@ export default {
         }
 
         if (returnRows.length) {
-            payload.records.push({
+            closingRecords.push({
                 type: "return",
                 route: this.routes.return,
                 bus_id: this.busIds[0] || 0,
@@ -1424,18 +1402,28 @@ export default {
             });
         }
 
-        // ❗ EXTRA SAFETY (don’t hit API with empty data)
-        if (!payload.records.length) {
-            throw new Error("No records to save");
+        const mergedResult = await this.mergeScheduleApi({
+            ...this.addData,
+            closingRecords,
+            headerLinks: this.buildHeaderLinks(),
+        });
+
+        if (!mergedResult || !mergedResult.id) {
+            throw new Error("Merge failed: Invalid response");
         }
 
+        this.closingData = mergedResult;
+
+        // ✅ STEP 2: Header Links
+        // Header links and terminal details were saved by the merge request.
+        // if this fails → it will automatically jump to catch
+
+        // ✅ STEP 3: Prepare Data
+
+        // ❗ EXTRA SAFETY (don’t hit API with empty data)
         // ✅ STEP 4: Final API
-        const saveResponse = await this.callApi(
-            "post",
-            "booking/close/schedule/closing/ticket-closing-shortage",
-            payload
-        );
-        this.ensureSuccessfulResponse(saveResponse, "Unable to save ticket closing entries");
+        // No additional API call is made here. The backend transaction has
+        // already committed the complete closing operation.
 
         // ✅ SUCCESS
         Swal.fire({

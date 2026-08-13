@@ -28186,56 +28186,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }, 0);
       this.netProfit = parseFloat(this.totalSale || 0) - parseFloat(this.totalAmount || 0);
     },
-    saveHeaderLinks: function saveHeaderLinks(ticketMergeId) {
+    buildHeaderLinks: function buildHeaderLinks() {
       var _this14 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var headIds, values, res;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                headIds = [];
-                values = [];
-                (_this14.postData.showExtra || []).forEach(function (checked, index) {
-                  var _this14$postData$extr, _this14$postData$amou;
+      var headIds = [];
+      var values = [];
+      (this.postData.showExtra || []).forEach(function (checked, index) {
+        var _this14$postData$extr, _this14$postData$amou;
 
-                  var selectedHead = (_this14$postData$extr = _this14.postData.extraCategory) === null || _this14$postData$extr === void 0 ? void 0 : _this14$postData$extr[index];
-                  var amount = (_this14$postData$amou = _this14.postData.amount) === null || _this14$postData$amou === void 0 ? void 0 : _this14$postData$amou[index];
+        var selectedHead = (_this14$postData$extr = _this14.postData.extraCategory) === null || _this14$postData$extr === void 0 ? void 0 : _this14$postData$extr[index];
+        var amount = (_this14$postData$amou = _this14.postData.amount) === null || _this14$postData$amou === void 0 ? void 0 : _this14$postData$amou[index];
 
-                  if (checked === true && selectedHead !== null && selectedHead !== undefined && selectedHead !== '') {
-                    headIds.push(selectedHead);
-                    values.push(parseFloat(amount || 0));
-                  }
-                });
-
-                if (headIds.length) {
-                  _context4.next = 5;
-                  break;
-                }
-
-                return _context4.abrupt("return");
-
-              case 5:
-                _context4.next = 7;
-                return _this14.callApi("post", "expenses/categories/expenseHeaderLink", {
-                  ticket_merge_id: ticketMergeId,
-                  headIds: headIds,
-                  values: values
-                });
-
-              case 7:
-                res = _context4.sent;
-
-                _this14.ensureSuccessfulResponse(res, "Unable to save expense header links");
-
-              case 9:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4);
-      }))();
+        if (checked === true && selectedHead !== null && selectedHead !== undefined && selectedHead !== '') {
+          headIds.push(selectedHead);
+          values.push(parseFloat(amount || 0));
+        }
+      });
+      return {
+        headIds: headIds,
+        values: values
+      };
     },
     getApiError: function getApiError(response, fallback) {
       var data = (response === null || response === void 0 ? void 0 : response.data) || response || {};
@@ -28261,14 +28231,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _arguments = arguments,
           _this15 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var _addData$busIds, _addData$mergeIds;
 
         var addData, payload, res, mergedData, _error$response, _error$response$data, _error$response$data$, errMsg;
 
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 addData = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : {};
                 payload = _objectSpread(_objectSpread({}, addData), {}, {
@@ -28279,7 +28249,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
 
                 if (!(!payload.busIds.length || !payload.mergeIds.length)) {
-                  _context5.next = 5;
+                  _context4.next = 5;
                   break;
                 }
 
@@ -28288,36 +28258,36 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   title: "Cannot merge",
                   text: "Bus IDs or Merge IDs are empty. Fetch unclosing data first."
                 });
-                return _context5.abrupt("return", null);
+                return _context4.abrupt("return", null);
 
               case 5:
-                _context5.prev = 5;
-                _context5.next = 8;
+                _context4.prev = 5;
+                _context4.next = 8;
                 return _this15.callApi("post", "booking/close/schedule/closing/merge", payload);
 
               case 8:
-                res = _context5.sent;
+                res = _context4.sent;
 
                 if (!(res.status === 200 || res.status === 201)) {
-                  _context5.next = 15;
+                  _context4.next = 15;
                   break;
                 }
 
                 mergedData = res.data || {};
                 _this15.mergedData = mergedData;
-                return _context5.abrupt("return", mergedData);
+                return _context4.abrupt("return", mergedData);
 
               case 15:
                 throw new Error("Merge failed with status ".concat(res.status));
 
               case 16:
-                _context5.next = 23;
+                _context4.next = 23;
                 break;
 
               case 18:
-                _context5.prev = 18;
-                _context5.t0 = _context5["catch"](5);
-                errMsg = (_context5.t0 === null || _context5.t0 === void 0 ? void 0 : (_error$response = _context5.t0.response) === null || _error$response === void 0 ? void 0 : (_error$response$data = _error$response.data) === null || _error$response$data === void 0 ? void 0 : (_error$response$data$ = _error$response$data.Error) === null || _error$response$data$ === void 0 ? void 0 : _error$response$data$.join("\n")) || _context5.t0.message || "Merge failed";
+                _context4.prev = 18;
+                _context4.t0 = _context4["catch"](5);
+                errMsg = (_context4.t0 === null || _context4.t0 === void 0 ? void 0 : (_error$response = _context4.t0.response) === null || _error$response === void 0 ? void 0 : (_error$response$data = _error$response.data) === null || _error$response$data === void 0 ? void 0 : (_error$response$data$ = _error$response$data.Error) === null || _error$response$data$ === void 0 ? void 0 : _error$response$data$.join("\n")) || _context4.t0.message || "Merge failed";
                 Swal.fire({
                   icon: "error",
                   title: "Merge Error",
@@ -28327,25 +28297,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 23:
               case "end":
-                return _context5.stop();
+                return _context4.stop();
             }
           }
-        }, _callee5, null, [[5, 18]]);
+        }, _callee4, null, [[5, 18]]);
       }))();
     },
     // ===== Save Ticket Closing Shortage =====
     saveTicketClosingShortage: function saveTicketClosingShortage() {
       var _this16 = this;
 
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        var _this16$data, _this16$data2, mapRows, startRows, returnRows, mergedResult, payload, saveResponse;
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var _this16$data, _this16$data2, mapRows, startRows, returnRows, closingRecords, mergedResult;
 
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 _this16.loading = true;
-                _context6.prev = 1;
+                _context5.prev = 1;
 
                 // Iterate over the currently displayed schedules so stale cache keys can
                 // never add, remove, or replace Start/Return rows in the API payload.
@@ -28391,42 +28361,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 returnRows = mapRows((_this16$data2 = _this16.data) === null || _this16$data2 === void 0 ? void 0 : _this16$data2.schedule_return, _this16.cashBankReturn);
 
                 if (!(!startRows.length && !returnRows.length)) {
-                  _context6.next = 7;
+                  _context5.next = 7;
                   break;
                 }
 
                 throw new Error("No current start or return schedule rows are available to save");
 
               case 7:
-                _context6.next = 9;
-                return _this16.mergeScheduleApi(_this16.addData);
-
-              case 9:
-                mergedResult = _context6.sent;
-
-                if (!(!mergedResult || !mergedResult.id)) {
-                  _context6.next = 12;
-                  break;
-                }
-
-                throw new Error("Merge failed: Invalid response");
-
-              case 12:
-                _this16.closingData = mergedResult; // ✅ STEP 2: Header Links
-
-                _context6.next = 15;
-                return _this16.saveHeaderLinks(mergedResult.id);
-
-              case 15:
-                // if this fails → it will automatically jump to catch
-                // ✅ STEP 3: Prepare Data
-                payload = {
-                  ticket_closing_id: mergedResult.id,
-                  records: []
-                };
+                // ✅ STEP 1: Merge
+                closingRecords = [];
 
                 if (startRows.length) {
-                  payload.records.push({
+                  closingRecords.push({
                     type: "start",
                     route: _this16.routes.start,
                     bus_id: _this16.busIds[0] || 0,
@@ -28435,31 +28381,40 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 if (returnRows.length) {
-                  payload.records.push({
+                  closingRecords.push({
                     type: "return",
                     route: _this16.routes["return"],
                     bus_id: _this16.busIds[0] || 0,
                     rows: returnRows
                   });
-                } // ❗ EXTRA SAFETY (don’t hit API with empty data)
+                }
 
+                _context5.next = 12;
+                return _this16.mergeScheduleApi(_objectSpread(_objectSpread({}, _this16.addData), {}, {
+                  closingRecords: closingRecords,
+                  headerLinks: _this16.buildHeaderLinks()
+                }));
 
-                if (payload.records.length) {
-                  _context6.next = 20;
+              case 12:
+                mergedResult = _context5.sent;
+
+                if (!(!mergedResult || !mergedResult.id)) {
+                  _context5.next = 15;
                   break;
                 }
 
-                throw new Error("No records to save");
+                throw new Error("Merge failed: Invalid response");
 
-              case 20:
-                _context6.next = 22;
-                return _this16.callApi("post", "booking/close/schedule/closing/ticket-closing-shortage", payload);
-
-              case 22:
-                saveResponse = _context6.sent;
-
-                _this16.ensureSuccessfulResponse(saveResponse, "Unable to save ticket closing entries"); // ✅ SUCCESS
-
+              case 15:
+                _this16.closingData = mergedResult; // ✅ STEP 2: Header Links
+                // Header links and terminal details were saved by the merge request.
+                // if this fails → it will automatically jump to catch
+                // ✅ STEP 3: Prepare Data
+                // ❗ EXTRA SAFETY (don’t hit API with empty data)
+                // ✅ STEP 4: Final API
+                // No additional API call is made here. The backend transaction has
+                // already committed the complete closing operation.
+                // ✅ SUCCESS
 
                 Swal.fire({
                   icon: "success",
@@ -28475,32 +28430,32 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 _this16.closeexampleModal();
 
-                _context6.next = 35;
+                _context5.next = 27;
                 break;
 
-              case 30:
-                _context6.prev = 30;
-                _context6.t0 = _context6["catch"](1);
-                console.error(_context6.t0);
+              case 22:
+                _context5.prev = 22;
+                _context5.t0 = _context5["catch"](1);
+                console.error(_context5.t0);
                 Swal.fire({
                   icon: "error",
                   title: "Error",
-                  text: _context6.t0.message || "Failed to save ticket closing"
+                  text: _context5.t0.message || "Failed to save ticket closing"
                 }); // ❗ IMPORTANT: stop everything
 
-                return _context6.abrupt("return");
+                return _context5.abrupt("return");
 
-              case 35:
-                _context6.prev = 35;
+              case 27:
+                _context5.prev = 27;
                 _this16.loading = false;
-                return _context6.finish(35);
+                return _context5.finish(27);
 
-              case 38:
+              case 30:
               case "end":
-                return _context6.stop();
+                return _context5.stop();
             }
           }
-        }, _callee6, null, [[1, 30, 35, 38]]);
+        }, _callee5, null, [[1, 22, 27, 30]]);
       }))();
     },
     // async saveTicketClosingShortage() {
