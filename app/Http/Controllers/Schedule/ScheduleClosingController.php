@@ -545,13 +545,65 @@ class ScheduleClosingController extends Controller
         if (!checkForSubmenu("closing")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+
+        $request->validate([
+            'mergeIds' => 'required|array|size:2',
+            'mergeIds.*' => 'required|integer',
+            'closingRecords' => 'required|array|min:1',
+            'closingRecords.*.type' => 'required|in:start,return',
+            'closingRecords.*.route' => 'nullable|integer',
+            'closingRecords.*.bus_id' => 'nullable|integer',
+            'closingRecords.*.rows' => 'required|array|min:1',
+            'closingRecords.*.rows.*.terminal_id' => 'required|integer|min:1',
+            'closingRecords.*.rows.*.passenger_count' => 'required|integer|min:0',
+            'closingRecords.*.rows.*.kt_commission' => 'required|numeric',
+            'closingRecords.*.rows.*.elt' => 'required|numeric',
+            'closingRecords.*.rows.*.cancellation_amount' => 'required|numeric',
+            'closingRecords.*.rows.*.other_commission' => 'required|numeric',
+            'closingRecords.*.rows.*.total_receivable' => 'required|numeric',
+            'closingRecords.*.rows.*.total_received_cash' => 'required|numeric',
+            'closingRecords.*.rows.*.total_received_bank' => 'required|numeric',
+            'closingRecords.*.rows.*.shortage' => 'required|numeric',
+            'closingRecords.*.rows.*.received' => 'required|numeric',
+            'closingRecords.*.rows.*.bank_id' => 'nullable|integer',
+            'headerLinks.headIds' => 'nullable|array',
+            'headerLinks.headIds.*' => 'required|integer',
+            'headerLinks.values' => 'nullable|array',
+            'headerLinks.values.*' => 'nullable|numeric',
+        ]);
+
+        $headerIds = $request->input('headerLinks.headIds', []);
+        $headerValues = $request->input('headerLinks.values', []);
+        if (count($headerIds) !== count($headerValues)) {
+            return response()->json([
+                'errors' => ['headerLinks' => ['Header IDs and values count mismatch.']],
+            ], 422);
+        }
         try {
             DB::beginTransaction();
             $mergeIdOne = $request->mergeIds[0];
             $mergeIdTwo = $request->mergeIds[1];
-            $mergeOne = DB::table('ticket_closing_merges')->where('id', $mergeIdOne)->first();
+            $mergeOne = DB::table('ticket_closing_merges')
+                ->where('id', $mergeIdOne)
+                ->where('company_id', Auth::user()->company_id)
+                ->whereNull('deleted_at')
+                ->lockForUpdate()
+                ->first();
 
-            $mergeTwo = DB::table('ticket_closing_merges')->where("id", $mergeIdTwo)->first();
+            $mergeTwo = DB::table('ticket_closing_merges')
+                ->where('id', $mergeIdTwo)
+                ->where('company_id', Auth::user()->company_id)
+                ->whereNull('deleted_at')
+                ->lockForUpdate()
+                ->first();
+
+            if (!$mergeOne || !$mergeTwo) {
+                throw new Exception('One or both selected closing records no longer exist.');
+            }
+
+            if ((int) $mergeOne->bus_id !== (int) $mergeTwo->bus_id) {
+                throw new Exception('Both closing records must belong to the same bus.');
+            }
 
             $merge = TicketClosingMerge::create([
                 "bus_id" => $mergeOne->bus_id,
@@ -569,6 +621,10 @@ class ScheduleClosingController extends Controller
             TicketClosingMerge::whereIn("id", $request->mergeIds)->delete();
 
             $closingIds = TicketClosing::where("ticket_merge_id", $merge->id)->pluck("id");
+
+            if ($closingIds->count() !== 2) {
+                throw new Exception('Exactly two closing records are required to complete the merge.');
+            }
 
             Ticket::whereIn("ticket_closing_id", $closingIds)
                 ->withTrashed()
@@ -599,6 +655,47 @@ class ScheduleClosingController extends Controller
                     'added_by' => Auth::user()->id,
                 ]);
             }
+
+            foreach ($headerIds as $key => $headerId) {
+                ReportHeaderLink::create([
+                    'ticket_merge_id' => $merge->id,
+                    'header_id' => $headerId,
+                    'value' => $headerValues[$key] ?? 0,
+                    'company_id' => Auth::user()->company_id,
+                    'added_by' => Auth::user()->id,
+                ]);
+            }
+
+            foreach ($request->closingRecords as $record) {
+                foreach ($record['rows'] as $row) {
+                    TicketClosingShortage::create([
+                        'ticket_closing_id' => $merge->id,
+                        'terminal_id' => $row['terminal_id'],
+                        'type' => $record['type'],
+                        'bus_id' => $record['bus_id'] ?? 0,
+                        'route_id' => $record['route'] ?? 0,
+                        'passenger_count' => round($row['passenger_count']),
+                        'kt_commission' => round($row['kt_commission']),
+                        'elt' => round($row['elt']),
+                        'cancellation_amount' => round($row['cancellation_amount']),
+                        'other_commission' => round($row['other_commission']),
+                        'total_receivable' => round($row['total_receivable']),
+                        'total_received_cash' => round($row['total_received_cash']),
+                        'bank_id' => $row['bank_id'] ?? null,
+                        'total_received_bank' => round($row['total_received_bank']),
+                        'shortage' => round($row['shortage']),
+                        'received' => round($row['received']),
+                        'company_id' => Auth::user()->company_id,
+                    ]);
+                }
+            }
+
+            ActivityLog::create([
+                'activity_by' => Auth::user()->id,
+                'message' => Auth::user()->name . ' | saved ticket closing shortage | Record ID: ' . $merge->id,
+                'requested_host' => $request->ip(),
+                'company_id' => Auth::user()->company_id,
+            ]);
 
             DB::commit();
             return $merge;
