@@ -179,7 +179,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <h5 class="text-center">
-                                        {{ details?.closing?.[1]?.schedule?.route?.name || "N/A" }}
+                                        {{ routeNameWithVia(details?.closing?.[1]?.schedule?.route) }}
                                     </h5>
 
                                     <table class="table table-bordered table-sm">
@@ -326,7 +326,7 @@
                                     </table>
 
                                     <h5 class="text-center my-3">
-                                        {{ details?.closing?.[0]?.schedule?.route?.name || "N/A" }}
+                                        {{ routeNameWithVia(details?.closing?.[0]?.schedule?.route) }}
                                     </h5>
 
                                     <table class="table table-bordered table-sm">
@@ -789,6 +789,13 @@ export default {
     },
 
     methods: {
+        routeNameWithVia(route) {
+            if (!route || !route.name) {
+                return "N/A";
+            }
+
+            return route.via ? `${route.name} (${route.via})` : route.name;
+        },
         initDataTable() {
             this.$nextTick(() => {
                 // Ensure jQuery and DataTable plugin are available

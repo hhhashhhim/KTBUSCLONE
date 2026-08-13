@@ -50107,6 +50107,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }))();
   },
   methods: {
+    routeNameWithVia: function routeNameWithVia(route) {
+      if (!route || !route.name) {
+        return "N/A";
+      }
+
+      return route.via ? "".concat(route.name, " (").concat(route.via, ")") : route.name;
+    },
     initDataTable: function initDataTable() {
       this.$nextTick(function () {
         // Ensure jQuery and DataTable plugin are available
@@ -111048,7 +111055,7 @@ var _hoisted_174 = ["value"];
 var _hoisted_175 = ["value"];
 var _hoisted_176 = ["value"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _$data$details, _$data$details2, _$data$details2$bus, _$data$details3, _$data$details4, _$data$details4$closi, _$data$details4$closi2, _$data$details4$closi3, _$data$details5, _$data$details5$closi, _$data$details5$closi2, _$data$details5$closi3, _$data$details5$closi4, _$data$details6, _$data$details6$bus, _$data$details7, _$data$details8, _$data$details8$closi, _$data$details8$closi2, _$data$details8$closi3, _$data$details9, _$data$details9$closi, _$data$details9$closi2, _$data$details9$closi3, _$data$details9$closi4, _$data$details10, _$data$details10$clos, _$data$details10$clos2, _$data$details10$clos3, _$data$details10$clos4, _$data$details11, _$data$details11$clos, _$data$details11$clos2, _$data$details11$clos3, _$data$details11$clos4;
+  var _$data$details, _$data$details2, _$data$details2$bus, _$data$details3, _$data$details4, _$data$details4$closi, _$data$details4$closi2, _$data$details4$closi3, _$data$details5, _$data$details5$closi, _$data$details5$closi2, _$data$details5$closi3, _$data$details5$closi4, _$data$details6, _$data$details6$bus, _$data$details7, _$data$details8, _$data$details8$closi, _$data$details8$closi2, _$data$details8$closi3, _$data$details9, _$data$details9$closi, _$data$details9$closi2, _$data$details9$closi3, _$data$details9$closi4, _$data$details10, _$data$details10$clos, _$data$details10$clos2, _$data$details10$clos3, _$data$details11, _$data$details11$clos, _$data$details11$clos2, _$data$details11$clos3;
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [$data.isLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
     "class": "loading-spinner",
@@ -111102,7 +111109,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[2] || (_cache[2] = function () {
       return $options.print && $options.print.apply($options, arguments);
     })
-  }, _hoisted_70)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", _hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(((_$data$details10 = $data.details) === null || _$data$details10 === void 0 ? void 0 : (_$data$details10$clos = _$data$details10.closing) === null || _$data$details10$clos === void 0 ? void 0 : (_$data$details10$clos2 = _$data$details10$clos[1]) === null || _$data$details10$clos2 === void 0 ? void 0 : (_$data$details10$clos3 = _$data$details10$clos2.schedule) === null || _$data$details10$clos3 === void 0 ? void 0 : (_$data$details10$clos4 = _$data$details10$clos3.route) === null || _$data$details10$clos4 === void 0 ? void 0 : _$data$details10$clos4.name) || "N/A"), 1
+  }, _hoisted_70)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", _hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.routeNameWithVia((_$data$details10 = $data.details) === null || _$data$details10 === void 0 ? void 0 : (_$data$details10$clos = _$data$details10.closing) === null || _$data$details10$clos === void 0 ? void 0 : (_$data$details10$clos2 = _$data$details10$clos[1]) === null || _$data$details10$clos2 === void 0 ? void 0 : (_$data$details10$clos3 = _$data$details10$clos2.schedule) === null || _$data$details10$clos3 === void 0 ? void 0 : _$data$details10$clos3.route)), 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_75, [_hoisted_76, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.startShortages, function (item, index) {
     var _item$terminal, _item$bank;
@@ -111239,7 +111246,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$insertComma($options.startTotals.totalReceived)), 1
   /* TEXT */
-  ), _hoisted_92, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Action column ")])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", _hoisted_93, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(((_$data$details11 = $data.details) === null || _$data$details11 === void 0 ? void 0 : (_$data$details11$clos = _$data$details11.closing) === null || _$data$details11$clos === void 0 ? void 0 : (_$data$details11$clos2 = _$data$details11$clos[0]) === null || _$data$details11$clos2 === void 0 ? void 0 : (_$data$details11$clos3 = _$data$details11$clos2.schedule) === null || _$data$details11$clos3 === void 0 ? void 0 : (_$data$details11$clos4 = _$data$details11$clos3.route) === null || _$data$details11$clos4 === void 0 ? void 0 : _$data$details11$clos4.name) || "N/A"), 1
+  ), _hoisted_92, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Action column ")])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", _hoisted_93, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.routeNameWithVia((_$data$details11 = $data.details) === null || _$data$details11 === void 0 ? void 0 : (_$data$details11$clos = _$data$details11.closing) === null || _$data$details11$clos === void 0 ? void 0 : (_$data$details11$clos2 = _$data$details11$clos[0]) === null || _$data$details11$clos2 === void 0 ? void 0 : (_$data$details11$clos3 = _$data$details11$clos2.schedule) === null || _$data$details11$clos3 === void 0 ? void 0 : _$data$details11$clos3.route)), 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_94, [_hoisted_95, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.returnShortages, function (item, index) {
     var _item$terminal2, _item$bank2;
