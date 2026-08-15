@@ -2587,6 +2587,8 @@ export default {
                 this.closeModal();
                 if (!pending) {
                     await this.callApi("post", "booking/whatsapp/cancel/message", { tickets: resCancelSeats.data.tickets });
+                } else {
+                    window.dispatchEvent(new CustomEvent('terminal-cancellation-count-refresh'));
                 }
             }
             if (resCancelSeats.status == 422) {
@@ -4733,6 +4735,8 @@ export default {
                 this.closeModal();
                 if (!pending) {
                     await this.callApi("post", "booking/whatsapp/cancel/message", { tickets: resCancelBooking.data.tickets });
+                } else {
+                    window.dispatchEvent(new CustomEvent('terminal-cancellation-count-refresh'));
                 }
             }
             if (resCancelBooking.status == 422) {
@@ -4810,6 +4814,7 @@ export default {
 
                 if (resCancelBooking.data.pending === true) {
                     Swal.fire("Request Submitted", "Cancellation request submitted for approval.", "success");
+                    window.dispatchEvent(new CustomEvent('terminal-cancellation-count-refresh'));
                     this.fetchScheduleData();
                     this.closeModal();
                     return;

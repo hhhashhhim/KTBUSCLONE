@@ -467,6 +467,7 @@ export default {
                 $('#onlineTerminalApproveModal').modal('hide');
                 swal("Approved", res.data.message, "success");
                 this.fetchRequests();
+                window.dispatchEvent(new CustomEvent('terminal-cancellation-count-refresh'));
             } else {
                 swal("Error", res.data.message || "Approval failed.", "error");
             }
@@ -493,6 +494,7 @@ export default {
                 $('#onlineTerminalRejectModal').modal('hide');
                 swal("Rejected", res.data.message, "success");
                 this.fetchRequests();
+                window.dispatchEvent(new CustomEvent('terminal-cancellation-count-refresh'));
             } else {
                 swal("Error", res.data.message || "Rejection failed.", "error");
             }

@@ -310,7 +310,9 @@
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('online-terminal-cancellation')">
                             <router-link class="nav-link text-capitalize online-terminal" :to="{ name: 'online-terminal-cancellation-requests' }">
-                                <i class="fas fa-bookmark"></i> Online Terminal Cancellations
+                                <i class="fas fa-bookmark"></i>
+                                <span>Terminal Cancellation</span>
+                                <span class="terminal-cancellation-count">{{ terminalCancellationPendingCount }}</span>
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('counter-expenses')">
@@ -604,23 +606,32 @@ export default {
                 company: "fa-building",
             },
             permissions: [],
+            terminalCancellationPendingCount: 0,
             pendingDockCount: 0, // 🚀 new
         }
     },
     created() {
         this.permissions = this.$store.state.permissions;
+        if (this.checkForSubmenu('online-terminal-cancellation')) {
+            this.getTerminalCancellationPendingCount();
+        }
         this.getPendingDockCount(); // 🚀 call on load
     },
     mounted() {
         this.syncActiveMenu();
         this.$el.querySelector('.sidebar-menu')?.addEventListener('click', this.activateClickedMenu);
+        window.addEventListener('terminal-cancellation-count-refresh', this.getTerminalCancellationPendingCount);
     },
     beforeUnmount() {
         this.$el.querySelector('.sidebar-menu')?.removeEventListener('click', this.activateClickedMenu);
+        window.removeEventListener('terminal-cancellation-count-refresh', this.getTerminalCancellationPendingCount);
     },
     watch: {
         '$route.fullPath'() {
             this.syncActiveMenu();
+            if (this.checkForSubmenu('online-terminal-cancellation')) {
+                this.getTerminalCancellationPendingCount();
+            }
         },
     },
     methods: {
@@ -699,6 +710,15 @@ export default {
             return valid;
         },
        
+       async getTerminalCancellationPendingCount() {
+    try {
+        const res = await this.callApi('post', 'online-terminals/cancellations/pending-count');
+        this.terminalCancellationPendingCount = Number(res.data.pending_count || 0);
+    } catch (err) {
+        this.terminalCancellationPendingCount = 0;
+    }
+},
+
        async getPendingDockCount() {
     try {
         const res = await this.callApi('get', 'fleet/dock-requests/pending-count'); // ✅ use GET not POST
@@ -727,5 +747,26 @@ export default {
 .sidebar-menu-blank-space > span {
     display: block;
     height: 100%;
+}
+
+.online-terminal {
+    display: flex !important;
+    align-items: center;
+}
+
+.terminal-cancellation-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin-left: auto;
+    padding: 0;
+    border-radius: 50%;
+    background-color: #3b82f6;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
 }
 </style>
