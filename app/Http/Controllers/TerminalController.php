@@ -564,9 +564,7 @@ public function filterData(Request $request)
             $query->whereIn('type', ['booked', 'over-issue'])
                 ->orWhere(function ($query) {
                     $query->where('type', 'canceled')
-                        ->whereHas('cancel_ticket', function ($q) {
-                            $q->where('percentage', '>', 0);
-                        });
+                        ->whereHas('cancel_ticket');
                 });
         })
 

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'web/v1/online-terminals/cancellations', 'middleware' => ['auth:sanctum']], function () {
     Route::post('/requests', [OnlineTerminalCancellationController::class, 'requests']);
+    Route::post('/pending-count', [OnlineTerminalCancellationController::class, 'pendingCount']);
     Route::post('/routes', [OnlineTerminalCancellationController::class, 'routes']);
     Route::post('/terminals', [OnlineTerminalCancellationController::class, 'terminals']);
     Route::post('/buses', [OnlineTerminalCancellationController::class, 'buses']);

@@ -1113,6 +1113,24 @@ class OnlineTerminalCancellationController extends Controller
             ->first();
     }
 
+    public function pendingCount()
+    {
+        if (!checkForSubmenu('online-terminal-cancellation')) {
+            return response()->json(["Error" => ['You are not authorized to access this url']], 403);
+        }
+
+        $pendingCount = BookkaruApiLog::where('status', 'pending')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('tickets')
+                    ->whereColumn('tickets.invoice_id', 'bookkaru_api_logs.normalized_invoice_id')
+                    ->where('tickets.company_id', Auth::user()->company_id);
+            })
+            ->count();
+
+        return response()->json(['pending_count' => $pendingCount]);
+    }
+
     private function logBelongsToAuthenticatedCompany(BookkaruApiLog $log): bool
     {
         return Ticket::withTrashed()
