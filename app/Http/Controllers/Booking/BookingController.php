@@ -63,6 +63,24 @@ class BookingController extends Controller
 {
     private function createTerminalCancellationRequest($tickets, Request $request)
     {
+        // Temporarily use the existing direct-cancellation flow. This switch can
+        // be enabled after terminal users have completed their training.
+        $approvalEnabled = filter_var(
+            config('services.terminal_cancellations.approval_enabled', false),
+            FILTER_VALIDATE_BOOLEAN
+        );
+        if (!$approvalEnabled) {
+            return null;
+        }
+
+        // Reservations are unpaid/unconfirmed and must always remain directly
+        // cancellable, even after approval requests are enabled for sold tickets.
+        if ($tickets->isNotEmpty() && $tickets->every(function ($ticket) {
+            return $ticket->type === 'advance booking';
+        })) {
+            return null;
+        }
+
         $terminal = Terminal::where('company_id', Auth::user()->company_id)
             ->find(Auth::user()->terminal_id);
 

@@ -44,4 +44,9 @@ return [
         'allowed_sources' => array_filter(array_map('trim', explode(',', env('ONLINE_TERMINAL_ALLOWED_SOURCES', 'Bookkaru,SastaTicket,Sasta Ticket,Bookme')))),
     ],
 
+    'terminal_cancellations' => [
+        // Keep disabled until terminal users have completed workflow training.
+        'approval_enabled' => env('TERMINAL_CANCELLATION_APPROVAL_ENABLED', false),
+    ],
+
 ];
