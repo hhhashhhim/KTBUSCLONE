@@ -186,6 +186,12 @@ class OnlineTerminalCancellationController extends Controller
         $toDateFilter = $this->normalizeFilterDate($request->toDateFilter);
 
         $query = BookkaruApiLog::with(['approvedBy:id,name', 'rejectedBy:id,name'])
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('tickets')
+                    ->whereColumn('tickets.invoice_id', 'bookkaru_api_logs.normalized_invoice_id')
+                    ->where('tickets.company_id', Auth::user()->company_id);
+            })
             ->when($request->request_id, function ($builder) use ($request) {
                 $builder->where('request_id', 'like', '%' . trim((string) $request->request_id) . '%');
             })
@@ -311,6 +317,9 @@ class OnlineTerminalCancellationController extends Controller
         $log = BookkaruApiLog::with(['approvedBy:id,name', 'rejectedBy:id,name'])->find($request->id);
         if (!$log) {
             return response()->json($this->businessError('Request not found.', 'NOT_FOUND'), 404);
+        }
+        if (!$this->logBelongsToAuthenticatedCompany($log)) {
+            return response()->json(["Error" => ['You are not authorized to access this request']], 403);
         }
 
         if (in_array($log->status, ['approved', 'cancelled', 'rejected'], true)) {
@@ -470,6 +479,9 @@ class OnlineTerminalCancellationController extends Controller
         $log = BookkaruApiLog::find($request->id);
         if (!$log) {
             return response()->json($this->businessError('Request not found.', 'NOT_FOUND'), 404);
+        }
+        if (!$this->logBelongsToAuthenticatedCompany($log)) {
+            return response()->json(["Error" => ['You are not authorized to access this request']], 403);
         }
 
         if (in_array($log->status, ['rejected', 'cancelled'], true)) {
@@ -1044,6 +1056,7 @@ class OnlineTerminalCancellationController extends Controller
             'seat_numbers' => $log->seat_numbers ?? [],
             'cancellation_reason' => data_get($log->request_payload, 'cancellation_reason'),
             'source' => data_get($log->request_payload, 'source', 'Online Terminal'),
+            'request_type' => data_get($log->request_payload, 'request_type', 'online'),
             'route' => data_get($ticket, 'schedule.route.name', 'N/A'),
             'bus_date' => $busDate ?: 'N/A',
             'bus_time' => $busTime ?: 'N/A',
@@ -1098,6 +1111,14 @@ class OnlineTerminalCancellationController extends Controller
             })
             ->orderBy('id')
             ->first();
+    }
+
+    private function logBelongsToAuthenticatedCompany(BookkaruApiLog $log): bool
+    {
+        return Ticket::withTrashed()
+            ->where('company_id', Auth::user()->company_id)
+            ->where('invoice_id', $log->normalized_invoice_id ?: $log->invoice_id)
+            ->exists();
     }
 
     private function formatBookingDateTime($timestamp)

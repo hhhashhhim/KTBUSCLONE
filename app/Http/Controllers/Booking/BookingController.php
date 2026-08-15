@@ -44,6 +44,7 @@ use App\Models\Hrm\Employee\Employee;
 use App\Models\Terminal;
 use App\Models\TerminalDiscount;
 use App\Models\Ticket;
+use App\Models\BookkaruApiLog;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 use App\Models\Invoice;
@@ -54,11 +55,118 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use App\Support\SeatNumber;
 use Exception;
 
 class BookingController extends Controller
 {
+    private function createTerminalCancellationRequest($tickets, Request $request)
+    {
+        $terminal = Terminal::where('company_id', Auth::user()->company_id)
+            ->find(Auth::user()->terminal_id);
+
+        if (!$terminal) {
+            return null;
+        }
+
+        if (!(bool) $terminal->cancellation_allowed) {
+            return response()->json([
+                'errors' => ['Cancellation' => ['Cancellation requests are not allowed for your terminal.']],
+            ], 422);
+        }
+
+        if ($tickets->isEmpty()) {
+            return response()->json([
+                'errors' => ['Cancellation' => ['No active ticket was found.']],
+            ], 422);
+        }
+
+        $invoiceGroups = $tickets->groupBy('invoice_id');
+        if ($invoiceGroups->count() !== 1 || !$tickets->first()->invoice_id) {
+            return response()->json([
+                'errors' => ['Cancellation' => ['Selected tickets must belong to one valid invoice.']],
+            ], 422);
+        }
+
+        $invoiceId = (int) $tickets->first()->invoice_id;
+        $seatNumbers = $tickets->pluck('seat_no')->map(fn ($seat) => (string) $seat)->values()->all();
+        $existing = BookkaruApiLog::where('normalized_invoice_id', $invoiceId)
+            ->where('status', 'pending')
+            ->get()
+            ->first(function ($log) use ($seatNumbers) {
+                return !empty(array_intersect($log->seat_numbers ?? [], $seatNumbers));
+            });
+
+        if ($existing) {
+            return response()->json([
+                'errors' => ['Cancellation' => ['A pending cancellation request already exists for this ticket.']],
+            ], 422);
+        }
+
+        $deductionPercentage = max(0, min(100, (float) ($request->percentage ?? 0)));
+        $sourceType = (int) $terminal->is_online_terminal === 1 ? 'online' : 'offline';
+        $source = $sourceType === 'online' ? 'Online Terminal' : 'Offline Terminal';
+        $requestId = 'PORTAL-' . strtoupper((string) Str::uuid());
+        $reason = trim((string) ($request->remarks ?? $request->reason ?? ''));
+        $transactionId = (string) ($tickets->first()->transaction_id ?? '');
+        $payload = [
+            'request_id' => $requestId,
+            'invoice_id' => $invoiceId,
+            'transaction_id' => $transactionId,
+            'booking_reference' => $transactionId,
+            'seat_numbers' => $seatNumbers,
+            'cancellation_reason' => $reason ?: 'Cancellation requested from portal terminal',
+            'source' => $source,
+            'request_type' => $sourceType,
+            'terminal_id' => $terminal->id,
+            'terminal_name' => $terminal->name,
+            'requested_by' => Auth::user()->id,
+            'deduction_percentage' => $deductionPercentage,
+            'refund_percentage' => 100 - $deductionPercentage,
+        ];
+        $response = [
+            'status' => 'pending',
+            'message' => 'Cancellation request submitted for approval.',
+            'data' => [
+                'request_id' => $requestId,
+                'invoice_id' => $invoiceId,
+                'seat_numbers' => $seatNumbers,
+                'request_type' => $sourceType,
+            ],
+        ];
+
+        BookkaruApiLog::create([
+            'request_id' => $requestId,
+            'invoice_id' => $invoiceId,
+            'normalized_invoice_id' => $invoiceId,
+            'booking_reference' => $transactionId,
+            'seat_numbers' => $seatNumbers,
+            'request_payload' => $payload,
+            'response_payload' => $response,
+            'status' => 'pending',
+            'approval_status' => 'pending',
+            'cancellation_status' => 'pending',
+            'success' => true,
+            'duplicate' => false,
+            'unauthorized' => false,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        ActivityLog::create([
+            'activity_by' => Auth::user()->id,
+            'message' => Auth::user()->name . ' | submitted ' . $sourceType . ' terminal cancellation request | invoice: ' . $invoiceId . ' | seats: ' . implode(',', $seatNumbers),
+            'requested_host' => $request->ip(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        return response()->json(array_merge($response, [
+            'pending' => true,
+            'tickets' => [],
+        ]));
+    }
+
     private function closingForTrip($scheduleId, $scheduleDate, $departureCity, $destinationCity, $departureTime)
     {
         $exactClosing = TicketClosing::where([
@@ -2053,6 +2161,12 @@ class BookingController extends Controller
 
             ])->first();
 
+            $pendingResponse = $this->createTerminalCancellationRequest(collect([$ticket])->filter(), $request);
+            if ($pendingResponse) {
+                DB::commit();
+                return $pendingResponse;
+            }
+
             $type = app(TicketCancellationService::class)->cancelTicket(
                 $ticket,
                 $request->percentage,
@@ -2090,6 +2204,11 @@ class BookingController extends Controller
         try {
             DB::beginTransaction();
             $tickets = Ticket::whereIn("id", $request->cancelAllSeat)->where(['company_id' => Auth::user()->company_id])->get();
+            $pendingResponse = $this->createTerminalCancellationRequest($tickets, $request);
+            if ($pendingResponse) {
+                DB::commit();
+                return $pendingResponse;
+            }
             $status = $tickets[0]->type;
             foreach ($tickets as $ticket) {
                 $type = app(TicketCancellationService::class)->cancelTicket(
