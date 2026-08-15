@@ -309,10 +309,12 @@
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('online-terminal-cancellation')">
-                            <router-link class="nav-link text-capitalize online-terminal" :to="{ name: 'online-terminal-cancellation-requests' }">
-                                <i class="fas fa-bookmark"></i>
-                                <span>Terminal Cancellation</span>
-                                <span class="terminal-cancellation-count">{{ terminalCancellationPendingCount }}</span>
+                            <router-link class="nav-link text-capitalize d-flex justify-content-between"
+                                :to="{ name: 'online-terminal-cancellation-requests' }">
+                                <span><i class="fas fa-bookmark"></i> Terminal Cancellation</span>
+                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">
+                                    {{ terminalCancellationPendingCount }}
+                                </span>
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('counter-expenses')">
@@ -749,24 +751,4 @@ export default {
     height: 100%;
 }
 
-.online-terminal {
-    display: flex !important;
-    align-items: center;
-}
-
-.terminal-cancellation-count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    margin-left: auto;
-    padding: 0;
-    border-radius: 50%;
-    background-color: #3b82f6;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1;
-}
 </style>
