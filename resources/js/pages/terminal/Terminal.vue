@@ -250,21 +250,6 @@
             </label>
           </div>
           <div class="form-group col-md-3">
-            <label class="mt-4" for="cancellation_allowed">Cancellation Allowed</label>
-            <label class="colorinput mx-3 mt-3">
-              <span>
-                <input
-                  type="checkbox"
-                  id="cancellation_allowed"
-                  class="colorinput-input"
-                  v-model="dataEdit.cancellation_allowed"
-                />
-                <span class="colorinput-color bg-primary"></span>
-              </span>
-            </label>
-            <small class="form-text text-muted">Creates an approval request; it does not cancel directly.</small>
-          </div>
-          <div class="form-group col-md-3">
             <label class="fw-bold mb-2 d-block">Payment Recovery Method</label>
 
             <div class="d-flex gap-3">
@@ -560,6 +545,21 @@
                 <span class="colorinput-color bg-primary"></span>
               </span>
             </label>
+          </div>
+          <div class="form-group col-md-3">
+            <label class="mt-4" for="edit_cancellation_allowed">Cancellation Allowed</label>
+            <label class="colorinput mx-3 mt-3">
+              <span>
+                <input
+                  type="checkbox"
+                  id="edit_cancellation_allowed"
+                  class="colorinput-input"
+                  v-model="dataEdit.cancellation_allowed"
+                />
+                <span class="colorinput-color bg-primary"></span>
+              </span>
+            </label>
+            <small class="form-text text-muted">Creates an approval request; it does not cancel directly.</small>
           </div>
           <div class="form-group col-md-3">
             <label class="fw-bold mb-2 d-block">Payment Recovery Method</label>
