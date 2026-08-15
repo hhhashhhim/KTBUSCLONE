@@ -5,7 +5,7 @@
                 <div class="col-12">
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h4>Online Terminal Cancellation Requests</h4>
+                            <h4>Terminal Cancellation Requests</h4>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -156,6 +156,7 @@
                                             <th>Request Date</th>
                                             <th>Time Difference</th>
                                             <th>Source</th>
+                                            <th>Type</th>
                                             <th>Status</th>
                                             <th>Decision By</th>
                                             <th>Decision Remarks</th>
@@ -185,6 +186,11 @@
                                             <td>{{ request.request_date || 'N/A' }}</td>
                                             <td>{{ request.time_difference || timeDifference(request) }}</td>
                                             <td>{{ request.source || 'Online Terminal' }}</td>
+                                            <td>
+                                                <span :class="request.request_type === 'offline' ? 'badge badge-secondary' : 'badge badge-info'">
+                                                    {{ request.request_type === 'offline' ? 'Offline' : 'Online' }}
+                                                </span>
+                                            </td>
                                             <td>
                                                 <span :class="statusClass(request.status)">
                                                     {{ statusLabel(request.status) }}

@@ -2571,10 +2571,10 @@ export default {
             this.cancelLoading = true;
             const resCancelSeats = await this.callApi("post", "booking/canceling/all", this.cancelAllData);
             if (resCancelSeats.status == 200) {
-                this.cancelLoading = true;
+                const pending = resCancelSeats.data.pending === true;
                 swal({
-                    title: "Success",
-                    text: "Seats Canceled Successfully",
+                    title: pending ? "Request Submitted" : "Success",
+                    text: pending ? "Cancellation request submitted for approval" : "Seats Canceled Successfully",
                     icon: "success",
                     timer: 2000
                 });
@@ -2585,7 +2585,9 @@ export default {
                 this.cancelAllData.percentage = "0";
                 this.cancelAllData.reason = "";
                 this.closeModal();
-                const resBookingDetail = await this.callApi("post", "booking/whatsapp/cancel/message", { tickets: resCancelSeats.data.tickets });
+                if (!pending) {
+                    await this.callApi("post", "booking/whatsapp/cancel/message", { tickets: resCancelSeats.data.tickets });
+                }
             }
             if (resCancelSeats.status == 422) {
                 this.dropScheduleButton = false;
@@ -4718,9 +4720,10 @@ export default {
             const resCancelBooking = await this.callApi("post", "booking/canceling", data);
             if (resCancelBooking.status == 200) {
                 this.cancelLoading = false;
+                const pending = resCancelBooking.data.pending === true;
                 swal({
-                    title: "Success",
-                    text: "Booking Canceled Successfully",
+                    title: pending ? "Request Submitted" : "Success",
+                    text: pending ? "Cancellation request submitted for approval" : "Booking Canceled Successfully",
                     icon: "success",
                     timer: 2000
                 });
@@ -4728,7 +4731,9 @@ export default {
                 this.fetchScheduleData();
                 this.resetArrays();
                 this.closeModal();
-                const resBookingDetail = await this.callApi("post", "booking/whatsapp/cancel/message", { tickets: resCancelBooking.data.tickets });
+                if (!pending) {
+                    await this.callApi("post", "booking/whatsapp/cancel/message", { tickets: resCancelBooking.data.tickets });
+                }
             }
             if (resCancelBooking.status == 422) {
                 this.dropScheduleButton = false;
@@ -4800,6 +4805,13 @@ export default {
 
                 if (resCancelBooking.status !== 200) {
                     Swal.fire("Error", "Unable to cancel booking.", "error");
+                    return;
+                }
+
+                if (resCancelBooking.data.pending === true) {
+                    Swal.fire("Request Submitted", "Cancellation request submitted for approval.", "success");
+                    this.fetchScheduleData();
+                    this.closeModal();
                     return;
                 }
 
