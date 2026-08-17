@@ -2468,17 +2468,32 @@ class BookingController extends Controller
             'terminal'
         )->where('company_id', Auth::user()->company_id)->withTrashed()->whereIn('id', $ids)->get();
         $tickets->map(function ($item) {
-            $departureDate = optional($item->scheduleDetail)->departure_date ?? $item->date;
-            $departureTime = optional($item->scheduleDetail)->departure_time ?? $item->schedule_time;
-            $sub = 0;
-            $terminalTime = TerminalTimeDifference::where([
-                'company_id' => Auth::user()->company_id,
-                'terminal_id' => $item->terminal_id,
-                'route_id' => $item->route_id,
-            ])->first();
+            $scheduleDetail = $item->scheduleDetail;
+            $hasDepartureSegmentTime = $scheduleDetail
+                && (int) $scheduleDetail->departure_id === (int) $item->departure_city_id
+                && !empty($scheduleDetail->departure_time);
 
-            if ($terminalTime) {
-                $sub = $terminalTime->time_difference * 60;
+            $departureDate = $hasDepartureSegmentTime
+                ? ($scheduleDetail->departure_date ?? $item->date)
+                : $item->date;
+            $departureTime = $hasDepartureSegmentTime
+                ? $scheduleDetail->departure_time
+                : $item->schedule_time;
+            $sub = 0;
+
+            // A matching schedule-detail time is already the departure city's
+            // adjusted time. Only use the legacy terminal offset when that
+            // segment-specific time is unavailable.
+            if (!$hasDepartureSegmentTime) {
+                $terminalTime = TerminalTimeDifference::where([
+                    'company_id' => Auth::user()->company_id,
+                    'terminal_id' => $item->terminal_id,
+                    'route_id' => $item->route_id,
+                ])->first();
+
+                if ($terminalTime) {
+                    $sub = $terminalTime->time_difference * 60;
+                }
             }
 
             $departureDateTime = strtotime($departureDate . ' ' . $departureTime);
