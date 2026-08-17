@@ -50480,7 +50480,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 res = _context7.sent;
 
                 if (res.status == 200) {
-                  expenses = res.data.expenses;
+                  expenses = res.data.expenses; // This method can be called more than once while the page is open.
+                  // Reset the form arrays before hydrating them so existing rows are
+                  // not appended again and submitted as duplicate expenses.
+
+                  _this8.postData.category = [];
+                  _this8.postData.description = [];
+                  _this8.postData.amount = [];
+                  _this8.postData.paid = [];
+                  _this8.postData.ledger = [];
+                  _this8.postData.invoice = [];
                   _this8.expenses = expenses;
                   _this8.totalSale = res.data.sale;
                   _this8.checkClosing = res.data.closing;

@@ -986,6 +986,17 @@ export default {
             });
             if (res.status == 200) {
                 const expenses = res.data.expenses;
+
+                // This method can be called more than once while the page is open.
+                // Reset the form arrays before hydrating them so existing rows are
+                // not appended again and submitted as duplicate expenses.
+                this.postData.category = [];
+                this.postData.description = [];
+                this.postData.amount = [];
+                this.postData.paid = [];
+                this.postData.ledger = [];
+                this.postData.invoice = [];
+
                 this.expenses = expenses;
                 this.totalSale = res.data.sale;
                 this.checkClosing = res.data.closing;
