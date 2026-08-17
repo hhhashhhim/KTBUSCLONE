@@ -2166,18 +2166,43 @@ class BookingController extends Controller
         if (!checkPermissionButtons("cancel-ticket") && !checkPermissionButtons("reserved-cancel")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+
+        $validated = $request->validate([
+            'ticket_id' => ['required', 'integer'],
+            'percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'remarks' => ['nullable', 'string', 'max:1000'],
+        ]);
+
         try {
             DB::beginTransaction();
-            $ticket = Ticket::where([
-                'company_id' => Auth::user()->company_id,
-                'date' => $request->date,
-                'schedule_id' => $request->schedule_id,
-                'customer_id' => $request->customer_id,
-                'departure_city_id' => $request->departure_id,
-                'destination_city_id' => $request->destination_id,
-                'seat_no' => $request->seat_no,
+            $ticket = Ticket::where('company_id', Auth::user()->company_id)
+                ->where('id', $validated['ticket_id'])
+                ->lockForUpdate()
+                ->first();
 
-            ])->first();
+            if (!$ticket) {
+                DB::rollBack();
+                return response()->json([
+                    'errors' => ['Cancellation' => ['The active ticket was not found or has already been canceled.']],
+                ], 422);
+            }
+
+            if ($ticket->type === 'advance booking') {
+                if (!checkPermissionButtons('reserved-cancel')) {
+                    DB::rollBack();
+                    return response()->json(["Error" => ['You are not authorized to cancel reserved tickets']], 403);
+                }
+            } elseif ($ticket->type === 'booked') {
+                if (!checkPermissionButtons('cancel-ticket')) {
+                    DB::rollBack();
+                    return response()->json(["Error" => ['You are not authorized to cancel confirmed tickets']], 403);
+                }
+            } else {
+                DB::rollBack();
+                return response()->json([
+                    'errors' => ['Cancellation' => ['This ticket type cannot be canceled from Booking.']],
+                ], 422);
+            }
 
             $pendingResponse = $this->createTerminalCancellationRequest(collect([$ticket])->filter(), $request);
             if ($pendingResponse) {
@@ -2187,13 +2212,13 @@ class BookingController extends Controller
 
             $type = app(TicketCancellationService::class)->cancelTicket(
                 $ticket,
-                $request->percentage,
-                $request->remarks,
+                $validated['percentage'] ?? 0,
+                $validated['remarks'] ?? null,
                 Auth::user()->id
             );
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
-                "message" => Auth::user()->name . " | canceled booking. seat no ($request->seat_no) | time : $ticket->schedule_date $ticket->schedule_time",
+                "message" => Auth::user()->name . " | canceled booking. ticket id ($ticket->id), seat no ($ticket->seat_no) | time : $ticket->schedule_date $ticket->schedule_time",
                 "requested_host" => $request->ip(),
                 "company_id" => Auth::user()->company_id
             ]);
