@@ -384,8 +384,8 @@ export default {
             filterData: {
                 bus_number: [],
                 route: [],
-                from_date: new Date().toISOString().split('T')[0],
-                to_date: new Date().toISOString().split('T')[0],
+                from_date: "",
+                to_date: "",
                 closing_from_date: new Date().toISOString().split('T')[0],
                 closing_to_date: new Date().toISOString().split('T')[0],
             },
@@ -506,8 +506,8 @@ export default {
         resetFilters() {
             this.filterData = {
                 bus_number: '',
-                from_date: new Date().toISOString().split('T')[0],
-                to_date: new Date().toISOString().split('T')[0],
+                from_date: "",
+                to_date: "",
                 closing_from_date: new Date().toISOString().split('T')[0],
                 closing_to_date: new Date().toISOString().split('T')[0],
             };
