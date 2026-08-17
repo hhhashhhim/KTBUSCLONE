@@ -4672,6 +4672,7 @@ export default {
 
         passDataToCancelModel: function (data) {
             this.cancelData = {
+                dataTicketId: data.id,
                 dataDate: data.date,
                 dataSchedule: data.schedule_id,
                 dataCustomer: data.customer_id,
@@ -4684,6 +4685,7 @@ export default {
         },
         passDataToCancelRefundModel: function (data) {
             this.cancelData = {
+                dataTicketId: data.id,
                 dataType: data.type,
                 dataDate: data.date,
                 dataSchedule: data.schedule_id,
@@ -4709,6 +4711,7 @@ export default {
         async cancelBooking(dataEnter) {
             this.cancelLoading = true;
             const data = {
+                ticket_id: dataEnter.dataTicketId,
                 date: dataEnter.dataDate,
                 schedule_id: dataEnter.dataSchedule,
                 customer_id: dataEnter.dataCustomer,
@@ -4791,6 +4794,7 @@ export default {
                    STEP 1: CANCEL
                 ====================== */
                 const cancelData = {
+                    ticket_id: dataEnter.dataTicketId,
                     date: dataEnter.dataDate,
                     schedule_id: dataEnter.dataSchedule,
                     customer_id: dataEnter.dataCustomer,

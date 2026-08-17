@@ -40650,6 +40650,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     passDataToCancelModel: function passDataToCancelModel(data) {
       this.cancelData = {
+        dataTicketId: data.id,
         dataDate: data.date,
         dataSchedule: data.schedule_id,
         dataCustomer: data.customer_id,
@@ -40662,6 +40663,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     passDataToCancelRefundModel: function passDataToCancelRefundModel(data) {
       this.cancelData = {
+        dataTicketId: data.id,
         dataType: data.type,
         dataDate: data.date,
         dataSchedule: data.schedule_id,
@@ -40690,6 +40692,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               case 0:
                 _this41.cancelLoading = true;
                 data = {
+                  ticket_id: dataEnter.dataTicketId,
                   date: dataEnter.dataDate,
                   schedule_id: dataEnter.dataSchedule,
                   customer_id: dataEnter.dataCustomer,
@@ -40814,6 +40817,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                    STEP 1: CANCEL
                 ====================== */
                 cancelData = {
+                  ticket_id: dataEnter.dataTicketId,
                   date: dataEnter.dataDate,
                   schedule_id: dataEnter.dataSchedule,
                   customer_id: dataEnter.dataCustomer,
