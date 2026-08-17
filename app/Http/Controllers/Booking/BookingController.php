@@ -2468,15 +2468,18 @@ class BookingController extends Controller
             'terminal'
         )->where('company_id', Auth::user()->company_id)->withTrashed()->whereIn('id', $ids)->get();
         $tickets->map(function ($item) {
-            // The ticket already stores the passenger's selected departure date
-            // and segment time. ticket.terminal_id is the issuing terminal, so
-            // applying its route offset here can change a correct ticket time.
-            $departureDate = $item->date
-                ?? optional($item->scheduleDetail)->departure_date
-                ?? $item->schedule_date;
-            $departureTime = $item->schedule_time
-                ?? optional($item->scheduleDetail)->departure_time
-                ?? $item->schedule_time_exact;
+            $departureDate = optional($item->scheduleDetail)->departure_date ?? $item->date;
+            $departureTime = optional($item->scheduleDetail)->departure_time ?? $item->schedule_time;
+            $sub = 0;
+            $terminalTime = TerminalTimeDifference::where([
+                'company_id' => Auth::user()->company_id,
+                'terminal_id' => $item->terminal_id,
+                'route_id' => $item->route_id,
+            ])->first();
+
+            if ($terminalTime) {
+                $sub = $terminalTime->time_difference * 60;
+            }
 
             $departureDateTime = strtotime($departureDate . ' ' . $departureTime);
             $item->acutal_time = $item->date . " " . $item->schedule_time;
@@ -2484,6 +2487,7 @@ class BookingController extends Controller
                 $item->pdf_departure_date = $departureDate;
                 $item->pdf_departure_time = $departureTime;
             } else {
+                $departureDateTime += $sub;
                 $item->pdf_departure_date = date("Y-m-d", $departureDateTime);
                 $item->pdf_departure_time = date("h:i A", $departureDateTime);
             }
