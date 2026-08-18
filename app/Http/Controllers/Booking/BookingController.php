@@ -920,6 +920,11 @@ class BookingController extends Controller
                         'new_booking_date' => $item['rescheduleDate'],
                     ]);
                 }
+
+                $newSeatFare = (int) round((float) $item['selected_seatFare']);
+                $originalPaidFare = (float) $ticket['seat_fare'] - (float) ($ticket['discount'] ?? 0);
+                $fareAdjustmentDiscount = round($newSeatFare - $originalPaidFare, 2);
+
                 $newTicket = Ticket::create([
                     'company_id' => Auth::user()->company_id,
                     'departure_city_id' => $item['dataDepartureCity'],
@@ -932,7 +937,7 @@ class BookingController extends Controller
                     'ticket_merge_id' => $assignedClosing ? $assignedClosing->ticket_merge_id : null,
                     'bus_id' => $assignedClosing ? $assignedClosing->bus_id : null,
                     'bus_class_id' => $scheduleDetail->bus_class_id,
-                    'seat_fare' => $item['selected_seatFare'],
+                    'seat_fare' => $newSeatFare,
                     'is_partial' => $isPartial,
                     'booking_no' => $bookingNo,
                     'schedule_date' => $scheduleDetail->schedule_date,
@@ -951,7 +956,7 @@ class BookingController extends Controller
                     'reschedule_type' => $item['overIssueReschedule'],
                     'added_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,
-                    'discount' => $item['rescheduleDiscount'] ?? 0,
+                    'discount' => $fareAdjustmentDiscount,
                     'booked_time' => date("Y-m-d H:i:s"),
                 ]);
                 TicketReschedule::create([
