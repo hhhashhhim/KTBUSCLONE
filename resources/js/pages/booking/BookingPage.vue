@@ -1076,11 +1076,6 @@
                             </div>
                             <div class="col-md-3">
                                 <h4 class="mb-3">Current Booking</h4>
-                                <div class="mb-2"><span class="h6"> New Fare : Rs {{
-                                    totalAlreadyBookedSeatFare ?? ""
-                                        }} </span>
-                                </div>
-                                <br>
                                 <div class="mb-2"><span class="h6"> Selected Seats Numbers </span><br>
                                     <span>{{ alreadyBookedSeat.join(', ') ?? "Not Selected Yet" }}</span>
                                 </div>
@@ -1103,10 +1098,37 @@
                                         </label>
                                     </div>
                                     <br>
-                                    <div class="form-group">
-                                        <label for="name">Discount </label>
-                                        <input type="text" @keypress="isNumberDiscount($event)" class="form-control"
-                                            v-model="rescheduleDiscount" />
+                                    <div class="reschedule-fare-summary">
+                                        <div class="fare-summary-heading">
+                                            <span>Fare Summary</span>
+                                            <small>Calculated automatically</small>
+                                        </div>
+
+                                        <template v-if="alreadyBookedSeat.length">
+                                            <div class="fare-summary-row">
+                                                <span>Original Paid Fare</span>
+                                                <strong>Rs {{ formatRescheduleAmount(rescheduleOriginalPaidFare) }}</strong>
+                                            </div>
+                                            <div class="fare-summary-row">
+                                                <span>New Seat Fare</span>
+                                                <strong>Rs {{ formatRescheduleAmount(rescheduleNewSeatFare) }}</strong>
+                                            </div>
+                                            <div class="fare-summary-row fare-adjustment-row">
+                                                <span>Saved Discount</span>
+                                                <strong :class="rescheduleFareAdjustment < 0 ? 'text-danger' : 'text-success'">
+                                                    {{ rescheduleFareAdjustment > 0 ? '+' : '' }}{{
+                                                        formatRescheduleAmount(rescheduleFareAdjustment) }}
+                                                </strong>
+                                            </div>
+                                            <div class="fare-summary-total">
+                                                <span>Preserved Ticket Total</span>
+                                                <strong>Rs {{ formatRescheduleAmount(reschedulePreservedTotal) }}</strong>
+                                            </div>
+                                        </template>
+
+                                        <div v-else class="fare-summary-empty">
+                                            Select the replacement seat to calculate the fare adjustment.
+                                        </div>
                                     </div>
                                 </div>
 
@@ -5519,6 +5541,13 @@ export default {
             }
 
         },
+
+        formatRescheduleAmount(value) {
+            return Number(value || 0).toLocaleString('en-PK', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+            });
+        },
         checkForSubmenu(moduleName) {
             let permissions = this.permissions;
             let valid = false;
@@ -5604,6 +5633,24 @@ export default {
         isOnlineTerminalSelected() {
             return Number(this.selectedTerminal?.is_online_terminal ?? 0) === 1;
         },
+        rescheduleOriginalPaidFare() {
+            return this.mainAllRescheduleData.reduce((total, item) => {
+                const ticket = item?.dataAll ?? {};
+                return total + (Number(ticket.seat_fare || 0) - Number(ticket.discount || 0));
+            }, 0);
+        },
+        rescheduleNewSeatFare() {
+            return this.alreadyBookedSeatFare.reduce(
+                (total, fare) => total + Number(fare || 0),
+                0
+            );
+        },
+        rescheduleFareAdjustment() {
+            return this.rescheduleNewSeatFare - this.rescheduleOriginalPaidFare;
+        },
+        reschedulePreservedTotal() {
+            return this.rescheduleNewSeatFare - this.rescheduleFareAdjustment;
+        },
 
         canShowJazzCashRefund() {
             const hasSubmenu = this.checkForSubmenu('jazz-cash-refund'); // called once
@@ -5621,6 +5668,82 @@ export default {
 </script>
 
 <style scoped>
+.reschedule-fare-summary {
+    overflow: hidden;
+    border: 1px solid #e4e7ec;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 5px 16px rgba(31, 45, 61, 0.07);
+    text-align: left;
+}
+
+.fare-summary-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: #f7f8ff;
+    border-bottom: 1px solid #e8eaff;
+    color: #34395e;
+    font-weight: 700;
+}
+
+.fare-summary-heading small {
+    color: #8b92a5;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.fare-summary-row,
+.fare-summary-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    color: #62677a;
+}
+
+.fare-summary-row + .fare-summary-row {
+    border-top: 1px dashed #eceef3;
+}
+
+.fare-summary-row strong,
+.fare-summary-total strong {
+    white-space: nowrap;
+    color: #34395e;
+}
+
+.fare-adjustment-row {
+    background: #fbfcfe;
+}
+
+.fare-adjustment-row strong.text-danger {
+    color: #fc544b;
+}
+
+.fare-adjustment-row strong.text-success {
+    color: #47c363;
+}
+
+.fare-summary-total {
+    background: #6777ef;
+    color: #fff;
+    font-weight: 600;
+}
+
+.fare-summary-total strong {
+    color: #fff;
+    font-size: 16px;
+}
+
+.fare-summary-empty {
+    padding: 16px 14px;
+    color: #8b92a5;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
 .image-span {
     background-color: #a2a3a7;
     border-radius: 10px;
