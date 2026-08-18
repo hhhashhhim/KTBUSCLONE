@@ -224,16 +224,19 @@ public function buses()
 
             $busDateTime = $this->getTerminalWiseBusDateTime($ticket, $terminalTimeDifferences);
             $cancellationDateTime = $this->getCancellationDateTime($cancelTicket);
+            $localCancellationDateTime = $cancellationDateTime
+                ? $cancellationDateTime->copy()->setTimezone(config('app.timezone'))
+                : null;
 
             $ticket->bus_datetime = $busDateTime ? $busDateTime->format('Y-m-d H:i:s') : null;
             $ticket->bus_time = $busDateTime ? $busDateTime->format('h:i A d-m-Y') : 'N/A';
             $ticket->cancellation_datetime = $cancellationDateTime ? $cancellationDateTime->format('Y-m-d H:i:s') : null;
-            $ticket->cancel_date = $cancellationDateTime ? $cancellationDateTime->format('h:i A d-m-Y') : 'N/A';
+            $ticket->cancel_date = $localCancellationDateTime ? $localCancellationDateTime->format('h:i A d-m-Y') : 'N/A';
 
-            $ticket->is_late_cancelled = $busDateTime && $cancellationDateTime
-                ? $cancellationDateTime->greaterThanOrEqualTo($busDateTime)
+            $ticket->is_late_cancelled = $busDateTime && $localCancellationDateTime
+                ? $localCancellationDateTime->greaterThanOrEqualTo($busDateTime)
                 : null;
-            $ticket->cancellation_status_color = $this->getCancellationStatusColor($busDateTime, $cancellationDateTime);
+            $ticket->cancellation_status_color = $this->getCancellationStatusColor($busDateTime, $localCancellationDateTime);
             $ticket->badge = $ticket->cancellation_status_color;
 
             $ticket->terminal_name = $ticket->terminal->name ?? $ticket->terminal_name ?? 'N/A';
@@ -280,9 +283,11 @@ public function buses()
             return null;
         }
 
-        $cancellationDateTime = $cancelTicket->time ?? $cancelTicket->created_at ?? null;
+        $cancellationDateTime = $cancelTicket->getRawOriginal('time')
+            ?? $cancelTicket->getRawOriginal('created_at')
+            ?? null;
 
-        return $cancellationDateTime ? Carbon::parse($cancellationDateTime) : null;
+        return $cancellationDateTime ? Carbon::parse($cancellationDateTime, 'UTC') : null;
     }
 
     private function getCancellationStatusColor(?Carbon $busDateTime, ?Carbon $cancellationDateTime): string
