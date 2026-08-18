@@ -291,10 +291,21 @@ public function buses()
             return 'white';
         }
 
-        return getRowBadgeColor(
-            $busDateTime->format('d-m-Y h:i A'),
-            $cancellationDateTime->format('d-m-Y h:i A')
-        );
+        if ($cancellationDateTime->greaterThanOrEqualTo($busDateTime)) {
+            return 'red';
+        }
+
+        $minutesBeforeDeparture = $cancellationDateTime->diffInMinutes($busDateTime);
+
+        if ($minutesBeforeDeparture >= 360) {
+            return 'green';
+        }
+
+        if ($minutesBeforeDeparture >= 120) {
+            return 'yellow';
+        }
+
+        return 'red';
     }
 
     private function getVisibleColumns(Request $request): array
