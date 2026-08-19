@@ -179,6 +179,55 @@
                                     <div><small>Surcharge</small><strong>{{ adjustmentLabel(scheduleView.schedule.surcharge) }}</strong></div>
                                 </div>
 
+                                <h6 class="font-weight-bold mb-2">Departure Timeline</h6>
+                                <div class="schedule-timeline mb-4">
+                                    <div v-for="(stop, index) in scheduleView.route_timeline"
+                                         :key="stop.city_id"
+                                         class="schedule-timeline-stop">
+                                        <div class="timeline-stop-marker">{{ index + 1 }}</div>
+                                        <div class="timeline-stop-content">
+                                            <div class="timeline-city-row">
+                                                <div>
+                                                    <strong>{{ stop.city_name }}</strong>
+                                                    <span class="timeline-difference">
+                                                        {{ index === 0 ? 'Schedule starting point' : '+' + stop.time_difference + ' from start' }}
+                                                    </span>
+                                                </div>
+                                                <div class="timeline-city-time">
+                                                    <small>City departure</small>
+                                                    <strong>{{ stop.departure_time ? tConvert(stop.departure_time) : '-' }}</strong>
+                                                    <span>{{ stop.departure_date || '' }}</span>
+                                                </div>
+                                            </div>
+
+                                            <div v-if="stop.terminals && stop.terminals.length" class="timeline-terminals">
+                                                <div v-for="terminal in stop.terminals" :key="terminal.id"
+                                                     class="timeline-terminal-card">
+                                                    <div>
+                                                        <small>Terminal</small>
+                                                        <strong>{{ terminal.name }}</strong>
+                                                    </div>
+                                                    <span class="terminal-adjustment"
+                                                          :class="terminal.adjustment_minutes < 0 ? 'is-earlier' : (terminal.adjustment_minutes > 0 ? 'is-later' : 'is-main')">
+                                                        {{ terminalAdjustmentLabel(terminal.adjustment_minutes, terminal.adjustment_configured) }}
+                                                    </span>
+                                                    <div class="terminal-time">
+                                                        <small>Departure</small>
+                                                        <strong>{{ terminal.departure_time ? tConvert(terminal.departure_time) : '-' }}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div v-else class="timeline-no-terminals">
+                                                No assigned terminal in this city.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-if="!scheduleView.route_timeline || !scheduleView.route_timeline.length"
+                                         class="text-center text-muted py-3">
+                                        No departure timeline available.
+                                    </div>
+                                </div>
+
                                 <h6 class="font-weight-bold mb-2">Route Details</h6>
                                 <div class="table-responsive">
                                     <table class="table table-sm table-hover schedule-route-table">
@@ -842,6 +891,7 @@ export default {
             scheduleView: {
                 schedule: null,
                 route_details: [],
+                route_timeline: [],
             },
             editRoutes: [],
             success: false,
@@ -986,7 +1036,7 @@ export default {
 
             this.viewLoading = true;
             this.viewError = "";
-            this.scheduleView = { schedule: null, route_details: [] };
+            this.scheduleView = { schedule: null, route_details: [], route_timeline: [] };
             this.$nextTick(() => {
                 $("#scheduleDetailsModal").modal("show");
             });
@@ -1020,6 +1070,22 @@ export default {
                 return `${adjustment.name} - ${adjustment.percentage || 0}%`;
             }
             return `${adjustment.name} - ${adjustment.flat || 0}`;
+        },
+        terminalAdjustmentLabel(minutes, configured = true) {
+            if (!configured) return "No adjustment";
+
+            const value = Number(minutes || 0);
+            if (value === 0) return "Main city time";
+
+            const absoluteMinutes = Math.abs(value);
+            const hours = Math.floor(absoluteMinutes / 60);
+            const remainingMinutes = Math.round(absoluteMinutes % 60);
+            const duration = [
+                hours ? `${hours}h` : "",
+                remainingMinutes ? `${remainingMinutes}m` : "",
+            ].filter(Boolean).join(" ");
+
+            return value < 0 ? `${duration} earlier` : `${duration} later`;
         },
         close() {
             $(".modal").click();
@@ -1687,9 +1753,205 @@ export default {
     border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
+.schedule-timeline {
+    padding: 16px;
+    border: 1px solid #e7eaf3;
+    border-radius: 10px;
+    background: #f8f9fc;
+}
+
+.schedule-timeline-stop {
+    position: relative;
+    display: flex;
+    gap: 14px;
+    padding-bottom: 18px;
+}
+
+.schedule-timeline-stop:last-child {
+    padding-bottom: 0;
+}
+
+.schedule-timeline-stop:not(:last-child)::before {
+    position: absolute;
+    top: 30px;
+    bottom: 0;
+    left: 14px;
+    width: 2px;
+    background: #dfe3f4;
+    content: "";
+}
+
+.timeline-stop-marker {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: 0 0 30px;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #6777ef;
+    box-shadow: 0 3px 8px rgba(103, 119, 239, 0.3);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.timeline-stop-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #e7eaf3;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.timeline-city-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 14px;
+}
+
+.timeline-city-row > div:first-child > strong,
+.timeline-city-time small,
+.timeline-city-time strong,
+.timeline-city-time span,
+.timeline-terminal-card small,
+.timeline-terminal-card strong {
+    display: block;
+}
+
+.timeline-city-row > div:first-child > strong {
+    color: #34395e;
+    font-size: 15px;
+}
+
+.timeline-difference {
+    display: inline-block;
+    margin-top: 4px;
+    color: #7b8490;
+    font-size: 11px;
+}
+
+.timeline-city-time {
+    min-width: 125px;
+    text-align: right;
+}
+
+.timeline-city-time small,
+.timeline-terminal-card small {
+    color: #9298a7;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
+.timeline-city-time strong {
+    color: #34395e;
+    font-size: 15px;
+}
+
+.timeline-city-time span {
+    color: #9298a7;
+    font-size: 10px;
+}
+
+.timeline-terminals {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 10px 14px 14px;
+    border-top: 1px solid #f0f1f6;
+    background: #fbfcff;
+}
+
+.timeline-terminal-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border: 1px solid #e8eaf2;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.timeline-terminal-card > div:first-child {
+    min-width: 0;
+}
+
+.timeline-terminal-card > div:first-child strong {
+    overflow: hidden;
+    color: #4b506d;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.terminal-adjustment {
+    padding: 3px 7px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.terminal-adjustment.is-earlier {
+    background: #e8f7ee;
+    color: #2f9d5c;
+}
+
+.terminal-adjustment.is-later {
+    background: #fff4df;
+    color: #c27a13;
+}
+
+.terminal-adjustment.is-main {
+    background: #edf0ff;
+    color: #5968d8;
+}
+
+.terminal-time {
+    min-width: 75px;
+    text-align: right;
+}
+
+.terminal-time strong {
+    color: #34395e;
+}
+
+.timeline-no-terminals {
+    padding: 9px 14px 12px;
+    border-top: 1px solid #f0f1f6;
+    color: #9298a7;
+    font-size: 11px;
+}
+
 @media (max-width: 991.98px) {
     .schedule-detail-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .timeline-terminals {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .timeline-city-row,
+    .timeline-terminal-card {
+        align-items: flex-start;
+        grid-template-columns: 1fr;
+    }
+
+    .timeline-city-row {
+        flex-direction: column;
+    }
+
+    .timeline-city-time,
+    .terminal-time {
+        text-align: left;
     }
 }
 
