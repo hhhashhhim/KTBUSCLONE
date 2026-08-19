@@ -2511,10 +2511,23 @@ class BookingController extends Controller
                 : $item->schedule_time;
             $sub = 0;
 
+            $departureCityName = strtolower(trim(optional($item->departure_city)->name ?? ''));
+            $destinationCityName = strtolower(trim(optional($item->destination_city)->name ?? ''));
+            $isRawalpindiKarachiRoute = in_array(
+                [$departureCityName, $destinationCityName],
+                [
+                    ['rawalpindi', 'karachi'],
+                    ['karachi', 'rawalpindi'],
+                ],
+                true
+            );
+
             // A matching schedule-detail time is already the departure city's
             // adjusted time. Only use the legacy terminal offset when that
-            // segment-specific time is unavailable.
-            if (!$hasDepartureSegmentTime) {
+            // segment-specific time is unavailable. Rawalpindi-Karachi uses
+            // multiple departure terminals in the same city, so its configured
+            // terminal offset must still be applied once to the segment time.
+            if (!$hasDepartureSegmentTime || $isRawalpindiKarachiRoute) {
                 $terminalTime = TerminalTimeDifference::where([
                     'company_id' => Auth::user()->company_id,
                     'terminal_id' => $item->terminal_id,
