@@ -20,6 +20,8 @@ use App\Models\Schedule\ScheduleDetail;
 use App\Models\Schedule\ScheduleTerminalSequence;
 use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
+use App\Models\Terminal\TerminalTimeDifference;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -279,6 +281,7 @@ class ScheduleController extends Controller
             ->min('schedule_date');
 
         $routeDetails = collect();
+        $routeTimeline = collect();
         if ($firstScheduleDate) {
             $routeDetails = ScheduleDetail::with([
                 'departure_city:id,name',
@@ -294,11 +297,116 @@ class ScheduleController extends Controller
                 ])
                 ->unique(fn ($detail) => $detail->departure_id . ':' . $detail->destination_id)
                 ->values();
+
+            $routeFares = RouteFare::with([
+                'city_from:id,name',
+                'city_to:id,name',
+                'fare_details:id,time_difference',
+            ])
+                ->where('company_id', Auth::user()->company_id)
+                ->where('route_id', $schedule->route_id)
+                ->orderBy('id')
+                ->get();
+
+            $referenceFareClassId = optional($routeFares->first())->fare_class_id;
+            $orderedFares = $routeFares
+                ->when($referenceFareClassId, fn ($fares) => $fares->where('fare_class_id', $referenceFareClassId))
+                ->values();
+
+            $cityIds = $orderedFares->pluck('departure_city_id')->unique()->values();
+            if ($orderedFares->isNotEmpty()) {
+                $lastDestinationId = $orderedFares->last()->destination_city_id;
+                if (!$cityIds->contains($lastDestinationId)) {
+                    $cityIds->push($lastDestinationId);
+                }
+            }
+
+            $cities = City::where('company_id', Auth::user()->company_id)
+                ->whereIn('id', $cityIds)
+                ->get(['id', 'name'])
+                ->keyBy('id');
+
+            $assignedTerminalIds = ScheduleTerminalVisibility::where('company_id', Auth::user()->company_id)
+                ->where('schedule_id', $schedule->id)
+                ->where('visibility', 1)
+                ->pluck('terminal_id');
+
+            $terminalsByCity = Terminal::where('company_id', Auth::user()->company_id)
+                ->whereIn('id', $assignedTerminalIds)
+                ->whereIn('city_id', $cityIds)
+                ->where('hide', 0)
+                ->get(['id', 'name', 'city_id'])
+                ->groupBy('city_id');
+
+            $terminalAdjustments = TerminalTimeDifference::where('company_id', Auth::user()->company_id)
+                ->where('route_id', $schedule->route_id)
+                ->whereIn('terminal_id', $assignedTerminalIds)
+                ->get(['terminal_id', 'time_difference'])
+                ->keyBy('terminal_id');
+
+            $originCityId = $cityIds->first();
+            $originDetail = $routeDetails->firstWhere('departure_id', $originCityId) ?? $routeDetails->first();
+            $scheduleStart = $originDetail
+                ? Carbon::parse($originDetail->departure_date . ' ' . $originDetail->departure_time)
+                : null;
+
+            $routeTimeline = $cityIds->map(function ($cityId, $index) use (
+                $cities,
+                $orderedFares,
+                $originCityId,
+                $scheduleStart,
+                $terminalsByCity,
+                $terminalAdjustments
+            ) {
+                $timeDifference = '00:00';
+                if ($index > 0) {
+                    $fare = $orderedFares->first(function ($routeFare) use ($originCityId, $cityId) {
+                        return (int) $routeFare->departure_city_id === (int) $originCityId
+                            && (int) $routeFare->destination_city_id === (int) $cityId;
+                    });
+                    $timeDifference = optional(optional($fare)->fare_details)->time_difference ?? '00:00';
+                }
+
+                [$hours, $minutes] = array_pad(array_map('intval', explode(':', $timeDifference)), 2, 0);
+                $cityDeparture = $scheduleStart
+                    ? $scheduleStart->copy()->addHours($hours)->addMinutes($minutes)
+                    : null;
+
+                $terminals = collect($terminalsByCity->get($cityId, []))->map(function ($terminal) use (
+                    $terminalAdjustments,
+                    $cityDeparture
+                ) {
+                    $terminalAdjustment = $terminalAdjustments->get($terminal->id);
+                    $adjustmentMinutes = (float) optional($terminalAdjustment)->time_difference;
+                    $terminalDeparture = $cityDeparture
+                        ? $cityDeparture->copy()->addSeconds((int) round($adjustmentMinutes * 60))
+                        : null;
+
+                    return [
+                        'id' => $terminal->id,
+                        'name' => $terminal->name,
+                        'adjustment_configured' => $terminalAdjustment !== null,
+                        'adjustment_minutes' => $adjustmentMinutes,
+                        'departure_date' => $terminalDeparture ? $terminalDeparture->format('Y-m-d') : null,
+                        'departure_time' => $terminalDeparture ? $terminalDeparture->format('H:i:s') : null,
+                    ];
+                })->values();
+
+                return [
+                    'city_id' => $cityId,
+                    'city_name' => optional($cities->get($cityId))->name ?? 'Unknown City',
+                    'time_difference' => $timeDifference,
+                    'departure_date' => $cityDeparture ? $cityDeparture->format('Y-m-d') : null,
+                    'departure_time' => $cityDeparture ? $cityDeparture->format('H:i:s') : null,
+                    'terminals' => $terminals,
+                ];
+            })->values();
         }
 
         return response()->json([
             'schedule' => $schedule,
             'route_details' => $routeDetails,
+            'route_timeline' => $routeTimeline,
         ]);
     }
 
