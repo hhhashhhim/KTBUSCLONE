@@ -2511,32 +2511,17 @@ class BookingController extends Controller
                 : $item->schedule_time;
             $sub = 0;
 
-            $departureCityName = strtolower(trim(optional($item->departure_city)->name ?? ''));
-            $destinationCityName = strtolower(trim(optional($item->destination_city)->name ?? ''));
-            $isRawalpindiKarachiRoute = in_array(
-                [$departureCityName, $destinationCityName],
-                [
-                    ['rawalpindi', 'karachi'],
-                    ['karachi', 'rawalpindi'],
-                ],
-                true
-            );
+            // ScheduleDetail contains the city-level departure time. Apply the
+            // ticket terminal's route-specific adjustment once, matching the
+            // departure time displayed in the booking schedule dropdown.
+            $terminalTime = TerminalTimeDifference::where([
+                'company_id' => Auth::user()->company_id,
+                'terminal_id' => $item->terminal_id,
+                'route_id' => $item->route_id,
+            ])->first();
 
-            // A matching schedule-detail time is already the departure city's
-            // adjusted time. Only use the legacy terminal offset when that
-            // segment-specific time is unavailable. Rawalpindi-Karachi uses
-            // multiple departure terminals in the same city, so its configured
-            // terminal offset must still be applied once to the segment time.
-            if (!$hasDepartureSegmentTime || $isRawalpindiKarachiRoute) {
-                $terminalTime = TerminalTimeDifference::where([
-                    'company_id' => Auth::user()->company_id,
-                    'terminal_id' => $item->terminal_id,
-                    'route_id' => $item->route_id,
-                ])->first();
-
-                if ($terminalTime) {
-                    $sub = $terminalTime->time_difference * 60;
-                }
+            if ($terminalTime) {
+                $sub = $terminalTime->time_difference * 60;
             }
 
             $departureDateTime = strtotime($departureDate . ' ' . $departureTime);
