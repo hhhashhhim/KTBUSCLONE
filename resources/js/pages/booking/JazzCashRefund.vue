@@ -262,13 +262,13 @@
 
                                                                 <td>
                                                                     <div class="d-flex gap-1">
-                                                                        <button v-if="record.refund_amount === null"
+                                                                        <button v-if="isRefundPending(record)"
                                                                             class="btn btn-sm btn-warning"
                                                                             @click="openRefundModal(record)">
                                                                             Refund
                                                                         </button>
 
-                                                                        <button v-if="record.refund_amount"
+                                                                        <button v-if="hasProcessedRefund(record)"
                                                                             class="btn btn-sm btn-info mx-2"
                                                                             @click="viewRefundDetails(record)">
                                                                             View
@@ -634,6 +634,12 @@ export default {
 
             const modal = new bootstrap.Modal(document.getElementById("refundModal"));
             modal.show();
+        },
+        isRefundPending(record) {
+            return Number(record?.refund_amount ?? 0) <= 0;
+        },
+        hasProcessedRefund(record) {
+            return Number(record?.refund_amount ?? 0) > 0;
         },
 
         async confirmRefund() {

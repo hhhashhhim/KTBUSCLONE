@@ -42334,6 +42334,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var modal = new bootstrap.Modal(document.getElementById("refundModal"));
       modal.show();
     },
+    isRefundPending: function isRefundPending(record) {
+      var _record$refund_amount;
+
+      return Number((_record$refund_amount = record === null || record === void 0 ? void 0 : record.refund_amount) !== null && _record$refund_amount !== void 0 ? _record$refund_amount : 0) <= 0;
+    },
+    hasProcessedRefund: function hasProcessedRefund(record) {
+      var _record$refund_amount2;
+
+      return Number((_record$refund_amount2 = record === null || record === void 0 ? void 0 : record.refund_amount) !== null && _record$refund_amount2 !== void 0 ? _record$refund_amount2 : 0) > 0;
+    },
     confirmRefund: function confirmRefund() {
       var _this6 = this;
 
@@ -101705,7 +101715,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [record.refund_amount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_72, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(record.refund_amount) + " → (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(100 - (record.refund_percentage || 0)) + "%) ", 1
     /* TEXT */
-    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_73, "-"))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_74, [record.refund_amount === null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_73, "-"))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_74, [$options.isRefundPending(record) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 0,
       "class": "btn btn-sm btn-warning",
       onClick: function onClick($event) {
@@ -101713,7 +101723,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }
     }, " Refund ", 8
     /* PROPS */
-    , _hoisted_75)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), record.refund_amount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    , _hoisted_75)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.hasProcessedRefund(record) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 1,
       "class": "btn btn-sm btn-info mx-2",
       onClick: function onClick($event) {
