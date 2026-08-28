@@ -248,7 +248,7 @@ public function buses()
             $ticket->total_fare = (int) $ticket->seat_fare - (int) $ticket->discount;
             $percentageValue = $ticket->total_fare * (int) $ticket->cancel_percentage;
             $final = $percentageValue / 100;
-            $ticket->amount_refund = (int) $ticket->seat_fare - $final;
+            $ticket->amount_refund = $ticket->total_fare - $final;
             $ticket->cancelation_charges = round($final);
 
             unset($ticket->cancel_ticket, $ticket->schedule, $ticket->customer);
