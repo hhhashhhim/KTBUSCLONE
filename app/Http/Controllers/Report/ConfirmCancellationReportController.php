@@ -302,6 +302,10 @@ public function buses()
 
         $minutesBeforeDeparture = $cancellationDateTime->diffInMinutes($busDateTime);
 
+        if ($minutesBeforeDeparture > 360) {
+            return 'white';
+        }
+
         if ($minutesBeforeDeparture >= 360) {
             return 'green';
         }
