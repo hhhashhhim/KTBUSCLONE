@@ -1790,9 +1790,13 @@
                         <!--loop for number of seats-->
 
                         <div class="card-body">
+                            <div class="alert alert-light border mb-4" role="status">
+                                <small class="text-muted d-block text-uppercase mb-1">Current Bus Class</small>
+                                <strong>{{ currentBusClassName }}</strong>
+                            </div>
                             <div class="row">
                                 <div class=" form-group col-md-12">
-                                    <label for="city_id">Bus Class<span class="text-danger ml-1">*</span></label>
+                                    <label for="city_id">Change Bus Class To<span class="text-danger ml-1">*</span></label>
                                     <select class="form-control" v-model="busClassData.bus_class">
                                         <option value="0">Select Bus Class</option>
                                         <option v-for="(bus_class, i) in bus_classes" :key="i" :value="bus_class.id">
@@ -1805,7 +1809,7 @@
                     </div>
                     <div class="modal-footer bg-whitesmoke br">
                         <button type="button" class="btn btn-primary" @click="updateBusClass()"
-                            :disabled="busClassUpdating">
+                            :disabled="busClassUpdating || String(busClassData.bus_class) === String(currentBusClassId)">
                             <span v-if="busClassUpdating" class="spinner-border spinner-border-sm mr-1"
                                 role="status" aria-hidden="true"></span>
                             {{ busClassUpdating ? 'Updating...' : 'Update' }}
@@ -2133,6 +2137,8 @@ export default {
             busClassData: {
                 bus_class: "0",
             },
+            currentBusClassId: 0,
+            currentBusClassName: "N/A",
             addForm: {
                 date: new Date().toISOString().substr(0, 10),
                 type: "booked",
@@ -2857,6 +2863,12 @@ export default {
             });
             if (resData.status == 200) {
                 this.bus_classes = resData.data.bus_classes;
+                const currentBusClass = this.schedule && this.schedule.bus_class
+                    ? this.schedule.bus_class
+                    : null;
+                this.currentBusClassId = currentBusClass ? currentBusClass.id : 0;
+                this.currentBusClassName = currentBusClass ? currentBusClass.name : "N/A";
+                this.busClassData.bus_class = this.currentBusClassId || "0";
                 $('#busClassModal').modal('show');
             }
         },
@@ -3038,6 +3050,14 @@ export default {
                     title: "Required",
                     text: "Bus Class is required",
                     icon: 'error',
+                    timer: 2000
+                });
+            }
+            if (String(this.busClassData.bus_class) === String(this.currentBusClassId)) {
+                return swal({
+                    title: "No Change",
+                    text: "Please select a different bus class",
+                    icon: "info",
                     timer: 2000
                 });
             }
@@ -3408,7 +3428,6 @@ export default {
                     timer: 2000
                 });
             }
-
             if (discount > fare) {
                 this.addForm.discount = 0;
                 this.addForm.totalAmount = fare;
@@ -3586,6 +3605,24 @@ export default {
                     dropTerminal: this.addForm.terminalId,
                     departure_time: this.addForm.departure_time,
                 });
+                if (resSelected.status != 200) {
+                    this.loading = false;
+                    this.showBookingDiv = false;
+                    this.getSchedule = false;
+
+                    let message = "Unable to load the seat map for the selected bus class.";
+                    if (resSelected.status == 422 && resSelected.data && resSelected.data.errors) {
+                        message = Object.keys(resSelected.data.errors)
+                            .reduce((messages, key) => messages.concat(resSelected.data.errors[key]), [])
+                            .join("\n");
+                    }
+                    swal({
+                        title: "Seat Map Error",
+                        text: message,
+                        icon: "error"
+                    });
+                    return;
+                }
                 if (resSelected.status == 200) {
                     this.loading = false
                     this.showBookingDiv = true;
