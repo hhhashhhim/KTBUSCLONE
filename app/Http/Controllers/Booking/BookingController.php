@@ -922,8 +922,31 @@ class BookingController extends Controller
                 }
 
                 $newSeatFare = (int) round((float) $item['selected_seatFare']);
-                $originalPaidFare = (float) $ticket['seat_fare'] - (float) ($ticket['discount'] ?? 0);
+                $savedOldTicket = Ticket::where('company_id', Auth::user()->company_id)
+                    ->where('id', $ticket['id'])
+                    ->first();
+                if (!$savedOldTicket) {
+                    DB::rollBack();
+                    return response()->json([
+                        'errors' => ['Ticket' => ['The original ticket could not be found.']],
+                    ], 422);
+                }
+
+                $originalPaidFare = (float) $savedOldTicket->seat_fare - (float) ($savedOldTicket->discount ?? 0);
                 $fareAdjustmentDiscount = round($newSeatFare - $originalPaidFare, 2);
+                $maximumRefundAmount = max(0, round($originalPaidFare - $newSeatFare, 2));
+                $refundAmount = round((float) ($item['refund_amount'] ?? 0), 2);
+
+                if ($refundAmount < 0 || $refundAmount > $maximumRefundAmount) {
+                    DB::rollBack();
+                    return response()->json([
+                        'errors' => [
+                            'Refund Amount' => [
+                                'Refund amount must be between 0 and ' . $maximumRefundAmount . ' for seat ' . $ticket['seat_no'] . '.',
+                            ],
+                        ],
+                    ], 422);
+                }
 
                 $newTicket = Ticket::create([
                     'company_id' => Auth::user()->company_id,
@@ -957,6 +980,7 @@ class BookingController extends Controller
                     'added_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,
                     'discount' => $fareAdjustmentDiscount,
+                    'refund_amount' => $refundAmount,
                     'booked_time' => date("Y-m-d H:i:s"),
                 ]);
                 TicketReschedule::create([
