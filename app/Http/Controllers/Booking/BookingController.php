@@ -1402,7 +1402,7 @@ class BookingController extends Controller
             echo "Error";
             return [];
         }
-        $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
+        $scheduleDetail = ScheduleDetail::with("bus_class:id,name,seat_map")->where([
             'company_id' => Auth::user()->company_id,
             'schedule_id' => $request->id,
             'departure_date' => $request->date,
@@ -1410,6 +1410,11 @@ class BookingController extends Controller
             'destination_id' => $request->destinationCity,
             'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
         ])->first();
+        if (!$scheduleDetail || !$scheduleDetail->bus_class) {
+            return response()->json([
+                'errors' => ['Schedule' => ['The selected schedule or its bus class could not be found.']],
+            ], 422);
+        }
         // Getting Already Booked Tickets
         $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy', 'updated_name')
             ->where('company_id', Auth::user()->company_id)->where('schedule_id', $request->id)
@@ -1671,7 +1676,11 @@ class BookingController extends Controller
                 }
             }
         }
-        $schedule->bus_class->seat_map = $seatMap;
+        // A bus class can be changed for one dated service without changing the
+        // master schedule. Return the class from that dated schedule detail so
+        // its id/name and seat map always describe the same layout.
+        $scheduleDetail->bus_class->seat_map = $seatMap;
+        $schedule->setRelation('bus_class', $scheduleDetail->bus_class);
         $assignedBus = $this->assignedBus($scheduleDetail->schedule_id, $scheduleDetail->schedule_date);
         $schedule->bus_no = $assignedBus ? $assignedBus->bus_number : "N/A";
         unset($schedule->route);
