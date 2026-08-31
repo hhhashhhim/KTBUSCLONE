@@ -1478,6 +1478,7 @@ class BookingController extends Controller
                     'class' => $ticket->bus_class_id,
                     'reserved' => true,
                     'selected' => false,
+                    'historical_ticket' => true,
                 ];
             }
         }
@@ -1498,6 +1499,18 @@ class BookingController extends Controller
                 // adding fare to each seat
                 if ($column['reserved']) {
                     $data = $fareForAllClasses->where('fare_class', $column['class'])->first();
+                    // Seats carried over from the previous bus layout already
+                    // have their sold fare on the ticket. Their old fare class
+                    // may not exist in the new layout's fare table.
+                    if (!$data && !empty($column['historical_ticket'])) {
+                        $data = (object) ['fare' => 0];
+                    } elseif (!$data) {
+                        return response()->json([
+                            'errors' => [
+                                'Fare Error' => ['A fare is not configured for one of the selected bus class seat types.'],
+                            ],
+                        ], 422);
+                    }
                     $seatMap[$i][$j]['fare'] = (int)$data->fare;
                     if ($scheduleDiscount) {
                         if ($scheduleDiscount->type == "percentage") {
@@ -1635,7 +1648,7 @@ class BookingController extends Controller
                 if (isset($column['class'])) {
                     $class = $fareClasses->where('id', $column['class'])->first();
                     $seatMap[$i][$j]['color'] = $class ? $class->color : '';
-                    $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
+                    $seatMap[$i][$j]['class_name'] = $class ? $class->name : 'N/A';
                     if ($class && $class->is_active == 0) {
                         return response()->json([
                             "errors" => [
@@ -1643,7 +1656,7 @@ class BookingController extends Controller
                             ]
                         ], 422);
                     }
-                    if ($class) {
+                    if ($class && empty($column['historical_ticket'])) {
                         $fare = (int)$fareForAllClasses->where('fare_class', $class->id)->first()->fare;
                         $seatMap[$i][$j]['fare'] = $fare;
                         if ($scheduleDiscount) {
@@ -1674,6 +1687,7 @@ class BookingController extends Controller
                         }
                     }
                 }
+                unset($seatMap[$i][$j]['historical_ticket']);
             }
         }
         // A bus class can be changed for one dated service without changing the
