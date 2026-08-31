@@ -1124,6 +1124,19 @@
                                                 <span>Preserved Ticket Total</span>
                                                 <strong>Rs {{ formatRescheduleAmount(reschedulePreservedTotal) }}</strong>
                                             </div>
+                                            <div v-if="rescheduleMaximumRefund > 0" class="form-group text-left mt-3 mb-0">
+                                                <label for="rescheduleRefundAmount" class="font-weight-bold mb-1">
+                                                    Refund Amount
+                                                </label>
+                                                <input id="rescheduleRefundAmount" v-model.number="rescheduleRefundAmount"
+                                                    type="number" class="form-control" min="0"
+                                                    :max="rescheduleMaximumRefund" step="1"
+                                                    :placeholder="'Maximum Rs ' + formatRescheduleAmount(rescheduleMaximumRefund)">
+                                                <small class="form-text text-muted">
+                                                    Optional. Maximum refundable amount: Rs
+                                                    {{ formatRescheduleAmount(rescheduleMaximumRefund) }}
+                                                </small>
+                                            </div>
                                         </template>
 
                                         <div v-else class="fare-summary-empty">
@@ -2104,6 +2117,7 @@ export default {
             overIssueScheduleCheckBox: 'general',
             rescheduleSeatType: "booked",
             rescheduleDiscount: "",
+            rescheduleRefundAmount: 0,
             eltIds: "",
             bookingLoading: false,
             EltButton: false,
@@ -2402,6 +2416,7 @@ export default {
             $(".modal").click();
         },
         closeReschedule() {
+            this.rescheduleRefundAmount = 0;
             $("#reschedule_modal").modal('hide');
         },
         closeOverissue() {
@@ -5313,6 +5328,17 @@ export default {
                     timer: 2000
                 });
             }
+            const requestedRefund = Number(this.rescheduleRefundAmount || 0);
+            if (!Number.isFinite(requestedRefund) || requestedRefund < 0 || requestedRefund > this.rescheduleMaximumRefund) {
+                return swal({
+                    title: "Invalid Refund Amount",
+                    text: "Refund amount must be between Rs 0 and Rs " + this.formatRescheduleAmount(this.rescheduleMaximumRefund),
+                    icon: "error",
+                    timer: 2500
+                });
+            }
+
+            let remainingRefund = requestedRefund;
             this.mainAllRescheduleData.map((single, index) => {
                 single.selected_seatNo = this.alreadyBookedSeat[index];
                 single.selected_seatClass = this.alreadyBookedSeatClass[index];
@@ -5327,6 +5353,11 @@ export default {
                 single.dataDepartureCity = parseInt(this.rescheduleData.dataDepartureCity);
                 single.dataDestination = this.rescheduleData.rescheduleDestinationCity;
                 single.departure_time = this.rescheduleData.departure_time;
+                const ticket = single.dataAll || {};
+                const originalPaidFare = Number(ticket.seat_fare || 0) - Number(ticket.discount || 0);
+                const maximumSeatRefund = Math.max(0, originalPaidFare - Number(single.selected_seatFare || 0));
+                single.refund_amount = Math.min(maximumSeatRefund, remainingRefund);
+                remainingRefund -= single.refund_amount;
             });
             this.loadingRescheduleButton = true;
             const resReschedule = await this.callApi("post", "booking/store", { 'data': this.mainAllRescheduleData, "rc_flag": 1 });
@@ -5687,6 +5718,14 @@ export default {
         },
         reschedulePreservedTotal() {
             return this.rescheduleNewSeatFare - this.rescheduleFareAdjustment;
+        },
+        rescheduleMaximumRefund() {
+            return this.mainAllRescheduleData.reduce((total, item, index) => {
+                const ticket = item?.dataAll ?? {};
+                const originalPaidFare = Number(ticket.seat_fare || 0) - Number(ticket.discount || 0);
+                const newSeatFare = Number(this.alreadyBookedSeatFare[index] || 0);
+                return total + Math.max(0, originalPaidFare - newSeatFare);
+            }, 0);
         },
 
         canShowJazzCashRefund() {
