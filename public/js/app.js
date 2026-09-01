@@ -42137,7 +42137,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, 0);
     },
     rescheduleFareAdjustment: function rescheduleFareAdjustment() {
-      return this.rescheduleNewSeatFare - this.rescheduleOriginalPaidFare;
+      return this.rescheduleNewSeatFare - this.rescheduleOriginalPaidFare + this.rescheduleAppliedRefund;
     },
     reschedulePreservedTotal: function reschedulePreservedTotal() {
       return this.rescheduleNewSeatFare - this.rescheduleFareAdjustment;
@@ -42153,6 +42153,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         var newSeatFare = Number(_this56.alreadyBookedSeatFare[index] || 0);
         return total + Math.max(0, originalPaidFare - newSeatFare);
       }, 0);
+    },
+    rescheduleAppliedRefund: function rescheduleAppliedRefund() {
+      var refund = Number(this.rescheduleRefundAmount || 0);
+      return Math.min(this.rescheduleMaximumRefund, Math.max(0, Number.isFinite(refund) ? refund : 0));
     },
     canShowJazzCashRefund: function canShowJazzCashRefund() {
       var hasSubmenu = this.checkForSubmenu('jazz-cash-refund'); // called once
@@ -98260,31 +98264,11 @@ var _hoisted_400 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_401 = {
-  "class": "fare-summary-row fare-adjustment-row"
+  key: 0,
+  "class": "form-group text-left px-3 pt-3 mb-2"
 };
 
 var _hoisted_402 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Saved Discount", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_403 = {
-  "class": "fare-summary-total"
-};
-
-var _hoisted_404 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Preserved Ticket Total", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_405 = {
-  key: 0,
-  "class": "form-group text-left mt-3 mb-0"
-};
-
-var _hoisted_406 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "rescheduleRefundAmount",
     "class": "font-weight-bold mb-1"
@@ -98293,10 +98277,30 @@ var _hoisted_406 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_407 = ["max", "placeholder"];
-var _hoisted_408 = {
+var _hoisted_403 = ["max", "placeholder"];
+var _hoisted_404 = {
   "class": "form-text text-muted"
 };
+var _hoisted_405 = {
+  "class": "fare-summary-row fare-adjustment-row"
+};
+
+var _hoisted_406 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Ticket Discount", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_407 = {
+  "class": "fare-summary-total"
+};
+
+var _hoisted_408 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "New Ticket Total", -1
+  /* HOISTED */
+  );
+});
+
 var _hoisted_409 = {
   key: 1,
   "class": "fare-summary-empty"
@@ -100135,13 +100139,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_399, [_hoisted_400, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Rs " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatRescheduleAmount($options.rescheduleNewSeatFare)), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_401, [_hoisted_402, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.rescheduleFareAdjustment < 0 ? 'text-danger' : 'text-success')
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.rescheduleFareAdjustment > 0 ? '+' : '') + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatRescheduleAmount($options.rescheduleFareAdjustment)), 3
-  /* TEXT, CLASS */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_403, [_hoisted_404, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Rs " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatRescheduleAmount($options.reschedulePreservedTotal)), 1
-  /* TEXT */
-  )]), $options.rescheduleMaximumRefund > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_405, [_hoisted_406, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  )]), $options.rescheduleMaximumRefund > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_401, [_hoisted_402, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     id: "rescheduleRefundAmount",
     "onUpdate:modelValue": _cache[81] || (_cache[81] = function ($event) {
       return $data.rescheduleRefundAmount = $event;
@@ -100154,11 +100152,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     placeholder: 'Maximum Rs ' + $options.formatRescheduleAmount($options.rescheduleMaximumRefund)
   }, null, 8
   /* PROPS */
-  , _hoisted_407), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.rescheduleRefundAmount, void 0, {
+  , _hoisted_403), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.rescheduleRefundAmount, void 0, {
     number: true
-  }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", _hoisted_408, " Optional. Maximum refundable amount: Rs " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatRescheduleAmount($options.rescheduleMaximumRefund)), 1
+  }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", _hoisted_404, " Maximum refundable amount: Rs " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatRescheduleAmount($options.rescheduleMaximumRefund)), 1
   /* TEXT */
-  )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64
+  )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_405, [_hoisted_406, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.rescheduleFareAdjustment < 0 ? 'text-danger' : 'text-success')
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.rescheduleFareAdjustment > 0 ? '+' : '') + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatRescheduleAmount($options.rescheduleFareAdjustment)), 3
+  /* TEXT, CLASS */
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_407, [_hoisted_408, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Rs " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatRescheduleAmount($options.reschedulePreservedTotal)), 1
+  /* TEXT */
+  )])], 64
   /* STABLE_FRAGMENT */
   )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_409, " Select the replacement seat to calculate the fare adjustment. "))])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_410, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "btn btn-primary",
