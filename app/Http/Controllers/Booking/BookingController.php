@@ -933,7 +933,6 @@ class BookingController extends Controller
                 }
 
                 $originalPaidFare = (float) $savedOldTicket->seat_fare - (float) ($savedOldTicket->discount ?? 0);
-                $fareAdjustmentDiscount = round($newSeatFare - $originalPaidFare, 2);
                 $maximumRefundAmount = max(0, round($originalPaidFare - $newSeatFare, 2));
                 $refundAmount = round((float) ($item['refund_amount'] ?? 0), 2);
 
@@ -947,6 +946,10 @@ class BookingController extends Controller
                         ],
                     ], 422);
                 }
+                // A refund reduces the value carried forward to the new ticket.
+                // Only the unrefunded fare difference remains as an adjustment
+                // in the existing discount column.
+                $fareAdjustmentDiscount = round($newSeatFare - $originalPaidFare + $refundAmount, 2);
 
                 $newTicket = Ticket::create([
                     'company_id' => Auth::user()->company_id,
