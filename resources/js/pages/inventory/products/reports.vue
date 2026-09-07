@@ -62,13 +62,20 @@
               <div><h5 class="mb-0">{{ result.title || selectedReport.name }}</h5><small class="text-muted">{{ result.count || 0 }} record(s) found</small></div>
               <button type="button" class="btn btn-dark" :disabled="loading" @click="printReport"><i class="fas fa-print mr-1"></i> Print PDF</button>
             </div>
+            <div v-if="result.summary && Object.keys(result.summary).length" class="report-summary">
+              <div v-for="(value, label) in result.summary" :key="label" class="summary-item"><small>{{ label }}</small><strong>{{ value }}</strong></div>
+            </div>
             <div class="table-responsive">
               <table class="table table-sm table-bordered table-hover mb-0">
-                <thead><tr><th v-for="column in result.columns" :key="column.key" :class="textClass(column)">{{ column.label }}</th></tr></thead>
+                <thead>
+                  <tr v-if="hasColumnGroups" class="column-groups"><th v-for="group in columnGroups" :key="group.label" :colspan="group.count" class="text-center">{{ group.label }}</th></tr>
+                  <tr><th v-for="column in result.columns" :key="column.key" :class="textClass(column)">{{ column.label }}</th></tr>
+                </thead>
                 <tbody>
                   <tr v-for="(row, rowIndex) in result.rows" :key="rowIndex"><td v-for="column in result.columns" :key="column.key" :class="textClass(column)">{{ display(row[column.key]) }}</td></tr>
                   <tr v-if="!result.rows || !result.rows.length"><td :colspan="result.columns ? result.columns.length : 1" class="text-center text-muted py-5"><i class="fas fa-inbox fa-2x mb-2 d-block"></i>No records found for the selected filters.</td></tr>
                 </tbody>
+                <tfoot v-if="result.totals && Object.keys(result.totals).length"><tr><td v-for="column in result.columns" :key="column.key" :class="textClass(column)">{{ result.totals[column.key] || '' }}</td></tr></tfoot>
               </table>
             </div>
           </div>
@@ -88,7 +95,7 @@ export default {
   data() {
     return {
       activeReport: '', loading: false, hasRun: false, products: [], suppliers: [], buses: [],
-      result: { title: '', columns: [], rows: [], count: 0 },
+      result: { title: '', columns: [], rows: [], count: 0, summary: {}, totals: {} },
       filters: { product_id: '', supplier_id: '', bus_id: '', grn: '', po: '', mr: '', sin: '', from: '', to: '' },
       reports: [
         { key: 'control-register', name: 'Inventory Control Register', description: 'Opening, received, issued and balance quantities', icon: 'fas fa-clipboard-list', fields: ['product', 'dates'] },
@@ -112,16 +119,27 @@ export default {
     busOptions() { return this.buses.map(bus => ({ id: bus.id, text: bus.bus_number })) },
     productSelectSettings() { return { width: '100%', allowClear: true, placeholder: this.selectedReport?.productRequired ? 'Select Product' : 'All Products' } },
     supplierSelectSettings() { return { width: '100%', allowClear: true, placeholder: this.selectedReport?.supplierRequired ? 'Select Supplier' : 'All Suppliers' } },
-    busSelectSettings() { return { width: '100%', allowClear: true, placeholder: 'All Buses' } }
+    busSelectSettings() { return { width: '100%', allowClear: true, placeholder: 'All Buses' } },
+    columnGroups() {
+      const groups = [];
+      if (!this.result.columns || this.result.columns.some(column => !column.group)) return groups;
+      this.result.columns.forEach(column => {
+        const current = groups[groups.length - 1];
+        if (current && current.label === column.group) current.count += 1;
+        else groups.push({ label: column.group, count: 1 });
+      });
+      return groups;
+    },
+    hasColumnGroups() { return this.columnGroups.length > 0 }
   },
   created() { this.fetchReportData() },
   methods: {
     emptyFilters() { return { product_id: '', supplier_id: '', bus_id: '', grn: '', po: '', mr: '', sin: '', from: '', to: '' } },
     async fetchReportData() { const response = await this.callApi('get', 'inventory/reports/data'); if (response.status === 200) { this.products = response.data.products || []; this.suppliers = response.data.suppliers || []; this.buses = response.data.buses || [] } },
     selectReport(report) { this.activeReport = report.key; this.resetFilters() },
-    closeReport() { this.activeReport = ''; this.hasRun = false; this.result = { title: '', columns: [], rows: [], count: 0 } },
+    closeReport() { this.activeReport = ''; this.hasRun = false; this.result = { title: '', columns: [], rows: [], count: 0, summary: {}, totals: {} } },
     uses(field) { return this.selectedReport && this.selectedReport.fields.includes(field) },
-    resetFilters() { this.filters = this.emptyFilters(); this.hasRun = false; this.result = { title: '', columns: [], rows: [], count: 0 } },
+    resetFilters() { this.filters = this.emptyFilters(); this.hasRun = false; this.result = { title: '', columns: [], rows: [], count: 0, summary: {}, totals: {} } },
     async runReport() {
       if (this.selectedReport.productRequired && !this.filters.product_id) return this.alertRequired('Please select a product.')
       if (this.selectedReport.supplierRequired && !this.filters.supplier_id) return this.alertRequired('Please select a supplier.')
@@ -160,7 +178,14 @@ export default {
 .report-actions .btn { min-height: 42px; }
 .report-results { border: 1px solid #e9ebf1; border-radius: 10px; overflow: hidden; }
 .results-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; background: #f8f9fc; border-bottom: 1px solid #e9ebf1; }
+.report-summary { display: flex; flex-wrap: wrap; gap: 12px; padding: 12px 18px; background: #eef1f7; border-bottom: 1px solid #dfe4ed; }
+.summary-item { min-width: 150px; padding-right: 18px; border-right: 1px solid #d4dae5; }
+.summary-item small, .summary-item strong { display: block; }
+.summary-item small { color: #7d8797; font-size: 11px; text-transform: uppercase; }
+.summary-item strong { color: var(--report-navy); font-size: 15px; }
 .report-results thead th { white-space: nowrap; background: var(--report-navy); color: #fff; border-color: #405482; padding: 10px 8px; font-size: 12px; }
+.report-results thead .column-groups th { background: #7e8b9e; text-transform: uppercase; letter-spacing: .04em; }
 .report-results tbody td { padding: 9px 8px; vertical-align: middle; }
+.report-results tfoot td { background: #eef1f7; color: var(--report-navy); font-weight: 700; }
 @media (max-width: 767px) { .report-header, .results-toolbar { align-items: flex-start; gap: 12px; } .results-toolbar { flex-direction: column; } }
 </style>

@@ -60752,7 +60752,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         title: '',
         columns: [],
         rows: [],
-        count: 0
+        count: 0,
+        summary: {},
+        totals: {}
       },
       filters: {
         product_id: '',
@@ -60892,6 +60894,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         allowClear: true,
         placeholder: 'All Buses'
       };
+    },
+    columnGroups: function columnGroups() {
+      var groups = [];
+      if (!this.result.columns || this.result.columns.some(function (column) {
+        return !column.group;
+      })) return groups;
+      this.result.columns.forEach(function (column) {
+        var current = groups[groups.length - 1];
+        if (current && current.label === column.group) current.count += 1;else groups.push({
+          label: column.group,
+          count: 1
+        });
+      });
+      return groups;
+    },
+    hasColumnGroups: function hasColumnGroups() {
+      return this.columnGroups.length > 0;
     }
   },
   created: function created() {
@@ -60951,7 +60970,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         title: '',
         columns: [],
         rows: [],
-        count: 0
+        count: 0,
+        summary: {},
+        totals: {}
       };
     },
     uses: function uses(field) {
@@ -60964,7 +60985,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         title: '',
         columns: [],
         rows: [],
-        count: 0
+        count: 0,
+        summary: {},
+        totals: {}
       };
     },
     runReport: function runReport() {
@@ -125600,17 +125623,26 @@ var _hoisted_49 = /*#__PURE__*/_withScopeId(function () {
 });
 
 var _hoisted_50 = {
-  "class": "table-responsive"
+  key: 0,
+  "class": "report-summary"
 };
 var _hoisted_51 = {
-  "class": "table table-sm table-bordered table-hover mb-0"
+  "class": "table-responsive"
 };
 var _hoisted_52 = {
+  "class": "table table-sm table-bordered table-hover mb-0"
+};
+var _hoisted_53 = {
+  key: 0,
+  "class": "column-groups"
+};
+var _hoisted_54 = ["colspan"];
+var _hoisted_55 = {
   key: 0
 };
-var _hoisted_53 = ["colspan"];
+var _hoisted_56 = ["colspan"];
 
-var _hoisted_54 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_57 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "fas fa-inbox fa-2x mb-2 d-block"
   }, null, -1
@@ -125618,9 +125650,12 @@ var _hoisted_54 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_55 = ["action"];
-var _hoisted_56 = ["value"];
-var _hoisted_57 = ["name", "value"];
+var _hoisted_58 = {
+  key: 0
+};
+var _hoisted_59 = ["action"];
+var _hoisted_60 = ["value"];
+var _hoisted_61 = ["name", "value"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_select2 = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("select2");
 
@@ -125782,7 +125817,28 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Print PDF")], 8
   /* PROPS */
-  , _hoisted_48)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.result.columns, function (column) {
+  , _hoisted_48)]), $data.result.summary && Object.keys($data.result.summary).length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_50, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.result.summary, function (value, label) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+      key: label,
+      "class": "summary-item"
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(label), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(value), 1
+    /* TEXT */
+    )]);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [$options.hasColumnGroups ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_53, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.columnGroups, function (group) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", {
+      key: group.label,
+      colspan: group.count,
+      "class": "text-center"
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(group.label), 9
+    /* TEXT, PROPS */
+    , _hoisted_54);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.result.columns, function (column) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", {
       key: column.key,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.textClass(column))
@@ -125806,12 +125862,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     ))]);
   }), 128
   /* KEYED_FRAGMENT */
-  )), !$data.result.rows || !$data.result.rows.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  )), !$data.result.rows || !$data.result.rows.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
     colspan: $data.result.columns ? $data.result.columns.length : 1,
     "class": "text-center text-muted py-5"
-  }, [_hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("No records found for the selected filters.")], 8
+  }, [_hoisted_57, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("No records found for the selected filters.")], 8
   /* PROPS */
-  , _hoisted_53)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+  , _hoisted_56)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $data.result.totals && Object.keys($data.result.totals).length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tfoot", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.result.columns, function (column) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", {
+      key: column.key,
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.textClass(column))
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.result.totals[column.key] || ''), 3
+    /* TEXT, CLASS */
+    );
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     ref: "printForm",
     action: "".concat(_ctx.$store.state.api_url, "api/web/v1/inventory/reports/pdf"),
     method: "post",
@@ -125822,7 +125887,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: _ctx.$store.state.token
   }, null, 8
   /* PROPS */
-  , _hoisted_56), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.printPayload, function (value, key) {
+  , _hoisted_60), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.printPayload, function (value, key) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
       key: key,
       type: "hidden",
@@ -125830,12 +125895,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       value: value
     }, null, 8
     /* PROPS */
-    , _hoisted_57);
+    , _hoisted_61);
   }), 128
   /* KEYED_FRAGMENT */
   ))], 8
   /* PROPS */
-  , _hoisted_55)])]);
+  , _hoisted_59)])]);
 }
 
 /***/ }),
@@ -158157,7 +158222,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.inventory-reports-page[data-v-3bf50110] { --report-primary: #6777ef; --report-navy: #263b70;\n}\n.report-directory[data-v-3bf50110], .report-panel[data-v-3bf50110] { border: 0; border-radius: 12px; box-shadow: 0 5px 22px rgba(31,45,61,.08); overflow: hidden;\n}\n.report-header[data-v-3bf50110] { min-height: 86px; padding: 20px 24px;\n}\n.report-header h4[data-v-3bf50110], .report-panel h4[data-v-3bf50110] { color: var(--report-navy);\n}\n.report-count[data-v-3bf50110] { background: #eef0ff; color: var(--report-primary); border-radius: 20px; padding: 7px 13px; font-size: 12px; font-weight: 700;\n}\n.report-link[data-v-3bf50110] { display: flex; align-items: center; min-height: 82px; padding: 14px; color: #3d4655; border: 1px solid #edf0f5; border-radius: 10px; background: #fff; transition: .2s ease; text-decoration: none;\n}\n.report-link[data-v-3bf50110]:hover, .report-link.active[data-v-3bf50110] { color: var(--report-primary); border-color: #cbd1ff; background: #f8f9ff; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(103,119,239,.13);\n}\n.report-number[data-v-3bf50110] { align-self: flex-start; color: #a3a9b5; font-size: 11px; margin-right: 8px;\n}\n.report-icon[data-v-3bf50110] { display: grid; place-items: center; flex: 0 0 42px; height: 42px; margin-right: 12px; border-radius: 10px; color: var(--report-primary); background: #eef0ff; font-size: 17px;\n}\n.report-link strong[data-v-3bf50110], .report-link small[data-v-3bf50110] { display: block;\n}\n.report-link strong[data-v-3bf50110] { font-size: 14px; margin-bottom: 3px;\n}\n.report-link small[data-v-3bf50110] { color: #8b93a1; line-height: 1.35;\n}\n.report-arrow[data-v-3bf50110] { margin-left: auto; color: #c3c8d1; font-size: 11px;\n}\n.report-panel .card-header[data-v-3bf50110] { min-height: 82px; padding: 18px 24px; border-bottom: 1px solid #f0f1f5;\n}\n[data-v-3bf50110] .report-panel .select2-container { width: 100% !important;\n}\n[data-v-3bf50110] .report-panel .select2-selection--single { min-height: 42px; border-color: #e4e6ef;\n}\n[data-v-3bf50110] .report-panel .select2-selection__rendered { line-height: 40px; padding-left: 14px;\n}\n[data-v-3bf50110] .report-panel .select2-selection__arrow { height: 40px;\n}\n.report-actions .btn[data-v-3bf50110] { min-height: 42px;\n}\n.report-results[data-v-3bf50110] { border: 1px solid #e9ebf1; border-radius: 10px; overflow: hidden;\n}\n.results-toolbar[data-v-3bf50110] { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; background: #f8f9fc; border-bottom: 1px solid #e9ebf1;\n}\n.report-results thead th[data-v-3bf50110] { white-space: nowrap; background: var(--report-navy); color: #fff; border-color: #405482; padding: 10px 8px; font-size: 12px;\n}\n.report-results tbody td[data-v-3bf50110] { padding: 9px 8px; vertical-align: middle;\n}\n@media (max-width: 767px) {\n.report-header[data-v-3bf50110], .results-toolbar[data-v-3bf50110] { align-items: flex-start; gap: 12px;\n}\n.results-toolbar[data-v-3bf50110] { flex-direction: column;\n}\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.inventory-reports-page[data-v-3bf50110] { --report-primary: #6777ef; --report-navy: #263b70;\n}\n.report-directory[data-v-3bf50110], .report-panel[data-v-3bf50110] { border: 0; border-radius: 12px; box-shadow: 0 5px 22px rgba(31,45,61,.08); overflow: hidden;\n}\n.report-header[data-v-3bf50110] { min-height: 86px; padding: 20px 24px;\n}\n.report-header h4[data-v-3bf50110], .report-panel h4[data-v-3bf50110] { color: var(--report-navy);\n}\n.report-count[data-v-3bf50110] { background: #eef0ff; color: var(--report-primary); border-radius: 20px; padding: 7px 13px; font-size: 12px; font-weight: 700;\n}\n.report-link[data-v-3bf50110] { display: flex; align-items: center; min-height: 82px; padding: 14px; color: #3d4655; border: 1px solid #edf0f5; border-radius: 10px; background: #fff; transition: .2s ease; text-decoration: none;\n}\n.report-link[data-v-3bf50110]:hover, .report-link.active[data-v-3bf50110] { color: var(--report-primary); border-color: #cbd1ff; background: #f8f9ff; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(103,119,239,.13);\n}\n.report-number[data-v-3bf50110] { align-self: flex-start; color: #a3a9b5; font-size: 11px; margin-right: 8px;\n}\n.report-icon[data-v-3bf50110] { display: grid; place-items: center; flex: 0 0 42px; height: 42px; margin-right: 12px; border-radius: 10px; color: var(--report-primary); background: #eef0ff; font-size: 17px;\n}\n.report-link strong[data-v-3bf50110], .report-link small[data-v-3bf50110] { display: block;\n}\n.report-link strong[data-v-3bf50110] { font-size: 14px; margin-bottom: 3px;\n}\n.report-link small[data-v-3bf50110] { color: #8b93a1; line-height: 1.35;\n}\n.report-arrow[data-v-3bf50110] { margin-left: auto; color: #c3c8d1; font-size: 11px;\n}\n.report-panel .card-header[data-v-3bf50110] { min-height: 82px; padding: 18px 24px; border-bottom: 1px solid #f0f1f5;\n}\n[data-v-3bf50110] .report-panel .select2-container { width: 100% !important;\n}\n[data-v-3bf50110] .report-panel .select2-selection--single { min-height: 42px; border-color: #e4e6ef;\n}\n[data-v-3bf50110] .report-panel .select2-selection__rendered { line-height: 40px; padding-left: 14px;\n}\n[data-v-3bf50110] .report-panel .select2-selection__arrow { height: 40px;\n}\n.report-actions .btn[data-v-3bf50110] { min-height: 42px;\n}\n.report-results[data-v-3bf50110] { border: 1px solid #e9ebf1; border-radius: 10px; overflow: hidden;\n}\n.results-toolbar[data-v-3bf50110] { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; background: #f8f9fc; border-bottom: 1px solid #e9ebf1;\n}\n.report-summary[data-v-3bf50110] { display: flex; flex-wrap: wrap; gap: 12px; padding: 12px 18px; background: #eef1f7; border-bottom: 1px solid #dfe4ed;\n}\n.summary-item[data-v-3bf50110] { min-width: 150px; padding-right: 18px; border-right: 1px solid #d4dae5;\n}\n.summary-item small[data-v-3bf50110], .summary-item strong[data-v-3bf50110] { display: block;\n}\n.summary-item small[data-v-3bf50110] { color: #7d8797; font-size: 11px; text-transform: uppercase;\n}\n.summary-item strong[data-v-3bf50110] { color: var(--report-navy); font-size: 15px;\n}\n.report-results thead th[data-v-3bf50110] { white-space: nowrap; background: var(--report-navy); color: #fff; border-color: #405482; padding: 10px 8px; font-size: 12px;\n}\n.report-results thead .column-groups th[data-v-3bf50110] { background: #7e8b9e; text-transform: uppercase; letter-spacing: .04em;\n}\n.report-results tbody td[data-v-3bf50110] { padding: 9px 8px; vertical-align: middle;\n}\n.report-results tfoot td[data-v-3bf50110] { background: #eef1f7; color: var(--report-navy); font-weight: 700;\n}\n@media (max-width: 767px) {\n.report-header[data-v-3bf50110], .results-toolbar[data-v-3bf50110] { align-items: flex-start; gap: 12px;\n}\n.results-toolbar[data-v-3bf50110] { flex-direction: column;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
