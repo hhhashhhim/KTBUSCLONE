@@ -164,6 +164,41 @@ class BidSummariesController extends Controller
             'bids'    => $bids
         ]);
     }
+
+    public function reject(Request $request)
+    {
+        $validated = $request->validate([
+            'prn_id' => ['required', 'integer'],
+        ]);
+
+        $bids = BidSummary::where('company_id', Auth::user()->company_id)
+            ->where('prn_id', $validated['prn_id'])
+            ->where('status', 1)
+            ->get();
+
+        if ($bids->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bid summary not found.',
+            ], 404);
+        }
+
+        $previousStatuses = $bids->pluck('status', 'id')->all();
+        BidSummary::whereIn('id', $bids->pluck('id'))->update(['status' => 0]);
+
+        ActivityLogger::log('Inventory Bid Summary', 'reject', 'Bid summary rejected', $validated['prn_id'], [
+            'statuses' => $previousStatuses,
+        ], [
+            'status' => 0,
+            'bid_ids' => $bids->pluck('id')->all(),
+        ], $request);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Bid summary rejected successfully.',
+        ]);
+    }
+
     // Show bids for PRN
     public function show(Request $request)
     {

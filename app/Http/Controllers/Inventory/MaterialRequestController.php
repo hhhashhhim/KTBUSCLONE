@@ -188,6 +188,30 @@ class MaterialRequestController extends Controller
             'message' => 'Material Request deleted successfully.',
         ]);
     }
+
+    public function reject(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => ['required', 'integer'],
+        ]);
+
+        $mr = MaterialRequest::where('company_id', Auth::user()->company_id)
+            ->where('status', 1)
+            ->findOrFail($validated['id']);
+        $previousStatus = $mr->status;
+        $mr->update(['status' => 0]);
+
+        ActivityLogger::log('Inventory Material Request', 'reject', 'Material request rejected', $mr->id, [
+            'status' => $previousStatus,
+        ], [
+            'status' => 0,
+        ], $request);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Material request rejected successfully.',
+        ]);
+    }
     public function destroy(Request $request)
     {
         $request->validate([

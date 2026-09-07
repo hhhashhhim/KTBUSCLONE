@@ -56,6 +56,7 @@ Route::middleware(['auth:sanctum'])->prefix('web/v1/pos')->group(function () {
     Route::post('store', [PurchaseOrderController::class, 'store']);  
     Route::post('show', [PurchaseOrderController::class, 'show']);  
     Route::post('getSingle', [PurchaseOrderController::class, 'getSingle']);  
+    Route::post('reject', [PurchaseOrderController::class, 'reject']);
 });
 // Bid Summaries
 Route::middleware(['auth:sanctum'])->prefix('web/v1/bid-summaries')->group(function () {
@@ -65,6 +66,7 @@ Route::middleware(['auth:sanctum'])->prefix('web/v1/bid-summaries')->group(funct
     Route::post('/compareBids', [BidSummariesController::class, 'compareBid']);
     Route::post('update', [BidSummariesController::class, 'update']);   
     Route::post('delete', [BidSummariesController::class, 'delete']);   
+    Route::post('reject', [BidSummariesController::class, 'reject']);
 });
 // PRN
 Route::middleware(['auth:sanctum'])->prefix('web/v1/prn')->group(function () {
@@ -72,6 +74,7 @@ Route::middleware(['auth:sanctum'])->prefix('web/v1/prn')->group(function () {
     Route::post('store', [PurchaseRequisitionNoteController::class, 'store']);      
     Route::post('viewPRN', [PurchaseRequisitionNoteController::class, 'view']);  
     Route::post('fetch-prn-products', [PurchaseRequisitionNoteController::class, 'fetchPrnProducts']);
+    Route::post('reject', [PurchaseRequisitionNoteController::class, 'reject']);
 });
 // MR
 Route::middleware(['auth:sanctum'])->prefix('web/v1/mr')->group(function () {
@@ -82,6 +85,7 @@ Route::middleware(['auth:sanctum'])->prefix('web/v1/mr')->group(function () {
     Route::post('mr-delete', [MaterialRequestController::class, 'mr_destroy']);
     Route::post('detail-delete', [MaterialRequestController::class, 'destroy']); 
     Route::post('buses', [MaterialRequestController::class, 'bus']); 
+    Route::post('reject', [MaterialRequestController::class, 'reject']);
     Route::get('products/{id}/issuance-history', [ProductController::class, 'issuanceHistory']);
 
 });

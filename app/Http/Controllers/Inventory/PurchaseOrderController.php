@@ -207,6 +207,31 @@ class PurchaseOrderController extends Controller
             ]
         ]);
     }
+
+    public function reject(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => ['required', 'integer'],
+        ]);
+
+        $po = PurchaseOrder::where('company_id', Auth::user()->company_id)
+            ->where('status', 1)
+            ->findOrFail($validated['id']);
+        $previousStatus = $po->status;
+        $po->update(['status' => 0]);
+
+        ActivityLogger::log('Inventory Purchase Order', 'reject', 'Purchase order rejected', $po->id, [
+            'status' => $previousStatus,
+        ], [
+            'status' => 0,
+        ], $request);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase order rejected successfully.',
+        ]);
+    }
+
     public function poPDF(Request $request)
     { 
         $poId = $request->input('po_id');

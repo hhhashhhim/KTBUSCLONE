@@ -125,6 +125,30 @@ class PurchaseRequisitionNoteController extends Controller
         ]);
     }
 
+    public function reject(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => ['required', 'integer'],
+        ]);
+
+        $prn = PurchaseRequisitionNote::where('company_id', Auth::user()->company_id)
+            ->where('status', 1)
+            ->findOrFail($validated['id']);
+        $previousStatus = $prn->status;
+        $prn->update(['status' => 0]);
+
+        ActivityLogger::log('Inventory Purchase Requisition', 'reject', 'Purchase requisition note rejected', $prn->id, [
+            'status' => $previousStatus,
+        ], [
+            'status' => 0,
+        ], $request);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase requisition note rejected successfully.',
+        ]);
+    }
+
     public function prnPDF(Request $request)
     { 
         $prnId = $request->input('prn_id');
