@@ -94,7 +94,7 @@
                 {{-- Main values row --}}
                 <tr>
                     <td>{{ $key + 1 }}</td>
-                    <td>{{ getBusName($single->closing[0]->bus_id) }}</td>
+                    <td>{{ getBusName($single->report_bus_id ?? $single->closing[0]->bus_id) }}</td>
 
                     @foreach ($dynamicHeaders as $keyHeader => $singleHeader)
                         @php

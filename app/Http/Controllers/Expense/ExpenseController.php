@@ -127,14 +127,27 @@ class ExpenseController extends Controller
         });
 
         $merge->refund += $refundAmount;
-        $shortage = TicketClosingShortage::with('terminal', 'bank')->where('ticket_closing_id', $request->ticket_merge_id)->get();
+        $shortage = TicketClosingShortage::with('terminal', 'bank', 'bus:id,bus_number')
+            ->where('company_id', Auth::user()->company_id)
+            ->where('ticket_closing_id', $request->ticket_merge_id)
+            ->get();
+        $details = TicketClosingMerge::with('bus', 'closing.schedule.route')
+            ->where('company_id', Auth::user()->company_id)
+            ->where('id', $request->ticket_merge_id)
+            ->first();
+        $reportingShortage = $shortage->first(function ($item) {
+            return (int) $item->bus_id > 0 && $item->bus;
+        });
+        if ($details && $reportingShortage) {
+            $details->setRelation('bus', $reportingShortage->bus);
+        }
         $checkClosing = AccountTransaction::where(["company_id"=>Auth::user()->company_id,"posting_id"=>$request->ticket_merge_id])->first();
         return [
             "expenses" => $expenses,
             "sale"     => $merge->seat_fare - $merge->discount - $merge->commission + $merge->elt + $merge->refund,
             "closing"  => $checkClosing ? true : false,
             'shortage' => $shortage,
-            'details'  => TicketClosingMerge::with('bus','closing.schedule.route')->where('id', $request->ticket_merge_id)->first()
+            'details'  => $details
         ];
     }
 
@@ -295,10 +308,17 @@ public function dailySummery(Request $request)
         ->get();
 
         // ================= RETURN SHORTAGES =================
-        $returnShortages = TicketClosingShortage::with('terminal' , 'route')
+        $returnShortages = TicketClosingShortage::with('terminal', 'bus', 'route')
         ->where('ticket_closing_id', $singleData->id)
         ->where('type', 'return')
         ->get();
+
+        $reportingShortage = $startShortages->concat($returnShortages)->first(function ($item) {
+            return (int) $item->bus_id > 0 && $item->bus;
+        });
+        if ($reportingShortage) {
+            $singleData->setRelation('bus', $reportingShortage->bus);
+        }
 
         // ================= EXPENSES =================
         $expenses = TicketMergeExpense::with('expense_category')

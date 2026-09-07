@@ -808,7 +808,8 @@ class ScheduleClosingController extends Controller
                     }
                 },
                 'bus:id,bus_number',
-                'shortage:id,ticket_closing_id,elt,terminal_id,shortage,total_receivable',
+                'shortage:id,ticket_closing_id,bus_id,elt,terminal_id,shortage,total_receivable',
+                'shortage.bus:id,bus_number',
                 'closing:id,ticket_merge_id,schedule_id',
                 'closing.schedule:id,name'
             ]);
@@ -822,9 +823,7 @@ class ScheduleClosingController extends Controller
             $query->whereRaw('1 = 0');
         }
 
-        if ($request->bus_number && count($request->bus_number) > 0) {
-            $query->whereIn('bus_id', $request->bus_number);
-        }
+        $this->applyReportingBusFilter($query, (array) $request->input('bus_number', []));
 
         if ($request->schedule_name_start && count($request->schedule_name_start) > 0) {
             $query->whereHas('closing.schedule', function ($q) use ($request) {
@@ -862,6 +861,14 @@ class ScheduleClosingController extends Controller
             ->withSum('shortage', 'elt')
             ->get()
             ->map(function ($item) {
+                $reportingShortage = $item->shortage->first(function ($shortage) {
+                    return (int) $shortage->bus_id > 0 && $shortage->bus;
+                });
+
+                if ($reportingShortage) {
+                    $item->setRelation('bus', $reportingShortage->bus);
+                }
+
                 $item->expenses_sum_amount =
                     $item->shortage_sum_kt_commission +
                     $item->shortage_sum_other_commission +
@@ -920,6 +927,26 @@ class ScheduleClosingController extends Controller
         return [
             'schedules' => $schedules
         ];
+    }
+
+    private function applyReportingBusFilter($query, array $busIds): void
+    {
+        $busIds = array_values(array_filter(array_map('intval', $busIds), function ($busId) {
+            return $busId > 0;
+        }));
+
+        if (empty($busIds)) {
+            return;
+        }
+
+        $query->where(function ($busQuery) use ($busIds) {
+            $busQuery->whereHas('shortage', function ($shortageQuery) use ($busIds) {
+                $shortageQuery->whereIn('bus_id', $busIds);
+            })->orWhere(function ($fallbackQuery) use ($busIds) {
+                $fallbackQuery->whereDoesntHave('shortage')
+                    ->whereIn('bus_id', $busIds);
+            });
+        });
     }
 
 
@@ -1132,9 +1159,7 @@ class ScheduleClosingController extends Controller
 
         // Bus filter
         $busNumbers = (array) $request->input('bus_number', []);
-        if (count($busNumbers) > 0) {
-            $mergesQuery->whereIn('bus_id', $busNumbers);
-        }
+        $this->applyReportingBusFilter($mergesQuery, $busNumbers);
 
         if ($request->from_date) {
             $mergesQuery->whereDate('schedule_departure_date', '>=', $request->from_date);
@@ -1354,9 +1379,7 @@ class ScheduleClosingController extends Controller
 
         // Bus filter
         $busNumbers = (array) $request->input('bus_number', []);
-        if (count($busNumbers) > 0) {
-            $mergesQuery->whereIn('bus_id', $busNumbers);
-        }
+        $this->applyReportingBusFilter($mergesQuery, $busNumbers);
 
         if ($request->from_date) {
             $mergesQuery->whereDate('schedule_departure_date', '>=', $request->from_date);
@@ -1528,6 +1551,7 @@ class ScheduleClosingController extends Controller
 
     $closings = TicketClosingMerge::with([
         'closing:id,ticket_merge_id,bus_id',
+        'shortage:id,ticket_closing_id,bus_id',
         'closing.tickets.elt:id,elt_price,ticket_id',
         'closing.tickets' => function ($q) {
             $q->where("type", "booked");
@@ -1544,7 +1568,7 @@ class ScheduleClosingController extends Controller
                 });
 
                 if (!empty($busIds)) {
-                    $q->whereIn('bus_id', $busIds);
+                    $this->applyReportingBusFilter($q, $busIds);
                 }
             }
 
@@ -1568,7 +1592,7 @@ class ScheduleClosingController extends Controller
                 });
 
                 if (!empty($busIds)) {
-                    $q->whereIn('bus_id', $busIds);
+                    $this->applyReportingBusFilter($q, $busIds);
                 }
             }
 
@@ -1618,6 +1642,13 @@ class ScheduleClosingController extends Controller
         ->groupBy(['ticket_merge_id', 'schedule_id', 'terminal_id']);
 
     $closings->map(function ($closing) {
+        $reportingShortage = $closing->shortage->first(function ($shortage) {
+            return (int) $shortage->bus_id > 0;
+        });
+        $closing->report_bus_id = optional($reportingShortage)->bus_id
+            ?? optional($closing->closing->first())->bus_id
+            ?? $closing->bus_id;
+
         $closing->closing->map(function ($ticket) use ($closing) {
             $ticket->ticket_fare = $ticket->tickets->sum("seat_fare") - $ticket->tickets->sum("discount");
             $ticket->elt_fare = 0;
