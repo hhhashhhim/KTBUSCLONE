@@ -42,6 +42,7 @@ class MaterialRequestController extends Controller
             'details'              => 'required|array|min:1',
             'details.*.product_id' => 'required|exists:products,id',
             'details.*.qty'        => 'required|numeric|min:1',
+            'details.*.avg_price'  => $request->boolean('direct_store') ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
             'details.*.reason'     => 'nullable|string',
             'direct_store'         => 'nullable|boolean',
         ]);
@@ -61,15 +62,18 @@ class MaterialRequestController extends Controller
                 ]);
 
                 foreach ($request->details as $detail) {
+                    $rate = (float) $detail['avg_price'];
+                    $total = round((float) $detail['qty'] * $rate, 2);
+
                     $grn->details()->create([
                         'product_id'        => $detail['product_id'],
                         'qty'               => $detail['qty'],
-                        'rate'              => 0,
-                        'total'             => 0,
+                        'rate'              => $rate,
+                        'total'             => $total,
                         'tax'               => 0,
                         'delivery_charges'  => 0,
                         'discount'          => 0,
-                        'net_amount'        => 0,
+                        'net_amount'        => $total,
                         'company_id'        => auth()->user()->company_id,
                         'created_at'        => now(),
                         'updated_at'        => now(),
