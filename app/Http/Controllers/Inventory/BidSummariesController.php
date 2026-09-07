@@ -532,7 +532,7 @@ class BidSummariesController extends Controller
     
   }
     require_once(public_path().'/assets/tcpdf/tcpdf.php');
-    class MYPDF extends TCPDF
+    class BidSummaryPDF extends TCPDF
     {
         public function Header()
         {

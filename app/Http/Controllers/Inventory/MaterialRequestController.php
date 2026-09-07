@@ -217,7 +217,7 @@ class MaterialRequestController extends Controller
         $pdf->SetAuthor('Kainat Travel  Material Request');
         $pdf->SetTitle('Purchase Requisition Note');
 
-        $pdf = new MYPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+        $pdf = new MaterialRequestPDF('P', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setPrintHeader(false); // Optional, if you’re not using a header
         $pdf->setPrintFooter(true);  // ✅ This is necessary
 
@@ -342,7 +342,7 @@ class MaterialRequestController extends Controller
 
     $company = Company::first(); // Or relevant company info
 
-  $pdf = new MYPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+  $pdf = new MaterialRequestPDF('P', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setPrintHeader(false); // Optional, if you’re not using a header
         $pdf->setPrintFooter(true);  // ✅ This is necessary
 
@@ -474,7 +474,7 @@ $pdf->writeHTML($tbl2, true, false, false, false, '');
 
 }
 require_once(public_path() . '/assets/tcpdf/tcpdf.php');
-class MYPDF extends TCPDF
+class MaterialRequestPDF extends TCPDF
 {
     public function Header() {}
     public function Footer()

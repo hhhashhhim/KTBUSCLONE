@@ -18,6 +18,11 @@ class GoodReceiveNoteDetail extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
-    } 
+    }
+
+    public function goodReceiveNote()
+    {
+        return $this->belongsTo(GoodReceiveNote::class, 'good_receive_note_id');
+    }
     
 }

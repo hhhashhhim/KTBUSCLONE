@@ -141,7 +141,7 @@ class PurchaseRequisitionNoteController extends Controller
         $mrDate = date('d-M-Y', strtotime($mr->created_at));
     
         // PDF setup
-        $pdf = new MYPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+        $pdf = new PurchaseRequisitionPDF('P', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(true);
         $pdf->AddPage();
@@ -241,7 +241,7 @@ class PurchaseRequisitionNoteController extends Controller
 
     }
     require_once(public_path().'/assets/tcpdf/tcpdf.php');
-    class MYPDF extends TCPDF
+    class PurchaseRequisitionPDF extends TCPDF
     {
         public function Header()
         {

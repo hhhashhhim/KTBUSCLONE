@@ -284,7 +284,7 @@ class StockInwardController extends Controller
         $supplier = $inward->supplier;
     
         // Setup TCPDF
-        $pdf = new MYPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+        $pdf = new StockInwardPDF('P', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(true);
         $pdf->AddPage();
@@ -358,7 +358,7 @@ class StockInwardController extends Controller
 
     }
     require_once(public_path().'/assets/tcpdf/tcpdf.php');
-    class MYPDF extends TCPDF
+    class StockInwardPDF extends TCPDF
     {
         public function Header()
         {

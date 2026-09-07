@@ -19,5 +19,10 @@ class PurchaseOrderDetail extends Model
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
+
+    public function purchaseOrder()
+    {
+        return $this->belongsTo(PurchaseOrder::class, 'po_id');
+    }
     
 }

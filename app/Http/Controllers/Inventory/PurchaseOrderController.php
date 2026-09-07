@@ -213,7 +213,7 @@ class PurchaseOrderController extends Controller
         $po = PurchaseOrder::with(['supplier', 'poDetails.product', 'goodReceiveNotes.details.product'])->findOrFail($poId);
     
         // Setup TCPDF
-        $pdf = new MYPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+        $pdf = new PurchaseOrderPDF('P', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(true);
         $pdf->AddPage();
@@ -348,7 +348,7 @@ class PurchaseOrderController extends Controller
 
     }
     require_once(public_path().'/assets/tcpdf/tcpdf.php');
-    class MYPDF extends TCPDF
+    class PurchaseOrderPDF extends TCPDF
     {
         public function Header()
         {

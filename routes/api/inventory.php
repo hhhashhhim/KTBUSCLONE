@@ -23,6 +23,10 @@ Route::middleware(['auth:sanctum'])->prefix('web/v1/reports')->group(function ()
     Route::post('/filter/filter_received', [ReportsController::class, 'filter_received']);   
     Route::post('/filter/filter_issued', [ReportsController::class, 'filter_issued']);   
 });
+Route::middleware(['auth:sanctum'])->prefix('web/v1/inventory/reports')->group(function () {
+    Route::get('/data', [ReportsController::class, 'reportData']);
+    Route::post('/run', [ReportsController::class, 'runReport']);
+});
 //PDFs
 Route::middleware(['custom.sanctum.token.verify'])->prefix('web/v1/')->group(function () {
     Route::post('mr/pdf/', [MaterialRequestController::class, 'mrPDF']);
@@ -32,6 +36,7 @@ Route::middleware(['custom.sanctum.token.verify'])->prefix('web/v1/')->group(fun
     Route::post('po/pdf/', [PurchaseOrderController::class, 'poPDF']);
     Route::post('grn/pdf', [StockInwardController::class, 'grnPDF']);
     Route::post('sin/pdf', [StockOutwardController::class, 'sinPDF']);
+    Route::post('inventory/reports/pdf', [ReportsController::class, 'reportPdf']);
 });
 // Stock Inward
 Route::middleware(['auth:sanctum'])->prefix('web/v1/outward')->group(function () {
