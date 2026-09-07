@@ -37,6 +37,7 @@
                       <th>MR #</th>
                       <th>Date</th>
                       <th>Request By</th>
+                      <th>Status</th>
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -48,6 +49,7 @@
                     <td>MR - {{ bid.prn?.mr_id || 'N/A' }}</td>
                     <td>{{ new Date(bid.created_at).toLocaleString() }}</td>
                     <td>{{ bid.prn?.mr?.requested_by_user?.name || 'N/A' }}</td>
+                    <td><span class="badge" :class="bid.status == 0 ? 'badge-danger' : (bid.status == 2 ? 'badge-secondary' : 'badge-success')">{{ bid.status == 0 ? 'Rejected' : (bid.status == 2 ? 'PO Generated' : 'Active') }}</span></td>
                      
                     <td>
                       <button class="btn btn-info btn-sm" @click="viewBidsByPRN(bid.prn?.id)">
@@ -60,7 +62,7 @@
                     </td>
                   </tr>
                   <tr v-if="uniquePRNBids.length == 0">
-                    <td colspan="7" class="text-center">No Bid Summaries Found</td>
+                    <td colspan="8" class="text-center">No Bid Summaries Found</td>
                   </tr>
                   </tbody>
                 </table>
@@ -106,6 +108,10 @@
                         <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#viewPRNModal"
                             @click="viewPRN(prn.id)">
                               <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm ml-1" :disabled="rejectingId === prn.id" title="Reject PRN" @click="rejectPRN(prn)">
+                          <span v-if="rejectingId === prn.id" class="spinner-border spinner-border-sm"></span>
+                          <i v-else class="fas fa-times"></i>
                         </button>
                       </td>
                     </tr>
@@ -712,6 +718,7 @@ export default {
         requestBy: '',
       },
       selectedPRN: '',
+      rejectingId: null,
       bid_number: '',
       bid_date: '',
       bidFormRows: [
@@ -801,6 +808,32 @@ export default {
         console.error('Failed to fetch bids and PRNs:', error);
       }
      },
+    async rejectPRN(prn) {
+      const confirmation = await Swal.fire({
+        title: 'Reject this PRN?',
+        text: `PRN-${prn.id} will be marked as Rejected. No record will be deleted.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        confirmButtonText: 'Yes, reject it'
+      });
+      if (!confirmation.isConfirmed) return;
+
+      this.rejectingId = prn.id;
+      try {
+        const response = await this.callApi('post', 'prn/reject', { id: prn.id });
+        if (response.status === 200 && response.data.success) {
+          if ($.fn.DataTable.isDataTable('.dataTable2')) $('.dataTable2').DataTable().destroy();
+          this.prns = this.prns.filter(item => item.id !== prn.id);
+          this.prnRequests = this.prns.length;
+          this.$nextTick(() => $('.dataTable2').DataTable());
+          return Swal.fire('Rejected', response.data.message, 'success');
+        }
+        Swal.fire('Error', response.data?.message || 'Unable to reject this PRN.', 'error');
+      } finally {
+        this.rejectingId = null;
+      }
+    },
     viewPRN(id) {
      this.selectedPRN = this.prns.find(prn => prn.id === id);
      }, 

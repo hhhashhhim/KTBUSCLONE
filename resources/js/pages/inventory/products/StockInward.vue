@@ -102,6 +102,10 @@
                               <button class="btn btn-success btn-sm mr-1 px-2" @click="addInward(po)">
                                 <i class="fas fa-plus"></i>
                               </button>
+                              <button class="btn btn-danger btn-sm" :disabled="rejectingId === po.id" title="Reject Purchase Order" @click="rejectPO(po)">
+                                <span v-if="rejectingId === po.id" class="spinner-border spinner-border-sm"></span>
+                                <i v-else class="fas fa-times"></i>
+                              </button>
                               <!-- <button class="btn btn-info btn-sm" @click="viewPODetail(po.id)">
                                 <i class="fas fa-eye"></i> View
                               </button> -->
@@ -330,6 +334,7 @@ import Add from '../../../components/Add.vue';
     data() {
       return { 
         selectedGRN: null, 
+        rejectingId: null,
         formID: 'addPOForm',
         activeTab: 'inward', // default tab
         inwards: [],
@@ -518,6 +523,31 @@ import Add from '../../../components/Add.vue';
           const form = this.$refs.printInwardPdfForm; 
           form.querySelector('input[name="inward_id"]').value = inwardId; 
           form.submit();
+        },
+        async rejectPO(po) {
+          const confirmation = await Swal.fire({
+            title: 'Reject this Purchase Order?',
+            text: `PO-${po.id} will be marked as Rejected. No record will be deleted.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Yes, reject it'
+          });
+          if (!confirmation.isConfirmed) return;
+
+          this.rejectingId = po.id;
+          try {
+            const response = await this.callApi('post', 'pos/reject', { id: po.id });
+            if (response.status === 200 && response.data.success) {
+              if ($.fn.DataTable.isDataTable('.dataTable1')) $('.dataTable1').DataTable().destroy();
+              this.pos = this.pos.filter(item => item.id !== po.id);
+              this.$nextTick(() => $('.dataTable1').DataTable());
+              return Swal.fire('Rejected', response.data.message, 'success');
+            }
+            Swal.fire('Error', response.data?.message || 'Unable to reject this Purchase Order.', 'error');
+          } finally {
+            this.rejectingId = null;
+          }
         },
         clearForm() {
             this.data = {

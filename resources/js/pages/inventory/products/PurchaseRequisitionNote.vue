@@ -44,6 +44,10 @@
                         <button class="btn btn-info btn-sm" @click="viewMR(mr)">
                           <i class="fas fa-eye"></i> View
                         </button>
+                        <button class="btn btn-danger btn-sm ml-1" :disabled="rejectingId === mr.id" title="Reject Material Request" @click="rejectMaterialRequest(mr)">
+                          <span v-if="rejectingId === mr.id" class="spinner-border spinner-border-sm"></span>
+                          <i v-else class="fas fa-times"></i> Reject
+                        </button>
                       </td>
                     </tr>
                     <tr v-if="mrs.length === 0">
@@ -82,29 +86,7 @@
                       <td>PRN - {{ prn.id }}</td>
                       <td>{{ new Date(prn.created_at).toLocaleString() }}</td>
                       <td>
-  <span class="badge text-white" :class="{
-    'badge-dark': !prn.mr,                 // No MR Found
-    'badge-danger': prn.mr && prn.mr.status == 0,
-    'badge-warning': prn.mr && prn.mr.status == 1,
-    'badge-success': prn.mr && (prn.mr.status == 2 || prn.mr.status == 7),
-    'badge-info': prn.mr && prn.mr.status == 3,
-    'badge-primary': prn.mr && prn.mr.status == 4,
-    'badge-secondary': prn.mr && prn.mr.status == 5,
-    'badge-dark': prn.mr && prn.mr.status == 6 // remove OR rename one
-  }">
-    {{
-      !prn.mr ? 'No MR Found' :
-        prn.mr.status == 0 ? 'Rejected' :
-        prn.mr.status == 1 ? 'Pending' :
-        prn.mr.status == 2 ? 'Store Issued' :
-        prn.mr.status == 3 ? 'Processing' :
-        prn.mr.status == 4 ? 'BID Generated' :
-        prn.mr.status == 5 ? 'PO Generated' :
-        prn.mr.status == 6 ? 'InWard Generated' :
-        prn.mr.status == 7 ? 'Partial Store Issued' :
-      'Unknown'
-    }}
-  </span>
+  <span class="badge text-white" :class="prnStatusClass(prn)">{{ prnStatusLabel(prn) }}</span>
 </td>
 
                       <td>
@@ -243,6 +225,7 @@ export default {
       mrRequests: 0,
       selectedPRN: null,
       activeTab: 'prn',
+      rejectingId: null,
     };
   },
   mounted() {
@@ -258,6 +241,21 @@ export default {
     },
   },
   methods: {
+    prnStatusClass(prn) {
+      if (prn.status == 0 || prn.mr?.status == 0) return 'badge-danger';
+      if (!prn.mr || prn.mr.status == 6) return 'badge-dark';
+      if (prn.mr.status == 1) return 'badge-warning';
+      if (prn.mr.status == 2 || prn.mr.status == 7) return 'badge-success';
+      if (prn.mr.status == 3) return 'badge-info';
+      if (prn.mr.status == 4) return 'badge-primary';
+      if (prn.mr.status == 5) return 'badge-secondary';
+      return 'badge-light';
+    },
+    prnStatusLabel(prn) {
+      if (prn.status == 0 || prn.mr?.status == 0) return 'Rejected';
+      if (!prn.mr) return 'No MR Found';
+      return ({ 1: 'Pending', 2: 'Store Issued', 3: 'Processing', 4: 'BID Generated', 5: 'PO Generated', 6: 'InWard Generated', 7: 'Partial Store Issued' })[prn.mr.status] || 'Unknown';
+    },
     async fetchMR_PRN() {
       try {
         const response = await this.callApi('post', 'prn');
@@ -368,6 +366,32 @@ export default {
       const form = this.$refs.printPRNPdfForm;
       form.querySelector('input[name="prn_id"]').value = prnId;
       form.submit();
+    },
+    async rejectMaterialRequest(mr) {
+      const confirmation = await Swal.fire({
+        title: 'Reject this Material Request?',
+        text: `MR-${mr.id} will be marked as Rejected. No record will be deleted.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        confirmButtonText: 'Yes, reject it'
+      });
+      if (!confirmation.isConfirmed) return;
+
+      this.rejectingId = mr.id;
+      try {
+        const response = await this.callApi('post', 'mr/reject', { id: mr.id });
+        if (response.status === 200 && response.data.success) {
+          if ($.fn.DataTable.isDataTable('.dataTable1')) $('.dataTable1').DataTable().destroy();
+          this.mrs = this.mrs.filter(item => item.id !== mr.id);
+          this.mrRequests = this.mrs.length;
+          this.$nextTick(() => $('.dataTable1').DataTable());
+          return Swal.fire('Rejected', response.data.message, 'success');
+        }
+        Swal.fire('Error', response.data?.message || 'Unable to reject this Material Request.', 'error');
+      } finally {
+        this.rejectingId = null;
+      }
     }
   },
 };

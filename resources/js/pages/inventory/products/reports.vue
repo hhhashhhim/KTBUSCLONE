@@ -33,14 +33,14 @@
             <div class="row align-items-end">
               <div v-if="uses('product')" class="col-lg-3 col-md-4 form-group">
                 <label>Product <span v-if="selectedReport.productRequired" class="text-danger">*</span></label>
-                <select v-model="filters.product_id" class="form-control"><option value="">All Products</option><option v-for="product in products" :key="product.id" :value="product.id">{{ product.name }}</option></select>
+                <select2 v-model="filters.product_id" :options="productOptions" :settings="productSelectSettings" />
               </div>
               <div v-if="uses('supplier')" class="col-lg-3 col-md-4 form-group">
                 <label>Supplier <span v-if="selectedReport.supplierRequired" class="text-danger">*</span></label>
-                <select v-model="filters.supplier_id" class="form-control"><option value="">All Suppliers</option><option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">{{ supplier.name }}</option></select>
+                <select2 v-model="filters.supplier_id" :options="supplierOptions" :settings="supplierSelectSettings" />
               </div>
               <div v-if="uses('bus')" class="col-lg-3 col-md-4 form-group">
-                <label>Bus</label><select v-model="filters.bus_id" class="form-control"><option value="">All Buses</option><option v-for="bus in buses" :key="bus.id" :value="bus.id">{{ bus.bus_number }}</option></select>
+                <label>Bus</label><select2 v-model="filters.bus_id" :options="busOptions" :settings="busSelectSettings" />
               </div>
               <div v-if="uses('grn')" class="col-lg-2 col-md-3 form-group"><label>GRN #</label><input v-model="filters.grn" type="number" min="1" class="form-control" placeholder="GRN number"></div>
               <div v-if="uses('po')" class="col-lg-2 col-md-3 form-group"><label>PO #</label><input v-model="filters.po" type="number" min="1" class="form-control" placeholder="PO number"></div>
@@ -106,7 +106,13 @@ export default {
   },
   computed: {
     selectedReport() { return this.reports.find(report => report.key === this.activeReport) || null },
-    printPayload() { return Object.assign({ type: this.activeReport }, this.filters) }
+    printPayload() { return Object.assign({ type: this.activeReport }, this.filters) },
+    productOptions() { return this.products.map(product => ({ id: product.id, text: product.name })) },
+    supplierOptions() { return this.suppliers.map(supplier => ({ id: supplier.id, text: supplier.name })) },
+    busOptions() { return this.buses.map(bus => ({ id: bus.id, text: bus.bus_number })) },
+    productSelectSettings() { return { width: '100%', allowClear: true, placeholder: this.selectedReport?.productRequired ? 'Select Product' : 'All Products' } },
+    supplierSelectSettings() { return { width: '100%', allowClear: true, placeholder: this.selectedReport?.supplierRequired ? 'Select Supplier' : 'All Suppliers' } },
+    busSelectSettings() { return { width: '100%', allowClear: true, placeholder: 'All Buses' } }
   },
   created() { this.fetchReportData() },
   methods: {
@@ -147,6 +153,10 @@ export default {
 .report-link small { color: #8b93a1; line-height: 1.35; }
 .report-arrow { margin-left: auto; color: #c3c8d1; font-size: 11px; }
 .report-panel .card-header { min-height: 82px; padding: 18px 24px; border-bottom: 1px solid #f0f1f5; }
+:deep(.report-panel .select2-container) { width: 100% !important; }
+:deep(.report-panel .select2-selection--single) { min-height: 42px; border-color: #e4e6ef; }
+:deep(.report-panel .select2-selection__rendered) { line-height: 40px; padding-left: 14px; }
+:deep(.report-panel .select2-selection__arrow) { height: 40px; }
 .report-actions .btn { min-height: 42px; }
 .report-results { border: 1px solid #e9ebf1; border-radius: 10px; overflow: hidden; }
 .results-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; background: #f8f9fc; border-bottom: 1px solid #e9ebf1; }

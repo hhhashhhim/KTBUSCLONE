@@ -39,6 +39,7 @@
                           <th>Remaining</th>
                           <th>Request By</th>
                           <th>Supplier Name</th> 
+                          <th>Status</th>
                           <th>Action</th>
                         </tr>
                       </thead>
@@ -55,6 +56,7 @@
                             <th>{{ po.remaining  }} PKR</th>
                             <td>{{ po.mr.requested_by_user.name }} PKR</td>
                             <td>{{ po.supplier.name }}</td>
+                            <td><span class="badge" :class="po.status == 0 ? 'badge-danger' : (po.status == 2 ? 'badge-success' : 'badge-warning')">{{ po.status == 0 ? 'Rejected' : (po.status == 2 ? 'Completed' : 'Active') }}</span></td>
                             <td>
                               <button class="btn btn-info btn-sm" @click="viewPODetail(po.id)">
                                 <i class="fas fa-eye"></i> View
@@ -107,6 +109,10 @@
                         </button>
                           <button class="btn btn-info btn-sm ml-1" @click="viewBidsByPRN(bid.prn?.id)">
                             <i class="fas fa-eye"></i>
+                          </button>
+                          <button class="btn btn-danger btn-sm ml-1" :disabled="rejectingId === bid.prn_id" title="Reject Bid Summary" @click="rejectBidSummary(bid)">
+                            <span v-if="rejectingId === bid.prn_id" class="spinner-border spinner-border-sm"></span>
+                            <i v-else class="fas fa-times"></i>
                           </button>
                         </td>
                       </tr>
@@ -418,6 +424,7 @@
         showViewBidModal: false,    // Add this
         selectedBids: [], 
         selectedDetails: [],
+        rejectingId: null,
         isApprovalMode: false,
         decisionMap: {}, // Keeps track of approve/reject state for each bidder
         activeTab: 'pos', 
@@ -703,6 +710,31 @@
         const form = this.$refs.printPOPdfForm; 
         form.querySelector('input[name="po_id"]').value = poId; 
         form.submit();
+      },
+      async rejectBidSummary(bid) {
+        const confirmation = await Swal.fire({
+          title: 'Reject this Bid Summary?',
+          text: `All bids for PRN-${bid.prn_id} will be marked as Rejected. No record will be deleted.`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#dc3545',
+          confirmButtonText: 'Yes, reject it'
+        });
+        if (!confirmation.isConfirmed) return;
+
+        this.rejectingId = bid.prn_id;
+        try {
+          const response = await this.callApi('post', 'bid-summaries/reject', { prn_id: bid.prn_id });
+          if (response.status === 200 && response.data.success) {
+            if ($.fn.DataTable.isDataTable('.dataTable1')) $('.dataTable1').DataTable().destroy();
+            this.bids = this.bids.filter(item => item.prn_id !== bid.prn_id);
+            this.$nextTick(() => $('.dataTable1').DataTable());
+            return Swal.fire('Rejected', response.data.message, 'success');
+          }
+          Swal.fire('Error', response.data?.message || 'Unable to reject this Bid Summary.', 'error');
+        } finally {
+          this.rejectingId = null;
+        }
       },
     }
   };
