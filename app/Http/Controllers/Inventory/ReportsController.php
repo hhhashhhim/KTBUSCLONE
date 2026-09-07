@@ -290,11 +290,28 @@ class ReportsController extends Controller
             : 'Generated: ' . date('d-M-Y h:i A');
         $pdf->SetFont('helvetica', '', 8);
         $pdf->Cell(0, 5, $period, 0, 1, 'C');
+        if (!empty($report['summary'])) {
+            $summary = [];
+            foreach ($report['summary'] as $label => $value) {
+                $summary[] = '<strong>' . $this->escape($label) . ':</strong> ' . $this->escape($value);
+            }
+            $pdf->Ln(2);
+            $pdf->writeHTML('<div style="background-color:#eef1f7;padding:6px;">' . implode(' &nbsp;&nbsp; | &nbsp;&nbsp; ', $summary) . '</div>', true, false, true, false, '');
+        }
         $pdf->Ln(3);
 
         $columnCount = max(1, count($report['columns']));
         $width = round(100 / $columnCount, 2);
-        $html = '<table border="1" cellpadding="4"><thead><tr style="background-color:#263b70;color:#ffffff;font-weight:bold;">';
+        $html = '<table border="1" cellpadding="4"><thead>';
+        $groups = $this->columnGroups($report['columns']);
+        if (!empty($groups)) {
+            $html .= '<tr style="background-color:#9aa6b5;color:#ffffff;font-weight:bold;text-align:center;">';
+            foreach ($groups as $group) {
+                $html .= '<th colspan="' . $group['count'] . '" width="' . round($width * $group['count'], 2) . '%">' . $this->escape($group['label']) . '</th>';
+            }
+            $html .= '</tr>';
+        }
+        $html .= '<tr style="background-color:#263b70;color:#ffffff;font-weight:bold;">';
         foreach ($report['columns'] as $column) {
             $html .= '<th width="' . $width . '%">' . $this->escape($column['label']) . '</th>';
         }
@@ -311,7 +328,16 @@ class ReportsController extends Controller
                 $html .= '</tr>';
             }
         }
-        $html .= '</tbody></table>';
+        $html .= '</tbody>';
+        if (!empty($report['totals'])) {
+            $html .= '<tfoot><tr style="background-color:#eef1f7;font-weight:bold;">';
+            foreach ($report['columns'] as $column) {
+                $align = ($column['align'] ?? 'left') === 'right' ? 'right' : (($column['align'] ?? '') === 'center' ? 'center' : 'left');
+                $html .= '<td align="' . $align . '" width="' . $width . '%">' . $this->escape($report['totals'][$column['key']] ?? '') . '</td>';
+            }
+            $html .= '</tr></tfoot>';
+        }
+        $html .= '</table>';
         $pdf->SetFont('helvetica', '', 7.5);
         $pdf->writeHTML($html, true, false, true, false, '');
         $pdf->Ln(3);
@@ -410,16 +436,105 @@ class ReportsController extends Controller
 
     private function itemLedgerReport(array $f): array
     {
-        if (empty($f['product_id'])) return $this->report('Item Ledger', [['message','Information']], [['message'=>'Select a product to view its ledger.']]);
-        $companyId=Auth::user()->company_id; $product=Product::where('company_id',$companyId)->findOrFail($f['product_id']); $from=Carbon::parse($f['from'] ?? '1900-01-01')->startOfDay(); $to=Carbon::parse($f['to'] ?? now()->toDateString())->endOfDay();
-        $openingIn=GoodReceiveNoteDetail::where('company_id',$companyId)->where('product_id',$product->id)->where('created_at','<',$from)->sum('qty'); $openingOut=StoreIssuanceNoteDetail::where('company_id',$companyId)->where('product_id',$product->id)->where('created_at','<',$from)->sum('qty'); $balance=$openingIn-$openingOut;
-        $moves=collect(); GoodReceiveNoteDetail::where('company_id',$companyId)->where('product_id',$product->id)->whereBetween('created_at',[$from,$to])->get()->each(fn($d)=>$moves->push(['date'=>$d->created_at,'type'=>'REC','doc'=>'GRN-'.$d->good_receive_note_id,'in'=>(float)$d->qty,'out'=>0,'rate'=>(float)$d->rate])); StoreIssuanceNoteDetail::where('company_id',$companyId)->where('product_id',$product->id)->whereBetween('created_at',[$from,$to])->get()->each(fn($d)=>$moves->push(['date'=>$d->created_at,'type'=>'ISS','doc'=>'SIN-'.$d->store_issuance_note_id,'in'=>0,'out'=>(float)$d->qty,'rate'=>(float)$d->rate]));
-        $rows=[['date'=>$from->format('d-M-Y'),'type'=>'OPEN','doc'=>'Opening Balance','in'=>'-','out'=>'-','rate'=>'-','balance'=>$balance]]; foreach($moves->sortBy('date') as $m){$balance += $m['in']-$m['out']; $rows[]=['date'=>$m['date']->format('d-M-Y'),'type'=>$m['type'],'doc'=>$m['doc'],'in'=>$m['in'] ?: '-','out'=>$m['out'] ?: '-','rate'=>$this->money($m['rate']),'balance'=>$balance];}
-        return $this->report('Item Ledger - '.$product->name, [['date','Date'],['type','Type','center'],['doc','Document'],['in','Qty In','right'],['out','Qty Out','right'],['rate','Rate','right'],['balance','Balance','right']], $rows);
+        if (empty($f['product_id'])) {
+            return $this->report('Item Ledger', [['message', 'Information']], [['message' => 'Select a product to view its ledger.']]);
+        }
+
+        $companyId = Auth::user()->company_id;
+        $product = Product::with('unit')->where('company_id', $companyId)->findOrFail($f['product_id']);
+        $from = Carbon::parse($f['from'] ?? '1900-01-01')->startOfDay();
+        $to = Carbon::parse($f['to'] ?? now()->toDateString())->endOfDay();
+
+        $openingReceipts = GoodReceiveNoteDetail::where('company_id', $companyId)->where('product_id', $product->id)->where('created_at', '<', $from)->get();
+        $openingIssues = StoreIssuanceNoteDetail::where('company_id', $companyId)->where('product_id', $product->id)->where('created_at', '<', $from)->get();
+        $balanceQty = (float) $openingReceipts->sum('qty') - (float) $openingIssues->sum('qty');
+        $balanceValue = $openingReceipts->sum(fn ($detail) => $this->lineValue($detail)) - $openingIssues->sum(fn ($detail) => $this->lineValue($detail));
+        $balanceRate = $balanceQty != 0 ? $balanceValue / $balanceQty : 0;
+
+        $moves = collect();
+        GoodReceiveNoteDetail::where('company_id', $companyId)->where('product_id', $product->id)->whereBetween('created_at', [$from, $to])->get()
+            ->each(function ($detail) use ($moves) {
+                $moves->push(['date' => $detail->created_at, 'type' => 'REC', 'doc' => 'GRN-' . $detail->good_receive_note_id, 'qty_in' => (float) $detail->qty, 'qty_out' => 0, 'rate' => (float) $detail->rate, 'value_in' => $this->lineValue($detail), 'value_out' => 0]);
+            });
+        StoreIssuanceNoteDetail::where('company_id', $companyId)->where('product_id', $product->id)->whereBetween('created_at', [$from, $to])->get()
+            ->each(function ($detail) use ($moves) {
+                $moves->push(['date' => $detail->created_at, 'type' => 'ISS', 'doc' => 'SIN-' . $detail->store_issuance_note_id, 'qty_in' => 0, 'qty_out' => (float) $detail->qty, 'rate' => (float) $detail->rate, 'value_in' => 0, 'value_out' => $this->lineValue($detail)]);
+            });
+
+        $rows = [[
+            'type' => 'OPEN', 'doc' => 'Opening Balance', 'date' => !empty($f['from']) ? $from->format('d-M-Y') : 'Beginning',
+            'receipt_qty' => '-', 'receipt_rate' => '-', 'receipt_value' => '-', 'issue_qty' => '-', 'issue_rate' => '-', 'issue_value' => '-',
+            'balance_qty' => $balanceQty, 'balance_rate' => $this->money($balanceRate), 'balance_value' => $this->money($balanceValue),
+        ]];
+        foreach ($moves->sortBy('date') as $move) {
+            $balanceQty += $move['qty_in'] - $move['qty_out'];
+            $balanceValue += $move['value_in'] - $move['value_out'];
+            $balanceRate = $balanceQty != 0 ? $balanceValue / $balanceQty : 0;
+            $rows[] = [
+                'type' => $move['type'], 'doc' => $move['doc'], 'date' => $move['date']->format('d-M-Y'),
+                'receipt_qty' => $move['qty_in'] ?: '-', 'receipt_rate' => $move['qty_in'] ? $this->money($move['rate']) : '-', 'receipt_value' => $move['qty_in'] ? $this->money($move['value_in']) : '-',
+                'issue_qty' => $move['qty_out'] ?: '-', 'issue_rate' => $move['qty_out'] ? $this->money($move['rate']) : '-', 'issue_value' => $move['qty_out'] ? $this->money($move['value_out']) : '-',
+                'balance_qty' => $balanceQty, 'balance_rate' => $this->money($balanceRate), 'balance_value' => $this->money($balanceValue),
+            ];
+        }
+
+        return $this->report('Item Ledger - ' . $product->name, [
+            ['type', 'Type', 'center', 'Transaction Details'], ['doc', 'Doc #', 'center', 'Transaction Details'], ['date', 'Date', 'center', 'Transaction Details'],
+            ['receipt_qty', 'Qty', 'right', 'Receipt'], ['receipt_rate', 'Rate', 'right', 'Receipt'], ['receipt_value', 'Value', 'right', 'Receipt'],
+            ['issue_qty', 'Qty', 'right', 'Issue'], ['issue_rate', 'Rate', 'right', 'Issue'], ['issue_value', 'Value', 'right', 'Issue'],
+            ['balance_qty', 'Qty', 'right', 'Balance'], ['balance_rate', 'Rate', 'right', 'Balance'], ['balance_value', 'Value', 'right', 'Balance'],
+        ], $rows, [
+            'Item' => $product->name,
+            'Unit of Measurement' => optional($product->unit)->name ?: '-',
+            'Current Stock' => $balanceQty,
+            'Current Value' => $this->money($balanceValue),
+        ]);
     }
 
-    private function itemWisePurchaseReport(array $f): array { $report=$this->goodsReceivedReport($f); $report['title']='Item-wise Purchase History'; return $report; }
-    private function partyWisePurchaseReport(array $f): array { $report=$this->goodsReceivedReport($f); $report['title']='Party-wise Purchase History'; return $report; }
+    private function itemWisePurchaseReport(array $f): array
+    {
+        return $this->purchaseHistoryReport($f, 'Item-wise Purchase History');
+    }
+
+    private function partyWisePurchaseReport(array $f): array
+    {
+        return $this->purchaseHistoryReport($f, 'Party-wise Purchase History');
+    }
+
+    private function purchaseHistoryReport(array $f, string $title): array
+    {
+        $query = GoodReceiveNoteDetail::with(['product', 'goodReceiveNote.supplier', 'goodReceiveNote.purchaseOrder'])
+            ->where('company_id', Auth::user()->company_id);
+        $this->dateFilter($query, $f);
+        $query->when($f['product_id'] ?? null, fn ($q, $id) => $q->where('product_id', $id));
+        $query->when($f['supplier_id'] ?? null, fn ($q, $id) => $q->whereHas('goodReceiveNote', fn ($grn) => $grn->where('supplier_id', $id)));
+
+        $rows = $query->latest()->get()->map(function ($detail, $index) {
+            $grn = $detail->goodReceiveNote;
+            $po = optional($grn)->purchaseOrder;
+            return [
+                'sr' => $index + 1,
+                'date' => optional($grn)->created_at ? $grn->created_at->format('d-M-Y') : $detail->created_at->format('d-M-Y'),
+                'po_date' => optional($po)->created_at ? $po->created_at->format('d-M-Y') : '-',
+                'po' => optional($grn)->po_id ? 'PO-' . $grn->po_id : '-',
+                'grn' => $detail->good_receive_note_id ? 'GRN-' . $detail->good_receive_note_id : '-',
+                'supplier' => optional(optional($grn)->supplier)->name ?: '-',
+                'item' => optional($detail->product)->name ?: '-',
+                'rate' => $this->money($detail->rate),
+                'qty' => (float) $detail->qty,
+                'total' => $this->money($this->lineValue($detail)),
+            ];
+        })->values()->all();
+
+        return $this->report($title, [
+            ['sr', 'Sr.', 'center'], ['date', 'GRN Date'], ['po_date', 'PO Date'], ['po', 'PO #'], ['grn', 'GRN #'],
+            ['supplier', 'Supplier'], ['item', 'Product'], ['rate', 'Rate', 'right'], ['qty', 'Qty', 'right'], ['total', 'Total', 'right'],
+        ], $rows, [], [
+            'item' => 'Grand Total',
+            'qty' => collect($rows)->sum('qty'),
+            'total' => $this->money(collect($rows)->sum(fn ($row) => (float) str_replace(',', '', $row['total']))),
+        ]);
+    }
 
     private function balanceStockReport(array $f): array
     {
@@ -428,7 +543,9 @@ class ReportsController extends Controller
     }
 
     private function dateFilter($query, array $f): void { if (!empty($f['from'])) $query->whereDate('created_at','>=',$f['from']); if (!empty($f['to'])) $query->whereDate('created_at','<=',$f['to']); }
-    private function report(string $title, array $columns, array $rows): array { return ['title'=>$title,'columns'=>array_map(fn($c)=>['key'=>$c[0],'label'=>$c[1],'align'=>$c[2] ?? 'left'],$columns),'rows'=>$rows,'count'=>count($rows)]; }
+    private function report(string $title, array $columns, array $rows, array $summary = [], array $totals = []): array { return ['title'=>$title,'columns'=>array_map(fn($c)=>['key'=>$c[0],'label'=>$c[1],'align'=>$c[2] ?? 'left','group'=>$c[3] ?? null],$columns),'rows'=>$rows,'count'=>count($rows),'summary'=>$summary,'totals'=>$totals]; }
+    private function columnGroups(array $columns): array { $groups=[]; foreach($columns as $column){ if(empty($column['group'])) return []; $last=count($groups)-1; if($last>=0 && $groups[$last]['label']===$column['group']){$groups[$last]['count']++;}else{$groups[]=['label'=>$column['group'],'count'=>1];} } return $groups; }
+    private function lineValue($detail): float { $stored=(float)($detail->total ?? 0); return $stored != 0 ? $stored : ((float)($detail->qty ?? 0)*(float)($detail->rate ?? 0)); }
     private function money($value): string { return number_format((float)$value,2); }
     private function escape($value): string { return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8'); }
 
