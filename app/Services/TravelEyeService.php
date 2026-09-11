@@ -70,12 +70,6 @@ class TravelEyeService
                 ->acceptJson()
                 ->timeout(max(1, (int) config('services.travel_eye.timeout', 15)));
 
-            if (!empty($terminal->smarteye_api)) {
-                $request = $request->withHeaders([
-                    config('services.travel_eye.api_key_header', 'X-API-Key') => $terminal->smarteye_api,
-                ]);
-            }
-
             $response = $request->post($endpoint, $payload);
             $successful = $response->successful();
 
@@ -110,7 +104,7 @@ class TravelEyeService
     private function terminalIsConfigured($terminal): bool
     {
         return !empty($terminal->smarteye_id)
-            && !empty($terminal->smarteye_password);
+            && !empty($terminal->smarteye_api);
     }
 
     private function buildVerifyPayload(Ticket $ticket): array
@@ -121,7 +115,9 @@ class TravelEyeService
 
         return [
             'usrName' => $terminal->smarteye_id,
-            'usrPass' => $terminal->smarteye_password,
+            // The live Travel Eye endpoint authenticates with the value issued
+            // in the Smarteye API column, not the web-account password.
+            'usrPass' => $terminal->smarteye_api,
             'terminal' => optional($terminal->city)->name,
             'voucher' => $this->voucherFor($ticket),
             'from' => optional($ticket->departure_city)->name,

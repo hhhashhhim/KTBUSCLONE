@@ -53,7 +53,6 @@ return [
         'base_url' => env('TRAVEL_EYE_BASE_URL', 'https://hoteleye.punjab.gov.pk'),
         'verify_path' => env('TRAVEL_EYE_VERIFY_PATH', '/TravelEyeApiPost/verify'),
         'timeout' => (int) env('TRAVEL_EYE_TIMEOUT', 15),
-        'api_key_header' => env('TRAVEL_EYE_API_KEY_HEADER', 'X-API-Key'),
     ],
 
 ];
