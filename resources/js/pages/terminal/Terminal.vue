@@ -705,6 +705,65 @@
                         </label>
                     </div> -->
         </div>
+        <div class="card border mt-3 mb-2">
+          <div class="card-header bg-light py-3">
+            <h6 class="mb-1">Smarteye Settings</h6>
+            <small class="text-muted">
+              Configure the Smarteye account connected to this terminal.
+            </small>
+          </div>
+          <div class="card-body pb-2">
+            <div class="row">
+              <div class="form-group col-md-6">
+                <label for="smarteye_email">Email Used</label>
+                <input
+                  id="smarteye_email"
+                  type="email"
+                  class="form-control"
+                  v-model.trim="dataEdit.smarteye_email"
+                  placeholder="Enter Smarteye email"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="form-group col-md-6">
+                <label for="smarteye_id">Smarteye ID</label>
+                <input
+                  id="smarteye_id"
+                  type="text"
+                  class="form-control"
+                  v-model.trim="dataEdit.smarteye_id"
+                  placeholder="Enter Smarteye ID"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="form-group col-md-6">
+                <label for="smarteye_password">Password</label>
+                <input
+                  id="smarteye_password"
+                  type="password"
+                  class="form-control"
+                  v-model="dataEdit.smarteye_password"
+                  placeholder="Leave blank to keep existing password"
+                  autocomplete="new-password"
+                />
+              </div>
+              <div class="form-group col-md-6">
+                <label for="smarteye_api">Smarteye API</label>
+                <input
+                  id="smarteye_api"
+                  type="password"
+                  class="form-control"
+                  v-model="dataEdit.smarteye_api"
+                  placeholder="Leave blank to keep existing API key"
+                  autocomplete="new-password"
+                />
+              </div>
+            </div>
+            <small class="form-text text-muted mt-0">
+              Saved passwords and API keys are protected and are not displayed again.
+            </small>
+          </div>
+        </div>
         <template v-slot:button>
           <button
             type="button"
@@ -1159,7 +1218,13 @@ export default {
 },
 
     async editTerminal(single) {
-      this.dataEdit = single;
+      this.dataEdit = {
+        ...single,
+        smarteye_email: single.smarteye_email || "",
+        smarteye_id: single.smarteye_id || "",
+        smarteye_password: "",
+        smarteye_api: "",
+      };
       this.dataEdit.cancellation_allowed = Number(single.cancellation_allowed || 0) === 1;
       this.dataEdit.other_terminal_passenger_detail =
         single.other_terminal_passenger_detail == 1 ? true : false;
