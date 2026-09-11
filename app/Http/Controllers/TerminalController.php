@@ -197,6 +197,10 @@ class TerminalController extends Controller
                 'urdu_name' => 'required',
                 // 'online_terminal_name' => 'required',
                 'contact' => 'required',
+                'smarteye_email' => 'nullable|email|max:255',
+                'smarteye_id' => 'nullable|string|max:255',
+                'smarteye_password' => 'nullable|string|max:1000',
+                'smarteye_api' => 'nullable|string|max:5000',
             ]);
             Terminal::where("city_id", $request->city_id)->update(["is_main" => 0]);
 $sendMessage = 0;
@@ -210,10 +214,7 @@ if (is_array($request->send_message)) {
         $sendMessage = 2;
     }
 }
-
-
-
-            Terminal::find($request->id)->update([
+            $terminalData = [
                 'name' => $request->name,
                 'urdu_name' => $request->urdu_name,
                 'contact' => plainContactAndCnic($request->contact),
@@ -238,7 +239,20 @@ if (is_array($request->send_message)) {
                 'status' => (int)$request->status,
                 'other_terminal_passenger_detail' => $request->other_terminal_passenger_detail,
                 'send_message' => $sendMessage,
-            ]);
+                'smarteye_email' => $request->smarteye_email,
+                'smarteye_id' => $request->smarteye_id,
+            ];
+
+            // An empty secret field means the existing value should be retained.
+            if ($request->filled('smarteye_password')) {
+                $terminalData['smarteye_password'] = $request->smarteye_password;
+            }
+
+            if ($request->filled('smarteye_api')) {
+                $terminalData['smarteye_api'] = $request->smarteye_api;
+            }
+
+            Terminal::findOrFail($request->id)->update($terminalData);
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
                 "message" => Auth::user()->name . " | updated terminal ($request->name)",

@@ -15,7 +15,16 @@ class Terminal extends Model
     use HasFactory, SoftDeletes;
 
     protected $guarded = [];
-    
+
+    protected $hidden = [
+        'smarteye_password',
+        'smarteye_api',
+    ];
+
+    protected $casts = [
+        'smarteye_password' => 'encrypted',
+        'smarteye_api' => 'encrypted',
+    ];
 
     public function addedBy()
     {
