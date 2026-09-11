@@ -50,6 +50,7 @@ use Carbon\Carbon;
 use App\Models\Invoice;
 use App\Models\User;
 use App\Services\TicketCancellationService;
+use App\Jobs\VerifyTravelEyeTicket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -702,6 +703,14 @@ class BookingController extends Controller
 
 
                 DB::commit();
+
+                // Send only successfully committed, confirmed tickets. The API
+                // call runs after the booking response and cannot roll back or
+                // delay the customer's booking if Travel Eye is unavailable.
+                foreach ($allTicket as $ticketId) {
+                    VerifyTravelEyeTicket::dispatchAfterResponse($ticketId);
+                }
+
                 return [
                     'ids' => implode('-', $allTicket),
                     'ticket' => Ticket::where('company_id', Auth::user()->company_id)->whereIn('id', $allTicket)->get(),
