@@ -1104,7 +1104,7 @@
                                             <small>Calculated automatically</small>
                                         </div>
 
-                                        <template v-if="alreadyBookedSeat.length">
+                                        <template v-if="rescheduleSelectionComplete">
                                             <div class="fare-summary-row">
                                                 <span>Original Paid Fare</span>
                                                 <strong>Rs {{ formatRescheduleAmount(rescheduleOriginalPaidFare) }}</strong>
@@ -1140,7 +1140,14 @@
                                         </template>
 
                                         <div v-else class="fare-summary-empty">
-                                            Select the replacement seat to calculate the fare adjustment.
+                                            <template v-if="alreadyBookedSeat.length">
+                                                Select {{ rescheduleSeatsRemaining }} more replacement
+                                                seat{{ rescheduleSeatsRemaining === 1 ? '' : 's' }} to calculate
+                                                the final fare and refund.
+                                            </template>
+                                            <template v-else>
+                                                Select the replacement seats to calculate the fare adjustment.
+                                            </template>
                                         </div>
                                     </div>
                                 </div>
@@ -3918,11 +3925,7 @@ export default {
             this.reScheduleDepart = '';
             this.reScheduleDest = '';
             this.reScheduleDate = '';
-            this.alreadyBookedSeatClassName = [];
-            this.alreadyBookedSeatClass = [];
-            this.alreadyBookedSeatFare = [];
-            this.totalAlreadyBookedSeatFare = 0;
-            this.alreadyBookedSeat = [];
+            this.resetRescheduleSelection();
             this.seatMapReschedule = false;
             if (this.rescheduleData.rescheduleSchedule == 0) {
                 this.seatMapReschedule = false;
@@ -3960,6 +3963,15 @@ export default {
                     }
                 }
             }
+        },
+
+        resetRescheduleSelection() {
+            this.alreadyBookedSeatClassName = [];
+            this.alreadyBookedSeatClass = [];
+            this.alreadyBookedSeatFare = [];
+            this.totalAlreadyBookedSeatFare = 0;
+            this.alreadyBookedSeat = [];
+            this.rescheduleRefundAmount = 0;
         },
 
         async selectSeat(row, col, seatNo, fare, colClass) {
@@ -4141,34 +4153,59 @@ export default {
         },
 
         reScheduleSelectSeat: function (row, col, data) {
-            if (this.reScheduleSeatMap.bus_class.seat_map[row][col].type == 0
-                || this.reScheduleSeatMap.bus_class.seat_map[row][col].type == undefined) {
-                let index = this.alreadyBookedSeat.indexOf(data.seatNo);
-                if (index != -1) {
-                    this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
-                    this.alreadyBookedSeat.splice(index, 1);
-                    this.alreadyBookedSeatFare.splice(parseFloat(data.fare), 1);
-                    this.totalAlreadyBookedSeatFare -= parseFloat(data.fare);
-                    this.alreadyBookedSeatClassName.splice(index, 1);
-                    this.alreadyBookedSeatClass.splice(index, 1);
-                } else {
-                    this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = true;
-                    this.alreadyBookedSeat.push(data.seatNo);
-                    this.alreadyBookedSeatFare.push(parseFloat(data.fare));
-                    this.totalAlreadyBookedSeatFare += parseFloat(data.fare);
-                    this.alreadyBookedSeatClassName.push(data.class_name);
-                    this.alreadyBookedSeatClass.push(data.class);
-                }
-            } else {
-                this.alreadyBookedSeat = [];
-                this.fetchReScheduleData();
+            const seat = this.reScheduleSeatMap.bus_class.seat_map[row][col];
+            const seatIsAvailable = seat.type === 0
+                || seat.type === '0'
+                || seat.type === null
+                || seat.type === undefined
+                || seat.type === ''
+                || seat.type === false;
+
+            if (!seatIsAvailable) {
                 return swal({
-                    title: "Oops",
-                    text: "Invalid Seat Combination",
+                    title: "Seat Not Available",
+                    text: "This seat is already booked or unavailable. Please select another seat.",
                     icon: "error",
                     timer: 2000
                 });
             }
+
+            const index = this.alreadyBookedSeat.findIndex(
+                selectedSeat => String(selectedSeat) === String(data.seatNo)
+            );
+
+            if (index !== -1) {
+                seat.alreadyBooked = false;
+                this.alreadyBookedSeat.splice(index, 1);
+                this.alreadyBookedSeatFare.splice(index, 1);
+                this.alreadyBookedSeatClassName.splice(index, 1);
+                this.alreadyBookedSeatClass.splice(index, 1);
+            } else {
+                if (this.alreadyBookedSeat.length >= this.mainAllRescheduleData.length) {
+                    return swal({
+                        title: "Seat Limit Reached",
+                        text: "You can only select " + this.mainAllRescheduleData.length + " replacement seat(s).",
+                        icon: "error",
+                        timer: 2000
+                    });
+                }
+
+                seat.alreadyBooked = true;
+                this.alreadyBookedSeat.push(data.seatNo);
+                this.alreadyBookedSeatFare.push(Number(data.fare || 0));
+                this.alreadyBookedSeatClassName.push(data.class_name);
+                this.alreadyBookedSeatClass.push(data.class);
+            }
+
+            this.totalAlreadyBookedSeatFare = this.alreadyBookedSeatFare.reduce(
+                (total, fare) => total + Number(fare || 0),
+                0
+            );
+
+            if (Number(this.rescheduleRefundAmount || 0) > this.rescheduleMaximumRefund) {
+                this.rescheduleRefundAmount = this.rescheduleMaximumRefund;
+            }
+
             this.reScheduleDest = $("#reScheduleDestinationCity option:selected").text();
             this.reScheduleDepart = $("#reScheduleDepartureCity option:selected").text();
             this.reScheduleSchedule = $("#reScheduleName option:selected").text();
@@ -5173,6 +5210,7 @@ export default {
             const arraySingleRescheduleData = [];
             const oldSeats = [];
             let totalFare = 0;
+            this.resetRescheduleSelection();
             this.reSpecificCities = [];
             this.rescheduleData.rescheduleSchedule = [];
             Object.entries(this.selectedSeatDataBackEnd).forEach(function (singleSeat, i) {
@@ -5215,6 +5253,7 @@ export default {
 
         // Reschedule model
         async passDataToRescheduleModel(data) {
+            this.resetRescheduleSelection();
             this.mainAllRescheduleData = [];
             this.reSpecificCities = [];
             this.rescheduleData = {
@@ -5286,11 +5325,9 @@ export default {
 
         async rescheduleSeats() {
             if (this.alreadyBookedSeat.length != this.mainAllRescheduleData.length) {
-                this.alreadyBookedSeat = [];
-                this.fetchReScheduleData();
                 return swal({
-                    title: "Oops",
-                    text: "Your Just Select " + this.mainAllRescheduleData.length + " for Reschedule",
+                    title: "Incomplete Seat Selection",
+                    text: "Please select exactly " + this.mainAllRescheduleData.length + " replacement seat(s) before rescheduling.",
                     icon: "error",
                     timer: 2000
                 });
@@ -5707,6 +5744,13 @@ export default {
                 return total + (Number(ticket.seat_fare || 0) - Number(ticket.discount || 0));
             }, 0);
         },
+        rescheduleSelectionComplete() {
+            return this.mainAllRescheduleData.length > 0
+                && this.alreadyBookedSeat.length === this.mainAllRescheduleData.length;
+        },
+        rescheduleSeatsRemaining() {
+            return Math.max(0, this.mainAllRescheduleData.length - this.alreadyBookedSeat.length);
+        },
         rescheduleNewSeatFare() {
             return this.alreadyBookedSeatFare.reduce(
                 (total, fare) => total + Number(fare || 0),
@@ -5720,6 +5764,10 @@ export default {
             return this.rescheduleNewSeatFare - this.rescheduleFareAdjustment;
         },
         rescheduleMaximumRefund() {
+            if (!this.rescheduleSelectionComplete) {
+                return 0;
+            }
+
             return this.mainAllRescheduleData.reduce((total, item, index) => {
                 const ticket = item?.dataAll ?? {};
                 const originalPaidFare = Number(ticket.seat_fare || 0) - Number(ticket.discount || 0);

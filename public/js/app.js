@@ -39455,18 +39455,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this29.reScheduleDepart = '';
                 _this29.reScheduleDest = '';
                 _this29.reScheduleDate = '';
-                _this29.alreadyBookedSeatClassName = [];
-                _this29.alreadyBookedSeatClass = [];
-                _this29.alreadyBookedSeatFare = [];
-                _this29.totalAlreadyBookedSeatFare = 0;
-                _this29.alreadyBookedSeat = [];
+
+                _this29.resetRescheduleSelection();
+
                 _this29.seatMapReschedule = false;
 
                 if (_this29.rescheduleData.rescheduleSchedule == 0) {
                   _this29.seatMapReschedule = false;
                 }
 
-                _context28.next = 14;
+                _context28.next = 10;
                 return _this29.callApi("post", "booking/schedule/selected", {
                   id: _this29.rescheduleData.rescheduleSchedule,
                   date: _this29.rescheduleData.rescheduleDate,
@@ -39476,7 +39474,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   departure_time: _this29.rescheduleData.departure_time
                 });
 
-              case 14:
+              case 10:
                 res = _context28.sent;
 
                 if (res.status == 200) {
@@ -39503,13 +39501,21 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   }
                 }
 
-              case 16:
+              case 12:
               case "end":
                 return _context28.stop();
             }
           }
         }, _callee28);
       }))();
+    },
+    resetRescheduleSelection: function resetRescheduleSelection() {
+      this.alreadyBookedSeatClassName = [];
+      this.alreadyBookedSeatClass = [];
+      this.alreadyBookedSeatFare = [];
+      this.totalAlreadyBookedSeatFare = 0;
+      this.alreadyBookedSeat = [];
+      this.rescheduleRefundAmount = 0;
     },
     selectSeat: function selectSeat(row, col, seatNo, fare, colClass) {
       var _this30 = this;
@@ -39799,33 +39805,51 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }))();
     },
     reScheduleSelectSeat: function reScheduleSelectSeat(row, col, data) {
-      if (this.reScheduleSeatMap.bus_class.seat_map[row][col].type == 0 || this.reScheduleSeatMap.bus_class.seat_map[row][col].type == undefined) {
-        var index = this.alreadyBookedSeat.indexOf(data.seatNo);
+      var seat = this.reScheduleSeatMap.bus_class.seat_map[row][col];
+      var seatIsAvailable = seat.type === 0 || seat.type === '0' || seat.type === null || seat.type === undefined || seat.type === '' || seat.type === false;
 
-        if (index != -1) {
-          this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = false;
-          this.alreadyBookedSeat.splice(index, 1);
-          this.alreadyBookedSeatFare.splice(parseFloat(data.fare), 1);
-          this.totalAlreadyBookedSeatFare -= parseFloat(data.fare);
-          this.alreadyBookedSeatClassName.splice(index, 1);
-          this.alreadyBookedSeatClass.splice(index, 1);
-        } else {
-          this.reScheduleSeatMap.bus_class.seat_map[row][col].alreadyBooked = true;
-          this.alreadyBookedSeat.push(data.seatNo);
-          this.alreadyBookedSeatFare.push(parseFloat(data.fare));
-          this.totalAlreadyBookedSeatFare += parseFloat(data.fare);
-          this.alreadyBookedSeatClassName.push(data.class_name);
-          this.alreadyBookedSeatClass.push(data["class"]);
-        }
-      } else {
-        this.alreadyBookedSeat = [];
-        this.fetchReScheduleData();
+      if (!seatIsAvailable) {
         return swal({
-          title: "Oops",
-          text: "Invalid Seat Combination",
+          title: "Seat Not Available",
+          text: "This seat is already booked or unavailable. Please select another seat.",
           icon: "error",
           timer: 2000
         });
+      }
+
+      var index = this.alreadyBookedSeat.findIndex(function (selectedSeat) {
+        return String(selectedSeat) === String(data.seatNo);
+      });
+
+      if (index !== -1) {
+        seat.alreadyBooked = false;
+        this.alreadyBookedSeat.splice(index, 1);
+        this.alreadyBookedSeatFare.splice(index, 1);
+        this.alreadyBookedSeatClassName.splice(index, 1);
+        this.alreadyBookedSeatClass.splice(index, 1);
+      } else {
+        if (this.alreadyBookedSeat.length >= this.mainAllRescheduleData.length) {
+          return swal({
+            title: "Seat Limit Reached",
+            text: "You can only select " + this.mainAllRescheduleData.length + " replacement seat(s).",
+            icon: "error",
+            timer: 2000
+          });
+        }
+
+        seat.alreadyBooked = true;
+        this.alreadyBookedSeat.push(data.seatNo);
+        this.alreadyBookedSeatFare.push(Number(data.fare || 0));
+        this.alreadyBookedSeatClassName.push(data.class_name);
+        this.alreadyBookedSeatClass.push(data["class"]);
+      }
+
+      this.totalAlreadyBookedSeatFare = this.alreadyBookedSeatFare.reduce(function (total, fare) {
+        return total + Number(fare || 0);
+      }, 0);
+
+      if (Number(this.rescheduleRefundAmount || 0) > this.rescheduleMaximumRefund) {
+        this.rescheduleRefundAmount = this.rescheduleMaximumRefund;
       }
 
       this.reScheduleDest = $("#reScheduleDestinationCity option:selected").text();
@@ -41282,6 +41306,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 arraySingleRescheduleData = [];
                 oldSeats = [];
                 totalFare = 0;
+
+                _this46.resetRescheduleSelection();
+
                 _this46.reSpecificCities = [];
                 _this46.rescheduleData.rescheduleSchedule = [];
                 Object.entries(_this46.selectedSeatDataBackEnd).forEach(function (singleSeat, i) {
@@ -41309,21 +41336,21 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this46.rescheduleData.rescheduleSchedule = 0;
 
                 if (!(parseInt(_this46.rescheduleData.dataDepartureCity) == 0)) {
-                  _context45.next = 14;
+                  _context45.next = 15;
                   break;
                 }
 
                 _this46.rescheduleData.rescheduleDestinationCity = 0;
-                _context45.next = 18;
+                _context45.next = 19;
                 break;
 
-              case 14:
-                _context45.next = 16;
+              case 15:
+                _context45.next = 17;
                 return _this46.callApi("post", "booking/getDestination", {
                   id: _this46.mainAllRescheduleData[0].dataDepartureCity
                 });
 
-              case 16:
+              case 17:
                 resReDepartureCity = _context45.sent;
 
                 if (resReDepartureCity.length == 0) {
@@ -41333,10 +41360,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   _this46.reSpecificCities = resReDepartureCity.data;
                 }
 
-              case 18:
+              case 19:
                 $("#reschedule_modal").modal('show');
 
-              case 19:
+              case 20:
               case "end":
                 return _context45.stop();
             }
@@ -41354,6 +41381,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           while (1) {
             switch (_context46.prev = _context46.next) {
               case 0:
+                _this47.resetRescheduleSelection();
+
                 _this47.mainAllRescheduleData = [];
                 _this47.reSpecificCities = [];
                 _this47.rescheduleData = {
@@ -41373,21 +41402,21 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _this47.mainAllRescheduleData.oldSeats = _this47.rescheduleData.dataSeat_no;
 
                 if (!(parseInt(_this47.rescheduleData.dataDepartureCity) == 0)) {
-                  _context46.next = 10;
+                  _context46.next = 11;
                   break;
                 }
 
                 _this47.rescheduleData.rescheduleDestinationCity = 0;
-                _context46.next = 14;
+                _context46.next = 15;
                 break;
 
-              case 10:
-                _context46.next = 12;
+              case 11:
+                _context46.next = 13;
                 return _this47.callApi("post", "booking/getDestination", {
                   id: parseInt(_this47.rescheduleData.dataDepartureCity)
                 });
 
-              case 12:
+              case 13:
                 resReDepartureCity = _context46.sent;
 
                 if (resReDepartureCity.length == 0) {
@@ -41397,10 +41426,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   _this47.reSpecificCities = resReDepartureCity.data;
                 }
 
-              case 14:
+              case 15:
                 $("#reschedule_modal").modal('show');
 
-              case 15:
+              case 16:
               case "end":
                 return _context46.stop();
             }
@@ -41477,24 +41506,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             switch (_context48.prev = _context48.next) {
               case 0:
                 if (!(_this49.alreadyBookedSeat.length != _this49.mainAllRescheduleData.length)) {
-                  _context48.next = 4;
+                  _context48.next = 2;
                   break;
                 }
 
-                _this49.alreadyBookedSeat = [];
-
-                _this49.fetchReScheduleData();
-
                 return _context48.abrupt("return", swal({
-                  title: "Oops",
-                  text: "Your Just Select " + _this49.mainAllRescheduleData.length + " for Reschedule",
+                  title: "Incomplete Seat Selection",
+                  text: "Please select exactly " + _this49.mainAllRescheduleData.length + " replacement seat(s) before rescheduling.",
                   icon: "error",
                   timer: 2000
                 }));
 
-              case 4:
+              case 2:
                 if (!(parseInt(_this49.rescheduleData.dataDepartureCity) == 0)) {
-                  _context48.next = 6;
+                  _context48.next = 4;
                   break;
                 }
 
@@ -41505,9 +41530,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 6:
+              case 4:
                 if (!(_this49.rescheduleData.rescheduleDestinationCity == 0)) {
-                  _context48.next = 8;
+                  _context48.next = 6;
                   break;
                 }
 
@@ -41518,9 +41543,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 8:
+              case 6:
                 if (!(_this49.rescheduleData.rescheduleDate == '' || typeof _this49.rescheduleData.rescheduleDate == 'undefined')) {
-                  _context48.next = 10;
+                  _context48.next = 8;
                   break;
                 }
 
@@ -41531,9 +41556,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 10:
+              case 8:
                 if (!(_this49.rescheduleData.rescheduleSchedule == 0)) {
-                  _context48.next = 12;
+                  _context48.next = 10;
                   break;
                 }
 
@@ -41544,11 +41569,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2000
                 }));
 
-              case 12:
+              case 10:
                 requestedRefund = Number(_this49.rescheduleRefundAmount || 0);
 
                 if (!(!Number.isFinite(requestedRefund) || requestedRefund < 0 || requestedRefund > _this49.rescheduleMaximumRefund)) {
-                  _context48.next = 15;
+                  _context48.next = 13;
                   break;
                 }
 
@@ -41559,7 +41584,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   timer: 2500
                 }));
 
-              case 15:
+              case 13:
                 remainingRefund = requestedRefund;
 
                 _this49.mainAllRescheduleData.map(function (single, index) {
@@ -41584,13 +41609,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 });
 
                 _this49.loadingRescheduleButton = true;
-                _context48.next = 20;
+                _context48.next = 18;
                 return _this49.callApi("post", "booking/store", {
                   'data': _this49.mainAllRescheduleData,
                   "rc_flag": 1
                 });
 
-              case 20:
+              case 18:
                 resReschedule = _context48.sent;
 
                 if (resReschedule.status == 200) {
@@ -41629,7 +41654,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   }
                 }
 
-              case 22:
+              case 20:
               case "end":
                 return _context48.stop();
             }
@@ -42131,6 +42156,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         return total + (Number(ticket.seat_fare || 0) - Number(ticket.discount || 0));
       }, 0);
     },
+    rescheduleSelectionComplete: function rescheduleSelectionComplete() {
+      return this.mainAllRescheduleData.length > 0 && this.alreadyBookedSeat.length === this.mainAllRescheduleData.length;
+    },
+    rescheduleSeatsRemaining: function rescheduleSeatsRemaining() {
+      return Math.max(0, this.mainAllRescheduleData.length - this.alreadyBookedSeat.length);
+    },
     rescheduleNewSeatFare: function rescheduleNewSeatFare() {
       return this.alreadyBookedSeatFare.reduce(function (total, fare) {
         return total + Number(fare || 0);
@@ -42144,6 +42175,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     rescheduleMaximumRefund: function rescheduleMaximumRefund() {
       var _this56 = this;
+
+      if (!this.rescheduleSelectionComplete) {
+        return 0;
+      }
 
       return this.mainAllRescheduleData.reduce(function (total, item, index) {
         var _item$dataAll2;
@@ -100542,7 +100577,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[80] || (_cache[80] = function ($event) {
       return $options.changeTypeReschedule($event);
     })
-  }), _hoisted_393])]), _hoisted_394, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_395, [_hoisted_396, $data.alreadyBookedSeat.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }), _hoisted_393])]), _hoisted_394, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_395, [_hoisted_396, $options.rescheduleSelectionComplete ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 0
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_397, [_hoisted_398, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Rs " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatRescheduleAmount($options.rescheduleOriginalPaidFare)), 1
   /* TEXT */
@@ -100573,7 +100608,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   )])], 64
   /* STABLE_FRAGMENT */
-  )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_409, " Select the replacement seat to calculate the fare adjustment. "))])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_410, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_409, [$data.alreadyBookedSeat.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 0
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Select " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.rescheduleSeatsRemaining) + " more replacement seat" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.rescheduleSeatsRemaining === 1 ? '' : 's') + " to calculate the final fare and refund. ", 1
+  /* TEXT */
+  )], 64
+  /* STABLE_FRAGMENT */
+  )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 1
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Select the replacement seats to calculate the fare adjustment. ")], 64
+  /* STABLE_FRAGMENT */
+  ))]))])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_410, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "btn btn-primary",
     onClick: _cache[82] || (_cache[82] = function ($event) {
       return $options.rescheduleSeats();
