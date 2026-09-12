@@ -1126,6 +1126,19 @@
                                                     {{ formatRescheduleAmount(rescheduleMaximumRefund) }}
                                                 </small>
                                             </div>
+                                            <div v-else class="reschedule-refund-notice">
+                                                <strong>No refund available</strong>
+                                                <span v-if="rescheduleNewSeatFare > rescheduleOriginalPaidFare">
+                                                    The selected seats cost Rs
+                                                    {{ formatRescheduleAmount(rescheduleNewSeatFare - rescheduleOriginalPaidFare) }}
+                                                    more than the original paid fare. This difference is adjusted in the
+                                                    ticket discount, so no refund amount can be entered.
+                                                </span>
+                                                <span v-else>
+                                                    The selected seats have the same fare as the original paid fare,
+                                                    so there is no refundable difference.
+                                                </span>
+                                            </div>
                                             <div class="fare-summary-row fare-adjustment-row">
                                                 <span>Ticket Discount</span>
                                                 <strong :class="rescheduleFareAdjustment < 0 ? 'text-danger' : 'text-success'">
@@ -5870,6 +5883,25 @@ export default {
     color: #8b92a5;
     font-size: 12px;
     line-height: 1.5;
+}
+
+.reschedule-refund-notice {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin: 10px 12px;
+    padding: 10px 12px;
+    border: 1px solid #ffe0a3;
+    border-radius: 7px;
+    background: #fff8e8;
+    color: #7a5b16;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.reschedule-refund-notice strong {
+    color: #5d450f;
+    font-size: 12px;
 }
 
 .image-span {
