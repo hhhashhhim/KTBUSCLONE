@@ -93,6 +93,26 @@ class TerminalController extends Controller
         return Terminal::with('addedBy')->where('city_id', $request->id)->where(['company_id' => Auth::user()->company_id, "hide" => 0])->get();
     }
 
+    public function smarteyeSettings(Request $request)
+    {
+        if (!checkPermissionButtons("edit-terminal")) {
+            return response()->json(["Error" => ['You are not authorized to access these settings']], 403);
+        }
+
+        $request->validate([
+            'id' => 'required|integer',
+        ]);
+
+        $terminal = Terminal::where('company_id', Auth::user()->company_id)
+            ->where('hide', 0)
+            ->findOrFail($request->id);
+
+        return response()->json([
+            'smarteye_password' => $terminal->smarteye_password ?? '',
+            'smarteye_api' => $terminal->smarteye_api ?? '',
+        ]);
+    }
+
     public function getRoutes(Request $request)
     {
         if (!checkForSubmenu("terminals")) {

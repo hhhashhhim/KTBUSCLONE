@@ -13,6 +13,7 @@ Route::group(['prefix' => 'web/v1/terminals','middleware' => ['auth:sanctum']], 
     Route::post('/cities', [TerminalController::class, 'cities']);
     Route::post('/all', [TerminalController::class, 'allTerminals']);
     Route::post('/getTerminal', [TerminalController::class, 'getTerminal']);
+    Route::post('/smarteye-settings', [TerminalController::class, 'smarteyeSettings']);
     Route::post('store', [TerminalController::class, 'store']);
     Route::post('update', [TerminalController::class, 'update']);
     Route::post('hide', [TerminalController::class, 'hideTerminal']);
