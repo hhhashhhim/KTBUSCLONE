@@ -44,7 +44,7 @@ class FaultClaim extends Model
 
     public function inspectionResult()
     {
-        return $this->hasOne(InspectionResult::class, 'fault_claim_id');
+        return $this->hasOne(InspectionResult::class, 'fault_claim_id')->latestOfMany();
     }
     public function parts()
     {

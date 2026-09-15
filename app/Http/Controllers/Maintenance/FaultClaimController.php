@@ -223,6 +223,10 @@ class FaultClaimController extends Controller
 
     public function submitResult(Request $request)
     {
+        if ($request->has('items')) {
+            return $this->submitItemResults($request);
+        }
+
         DB::beginTransaction();
 
         try {
@@ -305,6 +309,216 @@ class FaultClaimController extends Controller
         }
     }
 
+    private function submitItemResults(Request $request)
+    {
+        $validated = $request->validate([
+            'claim_id' => 'required|integer',
+            'items' => 'required|array|min:1',
+            'items.*.fault_claim_part_id' => 'required|integer|distinct',
+            'items.*.part_id' => 'required|integer',
+            'items.*.result' => ['nullable', Rule::in([
+                'no_fault',
+                'in_house',
+                'outsource',
+                'hybrid',
+                'dock_required',
+            ])],
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $fault = FaultClaim::where('id', $validated['claim_id'])
+                ->where('company_id', Auth::user()->company_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $claimParts = FaultClaimPart::where('fault_claim_id', $fault->id)
+                ->where('company_id', Auth::user()->company_id)
+                ->lockForUpdate()
+                ->get();
+
+            if ($claimParts->isEmpty()) {
+                throw new \RuntimeException('No items/services are attached to this fault claim.');
+            }
+
+            $submittedItems = collect($validated['items'])->keyBy('fault_claim_part_id');
+            $invalidIds = $submittedItems->keys()->diff($claimParts->pluck('id'));
+
+            if ($invalidIds->isNotEmpty()) {
+                throw new \RuntimeException('One or more submitted items do not belong to this fault claim.');
+            }
+
+            $actionableParts = $claimParts->filter(function ($part) {
+                return in_array($part->status, ['pending', 'dock_required'], true);
+            });
+
+            if ($actionableParts->isEmpty()) {
+                throw new \RuntimeException('All items/services in this fault claim already have a final result.');
+            }
+
+            foreach ($actionableParts as $part) {
+                $submitted = $submittedItems->get($part->id);
+                if (!$submitted || empty($submitted['result'])) {
+                    throw new \RuntimeException('Every pending item/service must have an inspection result.');
+                }
+
+                if ((int) $submitted['part_id'] !== (int) $part->part_id) {
+                    throw new \RuntimeException('The submitted item/service details are invalid.');
+                }
+            }
+
+            $selectedItems = $actionableParts->map(function ($part) use ($submittedItems) {
+                return [
+                    'part' => $part,
+                    'result' => $submittedItems->get($part->id)['result'],
+                ];
+            });
+
+            $selectedResults = $selectedItems->pluck('result');
+            $hasNoFault = $selectedResults->contains('no_fault');
+            $hasResolved = $selectedResults->contains(function ($result) {
+                return in_array($result, ['in_house', 'outsource', 'hybrid'], true);
+            });
+            $hasInHouse = $selectedResults->contains(function ($result) {
+                return in_array($result, ['in_house', 'hybrid'], true);
+            });
+            $hasOutsource = $selectedResults->contains(function ($result) {
+                return in_array($result, ['outsource', 'hybrid'], true);
+            });
+
+            if (($hasNoFault || $hasInHouse) && !$request->mechanic_name) {
+                throw new \RuntimeException('Mechanic name is required for No Fault, In House and Hybrid items.');
+            }
+
+            if ($hasResolved && (!$request->reading || !$request->maintenance_date)) {
+                throw new \RuntimeException('Current reading and maintenance date are required for resolved items.');
+            }
+
+            if ($hasOutsource && (!$request->vendor_id || !$request->bill_amount)) {
+                throw new \RuntimeException('Vendor and bill amount are required for Outsource and Hybrid items.');
+            }
+
+            if (($hasNoFault || $hasResolved) && !$request->comments) {
+                throw new \RuntimeException('Comments are required for No Fault and resolved items.');
+            }
+
+            $dockItems = $selectedItems->where('result', 'dock_required');
+            $nonDockItems = $selectedItems->where('result', '!=', 'dock_required');
+            $dockRequest = null;
+
+            if ($dockItems->isNotEmpty()) {
+                if (!$request->dock_time || $request->dock_time === '00:00'
+                    || !$request->periority || !$request->dock_description) {
+                    throw new \RuntimeException('Dock time, priority and description are required for Dock Required items.');
+                }
+
+                $dockRequest = DockRequest::create([
+                    'fault_claim_id' => $fault->id,
+                    'bus_id' => $fault->bus_id,
+                    'dock_time' => $request->dock_time,
+                    'periority' => $request->periority,
+                    'description' => $request->dock_description,
+                    'status' => 'pending',
+                    'added_by' => Auth::user()->id,
+                    'company_id' => Auth::user()->company_id,
+                ]);
+            }
+
+            $inspection = null;
+            if ($nonDockItems->isNotEmpty()) {
+                $hasResolved = $nonDockItems->contains(function ($item) {
+                    return in_array($item['result'], ['in_house', 'outsource', 'hybrid'], true);
+                });
+                $hasNoFault = $nonDockItems->contains('result', 'no_fault');
+                $repairTypes = $nonDockItems
+                    ->pluck('result')
+                    ->filter(fn($result) => $result !== 'no_fault')
+                    ->unique()
+                    ->values();
+
+                $inspection = InspectionResult::create([
+                    'fault_claim_id' => $fault->id,
+                    'bus_id' => $fault->bus_id,
+                    'driver_id' => $fault->driver_id,
+                    'status' => $hasResolved && $hasNoFault ? 'mixed' : ($hasResolved ? 'resolved' : 'no fault'),
+                    'repair_type' => $repairTypes->count() > 1
+                        ? 'mixed'
+                        : str_replace('_', ' ', $repairTypes->first() ?? ''),
+                    'machanic_name' => $request->mechanic_name,
+                    'current_reading' => $request->reading,
+                    'maintenance_date' => $request->maintenance_date,
+                    'vendor_id' => $request->vendor_id,
+                    'amount' => $request->bill_amount,
+                    'comments' => $request->comments,
+                    'added_by' => Auth::user()->id,
+                    'company_id' => Auth::user()->company_id,
+                ]);
+            }
+
+            foreach ($selectedItems as $selectedItem) {
+                $part = $selectedItem['part'];
+                $result = $selectedItem['result'];
+                $isDockRequired = $result === 'dock_required';
+
+                InspectionResultPart::create([
+                    'inspection_result_id' => $isDockRequired ? null : $inspection->id,
+                    'fault_claim_id' => $fault->id,
+                    'fault_claim_part_id' => $part->id,
+                    'dock_request_id' => $isDockRequired ? $dockRequest->id : null,
+                    'bus_id' => $fault->bus_id,
+                    'part_id' => $part->part_id,
+                    'status' => $isDockRequired ? 'dock required' : ($result === 'no_fault' ? 'no fault' : 'resolved'),
+                    'repair_type' => in_array($result, ['in_house', 'outsource', 'hybrid'], true)
+                        ? str_replace('_', ' ', $result)
+                        : null,
+                    'added_by' => Auth::user()->id,
+                    'company_id' => Auth::user()->company_id,
+                ]);
+
+                $part->update([
+                    'status' => $result,
+                    'dock_request_id' => $isDockRequired ? $dockRequest->id : $part->dock_request_id,
+                ]);
+            }
+
+            $fault->update([
+                'status' => $dockItems->isNotEmpty() ? 'pending' : 'resolved',
+            ]);
+
+            DB::commit();
+
+            ActivityLogger::log(
+                'Maintenance Fault Claim',
+                'status change',
+                'Item-wise fault claim results submitted',
+                $fault->id,
+                [],
+                [
+                    'status' => $fault->fresh()->status,
+                    'item_results' => $selectedItems->map(fn($item) => [
+                        'fault_claim_part_id' => $item['part']->id,
+                        'result' => $item['result'],
+                    ])->values()->all(),
+                ],
+                $request
+            );
+
+            return response()->json([
+                'message' => $dockItems->isNotEmpty()
+                    ? 'Item results saved. The claim remains open because one or more items require dock work.'
+                    : 'All item results saved and the fault claim is now resolved.',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Item-wise inspection result error: ' . $e->getMessage());
+
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
 
     public function show(Request $request)
     {
@@ -340,6 +554,7 @@ class FaultClaimController extends Controller
             'dockRequest'
         ])
             ->where("fault_claim_id", $request->id)
+            ->latest('id')
             ->first();
 
         return response()->json([
@@ -496,7 +711,7 @@ class FaultClaimController extends Controller
                 $q->select('id', 'name');
             },
             'dockRequest'
-        ])->where("fault_claim_id", $request->id)->first();
+        ])->where("fault_claim_id", $request->id)->latest('id')->first();
 
         return [
             "fault" => $fault,
