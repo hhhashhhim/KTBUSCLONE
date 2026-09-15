@@ -738,29 +738,57 @@
               </div>
               <div class="form-group col-md-6">
                 <label for="smarteye_password">Password</label>
-                <input
-                  id="smarteye_password"
-                  type="password"
-                  class="form-control"
-                  v-model="dataEdit.smarteye_password"
-                  placeholder="Leave blank to keep existing password"
-                  autocomplete="new-password"
-                />
+                <div class="input-group">
+                  <input
+                    id="smarteye_password"
+                    :type="showSmarteyePassword ? 'text' : 'password'"
+                    class="form-control"
+                    v-model="dataEdit.smarteye_password"
+                    placeholder="Enter Smarteye password"
+                    autocomplete="new-password"
+                    :disabled="smarteyeSettingsLoading"
+                  />
+                  <div class="input-group-append">
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      :disabled="smarteyeSettingsLoading"
+                      :aria-label="showSmarteyePassword ? 'Hide Smarteye password' : 'Show Smarteye password'"
+                      @click="showSmarteyePassword = !showSmarteyePassword"
+                    >
+                      <i :class="showSmarteyePassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                    </button>
+                  </div>
+                </div>
               </div>
               <div class="form-group col-md-6">
                 <label for="smarteye_api">Smarteye API</label>
-                <input
-                  id="smarteye_api"
-                  type="password"
-                  class="form-control"
-                  v-model="dataEdit.smarteye_api"
-                  placeholder="Leave blank to keep existing API key"
-                  autocomplete="new-password"
-                />
+                <div class="input-group">
+                  <input
+                    id="smarteye_api"
+                    :type="showSmarteyeApi ? 'text' : 'password'"
+                    class="form-control"
+                    v-model="dataEdit.smarteye_api"
+                    placeholder="Enter Smarteye API key"
+                    autocomplete="new-password"
+                    :disabled="smarteyeSettingsLoading"
+                  />
+                  <div class="input-group-append">
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary"
+                      :disabled="smarteyeSettingsLoading"
+                      :aria-label="showSmarteyeApi ? 'Hide Smarteye API key' : 'Show Smarteye API key'"
+                      @click="showSmarteyeApi = !showSmarteyeApi"
+                    >
+                      <i :class="showSmarteyeApi ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
             <small class="form-text text-muted mt-0">
-              Saved passwords and API keys are protected and are not displayed again.
+              Saved values are loaded securely for editing. Use the eye buttons to view them.
             </small>
           </div>
         </div>
@@ -768,7 +796,7 @@
           <button
             type="button"
             class="btn btn-primary"
-            :disabled="loading"
+            :disabled="loading || smarteyeSettingsLoading"
             @click="update"
           >
             {{ loading ? "Loading..." : "Update Terminal" }}
@@ -992,6 +1020,9 @@ export default {
       validationErrors: "",
       seen: true,
       loading: false,
+      smarteyeSettingsLoading: false,
+      showSmarteyePassword: false,
+      showSmarteyeApi: false,
       showDivComma: true,
       showDivPositive: true,
       showEditDivComma: true,
@@ -1229,13 +1260,45 @@ export default {
       this.dataEdit.other_terminal_passenger_detail =
         single.other_terminal_passenger_detail == 1 ? true : false;
       this.dataEdit.send_message =
-  single.send_message == 1
-    ? ["confirm"]
-    : single.send_message == 2
-    ? ["reserved"]
-    : single.send_message == 3
-    ? ["confirm", "reserved"]
-    : [];
+        single.send_message == 1
+          ? ["confirm"]
+          : single.send_message == 2
+          ? ["reserved"]
+          : single.send_message == 3
+          ? ["confirm", "reserved"]
+          : [];
+      this.showSmarteyePassword = false;
+      this.showSmarteyeApi = false;
+      this.smarteyeSettingsLoading = true;
+
+      try {
+        const smarteyeSettingsRes = await this.callApi(
+          "post",
+          "terminals/smarteye-settings",
+          { id: single.id }
+        );
+
+        if (smarteyeSettingsRes.status === 200) {
+          this.dataEdit.smarteye_password = smarteyeSettingsRes.data.smarteye_password || "";
+          this.dataEdit.smarteye_api = smarteyeSettingsRes.data.smarteye_api || "";
+        } else {
+          swal({
+            title: "Unable to Load Smarteye Settings",
+            text: "The saved Password and Smarteye API could not be loaded. Please try again.",
+            icon: "error",
+            timer: 2500,
+          });
+        }
+      } catch (error) {
+        swal({
+          title: "Unable to Load Smarteye Settings",
+          text: "The saved Password and Smarteye API could not be loaded. Please try again.",
+          icon: "error",
+          timer: 2500,
+        });
+      } finally {
+        this.smarteyeSettingsLoading = false;
+      }
 
     },
     async terminalDetail(id) {
