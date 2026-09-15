@@ -23,6 +23,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         $schedule->command('reserved:cancel')->everyFifteenMinutes();
         $schedule->command('jazzcash:check-pending-payment')->everyMinute();
+        $schedule->command('mobile:reconcile-payments')->everyMinute()->withoutOverlapping();
         $schedule->command('daily:report')->dailyAt("11:00");
     }
 

@@ -99,3 +99,6 @@ require_once('api/reports/confirmCancellationReports.php');
 require_once('api/onlineTerminalCancellations.php');
 // Inventory Routes
 require_once('api/inventory.php');
+
+// Passenger mobile application API. Kept separate from the staff-facing web API.
+require('api/mobile.php');
