@@ -318,6 +318,37 @@
                                         <i class="fas fa-info-circle"></i> No image uploaded.
                                     </div>
 
+                                    <div class="card border mb-4" v-if="selectedFault?.claim_parts?.length">
+                                        <div class="card-header bg-light">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-list-check mr-2"></i> Item / Service Results
+                                            </h6>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 65px;">#</th>
+                                                        <th>Item / Service</th>
+                                                        <th style="width: 230px;">Result</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(claimPart, index) in selectedFault.claim_parts"
+                                                        :key="claimPart.id">
+                                                        <td>{{ index + 1 }}</td>
+                                                        <td>{{ claimPart.part?.name || 'N/A' }}</td>
+                                                        <td>
+                                                            <span :class="getInspectionResultClass(claimPart.status)">
+                                                                {{ formatInspectionResult(claimPart.status) }}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
                                     <div v-if="selectedFault?.dock_requests?.length > 0">
                                         <div class="row">
                                             <div class="col-md-12 mb-3" v-for="(dock, i) in selectedFault.dock_requests"
@@ -531,61 +562,73 @@
 
                                 <!-- Main Status Selection -->
                                 <div class="col-md-12 mb-3">
-                                    <label><strong>Status <span class="text-danger">*</span></strong></label>
-                                    <div>
-                                        <label><input type="radio" v-model="result.status" value="no_fault" /> No
-                                            Fault</label>
-                                        <label class="ml-3"><input type="radio" v-model="result.status"
-                                                value="resolved" /> Resolved</label>
-                                        <label class="ml-3"><input type="radio" v-model="result.status"
-                                                value="dock_required" /> Dock Required</label>
+                                    <div class="inspection-progress-card">
+                                        <div>
+                                            <strong>Item Inspection Results</strong>
+                                            <small class="d-block text-muted">
+                                                Select a separate result for every item/service.
+                                            </small>
+                                        </div>
+                                        <span class="badge badge-primary p-2">
+                                            {{ markedInspectionItems }} / {{ actionableInspectionItems.length }} marked
+                                        </span>
                                     </div>
                                 </div>
 
-
-                                <!-- Resolved Repair Type Selection -->
-                                <div class="col-md-12 mb-3" v-if="result.status === 'resolved'">
-                                    <label><strong>Repair Type <span class="text-danger">*</span></strong></label>
-                                    <div>
-                                        <label><input type="radio" v-model="result.repair_type" value="in_house" /> In
-                                            House</label>
-                                        <label class="ml-3"><input type="radio" v-model="result.repair_type"
-                                                value="outsource" /> Outsource</label>
-                                        <label class="ml-3"><input type="radio" v-model="result.repair_type"
-                                                value="hybrid" /> Hybrid</label>
-                                    </div>
-                                </div>
-
-                                <!-- ✅ Parts Table Instead of Dropdown -->
-                                <div class="col-md-12" v-if="(result.status === 'no_fault' && parts.length)
-                                    || (result.status === 'resolved' && result.repair_type && parts.length)
-                                    || (result.status === 'dock_required' && parts.length)">
-                                    <div class="form-group">
-                                        <label><strong>Parts</strong></label>
-                                        <table class="table table-bordered table-striped">
+                                <div class="col-md-12" v-if="result.items.length">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered inspection-result-table">
                                             <thead class="thead-light">
                                                 <tr>
-                                                    <th>#</th>
-                                                    <th>Part Name</th>
-                                                    <th>Select</th>
+                                                    <th style="width: 65px;">#</th>
+                                                    <th>Item / Service</th>
+                                                    <th style="width: 290px;">Inspection Result</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="(part, index) in parts" :key="part.id">
+                                                <tr v-for="(item, index) in result.items" :key="item.fault_claim_part_id">
                                                     <td>{{ index + 1 }}</td>
-                                                    <td>{{ part.part?.name || part.maintenancePart?.name || 'N/A' }}
+                                                    <td>
+                                                        <strong>{{ item.name }}</strong>
+                                                        <small v-if="item.locked" class="d-block text-success">
+                                                            Result already completed
+                                                        </small>
+                                                        <small v-else-if="item.previous_result === 'dock_required'"
+                                                            class="d-block text-warning">
+                                                            Returned from dock — select the latest result
+                                                        </small>
                                                     </td>
                                                     <td>
-                                                        <input type="checkbox" :value="part.id" v-model="result.parts">
+                                                        <span v-if="item.locked"
+                                                            :class="getInspectionResultClass(item.result)">
+                                                            {{ formatInspectionResult(item.result) }}
+                                                        </span>
+                                                        <select v-else v-model="item.result" class="form-control">
+                                                            <option value="">Select Result</option>
+                                                            <option value="no_fault">No Fault</option>
+                                                            <option value="in_house">Resolved - In House</option>
+                                                            <option value="outsource">Resolved - Outsource</option>
+                                                            <option value="hybrid">Resolved - Hybrid</option>
+                                                            <option value="dock_required">Dock Required</option>
+                                                        </select>
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
+                                    <div v-if="actionableInspectionItems.length && !allInspectionItemsMarked"
+                                        class="alert alert-warning py-2">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                                        The fault claim will remain open. Mark every pending item before submitting.
+                                    </div>
+                                </div>
+
+                                <div v-else class="col-md-12">
+                                    <div class="alert alert-info">No items/services are attached to this fault claim.</div>
                                 </div>
 
                                 <!-- No Fault Fields -->
-                                <div class="col-md-6" v-if="result.status === 'no_fault'">
+                                <div class="col-md-6" v-if="hasNoFaultInspection">
                                     <div class="form-group">
                                         <label>Mechanic Name <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" v-model="result.mechanic_name" />
@@ -593,14 +636,14 @@
                                 </div>
 
                                 <!-- Resolved Shared Fields -->
-                                <div class="col-md-6" v-if="result.status === 'resolved' && result.repair_type">
+                                <div class="col-md-6" v-if="hasResolvedInspection">
                                     <div class="form-group">
                                         <label>Current Reading <span class="text-danger">*</span></label>
                                         <input type="number" class="form-control" v-model="result.reading" />
                                     </div>
                                 </div>
 
-                                <div class="col-md-6" v-if="result.status === 'resolved' && result.repair_type">
+                                <div class="col-md-6" v-if="hasResolvedInspection">
                                     <div class="form-group">
                                         <label>Maintenance Date <span class="text-danger">*</span></label>
                                         <input type="date" class="form-control" v-model="result.maintenance_date" />
@@ -609,7 +652,7 @@
 
                                 <!-- Mechanic Name (In House + Hybrid) -->
                                 <div class="col-md-6"
-                                    v-if="result.status === 'resolved' && ['in_house', 'hybrid'].includes(result.repair_type)">
+                                    v-if="hasInHouseInspection">
                                     <div class="form-group">
                                         <label>Mechanic Name <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" v-model="result.mechanic_name" />
@@ -618,7 +661,7 @@
 
                                 <!-- Vendor/Bill (Outsource + Hybrid) -->
                                 <div class="col-md-6"
-                                    v-if="result.status === 'resolved' && ['outsource', 'hybrid'].includes(result.repair_type)">
+                                    v-if="hasOutsourceInspection">
                                     <div class="form-group">
                                         <label>Vendor <span class="text-danger">*</span></label>
                                         <select class="form-control" v-model="result.vendor_id" ref="vendorSelect">
@@ -631,7 +674,7 @@
                                 </div>
 
                                 <div class="col-md-6"
-                                    v-if="result.status === 'resolved' && ['outsource', 'hybrid'].includes(result.repair_type)">
+                                    v-if="hasOutsourceInspection">
                                     <div class="form-group">
                                         <label>Bill Amount <span class="text-danger">*</span></label>
                                         <input type="number" class="form-control" v-model="result.bill_amount" />
@@ -639,7 +682,7 @@
                                 </div>
 
                                 <!-- Dock Required Fields -->
-                                <div class="col-md-6" v-if="result.status === 'dock_required'">
+                                <div class="col-md-6" v-if="hasDockRequiredInspection">
                                     <div class="form-group">
                                         <label>Dock Time <span class="text-danger">*</span></label>
                                         <div class="input-group">
@@ -653,7 +696,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-6" v-if="result.status === 'dock_required'">
+                                <div class="col-md-6" v-if="hasDockRequiredInspection">
                                     <div class="form-group">
                                         <label>Priority <span class="text-danger">*</span></label>
                                         <select class="form-control" v-model="result.periority">
@@ -665,7 +708,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-12" v-if="result.status === 'dock_required'">
+                                <div class="col-md-12" v-if="hasDockRequiredInspection">
                                     <div class="form-group">
                                         <label>Description <span class="text-danger">*</span></label>
                                         <textarea class="form-control" v-model="result.dock_description"></textarea>
@@ -673,8 +716,7 @@
                                 </div>
 
                                 <!-- Comments Field Always At End -->
-                                <div class="col-md-12"
-                                    v-if="result.status === 'no_fault' || (result.status === 'resolved' && result.repair_type)">
+                                <div class="col-md-12" v-if="hasNonDockInspection">
                                     <div class="form-group">
                                         <label>Comments <span class="text-danger">*</span></label>
                                         <textarea class="form-control" v-model="result.comments" rows="2"></textarea>
@@ -684,8 +726,9 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" @click="submitResult" :disabled="loading">
-                                <i class="fas fa-paper-plane"></i> {{ loading ? 'Submitting...' : 'Submit' }}
+                            <button type="button" class="btn btn-primary" @click="submitResult"
+                                :disabled="loading || !actionableInspectionItems.length">
+                                <i class="fas fa-paper-plane"></i> {{ loading ? 'Submitting...' : 'Submit Item Results' }}
                             </button>
                         </div>
                     </div>
@@ -729,9 +772,7 @@ export default {
             selectedFault: null,
             result: {
                 claim_id: '',
-                status: '',
-                repair_type: '',
-                parts: [],
+                items: [],
                 reading: '',
                 maintenance_date: '',
                 comments: '',
@@ -760,6 +801,45 @@ export default {
         this.resultDataReset = JSON.parse(JSON.stringify(this.result));
         this.permissions = this.$store.state.permissions;
     },
+    computed: {
+        actionableInspectionItems() {
+            return this.result.items.filter(item => !item.locked);
+        },
+        markedInspectionItems() {
+            return this.actionableInspectionItems.filter(item => item.result).length;
+        },
+        allInspectionItemsMarked() {
+            return this.actionableInspectionItems.length > 0
+                && this.markedInspectionItems === this.actionableInspectionItems.length;
+        },
+        selectedInspectionResults() {
+            return this.actionableInspectionItems.map(item => item.result).filter(Boolean);
+        },
+        hasNoFaultInspection() {
+            return this.selectedInspectionResults.includes('no_fault');
+        },
+        hasResolvedInspection() {
+            return this.selectedInspectionResults.some(result =>
+                ['in_house', 'outsource', 'hybrid'].includes(result)
+            );
+        },
+        hasInHouseInspection() {
+            return this.selectedInspectionResults.some(result =>
+                ['in_house', 'hybrid'].includes(result)
+            );
+        },
+        hasOutsourceInspection() {
+            return this.selectedInspectionResults.some(result =>
+                ['outsource', 'hybrid'].includes(result)
+            );
+        },
+        hasDockRequiredInspection() {
+            return this.selectedInspectionResults.includes('dock_required');
+        },
+        hasNonDockInspection() {
+            return this.selectedInspectionResults.some(result => result !== 'dock_required');
+        },
+    },
     watch: {
         'data.bus_id'(newVal) {
             this.$nextTick(() => {
@@ -778,11 +858,6 @@ export default {
         'data.driver_id'(newVal) {
             this.$nextTick(() => {
                 this.initSelect2();
-            });
-        },
-        'result.parts'(newVal) {
-            this.$nextTick(() => {
-                this.initInspectionSelect2();
             });
         },
         'result.vendor_id'(newVal) {
@@ -908,7 +983,21 @@ export default {
                     this.vendors = res.data.vendors || [];
 
                     // ✅ Pre-select all parts
-                    this.result.parts = this.parts.map(p => p.id);
+                    this.result.items = this.parts.map(part => {
+                        const savedResult = part.status && part.status !== 'pending'
+                            ? part.status
+                            : '';
+                        const requiresNewResult = !savedResult || savedResult === 'dock_required';
+
+                        return {
+                            fault_claim_part_id: part.id,
+                            part_id: part.part_id,
+                            name: part.part?.name || part.maintenancePart?.name || 'N/A',
+                            result: requiresNewResult ? '' : savedResult,
+                            previous_result: savedResult,
+                            locked: !requiresNewResult,
+                        };
+                    });
                 } else {
                     swal("Error", "Failed to fetch parts/vendors", "error");
                 }
@@ -1098,32 +1187,34 @@ export default {
                 });
             };
 
-            // Validate status
-            if (!this.result.status) return showError("Please select a Status");
+            if (!this.actionableInspectionItems.length) {
+                return showError("There are no pending items to inspect");
+            }
 
-            // No Fault
-            if (this.result.status === 'no_fault') {
+            if (!this.allInspectionItemsMarked) {
+                const remaining = this.actionableInspectionItems.length - this.markedInspectionItems;
+                return showError(`Please select an inspection result for all items. ${remaining} item(s) remaining.`);
+            }
+
+            if (this.hasNoFaultInspection) {
                 if (!this.result.mechanic_name) return showError("Please enter Mechanic Name");
             }
 
-            // Resolved
-            if (this.result.status === 'resolved') {
-                if (!this.result.repair_type) return showError("Please select a Repair Type");
+            if (this.hasResolvedInspection) {
                 if (!this.result.reading) return showError("Please enter Current Reading");
                 if (!this.result.maintenance_date) return showError("Please select Maintenance Date");
 
-                if (['in_house', 'hybrid'].includes(this.result.repair_type)) {
+                if (this.hasInHouseInspection) {
                     if (!this.result.mechanic_name) return showError("Please enter Mechanic Name");
                 }
 
-                if (['outsource', 'hybrid'].includes(this.result.repair_type)) {
+                if (this.hasOutsourceInspection) {
                     if (!this.result.vendor_id) return showError("Please select a Vendor");
                     if (!this.result.bill_amount) return showError("Please enter Bill Amount");
                 }
             }
 
-            // Dock Required
-            if (this.result.status === 'dock_required') {
+            if (this.hasDockRequiredInspection) {
                 if (!this.result.dock_hours && !this.result.dock_minutes) {
                     return showError("Please enter Dock Time");
                 }
@@ -1131,11 +1222,7 @@ export default {
                 if (!this.result.dock_description) return showError("Please enter Description");
             }
 
-            // Comments (for all)
-            if (
-                this.result.status === 'no_fault' ||
-                (this.result.status === 'resolved' && this.result.repair_type)
-            ) {
+            if (this.hasNonDockInspection) {
                 if (!this.result.comments) return showError("Please enter Comments");
             }
 
@@ -1151,20 +1238,45 @@ export default {
             };
 
             // ✅ Submit data
-            const res = await this.callApi('post', 'fleet/inspection-result/submit', this.result);
-            if (res.status === 200) {
-                swal({
-                    title: "Success",
-                    text: "Result Submited",
-                    icon: "success",
-                    timer: 2000
-                });
+            try {
+                const res = await this.callApi('post', 'fleet/inspection-result/submit', this.result);
+                if (res.status === 200) {
+                    swal({
+                        title: "Success",
+                        text: res.data.message || "Item inspection results submitted successfully",
+                        icon: "success",
+                        timer: 2000
+                    });
 
-                this.$nextTick(() => $('#addDockModal').modal('hide'));
-                await this.fetchData();
-                this.result = JSON.parse(JSON.stringify(this.resultDataReset));
+                    this.$nextTick(() => $('#addDockModal').modal('hide'));
+                    await this.fetchData();
+                    this.result = JSON.parse(JSON.stringify(this.resultDataReset));
+                } else {
+                    showError(res.data.message || "Unable to submit inspection results");
+                }
+            } finally {
+                this.loading = false;
             }
-            this.loading = false;
+        },
+        formatInspectionResult(result) {
+            const labels = {
+                no_fault: 'No Fault',
+                in_house: 'Resolved - In House',
+                outsource: 'Resolved - Outsource',
+                hybrid: 'Resolved - Hybrid',
+                dock_required: 'Dock Required',
+                pending: 'Pending',
+            };
+
+            return labels[result] || result || 'Pending';
+        },
+        getInspectionResultClass(result) {
+            if (result === 'dock_required') return 'badge badge-warning p-2';
+            if (result === 'no_fault') return 'badge badge-info p-2';
+            if (['in_house', 'outsource', 'hybrid'].includes(result)) {
+                return 'badge badge-success p-2';
+            }
+            return 'badge badge-secondary p-2';
         },
         getStatusClass(status) {
             switch (status) {
@@ -1195,16 +1307,6 @@ export default {
         },
         initInspectionSelect2() {
             const vm = this;
-
-            // Parts - multiple
-            if (this.$refs.partsSelect) {
-                const $parts = $(this.$refs.partsSelect);
-                $parts.select2({ dropdownParent: $('#addDockModal') })
-                    .off('change')
-                    .on('change', function () {
-                        vm.result.parts = $(this).val(); // update Vue data
-                    });
-            }
 
             // Vendor - single
             if (this.$refs.vendorSelect) {
@@ -1255,5 +1357,20 @@ export default {
 .progress-th {
     width: 70%;
 
+}
+
+.inspection-progress-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    border: 1px solid #e4e7ec;
+    border-radius: 8px;
+    background: #f8f9ff;
+}
+
+.inspection-result-table td {
+    vertical-align: middle;
 }
 </style>
