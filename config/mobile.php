@@ -28,5 +28,11 @@ return [
     'otp' => [
         'driver' => env('MOBILE_OTP_DRIVER', 'disabled'),
         'ttl_minutes' => (int) env('MOBILE_OTP_TTL_MINUTES', 10),
+        'whatsapp' => [
+            'api_key' => env('MOBILE_WHATSAPP_API_KEY'),
+            'client_code' => env('MOBILE_WHATSAPP_CLIENT_CODE', 'kainat-travels'),
+            'template' => env('MOBILE_WHATSAPP_OTP_TEMPLATE', 'otp'),
+            'language' => env('MOBILE_WHATSAPP_LANGUAGE', 'en'),
+        ],
     ],
 ];

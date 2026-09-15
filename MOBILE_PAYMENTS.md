@@ -102,3 +102,20 @@ Set `MOBILE_PAYMENT_ENVIRONMENT=live`, `MOBILE_PAYMENT_PREVIEW_ONLY=true`, and `
 Both app configuration and fare quotes include `payment_preview` and `payment_environment`. The mobile checkout labels live preview, permits reviewing method choices, and disables submission. Older clients cannot bypass the backend preview guard.
 
 The source website's live credentials were explicitly authorized for this local preview on 12 September 2026. They remain server-side. No live provider request, handshake, payment, reservation, or charge is used to validate preview. Before real activation, configure a public HTTPS mobile API and registered callback, complete provider acceptance and scheduler setup, and explicitly disable preview. Website production settings are unchanged.
+
+## Activation preparation — 15 September 2026
+
+At the user's request, the ignored local backend `.env` now selects live JazzCash
+and Bank Alfalah payments with `MOBILE_PAYMENT_PREVIEW_ONLY=false`,
+`MOBILE_ONLINE_PAYMENTS_ENABLED=true`, and
+`APP_URL=https://mobile-api.kainattravels.com`. Existing server-side merchant
+credentials are preserved. Source defaults remain disabled for unconfigured installs.
+The earlier preview section describes the optional preview mode, not the current
+local activation settings.
+
+Follow `MOBILE_DEPLOYMENT.md` when uploading. Git/source upload does not transfer
+ignored environment settings. Configure the server environment separately; the
+local `.env` is an overlay of local service settings, not a complete production
+Laravel environment. Provider callback registration, production acceptance, and
+server scheduler operation are not established by changing these flags. No live
+payment or production migration was performed for this activation preparation.

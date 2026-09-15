@@ -51,10 +51,14 @@ class MobileAuthController extends Controller
                     'password' => Hash::make($request->password),
                 ]);
             });
+            $verificationDeliverySent = false;
+            $verificationMessage = null;
             try {
                 $otp->issue($account);
-            } catch (RuntimeException $ignored) {
-                // Account creation remains valid; booking stays blocked until verification is configured.
+                $verificationDeliverySent = true;
+            } catch (RuntimeException $exception) {
+                // Keep the account and token so the passenger can retry delivery.
+                $verificationMessage = $exception->getMessage();
             }
             $account->load('customer');
 
@@ -62,6 +66,8 @@ class MobileAuthController extends Controller
                 'passenger' => (new PassengerResource($account))->resolve(),
                 'token' => $account->createToken('passenger-mobile')->plainTextToken,
                 'verification_pending' => true,
+                'verification_delivery_sent' => $verificationDeliverySent,
+                'verification_message' => $verificationMessage,
             ], 'Passenger account created.', 201);
         } catch (RuntimeException $exception) {
             return $this->failure($exception->getMessage(), [], $exception->getCode() ?: 422);
@@ -110,7 +116,9 @@ class MobileAuthController extends Controller
         if (!$otp->verify($request->user(), $request->code)) {
             return $this->failure('The verification code is invalid or expired.', [], 422);
         }
-        return $this->success(null, 'Mobile number verified.');
+        return $this->success([
+            'passenger' => (new PassengerResource($request->user()->load('customer')))->resolve(),
+        ], 'Mobile number verified.');
     }
 
     public function forgotPassword(
@@ -118,14 +126,16 @@ class MobileAuthController extends Controller
         MobileTravelService $travel,
         MobileOtpService $otp
     ) {
-        if (config('mobile.otp.driver') !== 'log' || !app()->environment(['local', 'testing'])) {
-            return $this->failure('Passenger OTP delivery is not configured.', [], 503);
-        }
-        $account = PassengerAccount::where('company_id', $travel->companyId())
-            ->where('mobile', $request->mobile)
-            ->first();
-        if ($account) {
-            $otp->issuePasswordReset($account);
+        try {
+            $otp->ensureConfigured();
+            $account = PassengerAccount::where('company_id', $travel->companyId())
+                ->where('mobile', $request->mobile)
+                ->first();
+            if ($account) {
+                $otp->issuePasswordReset($account);
+            }
+        } catch (RuntimeException $exception) {
+            return $this->failure($exception->getMessage(), [], $this->exceptionStatus($exception, 503));
         }
 
         return $this->success(null, 'If an account exists, a verification code has been sent.', 202);

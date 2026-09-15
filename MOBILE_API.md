@@ -87,7 +87,7 @@ Regression coverage: `tests/Feature/MobileSchedulingRulesTest.php` exercises rea
 - Wallet reads the existing loyalty-card balance (`card_assigns.starting_points`) for the signed-in passenger. A quote may include an optional `points_to_use` integer; the server calculates and revalidates the discount when the booking is created. The existing ticket `points_usage` field is preserved so the current cancellation workflow can return points.
 - `GET /fleet` returns active `mobile_fleet_media` records for the configured company. Each record may be linked to a bus class and has a `media_type` such as `exterior`, `interior`, or `seats`. Images are never bundled into the app: the URL is stored in the database. Management/upload screens for these records belong in the staff system and are not part of the passenger mobile API.
 - Notifications return an empty list and the feature flag remains disabled because no passenger notification store or device-token delivery integration exists.
-- SMS/OTP delivery requires a production provider implementation. `MOBILE_OTP_DRIVER=log` is limited to local/testing environments.
+- Signup, resend, and password-reset OTPs support SAR Zone WhatsApp delivery. See configuration below. `MOBILE_OTP_DRIVER=log` remains limited to local/testing environments.
 - Password reset uses a short-lived OTP followed by a one-time, 15-minute reset token. Existing passenger API tokens are revoked when the password changes.
 - Cancellation, refund, and rescheduling are deliberately not exposed to passengers.
 
@@ -99,3 +99,32 @@ See [MOBILE_PAYMENTS.md](MOBILE_PAYMENTS.md) for configuration, lifecycle, respo
 ### Payment preview
 
 `GET /app/config` and `POST /bookings/quote` include `payment_environment` (`sandbox` or `live`) and `payment_preview` (boolean). When preview is true, the quote can list configured methods for display, but `POST /bookings` for an online method returns HTTP 409: `Payment preview only. No booking or payment will be submitted.` Preview also prevents hosted checkout and gateway inquiries. Clients must label preview and disable payment submission. Merchant secrets are never included in either response.
+
+## WhatsApp OTP delivery
+
+Set `MOBILE_OTP_DRIVER=whatsapp` and `MOBILE_WHATSAPP_API_KEY` in the backend environment. Use the existing SAR Zone middleware credential, not `companies.whatsapp_auth_key` (that field belongs to the older messaging integration). Never put this key in Flutter or tracked files. Defaults are client `kainat-travels`, template `otp`, language `en`; override with `MOBILE_WHATSAPP_CLIENT_CODE`, `MOBILE_WHATSAPP_OTP_TEMPLATE`, and `MOBILE_WHATSAPP_LANGUAGE`. Clear/rebuild Laravel configuration cache after deployment and restart long-running PHP workers if applicable.
+
+The backend POSTs to `https://wa.sarzone.com/api/v1/whatsapp/send-template` with Bearer authentication and the same template fields as the existing booking OTP helper. It accepts Pakistani mobile forms `03xxxxxxxxx`, `3xxxxxxxxx`, and `923xxxxxxxxx` (formatting is stripped for delivery). It does not change passenger account lookup/uniqueness semantics. Codes use cryptographic randomness, are stored hashed in passenger-account fields, expire after `MOBILE_OTP_TTL_MINUTES` (default 10), and are consumed on verification. Signup and password reset use separate fields. Resending replaces the previous code. Provider acceptance requires HTTP 2xx and JSON `success: true`; it does not prove handset delivery. No automatic HTTP retry is performed.
+
+Existing JSON endpoints and request bodies remain unchanged:
+
+- `POST /auth/register`: `full_name`, `mobile`, `cnic`, `password`, `password_confirmation`, optional `email`; returns 201 with passenger, token, and `verification_pending: true`. Additional data fields: `verification_delivery_sent` (boolean, provider accepted) and `verification_message` (nullable safe failure explanation). Delivery failure keeps the unverified account/token so the app can offer resend; it never marks the passenger verified.
+- `POST /auth/resend-otp`: Bearer passenger token, no body; success 200, delivery/configuration failure 503 or invalid delivery number 422.
+- `POST /auth/verify-otp`: Bearer passenger token, `{ "code": "123456" }`; success 200 with `data.passenger` including `mobile_verified: true`; invalid/expired code 422.
+- `POST /auth/forgot-password`: `{ "mobile": "03001234567" }`; 202 with generic account-existence wording; delivery/configuration failures use the mobile error envelope (503, or 422 for invalid delivery number).
+- `POST /auth/verify-reset-otp`: `mobile`, `code`; returns the existing one-time reset token. `POST /auth/reset-password` continues to consume it and revoke passenger sessions.
+
+WhatsApp mode never logs OTPs, API keys, full phone numbers, or provider response bodies. `disabled` remains the safe default for unconfigured deployments. Existing staff booking/loyalty/discount WhatsApp flows are unchanged. No migration is needed. Run `php vendor/bin/phpunit --do-not-cache-result --filter 'MobileOtpTest|MobileApiContractTest'`; tests use a disposable SQLite database and fake HTTP, never send a real WhatsApp message.
+
+
+## Account deletion
+
+`DELETE /api/mobile/v1/account` requires a passenger Sanctum bearer token for the configured company, `Accept: application/json`, and JSON `{ "password": "<current password>", "confirmation": "DELETE" }`. Throttled to 5 requests/minute. Staff tokens and other-company accounts are rejected (403); missing/expired tokens return 401. Invalid fields or wrong password return 422 in the normal `{success, message, data, errors}` envelope. A wrong password does not sign the passenger out. Rate limiting returns 429.
+
+Success: HTTP 200, `{ "success": true, "message": "Your mobile account has been deleted.", "data": null, "errors": null }`. A single transaction records an audit event (account ID, company ID, timestamp), physically deletes the passenger account, saved passengers and mobile booking quotes, and revokes all its tokens. Failure rolls everything back. Passwords, OTP/reset digests and email are removed with the account. No OTP is sent for deletion; the current password provides fresh verification.
+
+Shared ERP customer details (including name, contact and CNIC), invoices/tickets, payment records and loyalty records are retained. Account deletion does not cancel bookings, refund payments or erase loyalty balances. Payment reconciliation remains independent of the deleted account. Passengers should save ticket references before proceeding and contact support for existing trips or data retained by the business. A new signup can use the same number, requires normal verification and receives a new account ID; old mobile invoices are not reassigned to it. Customer-linked loyalty records may be available again after signup.
+
+Deploy the new `mobile_account_deletions` migration and API before releasing the Flutter flow. No production migration is run by this implementation. The app must display API failures without claiming deletion, and clear its session and passenger caches after confirmed success. If a response is lost, the next request may return 401 because deletion already revoked the token; do not infer success from a network error.
+
+Business follow-up: define and publish retention periods for the shared ERP records and deletion audit. This feature deletes the mobile account; it does not claim complete erasure of all customer data or implement a public web deletion-request page.

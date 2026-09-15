@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Mobile\MobileAccountDeletionController;
 use App\Http\Controllers\Mobile\MobileAppController;
 use App\Http\Controllers\Mobile\MobileAuthController;
 use App\Http\Controllers\Mobile\MobileBookingController;
@@ -31,6 +32,8 @@ Route::prefix('mobile/v1')->group(function () {
         Route::post('auth/logout', [MobileAuthController::class, 'logout']);
         Route::post('auth/resend-otp', [MobileAuthController::class, 'resendOtp']);
         Route::post('auth/verify-otp', [MobileAuthController::class, 'verifyOtp']);
+
+        Route::delete('account', [MobileAccountDeletionController::class, 'destroy'])->middleware('throttle:5,1');
 
         Route::get('profile', [MobileProfileController::class, 'show']);
         Route::put('profile', [MobileProfileController::class, 'update']);
