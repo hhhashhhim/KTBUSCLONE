@@ -6,12 +6,31 @@ Use `/Users/malik/Desktop/Codes/KTBUSCLONE-mobile-backend` on branch
 `mobile-backend` of `hhhashhhim/KTBUSCLONE`. The Flutter checkout at `KTBUSGIT`
 is on `mobile-frontend` and is not the backend upload source.
 
-Include the current backend working-tree changes, including the untracked
-account-deletion controller, request, migration, and tests. A download of the
-current GitHub branch will omit local uncommitted changes. No commit or push has
-been performed by this task. Keep `.git`, local `.env`, logs, local database files,
-and local `bootstrap/cache` contents out of the upload. Point the web server's
-document root at Laravel's `public/` directory.
+Build a deployment ZIP from a committed, clean `mobile-backend` checkout:
+
+```bash
+php artisan test
+python3 scripts/build_mobile_backend.py /tmp/ktbus-backend-builds
+```
+
+The command requires Git, Python 3, PHP and Composer. It exports the current
+commit, installs the locked production Composer dependencies with optimized
+autoloading, checks PHP extension requirements, and writes a ZIP and SHA-256
+checksum. The ZIP includes `vendor/`, the existing compiled public assets, and
+`BUILD_REVISION` identifying its source commit. No JavaScript source is changed
+by this backend packaging step. Use PHP and extensions compatible with the target
+server; the current dependency lock requires PHP 8.2 or later.
+
+The build excludes local `.env` files, Git metadata, tests, runtime caches, logs,
+and `public/uploads/`. The `.env.example` template is included. Existing server
+uploads and persistent storage must be preserved or linked into a new release.
+Extract the ZIP into the deployment directory and point the web server document
+root at Laravel's `public/` directory. Ensure `storage/` and `bootstrap/cache/`
+are writable by the PHP process. Configure the private server environment and
+perform the deployment steps below. Building does not deploy or migrate a server.
+
+Push source and build tooling to `origin/mobile-backend`. Keep generated ZIPs
+and `vendor/` out of Git; distribute the ZIP separately as a deployment artifact.
 
 ## Server environment
 

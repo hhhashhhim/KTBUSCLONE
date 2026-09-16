@@ -8,3 +8,16 @@
 
 /.github export-ignore
 CHANGELOG.md export-ignore
+
+# Deployment archives must not include local runtime data.
+.env export-ignore
+.env.* export-ignore
+.env.example -export-ignore
+*.log export-ignore
+/bootstrap/cache export-ignore
+/public/uploads export-ignore
+/public/storage export-ignore
+/storage export-ignore
+/tests export-ignore
+/phpunit.xml export-ignore
+/.phpunit.result.cache export-ignore
