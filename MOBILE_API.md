@@ -41,6 +41,8 @@ All successful mobile responses use:
 
 Validation failures use the same envelope with status `422` and field errors.
 
+Booking quote, creation, list and detail endpoints preserve intentional business-error messages and their 4xx statuses (for example, expired quotes and unavailable seats). Database errors and unexpected failures are reported through Laravel's server-side exception logger and return HTTP `500` with `{"success":false,"message":"Something went wrong. Please try again.","data":null,"errors":{}}`, regardless of `APP_DEBUG`. Intentional service failures with a 5xx status retain that status but use the same generic message and are also reported. SQL, bindings, passenger details and stack traces are never included in these booking error responses. This change requires backend deployment only; no migration or Flutter change is required.
+
 ## Schedule search performance
 
 `GET /schedules` keeps the same request, authentication, response fields, and ERP eligibility rules. Search now loads shared booking-window settings, fares, adjustments, terminal restrictions, and tickets in batches using `MobileSearchData`. The helper exists only within one `schedules()` call; it is not a cross-request cache. Seat lookup, quote, and booking validation still read current data independently.

@@ -10,6 +10,7 @@ use App\Http\Resources\Mobile\BookingResource;
 use App\Services\Mobile\MobileBookingService;
 use Illuminate\Http\Request;
 use RuntimeException;
+use Throwable;
 
 class MobileBookingController extends Controller
 {
@@ -34,8 +35,8 @@ class MobileBookingController extends Controller
                 'payment_environment' => config('mobile_payments.environment'),
                 'payment_preview' => (bool) config('mobile_payments.preview_only'),
             ], 'Fare quote created.');
-        } catch (RuntimeException $exception) {
-            return $this->failure($exception->getMessage(), [], $this->exceptionStatus($exception));
+        } catch (Throwable $exception) {
+            return $this->bookingFailure($exception);
         }
     }
 
@@ -48,8 +49,8 @@ class MobileBookingController extends Controller
                 $request->payment_method
             );
             return $this->success((new BookingResource($booking))->resolve($request), 'Booking created.', 201);
-        } catch (RuntimeException $exception) {
-            return $this->failure($exception->getMessage(), [], $this->exceptionStatus($exception));
+        } catch (Throwable $exception) {
+            return $this->bookingFailure($exception);
         }
     }
 
@@ -66,8 +67,8 @@ class MobileBookingController extends Controller
                 'items' => $items,
                 'pagination' => $result['pagination'],
             ], 'Bookings retrieved.');
-        } catch (RuntimeException $exception) {
-            return $this->failure($exception->getMessage(), [], $this->exceptionStatus($exception));
+        } catch (Throwable $exception) {
+            return $this->bookingFailure($exception);
         }
     }
 
@@ -76,8 +77,26 @@ class MobileBookingController extends Controller
         try {
             $booking = $bookings->findFor($request->user(), (int) $invoice);
             return $this->success((new BookingResource($booking))->resolve($request), 'Booking retrieved.');
-        } catch (RuntimeException $exception) {
-            return $this->failure($exception->getMessage(), [], $this->exceptionStatus($exception));
+        } catch (Throwable $exception) {
+            return $this->bookingFailure($exception);
         }
+    }
+
+    private function bookingFailure(Throwable $exception)
+    {
+        // Booking services use plain RuntimeException for intentional business errors.
+        // Subclasses such as QueryException must never expose their internal messages,
+        // even when a database/driver error code happens to resemble an HTTP status.
+        $isBusinessException = get_class($exception) === RuntimeException::class
+            && $exception->getPrevious() === null;
+        $status = $isBusinessException ? $this->exceptionStatus($exception) : 500;
+
+        if ($isBusinessException && $status >= 400 && $status < 500) {
+            return $this->failure($exception->getMessage(), [], $status);
+        }
+
+        report($exception);
+
+        return $this->failure('Something went wrong. Please try again.', [], $status);
     }
 }
