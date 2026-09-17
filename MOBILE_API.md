@@ -43,6 +43,22 @@ Validation failures use the same envelope with status `422` and field errors.
 
 Booking quote, creation, list and detail endpoints preserve intentional business-error messages and their 4xx statuses (for example, expired quotes and unavailable seats). Database errors and unexpected failures are reported through Laravel's server-side exception logger and return HTTP `500` with `{"success":false,"message":"Something went wrong. Please try again.","data":null,"errors":{}}`, regardless of `APP_DEBUG`. Intentional service failures with a 5xx status retain that status but use the same generic message and are also reported. SQL, bindings, passenger details and stack traces are never included in these booking error responses. This change requires backend deployment only; no migration or Flutter change is required.
 
+## Payment expiry storage
+
+`payment.expires_at` remains an ISO-8601 deadline with a timezone offset. Status
+checks and checkout updates must not move that deadline. The checkout window is
+configured by `MOBILE_CHECKOUT_MINUTES` (default 10, clamped to 1–30 minutes) and
+capped at journey departure.
+
+Legacy MySQL/MariaDB can assign `ON UPDATE CURRENT_TIMESTAMP` to the first
+non-null TIMESTAMP column. On affected installations, updating `checked_at`
+overwrites `expires_at` and prematurely expires the booking. Migration
+`2026_09_17_000011_fix_mobile_payment_expiry_column.php` changes it to a non-null
+DATETIME with no automatic default or update. Existing stored values and payment
+statuses are preserved; expired payments and released seats are not revived.
+New installations use DATETIME from the initial payment migration. No Flutter
+rebuild or API contract change is needed.
+
 ## Booking passenger gender
 
 Booking quote requests accept `passengers.*.gender` as `male` or `female`. The

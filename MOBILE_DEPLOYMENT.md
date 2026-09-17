@@ -77,7 +77,8 @@ php artisan migrate --force \
   --path=database/migrations/2026_07_22_000007_enable_mobile_wallet_feature.php \
   --path=database/migrations/2026_09_12_000008_create_mobile_payments_table.php \
   --path=database/migrations/2026_09_12_000009_add_environment_to_mobile_payments.php \
-  --path=database/migrations/2026_09_15_000010_create_mobile_account_deletions_table.php
+  --path=database/migrations/2026_09_15_000010_create_mobile_account_deletions_table.php \
+  --path=database/migrations/2026_09_17_000011_fix_mobile_payment_expiry_column.php
 php artisan route:clear
 php artisan config:cache
 ```
@@ -125,3 +126,33 @@ verified separately; automated tests use fake gateway responses.
 
 After local testing, follow `kt_mobile_app/docs/ANDROID_RELEASE.md` on
 `mobile-frontend` and supply the existing Play upload key for the signed AAB.
+
+## Immediate payment expiry repair
+
+If a new booking immediately expires, inspect the `expires_at` column in
+`mobile_payments`. `ON UPDATE CURRENT_TIMESTAMP` is incorrect for this business
+deadline. After backing up the database, apply only the corrective migration:
+
+```bash
+php artisan migrate --force --path=database/migrations/2026_09_17_000011_fix_mobile_payment_expiry_column.php
+```
+
+Verify that the column is `datetime`, non-null, with no automatic default or
+`on update` attribute. Existing stored deadlines and statuses are preserved;
+previously expired bookings stay expired. Test a new booking after the migration.
+This is a forward-only repair; migration rollback deliberately does not restore
+the faulty timestamp behavior. No Composer install or Flutter rebuild is needed.
+
+The normal test suite covers repeated payment refreshes before checkout. To also
+reproduce the legacy database behavior and test both upgrade and fresh-install
+schemas, run the opt-in MySQL regression against a local test database:
+
+```bash
+MOBILE_MYSQL_TEST_DATABASE=your_local_test_database php artisan test --filter=MobilePaymentExpirySchemaTest
+```
+
+The regression creates only a connection-local temporary `mobile_payments` table;
+it does not change permanent tables. Optional `MOBILE_MYSQL_TEST_HOST`,
+`MOBILE_MYSQL_TEST_PORT`, `MOBILE_MYSQL_TEST_USERNAME`, and
+`MOBILE_MYSQL_TEST_PASSWORD` select the test connection. It never uses the
+application's `.env` database credentials as a fallback.

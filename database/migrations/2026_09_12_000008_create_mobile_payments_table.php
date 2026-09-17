@@ -23,7 +23,8 @@ class CreateMobilePaymentsTable extends Migration
             $table->unsignedInteger('ticket_count');
             $table->unsignedBigInteger('wallet_card_id')->nullable();
             $table->unsignedInteger('wallet_points')->default(0);
-            $table->timestamp('expires_at')->index();
+            // A business deadline must never acquire MySQL's implicit ON UPDATE behavior.
+            $table->dateTime('expires_at')->index();
             $table->timestamp('started_at')->nullable();
             $table->timestamp('checked_at')->nullable();
             $table->timestamp('paid_at')->nullable();

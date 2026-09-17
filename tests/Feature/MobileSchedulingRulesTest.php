@@ -403,6 +403,26 @@ class MobileSchedulingRulesTest extends TestCase
         $this->assertStringNotContainsString('test-password', $first->getContent());
     }
 
+    public function test_status_checks_before_checkout_preserve_the_original_payment_deadline()
+    {
+        \Illuminate\Support\Facades\Http::fake();
+        $booking = $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
+        $deadline = $booking->json('data.payment.expires_at');
+        $this->assertSame(now()->addMinutes(10)->toIso8601String(), $deadline);
+        $url = '/api/mobile/v1/bookings/' . $booking->json('data.id') . '/payment/refresh';
+        foreach ([2, 16, 16] as $seconds) {
+            Carbon::setTestNow(now()->addSeconds($seconds));
+            $response = $this->postJson($url)->assertOk()
+                ->assertJsonPath('data.payment.status', 'pending')
+                ->assertJsonPath('data.payment.expires_at', $deadline);
+            $this->assertNotNull($response->json('data.payment.checkout_url'));
+        }
+        $this->assertNull(\App\Models\MobilePayment::first()->started_at);
+        $this->assertDatabaseHas('tickets', ['type' => 'pending booking']);
+        $this->assertDatabaseCount('booking_cancels', 0);
+        \Illuminate\Support\Facades\Http::assertNothingSent();
+    }
+
     public function test_mobile_payment_checkout_requires_signature_and_uses_server_amount()
     {
         $booking = $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
