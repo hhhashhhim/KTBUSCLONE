@@ -54,6 +54,27 @@ class MobilePaymentGatewayTest extends TestCase
         $this->assertFalse($gateway->configured('easypaisa'));
     }
 
+    public function test_jazzcash_wallet_checkout_includes_signed_bank_and_product_fields()
+    {
+        Http::fake();
+        $gateway = new MobilePaymentGateway();
+        $form = $gateway->checkout($this->payment('jazzcash'));
+        $fields = $form['fields'];
+        $this->assertSame('https://sandbox.jazzcash.com.pk/merchantform', $form['action']);
+        $this->assertSame('MWALLET', $fields['pp_TxnType']);
+        $this->assertSame('TBANK', $fields['pp_BankID']);
+        $this->assertSame('RETL', $fields['pp_ProductID']);
+        $this->assertSame('250000', $fields['pp_Amount']);
+        $this->assertSame('test-merchant', $fields['pp_MerchantID']);
+        $this->assertSame(route('mobile.payments.return', ['payment' => 'payment-test']), $fields['pp_ReturnURL']);
+        $this->assertSame($gateway->jazzHash($fields), $fields['pp_SecureHash']);
+        // Missing routing fields must also change the signature: they cannot be
+        // injected into the HTML after signing the incomplete request.
+        $incomplete = array_merge($fields, ['pp_BankID' => '', 'pp_ProductID' => '']);
+        $this->assertNotSame($gateway->jazzHash($incomplete), $fields['pp_SecureHash']);
+        Http::assertNothingSent();
+    }
+
     public function test_jazzcash_status_inquiry_uses_stored_reference_and_verifies_amount()
     {
         Http::fake(['*' => Http::response($this->jazzResponse())]);

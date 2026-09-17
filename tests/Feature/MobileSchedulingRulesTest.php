@@ -429,7 +429,9 @@ class MobileSchedulingRulesTest extends TestCase
         $url = $booking->json('data.payment.checkout_url');
         $this->get(strtok($url, '?'))->assertForbidden();
         $response = $this->get($url)->assertOk()->assertHeader('Cache-Control', 'no-store, private');
-        $response->assertSee('name="pp_Amount" value="250000"', false);
+        $response->assertSee('name="pp_Amount" value="250000"', false)
+            ->assertSee('name="pp_BankID" value="TBANK"', false)
+            ->assertSee('name="pp_ProductID" value="RETL"', false);
         $this->get($url)->assertStatus(409);
         $this->assertDatabaseHas('tickets', ['type' => 'pending booking']);
     }

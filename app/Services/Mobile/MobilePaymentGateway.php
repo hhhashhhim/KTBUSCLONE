@@ -65,7 +65,8 @@ class MobilePaymentGateway
                 'pp_TxnDateTime' => $payment->created_at->copy()->timezone('Asia/Karachi')->format('YmdHis'),
                 'pp_BillReference' => (string) $payment->invoice_id, 'pp_Description' => 'Kainat Travels ticket',
                 'pp_TxnExpiryDateTime' => $payment->expires_at->copy()->timezone('Asia/Karachi')->format('YmdHis'),
-                'pp_ReturnURL' => $returnUrl, 'pp_SubMerchantID' => '', 'pp_BankID' => '', 'pp_ProductID' => '',
+                // JazzCash's MWALLET page-redirection contract requires these routing fields.
+                'pp_ReturnURL' => $returnUrl, 'pp_SubMerchantID' => '', 'pp_BankID' => 'TBANK', 'pp_ProductID' => 'RETL',
                 'ppmpf_1' => '', 'ppmpf_2' => '', 'ppmpf_3' => '', 'ppmpf_4' => '', 'ppmpf_5' => '',
             ];
             $fields['pp_SecureHash'] = $this->jazzHash($fields);

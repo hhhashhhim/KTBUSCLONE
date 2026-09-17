@@ -119,3 +119,20 @@ local `.env` is an overlay of local service settings, not a complete production
 Laravel environment. Provider callback registration, production acceptance, and
 server scheduler operation are not established by changing these flags. No live
 payment or production migration was performed for this activation preparation.
+
+## JazzCash merchant-information rejection
+
+The MWALLET hosted request includes `pp_BankID=TBANK` and `pp_ProductID=RETL`,
+as specified by the [JazzCash mobile-account page-redirection example](https://sandbox.jazzcash.com.pk/SandboxDocumentation/v4.2/index.html).
+Both fields are populated before calculating `pp_SecureHash`. Earlier mobile
+requests sent them empty. Deploy `app/Services/Mobile/MobilePaymentGateway.php`
+to correct the request; no migration or Composer update is needed for this change.
+
+An "insufficient merchant information" provider page alone does not identify
+which merchant check failed. If it persists with the complete request, verify
+that the configured merchant ID, password and integrity salt belong to the same
+live account, that MWALLET/page redirection is enabled, and that the mobile API
+return URL is registered with JazzCash. Never paste credentials or complete
+checkout form bodies into support messages. The automated tests use fake
+credentials and make no live payment requests; provider acceptance still needs
+verification on the deployed merchant account.
