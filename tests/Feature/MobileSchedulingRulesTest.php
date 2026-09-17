@@ -82,6 +82,78 @@ class MobileSchedulingRulesTest extends TestCase
         $this->assertDatabaseHas('tickets', ['seat_no' => '1', 'online_terminal' => 1]);
     }
 
+    /** @dataProvider bookingGenderMethods */
+    public function test_booking_stores_erp_gender_codes_and_returns_mobile_labels(string $method)
+    {
+        \Illuminate\Support\Facades\Http::fake();
+        if ($method !== 'counter') {
+            $this->paymentInput();
+            config()->set('mobile.payment_methods', ['jazzcash', 'bank_alfalah']);
+            config()->set('mobile_payments.bank_alfalah', [
+                'merchant_id' => '123', 'store_id' => '456', 'merchant_hash' => 'test-hash',
+                'username' => 'test-user', 'password' => 'test-password',
+                'key1' => '1234567890123456', 'key2' => 'abcdefghijklmnop',
+                'base_url' => 'https://sandbox.bankalfalah.com',
+            ]);
+        }
+        // A partial journey also exercises the ERP partial-ticket history table.
+        DB::table('cities')->insert(['id' => 3, 'company_id' => 1, 'name' => 'Final city']);
+        DB::table('routes_fares')->insert([
+            'route_id' => 30, 'company_id' => 1, 'departure_city_id' => 2, 'destination_city_id' => 3,
+        ]);
+        $input = $this->quoteInput(['1', '2']);
+        $input['passengers'][1]['gender'] = 'female';
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $input)->assertOk();
+        $booking = $this->postJson('/api/mobile/v1/bookings', [
+            'quote_token' => $quote->json('data.quote_token'), 'payment_method' => $method,
+        ])->assertCreated()->assertJsonPath('data.passengers.0.gender', 'male')
+            ->assertJsonPath('data.passengers.1.gender', 'female');
+        $invoice = $booking->json('data.id');
+        foreach (['tickets', 'ticket_advanced_bookeds', 'ticket_is_partials'] as $table) {
+            $this->assertSame([1, 0], DB::table($table)->orderBy('id')->pluck('gender')->all(), $table);
+        }
+        $this->getJson('/api/mobile/v1/bookings/' . $invoice)->assertOk()
+            ->assertJsonPath('data.passengers.0.gender', 'male')
+            ->assertJsonPath('data.passengers.1.gender', 'female');
+        $this->getJson('/api/mobile/v1/bookings')->assertOk()
+            ->assertJsonPath('data.items.0.passengers.0.gender', 'male')
+            ->assertJsonPath('data.items.0.passengers.1.gender', 'female');
+        if ($method !== 'counter') {
+            $booking->assertJsonPath('data.payment.method', $method)
+                ->assertJsonPath('data.payment.status', 'pending');
+        }
+        \Illuminate\Support\Facades\Http::assertNothingSent();
+    }
+
+    public static function bookingGenderMethods(): array
+    {
+        return [['counter'], ['jazzcash'], ['bank_alfalah']];
+    }
+
+    public function test_unsupported_booking_gender_returns_validation_error_without_creating_quote()
+    {
+        $input = $this->quoteInput();
+        $input['passengers'][0]['gender'] = 'other';
+        $this->postJson('/api/mobile/v1/bookings/quote', $input)->assertStatus(422)
+            ->assertJsonValidationErrors(['passengers.0.gender']);
+        $this->assertDatabaseCount('mobile_booking_quotes', 0);
+    }
+
+    public function test_old_quote_with_unsupported_gender_cannot_create_mislabelled_tickets()
+    {
+        $input = $this->paymentInput();
+        $quote = \App\Models\MobileBookingQuote::where('token', $input['quote_token'])->firstOrFail();
+        $payload = $quote->payload;
+        $payload['passengers'][0]['gender'] = 'other';
+        $quote->update(['payload' => $payload]);
+        $this->postJson('/api/mobile/v1/bookings', $input)->assertStatus(422)
+            ->assertJsonPath('message', 'This passenger gender is not supported for ticket booking. Please contact support.');
+        foreach (['tickets', 'ticket_advanced_bookeds', 'ticket_is_partials', 'invoices', 'customers', 'mobile_payments'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        $this->assertNull($quote->fresh()->used_at);
+    }
+
     /** @dataProvider scheduleRestrictions */
     public function test_restricted_journey_cannot_be_searched_previewed_or_quoted(string $restriction)
     {
@@ -671,10 +743,10 @@ class MobileSchedulingRulesTest extends TestCase
             'terminal_discounts' => ['terminal_id route_id discount', 'start_date end_date'],
             'invoices' => ['schedule_id route_id terminal_id passenger_account_id added_by', 'schedule_date schedule_time'],
             'customers' => ['added_by updated_by', 'name cnic contact'],
-            'tickets' => ['schedule_id route_id schedule_details_id terminal_id departure_city_id destination_city_id bus_class_id seat_fare is_partial booking_no invoice_id customer_id online_terminal added_by updated_by discount schedule_discount terminal_discount points_usage',
-                'seat_no schedule_date schedule_time schedule_time_exact date terminal_name gender type booked_time'],
-            'ticket_advanced_bookeds' => ['departure_city_id destination_city_id ticket_id seat_fare booking_no customer_id schedule_id added_by', 'seat_no date gender type'],
-            'ticket_is_partials' => ['departure_city_id destination_city_id ticket_id seat_fare booking_no customer_id schedule_id added_by', 'seat_no date gender type'],
+            'tickets' => ['schedule_id route_id schedule_details_id terminal_id departure_city_id destination_city_id bus_class_id seat_fare is_partial booking_no invoice_id customer_id online_terminal added_by updated_by discount schedule_discount terminal_discount points_usage gender',
+                'seat_no schedule_date schedule_time schedule_time_exact date terminal_name type booked_time'],
+            'ticket_advanced_bookeds' => ['departure_city_id destination_city_id ticket_id seat_fare booking_no customer_id schedule_id added_by gender', 'seat_no date type'],
+            'ticket_is_partials' => ['departure_city_id destination_city_id ticket_id seat_fare booking_no customer_id schedule_id added_by gender', 'seat_no date type'],
             'activity_logs' => ['activity_by', 'message requested_host'],
         ];
         foreach ($tables as $name => [$integers, $strings]) {
@@ -687,6 +759,12 @@ class MobileSchedulingRulesTest extends TestCase
                 $table->softDeletes();
                 $table->timestamps();
             });
+        }
+        // SQLite otherwise accepts "male" in INTEGER columns; model strict MySQL inserts.
+        foreach (['tickets', 'ticket_advanced_bookeds', 'ticket_is_partials'] as $table) {
+            DB::unprepared("CREATE TRIGGER {$table}_integer_gender BEFORE INSERT ON {$table}
+                WHEN NEW.gender IS NOT NULL AND typeof(NEW.gender) != 'integer'
+                BEGIN SELECT RAISE(ABORT, 'Ticket gender must be an integer'); END");
         }
         require_once base_path('database/migrations/2026_07_18_000003_create_mobile_booking_quotes_table.php');
         (new \CreateMobileBookingQuotesTable())->up();

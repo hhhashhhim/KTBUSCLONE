@@ -19,6 +19,13 @@ class QuoteBookingRequest extends MobileFormRequest
         $this->merge(['passengers' => $passengers]);
     }
 
+    public function messages()
+    {
+        return [
+            'passengers.*.gender.in' => 'This passenger gender is not supported for ticket booking. Please contact support.',
+        ];
+    }
+
     public function rules()
     {
         $maximum = (int) config('mobile.maximum_selectable_seats', 5);
@@ -35,7 +42,7 @@ class QuoteBookingRequest extends MobileFormRequest
             'passengers.*.full_name' => ['required', 'string', 'max:150'],
             'passengers.*.cnic' => ['required', 'digits:13'],
             'passengers.*.mobile' => ['required', 'string', 'min:10', 'max:15'],
-            'passengers.*.gender' => ['required', 'in:male,female,other'],
+            'passengers.*.gender' => ['required', 'in:male,female'],
             'points_to_use' => ['nullable', 'integer', 'min:0'],
         ];
     }

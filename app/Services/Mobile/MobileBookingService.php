@@ -23,6 +23,9 @@ use RuntimeException;
 
 class MobileBookingService
 {
+    // Existing ERP/website ticket codes: male = 1, female = 0.
+    private const TICKET_GENDERS = ['male' => 1, 'female' => 0];
+
     private $travel;
     private $loyalty;
 
@@ -309,7 +312,7 @@ class MobileBookingService
                         'terminal_id' => $terminal->id,
                         'terminal_name' => $terminal->name,
                         'online_terminal' => $terminal->is_online_terminal,
-                        'gender' => $passenger['gender'],
+                        'gender' => $this->ticketGender($passenger['gender']),
                         'type' => $paymentMethod === 'counter' ? 'advance booking' : 'pending booking',
                         'booked_time' => now(),
                         'added_by' => $systemUser->id,
@@ -467,10 +470,20 @@ class MobileBookingService
                     'cnic' => optional($ticket->customer)->cnic,
                     'mobile' => optional($ticket->customer)->contact,
                     'seat_number' => (string) $ticket->seat_no,
-                    'gender' => $ticket->gender,
+                    'gender' => array_flip(self::TICKET_GENDERS)[(string) $ticket->gender] ?? null,
                 ];
             })->all(),
         ];
+    }
+
+    private function ticketGender(string $gender): int
+    {
+        // Validate persisted quotes too: quotes created before this fix may contain "other".
+        if (!array_key_exists($gender, self::TICKET_GENDERS)) {
+            throw new RuntimeException('This passenger gender is not supported for ticket booking. Please contact support.', 422);
+        }
+
+        return self::TICKET_GENDERS[$gender];
     }
 
     private function assertSeatLimit(array $layout, int $selectedCount): void

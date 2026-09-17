@@ -43,6 +43,25 @@ Validation failures use the same envelope with status `422` and field errors.
 
 Booking quote, creation, list and detail endpoints preserve intentional business-error messages and their 4xx statuses (for example, expired quotes and unavailable seats). Database errors and unexpected failures are reported through Laravel's server-side exception logger and return HTTP `500` with `{"success":false,"message":"Something went wrong. Please try again.","data":null,"errors":{}}`, regardless of `APP_DEBUG`. Intentional service failures with a 5xx status retain that status but use the same generic message and are also reported. SQL, bindings, passenger details and stack traces are never included in these booking error responses. This change requires backend deployment only; no migration or Flutter change is required.
 
+## Booking passenger gender
+
+Booking quote requests accept `passengers.*.gender` as `male` or `female`. The
+mobile backend converts these labels to the existing ERP ticket codes (`male = 1`,
+`female = 0`) before creating tickets and their advance/partial history records.
+Booking creation, detail and list responses return the text labels to mobile clients.
+Unrecognized legacy ticket codes are returned as `null`, not assigned a gender.
+
+The ERP ticket contract has no verified code for `other`. Booking quotes using it
+return a field validation error (`422`); old persisted quotes using it are also
+rejected at booking creation with `422`, with no booking records committed. Profile
+and saved-passenger gender fields remain unchanged. Supporting `other` in bookings
+requires an agreed ERP representation and corresponding backend integration.
+
+Deploy `app/Services/Mobile/MobileBookingService.php` and
+`app/Http/Requests/Mobile/QuoteBookingRequest.php` for this fix. No database migration
+or Flutter rebuild is required. Regression tests use integer gender columns and
+SQLite insert guards to reproduce the production MySQL type constraint.
+
 ## Schedule search performance
 
 `GET /schedules` keeps the same request, authentication, response fields, and ERP eligibility rules. Search now loads shared booking-window settings, fares, adjustments, terminal restrictions, and tickets in batches using `MobileSearchData`. The helper exists only within one `schedules()` call; it is not a cross-request cache. Seat lookup, quote, and booking validation still read current data independently.
