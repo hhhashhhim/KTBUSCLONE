@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Resources\BreakResource;
 use Exception;
 use App\Support\SeatNumber;
+use App\Services\UpcomingScheduleService;
 
 class TicketingApiController extends Controller
 {
@@ -156,7 +157,8 @@ class TicketingApiController extends Controller
 
              
 
-                $data = ScheduleDetail::whereIn("schedule_id",$visibleScheduleIds)
+                $data = app(UpcomingScheduleService::class)->query($request->date, (int) $companyId)
+                ->whereIn("schedule_id",$visibleScheduleIds)
                 ->whereHas('schedule', function($q){$q->where("hide",0);})
                 ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name","bus_class_map:id,name,seat_map")
                 ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id')
@@ -346,7 +348,8 @@ class TicketingApiController extends Controller
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
 
-                $scheduleDetail = ScheduleDetail::with("bus_class:id,seat_map")->where([
+                $scheduleDetail = app(UpcomingScheduleService::class)->query($request->date, (int) $companyId)
+                    ->with("bus_class:id,seat_map")->where([
                     'company_id' => $companyId,
                     'schedule_id' => $request->schedule_id,
                     'departure_date' => $request->date,
@@ -355,6 +358,10 @@ class TicketingApiController extends Controller
                     'departure_time' =>  date("H:i:s",strtotime($request->departure_time)),
                 ])->first();
                 // Getting Already Booked Tickets
+                if (!$scheduleDetail || DropSchedule::where('schedule_id', $request->schedule_id)
+                    ->where('schedule_date', $scheduleDetail->schedule_date)->exists()) {
+                    return new EmptyResource(collect());
+                }
                 $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
                     ->where('company_id', $companyId)->where('schedule_id', $request->schedule_id)
                     ->whereDate('schedule_date', $scheduleDetail->schedule_date)->get();
@@ -362,9 +369,13 @@ class TicketingApiController extends Controller
                     $normalizedTicketSeatNumbers = array_map([SeatNumber::class, 'normalize'], $ticketSeatNumbers);
                 $schedule = Schedule::where('id', $request->schedule_id)
                     ->where('company_id', $companyId)
+                    ->where('hide', 0)
                     ->select('id', 'route_id', 'bus_class_id', 'time', 'discount_id', 'surcharge_id')
                     ->with('route:id,name,online_seat_choices', 'route.fares:id,route_id,departure_city_id,destination_city_id')
                     ->first();
+                if (!$schedule) {
+                    return new EmptyResource(collect());
+                }
                 $scheduleDiscount = Discount::where('id', $schedule->discount_id)
                 ->where('is_active', 1)
                 ->whereHas("discount_terminals", function ($q) use ($terminalId) {

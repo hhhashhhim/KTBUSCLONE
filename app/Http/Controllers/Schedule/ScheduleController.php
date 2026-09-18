@@ -29,6 +29,28 @@ use Illuminate\Support\Facades\Log;
 
 class ScheduleController extends Controller
 {
+    public function syncUpcomingSchedules(\App\Services\UpcomingScheduleService $service)
+    {
+        if (!checkForSubmenu('schedules') || (!checkPermissionButtons('edit-schedule') && !checkPermissionButtons('add-schedule'))) {
+            return response()->json(['message' => 'You are not authorized to sync schedules.'], 403);
+        }
+        try {
+            if (function_exists('set_time_limit')) {
+                set_time_limit(180);
+            }
+            $state = $service->sync((int) Auth::user()->company_id);
+            return response()->json(['message' => 'Upcoming schedules synced successfully.', 'data' => $state]);
+        } catch (\Illuminate\Database\QueryException $exception) {
+            report($exception);
+            return response()->json(['message' => 'Schedule sync failed. Please try again or contact support.'], 500);
+        } catch (\RuntimeException $exception) {
+            return response()->json(['message' => $exception->getMessage()], $exception->getCode() === 409 ? 409 : 422);
+        } catch (\Throwable $exception) {
+            report($exception);
+            return response()->json(['message' => 'Schedule sync failed. Please try again or contact support.'], 500);
+        }
+    }
+
     public function index(Request $request)
     {
         if(!checkForSubmenu("schedules"))

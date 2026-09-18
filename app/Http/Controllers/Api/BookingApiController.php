@@ -42,6 +42,7 @@ use Illuminate\Support\Facades\Cache;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use App\Support\SeatNumber;
+use App\Services\UpcomingScheduleService;
 
 class BookingApiController extends Controller
 {
@@ -155,7 +156,8 @@ class BookingApiController extends Controller
             $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id" => Auth::user()->company_id, "terminal_id" => $request->terminal ?? Auth::user()->terminal_id, "visibility" => 1])->pluck("schedule_id");
             $advanceBookingDays = Terminal::where("id", Auth::user()->terminal_id)->first()->advance_booking;
 
-            $data = ScheduleDetail::whereIn("schedule_id", $visibleScheduleIds)
+            $data = app(UpcomingScheduleService::class)->query($request->date, (int) $companyId)
+                ->whereIn("schedule_id", $visibleScheduleIds)
                 ->whereHas('schedule', function ($q) {
                     $q->where("hide", 0);
                 })
@@ -412,7 +414,8 @@ class BookingApiController extends Controller
             $companyId = Auth::user()->company_id;
             $terminalId = Auth::user()->terminal_id;
 
-            $scheduleDetail = ScheduleDetail::with("bus_class:id,front_icons,seat_map")->where([
+            $scheduleDetail = app(UpcomingScheduleService::class)->query($request->date, (int) $companyId)
+                ->with("bus_class:id,front_icons,seat_map")->where([
                 'company_id' => $companyId,
                 'schedule_id' => $request->schedule_id,
                 'departure_date' => date('Y-m-d', strtotime($request->date)),
@@ -420,6 +423,10 @@ class BookingApiController extends Controller
                 'destination_id' => $request->destination_city_id,
                 'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
             ])->first();
+            if (!$scheduleDetail || DropSchedule::where('schedule_id', $request->schedule_id)
+                ->where('schedule_date', $scheduleDetail->schedule_date)->exists()) {
+                return new EmptyResource(collect());
+            }
             // if ($terminalId == 14){
 
 
@@ -438,11 +445,15 @@ class BookingApiController extends Controller
             // }
             $schedule = Schedule::where('id', $request->schedule_id)
                 ->where('company_id', $companyId)
+                ->where('hide', 0)
                 ->select('id', 'route_id', 'bus_class_id', 'time', 'discount_id', 'surcharge_id')
                 ->with('route:id,name,online_seat_choices,online_seats', 'route.fares:id,route_id,departure_city_id,destination_city_id')
                 ->first();
 
             // Restrict route preview only when route-specific online terminal mappings exist.
+            if (!$schedule) {
+                return new EmptyResource(collect());
+            }
             $currentTerminalId = $terminalId;
             $terminalAllowedForRoute = true;
             $hasOnlineTerminalMappings = RouteOnlineTerminal::where([
