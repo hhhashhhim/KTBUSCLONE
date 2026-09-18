@@ -168,21 +168,78 @@ class BookingApiController extends Controller
                 ->get(["id", "schedule_id", "departure_id", "destination_id", "departure_time", "departure_date", "schedule_id", "schedule_date", "bus_class_id"]);
 
 
-            $bookedTickets = Ticket::where(["company_id" => $companyId])->whereIn("schedule_id", $data->pluck("schedule_id"))->whereIn("schedule_date", $data->pluck("schedule_date"))->get(["id", "schedule_id", "schedule_date"]);
+            if ($data->isEmpty()) {
+                return new EmptyResource($data);
+            }
 
-            $data->map(function ($single, $key) use ($data, $companyId, $terminalId, $bookedTickets, $request) {
-                // this is for if some schedule is drooped then it should not be throw
-                $scheduleDrop = DropSchedule::where(["schedule_date" => $single->schedule_date, "schedule_id" => $single->schedule_id])->first();
-                if ($scheduleDrop) {
-                    unset($data[$key]);
+            // Load shared rules once per request; keep the first matching rule,
+            // as the previous per-schedule first() queries did.
+            $scheduleIds = $data->pluck('schedule_id')->unique();
+            $scheduleDates = $data->pluck('schedule_date')->unique();
+            $routeIds = $data->pluck('schedule.route_id')->unique();
+            $tripKey = function ($row) {
+                return $row->schedule_id . '|' . $row->schedule_date;
+            };
+            $droppedSchedules = DropSchedule::whereIn('schedule_id', $scheduleIds)
+                ->whereIn('schedule_date', $scheduleDates)
+                ->get(['schedule_id', 'schedule_date'])->keyBy($tripKey);
+            $visibilities = TerminalVisibility::where([
+                'departure_city_id' => $request->departure_city_id,
+                'destination_city_id' => $request->destination_city_id,
+            ])->whereIn('route_id', $routeIds)->get()->unique('route_id')->keyBy('route_id');
+
+            $data = $data->filter(function ($single) use ($droppedSchedules, $visibilities, $tripKey) {
+                $visibility = $visibilities->get($single->schedule->route_id);
+                return !$droppedSchedules->has($tripKey($single))
+                    && !($visibility && $visibility->online_visibilty == 1);
+            });
+            if ($data->isEmpty()) {
+                return new EmptyResource(collect());
+            }
+
+            $bookedCounts = Ticket::where('company_id', $companyId)
+                ->whereIn('schedule_id', $data->pluck('schedule_id')->unique())
+                ->whereIn('schedule_date', $data->pluck('schedule_date')->unique())
+                ->select('schedule_id', 'schedule_date')->selectRaw('COUNT(*) AS booked_count')
+                ->groupBy('schedule_id', 'schedule_date')->get()->keyBy($tripKey);
+            $terminalTimes = TerminalTimeDifference::where([
+                'company_id' => $companyId, 'terminal_id' => $terminalId,
+            ])->whereIn('route_id', $routeIds)->get()->unique('route_id')->keyBy('route_id');
+            $fareClassIds = [];
+            foreach ($data as $single) {
+                foreach ($single->bus_class_map->seat_map as $row) {
+                    foreach ($row as $seat) {
+                        if (isset($seat['class'])) {
+                            $fareClassIds[] = $seat['class'];
+                        }
+                    }
                 }
-                // this is subroute visibility to check that this terminal if allow to fetch of specific subroute schedule
-                $visibility = TerminalVisibility::where(["departure_city_id" => $single->departure_id, "destination_city_id" => $single->destination_id, "route_id" => $single->schedule->route_id])->first();
-                if (isset($visibility) && $visibility->online_visibilty == 1) {
-                    unset($data[$key]);
-                }
+            }
+            $fareClasses = FareClass::whereIn('id', array_unique($fareClassIds))->get()->keyBy('id');
+            $fares = FareTable::where([
+                'from_city_id' => $request->departure_city_id,
+                'to_city_id' => $request->destination_city_id,
+                'company_id' => $companyId,
+            ])->get()->unique('fare_class')->keyBy('fare_class');
+            $surcharges = Surcharge::whereIn('id', $data->pluck('schedule.surcharge_id')->filter()->unique())
+                ->where('is_active', 1)->get()->keyBy('id');
+            $discounts = Discount::whereIn('id', $data->pluck('schedule.discount_id')->filter()->unique())
+                ->where('is_active', 1)->whereHas('discount_terminals', function ($q) use ($terminalId) {
+                    $q->where('terminal_id', $terminalId);
+                })->get()->keyBy('id');
+            $terminalDiscounts = TerminalDiscount::where('terminal_id', $terminalId ?? 0)
+                ->whereIn('route_id', $routeIds)
+                ->where('start_date', '<=', date('Y-m-d', strtotime($request->date)))
+                ->where('end_date', '>=', date('Y-m-d', strtotime($request->date)))
+                ->get()->unique('route_id')->keyBy('route_id');
+            $fareTableTime = FareTable::where([
+                'from_city_id' => $request->departure_city_id,
+                'to_city_id' => $request->destination_city_id,
+            ])->first()->time_difference ?? '00:00';
+
+            $data->each(function ($single) use ($bookedCounts, $tripKey, $terminalTimes, $fareClasses, $fares, $surcharges, $discounts, $terminalDiscounts, $fareTableTime) {
                 $sub = 0;
-                $terminalTime = TerminalTimeDifference::where(["company_id" => $companyId, 'terminal_id' => Auth::user()->terminal_id, 'route_id' => $single->schedule->route_id])->first();
+                $terminalTime = $terminalTimes->get($single->schedule->route_id);
                 if ($terminalTime) {
                     $sub = $terminalTime->time_difference * 60;
                 }
@@ -206,7 +263,6 @@ class BookingApiController extends Controller
                 }, 0);
 
 
-                $flattenedSeatMap = array_merge(...$seatMap);
                 $classes = array_reduce($flattenedSeatMap, function ($carry, $seat) {
                     if (isset($seat['class'])) {
                         $carry[] = $seat['class'];
@@ -217,27 +273,22 @@ class BookingApiController extends Controller
 
                 unset($single->bus_class_map);
 
-                $booked = $bookedTickets->where("schedule_id", $single->schedule_id)->where("schedule_date", $single->schedule_date)->count();
+                $booked = (int) optional($bookedCounts->get($tripKey($single)))->booked_count;
 
                 $single->total_seats = $count;
                 $single->available_seats = $count - $booked;
 
 
-                // this loop get all fare classes from seat map and fetch original fare and discount fare
+                $original_fare = [];
+                $discounted_fare = [];
+                $scheduleSurcharge = $surcharges->get($single->schedule->surcharge_id);
+                $scheduleDiscount = $discounts->get($single->schedule->discount_id);
+                $terminalDiscount = $terminalDiscounts->get($single->schedule->route_id);
+                // Calculate fares using the batched rules without additional queries.
                 foreach ($class_id as $value) {
                     // orginal fare
-                    $name = FareClass::find($value)->name;
-                    $fare = FareTable::where([
-                        'from_city_id' => $single->departure_id,
-                        'to_city_id' => $single->destination_id,
-                        'fare_class' => $value,
-                        'company_id' => $companyId,
-                    ])
-                        ->first()->fare;
-
-                    $scheduleSurcharge = Surcharge::where('id', $single->schedule->surcharge_id)
-                        ->where('is_active', 1)
-                        ->first();
+                    $name = $fareClasses->get($value)->name;
+                    $fare = $fares->get($value)->fare;
 
                     // total_fare represents the price before discounts, so include
                     // the schedule surcharge just like the preview seat fare.
@@ -255,15 +306,6 @@ class BookingApiController extends Controller
                     ];
 
                     // this is for discounted price
-                    $scheduleDiscount = Discount::where('id', $single->schedule->discount_id)
-                        ->where('is_active', 1)
-                        ->whereHas("discount_terminals", function ($q) use ($terminalId) {
-                            $q->where("terminal_id", $terminalId);
-                        })
-                        ->first();
-                    $terminalDiscount = TerminalDiscount::where(["terminal_id" => $terminalId ?? 0, "route_id" => $single->schedule->route_id])->where('start_date', '<=', date('Y-m-d', strtotime($request->date)))
-                        ->where('end_date', '>=', date('Y-m-d', strtotime($request->date)))->first();
-
                     $editFare = $fare;
                     if ($scheduleDiscount) {
                         if ($scheduleDiscount->type == "percentage") {
@@ -304,7 +346,6 @@ class BookingApiController extends Controller
                 $single->total_fare = $original_fare;
                 $single->final_fare = $discounted_fare;
 
-                $fareTableTime = FareTable::where(['from_city_id' => $single->departure_id, 'to_city_id' => $single->destination_id])->first()->time_difference ?? "00:00";
                 $timeDiff = explode(':', $fareTableTime);
                 $totalTime = (($timeDiff[0] * 3600) + ($timeDiff[1] * 60));
 
@@ -417,9 +458,10 @@ class BookingApiController extends Controller
             }
 
             // Getting Already Booked Tickets
-            $tickets = Ticket::with('departure_city', 'destination_city', 'schedule', 'customer', 'company', 'addedBy')
+            $tickets = Ticket::with('departure_city:id,name', 'destination_city:id,name')
                 ->where('company_id', $companyId)->where('schedule_id', $request->schedule_id)
-                ->whereDate('schedule_date', $scheduleDetail->schedule_date)->get();
+                ->where('schedule_date', $scheduleDetail->schedule_date)
+                ->get(['id', 'seat_no', 'gender', 'is_partial', 'type', 'departure_city_id', 'destination_city_id', 'online_terminal']);
             $ticketSeatNumbers = $tickets->pluck('seat_no')->toArray();
             $normalizedTicketSeatNumbers = array_map([SeatNumber::class, 'normalize'], $ticketSeatNumbers);
             $scheduleDiscount = Discount::where('id', $schedule->discount_id)
@@ -431,12 +473,12 @@ class BookingApiController extends Controller
             $scheduleSurcharge = Surcharge::where('id', $schedule->surcharge_id)->where('is_active', 1)->first();
             $fareForAllClasses = FareTable::where('from_city_id', $request->departure_city_id)->where('to_city_id', $request->destination_city_id)
                 ->where('company_id', $companyId)
-                ->get()->unique('fare_class');
+                ->get()->unique('fare_class')->keyBy('fare_class');
             // getting cities sequence for checking which city will be after other one
             $lastFare = $schedule->route->fares->last();
             $allFaresOfRoute = $schedule->route->fares->unique('departure_city_id')->pluck('departure_city_id')->toArray();
             array_push($allFaresOfRoute, $lastFare->destination_city_id);
-            $fareClasses = FareClass::where('company_id', $companyId)->get();
+            $fareClasses = FareClass::where('company_id', $companyId)->get()->keyBy('id');
             if (count($fareClasses) != count($fareForAllClasses)) {
                 return response()->json([
                     "errors" => [
@@ -459,40 +501,12 @@ class BookingApiController extends Controller
                 'limited_seat' =>  1,
             ])->first() ? true : false;
             $count = 0;
+            $seatPrices = [];
             foreach ($seatMap as $i => &$iValue) {
                 foreach ($iValue as $j => &$column) {
-                    // adding fare to each seat
+                    // Seat restrictions are applied in the existing map order.
                     if ($column['reserved']) {
                         $count++;
-                        $data = $fareForAllClasses->where('fare_class', $column['class'])->first();
-                        $baseFare = (int)$data->fare;
-                        $surchargeAmount = 0;
-                        if ($scheduleSurcharge) {
-                            $surchargeAmount = $scheduleSurcharge->type == "percentage"
-                                ? round(($baseFare * $scheduleSurcharge->percentage) / 100)
-                                : (int)$scheduleSurcharge->flat;
-                        }
-                        $seatMap[$i][$j]['fare'] = $baseFare;
-                        $seatMap[$i][$j]['original_fare'] = $scheduleSurcharge
-                            ? customRound($baseFare + $surchargeAmount)
-                            : $baseFare;
-                        if ($scheduleDiscount) {
-                            if ($scheduleDiscount->type == "percentage") {
-                                $number = $scheduleDiscount->percentage / 100;
-                                $percentage = $baseFare * $number;
-                                $seatMap[$i][$j]['fare'] = round($baseFare - $percentage);
-                            } else {
-                                $seatMap[$i][$j]['fare'] = $baseFare - (int)$scheduleDiscount->flat;
-                            }
-                        }
-                        if ($terminalDiscount) {
-                            $tdiscount = ($baseFare / 100) * (float)$terminalDiscount->discount;
-                            $seatMap[$i][$j]['fare'] = $seatMap[$i][$j]['fare'] - $tdiscount;
-                        }
-                        if ($scheduleSurcharge) {
-                            $seatMap[$i][$j]['fare'] += $surchargeAmount;
-                        }
-
                         // allow seat manage terminal wise
                         if (isset($seats) && !in_array(preg_replace("/[^0-9]/", "", $column['seatNo']), $seats)) {
                             $column['terminal_allow'] = false;
@@ -538,7 +552,7 @@ class BookingApiController extends Controller
                         // $seatMap[$i][$j]['booked_by'] = $tickets[$result]['addedBy']['name'];
                         $seatMap[$i][$j]['departure_city_name'] = $tickets[$result]['departure_city']['name'];
                         $seatMap[$i][$j]['destination_city_name'] = $tickets[$result]['destination_city']['name'];
-                        $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
+                        $seatMap[$i][$j]['class_name'] = $fareClasses->get($column['class'])->name;
                         $seatMap[$i][$j]['fare'] = 0;
                         if ($tickets[$result]['is_partial'] == 1) {
                             $resultPartials = isset($column['seatNo'])
@@ -556,7 +570,7 @@ class BookingApiController extends Controller
                                 // $seatMap[$i][$j]['booked_by'] = $tickets[$singlePartial]['addedBy']['name'];
                                 $seatMap[$i][$j]['departure_city_name'] = $tickets[$singlePartial]['departure_city']['name'];
                                 $seatMap[$i][$j]['destination_city_name'] = $tickets[$singlePartial]['destination_city']['name'];
-                                $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
+                                $seatMap[$i][$j]['class_name'] = $fareClasses->get($column['class'])->name;
                                 $seatMap[$i][$j]['fare'] = 0;
 
                                 $before = (array_search($request->departure_city_id, $allFaresOfRoute, false) < array_search($tickets[$singlePartial]['departure_city_id'], $allFaresOfRoute, false) &&
@@ -583,9 +597,9 @@ class BookingApiController extends Controller
                         }
                     }
                     if (isset($column['class'])) {
-                        $class = $fareClasses->where('id', $column['class'])->first();
+                        $class = $fareClasses->get($column['class']);
                         $seatMap[$i][$j]['color'] = $class ? $class->color : '';
-                        $seatMap[$i][$j]['class_name'] = $fareClasses->where('id', $column['class'])->first()->name;
+                        $seatMap[$i][$j]['class_name'] = $class->name;
                         if ($class && $class->is_active == 0) {
                             return response()->json([
                                 "errors" => [
@@ -594,37 +608,35 @@ class BookingApiController extends Controller
                             ], 422);
                         }
                         if ($class) {
-                            $fare = (int)$fareForAllClasses->where('fare_class', $class->id)->first()->fare;
-                            $surchargeAmount = 0;
-                            if ($scheduleSurcharge) {
-                                $surchargeAmount = $scheduleSurcharge->type == "percentage"
-                                    ? round(($fare * $scheduleSurcharge->percentage) / 100)
-                                    : (int)$scheduleSurcharge->flat;
-                            }
-                            $seatMap[$i][$j]['fare'] = $fare;
-                            $seatMap[$i][$j]['original_fare'] = $scheduleSurcharge
-                                ? customRound($fare + $surchargeAmount)
-                                : $fare;
-                            if ($scheduleDiscount) {
-                                if ($scheduleDiscount->type == "percentage") {
-                                    $number = $scheduleDiscount->percentage / 100;
-                                    $percentage = $fare * $number;
-                                    $seatMap[$i][$j]['fare'] = round($fare - $percentage);
-                                } else {
-                                    $seatMap[$i][$j]['fare'] = $fare - (int)$scheduleDiscount->flat;
+                            if (!isset($seatPrices[$class->id])) {
+                                $fare = (int)$fareForAllClasses->get($class->id)->fare;
+                                $surchargeAmount = 0;
+                                if ($scheduleSurcharge) {
+                                    $surchargeAmount = $scheduleSurcharge->type == "percentage"
+                                        ? round(($fare * $scheduleSurcharge->percentage) / 100)
+                                        : (int)$scheduleSurcharge->flat;
                                 }
+                                $price = $fare;
+                                if ($scheduleDiscount) {
+                                    if ($scheduleDiscount->type == "percentage") {
+                                        $price = round($fare - ($fare * ($scheduleDiscount->percentage / 100)));
+                                    } else {
+                                        $price = $fare - (int)$scheduleDiscount->flat;
+                                    }
+                                }
+                                if ($terminalDiscount) {
+                                    $price -= ($fare / 100) * (float)$terminalDiscount->discount;
+                                }
+                                if ($scheduleSurcharge) {
+                                    $price += $surchargeAmount;
+                                }
+                                $seatPrices[$class->id] = [
+                                    'fare' => $fare != $price ? customRound($price) : $price,
+                                    'original_fare' => $scheduleSurcharge ? customRound($fare + $surchargeAmount) : $fare,
+                                ];
                             }
-                            if ($terminalDiscount) {
-                                $tdiscount = ((int)$fare / 100) * (float)$terminalDiscount->discount;
-                                $seatMap[$i][$j]['fare'] = $seatMap[$i][$j]['fare'] - $tdiscount;
-                            }
-                            if ($scheduleSurcharge) {
-                                $seatMap[$i][$j]['fare'] += $surchargeAmount;
-                            }
-                            // check if any discount/surcharge apply then it should apply custom round other wise show fix fare
-                            if ($fare != $seatMap[$i][$j]['fare']) {
-                                $seatMap[$i][$j]['fare'] = customRound($seatMap[$i][$j]['fare'] ?? 0);
-                            }
+                            $seatMap[$i][$j]['fare'] = $seatPrices[$class->id]['fare'];
+                            $seatMap[$i][$j]['original_fare'] = $seatPrices[$class->id]['original_fare'];
                         }
                     }
                 }
@@ -637,7 +649,7 @@ class BookingApiController extends Controller
 
 
             // data found | not found
-            if ($data->count() > 0) {
+            if ($data) {
                 return new SuccessResource($data);
             } else {
                 return new EmptyResource($data);
