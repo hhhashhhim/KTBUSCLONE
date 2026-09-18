@@ -7,6 +7,13 @@
                         <div class="card-header d-flex justify-content-between">
                             <h4>Schedule</h4>
                             <div class="card-header-action">
+                                <button v-if="checkForSubmenuButtons('edit-schedule') || checkForSubmenuButtons('add-schedule')"
+                                        type="button" class="btn btn-outline-primary mr-2"
+                                        :disabled="syncingUpcoming" @click="syncUpcomingSchedules"
+                                        title="Refresh the next 60 days of schedules for online booking partners">
+                                    <i class="fas fa-sync-alt mr-1" :class="{ 'fa-spin': syncingUpcoming }"></i>
+                                    {{ syncingUpcoming ? 'Syncing schedules...' : 'Sync Upcoming Schedules' }}
+                                </button>
                                 <a v-if="checkForSubmenuButtons('add-schedule')"
                                    href="#"
                                    data-toggle="modal"
@@ -19,6 +26,9 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            <div v-if="upcomingSyncMessage" class="alert alert-success" role="status">
+                                {{ upcomingSyncMessage }}
+                            </div>
                             <!-- <transition name="fade">
                                 <div
                                     class="alert alert-danger alert-dismissible fade show"
@@ -869,6 +879,8 @@ export default {
                 placeholder: '00',
             },
             loading: false,
+            syncingUpcoming: false,
+            upcomingSyncMessage: '',
             todayDate: today,
             schedules: [],
             fareClasses: [],
@@ -1005,6 +1017,27 @@ export default {
         this.destroyScheduleTable();
     },
     methods: {
+        async syncUpcomingSchedules() {
+            if (this.syncingUpcoming) return;
+            this.syncingUpcoming = true;
+            this.upcomingSyncMessage = '';
+            try {
+                const res = await this.callApi('post', 'schedule/sync-upcoming', {}, { timeout: 180000 });
+                if (res && res.status === 200) {
+                    const state = res.data.data;
+                    this.upcomingSyncMessage = `Online booking schedules synced: ${state.window_start} to ${state.window_end}. Last synced: ${state.synced_at}.`;
+                    swal({ title: 'Schedules synced', text: this.upcomingSyncMessage, icon: 'success' });
+                } else {
+                    const message = res && res.data && res.data.message;
+                    swal({ title: 'Sync not completed', text: message || 'Unable to sync schedules. Please try again.', icon: 'error' });
+                }
+            } catch (error) {
+                const message = error.response && error.response.data && error.response.data.message;
+                swal({ title: 'Sync not completed', text: message || 'The sync could not be confirmed. Please try again shortly.', icon: 'error' });
+            } finally {
+                this.syncingUpcoming = false;
+            }
+        },
         destroyScheduleTable() {
             if ($.fn.DataTable && $.fn.DataTable.isDataTable('#schedule_table')) {
                 $('#schedule_table').DataTable().destroy();
