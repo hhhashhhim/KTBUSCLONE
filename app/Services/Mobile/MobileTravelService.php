@@ -183,6 +183,10 @@ class MobileTravelService
                     'class_id' => $classId,
                     'class_name' => $fare['class_name'] ?? null,
                     'price' => (float) ($fare['amount'] ?? 0),
+                    'base_fare' => (float) ($fare['original_amount'] ?? 0),
+                    'discount' => (float) ($fare['discount'] ?? 0),
+                    'surcharge' => (float) ($fare['surcharge'] ?? 0),
+                    'rounding_adjustment' => (float) ($fare['rounding_adjustment'] ?? 0),
                     'status' => $status,
                     'gender_restriction' => $column['gender'] ?? null,
                 ];
@@ -240,32 +244,35 @@ class MobileTravelService
             ->where('company_id', $this->companyId())
             ->where('from_city_id', $originId)
             ->where('to_city_id', $destinationId)
-            ->whereIn('fare_class', $classIds)
             ->get()
             ->unique('fare_class');
-        $classNames = $search ? $search->classNames : FareClass::whereIn('id', $classIds)->pluck('name', 'id');
+        $fareClasses = $search ? $search->fareClasses : FareClass::where('company_id', $this->companyId())
+            ->get(['id', 'name', 'is_active'])->keyBy('id');
+        // ERP requires the city-pair tariff to cover every company fare class.
+        if ($fareClasses->count() !== $fareRows->count()) {
+            throw new RuntimeException('The fare table is incomplete for this schedule.', 422);
+        }
 
-        return $classIds->map(function ($classId) use ($fareRows, $classNames, $detail, $search) {
+        return $classIds->map(function ($classId) use ($fareRows, $fareClasses, $detail, $search) {
             $row = $fareRows->firstWhere('fare_class', $classId);
             if (!$row) {
                 throw new RuntimeException('The fare table is incomplete for this schedule.', 422);
             }
+            $class = $fareClasses->get($classId);
+            if (!$class || (int) $class->is_active !== 1) {
+                throw new RuntimeException('This schedule contains an inactive or unavailable fare class.', 422);
+            }
             $original = (float) $row->fare;
-            $amount = $this->applyFareAdjustments($detail, $original, $search);
-
-            return [
+            return array_merge([
                 'class_id' => $classId,
-                'class_name' => $classNames->get($classId, 'Standard'),
-                'original_amount' => $original,
-                'amount' => $amount,
-            ];
+                'class_name' => $class->name,
+            ], $this->applyFareAdjustments($detail, $original, $search));
         })->all();
     }
 
-    private function applyFareAdjustments(ScheduleDetail $detail, float $fare, ?MobileSearchData $search = null): float
+    private function applyFareAdjustments(ScheduleDetail $detail, float $fare, ?MobileSearchData $search = null): array
     {
         $terminalId = $this->terminalId();
-        $adjusted = $fare;
         $schedule = $detail->schedule;
         $discount = $search ? $search->discounts->get(optional($schedule)->discount_id) : Discount::query()
             ->whereKey(optional($schedule)->discount_id)
@@ -274,11 +281,6 @@ class MobileTravelService
                 $query->where('terminal_id', $terminalId);
             })
             ->first();
-        if ($discount) {
-            $adjusted -= $discount->type === 'percentage'
-                ? ($fare * ((float) $discount->percentage / 100))
-                : (float) $discount->flat;
-        }
 
         $terminalDiscount = $search ? $search->terminalDiscounts->get(optional($schedule)->route_id) : TerminalDiscount::query()
             ->where('terminal_id', $terminalId)
@@ -286,21 +288,17 @@ class MobileTravelService
             ->whereDate('start_date', '<=', $detail->departure_date)
             ->whereDate('end_date', '>=', $detail->departure_date)
             ->first();
-        if ($terminalDiscount) {
-            $adjusted -= $fare * ((float) $terminalDiscount->discount / 100);
-        }
 
         $surcharge = $search ? $search->surcharges->get(optional($schedule)->surcharge_id) : Surcharge::query()
             ->whereKey(optional($schedule)->surcharge_id)
             ->where('is_active', 1)
             ->first();
-        if ($surcharge) {
-            $adjusted += $surcharge->type === 'percentage'
-                ? ($fare * ((float) $surcharge->percentage / 100))
-                : (float) $surcharge->flat;
+        $result = MobileFareCalculator::calculate($fare, $discount, $terminalDiscount, $surcharge);
+        if ($result['amount'] < 0) {
+            // Do not silently cap an invalid ERP tariff and invent a different price.
+            throw new RuntimeException('The fare configuration is invalid for this schedule.', 422);
         }
-
-        return $adjusted === $fare ? $fare : (float) customRound((int) round($adjusted));
+        return $result;
     }
 
     private function blockedTickets(

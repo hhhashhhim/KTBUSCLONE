@@ -25,7 +25,7 @@ class MobileSearchData
     public $limitedRoutes;
     public $terminal;
     public $fareRows;
-    public $classNames;
+    public $fareClasses;
     public $discounts;
     public $terminalDiscounts;
     public $surcharges;
@@ -59,13 +59,8 @@ class MobileSearchData
         $this->fareRows = FareTable::query()->where('company_id', $companyId)
             ->where('from_city_id', $originId)->where('to_city_id', $destinationId)
             ->get()->unique('fare_class');
-        $classIds = $details->flatMap(function ($detail) {
-            return collect(optional($detail->bus_class)->seat_map ?: [])->flatten(1)
-                ->filter(function ($seat) {
-                    return is_array($seat) && ($seat['reserved'] ?? false) && isset($seat['class']);
-                })->pluck('class');
-        })->unique();
-        $this->classNames = FareClass::whereIn('id', $classIds)->pluck('name', 'id');
+        $this->fareClasses = FareClass::where('company_id', $companyId)
+            ->get(['id', 'name', 'is_active'])->keyBy('id');
         $this->discounts = Discount::query()->whereIn('id', $details->pluck('schedule.discount_id')->filter()->unique())
             ->where('is_active', 1)->whereHas('discount_terminals', function ($query) use ($terminalId) {
                 $query->where('terminal_id', $terminalId);

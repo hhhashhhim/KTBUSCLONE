@@ -57,6 +57,8 @@ class MobilePaymentGatewayTest extends TestCase
     public function test_jazzcash_wallet_checkout_includes_signed_bank_and_product_fields()
     {
         Http::fake();
+        config()->set('mobile_payments.jazzcash.bank_id', 'TBANK');
+        config()->set('mobile_payments.jazzcash.product_id', 'RETL');
         $gateway = new MobilePaymentGateway();
         $form = $gateway->checkout($this->payment('jazzcash'));
         $fields = $form['fields'];
@@ -68,10 +70,34 @@ class MobilePaymentGatewayTest extends TestCase
         $this->assertSame('test-merchant', $fields['pp_MerchantID']);
         $this->assertSame(route('mobile.payments.return', ['payment' => 'payment-test']), $fields['pp_ReturnURL']);
         $this->assertSame($gateway->jazzHash($fields), $fields['pp_SecureHash']);
-        // Missing routing fields must also change the signature: they cannot be
-        // injected into the HTML after signing the incomplete request.
+        // Configured routing fields must be included before signing.
         $incomplete = array_merge($fields, ['pp_BankID' => '', 'pp_ProductID' => '']);
         $this->assertNotSame($gateway->jazzHash($incomplete), $fields['pp_SecureHash']);
+        Http::assertNothingSent();
+    }
+
+    public function test_default_jazzcash_checkout_matches_website_empty_routing_and_signature()
+    {
+        Http::fake();
+        // The setup omits the new optional keys, also covering older cached config.
+        $gateway = new MobilePaymentGateway();
+        $payment = $this->payment('jazzcash');
+        $fields = $gateway->checkout($payment)['fields'];
+        $this->assertSame('', $fields['pp_BankID']);
+        $this->assertSame('', $fields['pp_ProductID']);
+        // Independent canonical value order from the website's hosted form.
+        // Empty routing/optional fields contribute no values or separators.
+        $expected = hash_hmac('sha256', implode('&', [
+            'test-salt', '250000', '42', 'Kainat Travels ticket', 'EN',
+            'test-merchant', 'test-password',
+            route('mobile.payments.return', ['payment' => 'payment-test']),
+            'PKR', $fields['pp_TxnDateTime'], $fields['pp_TxnExpiryDateTime'],
+            'TTEST123', 'MWALLET', '1.1',
+        ]), 'test-salt');
+        $this->assertSame($expected, $fields['pp_SecureHash']);
+        config()->set('mobile_payments.jazzcash.bank_id', '');
+        config()->set('mobile_payments.jazzcash.product_id', '');
+        $this->assertSame($fields, $gateway->checkout($payment)['fields']);
         Http::assertNothingSent();
     }
 

@@ -111,6 +111,7 @@ class MobileSchedulingRulesTest extends TestCase
         $invoice = $booking->json('data.id');
         foreach (['tickets', 'ticket_advanced_bookeds', 'ticket_is_partials'] as $table) {
             $this->assertSame([1, 0], DB::table($table)->orderBy('id')->pluck('gender')->all(), $table);
+            $this->assertSame(['advance booking', 'advance booking'], DB::table($table)->orderBy('id')->pluck('type')->all(), $table);
         }
         $this->getJson('/api/mobile/v1/bookings/' . $invoice)->assertOk()
             ->assertJsonPath('data.passengers.0.gender', 'male')
@@ -399,7 +400,7 @@ class MobileSchedulingRulesTest extends TestCase
             ->assertJsonPath('data.payment.method', 'jazzcash');
         $this->assertDatabaseCount('mobile_payments', 1);
         $this->assertDatabaseCount('invoices', 1);
-        $this->assertDatabaseHas('tickets', ['type' => 'pending booking', 'transaction_id' => null]);
+        $this->assertDatabaseHas('tickets', ['type' => 'advance booking', 'transaction_id' => null]);
         $this->assertStringNotContainsString('test-password', $first->getContent());
     }
 
@@ -418,7 +419,7 @@ class MobileSchedulingRulesTest extends TestCase
             $this->assertNotNull($response->json('data.payment.checkout_url'));
         }
         $this->assertNull(\App\Models\MobilePayment::first()->started_at);
-        $this->assertDatabaseHas('tickets', ['type' => 'pending booking']);
+        $this->assertDatabaseHas('tickets', ['type' => 'advance booking']);
         $this->assertDatabaseCount('booking_cancels', 0);
         \Illuminate\Support\Facades\Http::assertNothingSent();
     }
@@ -430,10 +431,10 @@ class MobileSchedulingRulesTest extends TestCase
         $this->get(strtok($url, '?'))->assertForbidden();
         $response = $this->get($url)->assertOk()->assertHeader('Cache-Control', 'no-store, private');
         $response->assertSee('name="pp_Amount" value="250000"', false)
-            ->assertSee('name="pp_BankID" value="TBANK"', false)
-            ->assertSee('name="pp_ProductID" value="RETL"', false);
+            ->assertSee('name="pp_BankID" value=""', false)
+            ->assertSee('name="pp_ProductID" value=""', false);
         $this->get($url)->assertStatus(409);
-        $this->assertDatabaseHas('tickets', ['type' => 'pending booking']);
+        $this->assertDatabaseHas('tickets', ['type' => 'advance booking']);
     }
 
     public function test_mobile_payment_return_does_not_trust_forged_success_fields()
@@ -444,7 +445,7 @@ class MobileSchedulingRulesTest extends TestCase
         \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response(['pp_ResponseCode' => '000', 'pp_Status' => 'Pending'])]);
         $this->post('/api/mobile/v1/payments/' . $payment->public_id . '/return', ['pp_ResponseCode' => '000', 'pp_Status' => 'Completed', 'pp_Amount' => 250000])->assertOk();
         $this->assertDatabaseHas('mobile_payments', ['status' => 'pending']);
-        $this->assertDatabaseHas('tickets', ['type' => 'pending booking']);
+        $this->assertDatabaseHas('tickets', ['type' => 'advance booking']);
     }
 
     public function test_mobile_payment_verification_confirms_tickets_once()
@@ -503,7 +504,7 @@ class MobileSchedulingRulesTest extends TestCase
         Carbon::setTestNow(now()->addMinutes(11));
         \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response([], 503)]);
         $this->postJson('/api/mobile/v1/bookings/' . $payment->invoice_id . '/payment/refresh')->assertStatus(503);
-        $this->assertDatabaseHas('tickets', ['type' => 'pending booking', 'deleted_at' => null]);
+        $this->assertDatabaseHas('tickets', ['type' => 'advance booking', 'deleted_at' => null]);
         $this->assertDatabaseHas('mobile_payments', ['status' => 'pending']);
     }
 
@@ -516,6 +517,175 @@ class MobileSchedulingRulesTest extends TestCase
         Sanctum::actingAs(new PassengerAccount(['id' => 99, 'company_id' => 2]));
         $this->postJson('/api/mobile/v1/bookings/' . $payment->invoice_id . '/payment/refresh')->assertNotFound();
     }
+
+    /** @dataProvider reservationDeadlines */
+    public function test_online_hold_respects_erp_terminal_reservation_deadline(int $terminalMinutes, int $expectedMinutes)
+    {
+        $input = $this->paymentInput();
+        DB::table('terminals')->where('id', 10)->update(['reservation_cancel' => $terminalMinutes]);
+        $this->postJson('/api/mobile/v1/bookings', $input)->assertCreated()
+            ->assertJsonPath('data.payment.expires_at', now()->addMinutes($expectedMinutes)->toIso8601String());
+        $this->assertDatabaseHas('tickets', ['type' => 'advance booking']);
+    }
+
+    public static function reservationDeadlines(): array
+    {
+        return [[0, 10], [5, 5], [20, 10]];
+    }
+
+    /** @dataProvider erpCancellationModes */
+    public function test_erp_can_cancel_mobile_seats_with_existing_permissions(bool $issued, bool $bulk)
+    {
+        $booking = $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
+        $payment = \App\Models\MobilePayment::first();
+        $originalCheckout = $booking->json('data.payment.checkout_url');
+        if ($issued) {
+            $payment->update(['started_at' => now()]);
+            $this->fakePaidPayment($payment);
+            $this->postJson('/api/mobile/v1/bookings/' . $payment->invoice_id . '/payment/refresh')
+                ->assertOk()->assertJsonPath('data.status', 'confirmed');
+        }
+        $ticket = \App\Models\Ticket::first();
+        $this->createErpCancellationSchema();
+        $permission = $issued ? 'cancel-ticket' : 'reserved-cancel';
+        $role = \App\Models\admin\Role::create(['permissions' => []]);
+        Sanctum::actingAs(new \App\Models\User([
+            'id' => 20, 'company_id' => 1, 'role_id' => $role->id, 'name' => 'ERP operator',
+        ]));
+        $url = '/api/web/v1/booking/canceling' . ($bulk ? '/all' : '');
+        $body = $bulk ? ['cancelAllSeat' => [$ticket->id], 'percentage' => 0, 'reason' => 'Staff cancellation'] : [
+            'date' => $ticket->date, 'schedule_id' => $ticket->schedule_id, 'customer_id' => $ticket->customer_id,
+            'departure_id' => $ticket->departure_city_id, 'destination_id' => $ticket->destination_city_id,
+            'seat_no' => $ticket->seat_no, 'percentage' => 0, 'remarks' => 'Staff cancellation',
+        ];
+        $this->postJson($url, $body)->assertForbidden();
+        $role->update(['permissions' => [['childs' => [['buttons' => [['name' => $permission, 'allow' => true]]]]]]]);
+        $this->postJson($url, $body)->assertOk();
+        $this->assertDatabaseHas('booking_cancels', [
+            'ticket_id' => $ticket->id, 'type' => $issued ? 'booked' : 'advance booking', 'added_by' => 20,
+        ]);
+        $this->assertSoftDeleted('tickets', ['id' => $ticket->id, 'type' => 'canceled']);
+
+        Sanctum::actingAs(new PassengerAccount(['id' => 99, 'company_id' => 1]));
+        $this->getJson('/api/mobile/v1/bookings/' . $payment->invoice_id)->assertOk()
+            ->assertJsonPath('data.status', 'canceled')->assertJsonPath('data.payment.checkout_url', null)
+            ->assertJsonPath('data.qr_value', null);
+        $this->get($originalCheckout)->assertStatus(409);
+        if (!$issued) {
+            // A gateway receipt arriving after staff release cannot revive the seat.
+            $payment->update(['started_at' => now()]);
+            $this->fakePaidPayment($payment);
+            $this->postJson('/api/mobile/v1/bookings/' . $payment->invoice_id . '/payment/refresh')
+                ->assertOk()->assertJsonPath('data.payment.status', 'review_required')
+                ->assertJsonPath('data.qr_value', null);
+            $this->assertSoftDeleted('tickets', ['id' => $ticket->id, 'type' => 'canceled']);
+            $this->assertDatabaseCount('booking_cancels', 1);
+        }
+    }
+
+    public static function erpCancellationModes(): array
+    {
+        return ['reserved single' => [false, false], 'reserved bulk' => [false, true], 'issued single' => [true, false]];
+    }
+
+    private function createErpCancellationSchema(): void
+    {
+        // Legacy route files use require_once, so register the real booking
+        // routes again for this test's fresh application instance.
+        \Illuminate\Support\Facades\Route::prefix('api')->middleware('api')
+            ->group(base_path('routes/api/booking.php'));
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id(); $table->text('permissions'); $table->timestamps(); $table->softDeletes();
+        });
+        Schema::table('tickets', function (Blueprint $table) {
+            $table->string('refund_reason')->nullable(); $table->float('refund_percentage')->nullable();
+            $table->float('refund_amount')->nullable();
+        });
+        Schema::table('card_assigns', function (Blueprint $table) { $table->string('cnic')->nullable(); });
+        Schema::create('ticket_e_l_t_s', function (Blueprint $table) {
+            $table->id(); $table->integer('ticket_id'); $table->timestamps(); $table->softDeletes();
+        });
+    }
+
+    public function test_legacy_expiry_leaves_mobile_payments_to_reconciler_and_still_cancels_other_reservations()
+    {
+        $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
+        $mobile = \App\Models\Ticket::first();
+        DB::table('terminals')->where('id', 10)->update(['reservation_cancel' => 1]);
+        $legacy = $mobile->replicate();
+        $legacy->invoice_id = 999;
+        $legacy->seat_no = '2';
+        $legacy->save();
+        $otherCompany = $mobile->replicate();
+        $otherCompany->company_id = 2;
+        $otherCompany->seat_no = '3';
+        $otherCompany->save();
+        Carbon::setTestNow(now()->addMinutes(11));
+        $this->artisan('reserved:cancel')->assertExitCode(0);
+        $this->assertDatabaseHas('tickets', ['id' => $mobile->id, 'type' => 'advance booking', 'deleted_at' => null]);
+        $this->assertSoftDeleted('tickets', ['id' => $legacy->id, 'type' => 'canceled']);
+        $this->assertSoftDeleted('tickets', ['id' => $otherCompany->id, 'type' => 'canceled']);
+        $this->artisan('mobile:reconcile-payments')->assertExitCode(0);
+        $this->assertSoftDeleted('tickets', ['id' => $mobile->id, 'type' => 'canceled']);
+        $this->assertDatabaseHas('mobile_payments', ['status' => 'expired']);
+        $this->assertSame(1, DB::table('booking_cancels')->where('ticket_id', $mobile->id)->count());
+    }
+
+    public function test_legacy_expiry_still_works_without_mobile_payment_table()
+    {
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        $this->postJson('/api/mobile/v1/bookings', [
+            'quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter',
+        ])->assertCreated();
+        Schema::create('booking_cancels', function (Blueprint $table) {
+            $table->id(); $table->integer('company_id'); $table->integer('ticket_id'); $table->integer('percentage');
+            $table->string('reason'); $table->string('type'); $table->integer('added_by'); $table->timestamps();
+        });
+        DB::table('terminals')->update(['reservation_cancel' => 1]);
+        Carbon::setTestNow(now()->addMinutes(2));
+        $this->artisan('reserved:cancel')->assertExitCode(0);
+        $this->assertSame(0, \App\Models\Ticket::count());
+        $this->assertDatabaseHas('booking_cancels', ['type' => 'advance booking', 'reason' => 'auto cancel']);
+    }
+
+    public function test_status_repair_is_scoped_idempotent_and_preserves_cancellations_and_deadlines()
+    {
+        $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
+        $ticket = \App\Models\Ticket::first();
+        $ticket->update(['type' => 'pending booking']);
+        DB::table('ticket_advanced_bookeds')->update(['type' => 'pending booking']);
+        // Model the real advance history schema, which has no deleted_at column.
+        Schema::table('ticket_advanced_bookeds', function (Blueprint $table) { $table->dropColumn('deleted_at'); });
+        DB::table('ticket_is_partials')->insert([
+            'ticket_id' => $ticket->id, 'company_id' => 1, 'type' => 'pending booking',
+        ]);
+        $preserved = [];
+        foreach ([
+            ['invoice_id' => 999], ['company_id' => 2], ['deleted_at' => now()],
+            ['type' => 'booked'], ['type' => 'canceled'],
+        ] as $attributes) {
+            $other = $ticket->replicate()->fill($attributes);
+            $other->save();
+            $preserved[$other->id] = (array) DB::table('tickets')->where('id', $other->id)->first();
+        }
+        $before = (array) DB::table('tickets')->where('id', $ticket->id)->first();
+        $paymentBefore = DB::table('mobile_payments')->first();
+        require_once base_path('database/migrations/2026_09_18_000012_align_mobile_reservations_with_erp_status.php');
+        $repair = new \AlignMobileReservationsWithErpStatus();
+        $repair->up();
+        $repair->up();
+        $repair->down();
+        $before['type'] = 'advance booking';
+        $this->assertEquals($before, (array) DB::table('tickets')->where('id', $ticket->id)->first());
+        $this->assertEquals($paymentBefore, DB::table('mobile_payments')->first());
+        foreach ($preserved as $id => $row) {
+            $this->assertEquals($row, (array) DB::table('tickets')->where('id', $id)->first());
+        }
+        foreach (['ticket_advanced_bookeds', 'ticket_is_partials'] as $table) {
+            $this->assertDatabaseHas($table, ['ticket_id' => $ticket->id, 'type' => 'advance booking']);
+        }
+    }
+
 
     private function paymentInput(): array
     {
@@ -591,8 +761,8 @@ class MobileSchedulingRulesTest extends TestCase
         DB::table('schedules')->where('id', 41)->update(['discount_id' => null, 'surcharge_id' => null]);
         $service = app(\App\Services\Mobile\MobileTravelService::class);
         $rows = $service->schedules(1, 2, $this->date)->keyBy('schedule_detail_id');
-        // 10% schedule discount + 5% terminal discount + 100 flat surcharge, ERP-rounded.
-        $this->assertSame([2250.0, 3500.0], array_column($rows[50]['fares'], 'amount'));
+        // ERP uses base + active surcharge, replacing both eligible discounts.
+        $this->assertSame([2600.0, 4100.0], array_column($rows[50]['fares'], 'amount'));
         $this->assertSame([2400.0, 3800.0], array_column($rows[51]['fares'], 'amount'));
         foreach ($rows as $row) {
             $detail = $service->findDetail($row['schedule_detail_id'], 1, 2, $this->date);
@@ -693,6 +863,240 @@ class MobileSchedulingRulesTest extends TestCase
         ]);
     }
 
+    /** @dataProvider fareAdjustmentCases */
+    public function test_fare_adjustments_agree_from_search_through_booking_and_legacy_validation(
+        float $base, string $discountType, float $discountValue, float $terminalPercent,
+        ?string $surchargeType, float $surchargeValue, float $expectedDiscount,
+        float $expectedSurcharge, float $expectedRounding, float $expectedTotal
+    ) {
+        $this->seedSearchAdjustments();
+        DB::table('fare_tables')->where('fare_class', 70)->update(['fare' => $base]);
+        DB::table('discounts')->update(['type' => $discountType, 'flat' => $discountValue, 'percentage' => $discountValue]);
+        DB::table('terminal_discounts')->update(['discount' => $terminalPercent]);
+        DB::table('surcharges')->update(['is_active' => $surchargeType === null ? 0 : 1,
+            'type' => $surchargeType ?? 'flat', 'flat' => $surchargeValue, 'percentage' => $surchargeValue]);
+
+        $search = $this->getJson($this->searchUrl())->assertOk()->json('data.0.fares.0');
+        $seat = $this->getJson($this->seatsUrl())->assertOk()->json('data.seats.0');
+        $this->assertEquals($expectedTotal, $search['amount']);
+        $this->assertEquals($expectedTotal, $seat['price']);
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        foreach (['base_fare' => $base, 'discount' => $expectedDiscount, 'surcharge' => $expectedSurcharge,
+            'rounding_adjustment' => $expectedRounding, 'total' => $expectedTotal] as $field => $expected) {
+            $this->assertEquals($expected, $quote->json('data.' . $field), $field);
+        }
+        $this->assertQuoteAddsUp($quote->json('data'));
+        $created = $this->postJson('/api/mobile/v1/bookings', [
+            'quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter',
+        ])->assertCreated();
+        $this->assertEquals($expectedTotal, $created->json('data.total'));
+        $this->assertDatabaseHas('tickets', ['seat_no' => '1', 'seat_fare' => $expectedTotal]);
+
+        // Exercise the real ERP/online fare validator with the same company/terminal.
+        \Illuminate\Support\Facades\Auth::setUser(new \App\Models\User([
+            'id' => 20, 'company_id' => 1, 'terminal_id' => 10,
+        ]));
+        $request = new \Illuminate\Http\Request([
+            'schedule_id' => 40, 'departure_city_id' => 1, 'destination_city_id' => 2,
+            'date' => $this->date, 'selected_seats' => ['1'],
+            'selected_seats_class' => [70], 'selected_seats_fare' => [$expectedTotal],
+        ]);
+        $this->assertNull(seatFareIsWrong($request));
+        $request->merge(['selected_seats_fare' => [$expectedTotal + 50]]);
+        $this->assertEquals($expectedTotal, seatFareIsWrong($request)['expected_fare']);
+    }
+
+    public static function fareAdjustmentCases(): array
+    {
+        return [
+            'unchanged fare' => [2525, 'flat', 0, 0, null, 0, 0, 0, 0, 2525],
+            'percentage discount' => [2500, 'percentage', 10, 0, null, 0, 250, 0, 0, 2250],
+            'flat discount' => [2500, 'flat', 200, 0, null, 0, 200, 0, 0, 2300],
+            'terminal discount' => [2500, 'flat', 0, 5, null, 0, 125, 0, 25, 2400],
+            'flat surcharge' => [2500, 'flat', 0, 0, 'flat', 100, 0, 100, 0, 2600],
+            'percentage surcharge' => [2500, 'flat', 0, 0, 'percentage', 10, 0, 250, 0, 2750],
+            'surcharge overrides percentage discount' => [2500, 'percentage', 10, 0, 'flat', 100, 0, 100, 0, 2600],
+            'surcharge overrides flat discount' => [2500, 'flat', 100, 0, 'percentage', 10, 0, 250, 0, 2750],
+            'flat surcharge overrides both discounts' => [2500, 'percentage', 10, 5, 'flat', 100, 0, 100, 0, 2600],
+            'percentage surcharge overrides both discounts' => [2500, 'flat', 200, 5, 'percentage', 10, 0, 250, 0, 2750],
+            'round down' => [2500, 'flat', 126, 0, null, 0, 126, 0, -24, 2350],
+            'fractional terminal discount' => [2500, 'flat', 0, 1.25, null, 0, 31.25, 0, -18.75, 2450],
+            'both discounts without surcharge' => [2500, 'percentage', 10, 5, null, 0, 375, 0, 25, 2150],
+            'zero active surcharge still overrides discounts' => [2500, 'percentage', 10, 5, 'flat', 0, 0, 0, 0, 2500],
+            'fractional schedule discount rounds before terminal discount' => [2500, 'percentage', 1.03, 1, null, 0, 51, 0, 1, 2450],
+            'fractional flat discount uses ERP integer cast' => [2500, 'flat', 25.9, 0, null, 0, 25, 0, 25, 2500],
+            'percentage surcharge rounds before nearest fifty' => [2500, 'flat', 0, 0, 'percentage', 2.99, 0, 75, 25, 2600],
+            'free fare matches ERP' => [2500, 'flat', 2500, 0, null, 0, 2500, 0, 0, 0],
+        ];
+    }
+
+    public function test_mixed_class_quote_sums_each_seat_adjustment_and_rounding()
+    {
+        $this->seedSearchAdjustments();
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput(['1', '3']))->assertOk();
+        // ERP: 2500 + 100 = 2600; 4000 + 100 = 4100. Discounts are superseded.
+        foreach (['base_fare' => 6500, 'discount' => 0, 'surcharge' => 200,
+            'rounding_adjustment' => 0, 'total' => 6700] as $field => $expected) {
+            $this->assertEquals($expected, $quote->json('data.' . $field), $field);
+        }
+        $this->assertQuoteAddsUp($quote->json('data'));
+    }
+
+    /** @dataProvider excludedFareAdjustments */
+    public function test_inactive_unassigned_and_out_of_date_adjustments_are_excluded(string $excluded, float $expected)
+    {
+        $this->seedSearchAdjustments();
+        if (!in_array($excluded, ['inactive surcharge', 'deleted surcharge'], true)) {
+            DB::table('schedules')->update(['surcharge_id' => null]);
+        }
+        switch ($excluded) {
+            case 'inactive discount': DB::table('discounts')->update(['is_active' => 0]); break;
+            case 'another terminal': DB::table('schedule_terminal_discounts')->update(['terminal_id' => 11]); break;
+            case 'expired terminal discount': DB::table('terminal_discounts')->update(['end_date' => '2026-09-12']); break;
+            case 'future terminal discount': DB::table('terminal_discounts')->update(['start_date' => '2026-09-14']); break;
+            case 'inactive surcharge': DB::table('surcharges')->update(['is_active' => 0]); break;
+            case 'deleted surcharge': DB::table('surcharges')->update(['deleted_at' => now()]); break;
+            case 'deleted discount': DB::table('discounts')->update(['deleted_at' => now()]); break;
+            case 'deleted terminal discount': DB::table('terminal_discounts')->update(['deleted_at' => now()]); break;
+        }
+        $this->assertEquals($expected, $this->getJson($this->searchUrl())->assertOk()->json('data.0.fares.0.amount'));
+        $this->assertEquals($expected, $this->getJson($this->seatsUrl())->assertOk()->json('data.seats.0.price'));
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        $this->assertEquals($expected, $quote->json('data.total'));
+        $this->assertQuoteAddsUp($quote->json('data'));
+    }
+
+    public static function excludedFareAdjustments(): array
+    {
+        return [
+            ['inactive discount', 2400], ['another terminal', 2400],
+            ['expired terminal discount', 2250], ['future terminal discount', 2250],
+            ['inactive surcharge', 2150], ['deleted surcharge', 2150],
+            ['deleted discount', 2400], ['deleted terminal discount', 2250],
+        ];
+    }
+
+    /** @dataProvider changedFareAdjustments */
+    public function test_changed_discount_or_surcharge_rejects_old_quote(string $table, array $changes)
+    {
+        $this->seedSearchAdjustments();
+        if ($table !== 'surcharges') {
+            DB::table('schedules')->update(['surcharge_id' => null]);
+        }
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        DB::table($table)->update($changes);
+        $this->postJson('/api/mobile/v1/bookings', [
+            'quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter',
+        ])->assertStatus(409)->assertJsonPath('message', 'Seat availability or fare changed. Request a new quote.');
+        $this->assertDatabaseCount('invoices', 0);
+        $this->assertDatabaseCount('tickets', 0);
+    }
+
+    public static function changedFareAdjustments(): array
+    {
+        return [['discounts', ['percentage' => 20]], ['surcharges', ['flat' => 300]],
+            ['terminal_discounts', ['discount' => 10]]];
+    }
+
+    public function test_payment_amount_uses_adjusted_fare_once()
+    {
+        $this->seedSearchAdjustments();
+        $booking = $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
+        $this->assertEquals(2600, $booking->json('data.total'));
+        $this->assertDatabaseHas('mobile_payments', ['amount_minor' => 260000]);
+        $this->get($booking->json('data.payment.checkout_url'))->assertOk()
+            ->assertSee('name="pp_Amount" value="260000"', false);
+    }
+
+    public function test_wallet_is_deducted_after_discounts_surcharges_and_rounding()
+    {
+        $this->seedSearchAdjustments();
+        config()->set('mobile.features.wallet', true);
+        $loyalty = \Mockery::mock(\App\Services\Mobile\MobileLoyaltyService::class);
+        $loyalty->shouldReceive('deductionFor')->once()->withArgs(function ($account, $points, $amount) {
+            return $account->id === 99 && $points === 2 && $amount === 2600.0;
+        })->andReturn(['points' => 2, 'amount' => 100.25]);
+        $this->app->instance(\App\Services\Mobile\MobileLoyaltyService::class, $loyalty);
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', array_merge($this->quoteInput(), ['points_to_use' => 2]))->assertOk();
+        $this->assertEquals(100.25, $quote->json('data.wallet_deduction'));
+        $this->assertEquals(2499.75, $quote->json('data.total'));
+        $this->assertQuoteAddsUp($quote->json('data'));
+    }
+
+    public function test_discounts_changed_under_active_surcharge_do_not_change_erp_fare()
+    {
+        $this->seedSearchAdjustments();
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        DB::table('discounts')->update(['percentage' => 50]);
+        DB::table('terminal_discounts')->update(['discount' => 20]);
+        $created = $this->postJson('/api/mobile/v1/bookings', [
+            'quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter',
+        ])->assertCreated();
+        $this->assertEquals(2600, $created->json('data.total'));
+    }
+
+    public function test_mixed_class_discounts_without_surcharge_round_each_seat_before_summing()
+    {
+        $this->seedSearchAdjustments();
+        DB::table('schedules')->update(['surcharge_id' => null]);
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput(['1', '3']))->assertOk();
+        // 2500 - 375 + 25 = 2150; 4000 - 600 = 3400.
+        foreach (['base_fare' => 6500, 'discount' => 975, 'surcharge' => 0,
+            'rounding_adjustment' => 25, 'total' => 5550] as $field => $expected) {
+            $this->assertEquals($expected, $quote->json('data.' . $field), $field);
+        }
+        $this->assertQuoteAddsUp($quote->json('data'));
+    }
+
+    public function test_inactive_fare_class_blocks_search_seats_quotes_and_existing_quote()
+    {
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        DB::table('fare_classes')->update(['is_active' => 0]);
+        $message = 'This schedule contains an inactive or unavailable fare class.';
+        $this->getJson($this->searchUrl())->assertStatus(422)->assertJsonPath('message', $message);
+        $this->getJson($this->seatsUrl())->assertStatus(422)->assertJsonPath('message', $message);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertStatus(422)->assertJsonPath('message', $message);
+        $this->postJson('/api/mobile/v1/bookings', [
+            'quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter',
+        ])->assertStatus(422)->assertJsonPath('message', $message);
+        $this->assertDatabaseCount('tickets', 0);
+    }
+
+    public function test_fare_table_must_cover_all_company_classes_like_erp()
+    {
+        DB::table('fare_classes')->insert(['id' => 71, 'company_id' => 1, 'name' => 'Other class', 'is_active' => 1]);
+        $this->getJson($this->searchUrl())->assertStatus(422);
+        $this->getJson($this->seatsUrl())->assertStatus(422);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertStatus(422);
+        DB::table('fare_tables')->insert(['company_id' => 1, 'from_city_id' => 1, 'to_city_id' => 2, 'fare_class' => 71, 'fare' => 4000]);
+        // Other companies' classes and tariffs cannot affect this company.
+        DB::table('fare_classes')->insert(['id' => 72, 'company_id' => 2, 'name' => 'Other company', 'is_active' => 1]);
+        DB::table('fare_tables')->insert(['company_id' => 2, 'from_city_id' => 1, 'to_city_id' => 2, 'fare_class' => 72, 'fare' => 1]);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.fares.0.amount', 2500);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk()->assertJsonPath('data.total', 2500);
+    }
+
+    public function test_negative_erp_fare_is_rejected_instead_of_becoming_a_free_booking()
+    {
+        $this->seedSearchAdjustments();
+        DB::table('schedules')->update(['surcharge_id' => null]);
+        DB::table('discounts')->update(['type' => 'flat', 'flat' => 3000]);
+        $this->getJson($this->searchUrl())->assertStatus(422)
+            ->assertJsonPath('message', 'The fare configuration is invalid for this schedule.');
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertStatus(422);
+        $this->assertDatabaseCount('mobile_booking_quotes', 0);
+        $this->assertDatabaseCount('tickets', 0);
+    }
+
+
+    private function assertQuoteAddsUp(array $quote): void
+    {
+        $sum = $quote['base_fare'] - $quote['discount'] + $quote['surcharge']
+            + $quote['rounding_adjustment'] + $quote['taxes'] + $quote['fees'] - $quote['wallet_deduction'];
+        $this->assertEqualsWithDelta($quote['total'], $sum, 0.001);
+    }
+
+
     private function seedSearchAdjustments(): void
     {
         foreach (['discounts', 'surcharges'] as $name) {
@@ -707,7 +1111,7 @@ class MobileSchedulingRulesTest extends TestCase
         DB::table('terminal_discounts')->insert(['company_id' => 1, 'terminal_id' => 10, 'route_id' => 30,
             'discount' => 5, 'start_date' => $this->date, 'end_date' => $this->date]);
         DB::table('schedules')->update(['discount_id' => 80, 'surcharge_id' => 81]);
-        DB::table('fare_classes')->insert(['id' => 71, 'company_id' => 1, 'name' => 'Premium']);
+        DB::table('fare_classes')->insert(['id' => 71, 'company_id' => 1, 'name' => 'Premium', 'is_active' => 1]);
         DB::table('fare_tables')->insert(['company_id' => 1, 'from_city_id' => 1, 'to_city_id' => 2, 'fare_class' => 71, 'fare' => 4000]);
         $map = json_decode(DB::table('bus_classes')->value('seat_map'), true);
         $map[0][2]['class'] = 71;
@@ -735,7 +1139,7 @@ class MobileSchedulingRulesTest extends TestCase
         DB::table('bus_classes')->insert(['id' => 60, 'company_id' => 1, 'name' => 'Standard', 'seat_map' => json_encode([array_map(function ($seat) {
             return ['seatNo' => $seat, 'reserved' => true, 'type' => 0, 'class' => 70];
         }, ['1', '2', '3'])])]);
-        DB::table('fare_classes')->insert(['id' => 70, 'company_id' => 1, 'name' => 'Standard']);
+        DB::table('fare_classes')->insert(['id' => 70, 'company_id' => 1, 'name' => 'Standard', 'is_active' => 1]);
         DB::table('fare_tables')->insert(['company_id' => 1, 'from_city_id' => 1, 'to_city_id' => 2, 'fare_class' => 70, 'fare' => 2500]);
     }
 
@@ -744,7 +1148,7 @@ class MobileSchedulingRulesTest extends TestCase
         // Only columns needed by the real scheduling and advance-booking paths.
         $tables = [
             'cities' => ['', 'name'],
-            'terminals' => ['is_online_terminal advance_booking', 'name available_seats'],
+            'terminals' => ['is_online_terminal advance_booking reservation_cancel', 'name available_seats'],
             'users' => ['check_booking_minutes', ''],
             'routes' => ['online_seats', 'name online_seat_choices'],
             'routes_fares' => ['route_id departure_city_id destination_city_id', ''],
@@ -757,7 +1161,7 @@ class MobileSchedulingRulesTest extends TestCase
             'limited_seats' => ['route_id departure_city_id destination_city_id limited_seat', ''],
             'drop_schedules' => ['schedule_id', 'schedule_date'],
             'bus_classes' => ['', 'name seat_map'],
-            'fare_classes' => ['', 'name'],
+            'fare_classes' => ['is_active', 'name'],
             'fare_tables' => ['from_city_id to_city_id fare_class fare', ''],
             'discounts' => ['is_active', 'type'],
             'schedule_terminal_discounts' => ['discount_id terminal_id', ''],

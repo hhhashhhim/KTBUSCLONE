@@ -6,6 +6,7 @@ use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Models\Booking\BookingCancel;
 use Illuminate\Console\Command;
 
@@ -42,7 +43,18 @@ class OnlineReservedCancelTicket extends Command
      */
     public function handle()
     {
-        $tickets = Ticket::with("terminal:id,name,reservation_cancel")->where(["type"=>"advance booking"])->get();
+        $query = Ticket::with("terminal:id,name,reservation_cancel")->where(["type"=>"advance booking"]);
+        // Mobile online reservations use the ERP status too, but their payment
+        // reconciler must verify receipts and return wallet points before release.
+        // Counter and other legacy reservations keep their existing expiry path.
+        if (Schema::hasTable('mobile_payments')) {
+            $query->whereNotExists(function ($payment) {
+                $payment->selectRaw('1')->from('mobile_payments')
+                    ->whereColumn('mobile_payments.invoice_id', 'tickets.invoice_id')
+                    ->whereColumn('mobile_payments.company_id', 'tickets.company_id');
+            });
+        }
+        $tickets = $query->get();
         try {
             DB::beginTransaction();
             foreach($tickets as $ticket)

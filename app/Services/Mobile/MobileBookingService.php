@@ -105,14 +105,12 @@ class MobileBookingService
         $baseFare = $selected->sum(function ($seat) {
             return (float) $seat['price'];
         });
-        $originalFare = collect($this->travel->faresForDetail(
-            $detail,
-            (int) $input['origin_id'],
-            (int) $input['destination_id']
-        ))->keyBy('class_id');
-        $originalTotal = $selected->sum(function ($seat) use ($originalFare) {
-            return (float) data_get($originalFare->get($seat['class_id']), 'original_amount', $seat['price']);
-        });
+        // Use the same per-seat snapshot as the selected prices. A second fare
+        // query could produce a different breakdown if the tariff changes mid-request.
+        $breakdown = [];
+        foreach (['base_fare', 'discount', 'surcharge', 'rounding_adjustment'] as $field) {
+            $breakdown[$field] = round((float) $selected->sum($field), 2);
+        }
         $wallet = $this->walletEnabled()
             ? $this->loyalty->deductionFor(
                 $account,
@@ -132,13 +130,14 @@ class MobileBookingService
                 'date' => $input['date'],
                 'seats' => $selected->all(),
                 'passengers' => array_values($input['passengers']),
+                'fare_breakdown' => $breakdown,
                 'wallet' => [
                     'points' => $wallet['points'],
                     'deduction' => $wallet['amount'],
                 ],
             ],
-            'base_fare' => $originalTotal,
-            'discount' => max(0, $originalTotal - $baseFare),
+            'base_fare' => $breakdown['base_fare'],
+            'discount' => $breakdown['discount'],
             'taxes' => 0,
             'fees' => 0,
             'total' => max(0, $baseFare - $wallet['amount']),
@@ -313,7 +312,8 @@ class MobileBookingService
                         'terminal_name' => $terminal->name,
                         'online_terminal' => $terminal->is_online_terminal,
                         'gender' => $this->ticketGender($passenger['gender']),
-                        'type' => $paymentMethod === 'counter' ? 'advance booking' : 'pending booking',
+                        // ERP/API reservations use advance booking until the ticket is issued.
+                        'type' => 'advance booking',
                         'booked_time' => now(),
                         'added_by' => $systemUser->id,
                         'updated_by' => $systemUser->id,
@@ -363,7 +363,12 @@ class MobileBookingService
                 }
 
                 if ($paymentMethod !== 'counter') {
-                    $expires = now()->addMinutes(max(1, min(30, (int) config('mobile_payments.checkout_minutes', 10))));
+                    $minutes = max(1, min(30, (int) config('mobile_payments.checkout_minutes', 10)));
+                    // Respect the same terminal reservation limit as reserved:cancel.
+                    if ((int) $terminal->reservation_cancel > 0) {
+                        $minutes = min($minutes, (int) $terminal->reservation_cancel);
+                    }
+                    $expires = now()->addMinutes($minutes);
                     $departure = \Carbon\Carbon::parse($payload['date'] . ' ' . $detail->departure_time);
                     if ($departure->lte(now())) { throw new RuntimeException('This journey has already departed.', 409); }
                     if ($departure->lt($expires)) { $expires = $departure; }
@@ -445,13 +450,17 @@ class MobileBookingService
         }
         $first = $tickets->first();
         $confirmed = $tickets->every(function ($ticket) {
-            return $ticket->type === 'booked';
+            return !$ticket->trashed() && $ticket->type === 'booked';
+        });
+
+        $cancelled = $tickets->contains(function ($ticket) {
+            return $ticket->trashed() || $ticket->type === 'canceled';
         });
 
         return [
             'id' => $invoiceId,
             'reference' => 'KT-' . str_pad((string) $invoiceId, 8, '0', STR_PAD_LEFT),
-            'status' => $confirmed ? 'confirmed' : ($payment && in_array($payment->status, ['expired', 'review_required'], true) ? $payment->status : 'pending'),
+            'status' => $confirmed ? 'confirmed' : ($payment && in_array($payment->status, ['expired', 'review_required'], true) ? $payment->status : ($cancelled ? 'canceled' : 'pending')),
             'payment_status' => $payment ? ($payment->paid_at ? 'paid' : $payment->status) : ($confirmed ? 'paid' : 'pending'),
             'payment' => $payment ? app(MobilePaymentService::class)->present($payment) : null,
             'origin_name' => optional($first->departure_city)->name,

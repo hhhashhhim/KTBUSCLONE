@@ -27,6 +27,8 @@ class MobileBookingController extends Controller
                 'taxes' => (float) $quote->taxes,
                 'fees' => (float) $quote->fees,
                 'discount' => (float) $quote->discount,
+                'surcharge' => (float) data_get($quote->payload, 'fare_breakdown.surcharge', 0),
+                'rounding_adjustment' => (float) data_get($quote->payload, 'fare_breakdown.rounding_adjustment', 0),
                 'wallet_deduction' => (float) data_get($quote->payload, 'wallet.deduction', 0),
                 'wallet_points_used' => (int) data_get($quote->payload, 'wallet.points', 0),
                 'total' => (float) $quote->total,

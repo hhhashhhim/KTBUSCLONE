@@ -26,7 +26,7 @@ class MobilePaymentService
             'environment' => $payment->environment,
             'id' => $payment->public_id, 'method' => $payment->method, 'status' => $payment->status,
             'expires_at' => $payment->expires_at->toIso8601String(),
-            'checkout_url' => !config('mobile_payments.preview_only') && $payment->status === 'pending' && !$payment->started_at && $payment->expires_at->isFuture()
+            'checkout_url' => !config('mobile_payments.preview_only') && $payment->status === 'pending' && !$payment->started_at && $payment->expires_at->isFuture() && $this->hasReservation($payment)
                 ? URL::temporarySignedRoute('mobile.payments.checkout', $payment->expires_at, ['payment' => $payment->public_id]) : null,
         ];
     }
@@ -50,9 +50,7 @@ class MobilePaymentService
             if ($payment->status !== 'pending' || $payment->started_at || !$payment->expires_at->isFuture()) {
                 throw new RuntimeException('Checkout has already started or expired. Return to the app and check payment status.', 409);
             }
-            $active = Ticket::where('company_id', $payment->company_id)->where('invoice_id', $payment->invoice_id)
-                ->where('type', 'pending booking')->count();
-            if ($active !== $payment->ticket_count) { throw new RuntimeException('This reservation is no longer available.', 409); }
+            if (!$this->hasReservation($payment)) { throw new RuntimeException('This reservation is no longer available.', 409); }
             $form = $this->gateway->checkout($payment);
             $payment->refresh();
             if ($payment->status !== 'pending' || !$payment->expires_at->isFuture()) {
@@ -82,6 +80,12 @@ class MobilePaymentService
         } finally { $lock->release(); }
     }
 
+    private function hasReservation(MobilePayment $payment): bool
+    {
+        return Ticket::where('company_id', $payment->company_id)->where('invoice_id', $payment->invoice_id)
+            ->where('type', 'advance booking')->count() === $payment->ticket_count;
+    }
+
     private function settle(MobilePayment $payment, bool $paid): MobilePayment
     {
         $invoice = Invoice::where('company_id', $payment->company_id)->find($payment->invoice_id);
@@ -94,7 +98,7 @@ class MobilePaymentService
                 if (in_array($payment->status, ['paid', 'review_required'], true)) { return $payment; }
                 $tickets = Ticket::withTrashed()->where('company_id', $payment->company_id)
                     ->where('invoice_id', $payment->invoice_id)->lockForUpdate()->get();
-                $active = $tickets->filter(function ($ticket) { return !$ticket->trashed() && $ticket->type === 'pending booking'; });
+                $active = $tickets->filter(function ($ticket) { return !$ticket->trashed() && $ticket->type === 'advance booking'; });
                 $amount = (int) round($active->sum(function ($ticket) { return $ticket->seat_fare - $ticket->discount; }) * 100);
                 if ($paid) {
                     // Never revive released seats or overwrite a staff cancellation/reschedule.

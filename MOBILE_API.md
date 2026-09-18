@@ -43,12 +43,94 @@ Validation failures use the same envelope with status `422` and field errors.
 
 Booking quote, creation, list and detail endpoints preserve intentional business-error messages and their 4xx statuses (for example, expired quotes and unavailable seats). Database errors and unexpected failures are reported through Laravel's server-side exception logger and return HTTP `500` with `{"success":false,"message":"Something went wrong. Please try again.","data":null,"errors":{}}`, regardless of `APP_DEBUG`. Intentional service failures with a 5xx status retain that status but use the same generic message and are also reported. SQL, bindings, passenger details and stack traces are never included in these booking error responses. This change requires backend deployment only; no migration or Flutter change is required.
 
+## Fare adjustments and quote breakdown
+
+Mobile fares follow the existing ERP `BookingController::selected` seat-price
+calculation and `seatFareIsWrong` booking validator. These ERP files and the
+legacy online controllers remain unchanged. `MobileFareCalculator` mirrors their
+calculation; regression tests compare mobile search, seats, quotes and bookings
+against the original, independent ERP validator.
+
+Eligibility and lookup criteria:
+
+- Base fare: company, departure city, destination city and the seat's fare class
+  from `fare_tables`. ERP casts the base fare to whole rupees.
+- Fare table: the city-pair tariff must cover all company fare classes, and classes
+  used by the selected bus must exist and be active, as in the ERP seat picker.
+- Schedule discount: the schedule's `discount_id`, active, with an assignment to
+  the selling terminal. Mobile uses `MOBILE_TERMINAL_ID` for that terminal.
+- Terminal discount: the selling terminal and schedule route must match, and
+  the travel/departure date must be within `start_date` and `end_date`, inclusive.
+- Surcharge: the schedule's `surcharge_id` must refer to an active surcharge.
+  ERP does not require a discount-terminal assignment for a surcharge.
+- Soft-deleted fare/adjustment records are excluded by the existing models.
+
+ERP calculation order:
+
+1. Start with the original integer base fare.
+2. Apply an eligible schedule discount. Percentage: subtract a percentage of the
+   original fare and round to whole rupees. Flat: subtract the integer flat value.
+3. Subtract any eligible terminal discount, as a percentage of the original fare.
+4. If an active schedule surcharge exists, **replace the discounted result with
+   original fare plus surcharge**. A percentage surcharge is calculated from the
+   original fare and rounded to whole rupees. A flat surcharge uses its stored
+   amount. This precedence also applies to an active zero-value surcharge.
+5. If the resulting fare differs from the original, apply ERP `customRound`
+   (round to whole rupees, then the nearest Rs. 50). Otherwise preserve the fare.
+
+For a Rs. 2,500 base fare, a 10% schedule discount gives Rs. 2,250. With an
+additional 5% terminal discount and no surcharge, the pre-rounding fare is
+Rs. 2,125 and the payable seat fare is Rs. 2,150. If a Rs. 100 active surcharge is
+assigned, the ERP seat fare is Rs. 2,600; those discounts do not reduce it.
+
+Legacy online **search cards** historically combine adjustments differently from
+the ERP seat picker/booking validator. Mobile consistently uses the latter's
+bookable fare for its own search, seat selection and checkout. This does not
+change the existing website, ERP or partner API behavior.
+
+`GET /schedules` fare entries retain `original_amount` and `amount`, and add
+`discount`, `surcharge` and signed `rounding_adjustment`. Seat entries retain
+`price` and add `base_fare`, `discount`, `surcharge` and `rounding_adjustment`.
+`POST /bookings/quote` keeps its existing request/authentication and adds numeric
+`surcharge` and signed `rounding_adjustment` to `data`. The breakdown reports only
+effective adjustments, so `discount` is zero while a surcharge takes precedence.
+ERP's intermediate rounding is reflected in each effective adjustment. The final
+rounding line reconciles those monetary components to the actual seat fare.
+
+```
+total = base_fare - discount + surcharge + rounding_adjustment
+        + taxes + fees - wallet_deduction
+```
+
+Each selected seat is calculated/rounded independently before totals are summed.
+Existing mobile wallet redemption applies afterward. Flutter displays the server
+components and total, without reproducing these rules. A negative ERP result is
+rejected with HTTP `422` rather than silently changed into a free mobile booking.
+
+The existing quote JSON payload stores the breakdown; no migration is needed.
+Booking rechecks current seat prices under its existing lock; a changed fare
+returns HTTP `409` and requires a fresh quote. An old quote calculated with stacked
+discounts and surcharge is rejected if it no longer matches the ERP fare.
+Payment amounts come from the stored, revalidated server quote. Deploy the mobile
+backend correction before releasing the Flutter breakdown display. Older clients
+continue to use the server total and ignore new fields.
+
+Regression tests cover original ERP validator parity, surcharge precedence
+(including zero), flat/percentage calculations and intermediate rounding,
+terminal/date/active/deleted-record criteria, class eligibility, complete tariffs,
+mixed classes, stale quotes, wallet order and gateway amount. Run:
+
+```bash
+php artisan test --filter='MobileSchedulingRulesTest|MobileApiContractTest'
+```
+
+
 ## Payment expiry storage
 
 `payment.expires_at` remains an ISO-8601 deadline with a timezone offset. Status
 checks and checkout updates must not move that deadline. The checkout window is
 configured by `MOBILE_CHECKOUT_MINUTES` (default 10, clamped to 1–30 minutes) and
-capped at journey departure.
+capped at journey departure and the ERP terminal's positive `reservation_cancel` limit.
 
 Legacy MySQL/MariaDB can assign `ON UPDATE CURRENT_TIMESTAMP` to the first
 non-null TIMESTAMP column. On affected installations, updating `checked_at`
@@ -165,3 +247,14 @@ Shared ERP customer details (including name, contact and CNIC), invoices/tickets
 Deploy the new `mobile_account_deletions` migration and API before releasing the Flutter flow. No production migration is run by this implementation. The app must display API failures without claiming deletion, and clear its session and passenger caches after confirmed success. If a response is lost, the next request may return 401 because deletion already revoked the token; do not infer success from a network error.
 
 Business follow-up: define and publish retention periods for the shared ERP records and deletion audit. This feature deletes the mobile account; it does not claim complete erasure of all customer data or implement a public web deletion-request page.
+
+
+## ERP reservation status compatibility
+
+Mobile-created tickets and their advance/partial records use the ERP's
+`advance booking` status for holds, `booked` after verified payment, and
+`canceled` with soft deletion on cancellation. ERP staff use the existing
+`reserved-cancel` / `cancel-ticket` permissions. Mobile payment records retain
+their separate payment lifecycle; API summary labels remain compatible with
+existing clients. See `MOBILE_PAYMENTS.md` for the scoped data repair migration,
+terminal reservation deadline and scheduler deployment requirements.

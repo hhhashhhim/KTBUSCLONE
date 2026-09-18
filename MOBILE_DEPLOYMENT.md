@@ -78,7 +78,8 @@ php artisan migrate --force \
   --path=database/migrations/2026_09_12_000008_create_mobile_payments_table.php \
   --path=database/migrations/2026_09_12_000009_add_environment_to_mobile_payments.php \
   --path=database/migrations/2026_09_15_000010_create_mobile_account_deletions_table.php \
-  --path=database/migrations/2026_09_17_000011_fix_mobile_payment_expiry_column.php
+  --path=database/migrations/2026_09_17_000011_fix_mobile_payment_expiry_column.php \
+  --path=database/migrations/2026_09_18_000012_align_mobile_reservations_with_erp_status.php
 php artisan route:clear
 php artisan config:cache
 ```
@@ -156,3 +157,63 @@ it does not change permanent tables. Optional `MOBILE_MYSQL_TEST_HOST`,
 `MOBILE_MYSQL_TEST_PORT`, `MOBILE_MYSQL_TEST_USERNAME`, and
 `MOBILE_MYSQL_TEST_PASSWORD` select the test connection. It never uses the
 application's `.env` database credentials as a fallback.
+
+
+## cPanel update for the 18 September reservation and fare release
+
+The existing API checkout is `/home/wwwkaina/kt-mobile-api`, on `mobile-backend`
+of `hhhashhhim/KTBUSCLONE`. The separate `kt-mobile-api-source` directory is not
+the checkout updated by these commands. Keep the server's `.env`, `APP_KEY`,
+merchant credentials, uploads, and persistent storage.
+
+This release contains fare calculation alignment, merchant-configurable JazzCash
+routing fields (empty by default), and ERP-compatible reservation statuses. It
+does not add a failed-payment retry endpoint. Composer dependencies are unchanged.
+
+Check `git status --short` and compare any modified source files with
+`origin/mobile-backend` before pulling. Do not reset or discard server edits.
+Previously observed generated changes in `bootstrap/cache/packages.php` and
+`bootstrap/cache/services.php` and untracked `.env` backups are not source changes
+for this release and must not be staged or committed.
+
+Back up the database before the data migration. Put this application into Laravel
+maintenance mode before pulling. Its registered scheduled tasks do not opt into
+maintenance-mode execution, so subsequent `schedule:run` invocations skip them.
+Allow in-flight booking requests and scheduler/queue jobs to finish first; pause
+any jobs started directly outside Laravel's scheduler, and any other application
+that can modify the same mobile reservations during the migration.
+
+Once those checks are complete, run this block in cPanel Terminal:
+
+```bash
+cd /home/wwwkaina/kt-mobile-api &&
+php artisan down &&
+git pull --ff-only origin mobile-backend &&
+php artisan config:clear &&
+php artisan migrate --force --path=database/migrations/2026_09_18_000012_align_mobile_reservations_with_erp_status.php &&
+php artisan route:clear &&
+php artisan view:clear &&
+php artisan config:cache &&
+php artisan queue:restart &&
+php artisan up
+```
+
+If a command fails, the chain stops. Keep the application in maintenance mode
+until the failure is resolved, especially if new code is installed but the data
+migration has not completed. Do not add an unconditional `artisan up` on failure.
+The earlier payment-expiry repair was already confirmed applied on this server
+(batch 90); the new migration above is separate. Apply both in date order on a
+server where the earlier repair has not run.
+
+The new migration converts only active legacy `pending booking` rows linked to
+a same-company pending mobile payment, including their active history records.
+It preserves expiry deadlines, cancelled seats, receipts, and unrelated bookings.
+No production migration is run by the local build or Git push.
+
+After success, resume any explicitly paused jobs and verify:
+
+```bash
+php artisan migrate:status --path=database/migrations/2026_09_18_000012_align_mobile_reservations_with_erp_status.php
+git log -1 --oneline
+curl --fail --silent --show-error https://mobile-api.kainattravels.com/api/mobile/v1/app/config
+```

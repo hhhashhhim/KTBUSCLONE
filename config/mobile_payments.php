@@ -11,6 +11,9 @@ return [
         'merchant_id' => env('MOBILE_JAZZCASH_MERCHANT_ID'),
         'password' => env('MOBILE_JAZZCASH_PASSWORD'),
         'integrity_salt' => env('MOBILE_JAZZCASH_INTEGRITY_SALT'),
+        // Match the working website unless the merchant contract specifies routing values.
+        'bank_id' => env('MOBILE_JAZZCASH_BANK_ID', ''),
+        'product_id' => env('MOBILE_JAZZCASH_PRODUCT_ID', ''),
         'checkout_url' => env('MOBILE_JAZZCASH_CHECKOUT_URL'),
         'status_url' => env('MOBILE_JAZZCASH_STATUS_URL'),
     ],
