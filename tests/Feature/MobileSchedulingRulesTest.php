@@ -896,6 +896,101 @@ class MobileSchedulingRulesTest extends TestCase
     }
 
 
+    public function test_booking_history_query_count_stays_bounded_as_invoices_increase()
+    {
+        $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
+        $account = new PassengerAccount(['id' => 99, 'company_id' => 1]);
+        $service = app(\App\Services\Mobile\MobileBookingService::class);
+        $measure = function () use ($service, $account) {
+            DB::flushQueryLog();
+            DB::enableQueryLog();
+            try {
+                $result = $service->listFor($account);
+                return [$result, count(DB::getQueryLog())];
+            } finally {
+                DB::disableQueryLog();
+            }
+        };
+        [$single, $singleQueries] = $measure();
+        for ($index = 1; $index < 20; $index++) {
+            $this->copyBookingHistoryInvoice();
+        }
+        [$many, $manyQueries] = $measure();
+        $this->assertCount(1, $single['items']);
+        $this->assertCount(20, $many['items']);
+        $this->assertSame($singleQueries, $manyQueries, "History queries: one invoice=$singleQueries, twenty=$manyQueries");
+        $this->assertLessThanOrEqual(10, $manyQueries);
+        $this->assertSame(20, $many['pagination']['total']);
+        foreach ($many['items'] as $item) {
+            $this->assertSame('pending', $item['status']);
+            $this->assertNotNull($item['payment']['checkout_url']);
+            $this->assertSame(2500.0, $item['total']);
+        }
+    }
+
+    public function test_booking_history_preserves_statuses_checkout_ownership_and_pagination()
+    {
+        $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
+        [$paid, $paidTicket] = $this->copyBookingHistoryInvoice();
+        $paid->update(['status' => 'paid', 'paid_at' => now()]);
+        $paidTicket->update(['type' => 'booked']);
+        [$cancelled, $cancelledTicket] = $this->copyBookingHistoryInvoice();
+        $cancelledTicket->update(['type' => 'canceled']);
+        $cancelledTicket->delete();
+        [$expired, $expiredTicket] = $this->copyBookingHistoryInvoice();
+        $expired->update(['status' => 'expired']);
+        $expiredTicket->delete();
+        [$review, $reviewTicket] = $this->copyBookingHistoryInvoice();
+        $review->update(['status' => 'review_required', 'paid_at' => now()]);
+        $reviewTicket->delete();
+        [$started] = $this->copyBookingHistoryInvoice();
+        $started->update(['started_at' => now()]);
+        [$incomplete] = $this->copyBookingHistoryInvoice();
+        $incomplete->update(['ticket_count' => 2]);
+        [$foreign] = $this->copyBookingHistoryInvoice();
+        \App\Models\Invoice::whereKey($foreign->invoice_id)->update(['company_id' => 2]);
+        [$otherPassenger] = $this->copyBookingHistoryInvoice();
+        \App\Models\Invoice::whereKey($otherPassenger->invoice_id)->update(['passenger_account_id' => 100]);
+
+        $first = $this->getJson('/api/mobile/v1/bookings?per_page=4')->assertOk()
+            ->assertJsonPath('data.pagination.total', 7)->assertJsonPath('data.pagination.last_page', 2);
+        $second = $this->getJson('/api/mobile/v1/bookings?per_page=4&page=2')->assertOk();
+        $items = collect(array_merge($first->json('data.items'), $second->json('data.items')));
+        $this->assertSame([7, 6, 5, 4, 3, 2, 1], $items->pluck('id')->all());
+        foreach ($items as $item) {
+            $this->assertSame($this->getJson('/api/mobile/v1/bookings/' . $item['id'])->assertOk()->json('data'), $item);
+        }
+        $byInvoice = $items->keyBy('id');
+        $this->assertNotNull($byInvoice[1]['payment']['checkout_url']);
+        $this->assertSame('confirmed', $byInvoice[$paid->invoice_id]['status']);
+        $this->assertSame('KAINAT:' . $paid->invoice_id, $byInvoice[$paid->invoice_id]['qr_value']);
+        foreach ([$cancelled, $expired, $review, $started, $incomplete] as $payment) {
+            $this->assertNull($byInvoice[$payment->invoice_id]['payment']['checkout_url']);
+            $this->assertNull($byInvoice[$payment->invoice_id]['qr_value']);
+        }
+        $this->assertSame('canceled', $byInvoice[$cancelled->invoice_id]['status']);
+        $this->assertSame('expired', $byInvoice[$expired->invoice_id]['status']);
+        $this->assertSame('review_required', $byInvoice[$review->invoice_id]['status']);
+        $this->assertSame('paid', $byInvoice[$review->invoice_id]['payment_status']);
+        $this->getJson('/api/mobile/v1/bookings?per_page=4&page=3')->assertOk()->assertJsonPath('data.items', []);
+    }
+
+    private function copyBookingHistoryInvoice(): array
+    {
+        $invoice = \App\Models\Invoice::orderBy('id')->first()->replicate();
+        $invoice->save();
+        $ticket = \App\Models\Ticket::orderBy('id')->first()->replicate();
+        $ticket->invoice_id = $invoice->id;
+        $ticket->save();
+        $payment = \App\Models\MobilePayment::orderBy('id')->first()->replicate();
+        $payment->fill([
+            'invoice_id' => $invoice->id, 'quote_id' => 1000 + $invoice->id,
+            'public_id' => (string) \Illuminate\Support\Str::uuid(),
+            'transaction_reference' => 'history-' . $invoice->id,
+        ])->save();
+        return [$payment, $ticket];
+    }
+
     private function paymentInput(): array
     {
         require_once base_path('database/migrations/2026_09_12_000008_create_mobile_payments_table.php');

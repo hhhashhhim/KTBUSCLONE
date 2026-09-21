@@ -20,13 +20,13 @@ class MobilePaymentService
     private $gateway;
     public function __construct(MobilePaymentGateway $gateway) { $this->gateway = $gateway; }
 
-    public function present(MobilePayment $payment): array
+    public function present(MobilePayment $payment, ?bool $hasReservation = null): array
     {
         return [
             'environment' => $payment->environment,
             'id' => $payment->public_id, 'method' => $payment->method, 'status' => $payment->status,
             'expires_at' => $payment->expires_at->toIso8601String(),
-            'checkout_url' => !config('mobile_payments.preview_only') && $payment->status === 'pending' && !$payment->started_at && $payment->expires_at->isFuture() && $this->hasReservation($payment)
+            'checkout_url' => !config('mobile_payments.preview_only') && $payment->status === 'pending' && !$payment->started_at && $payment->expires_at->isFuture() && ($hasReservation ?? $this->hasReservation($payment))
                 ? URL::temporarySignedRoute('mobile.payments.checkout', $payment->expires_at, ['payment' => $payment->public_id]) : null,
         ];
     }

@@ -15,6 +15,7 @@ use App\Models\Schedule\ScheduleDetail;
 use App\Models\Terminal;
 use App\Models\Ticket;
 use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -409,9 +410,7 @@ class MobileBookingService
             ->pluck('id');
 
         return [
-            'items' => $invoiceIds->map(function ($invoiceId) use ($account) {
-                return $this->presentInvoice((int) $invoiceId, $account);
-            })->all(),
+            'items' => $this->presentInvoices($invoiceIds, $account),
             'pagination' => [
                 'current_page' => $page,
                 'per_page' => $perPage,
@@ -437,14 +436,41 @@ class MobileBookingService
 
     private function presentInvoice(int $invoiceId, PassengerAccount $account): array
     {
-        $payment = Schema::hasTable('mobile_payments') ? MobilePayment::where('invoice_id', $invoiceId)
-            ->where('company_id', $account->company_id)->where('passenger_account_id', $account->id)->first() : null;
-        $tickets = Ticket::query()->when($payment, function ($query) { $query->withTrashed(); })
+        return $this->presentInvoices(collect([$invoiceId]), $account)[0];
+    }
+
+    private function presentInvoices(Collection $invoiceIds, PassengerAccount $account): array
+    {
+        if ($invoiceIds->isEmpty()) {
+            return [];
+        }
+        $payments = Schema::hasTable('mobile_payments')
+            ? MobilePayment::whereIn('invoice_id', $invoiceIds)
+                ->where('company_id', $account->company_id)
+                ->where('passenger_account_id', $account->id)->get()->keyBy('invoice_id')
+            : collect();
+        $tickets = Ticket::withTrashed()
             ->with(['departure_city:id,name', 'destination_city:id,name', 'customer:id,name,cnic,contact'])
             ->where('company_id', $account->company_id)
-            ->where('invoice_id', $invoiceId)
+            ->whereIn('invoice_id', $invoiceIds)
+            ->where(function ($query) use ($payments) {
+                // Preserve the existing history visibility for online and counter bookings.
+                $query->whereNull('deleted_at')->orWhereIn('invoice_id', $payments->keys());
+            })
             ->orderBy('id')
-            ->get();
+            ->get()->groupBy('invoice_id');
+
+        return $invoiceIds->map(function ($invoiceId) use ($tickets, $payments) {
+            return $this->presentInvoiceTickets(
+                (int) $invoiceId,
+                $tickets->get($invoiceId, collect()),
+                $payments->get($invoiceId)
+            );
+        })->all();
+    }
+
+    private function presentInvoiceTickets(int $invoiceId, Collection $tickets, ?MobilePayment $payment): array
+    {
         if ($tickets->isEmpty()) {
             throw new RuntimeException('The booking was not found.', 404);
         }
@@ -462,7 +488,12 @@ class MobileBookingService
             'reference' => 'KT-' . str_pad((string) $invoiceId, 8, '0', STR_PAD_LEFT),
             'status' => $confirmed ? 'confirmed' : ($payment && in_array($payment->status, ['expired', 'review_required'], true) ? $payment->status : ($cancelled ? 'canceled' : 'pending')),
             'payment_status' => $payment ? ($payment->paid_at ? 'paid' : $payment->status) : ($confirmed ? 'paid' : 'pending'),
-            'payment' => $payment ? app(MobilePaymentService::class)->present($payment) : null,
+            'payment' => $payment ? app(MobilePaymentService::class)->present(
+                $payment,
+                $tickets->filter(function ($ticket) {
+                    return !$ticket->trashed() && $ticket->type === 'advance booking';
+                })->count() === $payment->ticket_count
+            ) : null,
             'origin_name' => optional($first->departure_city)->name,
             'destination_name' => optional($first->destination_city)->name,
             'departure_at' => $first->schedule_date . 'T' . $first->schedule_time,

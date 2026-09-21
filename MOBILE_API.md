@@ -288,6 +288,22 @@ Deploy the new `mobile_account_deletions` migration and API before releasing the
 Business follow-up: define and publish retention periods for the shared ERP records and deletion audit. This feature deletes the mobile account; it does not claim complete erasure of all customer data or implement a public web deletion-request page.
 
 
+## Booking history query batching
+
+`GET /bookings` loads each page's payments, tickets, cities and passengers in
+batches. Checkout-link eligibility uses those loaded ticket rows; opening
+checkout and settling payment still revalidate the current reservation. The
+endpoint's ownership checks, pagination, response fields, payment states and
+ticket visibility are unchanged. No cross-request cache is introduced.
+
+The regression fixture previously issued 142 SQL queries for 20 invoices; the
+batched implementation keeps the query count bounded as history grows. Deploy
+`MobileBookingService.php` and `MobilePaymentService.php` together. No database
+migration is required. The Flutter trip list also surfaces failures immediately
+so users can retry explicitly instead of waiting through automatic retries.
+
+Run `php vendor/bin/phpunit --do-not-cache-result --filter 'Mobile|ErpCancellationPermissionTest'`.
+
 ## ERP reservation status compatibility
 
 Mobile-created tickets and their advance/partial records use the ERP's
