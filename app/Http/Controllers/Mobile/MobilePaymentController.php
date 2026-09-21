@@ -34,7 +34,7 @@ class MobilePaymentController extends Controller
         abort_unless($request->hasValidSignature(), 403);
         $payment = MobilePayment::where('public_id', $payment)->firstOrFail();
         try {
-            return $this->page(['form' => $payments->checkout($payment), 'message' => 'Continue to your payment provider.']);
+            return $this->page(['form' => $payments->checkout($payment), 'message' => 'Opening secure payment…']);
         } catch (ConnectionException | RequestException $e) {
             return $this->page(['message' => 'The provider could not be reached. Return to the app and try again.'], 503);
         } catch (RuntimeException $e) {
@@ -58,10 +58,15 @@ class MobilePaymentController extends Controller
     private function page(array $data, int $status = 200)
     {
         $data['sandbox'] = config('mobile_payments.environment') === 'sandbox';
+        $scriptPolicy = '';
+        if (isset($data['form'])) {
+            $data['scriptNonce'] = base64_encode(random_bytes(18));
+            $scriptPolicy = "script-src 'nonce-{$data['scriptNonce']}'; ";
+        }
         return response()->view('mobile.payment', $data, $status)->withHeaders([
             'Cache-Control' => 'no-store, private', 'Referrer-Policy' => 'no-referrer',
             'X-Frame-Options' => 'DENY', 'X-Content-Type-Options' => 'nosniff',
-            'Content-Security-Policy' => "default-src 'none'; style-src 'unsafe-inline'; form-action https://sandbox.jazzcash.com.pk https://payments.jazzcash.com.pk https://onlinepayments.jazzcash.com.pk https://sandbox.bankalfalah.com https://payments.bankalfalah.com; base-uri 'none'; frame-ancestors 'none'",
+            'Content-Security-Policy' => "default-src 'none'; {$scriptPolicy}style-src 'unsafe-inline'; form-action https://sandbox.jazzcash.com.pk https://payments.jazzcash.com.pk https://onlinepayments.jazzcash.com.pk https://sandbox.bankalfalah.com https://payments.bankalfalah.com; base-uri 'none'; frame-ancestors 'none'",
         ]);
     }
 }

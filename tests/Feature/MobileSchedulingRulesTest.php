@@ -45,6 +45,173 @@ class MobileSchedulingRulesTest extends TestCase
         parent::tearDown();
     }
 
+    public function test_city_catalog_only_lists_upcoming_origins_and_reachable_destinations()
+    {
+        DB::table('cities')->insert([
+            ['id' => 3, 'company_id' => 1, 'name' => 'Unused city'],
+            ['id' => 4, 'company_id' => 1, 'name' => 'Fare only'],
+        ]);
+        DB::table('routes_fares')->insert([
+            'company_id' => 1, 'route_id' => 30, 'departure_city_id' => 1, 'destination_city_id' => 4,
+        ]);
+        $this->copySearchRun(41, 51, $this->date);
+        $this->getJson('/api/mobile/v1/cities')->assertOk()
+            ->assertExactJson(['success' => true, 'message' => 'Cities retrieved.',
+                'data' => [['id' => 1, 'name' => 'Origin']], 'errors' => null]);
+        $this->getJson('/api/mobile/v1/destinations?origin_id=1')->assertOk()
+            ->assertExactJson(['success' => true, 'message' => 'Destinations retrieved.',
+                'data' => [['id' => 2, 'name' => 'Destination']], 'errors' => null]);
+        $this->getJson('/api/mobile/v1/destinations?origin_id=2')->assertOk()->assertJsonPath('data', []);
+        $this->getJson('/api/mobile/v1/destinations?origin_id=999')->assertOk()->assertJsonPath('data', []);
+        $this->getJson('/api/mobile/v1/destinations')->assertStatus(422)->assertJsonValidationErrors('origin_id', 'errors');
+    }
+
+    /** @dataProvider cityCatalogRestrictions */
+    public function test_city_catalog_excludes_runs_that_are_not_mobile_visible(string $restriction)
+    {
+        $this->restrictJourney($restriction);
+        $this->getJson('/api/mobile/v1/cities')->assertOk()->assertJsonPath('data', []);
+        $this->getJson('/api/mobile/v1/destinations?origin_id=1')->assertOk()->assertJsonPath('data', []);
+    }
+
+    public static function cityCatalogRestrictions(): array
+    {
+        return array_values(array_filter(self::scheduleRestrictions(), function ($case) {
+            // City discovery covers active services even before sales open for a run.
+            return $case[0] !== 'booking_not_open';
+        }));
+    }
+
+    /** @dataProvider unavailableCityCatalogRecords */
+    public function test_city_catalog_excludes_deleted_and_foreign_company_records(string $table, string $column, $value)
+    {
+        DB::table($table)->update([$column => $value]);
+        $this->getJson('/api/mobile/v1/cities')->assertOk()->assertJsonPath('data', []);
+        $this->getJson('/api/mobile/v1/destinations?origin_id=1')->assertOk()->assertJsonPath('data', []);
+    }
+
+    public static function unavailableCityCatalogRecords(): array
+    {
+        $cases = [];
+        foreach (['cities', 'schedule_details', 'schedules', 'routes'] as $table) {
+            $cases[$table . ' deleted'] = [$table, 'deleted_at', '2026-09-12 00:00:00'];
+            $cases[$table . ' foreign company'] = [$table, 'company_id', 2];
+        }
+        return $cases;
+    }
+
+    public function test_city_catalog_uses_each_segments_pair_for_online_visibility_and_sorts_cities()
+    {
+        DB::table('cities')->insert(['id' => 3, 'company_id' => 1, 'name' => 'Alpha stop']);
+        $detail = (array) DB::table('schedule_details')->where('id', 50)->first();
+        DB::table('schedule_details')->insert(array_merge($detail, ['id' => 51, 'destination_id' => 3]));
+        DB::table('schedule_details')->insert(array_merge($detail, ['id' => 52, 'departure_id' => 3]));
+        DB::table('terminal_visibilities')->update(['online_visibilty' => 1]);
+        $this->getJson('/api/mobile/v1/cities')->assertOk()->assertJsonPath('data', [
+            ['id' => 3, 'name' => 'Alpha stop'], ['id' => 1, 'name' => 'Origin'],
+        ]);
+        $this->getJson('/api/mobile/v1/destinations?origin_id=1')->assertOk()
+            ->assertJsonPath('data', [['id' => 3, 'name' => 'Alpha stop']]);
+        $this->getJson('/api/mobile/v1/destinations?origin_id=3')->assertOk()
+            ->assertJsonPath('data', [['id' => 2, 'name' => 'Destination']]);
+        DB::table('terminal_visibilities')->update(['online_visibilty' => 0]);
+        $this->getJson('/api/mobile/v1/destinations?origin_id=1')->assertOk()->assertJsonPath('data', [
+            ['id' => 3, 'name' => 'Alpha stop'], ['id' => 2, 'name' => 'Destination'],
+        ]);
+    }
+
+    public function test_city_catalog_drops_only_matching_runs_and_refreshes_without_caching()
+    {
+        // The second segment departs tomorrow, but its run began tonight.
+        $this->copySearchRun(41, 51, '2026-09-12');
+        DB::table('drop_schedules')->insert([
+            ['company_id' => 1, 'schedule_id' => 40, 'schedule_date' => $this->date],
+            ['company_id' => 1, 'schedule_id' => 41, 'schedule_date' => $this->date],
+            ['company_id' => 2, 'schedule_id' => 41, 'schedule_date' => '2026-09-12'],
+        ]);
+        $service = app(\App\Services\Mobile\MobileTravelService::class);
+        $this->assertSame([1], $service->cities()->pluck('id')->all());
+        $this->assertSame([2], $service->destinations(1)->pluck('id')->all());
+        DB::table('drop_schedules')->insert(['company_id' => 1, 'schedule_id' => 41, 'schedule_date' => '2026-09-12']);
+        $this->assertCount(0, $service->cities());
+        $this->assertCount(0, $service->destinations(1));
+        DB::table('drop_schedules')->update(['deleted_at' => now()]);
+        $this->assertSame([1], $service->cities()->pluck('id')->all());
+        $this->assertSame([2], $service->destinations(1)->pluck('id')->all());
+    }
+
+    public function test_city_catalog_uses_upcoming_departure_time_and_exclusive_advance_booking_dates()
+    {
+        $service = app(\App\Services\Mobile\MobileTravelService::class);
+        foreach ([['2026-09-11', '13:00:00'], ['2026-09-12', '11:59:59'], ['2026-09-12', '12:00:00'], ['2026-09-22', '13:00:00']] as [$date, $time]) {
+            DB::table('schedule_details')->update(['departure_date' => $date, 'departure_time' => $time]);
+            $this->assertCount(0, $service->cities(), $date . ' ' . $time);
+            $this->assertCount(0, $service->destinations(1), $date . ' ' . $time);
+        }
+        foreach ([['2026-09-12', '12:00:01'], ['2026-09-21', '23:59:59']] as [$date, $time]) {
+            DB::table('schedule_details')->update(['departure_date' => $date, 'departure_time' => $time]);
+            $this->assertSame([1], $service->cities()->pluck('id')->all());
+            $this->assertSame([2], $service->destinations(1)->pluck('id')->all());
+        }
+        DB::table('terminals')->update(['advance_booking' => null]);
+        DB::table('schedule_details')->update(['departure_date' => '2026-10-12']);
+        $this->assertSame([1], $service->cities()->pluck('id')->all());
+    }
+
+    public function test_city_catalog_keeps_active_services_before_booking_opens_or_when_seats_sell_out()
+    {
+        $this->restrictJourney('booking_not_open');
+        $this->limitOnlineSeats(0);
+        $this->getJson('/api/mobile/v1/cities')->assertOk()->assertJsonPath('data.0.id', 1);
+        $this->getJson('/api/mobile/v1/destinations?origin_id=1')->assertOk()->assertJsonPath('data.0.id', 2);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data', []);
+    }
+
+    public function test_city_catalog_fails_closed_for_an_invalid_mobile_terminal()
+    {
+        DB::table('terminals')->update(['is_online_terminal' => 0]);
+        $this->getJson('/api/mobile/v1/cities')->assertStatus(503)->assertJsonPath('success', false);
+        $this->getJson('/api/mobile/v1/destinations?origin_id=1')->assertStatus(503)->assertJsonPath('success', false);
+    }
+
+    public function test_city_catalog_query_count_stays_constant_as_cities_and_runs_increase()
+    {
+        $service = app(\App\Services\Mobile\MobileTravelService::class);
+        $measure = function () use ($service) {
+            DB::flushQueryLog();
+            DB::enableQueryLog();
+            try {
+                $origins = $service->cities();
+                $destinations = $service->destinations(1);
+                return [$origins, $destinations, DB::getQueryLog()];
+            } finally {
+                DB::disableQueryLog();
+                DB::flushQueryLog();
+            }
+        };
+        [$oneOrigin, $oneDestination, $oneQueries] = $measure();
+        $this->assertCount(1, $oneOrigin);
+        $this->assertCount(1, $oneDestination);
+        for ($i = 1; $i <= 20; $i++) {
+            DB::table('cities')->insert(['id' => 100 + $i, 'company_id' => 1, 'name' => 'City ' . $i]);
+            $this->copySearchRun(100 + $i, 200 + $i, $this->date);
+            DB::table('schedule_details')->where('id', 200 + $i)->update(['destination_id' => 100 + $i]);
+            $this->copySearchRun(200 + $i, 300 + $i, $this->date);
+            DB::table('schedule_details')->where('id', 300 + $i)->update(['departure_id' => 100 + $i]);
+        }
+        [$manyOrigins, $manyDestinations, $manyQueries] = $measure();
+        $this->assertCount(21, $manyOrigins);
+        $this->assertCount(21, $manyDestinations);
+        $this->assertCount(count($oneQueries), $manyQueries, 'Catalog queries must not grow per city or run.');
+        $this->assertCount(4, $manyQueries, 'Each dropdown needs terminal validation and one city query.');
+        foreach ($manyQueries as $query) {
+            foreach (['tickets', 'fare_tables', 'bus_classes'] as $expensiveTable) {
+                $this->assertStringNotContainsString($expensiveTable, $query['query']);
+            }
+        }
+    }
+
+
     public function test_live_preview_shows_methods_but_cannot_create_a_booking()
     {
         $this->paymentInput();
@@ -433,8 +600,49 @@ class MobileSchedulingRulesTest extends TestCase
         $response->assertSee('name="pp_Amount" value="250000"', false)
             ->assertSee('name="pp_BankID" value=""', false)
             ->assertSee('name="pp_ProductID" value=""', false);
-        $this->get($url)->assertStatus(409);
+        $this->get($url)->assertStatus(409)
+            ->assertDontSee('<script', false)->assertDontSee('<form', false);
         $this->assertDatabaseHas('tickets', ['type' => 'advance booking']);
+    }
+
+    /** @dataProvider automaticCheckoutMethods */
+    public function test_checkout_automatically_forwards_the_signed_provider_form(string $method)
+    {
+        $booking = $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
+        config()->set('mobile_payments.bank_alfalah', [
+            'merchant_id' => '123', 'store_id' => '000456', 'merchant_hash' => 'test-hash',
+            'username' => 'test-user', 'password' => 'test-password',
+            'key1' => '1234567890123456', 'key2' => 'abcdefghijklmnop',
+            'base_url' => 'https://sandbox.bankalfalah.com',
+        ]);
+        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response([
+            'success' => 'true', 'AuthToken' => 'test-token',
+        ])]);
+        \App\Models\MobilePayment::first()->update(['method' => $method]);
+        $response = $this->get($booking->json('data.payment.checkout_url'))->assertOk();
+        $response->assertSee('Opening secure payment…')
+            ->assertSee('id="provider-checkout" method="post"', false);
+        $html = $response->getContent();
+        $this->assertSame(1, preg_match('/<script nonce="([^"\s]+)">/', $html, $matches));
+        $policy = $response->headers->get('Content-Security-Policy');
+        $this->assertStringContainsString("script-src 'nonce-{$matches[1]}'", $policy);
+        $this->assertStringNotContainsString("script-src 'unsafe-inline'", $policy);
+        $this->assertStringContainsString("default-src 'none'", $policy);
+        $this->assertStringContainsString("frame-ancestors 'none'", $policy);
+        $this->assertStringContainsString('HTMLFormElement.prototype.submit.call(form)', $html);
+        $this->assertStringNotContainsString('<button', preg_replace('/<noscript>.*?<\/noscript>/s', '', $html));
+        $this->assertStringContainsString('<button type="submit">Continue to payment</button>', $html);
+        $host = $method === 'jazzcash' ? 'https://sandbox.jazzcash.com.pk' : 'https://sandbox.bankalfalah.com';
+        $this->assertStringContainsString('action="' . $host, $html);
+        $this->assertStringContainsString($host, $policy);
+        $this->assertNotNull(\App\Models\MobilePayment::first()->started_at);
+        $this->getJson('/api/mobile/v1/bookings/' . $booking->json('data.id'))->assertOk()
+            ->assertJsonPath('data.payment.checkout_url', null)->assertJsonPath('data.payment.status', 'pending');
+    }
+
+    public static function automaticCheckoutMethods(): array
+    {
+        return [['jazzcash'], ['bank_alfalah']];
     }
 
     public function test_mobile_payment_return_does_not_trust_forged_success_fields()
@@ -443,7 +651,8 @@ class MobileSchedulingRulesTest extends TestCase
         $payment = \App\Models\MobilePayment::first();
         $payment->update(['started_at' => now()]);
         \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response(['pp_ResponseCode' => '000', 'pp_Status' => 'Pending'])]);
-        $this->post('/api/mobile/v1/payments/' . $payment->public_id . '/return', ['pp_ResponseCode' => '000', 'pp_Status' => 'Completed', 'pp_Amount' => 250000])->assertOk();
+        $this->post('/api/mobile/v1/payments/' . $payment->public_id . '/return', ['pp_ResponseCode' => '000', 'pp_Status' => 'Completed', 'pp_Amount' => 250000])->assertOk()
+            ->assertDontSee('<script', false)->assertDontSee('<form', false);
         $this->assertDatabaseHas('mobile_payments', ['status' => 'pending']);
         $this->assertDatabaseHas('tickets', ['type' => 'advance booking']);
     }

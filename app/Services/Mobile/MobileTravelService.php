@@ -6,7 +6,6 @@ use App\Models\City;
 use App\Models\Discount\Discount;
 use App\Models\FareClass;
 use App\Models\FareTable;
-use App\Models\Route\RouteFare;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
@@ -46,26 +45,41 @@ class MobileTravelService
 
     public function cities(): Collection
     {
-        return City::query()
-            ->where('company_id', $this->companyId())
-            ->where('hide', 0)
-            ->orderBy('name')
-            ->get(['id', 'name']);
+        return $this->cityOptions();
     }
 
     public function destinations(int $originId): Collection
     {
-        $companyId = $this->companyId();
-        $ids = RouteFare::query()
-            ->where('company_id', $companyId)
-            ->where('departure_city_id', $originId)
-            ->pluck('destination_city_id')
-            ->unique();
+        return $this->cityOptions($originId);
+    }
 
+    private function cityOptions(?int $originId = null): Collection
+    {
+        $companyId = $this->companyId();
+        $now = now();
+        $details = $this->policy->visibleDetails($companyId, $this->terminalId())
+            ->where(function ($upcoming) use ($now) {
+                $upcoming->where('departure_date', '>', $now->toDateString())
+                    ->orWhere(function ($today) use ($now) {
+                        $today->where('departure_date', $now->toDateString())
+                            ->where('departure_time', '>', $now->toTimeString());
+                    });
+            });
+
+        if (is_null($originId)) {
+            $details->select('departure_id');
+        } else {
+            $details->select('destination_id')
+                ->where('departure_id', $originId)
+                ->where('destination_id', '<>', $originId);
+        }
+
+        // Keep the eligible IDs inside SQL so cities stay unique without loading runs
+        // into PHP or evaluating a separate correlated schedule query for each city.
         return City::query()
             ->where('company_id', $companyId)
             ->where('hide', 0)
-            ->whereIn('id', $ids)
+            ->whereIn('id', $details)
             ->orderBy('name')
             ->get(['id', 'name']);
     }

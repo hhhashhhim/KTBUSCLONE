@@ -19,6 +19,20 @@ class MobileSchedulePolicy
 {
     public function eligibleDetails(int $companyId, int $terminalId, int $originId, int $destinationId, string $date): Builder
     {
+        return $this->visibleDetails($companyId, $terminalId)
+            ->with([
+                'departure_city:id,name', 'destination_city:id,name', 'bus_class:id,name,seat_map',
+                'schedule:id,route_id,bus_class_id,discount_id,surcharge_id,hide',
+                'schedule.route:id,name,online_seat_choices,online_seats,hide',
+                'schedule.route.fares:id,route_id,departure_city_id,destination_city_id',
+            ])
+            ->where('departure_id', $originId)->where('destination_id', $destinationId)
+            ->where('departure_date', $date);
+    }
+
+    /** Shared city-catalog and journey visibility; no fares or seat maps are loaded here. */
+    public function visibleDetails(int $companyId, int $terminalId): Builder
+    {
         $terminal = Terminal::query()->whereKey($terminalId)
             ->where('company_id', $companyId)->where('hide', 0)->first();
         if (!$terminal || (int) $terminal->is_online_terminal !== 1) {
@@ -26,15 +40,7 @@ class MobileSchedulePolicy
         }
 
         $query = ScheduleDetail::query()
-            ->with([
-                'departure_city:id,name', 'destination_city:id,name', 'bus_class:id,name,seat_map',
-                'schedule:id,route_id,bus_class_id,discount_id,surcharge_id,hide',
-                'schedule.route:id,name,online_seat_choices,online_seats,hide',
-                'schedule.route.fares:id,route_id,departure_city_id,destination_city_id',
-            ])
             ->where('company_id', $companyId)
-            ->where('departure_id', $originId)->where('destination_id', $destinationId)
-            ->where('departure_date', $date)
             ->where('departure_date', '>=', now()->toDateString())
             // An empty permission set must never expose every schedule.
             ->whereIn('schedule_id', ScheduleTerminalVisibility::query()
@@ -46,13 +52,14 @@ class MobileSchedulePolicy
             ->whereHas('destination_city', function ($city) use ($companyId) {
                 $city->where('company_id', $companyId)->where('hide', 0);
             })
-            ->whereHas('schedule', function ($schedule) use ($companyId, $terminalId, $originId, $destinationId) {
+            ->whereHas('schedule', function ($schedule) use ($companyId, $terminalId) {
                 $schedule->where('company_id', $companyId)->where('hide', 0)
-                    ->whereHas('route', function ($route) use ($companyId, $terminalId, $originId, $destinationId) {
+                    ->whereHas('route', function ($route) use ($companyId, $terminalId) {
                         $route->where('company_id', $companyId)->where('hide', 0)
                             ->whereNotIn('id', TerminalVisibility::query()->select('route_id')
                                 ->where('company_id', $companyId)->whereNotNull('route_id')
-                                ->where('departure_city_id', $originId)->where('destination_city_id', $destinationId)
+                                ->whereColumn('departure_city_id', 'schedule_details.departure_id')
+                                ->whereColumn('destination_city_id', 'schedule_details.destination_id')
                                 // The spelling and inverted flag are from the existing ERP schema.
                                 ->where('online_visibilty', 1))
                             ->where(function ($allowed) use ($companyId, $terminalId) {

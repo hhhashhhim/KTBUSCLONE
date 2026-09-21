@@ -43,6 +43,45 @@ Validation failures use the same envelope with status `422` and field errors.
 
 Booking quote, creation, list and detail endpoints preserve intentional business-error messages and their 4xx statuses (for example, expired quotes and unavailable seats). Database errors and unexpected failures are reported through Laravel's server-side exception logger and return HTTP `500` with `{"success":false,"message":"Something went wrong. Please try again.","data":null,"errors":{}}`, regardless of `APP_DEBUG`. Intentional service failures with a 5xx status retain that status but use the same generic message and are also reported. SQL, bindings, passenger details and stack traces are never included in these booking error responses. This change requires backend deployment only; no migration or Flutter change is required.
 
+## City dropdowns
+
+`GET /cities` returns only non-hidden company cities with at least one upcoming
+departure available to the mobile terminal. `GET /destinations?origin_id={id}`
+returns only cities reached by an upcoming schedule from that origin. A route fare
+or a visible city alone no longer makes a dropdown entry. Intermediate stops are
+included when they have a matching schedule-detail segment.
+
+Both endpoints reuse schedule search's company, soft-delete, city/schedule/route
+visibility, mobile-terminal permission, online route assignment, city-pair online
+visibility, dropped-run and advance-booking date rules. Departures already reached
+or passed are excluded in the application timezone. Dropped runs use schedule date,
+including overnight segments. Cities stay listed while any eligible run remains.
+
+These lists span upcoming dates within the terminal's advance-booking limit; they
+do not take the travel date. An active scheduled service can remain listed before
+its booking-opening time or when seats sell out. Date-specific search, seats and
+booking still check their existing booking-opening, fare, quota and seat rules.
+
+The request, passenger authentication, `{id, name}` entries, alphabetical order and
+response envelope are unchanged. No matches returns `data: []`. Invalid mobile
+terminal configuration returns `503`, as for schedule search. No Flutter rebuild
+or migration is required; deploy both updated mobile service PHP files together.
+
+The lookup uses a terminal validation query plus a city query with an eligible-city
+ID subquery. The matching IDs stay inside SQL, with no per-city schedule query.
+It does not fetch schedules into PHP, compute fares/seats, make one API call per
+city, or cache stale ERP visibility. Regression tests cover filtering and constant
+query counts as the catalog grows.
+
+Local synthetic benchmark on 2026-09-21: SQLite in memory with the repository's
+schedule/visibility indexes, 102 cities and 8,001 schedule-detail rows (including
+90 days of historical runs). After one warm-up and seven measured calls, median
+service times were 4.53 ms for cities and 3.66 ms for destinations, returning 41
+entries each. The previous unfiltered lookups took 0.67 ms and 0.97 ms, returning
+102 and 101 entries. Each filtered lookup uses two queries independent of the
+number of cities/runs. These figures measure local service overhead, not deployed
+MySQL or phone/network latency.
+
 ## Fare adjustments and quote breakdown
 
 Mobile fares follow the existing ERP `BookingController::selected` seat-price
@@ -191,7 +230,7 @@ The scheduling suite creates its own disposable SQLite in-memory connection; it 
 - Terminal `available_seats` and route `online_seat_choices` restrict selectable seats. Search counts use those restrictions as well as occupied seats.
 - For city pairs with `limited_seats.limited_seat = 1`, the remaining quota is the route's `online_seats` minus active online tickets for the entire run, across online terminals and city pairs. Cancelled/deleted tickets do not consume it. `maximum_selectable_seats` is capped by that remaining quota and may be `0`; exhausted seats are `unavailable`. Quote and booking requests cannot exceed the current limit.
 
-Restricted journeys are omitted from schedule search; direct seat, quote, and booking requests return `404` with the mobile error envelope when the journey is no longer eligible. Seat/quota conflicts return `409`. The app should refresh availability after either response. City catalog endpoints still list visible ERP cities; schedule search determines whether a particular journey is offered.
+Restricted journeys are omitted from schedule search; direct seat, quote, and booking requests return `404` with the mobile error envelope when the journey is no longer eligible. Seat/quota conflicts return `409`. The app should refresh availability after either response. City catalog endpoints list cities with upcoming mobile-visible schedule segments; date-specific search determines whether a particular journey is currently offered for booking.
 
 No new migration or endpoint is required for these checks. Configure the mobile online terminal's schedule/route permissions and service user in ERP before enabling bookings. Later changes to these existing ERP settings take effect on the next API request without a Flutter release. New kinds of ERP rules still require corresponding backend implementation and tests.
 

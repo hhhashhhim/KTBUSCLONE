@@ -11,12 +11,26 @@
     @if($sandbox)<p><strong>Sandbox payment — test transactions only</strong></p>@endif
     <p>{{ $message }}</p>
     @isset($form)
-        <form method="post" action="{{ $form['action'] }}" autocomplete="off">
+        <form id="provider-checkout" method="post" action="{{ $form['action'] }}" autocomplete="off">
             @foreach($form['fields'] as $name => $value)
                 <input type="hidden" name="{{ $name }}" value="{{ $value }}">
             @endforeach
-            <button type="submit">Continue to payment</button>
+            <noscript>
+                <p>Automatic forwarding is unavailable. Continue below.</p>
+                <button type="submit">Continue to payment</button>
+            </noscript>
         </form>
+        <script nonce="{{ $scriptNonce }}">
+            (function () {
+                var form = document.getElementById('provider-checkout');
+                if (!form || form.dataset.submitted === 'true') return;
+                form.dataset.submitted = 'true';
+                // Forward this prepared checkout once; status verification and
+                // eligibility for another attempt remain on the server.
+                form.addEventListener('submit', function (event) { event.preventDefault(); });
+                HTMLFormElement.prototype.submit.call(form);
+            })();
+        </script>
     @endisset
 </main></body>
 </html>

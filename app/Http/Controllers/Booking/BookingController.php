@@ -1751,7 +1751,11 @@ class BookingController extends Controller
 
     public function cancelingBooking(Request $request)
     {
-        if (!checkPermissionButtons("cancel-ticket") && !checkPermissionButtons("reserved-cancel")) {
+        $permissions = [
+            'booked' => checkPermissionButtons('cancel-ticket'),
+            'advance booking' => checkPermissionButtons('reserved-cancel'),
+        ];
+        if (!in_array(true, $permissions, true)) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
         try {
@@ -1765,7 +1769,16 @@ class BookingController extends Controller
                 'destination_city_id' => $request->destination_id,
                 'seat_no' => $request->seat_no,
 
-            ])->first();
+            ])->lockForUpdate()->first();
+
+            if (!$ticket) {
+                DB::rollBack();
+                return response()->json(["Error" => ['The ticket was not found.']], 404);
+            }
+            if (!($permissions[$ticket->type] ?? false)) {
+                DB::rollBack();
+                return response()->json(["Error" => ['You are not authorized to cancel this ticket.']], 403);
+            }
 
             $type = app(TicketCancellationService::class)->cancelTicket(
                 $ticket,
@@ -1784,7 +1797,6 @@ class BookingController extends Controller
             if ($type == "booked") {
                 $tkts[] = $ticket->id;
             }
-            $ticket->delete();
             DB::commit();
             return [
                 "tickets" => $tkts
@@ -1798,15 +1810,36 @@ class BookingController extends Controller
     public
     function cancelingAllBooking(Request $request)
     {
-        if (!checkPermissionButtons("cancel-ticket") && !checkPermissionButtons("reserved-cancel")) {
+        $permissions = [
+            'booked' => checkPermissionButtons('cancel-ticket'),
+            'advance booking' => checkPermissionButtons('reserved-cancel'),
+        ];
+        if (!in_array(true, $permissions, true)) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
+        $request->validate([
+            'cancelAllSeat' => 'required|array|min:1',
+            'cancelAllSeat.*' => 'required|integer|min:1|distinct',
+        ]);
         try {
             DB::beginTransaction();
-            $tickets = Ticket::whereIn("id", $request->cancelAllSeat)->where(['company_id' => Auth::user()->company_id])->get();
-            $status = $tickets[0]->type;
+            $tickets = Ticket::whereIn('id', $request->cancelAllSeat)
+                ->where('company_id', Auth::user()->company_id)
+                ->orderBy('id')->lockForUpdate()->get();
+            if ($tickets->count() !== count($request->cancelAllSeat)) {
+                DB::rollBack();
+                return response()->json(["Error" => ['One or more tickets were not found.']], 404);
+            }
+            // Authorize the entire locked selection before any cancellation side effects.
+            if (!$tickets->every(function ($ticket) use ($permissions) {
+                return $permissions[$ticket->type] ?? false;
+            })) {
+                DB::rollBack();
+                return response()->json(["Error" => ['You are not authorized to cancel one or more tickets.']], 403);
+            }
+            $tkts = $tickets->where('type', 'booked')->pluck('id')->all();
             foreach ($tickets as $ticket) {
-                $type = app(TicketCancellationService::class)->cancelTicket(
+                app(TicketCancellationService::class)->cancelTicket(
                     $ticket,
                     $request->percentage,
                     $request->reason,
@@ -1819,11 +1852,6 @@ class BookingController extends Controller
                 "requested_host" => $request->ip(),
                 "company_id" => Auth::user()->company_id
             ]);
-
-            $tkts = [];
-            if ($type == "booked") {
-                $tkts = $tickets->pluck('id');
-            }
 
             DB::commit();
             return [
