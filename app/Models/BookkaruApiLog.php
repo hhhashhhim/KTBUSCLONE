@@ -15,6 +15,7 @@ class BookkaruApiLog extends Model
     protected $appends = ['current_status'];
 
     protected $casts = [
+        'company_id' => 'integer',
         'invoice_id' => 'integer',
         'normalized_invoice_id' => 'integer',
         'approved_by' => 'integer',

@@ -35,7 +35,7 @@ class TerminalCancellationRequestsTest extends TestCase
         $this->table('ticket_e_l_t_s', ['ticket_id']);
         $this->table('booking_cancels', ['company_id', 'ticket_id', 'percentage', 'reason', 'type', 'added_by']);
         $this->table('activity_logs', ['activity_by', 'message', 'requested_host', 'company_id']);
-        $this->table('bookkaru_api_logs', ['request_id', 'invoice_id', 'normalized_invoice_id', 'booking_reference', 'seat_numbers', 'request_payload', 'response_payload', 'status', 'approval_status', 'cancellation_status', 'success', 'duplicate', 'unauthorized', 'ip_address', 'user_agent', 'approved_by', 'rejected_by', 'approved_at', 'rejected_at', 'cancelled_at', 'rejection_reason', 'exception_message']);
+        $this->table('bookkaru_api_logs', ['company_id', 'request_id', 'invoice_id', 'normalized_invoice_id', 'booking_reference', 'seat_numbers', 'request_payload', 'response_payload', 'status', 'approval_status', 'cancellation_status', 'success', 'duplicate', 'unauthorized', 'ip_address', 'user_agent', 'approved_by', 'rejected_by', 'approved_at', 'rejected_at', 'cancelled_at', 'rejection_reason', 'exception_message']);
         DB::table('roles')->insert(['id' => 1, 'permissions' => json_encode([['allow' => true, 'childs' => [
             ['name' => 'online-terminal-cancellation', 'allow' => true, 'buttons' => [
                 ['name' => 'approve-request', 'allow' => true], ['name' => 'reject-request', 'allow' => true],
@@ -91,6 +91,7 @@ class TerminalCancellationRequestsTest extends TestCase
         $this->assertEquals(7000, $row['refund_amount']);
         $this->assertSame('Requesting Clerk', $row['requested_by']);
         $this->assertSame([1], BookkaruApiLog::first()->request_payload['ticket_ids']);
+        $this->assertSame(1, BookkaruApiLog::first()->company_id);
         $this->assertSame(422, $this->submit()->getStatusCode());
         $this->assertSame(1, BookkaruApiLog::count());
     }
@@ -132,6 +133,7 @@ class TerminalCancellationRequestsTest extends TestCase
         $log = BookkaruApiLog::first();
         $log->update(['seat_numbers' => ['1', '2', '3', '4'], 'request_payload' => ['deduction_percentage' => 0],
             'response_payload' => ['data' => ['refund_amount' => 28000]]]);
+        $this->migrateCancellationOwnership();
         $rows = $this->listing(['tab' => 'pending'])['requests'];
         $this->assertCount(4, $rows);
         $this->assertCount(4, array_unique(array_column($rows, 'row_key')));
@@ -167,7 +169,7 @@ class TerminalCancellationRequestsTest extends TestCase
             $copy = $log->replicate(); $copy->request_id = 'TEST-' . $i; $copy->save();
         }
         Ticket::create(['company_id' => 2, 'invoice_id' => 200, 'seat_no' => '1']);
-        $other = $log->replicate(); $other->request_id = 'OTHER'; $other->invoice_id = 200; $other->normalized_invoice_id = 200; $other->save();
+        $other = $log->replicate(); $other->request_id = 'OTHER'; $other->company_id = 2; $other->invoice_id = 200; $other->normalized_invoice_id = 200; $other->save();
         $first = $this->listing(['tab' => 'pending']);
         $this->assertSame(103, $first['counts']['pending']);
         $this->assertSame(2, $first['pagination']['last_page']);
@@ -248,5 +250,102 @@ class TerminalCancellationRequestsTest extends TestCase
         $this->assertSame(25, $page['pagination']['per_page']);
         $last = $this->listing(['tab' => 'completed', 'invoiceFilter' => '100', 'page' => 3, 'per_page' => 25]);
         $this->assertCount(11, $last['requests']);
+    }
+
+    private function migrateCancellationOwnership(): void
+    {
+        require_once database_path('migrations/2026_09_23_000002_add_company_to_terminal_cancellation_requests.php');
+        (new \AddCompanyToTerminalCancellationRequests())->up();
+    }
+
+    public function test_migration_backfills_company_and_display_references_without_changing_approval_or_dates(): void
+    {
+        $this->submit();
+        $log = BookkaruApiLog::first();
+        $log->update(['company_id' => null, 'request_payload' => ['cancellation_reason' => 'Keep this'], 'updated_at' => '2020-01-01 10:00:00']);
+        $oldTicket = Ticket::find(1)->replicate();
+        $oldTicket->deleted_at = now(); $oldTicket->seat_fare = 99999; $oldTicket->save();
+        $other = $log->replicate(); $other->company_id = 2; $other->request_id = 'OTHER-COMPANY'; $other->save();
+        $this->migrateCancellationOwnership();
+        $log->refresh();
+        $this->assertSame(1, $log->company_id);
+        $this->assertSame([1], $log->request_payload['display_ticket_ids']);
+        $this->assertArrayNotHasKey('ticket_ids', $log->request_payload, 'Do not change the approval target for legacy requests');
+        $this->assertSame('Keep this', $log->request_payload['cancellation_reason']);
+        $this->assertSame('2020-01-01 10:00:00', $log->updated_at->format('Y-m-d H:i:s'));
+        $this->assertSame(2, $other->fresh()->company_id);
+        $this->assertSame([], $other->fresh()->request_payload['display_ticket_ids']);
+        $this->migrateCancellationOwnership(); // Safe to resume after an interrupted deployment.
+        $this->assertSame([1], $log->fresh()->request_payload['display_ticket_ids']);
+        $this->assertEquals(7000, $this->listing()['requests'][0]['refund_amount']);
+    }
+
+    public function test_migration_adds_company_column_to_old_schema(): void
+    {
+        $this->submit();
+        Schema::table('bookkaru_api_logs', fn (Blueprint $table) => $table->dropColumn('company_id'));
+        $this->migrateCancellationOwnership();
+        $this->assertTrue(Schema::hasColumn('bookkaru_api_logs', 'company_id'));
+        $this->assertSame(1, BookkaruApiLog::first()->company_id);
+        $this->assertSame([1], BookkaruApiLog::first()->request_payload['ticket_ids']);
+    }
+
+    public function test_listing_counts_never_query_tickets_and_page_details_are_batched(): void
+    {
+        $this->submit();
+        $log = BookkaruApiLog::first();
+        for ($i = 0; $i < 30; $i++) {
+            $copy = $log->replicate(); $copy->request_id = 'BATCH-' . $i; $copy->save();
+        }
+        DB::enableQueryLog(); DB::flushQueryLog();
+        try {
+            $data = $this->listing(['per_page' => 25]);
+            $queries = collect(DB::getQueryLog())->pluck('query');
+            $this->assertSame(31, $data['counts']['pending']);
+            $this->assertCount(25, $data['requests']);
+            $counts = $queries->filter(fn ($sql) => strpos($sql, 'count(*)') !== false && strpos($sql, 'bookkaru_api_logs') !== false);
+            $this->assertCount(2, $counts, 'Reuse the tab count rather than counting again for pagination');
+            foreach ($counts as $sql) $this->assertStringNotContainsString('tickets', $sql);
+            $this->assertCount(1, $queries->filter(fn ($sql) => strpos($sql, 'from "tickets"') !== false));
+            DB::flushQueryLog();
+            $response = app(OnlineTerminalCancellationController::class)->pendingCount();
+            $this->assertSame(31, $response->getData(true)['pending_count']);
+            foreach (DB::getQueryLog() as $query) $this->assertStringNotContainsString('tickets', $query['query']);
+        } finally {
+            DB::disableQueryLog(); DB::flushQueryLog();
+        }
+    }
+
+    public function test_foreign_company_request_cannot_be_approved_even_with_matching_invoice(): void
+    {
+        $this->submit();
+        $log = BookkaruApiLog::first(); $log->update(['company_id' => 2]);
+        $this->assertCount(0, $this->listing()['requests']);
+        $this->assertSame(0, app(OnlineTerminalCancellationController::class)->pendingCount()->getData(true)['pending_count']);
+        $response = app(OnlineTerminalCancellationController::class)->approveRequest(new Request(['id' => $log->id]));
+        $this->assertSame(403, $response->getStatusCode());
+        $this->assertSame(4, Ticket::count());
+    }
+
+    public function test_external_requests_derive_company_from_tickets_not_input(): void
+    {
+        config(['services.online_terminals.api_key' => 'local-test-key']);
+        $payload = ['request_id' => 'EXTERNAL', 'invoice_id' => 100, 'company_id' => 99,
+            'transaction_id' => 'TEST', 'seat_numbers' => ['1'], 'cancellation_reason' => 'Test only', 'source' => 'Test Terminal'];
+        $request = new Request($payload);
+        $request->headers->set('X-ONLINE-TERMINAL-API-KEY', 'local-test-key');
+        $response = app(OnlineTerminalCancellationController::class)->cancelSeat($request);
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $log = BookkaruApiLog::where('request_id', 'EXTERNAL')->first();
+        $this->assertSame(1, $log->company_id);
+        $this->assertSame([1], $log->request_payload['ticket_ids']);
+
+        $payload['request_id'] = 'EXTERNAL-FAILURE'; $payload['seat_numbers'] = ['99'];
+        $request = new Request($payload);
+        $request->headers->set('X-ONLINE-TERMINAL-API-KEY', 'local-test-key');
+        $this->assertSame(422, app(OnlineTerminalCancellationController::class)->cancelSeat($request)->getStatusCode());
+        $failed = BookkaruApiLog::where('request_id', 'EXTERNAL-FAILURE')->first();
+        $this->assertSame(1, $failed->company_id);
+        $this->assertSame([], $failed->request_payload['display_ticket_ids']);
     }
 }

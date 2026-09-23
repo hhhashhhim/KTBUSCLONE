@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Services\TicketCancellationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -112,6 +113,8 @@ class OnlineTerminalCancellationController extends Controller
                 return response()->json($ticketValidation, 422);
             }
 
+            $requestedTickets = Ticket::where('invoice_id', $invoiceId)->whereIn('seat_no', $seatNumbers)->get(['id', 'company_id']);
+            $companyId = optional($requestedTickets->first())->company_id;
             $requestPayload = array_merge($request->all(), [
                 'transaction_id' => $transactionId,
                 'booking_reference' => $transactionId,
@@ -121,7 +124,7 @@ class OnlineTerminalCancellationController extends Controller
                 // Never trust a caller-supplied requester identity.
                 'requested_by' => optional(Auth::guard('sanctum')->user())->id,
                 'requested_by_name' => optional(Auth::guard('sanctum')->user())->name,
-                'ticket_ids' => Ticket::where('invoice_id', $invoiceId)->whereIn('seat_no', $seatNumbers)->pluck('id')->all(),
+                'ticket_ids' => $requestedTickets->pluck('id')->all(),
             ]);
             $pendingResponse = $this->buildPendingResponse(
                 $requestId,
@@ -135,6 +138,7 @@ class OnlineTerminalCancellationController extends Controller
             );
 
             $log = BookkaruApiLog::create([
+                'company_id' => $companyId,
                 'request_id' => $requestId,
                 'invoice_id' => $invoiceId,
                 'normalized_invoice_id' => $invoiceId,
@@ -157,7 +161,7 @@ class OnlineTerminalCancellationController extends Controller
                 'activity_by' => 0,
                 'message' => $source . ' | cancellation request received | invoice id: ' . $invoiceId . ' | seats: ' . implode(',', $seatNumbers),
                 'requested_host' => $request->ip(),
-                'company_id' => $this->getCompanyIdForRequest($invoiceId, $seatNumbers),
+                'company_id' => $companyId,
             ]);
 
             return response()->json($pendingResponse, 200);
@@ -206,12 +210,7 @@ class OnlineTerminalCancellationController extends Controller
         $toDateFilter = $this->normalizeFilterDate($request->toDateFilter);
 
         $query = BookkaruApiLog::with(['approvedBy:id,name', 'rejectedBy:id,name'])
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('tickets')
-                    ->whereColumn('tickets.invoice_id', 'bookkaru_api_logs.normalized_invoice_id')
-                    ->where('tickets.company_id', Auth::user()->company_id);
-            })
+            ->where('company_id', Auth::user()->company_id)
             ->when($request->request_id, function ($builder) use ($request) {
                 $builder->where('request_id', 'like', '%' . trim((string) $request->request_id) . '%');
             })
@@ -234,6 +233,7 @@ class OnlineTerminalCancellationController extends Controller
                     $query->select(DB::raw(1))
                         ->from('tickets')
                         ->join('customers', 'customers.id', '=', 'tickets.customer_id')
+                        ->where('tickets.company_id', Auth::user()->company_id)
                         ->whereColumn('tickets.invoice_id', 'bookkaru_api_logs.normalized_invoice_id')
                         ->when($request->cnicFilter, function ($q) use ($request) {
                             $q->where('customers.cnic', 'like', '%' . str_replace('-', '', $request->cnicFilter) . '%');
@@ -283,14 +283,20 @@ class OnlineTerminalCancellationController extends Controller
             'completed' => (clone $completedQuery)->count(),
         ];
         $query = $tab === 'completed' ? $completedQuery : $pendingQuery;
+        $total = $counts[$tab];
         if ($request->status || $request->statusFilter) {
             $query->where('status', trim((string) ($request->status ?: $request->statusFilter)));
+            $total = (clone $query)->count();
         }
-        $page = $query->paginate((int) ($request->input('per_page') ?: 100), ['*'], 'page', max(1, (int) $request->input('page', 1)));
+        $perPage = (int) ($request->input('per_page') ?: 100);
+        $pageNumber = max(1, (int) $request->input('page', 1));
+        $logs = $total ? $query->forPage($pageNumber, $perPage)->get() : collect();
+        $page = new LengthAwarePaginator($logs, $total, $perPage, $pageNumber);
         $requesterIds = $page->getCollection()->map(fn ($log) => data_get($log->request_payload, 'requested_by'))->filter()->unique();
         $requesters = User::where('company_id', Auth::user()->company_id)->whereIn('id', $requesterIds)->pluck('name', 'id');
-        $requests = $page->getCollection()->flatMap(function (BookkaruApiLog $log) use ($requesters) {
-            return $this->formatPortalRows($log, $requesters);
+        $ticketsByLog = $this->bookingTicketsForLogs($page->getCollection());
+        $requests = $page->getCollection()->flatMap(function (BookkaruApiLog $log) use ($requesters, $ticketsByLog) {
+            return $this->formatPortalRows($log, $requesters, $ticketsByLog->get($log->id, collect()));
         })->values();
 
         return response()->json([
@@ -1086,9 +1092,8 @@ class OnlineTerminalCancellationController extends Controller
         }
     }
 
-    private function formatPortalRows(BookkaruApiLog $log, $requesters)
+    private function formatPortalRows(BookkaruApiLog $log, $requesters, $tickets)
     {
-        $tickets = $this->bookingTicketsForLog($log);
         $seatNumbers = $this->normalizeSeatNumbers($log->seat_numbers ?? []);
         $rows = collect($seatNumbers ?: [''])->map(function ($seat) use ($log, $tickets, $requesters) {
             return $this->formatPortalRow($log, $tickets->get($seat), $seat, $requesters);
@@ -1173,33 +1178,46 @@ class OnlineTerminalCancellationController extends Controller
         ];
     }
 
-    private function bookingTicketsForLog(BookkaruApiLog $log)
+    private function bookingTicketsForLogs($logs)
     {
-        $ticketIds = data_get($log->request_payload, 'ticket_ids')
-            ?: collect(data_get($log->response_payload, 'data.refunds', []))->pluck('ticket_id')->filter()->all();
-        $seatNumbers = collect($log->seat_numbers ?? [])
-            ->map(function ($seat) {
-                return trim((string) $seat);
-            })
-            ->filter()
-            ->values()
-            ->all();
-
-        return Ticket::withTrashed()
+        $references = $logs->mapWithKeys(function ($log) {
+            return [$log->id => $this->ticketIdsForLog($log)];
+        });
+        $ticketIds = $references->flatten()->unique()->values()->all();
+        if (!$ticketIds) {
+            return collect();
+        }
+        // Only primary-key lookups for this page, never an invoice scan for each row.
+        $tickets = Ticket::withTrashed()
             ->with([
                 'schedule:id,route_id',
                 'schedule.route:id,name',
                 'customer:id,name,cnic,contact',
             ])
             ->where('company_id', Auth::user()->company_id)
-            ->where('invoice_id', $log->normalized_invoice_id ?: $log->invoice_id)
-            ->whereIn('seat_no', $seatNumbers)
-            ->when($ticketIds, function ($query, $ids) {
-                $query->whereIn('id', $ids);
-            })
+            ->whereIn('id', $ticketIds)
             ->orderByRaw('deleted_at IS NULL DESC')
             ->orderByDesc('id')
-            ->get()->unique('seat_no')->keyBy('seat_no');
+            ->get();
+
+        return $logs->mapWithKeys(function ($log) use ($tickets, $references) {
+            $seats = $this->normalizeSeatNumbers($log->seat_numbers ?? []);
+            $matches = $tickets->whereIn('id', $references->get($log->id, []))
+                ->where('invoice_id', $log->normalized_invoice_id ?: $log->invoice_id)
+                ->filter(fn ($ticket) => in_array(trim((string) $ticket->seat_no), $seats, true))
+                ->unique('seat_no')->keyBy('seat_no');
+            return [$log->id => $matches];
+        });
+    }
+
+    private function ticketIdsForLog(BookkaruApiLog $log): array
+    {
+        // Legacy display references are backfilled once by the migration; they
+        // never change the authoritative ticket_ids used by approval.
+        $ids = data_get($log->request_payload, 'ticket_ids')
+            ?: collect(data_get($log->response_payload, 'data.refunds', []))->pluck('ticket_id')->filter()->all();
+        $ids = $ids ?: data_get($log->request_payload, 'display_ticket_ids', []);
+        return collect(is_array($ids) ? $ids : [])->map(fn ($id) => (int) $id)->filter(fn ($id) => $id > 0)->unique()->values()->all();
     }
 
     public function pendingCount()
@@ -1209,12 +1227,7 @@ class OnlineTerminalCancellationController extends Controller
         }
 
         $pendingCount = BookkaruApiLog::where('status', 'pending')
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('tickets')
-                    ->whereColumn('tickets.invoice_id', 'bookkaru_api_logs.normalized_invoice_id')
-                    ->where('tickets.company_id', Auth::user()->company_id);
-            })
+            ->where('company_id', Auth::user()->company_id)
             ->count();
 
         return response()->json(['pending_count' => $pendingCount]);
@@ -1222,10 +1235,7 @@ class OnlineTerminalCancellationController extends Controller
 
     private function logBelongsToAuthenticatedCompany(BookkaruApiLog $log): bool
     {
-        return Ticket::withTrashed()
-            ->where('company_id', Auth::user()->company_id)
-            ->where('invoice_id', $log->normalized_invoice_id ?: $log->invoice_id)
-            ->exists();
+        return $log->company_id !== null && (int) $log->company_id === (int) Auth::user()->company_id;
     }
 
     private function formatBookingDateTime($timestamp)
@@ -1286,6 +1296,7 @@ class OnlineTerminalCancellationController extends Controller
     private function storeUnauthorizedLog(Request $request, array $response)
     {
         BookkaruApiLog::create([
+            'company_id' => optional(Auth::guard('sanctum')->user())->company_id,
             'request_id' => $request->input('request_id'),
             'invoice_id' => $this->normalizeInvoiceId($request->input('invoice_id')),
             'normalized_invoice_id' => $this->normalizeInvoiceId($request->input('invoice_id')),
@@ -1311,13 +1322,20 @@ class OnlineTerminalCancellationController extends Controller
             return;
         }
 
+        $tickets = $invoiceId ? Ticket::withTrashed()->where('invoice_id', $invoiceId)
+            ->whereIn('seat_no', $seatNumbers)->get(['id', 'company_id']) : collect();
+        $companyId = optional($tickets->first())->company_id;
+        if (!$companyId && $invoiceId) {
+            $companyId = Ticket::withTrashed()->where('invoice_id', $invoiceId)->value('company_id');
+        }
         BookkaruApiLog::create([
+            'company_id' => $companyId ?: optional(Auth::guard('sanctum')->user())->company_id,
             'request_id' => $requestId,
             'invoice_id' => $invoiceId,
             'normalized_invoice_id' => $invoiceId,
             'booking_reference' => $transactionId,
             'seat_numbers' => $seatNumbers,
-            'request_payload' => $request->all(),
+            'request_payload' => array_merge($request->all(), ['ticket_ids' => [], 'display_ticket_ids' => $tickets->pluck('id')->all()]),
             'response_payload' => $response,
             'status' => $status,
             'approval_status' => $status,
@@ -1350,12 +1368,4 @@ class OnlineTerminalCancellationController extends Controller
         $log->update($attrs);
     }
 
-    private function getCompanyIdForRequest($invoiceId, array $seatNumbers)
-    {
-        $ticket = Ticket::where('invoice_id', $invoiceId)
-            ->whereIn('seat_no', $seatNumbers)
-            ->first();
-
-        return $ticket ? $ticket->company_id : null;
-    }
 }

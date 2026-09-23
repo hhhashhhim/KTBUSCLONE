@@ -111,6 +111,7 @@ class BookingController extends Controller
         $invoiceId = (int) $tickets->first()->invoice_id;
         $seatNumbers = $tickets->pluck('seat_no')->map(fn ($seat) => (string) $seat)->values()->all();
         $existing = BookkaruApiLog::where('normalized_invoice_id', $invoiceId)
+            ->where('company_id', Auth::user()->company_id)
             ->where('status', 'pending')
             ->get()
             ->first(function ($log) use ($seatNumbers) {
@@ -169,6 +170,7 @@ class BookingController extends Controller
             $seatResponse['data']['request_id'] = $seatRequestId;
             $seatResponse['data']['seat_numbers'] = $requestedSeats;
             BookkaruApiLog::create([
+                'company_id' => Auth::user()->company_id,
                 'request_id' => $seatRequestId,
                 'invoice_id' => $invoiceId,
                 'normalized_invoice_id' => $invoiceId,
