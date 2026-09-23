@@ -702,6 +702,7 @@ export default {
             let permissions = this.permissions;
             let valid = false;
             for (let i = 0; i < permissions.length; i++) {
+                if (permissions[i].allow === false) continue;
                 permissions[i].childs.forEach(subMenuItem => {
                     if (subMenuItem.name === moduleName) {
                         valid = subMenuItem.allow;
@@ -713,6 +714,12 @@ export default {
         },
        
        async getTerminalCancellationPendingCount() {
+    // Booking users can submit requests without access to the approval screen.
+    // The refresh event must not call its protected endpoint for those users.
+    if (!this.checkForSubmenu('online-terminal-cancellation')) {
+        this.terminalCancellationPendingCount = 0;
+        return;
+    }
     try {
         const res = await this.callApi('post', 'online-terminals/cancellations/pending-count');
         this.terminalCancellationPendingCount = Number(res.data.pending_count || 0);

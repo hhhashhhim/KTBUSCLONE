@@ -8,6 +8,15 @@
                             <h4>Terminal Cancellation Requests</h4>
                         </div>
                         <div class="card-body">
+                            <div class="cancellation-tabs mb-4" role="tablist" aria-label="Cancellation request status">
+                                <button v-for="tab in ['pending', 'completed']" :key="tab" type="button"
+                                        role="tab" :aria-selected="activeTab === tab"
+                                        :class="['cancellation-tab', { active: activeTab === tab }]"
+                                        @click="selectTab(tab)">
+                                    {{ tab === 'pending' ? 'Pending' : 'Completed' }}
+                                    <span class="cancellation-count">{{ counts[tab] }}</span>
+                                </button>
+                            </div>
                             <div class="row">
                                 <div class="col-md-3">
                                     <div class="form-group">
@@ -93,13 +102,13 @@
                                         <label for="statusFilter">Status</label>
                                         <select id="statusFilter" class="form-control"
                                                 v-model="filters.statusFilter"
-                                                @change="fetchRequests()">
-                                            <option value="">---Select Status---</option>
-                                            <option value="pending">Pending</option>
-                                            <option value="cancelled">Cancelled</option>
-                                            <option value="rejected">Rejected</option>
-                                            <option value="failed">Failed</option>
-                                            <option value="unauthorized">Unauthorized</option>
+                                                @change="fetchRequests()" :disabled="activeTab === 'pending'">
+                                            <option value="">{{ activeTab === 'pending' ? 'Pending' : 'All completed statuses' }}</option>
+                                            <option v-if="activeTab === 'completed'" value="cancelled">Cancelled</option>
+                                            <option v-if="activeTab === 'completed'" value="approved">Approved</option>
+                                            <option v-if="activeTab === 'completed'" value="rejected">Rejected</option>
+                                            <option v-if="activeTab === 'completed'" value="failed">Failed</option>
+                                            <option v-if="activeTab === 'completed'" value="unauthorized">Unauthorized</option>
                                         </select>
                                     </div>
                                 </div>
@@ -154,6 +163,7 @@
                                             <th>Refund Amount</th>
                                             <th>Booking Time</th>
                                             <th>Request Date</th>
+                                            <th>Requested By</th>
                                             <th>Time Difference</th>
                                             <th>Source</th>
                                             <th>Type</th>
@@ -165,12 +175,17 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="request in requests" :key="request.id"
+                                        <tr v-for="request in requests" :key="request.row_key || request.id"
                                             :class="timeDifferenceRowClass(request)">
                                             <td>{{ request.invoice_id }}</td>
                                             <td>{{ request.booking_reference || 'N/A' }}</td>
                                             <td>{{ request.route || 'N/A' }}</td>
-                                            <td>{{ formatSeats(request.seat_numbers) }}</td>
+                                            <td>
+                                                {{ formatSeats(request.seat_numbers) }}
+                                                <div class="small text-muted" v-if="request.request_seat_count > 1">
+                                                    Grouped request: {{ request.request_seat_count }} seats
+                                                </div>
+                                            </td>
                                             <td>{{ request.cancellation_reason || 'N/A' }}</td>
                                             <td>{{ request.bus_date || 'N/A' }}</td>
                                             <td>{{ request.bus_time || 'N/A' }}</td>
@@ -184,6 +199,7 @@
                                             <td>{{ formatFare(request.refund_amount) }}</td>
                                             <td>{{ request.booking_time || 'N/A' }}</td>
                                             <td>{{ request.request_date || 'N/A' }}</td>
+                                            <td>{{ request.requested_by || 'Not recorded' }}</td>
                                             <td>{{ request.time_difference || timeDifference(request) }}</td>
                                             <td>{{ request.source || 'Online Terminal' }}</td>
                                             <td>
@@ -208,13 +224,13 @@
                                                             v-if="canUseButton('approve-request')"
                                                             :disabled="actionLoadingId === request.id"
                                                             @click="openApproveModal(request)">
-                                                        Approve
+                                                        {{ request.request_seat_count > 1 ? 'Approve Group' : 'Approve' }}
                                                     </button>
                                                     <button class="btn btn-danger btn-sm"
                                                             v-if="canUseButton('reject-request')"
                                                             :disabled="actionLoadingId === request.id"
                                                             @click="openRejectModal(request)">
-                                                        Reject
+                                                        {{ request.request_seat_count > 1 ? 'Reject Group' : 'Reject' }}
                                                     </button>
                                                 </div>
                                                 <span class="text-muted" v-else>No action</span>
@@ -222,6 +238,15 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mt-3" v-if="pagination.last_page > 1">
+                                <span class="text-muted">Page {{ pagination.current_page }} of {{ pagination.last_page }} · {{ pagination.total }} requests</span>
+                                <div>
+                                    <button class="btn btn-outline-primary btn-sm mr-2" :disabled="loading || pagination.current_page <= 1"
+                                            @click="fetchRequests(pagination.current_page - 1)">Previous</button>
+                                    <button class="btn btn-outline-primary btn-sm" :disabled="loading || pagination.current_page >= pagination.last_page"
+                                            @click="fetchRequests(pagination.current_page + 1)">Next</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -233,15 +258,19 @@
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="onlineTerminalApproveModalLabel">Approve Online Terminal Request</h5>
+                            <h5 class="modal-title" id="onlineTerminalApproveModalLabel">Approve Terminal Request</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
+                            <div class="alert alert-info" v-if="selectedRequest">
+                                Seats: {{ formatSeats(selectedRequest.request_seat_numbers || selectedRequest.seat_numbers) }}
+                                <div v-if="selectedRequest.request_seat_count > 1">This existing grouped request covers all listed seats. Approval applies to all of them.</div>
+                            </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label>Seat Fare</label>
+                                    <label>Requested Seats Fare</label>
                                     <input type="text" class="form-control" :value="formatFare(approvePreview.fare)" disabled>
                                 </div>
                                 <div class="col-md-6">
@@ -286,12 +315,16 @@
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="onlineTerminalRejectModalLabel">Reject Online Terminal Request</h5>
+                            <h5 class="modal-title" id="onlineTerminalRejectModalLabel">Reject Terminal Request</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
+                            <div class="alert alert-info" v-if="selectedRequest">
+                                Seats: {{ formatSeats(selectedRequest.request_seat_numbers || selectedRequest.seat_numbers) }}
+                                <div v-if="selectedRequest.request_seat_count > 1">Rejection applies to all seats in this existing grouped request.</div>
+                            </div>
                             <label>Rejection Remarks</label>
                             <textarea class="form-control" rows="4" v-model="rejectionReason"
                                       placeholder="Enter rejection remarks"></textarea>
@@ -328,6 +361,9 @@ export default {
             },
             permissions: [],
             requests: [],
+            activeTab: 'pending',
+            counts: { pending: 0, completed: 0 },
+            pagination: { current_page: 1, last_page: 1, total: 0 },
             routes: [],
             terminals: [],
             buses: [],
@@ -366,7 +402,7 @@ export default {
     },
     computed: {
         approvePreview() {
-            const fare = Number(this.selectedRequest?.fare) || 0;
+            const fare = Number(this.selectedRequest?.request_fare ?? this.selectedRequest?.fare) || 0;
             const deductionPercentage = Math.min(Math.max(Number(this.approveForm.deduction_percentage) || 0, 0), 100);
             const refundPercentage = 100 - deductionPercentage;
             const deductionAmount = this.calculatePercentAmount(fare, deductionPercentage);
@@ -382,6 +418,12 @@ export default {
         },
     },
     methods: {
+        selectTab(tab) {
+            if (this.activeTab === tab) return;
+            this.activeTab = tab;
+            this.filters.statusFilter = '';
+            this.fetchRequests();
+        },
         defaultFilters() {
             return {
                 cnicFilter: '',
@@ -415,16 +457,22 @@ export default {
                 this.buses = resBuses.data;
             }
         },
-        async fetchRequests() {
+        async fetchRequests(page = 1) {
             const sequence = ++this.requestSequence;
             this.destroyDataTable();
             this.loading = true;
-            const res = await this.callApi('post', 'online-terminals/cancellations/requests', this.filters);
+            const res = await this.callApi('post', 'online-terminals/cancellations/requests', {
+                ...this.filters, tab: this.activeTab, page,
+            });
             if (sequence !== this.requestSequence) {
                 return;
             }
             if (res.status === 200 && res.data.status === true) {
                 this.requests = res.data.data.requests;
+                this.counts = res.data.data.counts || { pending: 0, completed: 0 };
+                this.pagination = res.data.data.pagination || { current_page: 1, last_page: 1, total: this.requests.length };
+            } else {
+                this.requests = [];
             }
             this.loading = false;
             this.$nextTick(() => {
@@ -524,7 +572,7 @@ export default {
             if (table && table.parentNode && $.fn.DataTable && !$.fn.DataTable.isDataTable(table)) {
                 $(table).DataTable({
                     language: {
-                        emptyTable: 'No online terminal cancellation requests found.',
+                        emptyTable: 'No terminal cancellation requests found in this tab.',
                     },
                 });
             }
@@ -672,6 +720,11 @@ export default {
 </script>
 
 <style scoped>
+.cancellation-tabs { display: flex; gap: 12px; border-bottom: 1px solid #e9edf5; padding-bottom: 14px; }
+.cancellation-tab { display: inline-flex; align-items: center; gap: 12px; border: 1px solid #e3e8f0; border-radius: 8px; padding: 12px 22px; background: #fff; color: #64748b; font-weight: 600; }
+.cancellation-tab.active { background: #eef2ff; color: #4f46e5; border-color: #a5b4fc; }
+.cancellation-count { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; padding: 0 7px; border-radius: 50%; background: #34395e; color: white; font-size: 12px; }
+.cancellation-tab:focus-visible { outline: 2px solid #6366f1; outline-offset: 3px; }
 .loading-spinner {
     display: block;
     margin: 0 auto;
