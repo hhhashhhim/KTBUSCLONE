@@ -544,7 +544,7 @@ public function filterData(Request $request)
     }
 
     $terminalId = ReportFilterScope::terminalId($request, 'terminal-sale-terminal-filter');
-    $routeIds = ReportFilterScope::routeIds($request, 'terminal-sale-route-filter');
+    $routeIds = \App\Support\TerminalSalesRouteGroups::routeIds($request);
     $userId = ReportFilterScope::terminalUserId($request, 'terminal-sale-user-filter');
 
     // Load all commissions once

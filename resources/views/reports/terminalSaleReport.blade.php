@@ -16,6 +16,7 @@
 
 <head>
     <style>
+        .cancelled-tag { display: inline-block; margin-top: 3px; padding: 2px 5px; border: 1px solid #c62828; border-radius: 3px; color: #a51d2d; font-size: 7pt; font-weight: bold; }
         @page {
             transform: rotate(-90deg);
             padding: 0;
@@ -200,7 +201,11 @@
                         @endif
 
                         @if (!empty($visibleColumnsLookup['invoice_id']))
-                            <td>{{ $single->invoice_id }}</td>
+                            <td>{{ $single->invoice_id }}
+                                @if ($single->type === 'canceled')
+                                    <br><span class="cancelled-tag">Cancelled</span>
+                                @endif
+                            </td>
                         @endif
 
                         @if (!empty($visibleColumnsLookup['transaction_id']))
@@ -212,7 +217,13 @@
                         @endif
 
                         @if (!empty($visibleColumnsLookup['status']))
-                            <td>{{ $single->type }}</td>
+                            <td>
+                                @if ($single->type === 'canceled')
+                                    <span class="cancelled-tag">Cancelled</span>
+                                @else
+                                    {{ $single->type }}
+                                @endif
+                            </td>
                         @endif
 
                         @if (!empty($visibleColumnsLookup['action_by']))
