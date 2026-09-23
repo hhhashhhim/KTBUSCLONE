@@ -55,8 +55,9 @@ function component(file, imports = {}) {
     assert.match(withPending, /aria-label="5 pending terminal cancellation requests"/);
     assert.match(withPending, /class="terminal-cancellation-label">Terminal Cancellation<\/span>/);
     const noPending = await renderTicketing(0);
-    assert.equal((noPending.match(/class="badge badge-secondary terminal-cancellation-count"/g) || []).length, 1,
-        'No parent notification when nothing is pending; child keeps its zero count');
+    assert.equal((noPending.match(/class="badge badge-secondary terminal-cancellation-count"/g) || []).length, 2,
+        'Both parent and child keep their count visible when nothing is pending');
+    assert.match(noPending, /aria-label="0 pending terminal cancellation requests"/);
     assert.doesNotMatch(await renderTicketing(5, false), /terminal-cancellation-count/,
         'Users without cancellation access do not see its notification');
 

@@ -274,7 +274,7 @@
                         <span class="ticketing-menu-label">
                             Ticketing
                         </span>
-                        <span v-if="checkForSubmenu('online-terminal-cancellation') && terminalCancellationPendingCount > 0"
+                        <span v-if="checkForSubmenu('online-terminal-cancellation')"
                             class="badge badge-secondary terminal-cancellation-count"
                             :title="terminalCancellationPendingCount + ' pending terminal cancellation requests'"
                             :aria-label="terminalCancellationPendingCount + ' pending terminal cancellation requests'">
