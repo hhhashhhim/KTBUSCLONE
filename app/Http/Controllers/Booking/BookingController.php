@@ -141,6 +141,7 @@ class BookingController extends Controller
             'terminal_id' => $terminal->id,
             'terminal_name' => $terminal->name,
             'requested_by' => Auth::user()->id,
+            'requested_by_name' => Auth::user()->name,
             'deduction_percentage' => $deductionPercentage,
             'refund_percentage' => 100 - $deductionPercentage,
         ];
@@ -155,23 +156,39 @@ class BookingController extends Controller
             ],
         ];
 
-        BookkaruApiLog::create([
-            'request_id' => $requestId,
-            'invoice_id' => $invoiceId,
-            'normalized_invoice_id' => $invoiceId,
-            'booking_reference' => $transactionId,
-            'seat_numbers' => $seatNumbers,
-            'request_payload' => $payload,
-            'response_payload' => $response,
-            'status' => 'pending',
-            'approval_status' => 'pending',
-            'cancellation_status' => 'pending',
-            'success' => true,
-            'duplicate' => false,
-            'unauthorized' => false,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
+        $requestIds = [];
+        foreach ($tickets as $requestedTicket) {
+            $seatRequestId = $tickets->count() === 1 ? $requestId : 'PORTAL-' . strtoupper((string) Str::uuid());
+            $requestedSeats = [(string) $requestedTicket->seat_no];
+            $seatPayload = array_merge($payload, [
+                'request_id' => $seatRequestId,
+                'seat_numbers' => $requestedSeats,
+                'ticket_ids' => [$requestedTicket->id],
+            ]);
+            $seatResponse = $response;
+            $seatResponse['data']['request_id'] = $seatRequestId;
+            $seatResponse['data']['seat_numbers'] = $requestedSeats;
+            BookkaruApiLog::create([
+                'request_id' => $seatRequestId,
+                'invoice_id' => $invoiceId,
+                'normalized_invoice_id' => $invoiceId,
+                'booking_reference' => $transactionId,
+                'seat_numbers' => $requestedSeats,
+                'request_payload' => $seatPayload,
+                'response_payload' => $seatResponse,
+                'status' => 'pending',
+                'approval_status' => 'pending',
+                'cancellation_status' => 'pending',
+                'success' => true,
+                'duplicate' => false,
+                'unauthorized' => false,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+            $requestIds[] = $seatRequestId;
+        }
+        $response['data']['request_id'] = $requestIds[0];
+        $response['data']['request_ids'] = $requestIds;
 
         ActivityLog::create([
             'activity_by' => Auth::user()->id,

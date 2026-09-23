@@ -11,14 +11,14 @@ use App\Models\Ticket;
 
 class TicketCancellationService
 {
-    public function cancelTicket(Ticket $ticket, $percentage = 0, $reason = null, $addedBy = null)
+    public function cancelTicket(Ticket $ticket, $percentage = 0, $reason = null, $addedBy = null, $refundFare = null)
     {
         $this->reverseLoyaltyPoints($ticket);
         $this->deleteElt($ticket);
 
         $previousType = $ticket->type;
         $refundPercentage = $this->normalizePercentage($percentage);
-        $refundAmount = round(((float) $ticket->seat_fare * $refundPercentage) / 100, 2);
+        $refundAmount = round((($refundFare ?? (float) $ticket->seat_fare) * $refundPercentage) / 100, 2);
 
         $ticket->update([
             'type' => 'canceled',

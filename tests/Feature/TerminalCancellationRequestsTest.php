@@ -1,0 +1,199 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Http\Controllers\Api\OnlineTerminalCancellationController;
+use App\Http\Controllers\Booking\BookingController;
+use App\Models\BookkaruApiLog;
+use App\Models\Ticket;
+use App\Models\User;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Tests\TestCase;
+
+/** Entirely in-memory: no application or production data is modified. */
+class TerminalCancellationRequestsTest extends TestCase
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['database.default' => 'cancellation_test', 'database.connections.cancellation_test' => [
+            'driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '',
+        ], 'services.terminal_cancellations.approval_enabled' => true]);
+        DB::setDefaultConnection('cancellation_test');
+        Schema::clearResolvedInstance('db.schema');
+        $this->table('roles', ['permissions']);
+        $this->table('users', ['name', 'company_id', 'role_id', 'terminal_id']);
+        $this->table('terminals', ['name', 'company_id', 'cancellation_allowed', 'is_online_terminal']);
+        $this->table('tickets', ['company_id', 'invoice_id', 'seat_no', 'seat_fare', 'discount', 'customer_id', 'schedule_id', 'type', 'transaction_id', 'date', 'schedule_date', 'schedule_time', 'refund_reason', 'refund_percentage', 'refund_amount']);
+        $this->table('customers', ['name', 'cnic', 'contact']);
+        $this->table('schedules', ['route_id']);
+        $this->table('routes', ['name']);
+        $this->table('ticket_e_l_t_s', ['ticket_id']);
+        $this->table('booking_cancels', ['company_id', 'ticket_id', 'percentage', 'reason', 'type', 'added_by']);
+        $this->table('activity_logs', ['activity_by', 'message', 'requested_host', 'company_id']);
+        $this->table('bookkaru_api_logs', ['request_id', 'invoice_id', 'normalized_invoice_id', 'booking_reference', 'seat_numbers', 'request_payload', 'response_payload', 'status', 'approval_status', 'cancellation_status', 'success', 'duplicate', 'unauthorized', 'ip_address', 'user_agent', 'approved_by', 'rejected_by', 'approved_at', 'rejected_at', 'cancelled_at', 'rejection_reason', 'exception_message']);
+        DB::table('roles')->insert(['id' => 1, 'permissions' => json_encode([['allow' => true, 'childs' => [
+            ['name' => 'online-terminal-cancellation', 'allow' => true, 'buttons' => [
+                ['name' => 'approve-request', 'allow' => true], ['name' => 'reject-request', 'allow' => true],
+                ['name' => 'cancel-ticket', 'allow' => true], ['name' => 'reserved-cancel', 'allow' => true],
+            ]],
+        ]]])]);
+        User::create(['id' => 1, 'name' => 'Requesting Clerk', 'company_id' => 1, 'role_id' => 1, 'terminal_id' => 1]);
+        Auth::setUser(User::find(1));
+        DB::table('terminals')->insert(['id' => 1, 'name' => 'Test Terminal', 'company_id' => 1, 'cancellation_allowed' => 1, 'is_online_terminal' => 0]);
+        for ($seat = 1; $seat <= 4; $seat++) {
+            Ticket::create(['id' => $seat, 'company_id' => 1, 'invoice_id' => 100, 'seat_no' => (string) $seat,
+                'seat_fare' => 9750, 'discount' => 2750, 'type' => 'booked', 'transaction_id' => 'TEST',
+                'date' => '2026-09-23', 'schedule_date' => '2026-09-23', 'schedule_time' => '16:00:00']);
+        }
+    }
+
+    private function table(string $name, array $columns): void
+    {
+        Schema::create($name, function (Blueprint $table) use ($columns) {
+            $table->increments('id');
+            foreach ($columns as $column) $table->text($column)->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    private function listing(array $filters = []): array
+    {
+        $response = app(OnlineTerminalCancellationController::class)->requests(new Request($filters));
+        $this->assertSame(200, $response->getStatusCode());
+        return $response->getData(true)['data'];
+    }
+
+    private function submit(int $ticketId = 1)
+    {
+        return app(BookingController::class)->cancelingBooking(new Request([
+            'ticket_id' => $ticketId, 'percentage' => 0, 'remarks' => 'Test cancellation',
+        ]));
+    }
+
+    public function test_single_seat_request_uses_only_that_seat_and_requesting_user(): void
+    {
+        $response = $this->submit();
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertTrue($response->getData(true)['pending']);
+        $this->assertSame(4, Ticket::count());
+        $this->assertSame(1, BookkaruApiLog::count());
+        // Even a stale invoice-level preview must not leak into a seat row.
+        BookkaruApiLog::first()->update(['response_payload' => ['data' => ['refund_amount' => 28000]]]);
+        $row = $this->listing(['tab' => 'pending'])['requests'][0];
+        $this->assertSame(['1'], $row['seat_numbers']);
+        $this->assertEquals(7000, $row['fare']);
+        $this->assertEquals(7000, $row['refund_amount']);
+        $this->assertSame('Requesting Clerk', $row['requested_by']);
+        $this->assertSame([1], BookkaruApiLog::first()->request_payload['ticket_ids']);
+        $this->assertSame(422, $this->submit()->getStatusCode());
+        $this->assertSame(1, BookkaruApiLog::count());
+    }
+
+    public function test_bulk_portal_requests_are_independent_and_tabs_count_decisions(): void
+    {
+        $response = app(BookingController::class)->cancelingAllBooking(new Request([
+            'cancelAllSeat' => [1, 2, 3, 4], 'percentage' => 0, 'reason' => 'Test bulk',
+        ]));
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertCount(4, $response->getData(true)['data']['request_ids']);
+        $data = $this->listing(['tab' => 'pending']);
+        $this->assertSame(['pending' => 4, 'completed' => 0], $data['counts']);
+        foreach ($data['requests'] as $row) {
+            $this->assertCount(1, $row['seat_numbers']);
+            $this->assertEquals(7000, $row['refund_amount']);
+        }
+        $id = BookkaruApiLog::first()->id;
+        $approved = app(OnlineTerminalCancellationController::class)->approveRequest(new Request(['id' => $id, 'deduction_percentage' => 10]));
+        $this->assertSame(200, $approved->getStatusCode(), $approved->getContent());
+        $this->assertEquals(6300, $approved->getData(true)['data']['refund_amount']);
+        $this->assertSame(3, Ticket::count());
+        $this->assertEquals(6300, Ticket::withTrashed()->find(1)->refund_amount);
+        $this->assertSame('booked', Ticket::find(2)->type);
+        $completed = $this->listing(['tab' => 'completed']);
+        $this->assertSame(['pending' => 3, 'completed' => 1], $completed['counts']);
+        $this->assertCount(1, $completed['requests']);
+        $this->assertEquals(6300, $completed['requests'][0]['refund_amount']);
+        $this->assertEquals(700, $completed['requests'][0]['deduction_amount']);
+        $reject = app(OnlineTerminalCancellationController::class)->rejectRequest(new Request(['id' => $id + 1, 'rejection_reason' => 'Test rejection']));
+        $this->assertSame(200, $reject->getStatusCode());
+        $this->assertSame(['pending' => 2, 'completed' => 2], $this->listing(['tab' => 'completed'])['counts']);
+        $this->assertSame(3, Ticket::count());
+    }
+
+    public function test_legacy_grouped_request_is_displayed_per_seat_not_total_refund(): void
+    {
+        $this->submit();
+        $log = BookkaruApiLog::first();
+        $log->update(['seat_numbers' => ['1', '2', '3', '4'], 'request_payload' => ['deduction_percentage' => 0],
+            'response_payload' => ['data' => ['refund_amount' => 28000]]]);
+        $rows = $this->listing(['tab' => 'pending'])['requests'];
+        $this->assertCount(4, $rows);
+        $this->assertCount(4, array_unique(array_column($rows, 'row_key')));
+        foreach ($rows as $row) {
+            $this->assertEquals(7000, $row['refund_amount']);
+            $this->assertEquals(28000, $row['request_fare']);
+        }
+        $log->update(['status' => 'cancelled', 'response_payload' => ['data' => ['refund_amount' => 25200, 'refunds' => array_map(fn ($id) => [
+            'ticket_id' => $id, 'seat_no' => (string) $id, 'refund_amount' => 6300, 'deduction_amount' => 700,
+        ], [1, 2, 3, 4])]]]);
+        foreach ($this->listing(['tab' => 'completed'])['requests'] as $row) $this->assertEquals(6300, $row['refund_amount']);
+    }
+
+    public function test_disallowed_terminal_creates_no_request_and_authorized_booking_user_can_submit(): void
+    {
+        DB::table('terminals')->where('id', 1)->update(['cancellation_allowed' => 0]);
+        $this->assertSame(422, $this->submit()->getStatusCode());
+        $this->assertSame(0, BookkaruApiLog::count());
+        DB::table('terminals')->where('id', 1)->update(['cancellation_allowed' => 1]);
+        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode([['allow' => true, 'childs' => [
+            ['name' => 'booking', 'allow' => true, 'buttons' => [['name' => 'cancel-ticket', 'allow' => true]]],
+        ]]])]);
+        $this->assertSame(200, $this->submit()->getStatusCode());
+        $this->assertSame(403, app(OnlineTerminalCancellationController::class)->pendingCount()->getStatusCode());
+        $this->assertSame(1, BookkaruApiLog::count());
+    }
+
+    public function test_counts_cover_all_pages_and_do_not_include_other_companies(): void
+    {
+        $this->submit();
+        $log = BookkaruApiLog::first();
+        for ($i = 0; $i < 102; $i++) {
+            $copy = $log->replicate(); $copy->request_id = 'TEST-' . $i; $copy->save();
+        }
+        Ticket::create(['company_id' => 2, 'invoice_id' => 200, 'seat_no' => '1']);
+        $other = $log->replicate(); $other->request_id = 'OTHER'; $other->invoice_id = 200; $other->normalized_invoice_id = 200; $other->save();
+        $first = $this->listing(['tab' => 'pending']);
+        $this->assertSame(103, $first['counts']['pending']);
+        $this->assertSame(2, $first['pagination']['last_page']);
+        $this->assertCount(100, $first['requests']);
+        $this->assertCount(3, $this->listing(['tab' => 'pending', 'page' => 2])['requests']);
+    }
+
+    public function test_saved_ticket_id_ignores_old_seat_versions_and_negative_discount_is_preserved(): void
+    {
+        Ticket::find(1)->update(['seat_fare' => 4100, 'discount' => -550]);
+        $old = Ticket::find(1)->replicate();
+        $old->seat_fare = 20000; $old->discount = 0; $old->deleted_at = now(); $old->save();
+        $this->assertSame(200, $this->submit()->getStatusCode());
+        $this->assertEquals(4650, $this->listing(['tab' => 'pending'])['requests'][0]['refund_amount']);
+        $response = app(OnlineTerminalCancellationController::class)->approveRequest(new Request(['id' => BookkaruApiLog::first()->id, 'deduction_percentage' => 0]));
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertEquals(4650, $response->getData(true)['data']['refund_amount']);
+        $this->assertSame(3, Ticket::count());
+    }
+
+    public function test_unpaid_reservation_still_cancels_directly(): void
+    {
+        Ticket::find(1)->update(['type' => 'advance booking']);
+        $response = $this->submit();
+        $this->assertIsArray($response);
+        $this->assertSame(0, BookkaruApiLog::count());
+        $this->assertSame(3, Ticket::count());
+    }
+}

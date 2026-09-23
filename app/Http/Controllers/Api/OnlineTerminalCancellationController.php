@@ -10,6 +10,7 @@ use App\Models\Bus\Bus;
 use App\Models\Route\Route as BusRoute;
 use App\Models\Terminal;
 use App\Models\Ticket;
+use App\Models\User;
 use App\Services\TicketCancellationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -117,6 +118,10 @@ class OnlineTerminalCancellationController extends Controller
                 'deduction_percentage' => $deductionPercentage,
                 'refund_percentage' => $refundPercentage,
                 'source' => $source,
+                // Never trust a caller-supplied requester identity.
+                'requested_by' => optional(Auth::guard('sanctum')->user())->id,
+                'requested_by_name' => optional(Auth::guard('sanctum')->user())->name,
+                'ticket_ids' => Ticket::where('invoice_id', $invoiceId)->whereIn('seat_no', $seatNumbers)->pluck('id')->all(),
             ]);
             $pendingResponse = $this->buildPendingResponse(
                 $requestId,
@@ -209,9 +214,6 @@ class OnlineTerminalCancellationController extends Controller
             ->when($request->transaction_id || $request->transactionFilter, function ($builder) use ($request) {
                 $builder->where('booking_reference', 'like', '%' . trim((string) ($request->transaction_id ?: $request->transactionFilter)) . '%');
             })
-            ->when($request->status || $request->statusFilter, function ($builder) use ($request) {
-                $builder->where('status', trim((string) ($request->status ?: $request->statusFilter)));
-            })
             ->when($this->hasBookingFilters($request), function ($builder) use ($request, $fromDateFilter, $toDateFilter) {
                 $builder->whereExists(function ($query) use ($request, $fromDateFilter, $toDateFilter) {
                     $query->select(DB::raw(1))
@@ -252,15 +254,37 @@ class OnlineTerminalCancellationController extends Controller
             })
             ->orderByDesc('id');
 
-        $requests = $query->limit(200)->get()->map(function (BookkaruApiLog $log) {
-            return $this->formatPortalRow($log);
-        });
+        // Counts cover all matching requests, not only the current page.
+        $counts = [
+            'pending' => (clone $query)->where('status', 'pending')->count(),
+            'completed' => (clone $query)->where('status', '!=', 'pending')->count(),
+        ];
+        if ($request->tab === 'pending') {
+            $query->where('status', 'pending');
+        } elseif ($request->tab === 'completed') {
+            $query->where('status', '!=', 'pending');
+        }
+        if ($request->status || $request->statusFilter) {
+            $query->where('status', trim((string) ($request->status ?: $request->statusFilter)));
+        }
+        $page = $query->paginate(100, ['*'], 'page', max(1, (int) $request->input('page', 1)));
+        $requesterIds = $page->getCollection()->map(fn ($log) => data_get($log->request_payload, 'requested_by'))->filter()->unique();
+        $requesters = User::where('company_id', Auth::user()->company_id)->whereIn('id', $requesterIds)->pluck('name', 'id');
+        $requests = $page->getCollection()->flatMap(function (BookkaruApiLog $log) use ($requesters) {
+            return $this->formatPortalRows($log, $requesters);
+        })->values();
 
         return response()->json([
             'status' => true,
             'message' => 'Online terminal cancellation requests fetched successfully.',
             'data' => [
                 'requests' => $requests,
+                'counts' => $counts,
+                'pagination' => [
+                    'current_page' => $page->currentPage(),
+                    'last_page' => $page->lastPage(),
+                    'total' => $page->total(),
+                ],
             ],
         ]);
     }
@@ -338,7 +362,7 @@ class OnlineTerminalCancellationController extends Controller
         $approvalRemarks = trim((string) ($request->remarks ?? $request->cancellation_reason ?? ''));
         $cancellationReason = data_get($log->request_payload, 'cancellation_reason', 'Cancelled from online terminal');
 
-        $ticketValidation = $this->validateTicketsForRequest($invoiceId, $seatNumbers, $transactionId ?: null);
+        $ticketValidation = $this->validateTicketsForRequest($invoiceId, $seatNumbers, $transactionId ?: null, (array) data_get($log->request_payload, 'ticket_ids', []));
         if ($ticketValidation !== true) {
             $response = $this->businessError('Cancellation approval failed.', 'CANCELLATION_FAILED');
             $this->applyFailureState($log, $response, auth()->id(), 'approve');
@@ -354,7 +378,11 @@ class OnlineTerminalCancellationController extends Controller
 
             DB::transaction(function () use ($invoiceId, $seatNumbers, $log, $now, $transactionId, $deductionPercentage, $refundPercentage, $approvalRemarks, $cancellationReason, &$cancelledSeats, &$refunds, &$response) {
                 $tickets = Ticket::where('invoice_id', $invoiceId)
+                    ->where('company_id', Auth::user()->company_id)
                     ->whereIn('seat_no', $seatNumbers)
+                    ->when(data_get($log->request_payload, 'ticket_ids'), function ($query, $ids) {
+                        $query->whereIn('id', $ids);
+                    })
                     ->lockForUpdate()
                     ->get();
 
@@ -363,7 +391,7 @@ class OnlineTerminalCancellationController extends Controller
                 }
 
                 foreach ($tickets as $ticket) {
-                    $seatFare = (float) $ticket->seat_fare;
+                    $seatFare = (float) $ticket->seat_fare - (float) ($ticket->discount ?? 0);
                     $deductionAmount = $this->calculatePercentageAmount($seatFare, $deductionPercentage);
                     $refundAmount = $this->calculatePercentageAmount($seatFare, $refundPercentage);
 
@@ -371,7 +399,8 @@ class OnlineTerminalCancellationController extends Controller
                         $ticket,
                         $refundPercentage,
                         $cancellationReason,
-                        auth()->id()
+                        auth()->id(),
+                        $seatFare
                     );
 
                     $cancelRecord = \App\Models\Booking\BookingCancel::where('ticket_id', $ticket->id)
@@ -748,7 +777,7 @@ class OnlineTerminalCancellationController extends Controller
         })->filter()->unique()->values()->all();
     }
 
-    private function validateTicketsForRequest($invoiceId, array $seatNumbers, $transactionId = null)
+    private function validateTicketsForRequest($invoiceId, array $seatNumbers, $transactionId = null, array $ticketIds = [])
     {
         $invoiceExists = Ticket::withTrashed()
             ->where('invoice_id', $invoiceId)
@@ -761,6 +790,9 @@ class OnlineTerminalCancellationController extends Controller
         $requestedTickets = Ticket::withTrashed()
             ->where('invoice_id', $invoiceId)
             ->whereIn('seat_no', $seatNumbers)
+            ->when($ticketIds, function ($query, $ids) {
+                $query->whereIn('id', $ids);
+            })
             ->get();
 
         if ($requestedTickets->count() !== count($seatNumbers)) {
@@ -859,7 +891,7 @@ class OnlineTerminalCancellationController extends Controller
             ->whereIn('seat_no', $seatNumbers)
             ->get()
             ->map(function (Ticket $ticket) use ($transactionId, $deductionPercentage, $refundPercentage, $refundReason) {
-                $seatFare = (float) $ticket->seat_fare;
+                $seatFare = (float) $ticket->seat_fare - (float) ($ticket->discount ?? 0);
                 $deductionAmount = $this->calculatePercentageAmount($seatFare, $deductionPercentage);
 
                 return [
@@ -1029,17 +1061,40 @@ class OnlineTerminalCancellationController extends Controller
         }
     }
 
-    private function formatPortalRow(BookkaruApiLog $log)
+    private function formatPortalRows(BookkaruApiLog $log, $requesters)
     {
-        $ticket = $this->bookingTicketForLog($log);
+        $tickets = $this->bookingTicketsForLog($log);
+        $seatNumbers = $this->normalizeSeatNumbers($log->seat_numbers ?? []);
+        $rows = collect($seatNumbers ?: [''])->map(function ($seat) use ($log, $tickets, $requesters) {
+            return $this->formatPortalRow($log, $tickets->get($seat), $seat, $requesters);
+        });
+        // Preserve the existing external multi-seat request/approval contract,
+        // while displaying each seat's money separately (never invoice totals).
+        $requestFare = $rows->sum(fn ($row) => is_numeric($row['fare']) ? $row['fare'] : 0);
+        return $rows->map(function ($row) use ($requestFare, $rows) {
+            $row['request_fare'] = $requestFare;
+            $row['request_seat_count'] = $rows->count();
+            return $row;
+        })->all();
+    }
+
+    private function formatPortalRow(BookkaruApiLog $log, ?Ticket $ticket, string $seatNumber, $requesters)
+    {
         $busDate = optional($ticket)->date;
         $busTime = optional($ticket)->schedule_time;
         $requestDate = optional($log->created_at)->format('Y-m-d H:i:s');
         $fare = $ticket ? ((float) $ticket->seat_fare - (float) ($ticket->discount ?? 0)) : null;
         $deductionPercentage = $this->resolveLogDeductionPercentage($log);
         $refundPercentage = $this->refundPercentageFromDeduction($deductionPercentage);
-        $deductionAmount = data_get($log->response_payload, 'data.deduction_amount');
-        $refundAmount = data_get($log->response_payload, 'data.refund_amount');
+        $seatRefund = collect(data_get($log->response_payload, 'data.refunds', []))->first(function ($refund) use ($ticket, $seatNumber) {
+            if ($ticket && isset($refund['ticket_id'])) {
+                return (int) $refund['ticket_id'] === (int) $ticket->id;
+            }
+            return trim((string) ($refund['seat_no'] ?? '')) === $seatNumber;
+        });
+        // Pending previews always use the requested seat's current net fare.
+        $deductionAmount = $log->current_status === 'cancelled' ? data_get($seatRefund, 'deduction_amount') : null;
+        $refundAmount = $log->current_status === 'cancelled' ? data_get($seatRefund, 'refund_amount') : null;
 
         if ($fare !== null) {
             $deductionAmount = $deductionAmount ?? $this->calculatePercentageAmount($fare, $deductionPercentage);
@@ -1048,12 +1103,16 @@ class OnlineTerminalCancellationController extends Controller
 
         return [
             'id' => $log->id,
+            'row_key' => $log->id . ':' . $seatNumber,
             'request_id' => $log->request_id,
             'invoice_id' => $log->invoice_id,
             'normalized_invoice_id' => $log->normalized_invoice_id,
             'booking_reference' => $log->booking_reference,
             'transaction_id' => data_get($log->request_payload, 'transaction_id', $log->booking_reference),
-            'seat_numbers' => $log->seat_numbers ?? [],
+            'seat_numbers' => $seatNumber === '' ? [] : [$seatNumber],
+            'request_seat_numbers' => $log->seat_numbers ?? [],
+            'requested_by' => $requesters->get(data_get($log->request_payload, 'requested_by'))
+                ?: data_get($log->request_payload, 'requested_by_name') ?: 'Not recorded (external/legacy request)',
             'cancellation_reason' => data_get($log->request_payload, 'cancellation_reason'),
             'source' => data_get($log->request_payload, 'source', 'Online Terminal'),
             'request_type' => data_get($log->request_payload, 'request_type', 'online'),
@@ -1089,8 +1148,10 @@ class OnlineTerminalCancellationController extends Controller
         ];
     }
 
-    private function bookingTicketForLog(BookkaruApiLog $log)
+    private function bookingTicketsForLog(BookkaruApiLog $log)
     {
+        $ticketIds = data_get($log->request_payload, 'ticket_ids')
+            ?: collect(data_get($log->response_payload, 'data.refunds', []))->pluck('ticket_id')->filter()->all();
         $seatNumbers = collect($log->seat_numbers ?? [])
             ->map(function ($seat) {
                 return trim((string) $seat);
@@ -1105,12 +1166,15 @@ class OnlineTerminalCancellationController extends Controller
                 'schedule.route:id,name',
                 'customer:id,name,cnic,contact',
             ])
+            ->where('company_id', Auth::user()->company_id)
             ->where('invoice_id', $log->normalized_invoice_id ?: $log->invoice_id)
-            ->when(!empty($seatNumbers), function ($query) use ($seatNumbers) {
-                $query->whereIn('seat_no', $seatNumbers);
+            ->whereIn('seat_no', $seatNumbers)
+            ->when($ticketIds, function ($query, $ids) {
+                $query->whereIn('id', $ids);
             })
-            ->orderBy('id')
-            ->first();
+            ->orderByRaw('deleted_at IS NULL DESC')
+            ->orderByDesc('id')
+            ->get()->unique('seat_no')->keyBy('seat_no');
     }
 
     public function pendingCount()
