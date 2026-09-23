@@ -785,12 +785,27 @@ public function filterData(Request $request)
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
 
+        $request->validate([
+            'fromDateTime' => ['nullable', 'date'],
+            'toDateTime' => ['nullable', 'date'],
+        ]);
         $reportData = $this->filterData($request);
         $tickets = $reportData['record'];
+        // Use the same effective terminal scope as the data query, not an
+        // untrusted filter value that a restricted user may have submitted.
+        $terminalId = ReportFilterScope::terminalId($request, 'terminal-sale-terminal-filter');
+        $terminalName = $terminalId
+            ? (Terminal::withTrashed()->where('company_id', Auth::user()->company_id)->where('id', $terminalId)->value('name') ?? 'Terminal unavailable')
+            : 'All permitted terminals';
 
         return view('reports.terminalSaleReport', [
             'tickets' => $tickets,
             'visibleColumns' => $this->getVisibleColumns($request),
+            'reportFilters' => [
+                'from' => $request->filled('fromDateTime') ? date('d-M-Y h:i A', strtotime($request->fromDateTime)) : 'Not specified',
+                'to' => $request->filled('toDateTime') ? date('d-M-Y h:i A', strtotime($request->toDateTime)) : 'Not specified',
+                'terminal' => $terminalName,
+            ],
         ]);
     }
 

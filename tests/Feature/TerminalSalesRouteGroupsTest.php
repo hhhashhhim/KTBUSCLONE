@@ -127,4 +127,28 @@ class TerminalSalesRouteGroupsTest extends TestCase
         $html = view('reports.terminalSaleReport', ['tickets' => collect([$ticket]), 'visibleColumns' => ['invoice_id']])->render();
         $this->assertStringNotContainsString('<span class="cancelled-tag">Cancelled</span>', $html);
     }
+
+    public function test_print_header_shows_dates_and_effective_terminal_even_without_results(): void
+    {
+        Schema::create('terminals', function (Blueprint $table) {
+            $table->increments('id'); $table->integer('company_id'); $table->string('name'); $table->softDeletes();
+        });
+        DB::table('terminals')->insert(['id' => 1, 'company_id' => 1, 'name' => 'Karachi Main Terminal']);
+        $controller = new class extends \App\Http\Controllers\TerminalController {
+            public function filterData(Request $request) { return ['record' => collect()]; }
+        };
+        Auth::user()->is_super_admin = 1;
+        $request = new Request(['terminal' => 1, 'fromDateTime' => '2026-09-01T00:00', 'toDateTime' => '2026-09-23T23:59']);
+        $html = $controller->terminalSalesPdf($request)->render();
+        $this->assertStringContainsString('Karachi Main Terminal', $html);
+        $this->assertStringContainsString('01-Sep-2026 12:00 AM', $html);
+        $this->assertStringContainsString('23-Sep-2026 11:59 PM', $html);
+        $html = $controller->terminalSalesPdf(new Request(['terminal' => 0]))->render();
+        $this->assertStringContainsString('All permitted terminals', $html);
+        Auth::user()->is_super_admin = 0;
+        Auth::user()->terminal_id = 1;
+        $html = $controller->terminalSalesPdf(new Request(['terminal' => 999]))->render();
+        $this->assertStringContainsString('Karachi Main Terminal', $html);
+        $this->assertStringNotContainsString('Terminal unavailable', $html);
+    }
 }

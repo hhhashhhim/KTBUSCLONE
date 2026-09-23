@@ -17,6 +17,8 @@
 <head>
     <style>
         .cancelled-tag { display: inline-block; margin-top: 3px; padding: 2px 5px; border: 1px solid #c62828; border-radius: 3px; color: #a51d2d; font-size: 7pt; font-weight: bold; }
+        .report-filter-summary { margin: 12px 0; border: 1px solid #aaa; }
+        .report-filter-summary td { padding: 7px 10px; text-align: left; vertical-align: top; font-size: 9pt; }
         @page {
             transform: rotate(-90deg);
             padding: 0;
@@ -49,8 +51,15 @@
 <body>
     <div style="border: 2px solid black; padding: 15px 3px 5px 3px;">
         <div class="companyName">Terminal Sales Report</div>
-
-        <br>
+        <table class="report-filter-summary">
+            <tr>
+                <td colspan="2"><strong>Terminal:</strong> {{ $reportFilters['terminal'] ?? 'Not specified' }}</td>
+            </tr>
+            <tr>
+                <td style="width: 50%;"><strong>From:</strong> {{ $reportFilters['from'] ?? 'Not specified' }}</td>
+                <td style="width: 50%;"><strong>To:</strong> {{ $reportFilters['to'] ?? 'Not specified' }}</td>
+            </tr>
+        </table>
 
         <table border="2" style="text-align: center;">
             <thead>
