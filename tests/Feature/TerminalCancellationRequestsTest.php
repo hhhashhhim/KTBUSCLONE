@@ -196,4 +196,57 @@ class TerminalCancellationRequestsTest extends TestCase
         $this->assertSame(0, BookkaruApiLog::count());
         $this->assertSame(3, Ticket::count());
     }
+
+    public function test_pending_has_no_age_limit_and_completed_defaults_to_ten_decision_days(): void
+    {
+        \Carbon\Carbon::setTestNow('2026-09-23 12:00:00');
+        try {
+            $this->submit();
+            $pending = BookkaruApiLog::first();
+            $pending->update(['created_at' => '2026-01-01 10:00:00', 'updated_at' => '2026-01-01 10:00:00']);
+            foreach ([
+                ['status' => 'cancelled', 'cancelled_at' => '2026-09-14 00:00:00'],
+                ['status' => 'rejected', 'rejected_at' => '2026-09-23 11:00:00'],
+                ['status' => 'cancelled', 'cancelled_at' => '2026-09-13 23:59:59'],
+                ['status' => 'failed', 'updated_at' => '2026-01-01 10:00:00'],
+            ] as $i => $decision) {
+                $log = $pending->replicate();
+                $log->request_id = 'DECISION-' . $i;
+                $log->fill($decision); $log->save();
+            }
+            $inbox = $this->listing();
+            $this->assertCount(1, $inbox['requests']);
+            $this->assertSame('pending', $inbox['requests'][0]['status']);
+            $this->assertSame(['pending' => 1, 'completed' => 2], $inbox['counts']);
+            $completed = $this->listing(['tab' => 'completed']);
+            $this->assertCount(2, $completed['requests']);
+            $this->assertTrue($completed['scope']['recent_completed_only']);
+            $this->assertSame('2026-09-14', $completed['scope']['from']);
+            $history = $this->listing(['tab' => 'completed', 'invoiceFilter' => '100']);
+            $this->assertFalse($history['scope']['recent_completed_only']);
+            $this->assertCount(4, $history['requests']);
+        } finally {
+            \Carbon\Carbon::setTestNow();
+        }
+    }
+
+    public function test_older_completed_filter_results_remain_server_paginated(): void
+    {
+        $this->submit();
+        $log = BookkaruApiLog::first();
+        $log->update(['status' => 'cancelled', 'cancelled_at' => '2020-01-01 00:00:00']);
+        for ($i = 0; $i < 60; $i++) {
+            $copy = $log->replicate(); $copy->request_id = 'OLD-' . $i; $copy->save();
+        }
+        $this->assertCount(0, $this->listing(['tab' => 'completed'])['requests']);
+        $page = $this->listing(['tab' => 'completed', 'invoiceFilter' => '100', 'page' => 2, 'per_page' => 25]);
+        $this->assertCount(25, $page['requests']);
+        $this->assertSame(61, $page['counts']['completed']);
+        $this->assertSame(61, $page['pagination']['total']);
+        $this->assertSame(3, $page['pagination']['last_page']);
+        $this->assertSame(2, $page['pagination']['current_page']);
+        $this->assertSame(25, $page['pagination']['per_page']);
+        $last = $this->listing(['tab' => 'completed', 'invoiceFilter' => '100', 'page' => 3, 'per_page' => 25]);
+        $this->assertCount(11, $last['requests']);
+    }
 }

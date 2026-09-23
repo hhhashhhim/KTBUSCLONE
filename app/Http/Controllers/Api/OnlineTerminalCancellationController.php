@@ -187,6 +187,21 @@ class OnlineTerminalCancellationController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
 
+        $request->validate([
+            'tab' => ['nullable', 'in:pending,completed'],
+            'page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'in:25,50,100'],
+        ]);
+        $tab = $request->input('tab') ?: 'pending';
+        $filterKeys = ['request_id', 'invoice_id', 'invoiceFilter', 'booking_reference', 'transaction_id',
+            'transactionFilter', 'status', 'statusFilter', 'cnicFilter', 'phoneFilter', 'nameFilter',
+            'routeFilter', 'terminalFilter', 'busFilter', 'fromDateFilter', 'toDateFilter', 'from_date', 'to_date'];
+        $hasFilters = collect($filterKeys)->contains(function ($key) use ($request) {
+            $value = $request->input($key);
+            return is_scalar($value) && trim((string) $value) !== '';
+        });
+        $recentFrom = Carbon::today()->subDays(9);
+        $recentUntil = Carbon::tomorrow();
         $fromDateFilter = $this->normalizeFilterDate($request->fromDateFilter);
         $toDateFilter = $this->normalizeFilterDate($request->toDateFilter);
 
@@ -254,20 +269,24 @@ class OnlineTerminalCancellationController extends Controller
             })
             ->orderByDesc('id');
 
-        // Counts cover all matching requests, not only the current page.
-        $counts = [
-            'pending' => (clone $query)->where('status', 'pending')->count(),
-            'completed' => (clone $query)->where('status', '!=', 'pending')->count(),
-        ];
-        if ($request->tab === 'pending') {
-            $query->where('status', 'pending');
-        } elseif ($request->tab === 'completed') {
-            $query->where('status', '!=', 'pending');
+        // Pending is never age-limited. Completed defaults to ten calendar days
+        // based on the decision time, not the travel/request creation date.
+        $pendingQuery = (clone $query)->where('status', 'pending');
+        $completedQuery = (clone $query)->where('status', '!=', 'pending');
+        if (!$hasFilters) {
+            $completedQuery->whereRaw('COALESCE(cancelled_at, rejected_at, approved_at, updated_at, created_at) >= ?', [$recentFrom->toDateTimeString()])
+                ->whereRaw('COALESCE(cancelled_at, rejected_at, approved_at, updated_at, created_at) < ?', [$recentUntil->toDateTimeString()]);
         }
+        // Counts cover the full result set, not just the current page.
+        $counts = [
+            'pending' => (clone $pendingQuery)->count(),
+            'completed' => (clone $completedQuery)->count(),
+        ];
+        $query = $tab === 'completed' ? $completedQuery : $pendingQuery;
         if ($request->status || $request->statusFilter) {
             $query->where('status', trim((string) ($request->status ?: $request->statusFilter)));
         }
-        $page = $query->paginate(100, ['*'], 'page', max(1, (int) $request->input('page', 1)));
+        $page = $query->paginate((int) ($request->input('per_page') ?: 100), ['*'], 'page', max(1, (int) $request->input('page', 1)));
         $requesterIds = $page->getCollection()->map(fn ($log) => data_get($log->request_payload, 'requested_by'))->filter()->unique();
         $requesters = User::where('company_id', Auth::user()->company_id)->whereIn('id', $requesterIds)->pluck('name', 'id');
         $requests = $page->getCollection()->flatMap(function (BookkaruApiLog $log) use ($requesters) {
@@ -280,10 +299,16 @@ class OnlineTerminalCancellationController extends Controller
             'data' => [
                 'requests' => $requests,
                 'counts' => $counts,
+                'scope' => [
+                    'recent_completed_only' => $tab === 'completed' && !$hasFilters,
+                    'from' => $recentFrom->toDateString(),
+                    'to' => $recentUntil->copy()->subDay()->toDateString(),
+                ],
                 'pagination' => [
                     'current_page' => $page->currentPage(),
                     'last_page' => $page->lastPage(),
                     'total' => $page->total(),
+                    'per_page' => $page->perPage(),
                 ],
             ],
         ]);
