@@ -5,7 +5,7 @@
                 <div class="col-12 col-md-12 col-lg-12">
                     <div class="card card-primary ">
                         <div class="card-header">
-                            <h4>Terminal SALES REPORT</h4>
+                            <h4>Terminal Sales Report</h4>
                         </div>
                         <div class="card-body">
                             <!-- Table -->
@@ -13,7 +13,25 @@
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            <div class="row">
+                                            <div class="sales-filter-heading">
+                                                <div><h5>Report filters</h5><p>Choose a departure period and narrow results by route, terminal or passenger.</p></div>
+                                            </div>
+                                            <div class="route-group-bar" v-if="canUseReportFilter('terminal-sale-route-filter')">
+                                                <div class="route-group-picker">
+                                                    <label for="routeGroupFilter">Saved route group</label>
+                                                    <select id="routeGroupFilter" class="form-control" v-model="filterSales.route_group_id" :disabled="groupsLoading">
+                                                        <option value="">Custom route selection</option>
+                                                        <option v-for="group in routeGroups" :key="group.id" :value="group.id">{{ group.name }} ({{ group.route_ids.length }} routes)</option>
+                                                    </select>
+                                                    <small>Reuse a saved set, such as Karachi closing, for this report and its printout.</small>
+                                                </div>
+                                                <button type="button" class="btn btn-outline-primary" @click="openRouteGroupModal" :disabled="groupsLoading || !groupsReady">
+                                                    <i class="fas fa-layer-group mr-1"></i> Manage route groups
+                                                </button>
+                                            </div>
+                                            <div v-if="groupLoadError" class="alert alert-warning">{{ groupLoadError }}</div>
+                                            <div class="row sales-filter-grid">
+                                                <div class="col-12 filter-section-label">Passenger &amp; booking</div>
                                                 <div class="my-2 col-md-3">
                                                     <label>CNIC No</label>
                                                     <input type="text" class="form-control"
@@ -50,7 +68,7 @@
                                                     <label for="terminalFilter">Terminals</label>
                                                     <select id="terminalFilter" class="form-control"
                                                         v-model="filterSales.terminal">
-                                                        <option value="0">Select Terminals</option>
+                                                        <option value="0">All permitted terminals</option>
                                                         <option v-for="(terminal, i) in terminals" :key="i"
                                                             :value="terminal.id">
                                                             {{ terminal.name }}
@@ -63,7 +81,6 @@
                                                     <label for="routeIds">Routes</label>
                                                     <select id="routeIds" class="form-control" multiple
                                                         v-model="filterSales.route">
-                                                        <option value="0">Select Route</option>
                                                         <option v-for="(route, i) in routes" :key="i" :value="route.id">
                                                             {{ route.name }} ({{ route.via ?? 'n/a' }})
                                                         </option>
@@ -74,54 +91,39 @@
                                                     <label for="usernameFilter">Users</label>
                                                     <select id="usernameFilter" class="form-control"
                                                         v-model="filterSales.user">
-                                                        <option value="0">Select Users</option>
+                                                        <option value="0">All permitted users</option>
                                                         <option v-for="(user, i) in users" :key="i" :value="user.id">
                                                             {{ user.name }}
                                                         </option>
                                                     </select>
                                                 </div>
                                                 <div class="my-2 col-md-3">
-                                                    <label for="fromDate">From Date Time</label>
+                                                    <label for="fromDate">Departure from <span class="text-danger">*</span></label>
                                                     <input id="fromDate" type="datetime-local" class="form-control"
                                                         v-model="filterSales.fromDateTime">
                                                 </div>
                                                 <div class="my-2 col-md-3">
-                                                    <label for="toDate">To Date Time</label>
+                                                    <label for="toDate">Departure to <span class="text-danger">*</span></label>
                                                     <input id="toDate" type="datetime-local" class="form-control"
                                                         v-model="filterSales.toDateTime">
                                                 </div>
                                                 <div class="my-2 col-md-3">
-                                                    <div class="" ref="columnDropdown">
-                                                        <label>Show/Hide Table Headers</label>
-                                                        <button type="button"
-                                                            class="btn btn-outline-secondary column-dropdown-toggle"
-                                                            @click.stop="toggleColumnDropdown()">
-                                                            {{ columnSelectionLabel }}
-                                                        </button>
-                                                        <div v-if="showColumnDropdown" class="column-dropdown-menu"
-                                                            @click.stop>
-                                                            <label v-for="column in columnOptions" :key="column.key"
-                                                                class="column-option">
-                                                                <input type="checkbox" :value="column.key"
-                                                                    v-model="visibleColumns">
-                                                                <span>{{ column.label }}</span>
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="my-2 col-md-3">
-                                                    <button class="btn btn-primary mt-4" type="button"
-                                                        @click="salesFilter()" :disabled="loadingTable">
-                                                        {{ loadingTable ? 'Loading...' : 'Fetch Record' }}
-                                                    </button>
+                                                    <label for="terminalSalesColumns">Report columns</label>
+                                                    <select id="terminalSalesColumns" class="form-control" multiple v-model="visibleColumns">
+                                                        <option v-for="column in columnOptions" :key="column.key" :value="column.key">{{ column.label }}</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                             <div class="report-tools-bar mt-2">
-
-                                                <div v-if="filters.record != null">
-                                                    <button class="btn btn-dark mt-4" type="button"
+                                                <span class="filter-selection-summary">{{ filterSales.route.length ? filterSales.route.length + ' routes selected' : 'All permitted routes' }} · {{ filters.record.length }} records loaded</span>
+                                                <button class="btn btn-light" type="button" @click="resetReportFilters" :disabled="loadingTable">Reset filters</button>
+                                                <button class="btn btn-primary" type="button" @click="salesFilter()" :disabled="loadingTable">
+                                                    <i class="fas fa-filter mr-1"></i>{{ loadingTable ? 'Loading...' : 'Apply filters' }}
+                                                </button>
+                                                <div v-if="filters.record.length">
+                                                    <button class="btn btn-dark" type="button"
                                                         @click="salesPrint()" :disabled="loadingTable">
-                                                        {{ loadingTable ? 'Loading...' : 'Print Record' }}
+                                                        <i class="fas fa-print mr-1"></i> Print report
                                                     </button>
                                                 </div>
                                             </div>
@@ -132,6 +134,7 @@
                                                 <input type="hidden" name="terminal" :value="filterSales.terminal">
                                                 <input type="hidden" name="user" :value="filterSales.user">
                                                 <input type="hidden" name="route" :value="filterSales.route">
+                                                <input type="hidden" name="route_group_id" :value="filterSales.route_group_id">
                                                 <input type="hidden" name="invoice_id" :value="filterSales.invoice_id">
                                                 <input type="hidden" name="transaction_id"
                                                     :value="filterSales.transaction_id">
@@ -212,13 +215,17 @@
                                                                     <td v-if="isColumnVisible('seat_no')">{{
                                                                         data.seat_no ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('invoice_id')">{{
-                                                                        data.invoice_id ?? 'N/A' }}</td>
+                                                                        data.invoice_id ?? 'N/A' }}
+                                                                        <div v-if="data.type === 'canceled'"><span class="cancelled-tag">Cancelled</span></div>
+                                                                    </td>
                                                                     <td v-if="isColumnVisible('transaction_id')">{{
                                                                         data.transaction_id ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('terminal_name')">{{
                                                                         data.terminal?.name ?? 'N/A' }}</td>
-                                                                    <td v-if="isColumnVisible('status')">{{ data.type ??
-                                                                        'N/A' }}</td>
+                                                                    <td v-if="isColumnVisible('status')">
+                                                                        <span v-if="data.type === 'canceled'" class="cancelled-tag">Cancelled</span>
+                                                                        <span v-else>{{ data.type ?? 'N/A' }}</span>
+                                                                    </td>
                                                                     <td v-if="isColumnVisible('action_by')">{{
                                                                         data.updated_name?.name ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('sale')">{{
@@ -308,6 +315,46 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="terminalSalesRouteGroupModal" tabindex="-1" role="dialog" aria-labelledby="routeGroupModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="routeGroupModalTitle">Manage route groups</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" :disabled="savingGroup"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted">Save routes together once, then select the group whenever you need the report. Groups are shared within your company.</p>
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label for="editingRouteGroup">Add or edit</label>
+                                <select id="editingRouteGroup" class="form-control" v-model="groupForm.id" :disabled="savingGroup">
+                                    <option value="">+ Add a new group</option>
+                                    <option v-for="group in routeGroups" :key="group.id" :value="group.id">{{ group.name }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label for="routeGroupName">Group name <span class="text-danger">*</span></label>
+                                <input id="routeGroupName" class="form-control" maxlength="120" placeholder="e.g. Karachi closing" v-model="groupForm.name" :disabled="savingGroup">
+                            </div>
+                        </div>
+                        <label for="groupRouteSearch">Routes <span class="text-danger">*</span> <span class="badge badge-primary ml-2">{{ groupForm.route_ids.length }} selected</span></label>
+                        <input id="groupRouteSearch" class="form-control mb-2" placeholder="Search routes or via cities..." v-model="groupRouteSearch">
+                        <div class="group-route-list">
+                            <label v-for="route in searchableGroupRoutes" :key="route.id" class="group-route-option">
+                                <input type="checkbox" :value="Number(route.id)" v-model="groupForm.route_ids" :disabled="savingGroup">
+                                <span>{{ route.name }} <small class="text-muted">{{ route.via ? '(' + route.via + ')' : '' }}</small></span>
+                            </label>
+                            <p v-if="!searchableGroupRoutes.length" class="text-muted p-3 mb-0">No matching routes.</p>
+                        </div>
+                        <div class="alert alert-danger mt-3 mb-0" v-if="groupSaveError">{{ groupSaveError }}</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-dismiss="modal" :disabled="savingGroup">Close</button>
+                        <button type="button" class="btn btn-primary" @click="saveRouteGroup" :disabled="savingGroup">{{ savingGroup ? 'Saving...' : (groupForm.id ? 'Save changes' : 'Create group') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 </template>
 <script>
@@ -339,12 +386,20 @@ export default {
         return {
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             terminals: [],
+            routes: [],
+            routeGroups: [],
+            groupsLoading: false,
+            groupsReady: false,
+            groupLoadError: '',
+            savingGroup: false,
+            groupSaveError: '',
+            groupRouteSearch: '',
+            groupForm: { id: '', name: '', route_ids: [] },
             loadingTable: false,
             users: [],
             permissions: [],
             columnOptions: COLUMN_OPTIONS.map((column) => ({ ...column })),
             visibleColumns: COLUMN_OPTIONS.filter((column) => column.checked).map((column) => column.key),
-            showColumnDropdown: false,
             filters: {
                 record: []
             },
@@ -353,6 +408,7 @@ export default {
                 terminal: 0,
                 user: 0,
                 route: [],
+                route_group_id: '',
                 invoice_id: '',
                 transaction_id: '',
                 passenger_name: '',
@@ -364,22 +420,20 @@ export default {
         }
     },
     computed: {
-        columnSelectionLabel() {
-            if (this.visibleColumns.length === this.columnOptions.length) {
-                return 'All Table Headers Selected';
-            }
-
-            if (this.visibleColumns.length === 0) {
-                return 'No Table Headers Selected';
-            }
-
-            return `${this.visibleColumns.length} Table Headers Selected`;
-        }
+        searchableGroupRoutes() {
+            const search = this.groupRouteSearch.trim().toLowerCase();
+            const routes = [...this.routes];
+            this.groupForm.route_ids.forEach(id => {
+                if (!routes.some(route => Number(route.id) === Number(id))) routes.push({ id, name: `Unavailable route #${id} — uncheck to remove` });
+            });
+            return routes.filter(route => `${route.name} ${route.via || ''}`.toLowerCase().includes(search));
+        },
     },
     async created() {
         $('.modal').remove();
-        this.fetchFilters();
         this.permissions = this.$store.state.permissions;
+        this.fetchFilters();
+        if (this.canUseReportFilter('terminal-sale-route-filter')) this.fetchRouteGroups();
         const currentRouteName = this.$route.name;
         if (currentRouteName == 'booking-page') {
             window.addEventListener('keydown', this.enterKey);
@@ -388,38 +442,110 @@ export default {
             window.removeEventListener('keydown', this.enterKey);
             window.removeEventListener('keydown', this.altM);
         }
-        setTimeout(() => {
-            $("#routeIds").select2({
-                closeOnSelect: false
-            });
-        }, 300);
     },
     mounted() {
-        document.addEventListener('click', this.handleDocumentClick);
-        const self = this;
-        // route
-        const routeIds = $('#routeIds');
-        routeIds.on('change', function () {
-            const selectedValues = $(this).val();
-            self.filterSales.route = selectedValues;
-        });
+        this.initSelect2Filters();
 
     },
     beforeUnmount() {
-        document.removeEventListener('click', this.handleDocumentClick);
+        ['#routeIds', '#terminalFilter', '#usernameFilter', '#routeGroupFilter', '#terminalSalesColumns', '#editingRouteGroup'].forEach(id => {
+            $(id).off('.terminalSales');
+            if ($(id).hasClass('select2-hidden-accessible')) $(id).select2('destroy');
+        });
+        $('#terminalSalesRouteGroupModal').modal('hide');
     },
     methods: {
-        toggleColumnDropdown() {
-            this.showColumnDropdown = !this.showColumnDropdown;
+        setupSelect2(id, value, onChange, options = {}) {
+            const select = $(id);
+            if (!select.length) return;
+            if (select.hasClass('select2-hidden-accessible')) select.select2('destroy');
+            select.select2({ width: '100%', minimumResultsForSearch: 0, ...options });
+            select.off('change.terminalSales').on('change.terminalSales', () => onChange(select.val()));
+            select.val(Array.isArray(value) ? value.map(String) : String(value ?? '')).trigger('change.select2');
         },
-        handleDocumentClick(event) {
-            if (!this.showColumnDropdown || !this.$refs.columnDropdown) {
+        initSelect2Filters() {
+            this.$nextTick(() => {
+                this.setupSelect2('#terminalFilter', this.filterSales.terminal, value => { this.filterSales.terminal = value || 0; });
+                this.setupSelect2('#usernameFilter', this.filterSales.user, value => { this.filterSales.user = value || 0; });
+                this.setupSelect2('#routeGroupFilter', this.filterSales.route_group_id, value => {
+                    this.filterSales.route_group_id = value || '';
+                    this.applyRouteGroup();
+                });
+                this.setupSelect2('#routeIds', this.filterSales.route, value => {
+                    this.filterSales.route_group_id = '';
+                    this.filterSales.route = (value || []).map(Number);
+                    $('#routeGroupFilter').val('').trigger('change.select2');
+                }, { closeOnSelect: false, placeholder: 'All permitted routes' });
+                this.setupSelect2('#terminalSalesColumns', this.visibleColumns, value => { this.visibleColumns = value || []; }, { closeOnSelect: false, placeholder: 'Choose report columns' });
+                this.setupSelect2('#editingRouteGroup', this.groupForm.id, value => {
+                    this.groupForm.id = value || '';
+                    this.editRouteGroup();
+                }, { dropdownParent: $('#terminalSalesRouteGroupModal') });
+            });
+        },
+        async fetchRouteGroups() {
+            this.groupsLoading = true;
+            try {
+                const res = await this.callApi('post', 'terminals/sales/route-groups');
+                if (res.status === 200) {
+                    this.routeGroups = res.data;
+                    this.groupsReady = true;
+                    this.groupLoadError = '';
+                    this.initSelect2Filters();
+                } else {
+                    this.groupLoadError = 'Saved route groups could not be loaded. Please check that the new database migration has been run. Custom route filters still work.';
+                }
+            } finally { this.groupsLoading = false; }
+        },
+        setSelectedRoutes(ids) {
+            this.filterSales.route = (ids || []).map(Number);
+            this.$nextTick(() => $('#routeIds').val(this.filterSales.route.map(String)).trigger('change.select2'));
+        },
+        applyRouteGroup() {
+            const group = this.routeGroups.find(group => Number(group.id) === Number(this.filterSales.route_group_id));
+            this.setSelectedRoutes(group ? group.route_ids : []);
+        },
+        openRouteGroupModal() {
+            this.groupForm.id = this.filterSales.route_group_id || '';
+            this.editRouteGroup();
+            if (!this.groupForm.id) this.groupForm.route_ids = [...this.filterSales.route].map(Number);
+            $('#terminalSalesRouteGroupModal').modal('show');
+            this.initSelect2Filters();
+        },
+        editRouteGroup() {
+            const group = this.routeGroups.find(group => Number(group.id) === Number(this.groupForm.id));
+            this.groupForm = group ? { id: group.id, name: group.name, route_ids: group.route_ids.map(Number) } : { id: '', name: '', route_ids: [] };
+            this.groupSaveError = '';
+            this.groupRouteSearch = '';
+        },
+        async saveRouteGroup() {
+            if (this.savingGroup) return;
+            if (!this.groupForm.name.trim() || !this.groupForm.route_ids.length) {
+                this.groupSaveError = 'Enter a group name and select at least one route.';
                 return;
             }
-
-            if (!this.$refs.columnDropdown.contains(event.target)) {
-                this.showColumnDropdown = false;
-            }
+            this.savingGroup = true;
+            this.groupSaveError = '';
+            try {
+                const res = await this.callApi('post', 'terminals/sales/route-groups/save', { ...this.groupForm, id: this.groupForm.id || null });
+                if (res.status === 200) {
+                    const group = res.data.group;
+                    this.routeGroups = [...this.routeGroups.filter(item => Number(item.id) !== Number(group.id)), group].sort((a, b) => a.name.localeCompare(b.name));
+                    this.filterSales.route_group_id = group.id;
+                    this.applyRouteGroup();
+                    this.initSelect2Filters();
+                    $('#terminalSalesRouteGroupModal').modal('hide');
+                    swal('Saved', 'Route group saved and selected. Click Apply filters to load the report.', 'success');
+                } else {
+                    this.groupSaveError = Object.values(res.data?.errors || {}).flat().join(' ') || res.data?.message || 'Unable to save the route group.';
+                }
+            } finally { this.savingGroup = false; }
+        },
+        resetReportFilters() {
+            this.filterSales = { terminal: 0, user: 0, route: [], route_group_id: '', invoice_id: '', transaction_id: '', passenger_name: '', passenger_contact: '', passenger_cnic: '', fromDateTime: '', toDateTime: '' };
+            this.setSelectedRoutes([]);
+            this.initSelect2Filters();
+            this.filters.record = [];
         },
         isColumnVisible(columnKey) {
             return this.visibleColumns.includes(columnKey);
@@ -432,6 +558,7 @@ export default {
                 this.terminals = resTerminals.data;
                 this.users = resUserNames.data;
                 this.routes = resRoutes.data;
+                this.initSelect2Filters();
             }
 
         },
@@ -455,8 +582,10 @@ export default {
             const resFetchData = await this.callApi("post", 'terminals/sales/fetchFilterData', this.filterSales);
             if (resFetchData.status == 200) {
                 this.filters.record = Object.values(resFetchData.data.record);
-                this.loadingTable = false;
+            } else {
+                swal('Unable to load report', Object.values(resFetchData.data?.errors || {}).flat().join(' ') || resFetchData.data?.message || 'Please try again.', 'error');
             }
+            this.loadingTable = false;
 
         },
         // sales Table
@@ -589,6 +718,22 @@ export default {
 }
 </script>
 <style scoped>
+.cancelled-tag { display: inline-block; margin-top: 4px; padding: 3px 7px; border-radius: 5px; border: 1px solid #f4b9c0; background: #fff0f1; color: #b42338; font-size: 10px; font-weight: 700; line-height: 1.3; }
+.sales-filter-grid :deep(.select2-selection--multiple) { max-height: 85px; overflow-y: auto; }
+.sales-filter-heading h5 { margin: 0 0 6px; color: #263455; font-size: 17px; }
+.sales-filter-heading p { color: #788399; margin-bottom: 18px; font-size: 13px; }
+.route-group-bar { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; padding: 18px 20px; margin-bottom: 20px; background: #f1f4ff; border: 1px solid #e0e6fc; border-radius: 10px; }
+.route-group-picker { flex: 1; min-width: 220px; }
+.route-group-picker small { display: block; color: #73809a; margin-top: 7px; }
+.sales-filter-grid { padding: 12px; border: 1px solid #e7ecf3; background: #fafbfd; border-radius: 10px; margin: 0; }
+.sales-filter-grid label, .route-group-picker label { font-size: 12px; font-weight: 600; color: #526079; margin-bottom: 7px; }
+.filter-section-label { text-transform: uppercase; letter-spacing: .08em; color: #8994a8; font-size: 11px; font-weight: 700; padding-top: 4px; }
+.filter-selection-summary { margin-right: auto; color: #7a8598; font-size: 12px; }
+.group-route-list { max-height: 320px; overflow-y: auto; border: 1px solid #e3e8ef; border-radius: 8px; }
+.group-route-option { display: flex; gap: 12px; align-items: center; padding: 12px 15px; margin: 0; border-bottom: 1px solid #eef1f6; cursor: pointer; }
+.group-route-option:hover { background: #f4f6ff; }
+.group-route-option input { width: 17px; height: 17px; flex-shrink: 0; }
+.sales-filter-grid .column-dropdown-wrapper { position: relative; min-width: 0; max-width: none; }
 table,
 th,
 td {
