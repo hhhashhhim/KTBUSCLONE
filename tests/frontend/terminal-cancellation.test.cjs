@@ -35,6 +35,31 @@ function component(file, imports = {}) {
     assert.equal(calls, 1);
     assert.equal(state.terminalCancellationPendingCount, 5);
 
+    // Render the actual Ticketing template without mounting the app or making API calls.
+    const { createSSRApp, compile } = require('vue');
+    const { renderToString } = require('@vue/server-renderer');
+    const sidebarSource = fs.readFileSync(path.join(__dirname, '../../resources/js/layouts/company/SideBar.vue'), 'utf8');
+    const ticketingTemplate = sidebarSource.split('<!-- Tickting panel -->')[1].split('<!-- loyalityCard Panel -->')[0];
+    async function renderTicketing(count, allowed = true) {
+        const app = createSSRApp({
+            render: compile(ticketingTemplate),
+            data: () => ({ terminalCancellationPendingCount: count }),
+            methods: { checkPermission: () => true, checkForSubmenu: () => allowed },
+        });
+        app.component('router-link', { template: '<a><slot /></a>' });
+        return renderToString(app);
+    }
+    const withPending = await renderTicketing(5);
+    assert.equal((withPending.match(/class="badge badge-secondary terminal-cancellation-count"/g) || []).length, 2,
+        'Both Ticketing and Terminal Cancellation show the same pending count');
+    assert.match(withPending, /aria-label="5 pending terminal cancellation requests"/);
+    assert.match(withPending, /class="terminal-cancellation-label">Terminal Cancellation<\/span>/);
+    const noPending = await renderTicketing(0);
+    assert.equal((noPending.match(/class="badge badge-secondary terminal-cancellation-count"/g) || []).length, 1,
+        'No parent notification when nothing is pending; child keeps its zero count');
+    assert.doesNotMatch(await renderTicketing(5, false), /terminal-cancellation-count/,
+        'Users without cancellation access do not see its notification');
+
     const page = component('resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue', { vueMask: {} });
     const view = page.data();
     view.defaultFilters = page.methods.defaultFilters;

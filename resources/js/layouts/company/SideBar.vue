@@ -270,9 +270,15 @@
                 </li>
                 <!-- Tickting panel -->
                 <li class="dropdown" v-if="checkPermission('ticketing')">
-                    <a href="#" class="menu-toggle nav-link has-dropdown"><i class="fas fa-ticket-alt"></i>
-                        <span>
+                    <a href="#" class="menu-toggle nav-link has-dropdown ticketing-menu-link"><i class="fas fa-ticket-alt"></i>
+                        <span class="ticketing-menu-label">
                             Ticketing
+                        </span>
+                        <span v-if="checkForSubmenu('online-terminal-cancellation') && terminalCancellationPendingCount > 0"
+                            class="badge badge-secondary terminal-cancellation-count"
+                            :title="terminalCancellationPendingCount + ' pending terminal cancellation requests'"
+                            :aria-label="terminalCancellationPendingCount + ' pending terminal cancellation requests'">
+                            {{ terminalCancellationPendingCount }}
                         </span>
                     </a>
                     <!--                    Permission just about terminals-->
@@ -309,10 +315,12 @@
                             </router-link>
                         </li>
                         <li class="dropdown" v-if="checkForSubmenu('online-terminal-cancellation')">
-                            <router-link class="nav-link text-capitalize d-flex justify-content-between"
-                                :to="{ name: 'online-terminal-cancellation-requests' }">
-                                <span><i class="fas fa-bookmark"></i> Terminal Cancellation</span>
-                                <span class="badge badge-secondary" style="width: 25px; padding: 6px;">
+                            <router-link class="nav-link text-capitalize terminal-cancellation-link"
+                                :to="{ name: 'online-terminal-cancellation-requests' }" title="Terminal Cancellation">
+                                <i class="fas fa-bookmark" aria-hidden="true"></i>
+                                <span class="terminal-cancellation-label">Terminal Cancellation</span>
+                                <span class="badge badge-secondary terminal-cancellation-count"
+                                    :aria-label="terminalCancellationPendingCount + ' pending requests'">
                                     {{ terminalCancellationPendingCount }}
                                 </span>
                             </router-link>
@@ -742,6 +750,55 @@ export default {
 </script>
 
 <style scoped>
+.main-sidebar .sidebar-menu li a.ticketing-menu-link {
+    padding-right: 40px;
+}
+
+.sidebar-mini .main-sidebar .sidebar-menu li a.ticketing-menu-link {
+    padding: 0;
+}
+
+.main-sidebar .sidebar-menu li a .ticketing-menu-label,
+.main-sidebar .sidebar-menu li a .terminal-cancellation-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    margin-top: 0;
+    white-space: nowrap;
+}
+
+.main-sidebar .sidebar-menu li a.terminal-cancellation-link {
+    padding-left: 42px;
+    padding-right: 12px;
+    font-size: 13px;
+    letter-spacing: 0;
+    flex-wrap: nowrap;
+}
+
+.main-sidebar .sidebar-menu li a.terminal-cancellation-link i {
+    flex: 0 0 14px;
+    width: 14px;
+    margin-right: 6px;
+}
+
+.main-sidebar .sidebar-menu li a .terminal-cancellation-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.main-sidebar .sidebar-menu li a .terminal-cancellation-count {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 25px;
+    height: 25px;
+    margin: 0 0 0 6px;
+    padding: 0 5px;
+    line-height: 25px;
+    border-radius: 999px;
+    text-align: center;
+    color: #fff;
+}
+
 .sidebar-menu {
     padding-bottom: 170px !important;
 }
