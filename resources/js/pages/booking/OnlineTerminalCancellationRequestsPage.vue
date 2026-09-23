@@ -17,93 +17,56 @@
                                     <span class="cancellation-count">{{ counts[tab] }}</span>
                                 </button>
                             </div>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
+                            <form class="cancellation-filters" @submit.prevent="applyFilters()">
+                                <div class="cancellation-filter-header">
+                                    <div class="cancellation-filter-heading">
+                                        <span class="cancellation-filter-icon"><i class="fas fa-filter" aria-hidden="true"></i></span>
+                                        <div><h5>Find cancellation requests</h5><p>Search by passenger, booking reference or journey.</p></div>
+                                    </div>
+                                    <span class="cancellation-filter-hint">All filters are optional</span>
+                                </div>
+                                <div class="cancellation-filter-grid">
+                                    <div class="cancellation-filter-field">
+                                        <label for="nameFilter">Passenger name</label>
+                                        <input id="nameFilter" type="text" class="form-control" v-model="filters.nameFilter" placeholder="Enter passenger name">
+                                    </div>
+                                    <div class="cancellation-filter-field">
                                         <label for="cnicFilter">CNIC</label>
-                                        <vue-mask id="cnicFilter" class="form-control"
-                                                  v-model="filters.cnicFilter" mask="00000-0000000-0"
-                                                  @keyup="fetchRequests()" :raw="false"
-                                                  :options="options">
-                                        </vue-mask>
+                                        <vue-mask id="cnicFilter" class="form-control" v-model="filters.cnicFilter" mask="00000-0000000-0" :raw="false" :options="options"></vue-mask>
                                     </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="phoneFilter">Cell #</label>
-                                        <vue-mask id="phoneFilter" class="form-control"
-                                                  v-model="filters.phoneFilter" mask="0000-0000000"
-                                                  :raw="false" @keyup="fetchRequests()"
-                                                  :options="optionsContact">
-                                        </vue-mask>
+                                    <div class="cancellation-filter-field">
+                                        <label for="phoneFilter">Mobile number</label>
+                                        <vue-mask id="phoneFilter" class="form-control" v-model="filters.phoneFilter" mask="0000-0000000" :raw="false" :options="optionsContact"></vue-mask>
                                     </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="nameFilter">Name</label>
-                                        <input id="nameFilter" type="text" class="form-control"
-                                               v-model="filters.nameFilter"
-                                               @keyup="fetchRequests()">
+                                    <div class="cancellation-filter-field">
+                                        <label for="invoiceFilter">Invoice number</label>
+                                        <input id="invoiceFilter" type="text" class="form-control" v-model="filters.invoiceFilter" placeholder="Enter invoice number">
                                     </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="invoiceFilter">Invoice</label>
-                                        <input id="invoiceFilter" type="text" class="form-control"
-                                               v-model="filters.invoiceFilter"
-                                               @keyup="fetchRequests()">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
+                                    <div class="cancellation-filter-field">
                                         <label for="routeFilter">Route</label>
-                                        <select id="routeFilter" class="form-control"
-                                                v-model="filters.routeFilter"
-                                                @change="fetchRequests()">
-                                            <option value="">---Select Route---</option>
-                                            <option v-for="(route, i) in routes" :key="i" :value="route.id">
-                                                {{ route.name }}  ({{ route.via ?? 'n/a' }})
-                                            </option>
+                                        <select id="routeFilter" class="form-control" data-cancellation-filter="routeFilter" v-model="filters.routeFilter">
+                                            <option value="">All routes</option>
+                                            <option v-for="route in routes" :key="route.id" :value="route.id">{{ route.name }}{{ route.via ? ' (' + route.via + ')' : '' }}</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="terminalFilter">Terminals</label>
-                                        <select id="terminalFilter" class="form-control"
-                                                v-model="filters.terminalFilter"
-                                                @change="fetchRequests()">
-                                            <option value="">---Select Terminal---</option>
-                                            <option v-for="(terminal, i) in terminals" :key="i" :value="terminal.id">
-                                                {{ terminal.name }}
-                                            </option>
+                                    <div class="cancellation-filter-field">
+                                        <label for="terminalFilter">Terminal</label>
+                                        <select id="terminalFilter" class="form-control" data-cancellation-filter="terminalFilter" v-model="filters.terminalFilter">
+                                            <option value="">All terminals</option>
+                                            <option v-for="terminal in terminals" :key="terminal.id" :value="terminal.id">{{ terminal.name }}</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="busFilter">Bus #</label>
-                                        <select id="busFilter" class="form-control"
-                                                v-model="filters.busFilter"
-                                                @change="fetchRequests()">
-                                            <option value="">---Select Bus #---</option>
-                                            <option v-for="(bus, i) in buses" :key="i" :value="bus.id">
-                                                {{ bus.bus_number }}
-                                            </option>
+                                    <div class="cancellation-filter-field">
+                                        <label for="busFilter">Bus number</label>
+                                        <select id="busFilter" class="form-control" data-cancellation-filter="busFilter" v-model="filters.busFilter">
+                                            <option value="">All buses</option>
+                                            <option v-for="bus in buses" :key="bus.id" :value="bus.id">{{ bus.bus_number }}</option>
                                         </select>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="statusFilter">Status</label>
-                                        <select id="statusFilter" class="form-control"
-                                                v-model="filters.statusFilter"
-                                                @change="fetchRequests()" :disabled="activeTab === 'pending'">
-                                            <option value="">{{ activeTab === 'pending' ? 'Pending' : 'All completed statuses' }}</option>
+                                    <div class="cancellation-filter-field">
+                                        <label for="statusFilter">Request status</label>
+                                        <select id="statusFilter" class="form-control" data-cancellation-filter="statusFilter" v-model="filters.statusFilter" :disabled="activeTab === 'pending'">
+                                            <option value="">{{ activeTab === 'pending' ? 'Pending requests' : 'All completed statuses' }}</option>
                                             <option v-if="activeTab === 'completed'" value="cancelled">Cancelled</option>
                                             <option v-if="activeTab === 'completed'" value="approved">Approved</option>
                                             <option v-if="activeTab === 'completed'" value="rejected">Rejected</option>
@@ -111,40 +74,32 @@
                                             <option v-if="activeTab === 'completed'" value="unauthorized">Unauthorized</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="fromDateFilter">Departure Date From</label>
-                                        <input type="date" class="form-control" id="fromDateFilter"
-                                               v-model="filters.fromDateFilter"
-                                               @change="fetchRequests()">
+                                    <div class="cancellation-filter-field">
+                                        <label for="fromDateFilter">Departure date · From</label>
+                                        <input type="date" class="form-control" id="fromDateFilter" v-model="filters.fromDateFilter" :max="filters.toDateFilter || undefined">
+                                    </div>
+                                    <div class="cancellation-filter-field">
+                                        <label for="toDateFilter">Departure date · To</label>
+                                        <input type="date" class="form-control" id="toDateFilter" v-model="filters.toDateFilter" :min="filters.fromDateFilter || undefined">
+                                    </div>
+                                    <div class="cancellation-filter-field">
+                                        <label for="transactionFilter">Transaction reference</label>
+                                        <input id="transactionFilter" type="text" class="form-control" v-model="filters.transactionFilter" placeholder="Enter transaction reference">
+                                    </div>
+                                    <div class="cancellation-filter-actions">
+                                        <button type="submit" class="btn btn-primary" :disabled="loading"><i class="fas fa-search" aria-hidden="true"></i> Apply filters</button>
+                                        <button type="button" class="btn btn-outline-secondary" @click="resetFilters()" :disabled="loading">Reset</button>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="toDateFilter">Departure Date To</label>
-                                        <input type="date" class="form-control" id="toDateFilter"
-                                               v-model="filters.toDateFilter"
-                                               @change="fetchRequests()">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="transactionFilter">Transaction #</label>
-                                        <input id="transactionFilter" type="text" class="form-control"
-                                               v-model="filters.transactionFilter"
-                                               @keyup="fetchRequests()">
-                                    </div>
-                                </div>
-                            </div>
+                            </form>
 
                             <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
                                 <div class="text-muted small mr-3">
-                                    <template v-if="activeTab === 'pending'">Pending requests load automatically, with no date limit.</template>
+                                    <template v-if="loading">Loading {{ activeTab }} requests…</template>
+                                    <template v-else-if="activeTab === 'pending'">Pending requests load automatically, with no date limit.</template>
                                     <template v-else-if="resultScope.recent_completed_only">Completed in the last 10 days ({{ resultScope.from }} to {{ resultScope.to }}). Use filters above to search older records.</template>
                                     <template v-else>Searching completed history using your filters.</template>
                                 </div>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="resetFilters()" :disabled="loading">Reset filters</button>
                             </div>
                             <div class="table-responsive">
                                 <div v-if="loading" class="text-center py-4">
@@ -248,11 +203,12 @@
                                 </table>
                             </div>
                             <div class="d-flex align-items-center justify-content-between flex-wrap mt-3">
-                                <label class="mb-0 mr-2">Requests per page
-                                    <select class="form-control form-control-sm d-inline-block w-auto ml-2" v-model.number="perPage" @change="fetchRequests()" :disabled="loading">
+                                <div class="cancellation-page-size mr-2">
+                                    <label class="mb-0" for="cancellationPageSize">Requests per page</label>
+                                    <select id="cancellationPageSize" class="form-control" v-model.number="perPage" :disabled="loading">
                                         <option :value="25">25</option><option :value="50">50</option><option :value="100">100</option>
                                     </select>
-                                </label>
+                                </div>
                                 <span class="text-muted">Page {{ pagination.current_page }} of {{ pagination.last_page }} · {{ pagination.total }} requests</span>
                                 <div>
                                     <button class="btn btn-outline-primary btn-sm mr-2" :disabled="loading || pagination.current_page <= 1"
@@ -384,6 +340,8 @@ export default {
             buses: [],
             loading: false,
             requestSequence: 0,
+            filtersDisposed: false,
+            appliedFilters: {},
             actionLoadingId: null,
             approveLoading: false,
             rejectLoading: false,
@@ -410,10 +368,20 @@ export default {
     },
     created() {
         this.permissions = this.$store.state.permissions;
+        this.appliedFilters = this.defaultFilters();
         this.fetchRoutes();
         this.fetchTerminals();
         this.fetchBus();
         this.fetchRequests();
+    },
+    mounted() {
+        this.initFilterSelect2();
+    },
+    beforeUnmount() {
+        this.filtersDisposed = true;
+        this.requestSequence++;
+        this.destroyFilterSelect2();
+        this.destroyDataTable();
     },
     computed: {
         approvePreview() {
@@ -433,11 +401,46 @@ export default {
         },
     },
     methods: {
+        initFilterSelect2() {
+            this.$nextTick(() => {
+                if (this.filtersDisposed || !this.$el || typeof $ === 'undefined' || !$.fn.select2) return;
+                this.$el.querySelectorAll('[data-cancellation-filter], #cancellationPageSize').forEach(element => {
+                    const select = $(element);
+                    const field = element.dataset.cancellationFilter;
+                    select.off('.terminalCancellationFilters');
+                    if (select.hasClass('select2-hidden-accessible')) select.select2('destroy');
+                    select.select2({ width: '100%', minimumResultsForSearch: 0, dropdownParent: select.parent() });
+                    select.val(String(field ? this.filters[field] || '' : this.perPage)).trigger('change.select2');
+                    select.on('change.terminalCancellationFilters', () => {
+                        if (field) {
+                            this.filters[field] = select.val() || '';
+                        } else {
+                            this.perPage = Number(select.val()) || 25;
+                            this.fetchRequests();
+                        }
+                    });
+                });
+            });
+        },
+        destroyFilterSelect2() {
+            if (!this.$el || typeof $ === 'undefined' || !$.fn.select2) return;
+            this.$el.querySelectorAll('[data-cancellation-filter], #cancellationPageSize').forEach(element => {
+                const select = $(element);
+                select.off('.terminalCancellationFilters');
+                if (select.hasClass('select2-hidden-accessible')) select.select2('destroy');
+            });
+        },
+        applyFilters() {
+            this.appliedFilters = { ...this.filters };
+            this.fetchRequests();
+        },
         selectTab(tab) {
             if (this.activeTab === tab) return;
             this.activeTab = tab;
             // Do not carry historical Completed filters into the Pending inbox.
             this.filters = this.defaultFilters();
+            this.appliedFilters = { ...this.filters };
+            this.initFilterSelect2();
             this.fetchRequests();
         },
         defaultFilters() {
@@ -459,18 +462,21 @@ export default {
             const resRoute = await this.callApi("post", "online-terminals/cancellations/routes");
             if (resRoute.status === 200) {
                 this.routes = resRoute.data;
+                this.initFilterSelect2();
             }
         },
         async fetchTerminals() {
             const resTerminal = await this.callApi("post", "online-terminals/cancellations/terminals");
             if (resTerminal.status === 200) {
                 this.terminals = resTerminal.data;
+                this.initFilterSelect2();
             }
         },
         async fetchBus() {
             const resBuses = await this.callApi("post", "online-terminals/cancellations/buses");
             if (resBuses.status === 200) {
                 this.buses = resBuses.data;
+                this.initFilterSelect2();
             }
         },
         async fetchRequests(page = 1) {
@@ -478,7 +484,7 @@ export default {
             this.destroyDataTable();
             this.loading = true;
             const res = await this.callApi('post', 'online-terminals/cancellations/requests', {
-                ...this.filters, tab: this.activeTab, page, per_page: this.perPage,
+                ...this.appliedFilters, tab: this.activeTab, page, per_page: this.perPage,
             });
             if (sequence !== this.requestSequence) {
                 return;
@@ -498,6 +504,8 @@ export default {
         },
         resetFilters() {
             this.filters = this.defaultFilters();
+            this.appliedFilters = { ...this.filters };
+            this.initFilterSelect2();
             this.fetchRequests();
         },
         openApproveModal(request) {
@@ -743,6 +751,41 @@ export default {
 </script>
 
 <style scoped>
+.cancellation-filters { margin-bottom: 20px; border: 1px solid #e3e8f0; border-radius: 12px; background: #f8fafc; }
+.cancellation-filter-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px; border-bottom: 1px solid #e3e8f0; }
+.cancellation-filter-heading { display: flex; align-items: center; gap: 12px; }
+.cancellation-filter-icon { display: flex; align-items: center; justify-content: center; flex: 0 0 36px; height: 36px; border-radius: 10px; background: #eef2ff; color: #6366f1; }
+.cancellation-filter-heading h5 { margin: 0 0 4px; color: #34395e; font-size: 15px; font-weight: 600; }
+.cancellation-filter-heading p, .cancellation-filter-hint { margin: 0; color: #64748b; font-size: 12px; line-height: 1.5; }
+.cancellation-filter-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 20px; padding: 20px; }
+.cancellation-filter-field { min-width: 0; position: relative; }
+.cancellation-filter-field label { display: block; margin-bottom: 7px; color: #475569; font-size: 12px; font-weight: 600; letter-spacing: 0; }
+.cancellation-filter-field .form-control { height: 42px; min-width: 0; border: 1px solid #dce2eb; border-radius: 7px; background: #fff; font-size: 13px; padding: 9px 12px; }
+.cancellation-filter-field .form-control:focus { border-color: #818cf8; box-shadow: 0 0 0 3px rgba(99, 102, 241, .1); }
+.cancellation-filter-field :deep(.select2-container) { width: 100% !important; min-width: 0; }
+.cancellation-filter-field :deep(.select2-selection--single) { height: 42px; border: 1px solid #dce2eb; border-radius: 7px; background: #fff; }
+.cancellation-filter-field :deep(.select2-selection__rendered) { line-height: 40px !important; padding-left: 12px !important; padding-right: 30px !important; color: #475569; font-size: 13px; }
+.cancellation-filter-field :deep(.select2-selection__arrow) { height: 40px !important; right: 8px !important; }
+.cancellation-filter-field :deep(.select2-container--focus .select2-selection), .cancellation-filter-field :deep(.select2-container--open .select2-selection) { border-color: #818cf8; box-shadow: 0 0 0 3px rgba(99, 102, 241, .1); }
+.cancellation-filter-field :deep(.select2-container--disabled .select2-selection) { background: #edf1f6; }
+.cancellation-filter-field :deep(.select2-dropdown), .cancellation-page-size :deep(.select2-dropdown) { border-color: #dce2eb; box-shadow: 0 6px 18px rgba(15, 23, 42, .08); font-size: 13px; }
+.cancellation-filter-field :deep(.select2-search__field) { border-radius: 5px; }
+.cancellation-filter-actions { display: flex; align-items: flex-end; gap: 8px; }
+.cancellation-filter-actions .btn { height: 42px; white-space: nowrap; border-radius: 7px; box-shadow: none; }
+.cancellation-filter-actions .btn-primary { flex: 1; }
+.cancellation-filter-actions .btn i { margin-right: 5px; }
+.cancellation-page-size { display: flex; align-items: center; gap: 10px; font-size: 12px; position: relative; }
+.cancellation-page-size :deep(.select2-container) { width: 80px !important; }
+.cancellation-page-size :deep(.select2-selection--single) { height: 34px; border-color: #dce2eb; border-radius: 6px; }
+.cancellation-page-size :deep(.select2-selection__rendered) { line-height: 32px !important; }
+.cancellation-page-size :deep(.select2-selection__arrow) { height: 32px !important; }
+@media (max-width: 1199px) { .cancellation-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 575px) {
+    .cancellation-filter-header { align-items: flex-start; padding: 16px; }
+    .cancellation-filter-hint { display: none; }
+    .cancellation-filter-grid { grid-template-columns: minmax(0, 1fr); padding: 16px; gap: 14px; }
+    .cancellation-tabs { flex-wrap: wrap; }
+}
 .cancellation-tabs { display: flex; gap: 12px; border-bottom: 1px solid #e9edf5; padding-bottom: 14px; }
 .cancellation-tab { display: inline-flex; align-items: center; gap: 12px; border: 1px solid #e3e8f0; border-radius: 8px; padding: 12px 22px; background: #fff; color: #64748b; font-weight: 600; }
 .cancellation-tab.active { background: #eef2ff; color: #4f46e5; border-color: #a5b4fc; }

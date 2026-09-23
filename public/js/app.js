@@ -42911,17 +42911,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_jquery_mask__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_jquery_mask__WEBPACK_IMPORTED_MODULE_0__);
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return generator._invoke = function (innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; }(innerFn, self, context), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; this._invoke = function (method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (object) { var keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -42960,6 +42960,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       buses: [],
       loading: false,
       requestSequence: 0,
+      filtersDisposed: false,
+      appliedFilters: {},
       actionLoadingId: null,
       approveLoading: false,
       rejectLoading: false,
@@ -42986,10 +42988,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   created: function created() {
     this.permissions = this.$store.state.permissions;
+    this.appliedFilters = this.defaultFilters();
     this.fetchRoutes();
     this.fetchTerminals();
     this.fetchBus();
     this.fetchRequests();
+  },
+  mounted: function mounted() {
+    this.initFilterSelect2();
+  },
+  beforeUnmount: function beforeUnmount() {
+    this.filtersDisposed = true;
+    this.requestSequence++;
+    this.destroyFilterSelect2();
+    this.destroyDataTable();
   },
   computed: {
     approvePreview: function approvePreview() {
@@ -43010,11 +43022,54 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   methods: {
+    initFilterSelect2: function initFilterSelect2() {
+      var _this = this;
+
+      this.$nextTick(function () {
+        if (_this.filtersDisposed || !_this.$el || typeof $ === 'undefined' || !$.fn.select2) return;
+
+        _this.$el.querySelectorAll('[data-cancellation-filter], #cancellationPageSize').forEach(function (element) {
+          var select = $(element);
+          var field = element.dataset.cancellationFilter;
+          select.off('.terminalCancellationFilters');
+          if (select.hasClass('select2-hidden-accessible')) select.select2('destroy');
+          select.select2({
+            width: '100%',
+            minimumResultsForSearch: 0,
+            dropdownParent: select.parent()
+          });
+          select.val(String(field ? _this.filters[field] || '' : _this.perPage)).trigger('change.select2');
+          select.on('change.terminalCancellationFilters', function () {
+            if (field) {
+              _this.filters[field] = select.val() || '';
+            } else {
+              _this.perPage = Number(select.val()) || 25;
+
+              _this.fetchRequests();
+            }
+          });
+        });
+      });
+    },
+    destroyFilterSelect2: function destroyFilterSelect2() {
+      if (!this.$el || typeof $ === 'undefined' || !$.fn.select2) return;
+      this.$el.querySelectorAll('[data-cancellation-filter], #cancellationPageSize').forEach(function (element) {
+        var select = $(element);
+        select.off('.terminalCancellationFilters');
+        if (select.hasClass('select2-hidden-accessible')) select.select2('destroy');
+      });
+    },
+    applyFilters: function applyFilters() {
+      this.appliedFilters = _objectSpread({}, this.filters);
+      this.fetchRequests();
+    },
     selectTab: function selectTab(tab) {
       if (this.activeTab === tab) return;
       this.activeTab = tab; // Do not carry historical Completed filters into the Pending inbox.
 
       this.filters = this.defaultFilters();
+      this.appliedFilters = _objectSpread({}, this.filters);
+      this.initFilterSelect2();
       this.fetchRequests();
     },
     defaultFilters: function defaultFilters() {
@@ -43033,7 +43088,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       };
     },
     fetchRoutes: function fetchRoutes() {
-      var _this = this;
+      var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         var resRoute;
@@ -43042,13 +43097,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return _this.callApi("post", "online-terminals/cancellations/routes");
+                return _this2.callApi("post", "online-terminals/cancellations/routes");
 
               case 2:
                 resRoute = _context.sent;
 
                 if (resRoute.status === 200) {
-                  _this.routes = resRoute.data;
+                  _this2.routes = resRoute.data;
+
+                  _this2.initFilterSelect2();
                 }
 
               case 4:
@@ -43060,7 +43117,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     fetchTerminals: function fetchTerminals() {
-      var _this2 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var resTerminal;
@@ -43069,13 +43126,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return _this2.callApi("post", "online-terminals/cancellations/terminals");
+                return _this3.callApi("post", "online-terminals/cancellations/terminals");
 
               case 2:
                 resTerminal = _context2.sent;
 
                 if (resTerminal.status === 200) {
-                  _this2.terminals = resTerminal.data;
+                  _this3.terminals = resTerminal.data;
+
+                  _this3.initFilterSelect2();
                 }
 
               case 4:
@@ -43087,7 +43146,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     fetchBus: function fetchBus() {
-      var _this3 = this;
+      var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var resBuses;
@@ -43096,13 +43155,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return _this3.callApi("post", "online-terminals/cancellations/buses");
+                return _this4.callApi("post", "online-terminals/cancellations/buses");
 
               case 2:
                 resBuses = _context3.sent;
 
                 if (resBuses.status === 200) {
-                  _this3.buses = resBuses.data;
+                  _this4.buses = resBuses.data;
+
+                  _this4.initFilterSelect2();
                 }
 
               case 4:
@@ -43115,7 +43176,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     fetchRequests: function fetchRequests() {
       var _arguments = arguments,
-          _this4 = this;
+          _this5 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var page, sequence, res;
@@ -43124,22 +43185,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context4.prev = _context4.next) {
               case 0:
                 page = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : 1;
-                sequence = ++_this4.requestSequence;
+                sequence = ++_this5.requestSequence;
 
-                _this4.destroyDataTable();
+                _this5.destroyDataTable();
 
-                _this4.loading = true;
+                _this5.loading = true;
                 _context4.next = 6;
-                return _this4.callApi('post', 'online-terminals/cancellations/requests', _objectSpread(_objectSpread({}, _this4.filters), {}, {
-                  tab: _this4.activeTab,
+                return _this5.callApi('post', 'online-terminals/cancellations/requests', _objectSpread(_objectSpread({}, _this5.appliedFilters), {}, {
+                  tab: _this5.activeTab,
                   page: page,
-                  per_page: _this4.perPage
+                  per_page: _this5.perPage
                 }));
 
               case 6:
                 res = _context4.sent;
 
-                if (!(sequence !== _this4.requestSequence)) {
+                if (!(sequence !== _this5.requestSequence)) {
                   _context4.next = 9;
                   break;
                 }
@@ -43148,29 +43209,29 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 9:
                 if (res.status === 200 && res.data.status === true) {
-                  _this4.requests = res.data.data.requests;
-                  _this4.counts = res.data.data.counts || {
+                  _this5.requests = res.data.data.requests;
+                  _this5.counts = res.data.data.counts || {
                     pending: 0,
                     completed: 0
                   };
-                  _this4.resultScope = res.data.data.scope || {
+                  _this5.resultScope = res.data.data.scope || {
                     recent_completed_only: false,
                     from: '',
                     to: ''
                   };
-                  _this4.pagination = res.data.data.pagination || {
+                  _this5.pagination = res.data.data.pagination || {
                     current_page: 1,
                     last_page: 1,
-                    total: _this4.requests.length
+                    total: _this5.requests.length
                   };
                 } else {
-                  _this4.requests = [];
+                  _this5.requests = [];
                 }
 
-                _this4.loading = false;
+                _this5.loading = false;
 
-                _this4.$nextTick(function () {
-                  _this4.initDataTable();
+                _this5.$nextTick(function () {
+                  _this5.initDataTable();
                 });
 
               case 12:
@@ -43183,6 +43244,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     resetFilters: function resetFilters() {
       this.filters = this.defaultFilters();
+      this.appliedFilters = _objectSpread({}, this.filters);
+      this.initFilterSelect2();
       this.fetchRequests();
     },
     openApproveModal: function openApproveModal(request) {
@@ -43194,7 +43257,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       $('#onlineTerminalApproveModal').modal('show');
     },
     approveRequest: function approveRequest() {
-      var _this5 = this;
+      var _this6 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var res;
@@ -43202,7 +43265,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                if (_this5.selectedRequest) {
+                if (_this6.selectedRequest) {
                   _context5.next = 2;
                   break;
                 }
@@ -43210,7 +43273,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _context5.abrupt("return");
 
               case 2:
-                if (!(_this5.approveForm.deduction_percentage < 0 || _this5.approveForm.deduction_percentage > 100)) {
+                if (!(_this6.approveForm.deduction_percentage < 0 || _this6.approveForm.deduction_percentage > 100)) {
                   _context5.next = 5;
                   break;
                 }
@@ -43219,25 +43282,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _context5.abrupt("return");
 
               case 5:
-                _this5.approveLoading = true;
-                _this5.actionLoadingId = _this5.selectedRequest.id;
+                _this6.approveLoading = true;
+                _this6.actionLoadingId = _this6.selectedRequest.id;
                 _context5.next = 9;
-                return _this5.callApi('post', 'online-terminals/cancellations/approve', {
-                  id: _this5.selectedRequest.id,
-                  deduction_percentage: _this5.approveForm.deduction_percentage,
-                  remarks: _this5.approveForm.remarks
+                return _this6.callApi('post', 'online-terminals/cancellations/approve', {
+                  id: _this6.selectedRequest.id,
+                  deduction_percentage: _this6.approveForm.deduction_percentage,
+                  remarks: _this6.approveForm.remarks
                 });
 
               case 9:
                 res = _context5.sent;
-                _this5.approveLoading = false;
-                _this5.actionLoadingId = null;
+                _this6.approveLoading = false;
+                _this6.actionLoadingId = null;
 
-                if (res.status === 200 && _this5.isApiSuccess(res.data)) {
+                if (res.status === 200 && _this6.isApiSuccess(res.data)) {
                   $('#onlineTerminalApproveModal').modal('hide');
                   swal("Approved", res.data.message, "success");
 
-                  _this5.fetchRequests();
+                  _this6.fetchRequests();
 
                   window.dispatchEvent(new CustomEvent('terminal-cancellation-count-refresh'));
                 } else {
@@ -43258,7 +43321,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       $('#onlineTerminalRejectModal').modal('show');
     },
     rejectRequest: function rejectRequest() {
-      var _this6 = this;
+      var _this7 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var res;
@@ -43266,7 +43329,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                if (_this6.rejectionReason.trim()) {
+                if (_this7.rejectionReason.trim()) {
                   _context6.next = 3;
                   break;
                 }
@@ -43275,22 +43338,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _context6.abrupt("return");
 
               case 3:
-                _this6.rejectLoading = true;
+                _this7.rejectLoading = true;
                 _context6.next = 6;
-                return _this6.callApi('post', 'online-terminals/cancellations/reject', {
-                  id: _this6.selectedRequest.id,
-                  rejection_reason: _this6.rejectionReason
+                return _this7.callApi('post', 'online-terminals/cancellations/reject', {
+                  id: _this7.selectedRequest.id,
+                  rejection_reason: _this7.rejectionReason
                 });
 
               case 6:
                 res = _context6.sent;
-                _this6.rejectLoading = false;
+                _this7.rejectLoading = false;
 
-                if (res.status === 200 && _this6.isApiSuccess(res.data)) {
+                if (res.status === 200 && _this7.isApiSuccess(res.data)) {
                   $('#onlineTerminalRejectModal').modal('hide');
                   swal("Rejected", res.data.message, "success");
 
-                  _this6.fetchRequests();
+                  _this7.fetchRequests();
 
                   window.dispatchEvent(new CustomEvent('terminal-cancellation-count-refresh'));
                 } else {
@@ -103355,17 +103418,29 @@ var _hoisted_9 = ["aria-selected", "onClick"];
 var _hoisted_10 = {
   "class": "cancellation-count"
 };
-var _hoisted_11 = {
-  "class": "row"
-};
+
+var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"cancellation-filter-header\" data-v-1614d8e4><div class=\"cancellation-filter-heading\" data-v-1614d8e4><span class=\"cancellation-filter-icon\" data-v-1614d8e4><i class=\"fas fa-filter\" aria-hidden=\"true\" data-v-1614d8e4></i></span><div data-v-1614d8e4><h5 data-v-1614d8e4>Find cancellation requests</h5><p data-v-1614d8e4>Search by passenger, booking reference or journey.</p></div></div><span class=\"cancellation-filter-hint\" data-v-1614d8e4>All filters are optional</span></div>", 1);
+
 var _hoisted_12 = {
-  "class": "col-md-3"
+  "class": "cancellation-filter-grid"
 };
 var _hoisted_13 = {
-  "class": "form-group"
+  "class": "cancellation-filter-field"
 };
 
 var _hoisted_14 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "nameFilter"
+  }, "Passenger name", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_15 = {
+  "class": "cancellation-filter-field"
+};
+
+var _hoisted_16 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "cnicFilter"
   }, "CNIC", -1
@@ -103373,62 +103448,35 @@ var _hoisted_14 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_15 = {
-  "class": "col-md-3"
-};
-var _hoisted_16 = {
-  "class": "form-group"
+var _hoisted_17 = {
+  "class": "cancellation-filter-field"
 };
 
-var _hoisted_17 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_18 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "phoneFilter"
-  }, "Cell #", -1
+  }, "Mobile number", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_18 = {
-  "class": "col-md-3"
-};
 var _hoisted_19 = {
-  "class": "form-group"
+  "class": "cancellation-filter-field"
 };
 
 var _hoisted_20 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "for": "nameFilter"
-  }, "Name", -1
+    "for": "invoiceFilter"
+  }, "Invoice number", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_21 = {
-  "class": "col-md-3"
-};
-var _hoisted_22 = {
-  "class": "form-group"
+  "class": "cancellation-filter-field"
 };
 
-var _hoisted_23 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "for": "invoiceFilter"
-  }, "Invoice", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_24 = {
-  "class": "row"
-};
-var _hoisted_25 = {
-  "class": "col-md-4"
-};
-var _hoisted_26 = {
-  "class": "form-group"
-};
-
-var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "routeFilter"
   }, "Route", -1
@@ -103436,203 +103484,208 @@ var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_28 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_23 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: ""
-  }, "---Select Route---", -1
+  }, "All routes", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_29 = ["value"];
-var _hoisted_30 = {
-  "class": "col-md-4"
-};
-var _hoisted_31 = {
-  "class": "form-group"
+var _hoisted_24 = ["value"];
+var _hoisted_25 = {
+  "class": "cancellation-filter-field"
 };
 
-var _hoisted_32 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_26 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "terminalFilter"
-  }, "Terminals", -1
+  }, "Terminal", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_33 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: ""
-  }, "---Select Terminal---", -1
+  }, "All terminals", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_34 = ["value"];
-var _hoisted_35 = {
-  "class": "col-md-4"
-};
-var _hoisted_36 = {
-  "class": "form-group"
+var _hoisted_28 = ["value"];
+var _hoisted_29 = {
+  "class": "cancellation-filter-field"
 };
 
-var _hoisted_37 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_30 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "busFilter"
-  }, "Bus #", -1
+  }, "Bus number", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_38 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_31 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: ""
-  }, "---Select Bus #---", -1
+  }, "All buses", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_39 = ["value"];
+var _hoisted_32 = ["value"];
+var _hoisted_33 = {
+  "class": "cancellation-filter-field"
+};
+
+var _hoisted_34 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "for": "statusFilter"
+  }, "Request status", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_35 = ["disabled"];
+var _hoisted_36 = {
+  value: ""
+};
+var _hoisted_37 = {
+  key: 0,
+  value: "cancelled"
+};
+var _hoisted_38 = {
+  key: 1,
+  value: "approved"
+};
+var _hoisted_39 = {
+  key: 2,
+  value: "rejected"
+};
 var _hoisted_40 = {
-  "class": "row"
+  key: 3,
+  value: "failed"
 };
 var _hoisted_41 = {
-  "class": "col-md-4"
+  key: 4,
+  value: "unauthorized"
 };
 var _hoisted_42 = {
-  "class": "form-group"
+  "class": "cancellation-filter-field"
 };
 
 var _hoisted_43 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "for": "statusFilter"
-  }, "Status", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_44 = ["disabled"];
-var _hoisted_45 = {
-  value: ""
-};
-var _hoisted_46 = {
-  key: 0,
-  value: "cancelled"
-};
-var _hoisted_47 = {
-  key: 1,
-  value: "approved"
-};
-var _hoisted_48 = {
-  key: 2,
-  value: "rejected"
-};
-var _hoisted_49 = {
-  key: 3,
-  value: "failed"
-};
-var _hoisted_50 = {
-  key: 4,
-  value: "unauthorized"
-};
-var _hoisted_51 = {
-  "class": "col-md-4"
-};
-var _hoisted_52 = {
-  "class": "form-group"
-};
-
-var _hoisted_53 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "fromDateFilter"
-  }, "Departure Date From", -1
+  }, "Departure date · From", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_54 = {
-  "class": "col-md-4"
-};
-var _hoisted_55 = {
-  "class": "form-group"
+var _hoisted_44 = ["max"];
+var _hoisted_45 = {
+  "class": "cancellation-filter-field"
 };
 
-var _hoisted_56 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "toDateFilter"
-  }, "Departure Date To", -1
+  }, "Departure date · To", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_57 = {
-  "class": "col-md-3"
-};
-var _hoisted_58 = {
-  "class": "form-group"
+var _hoisted_47 = ["min"];
+var _hoisted_48 = {
+  "class": "cancellation-filter-field"
 };
 
-var _hoisted_59 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_49 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "for": "transactionFilter"
-  }, "Transaction #", -1
+  }, "Transaction reference", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_60 = {
+var _hoisted_50 = {
+  "class": "cancellation-filter-actions"
+};
+var _hoisted_51 = ["disabled"];
+
+var _hoisted_52 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "fas fa-search",
+    "aria-hidden": "true"
+  }, null, -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_53 = ["disabled"];
+var _hoisted_54 = {
   "class": "d-flex align-items-center justify-content-between flex-wrap mb-3"
 };
-var _hoisted_61 = {
+var _hoisted_55 = {
   "class": "text-muted small mr-3"
 };
-var _hoisted_62 = ["disabled"];
-var _hoisted_63 = {
+var _hoisted_56 = {
   "class": "table-responsive"
 };
-var _hoisted_64 = {
+var _hoisted_57 = {
   key: 0,
   "class": "text-center py-4"
 };
-var _hoisted_65 = ["src"];
-var _hoisted_66 = {
+var _hoisted_58 = ["src"];
+var _hoisted_59 = {
   "class": "table table-bordered table-striped text-center",
   id: "online_terminal_cancellation_table"
 };
 
-var _hoisted_67 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_60 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Invoice"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Booking Reference"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Route"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Seats"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Reason"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Bus Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Passenger Name"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "CNIC"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Contact"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Fare"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Deduction %"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Deduction Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Refund %"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Refund Amount"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Booking Time"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Request Date"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Requested By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Time Difference"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Source"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Type"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Status"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Decision By"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Decision Remarks"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Cancelled At"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", null, "Actions")])], -1
   /* HOISTED */
   );
 });
 
-var _hoisted_68 = {
+var _hoisted_61 = {
   key: 0,
   "class": "small text-muted"
 };
-var _hoisted_69 = {
+var _hoisted_62 = {
   key: 0,
   "class": "small text-muted"
 };
-var _hoisted_70 = {
+var _hoisted_63 = {
   key: 0,
   "class": "btn-group"
 };
-var _hoisted_71 = ["disabled", "onClick"];
-var _hoisted_72 = ["disabled", "onClick"];
-var _hoisted_73 = {
+var _hoisted_64 = ["disabled", "onClick"];
+var _hoisted_65 = ["disabled", "onClick"];
+var _hoisted_66 = {
   key: 1,
   "class": "text-muted"
 };
-var _hoisted_74 = {
+var _hoisted_67 = {
   "class": "d-flex align-items-center justify-content-between flex-wrap mt-3"
 };
-var _hoisted_75 = {
-  "class": "mb-0 mr-2"
+var _hoisted_68 = {
+  "class": "cancellation-page-size mr-2"
 };
-var _hoisted_76 = ["disabled"];
 
-var _hoisted_77 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_69 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "mb-0",
+    "for": "cancellationPageSize"
+  }, "Requests per page", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_70 = ["disabled"];
+
+var _hoisted_71 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: 25
   }, "25", -1
@@ -103640,7 +103693,7 @@ var _hoisted_77 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_78 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_72 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: 50
   }, "50", -1
@@ -103648,7 +103701,7 @@ var _hoisted_78 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_79 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_73 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: 100
   }, "100", -1
@@ -103656,13 +103709,13 @@ var _hoisted_79 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_80 = [_hoisted_77, _hoisted_78, _hoisted_79];
-var _hoisted_81 = {
+var _hoisted_74 = [_hoisted_71, _hoisted_72, _hoisted_73];
+var _hoisted_75 = {
   "class": "text-muted"
 };
-var _hoisted_82 = ["disabled"];
-var _hoisted_83 = ["disabled"];
-var _hoisted_84 = {
+var _hoisted_76 = ["disabled"];
+var _hoisted_77 = ["disabled"];
+var _hoisted_78 = {
   "class": "modal fade",
   id: "onlineTerminalApproveModal",
   tabindex: "-1",
@@ -103670,15 +103723,15 @@ var _hoisted_84 = {
   "aria-labelledby": "onlineTerminalApproveModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_85 = {
+var _hoisted_79 = {
   "class": "modal-dialog modal-dialog-centered",
   role: "document"
 };
-var _hoisted_86 = {
+var _hoisted_80 = {
   "class": "modal-content"
 };
 
-var _hoisted_87 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_81 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "modal-header"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
@@ -103696,91 +103749,91 @@ var _hoisted_87 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_88 = {
+var _hoisted_82 = {
   "class": "modal-body"
 };
-var _hoisted_89 = {
+var _hoisted_83 = {
   key: 0,
   "class": "alert alert-info"
 };
-var _hoisted_90 = {
+var _hoisted_84 = {
   key: 0
 };
-var _hoisted_91 = {
+var _hoisted_85 = {
   "class": "row"
 };
-var _hoisted_92 = {
+var _hoisted_86 = {
   "class": "col-md-6"
 };
 
-var _hoisted_93 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_87 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Requested Seats Fare", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_88 = ["value"];
+var _hoisted_89 = {
+  "class": "col-md-6"
+};
+
+var _hoisted_90 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Deduction Percentage", -1
+  /* HOISTED */
+  );
+});
+
+var _hoisted_91 = {
+  "class": "row mt-3"
+};
+var _hoisted_92 = {
+  "class": "col-md-4"
+};
+
+var _hoisted_93 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Deduction Amount", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_94 = ["value"];
 var _hoisted_95 = {
-  "class": "col-md-6"
+  "class": "col-md-4"
 };
 
 var _hoisted_96 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Deduction Percentage", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Refund Percentage", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_97 = {
-  "class": "row mt-3"
-};
+var _hoisted_97 = ["value"];
 var _hoisted_98 = {
   "class": "col-md-4"
 };
 
 var _hoisted_99 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Deduction Amount", -1
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Refund Amount", -1
   /* HOISTED */
   );
 });
 
 var _hoisted_100 = ["value"];
 var _hoisted_101 = {
-  "class": "col-md-4"
-};
-
-var _hoisted_102 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Refund Percentage", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_103 = ["value"];
-var _hoisted_104 = {
-  "class": "col-md-4"
-};
-
-var _hoisted_105 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Refund Amount", -1
-  /* HOISTED */
-  );
-});
-
-var _hoisted_106 = ["value"];
-var _hoisted_107 = {
   "class": "mt-3"
 };
 
-var _hoisted_108 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_102 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Approval Remarks", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_109 = {
+var _hoisted_103 = {
   "class": "modal-footer"
 };
 
-var _hoisted_110 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_104 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-secondary",
@@ -103790,8 +103843,8 @@ var _hoisted_110 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_111 = ["disabled"];
-var _hoisted_112 = {
+var _hoisted_105 = ["disabled"];
+var _hoisted_106 = {
   "class": "modal fade",
   id: "onlineTerminalRejectModal",
   tabindex: "-1",
@@ -103799,15 +103852,15 @@ var _hoisted_112 = {
   "aria-labelledby": "onlineTerminalRejectModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_113 = {
+var _hoisted_107 = {
   "class": "modal-dialog modal-dialog-centered",
   role: "document"
 };
-var _hoisted_114 = {
+var _hoisted_108 = {
   "class": "modal-content"
 };
 
-var _hoisted_115 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_109 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "modal-header"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
@@ -103825,28 +103878,28 @@ var _hoisted_115 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_116 = {
+var _hoisted_110 = {
   "class": "modal-body"
 };
-var _hoisted_117 = {
+var _hoisted_111 = {
   key: 0,
   "class": "alert alert-info"
 };
-var _hoisted_118 = {
+var _hoisted_112 = {
   key: 0
 };
 
-var _hoisted_119 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_113 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Rejection Remarks", -1
   /* HOISTED */
   );
 });
 
-var _hoisted_120 = {
+var _hoisted_114 = {
   "class": "modal-footer"
 };
 
-var _hoisted_121 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_115 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-secondary",
@@ -103856,7 +103909,7 @@ var _hoisted_121 = /*#__PURE__*/_withScopeId(function () {
   );
 });
 
-var _hoisted_122 = ["disabled"];
+var _hoisted_116 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_vue_mask = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("vue-mask");
 
@@ -103881,22 +103934,34 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_9);
   }), 64
   /* STABLE_FRAGMENT */
-  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
+  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+    "class": "cancellation-filters",
+    onSubmit: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.applyFilters();
+    }, ["prevent"]))
+  }, [_hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    id: "nameFilter",
+    type: "text",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
+      return $data.filters.nameFilter = $event;
+    }),
+    placeholder: "Enter passenger name"
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.nameFilter]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [_hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
     id: "cnicFilter",
     "class": "form-control",
     modelValue: $data.filters.cnicFilter,
-    "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
+    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
       return $data.filters.cnicFilter = $event;
     }),
     mask: "00000-0000000-0",
-    onKeyup: _cache[1] || (_cache[1] = function ($event) {
-      return $options.fetchRequests();
-    }),
     raw: false,
     options: $data.options
   }, null, 8
   /* PROPS */
-  , ["modelValue", "options"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
+  , ["modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [_hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_mask, {
     id: "phoneFilter",
     "class": "form-control",
     modelValue: $data.filters.phoneFilter,
@@ -103905,177 +103970,158 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     mask: "0000-0000000",
     raw: false,
-    onKeyup: _cache[3] || (_cache[3] = function ($event) {
-      return $options.fetchRequests();
-    }),
     options: $data.optionsContact
   }, null, 8
   /* PROPS */
-  , ["modelValue", "options"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [_hoisted_20, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    id: "nameFilter",
-    type: "text",
-    "class": "form-control",
-    "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
-      return $data.filters.nameFilter = $event;
-    }),
-    onKeyup: _cache[5] || (_cache[5] = function ($event) {
-      return $options.fetchRequests();
-    })
-  }, null, 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.nameFilter]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [_hoisted_23, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , ["modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [_hoisted_20, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     id: "invoiceFilter",
     type: "text",
     "class": "form-control",
-    "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+    "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
       return $data.filters.invoiceFilter = $event;
     }),
-    onKeyup: _cache[7] || (_cache[7] = function ($event) {
-      return $options.fetchRequests();
-    })
-  }, null, 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.invoiceFilter]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [_hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    placeholder: "Enter invoice number"
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.invoiceFilter]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [_hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     id: "routeFilter",
     "class": "form-control",
-    "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
+    "data-cancellation-filter": "routeFilter",
+    "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
       return $data.filters.routeFilter = $event;
-    }),
-    onChange: _cache[9] || (_cache[9] = function ($event) {
-      return $options.fetchRequests();
     })
-  }, [_hoisted_28, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.routes, function (route, i) {
-    var _route$via;
-
+  }, [_hoisted_23, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.routes, function (route) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
-      key: i,
+      key: route.id,
       value: route.id
-    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(route.name) + " (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((_route$via = route.via) !== null && _route$via !== void 0 ? _route$via : 'n/a') + ") ", 9
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(route.name) + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(route.via ? ' (' + route.via + ')' : ''), 9
     /* TEXT, PROPS */
-    , _hoisted_29);
+    , _hoisted_24);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.routeFilter]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [_hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  ))], 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.routeFilter]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [_hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     id: "terminalFilter",
     "class": "form-control",
-    "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+    "data-cancellation-filter": "terminalFilter",
+    "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
       return $data.filters.terminalFilter = $event;
-    }),
-    onChange: _cache[11] || (_cache[11] = function ($event) {
-      return $options.fetchRequests();
     })
-  }, [_hoisted_33, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.terminals, function (terminal, i) {
+  }, [_hoisted_27, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.terminals, function (terminal) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
-      key: i,
+      key: terminal.id,
       value: terminal.id
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(terminal.name), 9
     /* TEXT, PROPS */
-    , _hoisted_34);
+    , _hoisted_28);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.terminalFilter]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [_hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  ))], 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.terminalFilter]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [_hoisted_30, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     id: "busFilter",
     "class": "form-control",
-    "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
+    "data-cancellation-filter": "busFilter",
+    "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
       return $data.filters.busFilter = $event;
-    }),
-    onChange: _cache[13] || (_cache[13] = function ($event) {
-      return $options.fetchRequests();
     })
-  }, [_hoisted_38, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.buses, function (bus, i) {
+  }, [_hoisted_31, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.buses, function (bus) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
-      key: i,
+      key: bus.id,
       value: bus.id
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(bus.bus_number), 9
     /* TEXT, PROPS */
-    , _hoisted_39);
+    , _hoisted_32);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.busFilter]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_41, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [_hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  ))], 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.busFilter]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [_hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     id: "statusFilter",
     "class": "form-control",
-    "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
+    "data-cancellation-filter": "statusFilter",
+    "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
       return $data.filters.statusFilter = $event;
     }),
-    onChange: _cache[15] || (_cache[15] = function ($event) {
-      return $options.fetchRequests();
-    }),
     disabled: $data.activeTab === 'pending'
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", _hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.activeTab === 'pending' ? 'Pending' : 'All completed statuses'), 1
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", _hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.activeTab === 'pending' ? 'Pending requests' : 'All completed statuses'), 1
   /* TEXT */
-  ), $data.activeTab === 'completed' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_46, "Cancelled")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.activeTab === 'completed' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_47, "Approved")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.activeTab === 'completed' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_48, "Rejected")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.activeTab === 'completed' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_49, "Failed")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.activeTab === 'completed' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_50, "Unauthorized")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 40
-  /* PROPS, HYDRATE_EVENTS */
-  , _hoisted_44), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.statusFilter]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [_hoisted_53, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  ), $data.activeTab === 'completed' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_37, "Cancelled")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.activeTab === 'completed' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_38, "Approved")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.activeTab === 'completed' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_39, "Rejected")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.activeTab === 'completed' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_40, "Failed")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.activeTab === 'completed' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_41, "Unauthorized")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 8
+  /* PROPS */
+  , _hoisted_35), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.statusFilter]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [_hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "date",
     "class": "form-control",
     id: "fromDateFilter",
-    "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
+    "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
       return $data.filters.fromDateFilter = $event;
     }),
-    onChange: _cache[17] || (_cache[17] = function ($event) {
-      return $options.fetchRequests();
-    })
-  }, null, 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.fromDateFilter]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_55, [_hoisted_56, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    max: $data.filters.toDateFilter || undefined
+  }, null, 8
+  /* PROPS */
+  , _hoisted_44), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.fromDateFilter]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "date",
     "class": "form-control",
     id: "toDateFilter",
-    "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
+    "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
       return $data.filters.toDateFilter = $event;
     }),
-    onChange: _cache[19] || (_cache[19] = function ($event) {
-      return $options.fetchRequests();
-    })
-  }, null, 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.toDateFilter]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_58, [_hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    min: $data.filters.fromDateFilter || undefined
+  }, null, 8
+  /* PROPS */
+  , _hoisted_47), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.toDateFilter]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     id: "transactionFilter",
     type: "text",
     "class": "form-control",
-    "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
+    "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
       return $data.filters.transactionFilter = $event;
     }),
-    onKeyup: _cache[21] || (_cache[21] = function ($event) {
-      return $options.fetchRequests();
-    })
-  }, null, 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.transactionFilter]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_61, [$data.activeTab === 'pending' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    placeholder: "Enter transaction reference"
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.transactionFilter]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "submit",
+    "class": "btn btn-primary",
+    disabled: $data.loading
+  }, [_hoisted_52, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Apply filters")], 8
+  /* PROPS */
+  , _hoisted_51), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-outline-secondary",
+    onClick: _cache[11] || (_cache[11] = function ($event) {
+      return $options.resetFilters();
+    }),
+    disabled: $data.loading
+  }, "Reset", 8
+  /* PROPS */
+  , _hoisted_53)])])], 32
+  /* HYDRATE_EVENTS */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_55, [$data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 0
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Loading " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.activeTab) + " requests…", 1
+  /* TEXT */
+  )], 64
+  /* STABLE_FRAGMENT */
+  )) : $data.activeTab === 'pending' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 1
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Pending requests load automatically, with no date limit.")], 64
   /* STABLE_FRAGMENT */
   )) : $data.resultScope.recent_completed_only ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 1
+    key: 2
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Completed in the last 10 days (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.resultScope.from) + " to " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.resultScope.to) + "). Use filters above to search older records.", 1
   /* TEXT */
   )], 64
   /* STABLE_FRAGMENT */
   )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 2
+    key: 3
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Searching completed history using your filters.")], 64
   /* STABLE_FRAGMENT */
-  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    type: "button",
-    "class": "btn btn-outline-secondary btn-sm",
-    onClick: _cache[22] || (_cache[22] = function ($event) {
-      return $options.resetFilters();
-    }),
-    disabled: $data.loading
-  }, "Reset filters", 8
-  /* PROPS */
-  , _hoisted_62)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_63, [$data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_64, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+  ))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [$data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
     "class": "loading-spinner",
     src: _ctx.$store.state.main_url + 'assets/img/loading-spinner.gif'
   }, null, 8
   /* PROPS */
-  , _hoisted_65)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_66, [_hoisted_67, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.requests, function (request) {
+  , _hoisted_58)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_59, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.requests, function (request) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
       key: request.row_key || request.id,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.timeDifferenceRowClass(request))
@@ -104087,7 +104133,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatSeats(request.seat_numbers)) + " ", 1
     /* TEXT */
-    ), request.request_seat_count > 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_68, " Grouped request: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.request_seat_count) + " seats ", 1
+    ), request.request_seat_count > 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_61, " Grouped request: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.request_seat_count) + " seats ", 1
     /* TEXT */
     )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.cancellation_reason || 'N/A'), 1
     /* TEXT */
@@ -104129,7 +104175,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.statusClass(request.status))
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusLabel(request.status)), 3
     /* TEXT, CLASS */
-    ), request.cancellation_status ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_69, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusLabel(request.cancellation_status)), 1
+    ), request.cancellation_status ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusLabel(request.cancellation_status)), 1
     /* TEXT */
     )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.decision_by || 'N/A'), 1
     /* TEXT */
@@ -104137,7 +104183,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.cancelled_at || 'N/A'), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [request.status === 'pending' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_70, [$options.canUseButton('approve-request') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", null, [request.status === 'pending' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_63, [$options.canUseButton('approve-request') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 0,
       "class": "btn btn-success btn-sm",
       disabled: $data.actionLoadingId === request.id,
@@ -104146,7 +104192,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.request_seat_count > 1 ? 'Approve Group' : 'Approve'), 9
     /* TEXT, PROPS */
-    , _hoisted_71)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canUseButton('reject-request') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    , _hoisted_64)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canUseButton('reject-request') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 1,
       "class": "btn btn-danger btn-sm",
       disabled: $data.actionLoadingId === request.id,
@@ -104155,126 +104201,124 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(request.request_seat_count > 1 ? 'Reject Group' : 'Reject'), 9
     /* TEXT, PROPS */
-    , _hoisted_72)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_73, "No action"))])], 2
+    , _hoisted_65)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_66, "No action"))])], 2
     /* CLASS */
     );
   }), 128
   /* KEYED_FRAGMENT */
   ))])], 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, !$data.loading]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_74, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_75, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Requests per page "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
-    "class": "form-control form-control-sm d-inline-block w-auto ml-2",
-    "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, !$data.loading]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [_hoisted_69, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    id: "cancellationPageSize",
+    "class": "form-control",
+    "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
       return $data.perPage = $event;
     }),
-    onChange: _cache[24] || (_cache[24] = function ($event) {
-      return $options.fetchRequests();
-    }),
     disabled: $data.loading
-  }, _hoisted_80, 40
-  /* PROPS, HYDRATE_EVENTS */
-  , _hoisted_76), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.perPage, void 0, {
+  }, _hoisted_74, 8
+  /* PROPS */
+  , _hoisted_70), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.perPage, void 0, {
     number: true
-  }]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_81, "Page " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.pagination.current_page) + " of " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.pagination.last_page) + " · " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.pagination.total) + " requests", 1
+  }]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_75, "Page " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.pagination.current_page) + " of " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.pagination.last_page) + " · " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.pagination.total) + " requests", 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "btn btn-outline-primary btn-sm mr-2",
     disabled: $data.loading || $data.pagination.current_page <= 1,
-    onClick: _cache[25] || (_cache[25] = function ($event) {
+    onClick: _cache[14] || (_cache[14] = function ($event) {
       return $options.fetchRequests($data.pagination.current_page - 1);
     })
   }, "Previous", 8
   /* PROPS */
-  , _hoisted_82), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  , _hoisted_76), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "btn btn-outline-primary btn-sm",
     disabled: $data.loading || $data.pagination.current_page >= $data.pagination.last_page,
-    onClick: _cache[26] || (_cache[26] = function ($event) {
+    onClick: _cache[15] || (_cache[15] = function ($event) {
       return $options.fetchRequests($data.pagination.current_page + 1);
     })
   }, "Next", 8
   /* PROPS */
-  , _hoisted_83)])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_84, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_85, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_86, [_hoisted_87, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_88, [$data.selectedRequest ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_89, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Seats: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatSeats($data.selectedRequest.request_seat_numbers || $data.selectedRequest.seat_numbers)) + " ", 1
+  , _hoisted_77)])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_78, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_79, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_80, [_hoisted_81, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_82, [$data.selectedRequest ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_83, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Seats: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatSeats($data.selectedRequest.request_seat_numbers || $data.selectedRequest.seat_numbers)) + " ", 1
   /* TEXT */
-  ), $data.selectedRequest.request_seat_count > 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_90, "This existing grouped request covers all listed seats. Approval applies to all of them.")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_91, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_92, [_hoisted_93, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  ), $data.selectedRequest.request_seat_count > 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_84, "This existing grouped request covers all listed seats. Approval applies to all of them.")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_85, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_86, [_hoisted_87, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "text",
     "class": "form-control",
     value: $options.formatFare($options.approvePreview.fare),
     disabled: ""
   }, null, 8
   /* PROPS */
-  , _hoisted_94)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_95, [_hoisted_96, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_88)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_89, [_hoisted_90, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "number",
     "class": "form-control",
     min: "0",
     max: "100",
     step: "0.01",
-    "onUpdate:modelValue": _cache[27] || (_cache[27] = function ($event) {
+    "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
       return $data.approveForm.deduction_percentage = $event;
     })
   }, null, 512
   /* NEED_PATCH */
   ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.approveForm.deduction_percentage, void 0, {
     number: true
-  }]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_97, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_98, [_hoisted_99, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_91, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_92, [_hoisted_93, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "text",
     "class": "form-control",
     value: $options.formatFare($options.approvePreview.deduction_amount),
     disabled: ""
   }, null, 8
   /* PROPS */
-  , _hoisted_100)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_101, [_hoisted_102, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_94)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_95, [_hoisted_96, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "text",
     "class": "form-control",
     value: $options.formatPercentage($options.approvePreview.refund_percentage),
     disabled: ""
   }, null, 8
   /* PROPS */
-  , _hoisted_103)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_104, [_hoisted_105, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  , _hoisted_97)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_98, [_hoisted_99, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "text",
     "class": "form-control",
     value: $options.formatFare($options.approvePreview.refund_amount),
     disabled: ""
   }, null, 8
   /* PROPS */
-  , _hoisted_106)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_107, [_hoisted_108, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+  , _hoisted_100)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_101, [_hoisted_102, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
     "class": "form-control",
     rows: "4",
-    "onUpdate:modelValue": _cache[28] || (_cache[28] = function ($event) {
+    "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
       return $data.approveForm.remarks = $event;
     }),
     placeholder: "Enter approval remarks"
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.approveForm.remarks]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_109, [_hoisted_110, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.approveForm.remarks]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_103, [_hoisted_104, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-success",
-    onClick: _cache[29] || (_cache[29] = function ($event) {
+    onClick: _cache[18] || (_cache[18] = function ($event) {
       return $options.approveRequest();
     }),
     disabled: $data.approveLoading
   }, " Approve Request ", 8
   /* PROPS */
-  , _hoisted_111)])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_112, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_113, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_114, [_hoisted_115, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_116, [$data.selectedRequest ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_117, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Seats: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatSeats($data.selectedRequest.request_seat_numbers || $data.selectedRequest.seat_numbers)) + " ", 1
+  , _hoisted_105)])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_106, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_107, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_108, [_hoisted_109, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_110, [$data.selectedRequest ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_111, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Seats: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatSeats($data.selectedRequest.request_seat_numbers || $data.selectedRequest.seat_numbers)) + " ", 1
   /* TEXT */
-  ), $data.selectedRequest.request_seat_count > 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_118, "Rejection applies to all seats in this existing grouped request.")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_119, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+  ), $data.selectedRequest.request_seat_count > 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_112, "Rejection applies to all seats in this existing grouped request.")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_113, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
     "class": "form-control",
     rows: "4",
-    "onUpdate:modelValue": _cache[30] || (_cache[30] = function ($event) {
+    "onUpdate:modelValue": _cache[19] || (_cache[19] = function ($event) {
       return $data.rejectionReason = $event;
     }),
     placeholder: "Enter rejection remarks"
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.rejectionReason]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_120, [_hoisted_121, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.rejectionReason]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_114, [_hoisted_115, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-danger",
-    onClick: _cache[31] || (_cache[31] = function ($event) {
+    onClick: _cache[20] || (_cache[20] = function ($event) {
       return $options.rejectRequest();
     }),
     disabled: $data.rejectLoading
   }, " Reject Request ", 8
   /* PROPS */
-  , _hoisted_122)])])])])])]);
+  , _hoisted_116)])])])])])]);
 }
 
 /***/ }),
@@ -159228,7 +159272,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.cancellation-tabs[data-v-1614d8e4] { display: flex; gap: 12px; border-bottom: 1px solid #e9edf5; padding-bottom: 14px;\n}\n.cancellation-tab[data-v-1614d8e4] { display: inline-flex; align-items: center; gap: 12px; border: 1px solid #e3e8f0; border-radius: 8px; padding: 12px 22px; background: #fff; color: #64748b; font-weight: 600;\n}\n.cancellation-tab.active[data-v-1614d8e4] { background: #eef2ff; color: #4f46e5; border-color: #a5b4fc;\n}\n.cancellation-count[data-v-1614d8e4] { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; padding: 0 7px; border-radius: 50%; background: #34395e; color: white; font-size: 12px;\n}\n.cancellation-tab[data-v-1614d8e4]:focus-visible { outline: 2px solid #6366f1; outline-offset: 3px;\n}\n.loading-spinner[data-v-1614d8e4] {\r\n    display: block;\r\n    margin: 0 auto;\r\n    padding: 2em;\n}\r\n\r\n/* #online_terminal_cancellation_table tr.time-difference-red > td {\r\n    background-color: #DC3545;\r\n}\r\n\r\n#online_terminal_cancellation_table tr.time-difference-yellow > td {\r\n    background-color: #FFC107;\r\n}\r\n\r\n#online_terminal_cancellation_table tr.time-difference-green > td {\r\n    background-color: #28A745;\r\n}\r\n\r\n#online_terminal_cancellation_table tr.time-difference-white > td {\r\n    background-color:transparent;\r\n} */\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.cancellation-filters[data-v-1614d8e4] { margin-bottom: 20px; border: 1px solid #e3e8f0; border-radius: 12px; background: #f8fafc;\n}\n.cancellation-filter-header[data-v-1614d8e4] { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px; border-bottom: 1px solid #e3e8f0;\n}\n.cancellation-filter-heading[data-v-1614d8e4] { display: flex; align-items: center; gap: 12px;\n}\n.cancellation-filter-icon[data-v-1614d8e4] { display: flex; align-items: center; justify-content: center; flex: 0 0 36px; height: 36px; border-radius: 10px; background: #eef2ff; color: #6366f1;\n}\n.cancellation-filter-heading h5[data-v-1614d8e4] { margin: 0 0 4px; color: #34395e; font-size: 15px; font-weight: 600;\n}\n.cancellation-filter-heading p[data-v-1614d8e4], .cancellation-filter-hint[data-v-1614d8e4] { margin: 0; color: #64748b; font-size: 12px; line-height: 1.5;\n}\n.cancellation-filter-grid[data-v-1614d8e4] { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 20px; padding: 20px;\n}\n.cancellation-filter-field[data-v-1614d8e4] { min-width: 0; position: relative;\n}\n.cancellation-filter-field label[data-v-1614d8e4] { display: block; margin-bottom: 7px; color: #475569; font-size: 12px; font-weight: 600; letter-spacing: 0;\n}\n.cancellation-filter-field .form-control[data-v-1614d8e4] { height: 42px; min-width: 0; border: 1px solid #dce2eb; border-radius: 7px; background: #fff; font-size: 13px; padding: 9px 12px;\n}\n.cancellation-filter-field .form-control[data-v-1614d8e4]:focus { border-color: #818cf8; box-shadow: 0 0 0 3px rgba(99, 102, 241, .1);\n}\n.cancellation-filter-field[data-v-1614d8e4] .select2-container { width: 100% !important; min-width: 0;\n}\n.cancellation-filter-field[data-v-1614d8e4] .select2-selection--single { height: 42px; border: 1px solid #dce2eb; border-radius: 7px; background: #fff;\n}\n.cancellation-filter-field[data-v-1614d8e4] .select2-selection__rendered { line-height: 40px !important; padding-left: 12px !important; padding-right: 30px !important; color: #475569; font-size: 13px;\n}\n.cancellation-filter-field[data-v-1614d8e4] .select2-selection__arrow { height: 40px !important; right: 8px !important;\n}\n.cancellation-filter-field[data-v-1614d8e4] .select2-container--focus .select2-selection, .cancellation-filter-field[data-v-1614d8e4] .select2-container--open .select2-selection { border-color: #818cf8; box-shadow: 0 0 0 3px rgba(99, 102, 241, .1);\n}\n.cancellation-filter-field[data-v-1614d8e4] .select2-container--disabled .select2-selection { background: #edf1f6;\n}\n.cancellation-filter-field[data-v-1614d8e4] .select2-dropdown, .cancellation-page-size[data-v-1614d8e4] .select2-dropdown { border-color: #dce2eb; box-shadow: 0 6px 18px rgba(15, 23, 42, .08); font-size: 13px;\n}\n.cancellation-filter-field[data-v-1614d8e4] .select2-search__field { border-radius: 5px;\n}\n.cancellation-filter-actions[data-v-1614d8e4] { display: flex; align-items: flex-end; gap: 8px;\n}\n.cancellation-filter-actions .btn[data-v-1614d8e4] { height: 42px; white-space: nowrap; border-radius: 7px; box-shadow: none;\n}\n.cancellation-filter-actions .btn-primary[data-v-1614d8e4] { flex: 1;\n}\n.cancellation-filter-actions .btn i[data-v-1614d8e4] { margin-right: 5px;\n}\n.cancellation-page-size[data-v-1614d8e4] { display: flex; align-items: center; gap: 10px; font-size: 12px; position: relative;\n}\n.cancellation-page-size[data-v-1614d8e4] .select2-container { width: 80px !important;\n}\n.cancellation-page-size[data-v-1614d8e4] .select2-selection--single { height: 34px; border-color: #dce2eb; border-radius: 6px;\n}\n.cancellation-page-size[data-v-1614d8e4] .select2-selection__rendered { line-height: 32px !important;\n}\n.cancellation-page-size[data-v-1614d8e4] .select2-selection__arrow { height: 32px !important;\n}\n@media (max-width: 1199px) {\n.cancellation-filter-grid[data-v-1614d8e4] { grid-template-columns: repeat(2, minmax(0, 1fr));\n}\n}\n@media (max-width: 575px) {\n.cancellation-filter-header[data-v-1614d8e4] { align-items: flex-start; padding: 16px;\n}\n.cancellation-filter-hint[data-v-1614d8e4] { display: none;\n}\n.cancellation-filter-grid[data-v-1614d8e4] { grid-template-columns: minmax(0, 1fr); padding: 16px; gap: 14px;\n}\n.cancellation-tabs[data-v-1614d8e4] { flex-wrap: wrap;\n}\n}\n.cancellation-tabs[data-v-1614d8e4] { display: flex; gap: 12px; border-bottom: 1px solid #e9edf5; padding-bottom: 14px;\n}\n.cancellation-tab[data-v-1614d8e4] { display: inline-flex; align-items: center; gap: 12px; border: 1px solid #e3e8f0; border-radius: 8px; padding: 12px 22px; background: #fff; color: #64748b; font-weight: 600;\n}\n.cancellation-tab.active[data-v-1614d8e4] { background: #eef2ff; color: #4f46e5; border-color: #a5b4fc;\n}\n.cancellation-count[data-v-1614d8e4] { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; padding: 0 7px; border-radius: 50%; background: #34395e; color: white; font-size: 12px;\n}\n.cancellation-tab[data-v-1614d8e4]:focus-visible { outline: 2px solid #6366f1; outline-offset: 3px;\n}\n.loading-spinner[data-v-1614d8e4] {\r\n    display: block;\r\n    margin: 0 auto;\r\n    padding: 2em;\n}\r\n\r\n/* #online_terminal_cancellation_table tr.time-difference-red > td {\r\n    background-color: #DC3545;\r\n}\r\n\r\n#online_terminal_cancellation_table tr.time-difference-yellow > td {\r\n    background-color: #FFC107;\r\n}\r\n\r\n#online_terminal_cancellation_table tr.time-difference-green > td {\r\n    background-color: #28A745;\r\n}\r\n\r\n#online_terminal_cancellation_table tr.time-difference-white > td {\r\n    background-color:transparent;\r\n} */\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
