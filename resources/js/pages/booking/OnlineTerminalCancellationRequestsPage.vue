@@ -138,6 +138,14 @@
                                 </div>
                             </div>
 
+                            <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+                                <div class="text-muted small mr-3">
+                                    <template v-if="activeTab === 'pending'">Pending requests load automatically, with no date limit.</template>
+                                    <template v-else-if="resultScope.recent_completed_only">Completed in the last 10 days ({{ resultScope.from }} to {{ resultScope.to }}). Use filters above to search older records.</template>
+                                    <template v-else>Searching completed history using your filters.</template>
+                                </div>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="resetFilters()" :disabled="loading">Reset filters</button>
+                            </div>
                             <div class="table-responsive">
                                 <div v-if="loading" class="text-center py-4">
                                     <img class="loading-spinner"
@@ -239,7 +247,12 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="d-flex align-items-center justify-content-between mt-3" v-if="pagination.last_page > 1">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap mt-3">
+                                <label class="mb-0 mr-2">Requests per page
+                                    <select class="form-control form-control-sm d-inline-block w-auto ml-2" v-model.number="perPage" @change="fetchRequests()" :disabled="loading">
+                                        <option :value="25">25</option><option :value="50">50</option><option :value="100">100</option>
+                                    </select>
+                                </label>
                                 <span class="text-muted">Page {{ pagination.current_page }} of {{ pagination.last_page }} · {{ pagination.total }} requests</span>
                                 <div>
                                     <button class="btn btn-outline-primary btn-sm mr-2" :disabled="loading || pagination.current_page <= 1"
@@ -364,6 +377,8 @@ export default {
             activeTab: 'pending',
             counts: { pending: 0, completed: 0 },
             pagination: { current_page: 1, last_page: 1, total: 0 },
+            perPage: 25,
+            resultScope: { recent_completed_only: false, from: '', to: '' },
             routes: [],
             terminals: [],
             buses: [],
@@ -421,7 +436,8 @@ export default {
         selectTab(tab) {
             if (this.activeTab === tab) return;
             this.activeTab = tab;
-            this.filters.statusFilter = '';
+            // Do not carry historical Completed filters into the Pending inbox.
+            this.filters = this.defaultFilters();
             this.fetchRequests();
         },
         defaultFilters() {
@@ -462,7 +478,7 @@ export default {
             this.destroyDataTable();
             this.loading = true;
             const res = await this.callApi('post', 'online-terminals/cancellations/requests', {
-                ...this.filters, tab: this.activeTab, page,
+                ...this.filters, tab: this.activeTab, page, per_page: this.perPage,
             });
             if (sequence !== this.requestSequence) {
                 return;
@@ -470,6 +486,7 @@ export default {
             if (res.status === 200 && res.data.status === true) {
                 this.requests = res.data.data.requests;
                 this.counts = res.data.data.counts || { pending: 0, completed: 0 };
+                this.resultScope = res.data.data.scope || { recent_completed_only: false, from: '', to: '' };
                 this.pagination = res.data.data.pagination || { current_page: 1, last_page: 1, total: this.requests.length };
             } else {
                 this.requests = [];
@@ -571,6 +588,12 @@ export default {
             const table = document.getElementById('online_terminal_cancellation_table');
             if (table && table.parentNode && $.fn.DataTable && !$.fn.DataTable.isDataTable(table)) {
                 $(table).DataTable({
+                    // Pagination and filtering belong to the API, not just the
+                    // subset of rows currently loaded in the browser.
+                    paging: false,
+                    searching: false,
+                    info: false,
+                    ordering: false,
                     language: {
                         emptyTable: 'No terminal cancellation requests found in this tab.',
                     },

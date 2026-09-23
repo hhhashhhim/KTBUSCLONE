@@ -37,11 +37,15 @@ function component(file, imports = {}) {
 
     const page = component('resources/js/pages/booking/OnlineTerminalCancellationRequestsPage.vue', { vueMask: {} });
     const view = page.data();
+    view.defaultFilters = page.methods.defaultFilters;
     view.fetchRequests = () => { calls++; };
     view.filters.statusFilter = 'cancelled';
+    view.filters.fromDateFilter = '2020-01-01';
     page.methods.selectTab.call(view, 'completed');
     assert.equal(view.activeTab, 'completed');
     assert.equal(view.filters.statusFilter, '');
+    assert.equal(view.filters.fromDateFilter, '', 'Switching tabs must not retain historical date filters');
+    assert.equal(view.perPage, 25);
     assert.equal(calls, 2);
     page.methods.selectTab.call(view, 'completed');
     assert.equal(calls, 2, 'Clicking the active tab does not fetch again');
