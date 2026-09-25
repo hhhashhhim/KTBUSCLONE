@@ -1,0 +1,28 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const { parse, compileTemplate } = require('@vue/compiler-sfc');
+const file = 'resources/js/pages/Sales/TicketActivityModal.vue';
+const source = fs.readFileSync(file, 'utf8');
+const parsed = parse(source);
+assert.deepEqual(parsed.errors, []);
+assert.deepEqual(compileTemplate({ source: parsed.descriptor.template.content, filename: file, id: 'test' }).errors, []);
+const context = { module: { exports: {} }, $: () => ({ modal() {} }) };
+vm.runInNewContext(parsed.descriptor.script.content.replace('export default', 'module.exports ='), context);
+const component = context.module.exports;
+const view = component.data();
+Object.entries(component.methods).forEach(([key, fn]) => view[key] = fn.bind(view));
+(async () => {
+    let calls = 0;
+    view.callApi = async (method, path, payload) => { calls++; assert.equal(path, 'terminals/sales/ticket-details'); assert.equal(payload.invoice_id, '1234'); return { status: 200, data: { invoice_id: '1234', tickets: [], events: [] } }; };
+    view.invoice = '1234%'; await view.search(); assert.equal(calls, 0); assert.ok(view.error);
+    view.invoice = ' 1234 '; await view.search(); assert.equal(calls, 1); assert.equal(view.result.invoice_id, '1234'); assert.equal(view.loading, false);
+    view.invoice = '5678'; assert.equal(view.result.invoice_id, '1234', 'Print uses loaded invoice, not an unsubmitted edit');
+    view.callApi = async () => ({ status: 404 }); await view.search(); assert.equal(view.result, null); assert.match(view.error, /No ticket/);
+    view.callApi = async () => { throw new Error('Network'); }; await view.search(); assert.equal(view.loading, false); assert.match(view.error, /try again/);
+    view.loading = true; view.callApi = () => { throw new Error('Duplicate request'); }; await view.search();
+    assert.equal(view.money(null), 'Not recorded'); assert.equal(view.statusClass({ status: 'Cancelled' }), 'status-cancelled');
+    assert.ok(source.includes('result ? result.invoice_id'));
+    assert.ok(!source.includes('v-html'));
+    console.log('PASS ticket activity template, invoice validation, search, errors, duplicate guard and print binding');
+})().catch(error => { console.error(error); process.exitCode = 1; });

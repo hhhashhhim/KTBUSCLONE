@@ -6,6 +6,7 @@
                     <div class="card card-primary ">
                         <div class="card-header">
                             <h4>Terminal Sales Report</h4>
+                            <button type="button" class="btn btn-outline-primary ml-auto" @click="$refs.ticketActivity.open(filterSales.invoice_id)"><i class="fas fa-ticket-alt mr-1"></i> Ticket Details</button>
                         </div>
                         <div class="card-body">
                             <!-- Table -->
@@ -315,6 +316,7 @@
                 </div>
             </div>
         </div>
+        <TicketActivityModal ref="ticketActivity" />
         <div class="modal fade" id="terminalSalesRouteGroupModal" tabindex="-1" role="dialog" aria-labelledby="routeGroupModalTitle" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -358,6 +360,7 @@
     </section>
 </template>
 <script>
+import TicketActivityModal from './TicketActivityModal.vue';
 const COLUMN_OPTIONS = [
     { key: 'bus_time', label: 'Bus Time', checked: true },
     { key: 'bus_number', label: 'Bus No', checked: true },
@@ -382,6 +385,7 @@ const COLUMN_OPTIONS = [
 
 export default {
     name: "TerminalSaleReportsPage",
+    components: { TicketActivityModal },
     data() {
         return {
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),

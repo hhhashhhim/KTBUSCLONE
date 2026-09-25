@@ -14,7 +14,8 @@ const context = {
     $: () => ({ modal: action => { modalAction = action; } }),
     swal() {},
 };
-vm.runInNewContext(parsed.descriptor.script.content.replace('export default', 'module.exports ='), context);
+context.TicketActivityModal = {};
+vm.runInNewContext(parsed.descriptor.script.content.replace(/^import TicketActivityModal[^\n]+/m, '').replace('export default', 'module.exports ='), context);
 const component = context.module.exports;
 const view = component.data();
 Object.entries(component.methods).forEach(([key, fn]) => view[key] = fn.bind(view));
