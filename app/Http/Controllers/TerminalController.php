@@ -571,7 +571,7 @@ public function filterData(Request $request)
         'bus:id,bus_number',
         'customer:id,name,cnic,contact',
         'route:id,name,via',
-        'cancel_ticket:id,percentage,ticket_id',
+        'cancel_ticket:id,percentage,ticket_id,type,reason',
     ])
         ->withTrashed()
         ->select([
@@ -707,8 +707,10 @@ public function filterData(Request $request)
 
         $ticket->refund = 0;
         $ticket->cancellation_charges = 0;
+        $ticket->is_unpaid_cancellation = \App\Support\TerminalSaleStatus::isUnpaidCancellation($ticket);
+        $ticket->report_status = \App\Support\TerminalSaleStatus::label($ticket);
 
-        if ($ticket->type === 'canceled' && $ticket->cancel_ticket) {
+        if ($ticket->type === 'canceled' && $ticket->cancel_ticket && !$ticket->is_unpaid_cancellation) {
 
             $ticket->cancellation_charges = (
                 $fare * $ticket->cancel_ticket->percentage

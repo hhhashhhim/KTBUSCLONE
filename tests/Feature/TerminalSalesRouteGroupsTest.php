@@ -151,4 +151,73 @@ class TerminalSalesRouteGroupsTest extends TestCase
         $this->assertStringContainsString('Karachi Main Terminal', $html);
         $this->assertStringNotContainsString('Terminal unavailable', $html);
     }
+
+    public function test_sales_and_print_separate_unpaid_reservations_without_inflating_refunds(): void
+    {
+        foreach ([
+            'terminal_commissions' => ['terminal_id', 'route_id', 'fix_commission', 'flat_commission', 'percentage_commission', 'adjustment_commission'],
+            'terminals' => ['company_id', 'name'],
+            'customers' => ['name', 'cnic', 'contact'],
+            'bus_classes' => ['name'],
+            'buses' => ['bus_number'],
+            'schedules' => ['name', 'time'],
+            'booking_cancels' => ['ticket_id', 'percentage', 'type', 'reason'],
+            'tickets' => ['company_id', 'terminal_id', 'route_id', 'bus_class_id', 'schedule_date', 'schedule_time', 'schedule_time_exact', 'updated_by', 'bus_id', 'invoice_id', 'seat_fare', 'discount', 'seat_no', 'customer_id', 'type', 'transaction_id'],
+        ] as $name => $columns) {
+            Schema::create($name, function (Blueprint $table) use ($columns) {
+                $table->increments('id');
+                foreach ($columns as $column) $table->text($column)->nullable();
+                $table->timestamps(); $table->softDeletes();
+            });
+        }
+        Auth::user()->is_super_admin = 1;
+        DB::table('terminals')->insert(['id' => 1, 'company_id' => 1, 'name' => 'Test terminal']);
+        DB::table('customers')->insert(['id' => 1, 'name' => 'Test passenger']);
+        DB::table('terminal_commissions')->insert(['terminal_id' => 1, 'route_id' => 1, 'fix_commission' => 50, 'percentage_commission' => 10]);
+        foreach ([
+            [1, 'booked', 10000, 1000, null, null, null],
+            [2, 'canceled', 7000, 0, 'booked', 10, 'Customer cancellation'],
+            [3, 'canceled', 7000, 0, 'advance booking', 0, 'auto cancel'],
+            [4, 'canceled', 9000, 0, 'advance booking', 20, 'Manual reservation cancellation'],
+            [5, 'canceled', 1000, 0, 'booked', 0, 'Paid cash without transaction reference'],
+        ] as [$id, $type, $fare, $discount, $previousType, $percentage, $reason]) {
+            DB::table('tickets')->insert(['id' => $id, 'company_id' => 1, 'terminal_id' => 1, 'route_id' => 1, 'customer_id' => 1,
+                'invoice_id' => 100 + $id, 'type' => $type, 'seat_fare' => $fare, 'discount' => $discount, 'seat_no' => $id,
+                'schedule_date' => '2026-09-23', 'schedule_time' => '16:00:00', 'schedule_time_exact' => '16:00:00',
+                'deleted_at' => $type === 'canceled' ? now() : null]);
+            if ($previousType) DB::table('booking_cancels')->insert(['ticket_id' => $id, 'type' => $previousType, 'percentage' => $percentage, 'reason' => $reason]);
+        }
+        $report = app(\App\Http\Controllers\TerminalController::class)->filterData(new Request(['terminal' => 1]));
+        $rows = $report['record']->keyBy('id');
+        $this->assertCount(5, $rows);
+        $this->assertSame('booked', $rows[1]->report_status);
+        $this->assertSame('Cancelled', $rows[2]->report_status);
+        $this->assertSame('Expired reservation', $rows[3]->report_status);
+        $this->assertSame('Cancelled reservation', $rows[4]->report_status);
+        foreach ([3, 4] as $id) {
+            $this->assertTrue($rows[$id]->is_unpaid_cancellation);
+            foreach (['sale', 'refund', 'cancellation_charges', 'seat_commission', 'terminal_commission', 'net_cash'] as $field) $this->assertEquals(0, $rows[$id]->$field);
+        }
+        $this->assertFalse($rows[5]->is_unpaid_cancellation, 'Missing transaction ID is not proof of an unpaid ticket');
+        $this->assertEquals(1000, $rows[5]->refund);
+        $this->assertEquals(9000, $report['total']['sale']);
+        $this->assertEquals(7300, $report['total']['refund']);
+        $this->assertEquals(700, $report['total']['cancellation_charges']);
+        $this->assertEquals(8750, $report['total']['net_cash']);
+
+        $html = view('reports.terminalSaleReport', ['tickets' => $report['record'],
+            'visibleColumns' => ['invoice_id', 'status', 'sale', 'refund', 'cancellation_charges', 'net_cash']])->render();
+        $doc = new \DOMDocument();
+        @$doc->loadHTML($html);
+        $xpath = new \DOMXPath($doc);
+        foreach ([103 => 'Expired reservation', 104 => 'Cancelled reservation'] as $invoice => $label) {
+            $cells = $xpath->query('//tbody/tr[td[1][contains(., "' . $invoice . '")]]/td');
+            $this->assertSame(6, $cells->length);
+            $this->assertStringContainsString($label, $cells->item(0)->textContent, 'Invoice badge remains visible when status is hidden');
+            $this->assertSame($label, trim($cells->item(1)->textContent));
+            for ($i = 2; $i < 6; $i++) $this->assertEquals(0, (float) trim($cells->item($i)->textContent));
+        }
+        $this->assertSame('booked', DB::table('tickets')->where('id', 1)->value('type'));
+        $this->assertSame(4, DB::table('booking_cancels')->count());
+    }
 }

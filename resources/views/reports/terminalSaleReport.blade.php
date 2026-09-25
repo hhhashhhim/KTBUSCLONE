@@ -17,6 +17,7 @@
 <head>
     <style>
         .cancelled-tag { display: inline-block; margin-top: 3px; padding: 2px 5px; border: 1px solid #c62828; border-radius: 3px; color: #a51d2d; font-size: 7pt; font-weight: bold; }
+        .reservation-tag { display: inline-block; margin-top: 3px; padding: 2px 5px; border: 1px solid #b7791f; border-radius: 3px; color: #805b10; font-size: 7pt; font-weight: bold; }
         .report-filter-summary { margin: 12px 0; border: 1px solid #aaa; }
         .report-filter-summary td { padding: 7px 10px; text-align: left; vertical-align: top; font-size: 9pt; }
         @page {
@@ -131,16 +132,19 @@
             <tbody>
                 @foreach ($tickets as $single)
                     @php
+                        $isUnpaidCancellation = \App\Support\TerminalSaleStatus::isUnpaidCancellation($single);
+                        $cancellationLabel = \App\Support\TerminalSaleStatus::label($single);
+                        $isPaidCancellation = $single->type === 'canceled' && !$isUnpaidCancellation;
                         $sale =
                             $single->type !== 'canceled' ? (float) $single->seat_fare - (float) $single->discount : 0;
 
                         $cancellationCharges =
-                            $single->type === 'canceled'
+                            $isPaidCancellation
                                 ? ((float) $single->seat_fare - (float) $single->discount) *
                                     ((float) ($single->cancel_ticket->percentage ?? 0) / 100)
                                 : 0;
                         $refund =
-                            $single->type === 'canceled'
+                            $isPaidCancellation
                                 ? max((float) $single->seat_fare - (float) $single->discount - $cancellationCharges, 0)
                                 : 0;
 
@@ -212,7 +216,7 @@
                         @if (!empty($visibleColumnsLookup['invoice_id']))
                             <td>{{ $single->invoice_id }}
                                 @if ($single->type === 'canceled')
-                                    <br><span class="cancelled-tag">Cancelled</span>
+                                    <br><span class="{{ $isUnpaidCancellation ? 'reservation-tag' : 'cancelled-tag' }}">{{ $cancellationLabel }}</span>
                                 @endif
                             </td>
                         @endif
@@ -228,7 +232,7 @@
                         @if (!empty($visibleColumnsLookup['status']))
                             <td>
                                 @if ($single->type === 'canceled')
-                                    <span class="cancelled-tag">Cancelled</span>
+                                    <span class="{{ $isUnpaidCancellation ? 'reservation-tag' : 'cancelled-tag' }}">{{ $cancellationLabel }}</span>
                                 @else
                                     {{ $single->type }}
                                 @endif
