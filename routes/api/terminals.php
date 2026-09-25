@@ -22,6 +22,7 @@ Route::group(['prefix' => 'web/v1/terminals','middleware' => ['auth:sanctum']], 
     Route::post('/sales/getTerminals', [TerminalController::class, 'terminalSalesTerminals']);
     Route::post('/sales/getUsers', [TerminalController::class, 'terminalSalesUsers']);
     Route::post('/sales/getRoutes', [TerminalController::class, 'terminalSalesRoutes']);
+    Route::post('/sales/ticket-details', [\App\Http\Controllers\Report\TerminalTicketActivityController::class, 'show']);
     Route::post('/sales/route-groups', [\App\Http\Controllers\Report\TerminalSalesRouteGroupController::class, 'index']);
     Route::post('/sales/route-groups/save', [\App\Http\Controllers\Report\TerminalSalesRouteGroupController::class, 'save']);
     Route::post('/discount/fetchFilterData', [TerminalController::class, 'filterDataDiscount']);
