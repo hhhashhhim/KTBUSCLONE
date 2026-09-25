@@ -216,14 +216,14 @@
                                                                         data.seat_no ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('invoice_id')">{{
                                                                         data.invoice_id ?? 'N/A' }}
-                                                                        <div v-if="data.type === 'canceled'"><span class="cancelled-tag">Cancelled</span></div>
+                                                                        <div v-if="data.type === 'canceled'"><span :class="isUnpaidCancellation(data) ? 'reservation-tag' : 'cancelled-tag'">{{ cancellationLabel(data) }}</span></div>
                                                                     </td>
                                                                     <td v-if="isColumnVisible('transaction_id')">{{
                                                                         data.transaction_id ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('terminal_name')">{{
                                                                         data.terminal?.name ?? 'N/A' }}</td>
                                                                     <td v-if="isColumnVisible('status')">
-                                                                        <span v-if="data.type === 'canceled'" class="cancelled-tag">Cancelled</span>
+                                                                        <span v-if="data.type === 'canceled'" :class="isUnpaidCancellation(data) ? 'reservation-tag' : 'cancelled-tag'">{{ cancellationLabel(data) }}</span>
                                                                         <span v-else>{{ data.type ?? 'N/A' }}</span>
                                                                     </td>
                                                                     <td v-if="isColumnVisible('action_by')">{{
@@ -233,11 +233,11 @@
                                                                         (data.seat_fare -
                                                                         data.discount) : 0) }}</td>
                                                                     <td v-if="isColumnVisible('refund')">{{
-                                                                        $insertComma(data.type == 'canceled' ?
+                                                                        $insertComma(data.type == 'canceled' && !isUnpaidCancellation(data) ?
                                                                         data.refund : 0) }}
                                                                     </td>
                                                                     <td v-if="isColumnVisible('cancellation_charges')">
-                                                                        {{ $insertComma(data.cancellation_charges ?? 0) }}
+                                                                        {{ $insertComma(isUnpaidCancellation(data) ? 0 : data.cancellation_charges ?? 0) }}
                                                                     </td>
                                                                     <td v-if="isColumnVisible('terminal_commission')">
                                                                         {{
@@ -254,7 +254,7 @@
                                                                         {{ $insertComma(data.seat_commission ?? 0) }}
                                                                     </td>
                                                                     <td v-if="isColumnVisible('net_cash')">
-                                                                        {{ $insertComma(data.net_cash ?? 0) }}
+                                                                        {{ $insertComma(isUnpaidCancellation(data) ? 0 : data.net_cash ?? 0) }}
                                                                     </td>
                                                                 </tr>
                                                                 <tr v-if="filters.record.length > 0">
@@ -630,7 +630,7 @@ export default {
         totalRefundAmount: function () {
             if (this.filters.record && Array.isArray(this.filters.record)) {
                 return this.filters.record.reduce((sum, data) => {
-                    if (data.type === 'canceled') {
+                    if (data.type === 'canceled' && !this.isUnpaidCancellation(data)) {
                         const refundValue = Number(data.refund) || 0;
                         return sum + refundValue;
                     }
@@ -642,7 +642,7 @@ export default {
         totalCancellationCharges: function () {
             if (this.filters.record && Array.isArray(this.filters.record)) {
                 return this.filters.record.reduce((sum, data) => {
-                    return sum + (Number(data.cancellation_charges) || 0);
+                    return sum + (this.isUnpaidCancellation(data) ? 0 : Number(data.cancellation_charges) || 0);
                 }, 0);
             }
             return 0;
@@ -656,10 +656,19 @@ export default {
         totalNetCashRowsOnly() {
             if (this.filters.record && Array.isArray(this.filters.record)) {
                 return this.filters.record.reduce((sum, data) => {
-                    return sum + (Number(data.net_cash) || 0);
+                    return sum + (this.isUnpaidCancellation(data) ? 0 : Number(data.net_cash) || 0);
                 }, 0);
             }
             return 0;
+        },
+        isUnpaidCancellation(data) {
+            return data.type === 'canceled' && (data.is_unpaid_cancellation === true || data.cancel_ticket?.type === 'advance booking');
+        },
+        cancellationLabel(data) {
+            if (data.report_status) return data.report_status;
+            if (!this.isUnpaidCancellation(data)) return 'Cancelled';
+            return String(data.cancel_ticket?.reason || '').trim().toLowerCase() === 'auto cancel'
+                ? 'Expired reservation' : 'Cancelled reservation';
         },
         totalCommission: function () {
             if (this.filters.record && Array.isArray(this.filters.record)) {
@@ -719,6 +728,7 @@ export default {
 </script>
 <style scoped>
 .cancelled-tag { display: inline-block; margin-top: 4px; padding: 3px 7px; border-radius: 5px; border: 1px solid #f4b9c0; background: #fff0f1; color: #b42338; font-size: 10px; font-weight: 700; line-height: 1.3; }
+.reservation-tag { display: inline-block; margin-top: 4px; padding: 3px 7px; border-radius: 5px; border: 1px solid #e5c98b; background: #fff8e8; color: #805b10; font-size: 10px; font-weight: 700; line-height: 1.3; }
 .sales-filter-grid :deep(.select2-selection--multiple) { max-height: 85px; overflow-y: auto; }
 .sales-filter-heading h5 { margin: 0 0 6px; color: #263455; font-size: 17px; }
 .sales-filter-heading p { color: #788399; margin-bottom: 18px; font-size: 13px; }

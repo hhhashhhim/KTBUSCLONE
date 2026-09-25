@@ -24,7 +24,19 @@ component.methods.initSelect2Filters.call(initState);
 for (const [, id] of source.matchAll(/<select id="([^"]+)"/g)) {
     assert.ok(selectIds.includes('#' + id), id + ' must be initialized as Select2');
 }
-assert.ok(source.includes('class="cancelled-tag">Cancelled</span>'));
+assert.ok(source.includes('cancellationLabel(data)'));
+const expired = { type: 'canceled', cancel_ticket: { type: 'advance booking', reason: 'auto cancel' }, refund: 7000, cancellation_charges: 20, net_cash: 20 };
+const manualReservation = { type: 'canceled', cancel_ticket: { type: 'advance booking', reason: 'Manual cancel' }, refund: 9000 };
+assert.equal(view.cancellationLabel(expired), 'Expired reservation');
+assert.equal(view.cancellationLabel(manualReservation), 'Cancelled reservation');
+assert.equal(view.isUnpaidCancellation({ type: 'canceled', transaction_id: null, cancel_ticket: { type: 'booked' } }), false);
+view.filters.record = [expired, manualReservation,
+    { type: 'canceled', cancel_ticket: { type: 'booked' }, refund: 6300, cancellation_charges: 700 },
+    { type: 'booked', seat_fare: 10000, discount: 1000, seat_commission: 900, comsn: 50 }];
+assert.equal(view.totalRefundAmount(), 6300, 'Expired and manually cancelled unpaid reservations must not add refunds');
+assert.equal(view.totalCancellationCharges(), 700);
+assert.equal(view.totalSaleAmount(), 9000);
+assert.equal(view.totalNetCash(), 8750);
 view.$nextTick = () => {};
 view.routes = [{ id: 1, name: 'Karachi - Rawalpindi', via: 'Multan' }, { id: 2, name: 'Rawalpindi - Karachi' }];
 view.routeGroups = [{ id: 7, name: 'Karachi closing', route_ids: [1, 2] }];
