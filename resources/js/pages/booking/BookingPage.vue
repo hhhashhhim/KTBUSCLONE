@@ -400,6 +400,11 @@
                                                     @click="seatDetails()">
                                                     Seat Details
                                                 </button>
+                                                <button v-if="checkForSubmenu('terminal-sale') || checkForSubmenuButtons('seat-details')"
+                                                    type="button" class="btn btn-outline-primary btn-sm mr-2"
+                                                    @click="$refs.ticketActivity.open()">
+                                                    <i class="fas fa-ticket-alt mr-1"></i> Ticket Details
+                                                </button>
                                                 <a v-if="checkForSubmenuButtons('message-bus') && hideDivButtonsDrop"
                                                     href="#" class="btn btn-outline-success btn-sm mr-2"
                                                     data-target="#message_modal" data-toggle="modal">
@@ -421,8 +426,19 @@
                                                     {{ getSchedule ? "Loading..." : 'Refresh' }}
                                                 </button>
                                             </div>
-                                            <div class="text-center" v-if="!hideDivButtonsDrop">
-                                                <h4>{{ labelDrop }}</h4>
+                                            <div v-if="!hideDivButtonsDrop" class="alert alert-warning dropped-schedule-alert mt-3 mb-0" role="alert">
+                                                <div class="d-flex align-items-start">
+                                                    <i class="fas fa-exclamation-triangle mr-3 mt-1" aria-hidden="true"></i>
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="alert-heading mb-1">Schedule dropped</h6>
+                                                        <p class="mb-3">Booking is unavailable for this dropped schedule.</p>
+                                                        <div class="row">
+                                                            <div class="col-sm-6 mb-2"><small class="d-block">Dropped by</small><strong>{{ droppedSchedule?.drop_by?.name || 'Not recorded' }}</strong></div>
+                                                            <div class="col-sm-6 mb-2"><small class="d-block">Dropped on</small><strong>{{ droppedSchedule?.dropped_at_display || 'Not recorded' }}</strong></div>
+                                                        </div>
+                                                        <div v-if="droppedSchedule?.reason" class="drop-reason mt-1"><small class="d-block">Reason</small>{{ droppedSchedule.reason }}</div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1985,6 +2001,7 @@
             <input type="hidden" name="token" :value="this.$store.state.token">
             <input type="hidden" name="elt_ids" :value="this.eltIds">
         </form>
+        <TicketActivityModal ref="ticketActivity" />
     </section>
 </template>
 
@@ -1996,6 +2013,7 @@ import vueMask from "vue-jquery-mask";
 import ReschedulePopup from "./popup/ReschedulePopup.vue";
 import OverIssuePopup from "./popup/OverIssuePopup.vue";
 import DetailsModal from "./popup/DetailsModal.vue";
+import TicketActivityModal from "../Sales/TicketActivityModal.vue";
 
 
 export default {
@@ -2007,6 +2025,7 @@ export default {
         ReschedulePopup,
         OverIssuePopup,
         DetailsModal,
+        TicketActivityModal,
         vueMask,
     },
     data() {
@@ -2146,7 +2165,8 @@ export default {
             showRescheduleDiscountDiv: false,
             allRescheduleButton: false,
             revertScheduleButton: false,
-            labelDrop: '',
+            droppedSchedule: null,
+            dropCheckRequestId: 0,
             hideDivButtonsDrop: true,
             ticketsIds: "",
             label: "",
@@ -3911,7 +3931,8 @@ export default {
         },
 
         async busDropCheck() {
-            this.labelDrop = '';
+            const requestId = ++this.dropCheckRequestId;
+            this.droppedSchedule = null;
             this.hideDivButtonsDrop = true;
             const resDropCheck = await this.callApi("post", "booking/schedule/dropCheck", {
                 id: this.addForm.schedule,
@@ -3920,13 +3941,14 @@ export default {
                 destinationCity: this.addForm.destinationCity,
                 departure_time: this.addForm.departure_time,
             });
+            if (requestId !== this.dropCheckRequestId) return;
             if (resDropCheck.status == 200) {
                 if (resDropCheck.data.checkDrop) {
-                    this.labelDrop = "This schedule is dropped by " + resDropCheck.data.checkDrop.drop_by.name ?? 'N/A';
+                    this.droppedSchedule = resDropCheck.data.checkDrop;
                     this.hideDivButtonsDrop = false;
                 } else {
                     this.hideDivButtonsDrop = true;
-                    this.labelDrop = '';
+                    this.droppedSchedule = null;
                 }
             }
 
@@ -5809,6 +5831,11 @@ export default {
 </script>
 
 <style scoped>
+.dropped-schedule-alert { border: 1px solid #efd398; border-left: 4px solid #d69b24; border-radius: 8px; background: #fff8e8; color: #775316; text-align: left; }
+.dropped-schedule-alert .alert-heading { color: #775316; font-weight: 700; }
+.dropped-schedule-alert small { font-size: 11px; text-transform: uppercase; letter-spacing: .3px; margin-bottom: 3px; }
+.dropped-schedule-alert strong, .drop-reason { overflow-wrap: anywhere; }
+.drop-reason { border-top: 1px solid #efdeb8; padding-top: 10px; }
 .reschedule-fare-summary {
     overflow: hidden;
     border: 1px solid #e4e7ec;
