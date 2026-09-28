@@ -251,6 +251,24 @@ class TerminalSalesRouteGroupsTest extends TestCase
         $this->assertStringContainsString('Cancellations with a recorded refund only', $html);
         $this->assertStringNotContainsString('Expired reservation</span>', $html);
         $this->assertEquals(10550, $controller->filterData(new Request(['terminal' => 1, 'cancellation_scope' => 'financial']))['total']['net_cash']);
+
+        // Separate charge-only and refund-only rows prove OR selection, not intersection.
+        DB::table('tickets')->where('id', 2)->update(['refund_amount' => 0]);
+        DB::table('tickets')->where('id', 5)->update(['refund_amount' => 1000]);
+        foreach ([
+            [['ticket_status' => ['booked', 'refunded'], 'cancellation_scope' => ['charges', 'refund']], [1, 5]],
+            [['ticket_status' => ['canceled', 'refunded'], 'cancellation_scope' => ['charges', 'refund']], [2, 5]],
+            [['ticket_status' => 'canceled,refunded', 'cancellation_scope' => 'charges,refund'], [2, 5]],
+            [['ticket_status' => ['booked', 'unpaid'], 'cancellation_scope' => ['financial']], [1, 3, 4]],
+            [['ticket_status' => [], 'cancellation_scope' => []], [1, 2, 3, 4, 5, 6, 7]],
+            [['ticket_status' => '', 'cancellation_scope' => ''], [1, 2, 3, 4, 5, 6, 7]],
+        ] as [$filters, $expected]) {
+            $filtered = $controller->filterData(new Request($filters + ['terminal' => 1]));
+            $this->assertSame($expected, $filtered['record']->pluck('id')->sort()->values()->all(), json_encode($filters));
+        }
+        $html = $controller->terminalSalesPdf(new Request(['terminal' => 1, 'ticket_status' => 'booked,refunded', 'cancellation_scope' => 'charges,refund']))->render();
+        $this->assertStringContainsString('Booked OR Refund recorded', $html);
+        $this->assertStringContainsString('Cancellations with charges only OR Cancellations with a recorded refund only', $html);
     }
 
     public function test_invalid_sales_status_filter_is_rejected(): void
