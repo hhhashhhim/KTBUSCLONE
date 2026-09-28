@@ -1365,12 +1365,19 @@ class BookingController extends Controller
             'destination_id' => $request->destinationCity,
             'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
         ])->first()->schedule_date;
-        $found = DropSchedule::with("drop_by")->where([
+        $found = DropSchedule::with('drop_by:id,name')->where([
             'company_id' => Auth::user()->company_id,
             'schedule_date' => $uniqueDate,
             'schedule_id' => $request->id,
             'is_drop' => 1,
         ])->first();
+
+        if ($found) {
+            // Reverting soft-deletes the drop; each new drop has its own creation time.
+            // Do not use the departure date or updated_at as the drop timestamp.
+            $found->dropped_at_display = $found->created_at
+                ? $found->created_at->format('d-M-Y h:i A') : null;
+        }
 
         return [
             "checkDrop" => $found,

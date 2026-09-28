@@ -24,7 +24,8 @@ class TerminalTicketActivityController extends Controller
 
     public function details(Request $request): array
     {
-        abort_unless(checkForSubmenu('terminal-sale'), 403);
+        abort_unless(checkForSubmenu('terminal-sale')
+            || (checkForSubmenu('bookings') && checkPermissionButtons('seat-details')), 403);
         $input = $request->validate(['invoice_id' => ['required', 'regex:/^[0-9]{1,20}$/']]);
         $company = Auth::user()->company_id;
         // Lookup is independent of report filters, but never of the user's access scope.

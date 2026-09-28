@@ -124,6 +124,47 @@ class TerminalTicketActivityTest extends TestCase
         $this->details('1234%');
     }
 
+    public function test_booking_seat_details_permission_can_use_lookup_and_print_with_existing_scope(): void
+    {
+        Auth::user()->is_super_admin = 0;
+        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode([['allow' => true, 'childs' => [
+            ['name' => 'bookings', 'allow' => true, 'buttons' => [['name' => 'seat-details', 'allow' => true]]],
+        ]]])]);
+        DB::table('tickets')->where('id', 4)->update(['company_id' => 2]);
+        $this->assertCount(3, $this->details()['tickets']);
+        $this->assertStringContainsString('Activity history', app(TerminalTicketActivityController::class)->print(new Request(['invoice_id' => '1234']))->render());
+        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode([['allow' => true, 'childs' => [
+            ['name' => 'bookings', 'allow' => true, 'buttons' => [['name' => 'seat-details', 'allow' => false]]],
+        ]]])]);
+        $this->expectException(HttpException::class);
+        $this->details();
+    }
+
+    public function test_booking_drop_alert_uses_creation_time_and_excludes_reverted_records(): void
+    {
+        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode([['allow' => true, 'childs' => [['name' => 'bookings', 'allow' => true, 'buttons' => []]]]])]);
+        foreach ([
+            'schedule_details' => ['company_id', 'schedule_id', 'departure_date', 'departure_id', 'destination_id', 'departure_time', 'schedule_date'],
+            'drop_schedules' => ['company_id', 'schedule_id', 'schedule_date', 'is_drop', 'added_by', 'reason'],
+        ] as $name => $columns) Schema::create($name, function (Blueprint $table) use ($columns) {
+            $table->increments('id'); foreach ($columns as $column) $table->text($column)->nullable(); $table->timestamps(); $table->softDeletes();
+        });
+        DB::table('schedule_details')->insert(['id' => 1, 'company_id' => 1, 'schedule_id' => 7, 'departure_date' => '2026-09-28', 'departure_id' => 1, 'destination_id' => 2, 'departure_time' => '11:00:00', 'schedule_date' => '2026-09-28']);
+        foreach ([1, 2] as $id) DB::table('drop_schedules')->insert(['id' => $id, 'company_id' => 1, 'schedule_id' => 7, 'schedule_date' => '2026-09-28', 'is_drop' => 1,
+            'added_by' => 2, 'reason' => 'Operational delay', 'created_at' => $id === 1 ? '2026-09-26 08:00:00' : '2026-09-28 08:48:12',
+            'updated_at' => '2026-09-28 09:00:00', 'deleted_at' => $id === 1 ? '2026-09-27 00:00:00' : null]);
+        DB::table('users')->where('id', 2)->update(['deleted_at' => '2026-09-28 09:00:00']);
+        $request = new Request(['id' => 7, 'date' => '2026-09-28', 'departureCity' => 1, 'destinationCity' => 2, 'departure_time' => '11:00 AM']);
+        $controller = app(\App\Http\Controllers\Booking\BookingController::class);
+        $drop = $controller->dropCheck($request)['checkDrop'];
+        $this->assertEquals(2, $drop->id);
+        $this->assertSame('28-Sep-2026 08:48 AM', $drop->dropped_at_display);
+        $this->assertSame('Cancellation user', $drop->drop_by->name);
+        $this->assertSame('Operational delay', $drop->reason);
+        DB::table('drop_schedules')->where('id', 2)->update(['deleted_at' => '2026-09-28 10:00:00']);
+        $this->assertNull($controller->dropCheck($request)['checkDrop']);
+    }
+
     public function test_lookup_indexes_can_be_migrated_and_rolled_back_without_changing_records(): void
     {
         require_once database_path('migrations/2026_09_26_000001_add_ticket_activity_lookup_indexes.php');
