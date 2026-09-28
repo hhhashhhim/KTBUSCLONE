@@ -60,6 +60,9 @@
                 <td style="width: 50%;"><strong>From:</strong> {{ $reportFilters['from'] ?? 'Not specified' }}</td>
                 <td style="width: 50%;"><strong>To:</strong> {{ $reportFilters['to'] ?? 'Not specified' }}</td>
             </tr>
+            @if (!empty($reportFilters['status']))
+                <tr><td colspan="2"><strong>Included entries:</strong> {{ $reportFilters['status'] }}</td></tr>
+            @endif
         </table>
 
         <table border="2" style="text-align: center;">

@@ -543,6 +543,7 @@ public function filterData(Request $request)
         ], 403);
     }
 
+    \App\Support\TerminalSaleFilters::validate($request);
     $terminalId = ReportFilterScope::terminalId($request, 'terminal-sale-terminal-filter');
     $routeIds = \App\Support\TerminalSalesRouteGroups::routeIds($request);
     $userId = ReportFilterScope::terminalUserId($request, 'terminal-sale-user-filter');
@@ -591,6 +592,7 @@ public function filterData(Request $request)
             'customer_id',
             'type',
             'transaction_id',
+            'refund_amount',
         ])
         ->where('company_id', Auth::user()->company_id)
 
@@ -728,7 +730,9 @@ public function filterData(Request $request)
         return $ticket;
     });
 
-    $sortedTickets = $tickets->sortBy('schedule_date_time')->values();
+    $sortedTickets = $tickets
+        ->filter(fn ($ticket) => \App\Support\TerminalSaleFilters::includes($ticket, $request))
+        ->sortBy('schedule_date_time')->values();
     $terminalCommissionTotal = $sortedTickets
         ->filter(fn ($ticket) => $ticket->type !== 'canceled')
         ->unique(function ($ticket) {
@@ -807,6 +811,7 @@ public function filterData(Request $request)
                 'from' => $request->filled('fromDateTime') ? date('d-M-Y h:i A', strtotime($request->fromDateTime)) : 'Not specified',
                 'to' => $request->filled('toDateTime') ? date('d-M-Y h:i A', strtotime($request->toDateTime)) : 'Not specified',
                 'terminal' => $terminalName,
+                'status' => \App\Support\TerminalSaleFilters::summary($request),
             ],
         ]);
     }

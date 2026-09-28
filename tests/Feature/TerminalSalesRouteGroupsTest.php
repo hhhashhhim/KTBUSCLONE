@@ -162,7 +162,7 @@ class TerminalSalesRouteGroupsTest extends TestCase
             'buses' => ['bus_number'],
             'schedules' => ['name', 'time'],
             'booking_cancels' => ['ticket_id', 'percentage', 'type', 'reason'],
-            'tickets' => ['company_id', 'terminal_id', 'route_id', 'bus_class_id', 'schedule_date', 'schedule_time', 'schedule_time_exact', 'updated_by', 'bus_id', 'invoice_id', 'seat_fare', 'discount', 'seat_no', 'customer_id', 'type', 'transaction_id'],
+            'tickets' => ['company_id', 'terminal_id', 'route_id', 'bus_class_id', 'schedule_date', 'schedule_time', 'schedule_time_exact', 'updated_by', 'bus_id', 'invoice_id', 'seat_fare', 'discount', 'seat_no', 'customer_id', 'type', 'transaction_id', 'refund_amount'],
         ] as $name => $columns) {
             Schema::create($name, function (Blueprint $table) use ($columns) {
                 $table->increments('id');
@@ -219,5 +219,43 @@ class TerminalSalesRouteGroupsTest extends TestCase
         }
         $this->assertSame('booked', DB::table('tickets')->where('id', 1)->value('type'));
         $this->assertSame(4, DB::table('booking_cancels')->count());
+
+        DB::table('tickets')->where('id', 2)->update(['refund_amount' => 6300]);
+        DB::table('tickets')->where('id', 3)->update(['refund_amount' => 999]); // Bad legacy value must not make an unpaid hold a refund.
+        $overissue = (array) DB::table('tickets')->where('id', 1)->first();
+        DB::table('tickets')->insert(array_merge($overissue, ['id' => 6, 'invoice_id' => 106, 'type' => 'over-issue', 'seat_fare' => 2000, 'discount' => 0]));
+        DB::table('tickets')->insert(array_merge($overissue, ['id' => 7, 'invoice_id' => 107, 'type' => 'canceled', 'seat_fare' => 0, 'discount' => 0]));
+        DB::table('booking_cancels')->insert(['ticket_id' => 7, 'type' => 'booked', 'percentage' => 0]);
+        $controller = app(\App\Http\Controllers\TerminalController::class);
+        foreach ([
+            [['ticket_status' => 'booked'], [1]],
+            [['ticket_status' => 'over-issue'], [6]],
+            [['ticket_status' => 'canceled'], [2, 3, 4, 5, 7]],
+            [['ticket_status' => 'refunded'], [2]],
+            [['ticket_status' => 'unpaid', 'cancellation_scope' => 'financial'], [3, 4]],
+            [['cancellation_scope' => 'financial'], [1, 2, 5, 6]],
+            [['cancellation_scope' => 'charges'], [1, 2, 6]],
+            [['cancellation_scope' => 'refund'], [1, 2, 6]],
+            [['ticket_status' => 'canceled', 'cancellation_scope' => 'refund'], [2]],
+            [['cancellation_scope' => 'all'], [1, 2, 3, 4, 5, 6, 7]],
+        ] as [$filters, $expected]) {
+            $filtered = $controller->filterData(new Request($filters + ['terminal' => 1]));
+            $this->assertSame($expected, $filtered['record']->pluck('id')->sort()->values()->all(), json_encode($filters));
+        }
+        $request = new Request(['terminal' => 1, 'ticket_status' => 'canceled', 'cancellation_scope' => 'refund']);
+        $filtered = $controller->filterData($request);
+        $this->assertEquals(0, $filtered['total']['sale']);
+        $this->assertEquals(6300, $filtered['total']['refund']);
+        $this->assertEquals(700, $filtered['total']['cancellation_charges']);
+        $html = $controller->terminalSalesPdf($request)->render();
+        $this->assertStringContainsString('Cancellations with a recorded refund only', $html);
+        $this->assertStringNotContainsString('Expired reservation</span>', $html);
+        $this->assertEquals(10550, $controller->filterData(new Request(['terminal' => 1, 'cancellation_scope' => 'financial']))['total']['net_cash']);
+    }
+
+    public function test_invalid_sales_status_filter_is_rejected(): void
+    {
+        $this->expectException(ValidationException::class);
+        \App\Support\TerminalSaleFilters::validate(new Request(['ticket_status' => 'invalid']));
     }
 }
