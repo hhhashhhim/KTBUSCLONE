@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Http\Controllers\Api\BookingApiController;
 use App\Http\Controllers\Api\TicketingApiController;
+use App\Http\Controllers\Booking\BookingController;
 use App\Models\Schedule\ScheduleDetail;
 use App\Models\User;
 use App\Services\UpcomingScheduleService;
@@ -204,6 +205,62 @@ class UpcomingScheduleProjectionTest extends TestCase
         }
         $response = $result instanceof \Illuminate\Contracts\Support\Responsable ? $result->toResponse($request) : $result;
         return json_decode($response->getContent(), true);
+    }
+
+    public function test_booking_dropdown_reuses_projection_without_changing_terminal_rules_or_history()
+    {
+        $this->table('roles', [], ['permissions']);
+        DB::table('roles')->insert(['id' => 1, 'permissions' => json_encode([['allow' => true, 'childs' => [
+            ['name' => 'bookings', 'allow' => true, 'buttons' => []],
+        ]]])]);
+        Auth::user()->role_id = 1;
+        $this->detail(2, -1);
+        $this->detail(3, 59);
+        $this->detail(4, 60);
+        $this->detail(5, 1, 2); // Other company's row must not enter this dropdown.
+        DB::table('terminal_time_differences')->insert(['company_id' => 1, 'terminal_id' => 1, 'route_id' => 1, 'time_difference' => -90]);
+        $load = function ($days) {
+            $result = app(BookingController::class)->fetchSpecificSchedule(new Request([
+                'date' => today()->addDays($days)->toDateString(), 'departure_city_id' => 1, 'destination_city_id' => 2,
+            ]));
+            return collect($result)->values()->toArray();
+        };
+        $baseline = [];
+        foreach ([-1, 1, 59, 60] as $days) $baseline[$days] = $load($days);
+        $this->assertCount(1, $baseline[1]);
+        $this->assertSame('04:30 PM', $baseline[1][0]['departure_time']);
+        $this->migration->up();
+        $service = new UpcomingScheduleService();
+        $service->sync(1);
+        foreach ($baseline as $days => $rows) {
+            DB::enableQueryLog(); DB::flushQueryLog();
+            $this->assertSame($rows, $load($days));
+            $queries = collect(DB::getQueryLog())->pluck('query')->implode(' ');
+            DB::disableQueryLog();
+            if ($days >= 0 && $days < 60) $this->assertStringContainsString('`schedule_details_next_60_days`', $queries);
+            else $this->assertStringNotContainsString('`schedule_details_next_60_days`', $queries);
+        }
+        // Unlike third-party listings, the staff dropdown must retain dropped trips.
+        DB::table('drop_schedules')->insert(['company_id' => 1, 'schedule_id' => 1, 'schedule_date' => today()->addDay()->toDateString()]);
+        $this->assertSame($baseline[1], $load(1));
+        // Schedule edits are visible immediately through the existing DB triggers.
+        DB::table('schedule_details')->where('id', 1)->update(['departure_time' => '19:00:00']);
+        $this->assertSame('05:30 PM', $load(1)[0]['departure_time']);
+        DB::table('schedules')->where('id', 1)->update(['hide' => 1]);
+        $this->assertSame([], $load(1));
+        DB::table('schedules')->where('id', 1)->update(['hide' => 0]);
+        DB::table('schedule_terminal_visibilities')->update(['visibility' => 0]);
+        $this->assertSame([], $load(1));
+        DB::table('schedule_terminal_visibilities')->update(['visibility' => 1]);
+        DB::table('terminals')->where('id', 1)->update(['advance_booking' => 1]);
+        $this->assertSame([], $load(1));
+        DB::table('terminals')->where('id', 1)->update(['advance_booking' => 90]);
+        // An unsynced company still reads the original data.
+        DB::table('schedule_projection_syncs')->where('company_id', 1)->update(['synced_at' => null]);
+        DB::enableQueryLog(); DB::flushQueryLog();
+        $this->assertCount(1, $load(1));
+        $this->assertStringNotContainsString('`schedule_details_next_60_days`', collect(DB::getQueryLog())->pluck('query')->implode(' '));
+        DB::disableQueryLog();
     }
 
     public function test_both_external_apis_keep_responses_live_and_exclude_dropped_or_hidden_trips()

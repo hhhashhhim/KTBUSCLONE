@@ -50,6 +50,7 @@ use Carbon\Carbon;
 use App\Models\Invoice;
 use App\Models\User;
 use App\Services\TicketCancellationService;
+use App\Services\UpcomingScheduleService;
 use App\Jobs\VerifyTravelEyeTicket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -1087,7 +1088,10 @@ class BookingController extends Controller
         $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id" => $companyId, "terminal_id" => $terminalId, "visibility" => 1])->pluck("schedule_id");
         $advanceBookingDays = Terminal::where("id", $userTerminalId)->value("advance_booking");
 
-        $allSchedules = ScheduleDetail::whereIn("schedule_id", $visibleScheduleIds)
+        // Read the synced upcoming copy when covered; keep historical/future fallback.
+        // Only schedule discovery uses the copy. Seat state and booking writes stay live.
+        $allSchedules = app(UpcomingScheduleService::class)->query($request->date, (int) $companyId)
+            ->whereIn("schedule_id", $visibleScheduleIds)
             ->with('schedule')
             ->whereHas('schedule', function ($q) {
                 $q->where("hide", 0);
