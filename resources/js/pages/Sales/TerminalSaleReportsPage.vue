@@ -32,6 +32,27 @@
                                             </div>
                                             <div v-if="groupLoadError" class="alert alert-warning">{{ groupLoadError }}</div>
                                             <div class="row sales-filter-grid">
+                                                <div class="col-md-6 my-2">
+                                                    <label for="ticketStatusFilter">Ticket status</label>
+                                                    <select id="ticketStatusFilter" class="form-control" v-model="filterSales.ticket_status">
+                                                        <option value="all">All report statuses</option>
+                                                        <option value="booked">Booked</option>
+                                                        <option value="over-issue">Over-issued</option>
+                                                        <option value="canceled">Cancelled</option>
+                                                        <option value="refunded">Refund recorded (cancelled tickets)</option>
+                                                        <option value="unpaid">Expired / cancelled unpaid reservations</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 my-2">
+                                                    <label for="cancellationScopeFilter">Cancellation entries</label>
+                                                    <select id="cancellationScopeFilter" class="form-control" v-model="filterSales.cancellation_scope" :disabled="filterSales.ticket_status === 'unpaid'">
+                                                        <option value="financial">Sales / settlement entries (refund or cancellation charge)</option>
+                                                        <option value="charges">Cancellations with charges only</option>
+                                                        <option value="refund">Cancellations with a recorded refund only</option>
+                                                        <option value="all">All cancellations (including unpaid reservations)</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12"><p class="text-muted small mb-2">Cancellation entries controls cancelled rows only; booked sales remain included unless filtered out by status. Settlement entries excludes unpaid reservations and zero-amount cancellations. Refund recorded means a saved refund amount, not payment-provider confirmation. Select unpaid reservations for an audit view.</p></div>
                                                 <div class="col-12 filter-section-label">Passenger &amp; booking</div>
                                                 <div class="my-2 col-md-3">
                                                     <label>CNIC No</label>
@@ -136,6 +157,8 @@
                                                 <input type="hidden" name="user" :value="filterSales.user">
                                                 <input type="hidden" name="route" :value="filterSales.route">
                                                 <input type="hidden" name="route_group_id" :value="filterSales.route_group_id">
+                                                <input type="hidden" name="ticket_status" :value="filterSales.ticket_status">
+                                                <input type="hidden" name="cancellation_scope" :value="filterSales.cancellation_scope">
                                                 <input type="hidden" name="invoice_id" :value="filterSales.invoice_id">
                                                 <input type="hidden" name="transaction_id"
                                                     :value="filterSales.transaction_id">
@@ -400,6 +423,7 @@ export default {
             groupRouteSearch: '',
             groupForm: { id: '', name: '', route_ids: [] },
             loadingTable: false,
+            appliedSalesFilters: null,
             users: [],
             permissions: [],
             columnOptions: COLUMN_OPTIONS.map((column) => ({ ...column })),
@@ -409,6 +433,8 @@ export default {
             },
             refundFilters: [],
             filterSales: {
+                ticket_status: 'all',
+                cancellation_scope: 'financial',
                 terminal: 0,
                 user: 0,
                 route: [],
@@ -452,7 +478,7 @@ export default {
 
     },
     beforeUnmount() {
-        ['#routeIds', '#terminalFilter', '#usernameFilter', '#routeGroupFilter', '#terminalSalesColumns', '#editingRouteGroup'].forEach(id => {
+        ['#routeIds', '#terminalFilter', '#usernameFilter', '#routeGroupFilter', '#terminalSalesColumns', '#editingRouteGroup', '#ticketStatusFilter', '#cancellationScopeFilter'].forEach(id => {
             $(id).off('.terminalSales');
             if ($(id).hasClass('select2-hidden-accessible')) $(id).select2('destroy');
         });
@@ -469,6 +495,8 @@ export default {
         },
         initSelect2Filters() {
             this.$nextTick(() => {
+                this.setupSelect2('#ticketStatusFilter', this.filterSales.ticket_status, value => { this.filterSales.ticket_status = value || 'all'; });
+                this.setupSelect2('#cancellationScopeFilter', this.filterSales.cancellation_scope, value => { this.filterSales.cancellation_scope = value || 'financial'; });
                 this.setupSelect2('#terminalFilter', this.filterSales.terminal, value => { this.filterSales.terminal = value || 0; });
                 this.setupSelect2('#usernameFilter', this.filterSales.user, value => { this.filterSales.user = value || 0; });
                 this.setupSelect2('#routeGroupFilter', this.filterSales.route_group_id, value => {
@@ -546,7 +574,8 @@ export default {
             } finally { this.savingGroup = false; }
         },
         resetReportFilters() {
-            this.filterSales = { terminal: 0, user: 0, route: [], route_group_id: '', invoice_id: '', transaction_id: '', passenger_name: '', passenger_contact: '', passenger_cnic: '', fromDateTime: '', toDateTime: '' };
+            this.filterSales = { terminal: 0, user: 0, route: [], route_group_id: '', invoice_id: '', transaction_id: '', passenger_name: '', passenger_contact: '', passenger_cnic: '', fromDateTime: '', toDateTime: '', ticket_status: 'all', cancellation_scope: 'financial' };
+            this.appliedSalesFilters = null;
             this.setSelectedRoutes([]);
             this.initSelect2Filters();
             this.filters.record = [];
@@ -583,9 +612,11 @@ export default {
                 });
             this.loadingTable = true;
 
-            const resFetchData = await this.callApi("post", 'terminals/sales/fetchFilterData', this.filterSales);
+            const submittedFilters = JSON.parse(JSON.stringify(this.filterSales));
+            const resFetchData = await this.callApi("post", 'terminals/sales/fetchFilterData', submittedFilters);
             if (resFetchData.status == 200) {
                 this.filters.record = Object.values(resFetchData.data.record);
+                this.appliedSalesFilters = submittedFilters;
             } else {
                 swal('Unable to load report', Object.values(resFetchData.data?.errors || {}).flat().join(' ') || resFetchData.data?.message || 'Please try again.', 'error');
             }
@@ -602,6 +633,9 @@ export default {
         },
         // sales print
         salesPrint: function () {
+            if (!this.appliedSalesFilters || JSON.stringify(this.appliedSalesFilters) !== JSON.stringify(this.filterSales)) {
+                return swal('Apply filters first', 'Apply your current filters before printing so the submitted report matches the displayed results.', 'info');
+            }
             if (!this.filterSales.fromDateTime)
                 return swal({
                     title: "Required",
