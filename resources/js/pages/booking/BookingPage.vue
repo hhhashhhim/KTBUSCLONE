@@ -426,17 +426,28 @@
                                                     {{ getSchedule ? "Loading..." : 'Refresh' }}
                                                 </button>
                                             </div>
-                                            <div v-if="!hideDivButtonsDrop" class="alert alert-warning dropped-schedule-alert mt-3 mb-0" role="alert">
+                                            <div v-if="!hideDivButtonsDrop || dropHistory.length" class="alert dropped-schedule-alert mt-3 mb-0" :class="hideDivButtonsDrop ? 'alert-info schedule-reactivated-alert' : 'alert-warning'" role="alert">
                                                 <div class="d-flex align-items-start">
                                                     <i class="fas fa-exclamation-triangle mr-3 mt-1" aria-hidden="true"></i>
                                                     <div class="flex-grow-1">
-                                                        <h6 class="alert-heading mb-1">Schedule dropped</h6>
-                                                        <p class="mb-3">Booking is unavailable for this dropped schedule.</p>
+                                                        <h6 class="alert-heading mb-1">{{ hideDivButtonsDrop ? 'Schedule reactivated' : 'Schedule dropped' }}</h6>
+                                                        <p class="mb-3">{{ hideDivButtonsDrop ? 'The previous drop was reverted. Its history is retained below.' : 'Booking is unavailable for this dropped schedule.' }}</p>
                                                         <div class="row">
-                                                            <div class="col-sm-6 mb-2"><small class="d-block">Dropped by</small><strong>{{ droppedSchedule?.drop_by?.name || 'Not recorded' }}</strong></div>
-                                                            <div class="col-sm-6 mb-2"><small class="d-block">Dropped on</small><strong>{{ droppedSchedule?.dropped_at_display || 'Not recorded' }}</strong></div>
+                                                            <div class="col-sm-6 mb-2"><small class="d-block">First dropped by</small><strong>{{ firstScheduleDrop?.by || 'Not recorded' }}</strong></div>
+                                                            <div class="col-sm-6 mb-2"><small class="d-block">First dropped on</small><strong>{{ firstScheduleDrop?.at_display || 'Not recorded' }}</strong></div>
                                                         </div>
-                                                        <div v-if="droppedSchedule?.reason" class="drop-reason mt-1"><small class="d-block">Reason</small>{{ droppedSchedule.reason }}</div>
+                                                        <div v-if="droppedSchedule?.reason" class="drop-reason mt-1"><small class="d-block">Current drop reason</small>{{ droppedSchedule.reason }}</div>
+                                                        <div v-if="dropHistory.length" class="drop-reason mt-3">
+                                                            <strong>Drop / reactivation activity</strong>
+                                                            <ol class="list-unstyled mb-0 mt-2">
+                                                                <li v-for="event in dropHistory" :key="event.key" class="schedule-drop-event">
+                                                                    <div class="d-flex justify-content-between flex-wrap"><b>{{ event.action }}</b><span>{{ event.at_display }}</span></div>
+                                                                    <div>By: {{ event.by }}</div>
+                                                                    <div v-if="event.reason">Reason: {{ event.reason }}</div>
+                                                                </li>
+                                                            </ol>
+                                                            <small class="d-block mt-2">Older reactivations may not have a recorded staff name.</small>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2166,6 +2177,8 @@ export default {
             allRescheduleButton: false,
             revertScheduleButton: false,
             droppedSchedule: null,
+            firstScheduleDrop: null,
+            dropHistory: [],
             dropCheckRequestId: 0,
             hideDivButtonsDrop: true,
             ticketsIds: "",
@@ -3933,6 +3946,8 @@ export default {
         async busDropCheck() {
             const requestId = ++this.dropCheckRequestId;
             this.droppedSchedule = null;
+            this.firstScheduleDrop = null;
+            this.dropHistory = [];
             this.hideDivButtonsDrop = true;
             const resDropCheck = await this.callApi("post", "booking/schedule/dropCheck", {
                 id: this.addForm.schedule,
@@ -3943,6 +3958,8 @@ export default {
             });
             if (requestId !== this.dropCheckRequestId) return;
             if (resDropCheck.status == 200) {
+                this.firstScheduleDrop = resDropCheck.data.firstDrop || null;
+                this.dropHistory = resDropCheck.data.dropHistory || [];
                 if (resDropCheck.data.checkDrop) {
                     this.droppedSchedule = resDropCheck.data.checkDrop;
                     this.hideDivButtonsDrop = false;
@@ -5836,6 +5853,9 @@ export default {
 .dropped-schedule-alert small { font-size: 11px; text-transform: uppercase; letter-spacing: .3px; margin-bottom: 3px; }
 .dropped-schedule-alert strong, .drop-reason { overflow-wrap: anywhere; }
 .drop-reason { border-top: 1px solid #efdeb8; padding-top: 10px; }
+.schedule-drop-event { padding: 9px 0; border-bottom: 1px solid rgba(119, 83, 22, .15); overflow-wrap: anywhere; font-size: 12px; }
+.schedule-reactivated-alert { background: #eef7fc; color: #29556d; border-color: #bad8e9; }
+.schedule-reactivated-alert .alert-heading { color: #29556d; }
 .reschedule-fare-summary {
     overflow: hidden;
     border: 1px solid #e4e7ec;
