@@ -1364,13 +1364,36 @@ class BookingController extends Controller
             'departure_id' => $request->departureCity,
             'destination_id' => $request->destinationCity,
             'departure_time' =>  date("H:i:s", strtotime($request->departure_time)),
-        ])->first()->schedule_date;
-        $found = DropSchedule::with('drop_by:id,name')->where([
+        ])->firstOrFail()->schedule_date;
+        $drops = DropSchedule::withTrashed()->with(['drop_by:id,name', 'reactivated_by:id,name'])->where([
             'company_id' => Auth::user()->company_id,
             'schedule_date' => $uniqueDate,
             'schedule_id' => $request->id,
             'is_drop' => 1,
-        ])->first();
+        ])->orderBy('created_at')->orderBy('id')->get();
+        $found = $drops->first(fn ($drop) => !$drop->trashed());
+        $first = $drops->first();
+        $history = [];
+        foreach ($drops as $index => $drop) {
+            $history[] = [
+                'key' => $drop->id . '-drop',
+                'action' => $index === 0 ? 'First drop' : 'Dropped again',
+                'at' => $drop->created_at ? $drop->created_at->format('Y-m-d H:i:s') : null,
+                'at_display' => $drop->created_at ? $drop->created_at->format('d-M-Y h:i A') : 'Not recorded',
+                'by' => optional($drop->drop_by)->name ?: 'Not recorded',
+                'reason' => $drop->reason,
+            ];
+            if ($drop->trashed()) {
+                $history[] = [
+                    'key' => $drop->id . '-reactivate',
+                    'action' => 'Reactivated',
+                    'at' => $drop->deleted_at->format('Y-m-d H:i:s'),
+                    'at_display' => $drop->deleted_at->format('d-M-Y h:i A'),
+                    'by' => optional($drop->reactivated_by)->name ?: 'Not recorded',
+                    'reason' => null,
+                ];
+            }
+        }
 
         if ($found) {
             // Reverting soft-deletes the drop; each new drop has its own creation time.
@@ -1381,6 +1404,11 @@ class BookingController extends Controller
 
         return [
             "checkDrop" => $found,
+            'firstDrop' => $first ? [
+                'by' => optional($first->drop_by)->name ?: 'Not recorded',
+                'at_display' => $first->created_at ? $first->created_at->format('d-M-Y h:i A') : 'Not recorded',
+            ] : null,
+            'dropHistory' => collect($history)->sortBy('at')->values(),
         ];
     }
 
@@ -2006,12 +2034,16 @@ class BookingController extends Controller
                 'departure_id' => $request->departure_city_id,
                 'destination_id' => $request->destination_city_id,
             ])->first();
-            DropSchedule::where([
+            $dropIds = DropSchedule::where([
                 'company_id' => Auth::user()->company_id,
                 'schedule_date' => $scheduleDetail->schedule_date,
                 'schedule_id' => $request->schedule_id,
                 'is_drop' => 1,
-            ])->delete();
+            ])->lockForUpdate()->pluck('id');
+            // Preserve who reactivated this specific drop, alongside deleted_at.
+            // Legacy reactivations have no directly linked actor and remain unknown.
+            DropSchedule::whereIn('id', $dropIds)->update(['updated_by' => Auth::user()->id]);
+            DropSchedule::whereIn('id', $dropIds)->delete();
             ActivityLog::create([
                 "activity_by" => Auth::user()->id,
                 "message" => Auth::user()->name . " | revert schedule | time : $scheduleDetail->schedule_date $scheduleDetail->departure_time",

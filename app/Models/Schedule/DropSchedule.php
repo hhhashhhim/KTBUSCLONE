@@ -27,4 +27,9 @@ class DropSchedule extends Model
     {
         return $this->hasOne( User::class, 'id', 'added_by' );
     }
+
+    public function reactivated_by()
+    {
+        return $this->hasOne(User::class, 'id', 'updated_by');
+    }
 }

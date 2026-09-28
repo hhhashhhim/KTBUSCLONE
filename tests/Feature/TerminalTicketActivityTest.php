@@ -140,12 +140,13 @@ class TerminalTicketActivityTest extends TestCase
         $this->details();
     }
 
-    public function test_booking_drop_alert_uses_creation_time_and_excludes_reverted_records(): void
+    public function test_booking_drop_history_preserves_first_drop_and_records_reactivation_actor(): void
     {
-        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode([['allow' => true, 'childs' => [['name' => 'bookings', 'allow' => true, 'buttons' => []]]]])]);
+        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode([['allow' => true, 'childs' => [['name' => 'bookings', 'allow' => true, 'buttons' => [['name' => 'drop-schedule', 'allow' => true]]]]]])]);
         foreach ([
             'schedule_details' => ['company_id', 'schedule_id', 'departure_date', 'departure_id', 'destination_id', 'departure_time', 'schedule_date'],
-            'drop_schedules' => ['company_id', 'schedule_id', 'schedule_date', 'is_drop', 'added_by', 'reason'],
+            'drop_schedules' => ['company_id', 'schedule_id', 'schedule_date', 'is_drop', 'added_by', 'updated_by', 'reason'],
+            'activity_logs' => ['activity_by', 'company_id', 'message', 'requested_host'],
         ] as $name => $columns) Schema::create($name, function (Blueprint $table) use ($columns) {
             $table->increments('id'); foreach ($columns as $column) $table->text($column)->nullable(); $table->timestamps(); $table->softDeletes();
         });
@@ -156,13 +157,38 @@ class TerminalTicketActivityTest extends TestCase
         DB::table('users')->where('id', 2)->update(['deleted_at' => '2026-09-28 09:00:00']);
         $request = new Request(['id' => 7, 'date' => '2026-09-28', 'departureCity' => 1, 'destinationCity' => 2, 'departure_time' => '11:00 AM']);
         $controller = app(\App\Http\Controllers\Booking\BookingController::class);
-        $drop = $controller->dropCheck($request)['checkDrop'];
+        $result = $controller->dropCheck($request);
+        $drop = $result['checkDrop'];
         $this->assertEquals(2, $drop->id);
         $this->assertSame('28-Sep-2026 08:48 AM', $drop->dropped_at_display);
         $this->assertSame('Cancellation user', $drop->drop_by->name);
         $this->assertSame('Operational delay', $drop->reason);
-        DB::table('drop_schedules')->where('id', 2)->update(['deleted_at' => '2026-09-28 10:00:00']);
-        $this->assertNull($controller->dropCheck($request)['checkDrop']);
+        $this->assertSame('26-Sep-2026 08:00 AM', $result['firstDrop']['at_display']);
+        $this->assertSame(['First drop', 'Reactivated', 'Dropped again'], $result['dropHistory']->pluck('action')->all());
+        $this->assertSame('Not recorded', $result['dropHistory'][1]['by']);
+
+        // Run the real reactivation flow, which must retain the first drop and save its actor.
+        $controller->revertDropSchedule(new Request(['schedule_id' => 7, 'date' => '2026-09-28', 'departure_city_id' => 1, 'destination_city_id' => 2]));
+        $this->assertEquals(1, DB::table('drop_schedules')->where('id', 2)->value('updated_by'));
+        $this->assertNotNull(DB::table('drop_schedules')->where('id', 2)->value('deleted_at'));
+        $this->assertSame('2026-09-28 08:48:12', DB::table('drop_schedules')->where('id', 2)->value('created_at'));
+        $result = $controller->dropCheck($request);
+        $this->assertNull($result['checkDrop']);
+        $this->assertCount(4, $result['dropHistory']);
+        $this->assertSame('Report user', $result['dropHistory']->firstWhere('key', '2-reactivate')['by']);
+        $this->assertSame('26-Sep-2026 08:00 AM', $result['firstDrop']['at_display']);
+
+        $next = ['company_id' => 1, 'schedule_id' => 7, 'schedule_date' => '2026-09-28', 'is_drop' => 1,
+            'added_by' => 1, 'created_at' => now()->addMinute()->format('Y-m-d H:i:s')];
+        DB::table('drop_schedules')->insert($next + ['id' => 3]);
+        DB::table('drop_schedules')->insert(array_merge($next, ['id' => 4, 'company_id' => 2]));
+        DB::table('drop_schedules')->insert(array_merge($next, ['id' => 5, 'schedule_date' => '2026-09-29']));
+        $result = $controller->dropCheck($request);
+        $this->assertEquals(3, $result['checkDrop']->id);
+        $this->assertCount(5, $result['dropHistory']);
+        $this->assertSame('26-Sep-2026 08:00 AM', $result['firstDrop']['at_display']);
+        $this->assertSame('Cancellation user', $result['firstDrop']['by']);
+        $this->assertSame('Report user', $result['dropHistory']->last()['by']);
     }
 
     public function test_lookup_indexes_can_be_migrated_and_rolled_back_without_changing_records(): void
