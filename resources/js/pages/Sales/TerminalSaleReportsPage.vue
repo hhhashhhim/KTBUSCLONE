@@ -34,8 +34,7 @@
                                             <div class="row sales-filter-grid">
                                                 <div class="col-md-6 my-2">
                                                     <label for="ticketStatusFilter">Ticket status</label>
-                                                    <select id="ticketStatusFilter" class="form-control" v-model="filterSales.ticket_status">
-                                                        <option value="all">All report statuses</option>
+                                                    <select id="ticketStatusFilter" class="form-control" multiple v-model="filterSales.ticket_status">
                                                         <option value="booked">Booked</option>
                                                         <option value="over-issue">Over-issued</option>
                                                         <option value="canceled">Cancelled</option>
@@ -45,14 +44,13 @@
                                                 </div>
                                                 <div class="col-md-6 my-2">
                                                     <label for="cancellationScopeFilter">Cancellation entries</label>
-                                                    <select id="cancellationScopeFilter" class="form-control" v-model="filterSales.cancellation_scope" :disabled="filterSales.ticket_status === 'unpaid'">
+                                                    <select id="cancellationScopeFilter" class="form-control" multiple v-model="filterSales.cancellation_scope">
                                                         <option value="financial">Sales / settlement entries (refund or cancellation charge)</option>
                                                         <option value="charges">Cancellations with charges only</option>
                                                         <option value="refund">Cancellations with a recorded refund only</option>
-                                                        <option value="all">All cancellations (including unpaid reservations)</option>
                                                     </select>
                                                 </div>
-                                                <div class="col-12"><p class="text-muted small mb-2">Cancellation entries controls cancelled rows only; booked sales remain included unless filtered out by status. Settlement entries excludes unpaid reservations and zero-amount cancellations. Refund recorded means a saved refund amount, not payment-provider confirmation. Select unpaid reservations for an audit view.</p></div>
+                                                <div class="col-12"><p class="text-muted small mb-2">Select multiple options to include any matching entry. Clear a filter to include all its options. Cancellation entries applies only to cancelled rows. Settlement entries excludes unpaid reservations and zero-amount cancellations; explicitly selecting unpaid reservations includes them for audit. Refund recorded means a saved amount, not payment-provider confirmation.</p></div>
                                                 <div class="col-12 filter-section-label">Passenger &amp; booking</div>
                                                 <div class="my-2 col-md-3">
                                                     <label>CNIC No</label>
@@ -157,8 +155,8 @@
                                                 <input type="hidden" name="user" :value="filterSales.user">
                                                 <input type="hidden" name="route" :value="filterSales.route">
                                                 <input type="hidden" name="route_group_id" :value="filterSales.route_group_id">
-                                                <input type="hidden" name="ticket_status" :value="filterSales.ticket_status">
-                                                <input type="hidden" name="cancellation_scope" :value="filterSales.cancellation_scope">
+                                                <input type="hidden" name="ticket_status" :value="filterSales.ticket_status.join(',')">
+                                                <input type="hidden" name="cancellation_scope" :value="filterSales.cancellation_scope.join(',')">
                                                 <input type="hidden" name="invoice_id" :value="filterSales.invoice_id">
                                                 <input type="hidden" name="transaction_id"
                                                     :value="filterSales.transaction_id">
@@ -433,8 +431,8 @@ export default {
             },
             refundFilters: [],
             filterSales: {
-                ticket_status: 'all',
-                cancellation_scope: 'financial',
+                ticket_status: [],
+                cancellation_scope: ['financial'],
                 terminal: 0,
                 user: 0,
                 route: [],
@@ -495,8 +493,8 @@ export default {
         },
         initSelect2Filters() {
             this.$nextTick(() => {
-                this.setupSelect2('#ticketStatusFilter', this.filterSales.ticket_status, value => { this.filterSales.ticket_status = value || 'all'; });
-                this.setupSelect2('#cancellationScopeFilter', this.filterSales.cancellation_scope, value => { this.filterSales.cancellation_scope = value || 'financial'; });
+                this.setupSelect2('#ticketStatusFilter', this.filterSales.ticket_status, value => { this.filterSales.ticket_status = value || []; }, { closeOnSelect: false, placeholder: 'All report statuses' });
+                this.setupSelect2('#cancellationScopeFilter', this.filterSales.cancellation_scope, value => { this.filterSales.cancellation_scope = value || []; }, { closeOnSelect: false, placeholder: 'All cancellations (including unpaid reservations)' });
                 this.setupSelect2('#terminalFilter', this.filterSales.terminal, value => { this.filterSales.terminal = value || 0; });
                 this.setupSelect2('#usernameFilter', this.filterSales.user, value => { this.filterSales.user = value || 0; });
                 this.setupSelect2('#routeGroupFilter', this.filterSales.route_group_id, value => {
@@ -574,7 +572,7 @@ export default {
             } finally { this.savingGroup = false; }
         },
         resetReportFilters() {
-            this.filterSales = { terminal: 0, user: 0, route: [], route_group_id: '', invoice_id: '', transaction_id: '', passenger_name: '', passenger_contact: '', passenger_cnic: '', fromDateTime: '', toDateTime: '', ticket_status: 'all', cancellation_scope: 'financial' };
+            this.filterSales = { terminal: 0, user: 0, route: [], route_group_id: '', invoice_id: '', transaction_id: '', passenger_name: '', passenger_contact: '', passenger_cnic: '', fromDateTime: '', toDateTime: '', ticket_status: [], cancellation_scope: ['financial'] };
             this.appliedSalesFilters = null;
             this.setSelectedRoutes([]);
             this.initSelect2Filters();
