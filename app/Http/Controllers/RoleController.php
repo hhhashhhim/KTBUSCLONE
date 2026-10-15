@@ -25,7 +25,9 @@ class RoleController extends Controller
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $role = Role::with('company:id,name')->find($request->id);
+        $role = Role::with('company:id,name')->when(!Auth::user()->is_super_admin, function ($query) {
+            $query->where('company_id', Auth::user()->company_id);
+        })->findOrFail($request->id);
         $company = Company::find($role->company_id);
         if ($company) {
 
@@ -41,6 +43,9 @@ class RoleController extends Controller
                         // If Main Module is not in permission then don't check its sub modules and return back to next module.
                     }
                     $module['allow'] = false;
+                    if (($module['name'] ?? '') === 'call-center') {
+                        foreach ($module['buttons'] ?? [] as $k => $button) { $module['buttons'][$k]['allow'] = false; }
+                    }
                     // Setting default false value of main module so that the role does't inherit true as per from company permissions
                     foreach ($module['childs'] as $j => $childModule) {
 
@@ -50,6 +55,11 @@ class RoleController extends Controller
                             // If sub module is false then vanish it from the permissions also
                         }
                         $module['childs'][$j]['allow'] = false;
+                        if ($childModule['name'] === 'call-center') {
+                            foreach ($module['childs'][$j]['buttons'] ?? [] as $k => $button) {
+                                $module['childs'][$j]['buttons'][$k]['allow'] = false;
+                            }
+                        }
                         // Setting default false value so that the role does't inherit true as per from company permissions
 
                     }
@@ -59,11 +69,13 @@ class RoleController extends Controller
 
             }
 
+            $modules = \App\Support\CallCenterPermissions::append($modules);
             $modules = $this->stripUserWisePermissions($this->addMissingPermissions($modules));
 
             return response()->json([
                 'role' => $role,
                 'permissions' => $modules,
+                'call_center_privileges' => \App\Support\CallCenterPermissions::definitions(),
             ], 200);
 
         }else{
@@ -97,14 +109,19 @@ class RoleController extends Controller
     }
     public function update(Request $request)
     {
-        if(!checkPermissionButtons("edit-role"))
+        if(!checkForSubmenu("roles") || !checkPermissionButtons("edit-role"))
         {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        Role::find($request->id)->update([
+        $request->validate(['permissions' => 'required|array', 'permissions.*.allow' => 'required|boolean',
+            'permissions.*.buttons.*.allow' => 'required|boolean',
+            'permissions.*.childs.*.allow' => 'required|boolean', 'permissions.*.childs.*.buttons.*.allow' => 'required|boolean']);
+        Role::when(!Auth::user()->is_super_admin, function ($query) {
+            $query->where('company_id', Auth::user()->company_id);
+        })->findOrFail($request->id)->update([
             'name' => $request->name,
             'company_id' => auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id,
-            'permissions' => $request->permissions,
+            'permissions' => \App\Support\CallCenterPermissions::append($request->permissions),
         ]);
         ActivityLog::create([
             "activity_by" => Auth::user()->id,

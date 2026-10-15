@@ -1,0 +1,889 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\User;
+use App\Models\CallCenter\CallLog;
+use App\Support\CallCenterPermissions;
+use Carbon\Carbon;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
+
+class CallCenterTest extends TestCase
+{
+    private const BASE = '/api/web/v1/call-center';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Explicitly isolate this suite: never run legacy migrations or touch a configured database.
+        config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:',
+            'cache.default' => 'array', 'session.driver' => 'array']);
+        DB::purge('sqlite');
+        Carbon::setTestNow(Carbon::parse('2026-10-13 09:00:00', 'Asia/Karachi'));
+        $this->legacySchema();
+        require_once database_path('migrations/2026_10_13_000001_create_call_center_tables.php');
+        (new \CreateCallCenterTables)->up();
+        require_once database_path('migrations/2026_10_15_000001_add_call_center_passenger_lookup_index.php');
+        (new \AddCallCenterPassengerLookupIndex)->up();
+        require_once database_path('migrations/2026_10_15_000002_add_call_center_inquiry_topic.php');
+        (new \AddCallCenterInquiryTopic)->up();
+        require_once database_path('migrations/2026_10_15_000003_add_call_center_complaint_journey.php');
+        (new \AddCallCenterComplaintJourney)->up();
+        require_once database_path('migrations/2026_10_15_000004_add_call_center_complaint_resolution.php');
+        (new \AddCallCenterComplaintResolution)->up();
+        DB::table('companies')->insert([
+            ['id' => 1, 'modules' => json_encode(CallCenterPermissions::append([], true))], ['id' => 2, 'modules' => json_encode(CallCenterPermissions::append([], true))],
+        ]);
+        DB::table('terminals')->insert([
+            ['id' => 10, 'company_id' => 1, 'name' => 'Lahore', 'hide' => 0],
+            ['id' => 11, 'company_id' => 1, 'name' => 'Karachi', 'hide' => 0],
+            ['id' => 20, 'company_id' => 2, 'name' => 'Other company', 'hide' => 0],
+        ]);
+        DB::table('cities')->insert([['id' => 1, 'name' => 'Lahore'], ['id' => 2, 'name' => 'Karachi']]);
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
+    }
+
+    private function legacySchema(): void
+    {
+        Schema::create('companies', function (Blueprint $t) { $t->id(); $t->text('modules')->nullable(); $t->string('name')->nullable(); $t->softDeletes(); });
+        Schema::create('roles', function (Blueprint $t) { $t->id(); $t->integer('company_id'); $t->string('name')->nullable(); $t->text('permissions')->nullable(); $t->softDeletes(); $t->timestamps(); });
+        Schema::create('users', function (Blueprint $t) {
+            $t->id(); $t->integer('company_id'); $t->integer('terminal_id')->nullable(); $t->integer('role_id'); $t->string('name');
+            $t->integer('hide')->default(0); $t->text('route_ids')->nullable(); $t->integer('is_super_admin')->default(0); $t->timestamps();
+        });
+        Schema::create('terminals', function (Blueprint $t) { $t->id(); $t->integer('company_id'); $t->string('name'); $t->integer('hide')->default(0); $t->softDeletes(); });
+        Schema::create('cities', function (Blueprint $t) { $t->id(); $t->string('name'); $t->softDeletes(); });
+        Schema::create('customers', function (Blueprint $t) { $t->id(); $t->integer('company_id'); $t->string('name'); $t->string('contact'); $t->string('cnic'); $t->softDeletes(); });
+        Schema::create('tickets', function (Blueprint $t) {
+            $t->id(); $t->integer('company_id'); $t->integer('terminal_id'); $t->integer('route_id')->default(1); $t->integer('customer_id');
+            $t->integer('booking_no')->nullable(); $t->integer('invoice_id')->nullable(); $t->integer('seat_no')->default(1); $t->string('type')->default('booked');
+            $t->date('schedule_date')->nullable(); $t->string('schedule_time')->nullable(); $t->decimal('seat_fare')->default(2000);
+            $t->integer('departure_city_id')->default(1); $t->integer('destination_city_id')->default(2); $t->boolean('is_partial')->default(false);
+            $t->decimal('refund_amount')->nullable(); $t->softDeletes(); $t->timestamps();
+        });
+        Schema::create('ticket_reschedules', function (Blueprint $t) { $t->id(); $t->integer('company_id'); $t->integer('old_ticket_id'); $t->integer('new_ticket_id')->nullable(); $t->integer('added_by'); $t->softDeletes(); $t->timestamps(); });
+        Schema::create('booking_cancels', function (Blueprint $t) { $t->id(); $t->integer('company_id'); $t->integer('ticket_id'); $t->integer('added_by'); $t->string('type'); $t->softDeletes(); $t->timestamps(); });
+    }
+
+    private function agent(int $id = 1, int $company = 1, int $terminal = 10, bool $supervise = false, bool $all = false, bool $allow = true, string $routes = 'all'): User
+    {
+        $permissions = [['name' => 'ticketing', 'allow' => true, 'childs' => [['name' => 'call-center', 'allow' => $allow, 'buttons' => [
+            ['name' => 'call-center-supervise', 'allow' => $supervise], ['name' => 'call-center-all-terminals', 'allow' => $all],
+        ]]]]];
+        $permissions = CallCenterPermissions::append($permissions, false, true);
+        DB::table('roles')->insert(['id' => $id, 'company_id' => $company, 'permissions' => json_encode($permissions)]);
+        return User::create(['id' => $id, 'company_id' => $company, 'terminal_id' => $terminal, 'role_id' => $id, 'name' => 'Agent ' . $id, 'route_ids' => $routes]);
+    }
+
+    private function ticket(int $id = 100, array $attrs = []): void
+    {
+        $customer = $attrs['customer_id'] ?? $id;
+        if (!DB::table('customers')->where('id', $customer)->exists()) {
+            DB::table('customers')->insert(['id' => $customer, 'company_id' => $attrs['company_id'] ?? 1, 'name' => 'Passenger ' . $customer,
+                'contact' => '03001234567', 'cnic' => '3520212345671']);
+        }
+        DB::table('tickets')->insert(array_merge(['id' => $id, 'company_id' => 1, 'terminal_id' => 10, 'customer_id' => $customer,
+            'invoice_id' => 8000 + $id, 'booking_no' => $id, 'schedule_date' => '2026-10-14', 'schedule_time' => '10:30'], $attrs));
+    }
+
+    private function logCall(User $agent, array $attrs = []): CallLog
+    {
+        return CallLog::create(array_merge(['company_id' => $agent->company_id, 'terminal_id' => $agent->terminal_id, 'agent_id' => $agent->id,
+            'call_date' => '2026-10-13', 'called_at' => '2026-10-13 09:00:00', 'shift' => 1, 'category' => 'GI', 'status' => 'new'], $attrs));
+    }
+
+    private function snapshot(int $shift = 0): string
+    {
+        return $this->getJson(self::BASE . ($shift ? '/summary' : '/daily-report') . '?date=2026-10-13')->assertOk()
+            ->json($shift ? 'data.snapshot_tokens.' . $shift : 'data.snapshot_token');
+    }
+
+    public function test_access_requires_authentication_and_enabled_company_role_parent(): void
+    {
+        $this->getJson(self::BASE . '/options')->assertUnauthorized();
+        $user = $this->agent(1, 1, 10, false, false, false);
+        Sanctum::actingAs($user);
+        $this->getJson(self::BASE . '/options')->assertForbidden();
+        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode([['name' => 'ticketing', 'allow' => false, 'childs' => [['name' => 'call-center', 'allow' => true]]]])]);
+        $user->unsetRelation('role');
+        $this->getJson(self::BASE . '/options')->assertForbidden();
+    }
+
+    public function test_lookup_masks_cnic_and_enforces_company_terminal_and_route_boundaries(): void
+    {
+        $user = $this->agent(1, 1, 10, false, false, true, '[1]'); Sanctum::actingAs($user);
+        $this->ticket(100); $this->ticket(101, ['terminal_id' => 11]);
+        $this->ticket(102, ['route_id' => 2]); $this->ticket(103, ['company_id' => 2, 'terminal_id' => 20]);
+        $result = $this->getJson(self::BASE . '/passengers?search_by=phone&q=%2B92%20300-1234567')->assertOk();
+        $result->assertJsonCount(1, 'data.passengers')->assertJsonPath('data.passengers.0.id', 100)->assertJsonMissing(['cnic' => '3520212345671']);
+        $this->assertSame('*********5671', $result->json('data.passengers.0.cnic_masked'));
+        $this->getJson(self::BASE . '/passengers?search_by=cnic&q=35202-1234567-1')->assertJsonCount(1, 'data.passengers');
+        $this->getJson(self::BASE . '/passengers?search_by=phone&q=03119999999')->assertOk()->assertJsonCount(0, 'data.passengers');
+        $this->getJson(self::BASE . '/passengers?search_by=cnic&q=3520299999999')->assertOk()->assertJsonCount(0, 'data.passengers');
+        $this->getJson(self::BASE . '/passengers?search_by=phone&q=123')->assertUnprocessable();
+        $this->getJson(self::BASE . '/passengers?search_by=ticket&q=100abc')->assertUnprocessable();
+    }
+
+    public function test_ticket_lookup_includes_the_matching_old_ticket(): void
+    {
+        Sanctum::actingAs($this->agent());
+        $this->ticket(100);
+        for ($i = 101; $i < 130; $i++) { $this->ticket($i, ['customer_id' => 100]); }
+        $this->getJson(self::BASE . '/passengers?search_by=ticket&q=100')->assertOk()
+            ->assertJsonPath('data.passengers.0.tickets.0.id', 100)->assertJsonCount(1, 'data.passengers.0.tickets');
+    }
+
+    public function test_partial_journey_is_not_reported_as_partial_payment_and_reschedule_is_not_cancelled(): void
+    {
+        Sanctum::actingAs($this->agent());
+        $this->ticket(100, ['is_partial' => true]);
+        $this->ticket(101, ['type' => 'reschedule', 'deleted_at' => now()]);
+        $this->getJson(self::BASE . '/passengers?search_by=ticket&q=100')->assertOk()
+            ->assertJsonPath('data.passengers.0.tickets.0.payment_status', 'recorded_booking')
+            ->assertJsonPath('data.passengers.0.tickets.0.can_link_booking', true);
+        $this->getJson(self::BASE . '/passengers?search_by=ticket&q=101')->assertOk()
+            ->assertJsonPath('data.passengers.0.tickets.0.payment_status', 'unconfirmed')
+            ->assertJsonPath('data.passengers.0.tickets.0.can_link_booking', false);
+    }
+
+    public function test_general_information_and_overnight_shift_record_server_identity_and_audit(): void
+    {
+        Sanctum::actingAs($this->agent());
+        $result = $this->postJson(self::BASE . '/calls', ['category' => 'GI', 'shift' => 3, 'call_date' => '2026-10-12', 'remarks' => 'Asked terminal location',
+            'agent_id' => 999, 'company_id' => 2, 'terminal_id' => 20, 'called_at' => '2000-01-01'])->assertCreated();
+        $result->assertJsonPath('data.agent_id', 1)->assertJsonPath('data.company_id', 1)->assertJsonPath('data.terminal_id', 10)
+            ->assertJsonPath('data.call_date', '2026-10-12')->assertJsonPath('data.called_at', '2026-10-13 09:00:00')
+            ->assertJsonPath('data.status', 'new')->assertJsonPath('data.seat_count', 0);
+        $this->assertDatabaseCount('call_center_audits', 1);
+        $this->postJson(self::BASE . '/calls', ['category' => 'GI', 'shift' => 1, 'call_date' => '2026-10-11'])->assertUnprocessable();
+        $this->postJson(self::BASE . '/calls', ['category' => 'OTHER', 'shift' => 1])->assertUnprocessable();
+        $this->postJson(self::BASE . '/calls', ['category' => ['GI'], 'shift' => 1])->assertUnprocessable();
+    }
+
+    public function test_booking_link_is_verified_and_seats_are_derived_without_mutating_tickets(): void
+    {
+        Sanctum::actingAs($this->agent()); $this->ticket(100); $this->ticket(101, ['invoice_id' => 8100, 'customer_id' => 100]);
+        $this->ticket(102, ['type' => 'reserved']); $this->ticket(103, ['company_id' => 2, 'terminal_id' => 20]);
+        $this->postJson(self::BASE . '/calls', ['category' => 'BK', 'shift' => 1])->assertCreated()->assertJsonPath('data.seat_count', 0);
+        foreach ([102, 103] as $ticket) { $this->postJson(self::BASE . '/calls', ['category' => 'BK', 'shift' => 1, 'ticket_id' => $ticket])->assertUnprocessable(); }
+        $this->postJson(self::BASE . '/calls', ['category' => 'BK', 'shift' => 1, 'ticket_id' => 100, 'customer_id' => 102])->assertUnprocessable();
+        $call = $this->postJson(self::BASE . '/calls', ['category' => 'BK', 'shift' => 1, 'ticket_id' => 100, 'seat_count' => 99])->assertCreated()
+            ->assertJsonPath('data.seat_count', 2)->assertJsonPath('data.customer_id', 100)->json('data.id');
+        $this->assertDatabaseCount('tickets', 4); $this->assertDatabaseCount('booking_cancels', 0);
+        DB::table('tickets')->where('id', 100)->update(['type' => 'canceled', 'deleted_at' => now()]);
+        $this->patchJson(self::BASE . '/calls/' . $call, ['status' => 'closed', 'seat_count' => 20])->assertOk()->assertJsonPath('data.seat_count', 2);
+    }
+
+    public function test_followup_assignment_visibility_and_audit(): void
+    {
+        $user = $this->agent(); $other = $this->agent(2); $restricted = $this->agent(3, 1, 10, false, false, true, '[2]');
+        $this->ticket(100); Sanctum::actingAs($user);
+        $parent = $this->logCall($user, ['ticket_id' => 100, 'customer_id' => 100]);
+        $this->postJson(self::BASE . '/calls', ['category' => 'FU', 'shift' => 1])->assertUnprocessable();
+        $this->patchJson(self::BASE . '/calls/' . $parent->id, ['assigned_to' => $restricted->id])->assertUnprocessable();
+        $this->patchJson(self::BASE . '/calls/' . $parent->id, ['assigned_to' => $other->id, 'callback_at' => '2026-10-13 12:00:00'])->assertOk();
+        Sanctum::actingAs($other);
+        $this->getJson(self::BASE . '/calls/' . $parent->id)->assertOk()->assertJsonPath('data.audit.0.actor.name', 'Agent 1');
+        $this->postJson(self::BASE . '/calls', ['category' => 'FU', 'shift' => 1, 'parent_call_id' => $parent->id])->assertCreated();
+        $this->getJson(self::BASE . '/summary?date=2026-10-13')->assertJsonPath('data.totals.total', 1)->assertJsonPath('data.totals.FU', 1);
+    }
+
+    public function test_calls_cannot_be_read_or_updated_across_agents_or_companies(): void
+    {
+        $user = $this->agent(); $other = $this->agent(2); $outsider = $this->agent(3, 2, 20);
+        $otherCall = $this->logCall($other); $outsideCall = $this->logCall($outsider);
+        Sanctum::actingAs($user);
+        foreach ([$otherCall, $outsideCall] as $call) {
+            $this->getJson(self::BASE . '/calls/' . $call->id)->assertNotFound();
+            $this->patchJson(self::BASE . '/calls/' . $call->id, ['status' => 'closed'])->assertNotFound();
+        }
+        $this->getJson(self::BASE . '/calls?terminal_id=20')->assertForbidden();
+        $this->postJson(self::BASE . '/daily-review', ['date' => '2026-10-13'])->assertForbidden();
+    }
+
+    public function test_summary_ratios_closure_counts_and_review_staleness(): void
+    {
+        $supervisor = $this->agent(1, 1, 10, true); $agent = $this->agent(2);
+        $first = $this->logCall($agent);
+        $this->logCall($agent, ['category' => 'BK', 'seat_count' => 3]);
+        $this->logCall($agent, ['category' => 'C', 'status' => 'closed', 'shift' => 2]);
+        $this->logCall($agent, ['category' => 'FU', 'shift' => 2]);
+        Sanctum::actingAs($supervisor);
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-13')->assertOk()->assertJsonPath('data.totals.total', 4)
+            ->assertJsonPath('data.totals.seats', 3)->assertJsonPath('data.ratios.booking', 25)->assertJsonPath('data.complaints.closed', 1)
+            ->assertJsonPath('data.followups.pending', 1)->assertJsonCount(2, 'data.rows');
+        $this->postJson(self::BASE . '/shift-review', ['date' => '2026-10-13', 'shift' => 1, 'remarks' => 'Checked', 'snapshot_token' => $this->snapshot(1)])->assertOk()->assertJsonPath('data.stale', false);
+        $this->postJson(self::BASE . '/daily-review', ['date' => '2026-10-13', 'remarks' => 'Done', 'next_day_actions' => 'Call passenger', 'snapshot_token' => $this->snapshot()])->assertOk()->assertJsonPath('data.stale', false);
+        $this->patchJson(self::BASE . '/calls/' . $first->id, ['remarks' => 'Changed'])->assertOk();
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-13')->assertJsonPath('data.review.stale', true);
+        $this->getJson(self::BASE . '/summary?date=2026-10-13&shift=1')->assertJsonPath('data.reviews.0.stale', true);
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-12')->assertJsonPath('data.ratios.booking', 0);
+    }
+
+    public function test_cross_terminal_calls_are_attributed_to_recording_terminal_and_remain_visible(): void
+    {
+        $supervisor = $this->agent(1, 1, 10, true, true); Sanctum::actingAs($supervisor);
+        $this->ticket(100, ['terminal_id' => 11]);
+        $this->postJson(self::BASE . '/calls', ['category' => 'BK', 'shift' => 1, 'ticket_id' => 100])->assertCreated();
+        $this->getJson(self::BASE . '/summary?date=2026-10-13&terminal_id=10')->assertOk()->assertJsonPath('data.totals.total', 1);
+        $this->getJson(self::BASE . '/summary?date=2026-10-13&terminal_id=11')->assertJsonPath('data.totals.total', 0);
+    }
+
+    public function test_seat_movement_report_uses_recorded_events_and_excludes_unpaid_and_out_of_scope(): void
+    {
+        Sanctum::actingAs($this->agent(1, 1, 10, true));
+        $this->ticket(100, ['type' => 'reschedule', 'deleted_at' => now()]);
+        $this->ticket(101, ['type' => 'canceled', 'deleted_at' => now(), 'refund_amount' => 1000]);
+        $this->ticket(102, ['type' => 'canceled', 'deleted_at' => now(), 'refund_amount' => 0]);
+        $this->ticket(103, ['type' => 'canceled', 'deleted_at' => now(), 'refund_amount' => 1000, 'terminal_id' => 11]);
+        $this->ticket(104, ['type' => 'canceled', 'deleted_at' => now(), 'refund_amount' => 1000]);
+        DB::table('ticket_reschedules')->insert(['company_id' => 1, 'old_ticket_id' => 100, 'added_by' => 1, 'created_at' => now()]);
+        foreach ([101, 101, 102, 103] as $id) {
+            DB::table('booking_cancels')->insert(['company_id' => 1, 'ticket_id' => $id, 'added_by' => 1, 'type' => 'booked', 'created_at' => now()]);
+        }
+        DB::table('booking_cancels')->insert(['company_id' => 1, 'ticket_id' => 104, 'added_by' => 1, 'type' => 'reserved', 'created_at' => now()]);
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-13')->assertOk()->assertJsonCount(1, 'data.seat_movements')
+            ->assertJsonPath('data.seat_movements.0.shifted', 1)->assertJsonPath('data.seat_movements.0.refunded', 1);
+    }
+
+    public function test_formatted_phone_call_search_and_self_parent_protection(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user);
+        $call = $this->logCall($user, ['caller_phone' => '0300-1234567']);
+        $this->getJson(self::BASE . '/calls?search=%2B92%20300%201234567')->assertOk()->assertJsonPath('data.total', 1);
+        $this->patchJson(self::BASE . '/calls/' . $call->id, ['category' => 'FU', 'parent_call_id' => $call->id])->assertUnprocessable();
+    }
+
+    public function test_permission_migration_and_future_templates_default_roles_to_denied(): void
+    {
+        $this->agent(1, 1, 10, false, false, false);
+        require_once database_path('migrations/2026_10_13_000002_add_call_center_permissions.php');
+        (new \AddCallCenterPermissions)->up();
+        $company = json_decode(DB::table('companies')->where('id', 1)->value('modules'), true);
+        $role = json_decode(DB::table('roles')->where('id', 1)->value('permissions'), true);
+        $this->assertTrue($company[0]['allow']);
+        $this->assertFalse($role[0]['allow']);
+        $this->assertFalse(CallCenterPermissions::append([])[0]['allow']);
+        $this->assertSame($role, CallCenterPermissions::append($role));
+        (new \AddCallCenterPermissions)->down();
+        $this->assertEmpty(json_decode(DB::table('roles')->where('id', 1)->value('permissions'), true)[0]['childs']);
+    }
+
+    public function test_supervisor_still_cannot_link_cross_company_or_unassigned_route_bookings(): void
+    {
+        $user = $this->agent(1, 1, 10, true, true, true, '[1]'); Sanctum::actingAs($user);
+        $this->ticket(100, ['route_id' => 2]); $this->ticket(101, ['company_id' => 2, 'terminal_id' => 20]);
+        foreach ([100, 101] as $ticket) {
+            $this->postJson(self::BASE . '/calls', ['category' => 'BK', 'shift' => 1, 'ticket_id' => $ticket])->assertUnprocessable();
+        }
+        DB::table('roles')->where('id', 1)->update(['company_id' => 2]); $user->unsetRelation('role');
+        $this->getJson(self::BASE . '/options')->assertForbidden();
+    }
+
+    public function test_review_cannot_certify_filtered_or_future_reports_and_new_calls_invalidate_review(): void
+    {
+        $user = $this->agent(1, 1, 10, true); Sanctum::actingAs($user);
+        $this->postJson(self::BASE . '/daily-review', ['date' => '2026-10-14'])->assertUnprocessable();
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-13&category=GI')->assertUnprocessable();
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-13&shift=1')->assertUnprocessable();
+        $this->postJson(self::BASE . '/daily-review', ['date' => '2026-10-13', 'snapshot_token' => $this->snapshot()])->assertOk()->assertJsonPath('data.stale', false);
+        $this->logCall($user);
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-13')->assertOk()->assertJsonPath('data.review.stale', true);
+    }
+
+    public function test_callbacks_filter_and_call_pagination_are_scoped(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user);
+        $this->postJson(self::BASE . '/calls', ['category' => 'C', 'shift' => 1, 'callback_at' => '2026-10-13 14:00:00'])->assertCreated()->assertJsonPath('data.assigned_to', 1);
+        $this->logCall($user, ['status' => 'closed', 'callback_at' => '2026-10-13 14:00:00']);
+        for ($i = 0; $i < 26; $i++) { $this->logCall($user); }
+        $this->getJson(self::BASE . '/calls?pending_callbacks=1')->assertOk()->assertJsonPath('data.total', 1);
+        $this->getJson(self::BASE . '/calls?page=2')->assertOk()->assertJsonPath('data.total', 28)->assertJsonCount(3, 'data.data');
+    }
+
+    public function test_short_ticket_numbers_are_searchable_and_zero_is_rejected(): void
+    {
+        Sanctum::actingAs($this->agent()); $this->ticket(12);
+        $this->getJson(self::BASE . '/passengers?search_by=ticket&q=12')->assertOk()->assertJsonPath('data.passengers.0.tickets.0.id', 12);
+        $this->getJson(self::BASE . '/passengers?search_by=ticket&q=000')->assertUnprocessable();
+    }
+
+    public function test_review_rejects_data_changed_since_report_was_displayed(): void
+    {
+        $user = $this->agent(1, 1, 10, true); Sanctum::actingAs($user);
+        $dailyToken = $this->snapshot(); $shiftToken = $this->snapshot(1);
+        $this->logCall($user);
+        $this->postJson(self::BASE . '/daily-review', ['date' => '2026-10-13', 'snapshot_token' => $dailyToken])->assertStatus(409)
+            ->assertJsonPath('message', 'Report changed. Reload it before reviewing.');
+        $this->postJson(self::BASE . '/shift-review', ['date' => '2026-10-13', 'shift' => 1, 'snapshot_token' => $shiftToken])->assertStatus(409);
+        $this->assertDatabaseCount('call_center_reviews', 0);
+        $this->postJson(self::BASE . '/daily-review', ['date' => '2026-10-13', 'snapshot_token' => $this->snapshot()])->assertOk();
+    }
+
+    public function test_report_token_uses_rows_displayed_even_if_new_call_arrives_during_report_loading(): void
+    {
+        $user = $this->agent(1, 1, 10, true); Sanctum::actingAs($user);
+        $this->logCall($user);
+        $originalToken = $this->snapshot();
+        $insertOnNextRead = true;
+        DB::listen(function ($query) use (&$insertOnNextRead, $user) {
+            if ($insertOnNextRead && strpos($query->sql, 'select * from "call_center_calls"') === 0) {
+                $insertOnNextRead = false;
+                $this->logCall($user);
+            }
+        });
+        $response = $this->getJson(self::BASE . '/daily-report?date=2026-10-13')->assertOk();
+        $response->assertJsonPath('data.totals.total', 1)->assertJsonPath('data.snapshot_token', $originalToken);
+        $this->assertDatabaseCount('call_center_calls', 2);
+        $this->postJson(self::BASE . '/daily-review', ['date' => '2026-10-13', 'snapshot_token' => $response->json('data.snapshot_token')])->assertStatus(409);
+    }
+    public function test_simple_save_outcomes_validate_callbacks_and_preserve_audit(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user);
+        $this->postJson(self::BASE . '/calls', ['category' => 'GI', 'inquiry_topic' => 'fare', 'shift' => 2, 'outcome' => 'finish'])
+            ->assertCreated()->assertJsonPath('data.status', 'closed')->assertJsonPath('data.inquiry_topic', 'fare');
+        $payload = ['category' => 'C', 'shift' => 2, 'remarks' => 'Luggage missing', 'outcome' => 'follow_up', 'caller_phone' => '03001234567'];
+        $this->postJson(self::BASE . '/calls', $payload)->assertUnprocessable()->assertJsonValidationErrors('callback_at');
+        $this->postJson(self::BASE . '/calls', $payload + ['callback_at' => '2026-10-13 08:59:00'])->assertUnprocessable();
+        $this->postJson(self::BASE . '/calls', array_merge($payload, ['callback_at' => '2026-10-13 10:00:00', 'caller_phone' => '']))->assertUnprocessable()->assertJsonValidationErrors('caller_phone');
+        $call = $this->postJson(self::BASE . '/calls', $payload + ['callback_at' => '2026-10-13 10:00:00'])->assertCreated()
+            ->assertJsonPath('data.status', 'waiting')->assertJsonPath('data.assigned_to', 1)->json('data.id');
+        $this->patchJson(self::BASE . '/calls/' . $call, ['outcome' => 'finish'])->assertOk()->assertJsonPath('data.status', 'waiting');
+        $this->postJson(self::BASE . '/calls/' . $call . '/close-complaint', ['resolution_remarks' => 'Luggage returned.'])->assertOk()->assertJsonPath('data.status', 'closed')->assertJsonPath('data.callback_at', null);
+        $this->assertDatabaseCount('call_center_audits', 3);
+        $this->postJson(self::BASE . '/calls', ['category' => 'C', 'shift' => 1, 'outcome' => 'finish'])->assertUnprocessable()->assertJsonValidationErrors('remarks');
+    }
+
+    public function test_work_queues_include_overdue_work_from_earlier_days_and_keep_scope(): void
+    {
+        $user = $this->agent(); $other = $this->agent(2); Sanctum::actingAs($user);
+        $due = $this->logCall($user, ['call_date' => '2026-10-12', 'category' => 'C', 'callback_at' => '2026-10-12 12:00:00']);
+        $this->logCall($user, ['category' => 'C', 'callback_at' => '2026-10-13 10:00:00']);
+        $this->logCall($user, ['category' => 'C', 'status' => 'closed', 'callback_at' => '2026-10-12 10:00:00']);
+        $this->logCall($other, ['category' => 'C', 'callback_at' => '2026-10-12 10:00:00']);
+        $this->getJson(self::BASE . '/calls?queue=callbacks_due&date=2026-10-13')->assertOk()->assertJsonPath('data.total', 1)->assertJsonPath('data.data.0.id', $due->id);
+        $this->getJson(self::BASE . '/calls?queue=open_complaints&date=2026-10-13')->assertOk()->assertJsonPath('data.total', 2);
+        $this->getJson(self::BASE . '/calls?queue=today')->assertOk()->assertJsonPath('data.total', 2);
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-13&queue=open_complaints')->assertUnprocessable();
+    }
+
+    public function test_caller_history_matches_normalized_phone_without_exposing_other_agents_or_routes(): void
+    {
+        $user = $this->agent(1, 1, 10, false, false, true, '[1]'); $other = $this->agent(2); $foreign = $this->agent(3, 2, 20);
+        $this->ticket(100); $this->ticket(200, ['route_id' => 2]); Sanctum::actingAs($user);
+        $this->logCall($user, ['customer_id' => 100, 'ticket_id' => 100, 'category' => 'C']);
+        $this->logCall($user, ['caller_phone' => '+92 300-1234567', 'remarks' => 'Earlier inquiry']);
+        $this->logCall($other, ['caller_phone' => '03001234567', 'category' => 'C']);
+        $this->logCall($foreign, ['caller_phone' => '03001234567']);
+        $this->logCall($user, ['ticket_id' => 200, 'caller_phone' => '03001234567']);
+        $this->getJson(self::BASE . '/history?customer_id=100')->assertOk()->assertJsonCount(2, 'data.recent_calls')->assertJsonPath('data.open_complaint_count', 1);
+        $this->getJson(self::BASE . '/history?phone=03001234567')->assertOk()->assertJsonCount(1, 'data.recent_calls');
+        $this->getJson(self::BASE . '/history?customer_id=200')->assertNotFound();
+        $this->getJson(self::BASE . '/history?phone=123')->assertUnprocessable();
+    }
+
+    public function test_finishing_followup_resolves_parent_only_when_explicit_and_authorized(): void
+    {
+        $user = $this->agent(); $other = $this->agent(2); Sanctum::actingAs($user);
+        $parent = $this->logCall($user, ['category' => 'C', 'callback_at' => '2026-10-13 10:00:00']);
+        $payload = ['category' => 'FU', 'shift' => 1, 'parent_call_id' => $parent->id, 'outcome' => 'finish'];
+        $this->postJson(self::BASE . '/calls', $payload)->assertCreated();
+        $this->assertSame('new', $parent->fresh()->status);
+        $followupId = $this->postJson(self::BASE . '/calls', $payload + ['resolve_parent' => true, 'remarks' => 'Issue resolved with the caller.'])->assertCreated()->json('data.id');
+        $this->assertSame('closed', $parent->fresh()->status); $this->assertNull($parent->fresh()->callback_at);
+        $this->assertDatabaseHas('call_center_audits', ['call_id' => $parent->id, 'actor_id' => $user->id, 'action' => 'closed']);
+        $this->assertSame($followupId, json_decode(DB::table('call_center_audits')->where('call_id', $parent->id)->value('changes'), true)['resolved_by_call']);
+        $hidden = $this->logCall($other, ['category' => 'C']);
+        $this->postJson(self::BASE . '/calls', array_merge($payload, ['parent_call_id' => $hidden->id, 'resolve_parent' => true]))->assertUnprocessable();
+        $this->assertSame('new', $hidden->fresh()->status);
+    }
+
+    public function test_optional_complaint_journey_can_be_saved_reopened_edited_and_cleared(): void
+    {
+        Sanctum::actingAs($this->agent());
+        $fields = ['complaint_from_city' => 'Lahore', 'complaint_to_city' => 'Rawalpindi', 'complaint_bus_time' => '18:30', 'complaint_seat_number' => '12'];
+        $id = $this->postJson(self::BASE . '/calls', ['category' => 'C', 'shift' => 1, 'remarks' => 'Seat issue', 'outcome' => 'finish'] + $fields)
+            ->assertCreated()->assertJsonPath('data.complaint_bus_time', '18:30')->json('data.id');
+        $this->getJson(self::BASE . '/calls/' . $id)->assertOk()->assertJsonFragment($fields);
+        $this->getJson(self::BASE . '/calls')->assertOk()->assertJsonFragment($fields);
+        $this->patchJson(self::BASE . '/calls/' . $id, ['remarks' => 'Updated issue'])->assertOk()->assertJsonFragment($fields);
+        $this->patchJson(self::BASE . '/calls/' . $id, ['complaint_seat_number' => '14'])->assertOk()->assertJsonPath('data.complaint_seat_number', '14');
+        $audit = json_decode(DB::table('call_center_audits')->where('call_id', $id)->orderByDesc('id')->value('changes'), true);
+        $this->assertSame(['from' => '12', 'to' => '14'], $audit['complaint_seat_number']);
+        $this->patchJson(self::BASE . '/calls/' . $id, array_fill_keys(array_keys($fields), null))->assertOk()->assertJsonPath('data.complaint_bus_time', null);
+        $this->assertDatabaseHas('call_center_calls', ['id' => $id] + array_fill_keys(array_keys($fields), null));
+        $this->assertDatabaseCount('tickets', 0);
+    }
+
+    public function test_complaint_journey_is_optional_and_validated_without_affecting_other_categories(): void
+    {
+        Sanctum::actingAs($this->agent());
+        $base = ['category' => 'C', 'shift' => 1, 'remarks' => 'General complaint', 'outcome' => 'finish'];
+        $id = $this->postJson(self::BASE . '/calls', $base)->assertCreated()->json('data.id');
+        $this->postJson(self::BASE . '/calls', $base + ['complaint_from_city' => 'Lahore'])->assertCreated();
+        $this->postJson(self::BASE . '/calls', $base + ['complaint_bus_time' => '25:00', 'complaint_seat_number' => str_repeat('1', 21), 'complaint_to_city' => str_repeat('x', 121)])
+            ->assertUnprocessable()->assertJsonValidationErrors(['complaint_bus_time', 'complaint_seat_number', 'complaint_to_city']);
+        $this->patchJson(self::BASE . '/calls/' . $id, ['complaint_bus_time' => '00:00', 'complaint_seat_number' => '12'])->assertOk();
+        $this->patchJson(self::BASE . '/calls/' . $id, ['category' => 'GI'])->assertOk()->assertJsonPath('data.complaint_bus_time', null)->assertJsonPath('data.complaint_seat_number', null);
+    }
+
+    public function test_confirmed_booking_journey_is_optional_and_saved_without_changing_the_booking(): void
+    {
+        Sanctum::actingAs($this->agent());
+        $this->ticket(100);
+        $ticketsBefore = DB::table('tickets')->get()->toJson();
+        $base = ['category' => 'BK', 'shift' => 1, 'ticket_id' => 100, 'outcome' => 'finish'];
+        $fields = ['complaint_from_city' => 'Lahore', 'complaint_to_city' => 'Rawalpindi', 'complaint_bus_time' => '18:30', 'complaint_seat_number' => '12'];
+        $empty = $this->postJson(self::BASE . '/calls', $base)->assertCreated()->json('data.id');
+        $this->getJson(self::BASE . '/calls/' . $empty)->assertOk()->assertJsonFragment(array_fill_keys(array_keys($fields), null));
+        $id = $this->postJson(self::BASE . '/calls', $base + $fields)->assertCreated()->assertJsonPath('data.seat_count', 1)->json('data.id');
+        $this->getJson(self::BASE . '/calls/' . $id)->assertOk()->assertJsonFragment($fields);
+        $this->getJson(self::BASE . '/calls')->assertOk()->assertJsonFragment($fields);
+        $this->patchJson(self::BASE . '/calls/' . $id, ['remarks' => 'Booking confirmed'])->assertOk()->assertJsonFragment($fields);
+        $this->patchJson(self::BASE . '/calls/' . $id, ['complaint_seat_number' => '14', 'seat_count' => 99])->assertOk()
+            ->assertJsonPath('data.complaint_seat_number', '14')->assertJsonPath('data.seat_count', 1);
+        $audit = json_decode(DB::table('call_center_audits')->where('call_id', $id)->orderByDesc('id')->value('changes'), true);
+        $this->assertSame(['from' => '12', 'to' => '14'], $audit['complaint_seat_number']);
+        $this->patchJson(self::BASE . '/calls/' . $id, ['complaint_bus_time' => '25:00'])->assertUnprocessable()->assertJsonValidationErrors('complaint_bus_time');
+        $this->patchJson(self::BASE . '/calls/' . $id, array_fill_keys(array_keys($fields), null))->assertOk()
+            ->assertJsonFragment(array_fill_keys(array_keys($fields), null));
+        $this->patchJson(self::BASE . '/calls/' . $id, ['complaint_from_city' => 'Karachi'])->assertOk()->assertJsonPath('data.complaint_from_city', 'Karachi');
+        $this->patchJson(self::BASE . '/calls/' . $id, ['category' => 'C', 'status' => 'new'])->assertOk()->assertJsonPath('data.complaint_from_city', 'Karachi');
+        $this->patchJson(self::BASE . '/calls/' . $id, ['category' => 'GI'])->assertOk()->assertJsonPath('data.complaint_from_city', null);
+        $this->assertSame($ticketsBefore, DB::table('tickets')->get()->toJson());
+    }
+
+    public function test_confirmed_booking_call_can_be_saved_and_followed_up_without_a_ticket(): void
+    {
+        Sanctum::actingAs($this->agent());
+        $fields = ['caller_name' => 'Manual caller', 'caller_phone' => '03001234567', 'complaint_from_city' => 'Lahore',
+            'complaint_to_city' => 'Karachi', 'complaint_bus_time' => '18:30', 'complaint_seat_number' => '12'];
+        $id = $this->postJson(self::BASE . '/calls', ['category' => 'BK', 'shift' => 1, 'outcome' => 'finish', 'seat_count' => 99] + $fields)
+            ->assertCreated()->assertJsonPath('data.seat_count', 0)->assertJsonPath('data.status', 'closed')->json('data.id');
+        $this->getJson(self::BASE . '/calls/' . $id)->assertOk()->assertJsonFragment($fields)
+            ->assertJsonPath('data.ticket_id', null)->assertJsonPath('data.customer_id', null);
+        $this->patchJson(self::BASE . '/calls/' . $id, ['remarks' => 'Confirmed by caller', 'outcome' => 'follow_up', 'callback_at' => '2026-10-13 12:00:00'])
+            ->assertOk()->assertJsonPath('data.status', 'waiting')->assertJsonPath('data.ticket_id', null)->assertJsonFragment($fields);
+        $this->getJson(self::BASE . '/summary?date=2026-10-13')->assertOk()->assertJsonPath('data.totals.BK', 1)->assertJsonPath('data.totals.seats', 0);
+        $this->assertDatabaseCount('tickets', 0);
+    }
+
+    public function test_optional_booking_link_can_be_added_and_removed_while_preserving_customer_scope(): void
+    {
+        Sanctum::actingAs($this->agent());
+        $this->ticket(100); $this->ticket(101, ['company_id' => 2, 'terminal_id' => 20]);
+        $ticketsBefore = DB::table('tickets')->get()->toJson();
+        $id = $this->postJson(self::BASE . '/calls', ['category' => 'BK', 'shift' => 1, 'customer_id' => 100])
+            ->assertCreated()->assertJsonPath('data.seat_count', 0)->json('data.id');
+        $this->patchJson(self::BASE . '/calls/' . $id, ['ticket_id' => 100])->assertOk()->assertJsonPath('data.seat_count', 1);
+        $this->patchJson(self::BASE . '/calls/' . $id, ['ticket_id' => null])->assertOk()
+            ->assertJsonPath('data.seat_count', 0)->assertJsonPath('data.customer_id', 100)->assertJsonPath('data.ticket_id', null);
+        $this->patchJson(self::BASE . '/calls/' . $id, ['seat_count' => 99])->assertOk()->assertJsonPath('data.seat_count', 0);
+        $this->patchJson(self::BASE . '/calls/' . $id, ['customer_id' => 101])->assertUnprocessable()->assertJsonValidationErrors('customer_id');
+        $this->patchJson(self::BASE . '/calls/' . $id, ['customer_id' => null, 'outcome' => 'finish'])->assertOk()->assertJsonPath('data.customer_id', null);
+        $this->getJson(self::BASE . '/summary?date=2026-10-13')->assertOk()->assertJsonPath('data.totals.seats', 0);
+        $this->assertSame($ticketsBefore, DB::table('tickets')->get()->toJson());
+    }
+
+    public function test_recorded_complaints_stay_open_until_closed_with_required_remarks(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user);
+        foreach (['record', 'finish'] as $outcome) {
+            $this->postJson(self::BASE . '/calls', ['category' => 'C', 'shift' => 1, 'remarks' => 'Luggage missing', 'outcome' => $outcome])
+                ->assertCreated()->assertJsonPath('data.status', 'new');
+        }
+        $this->getJson(self::BASE . '/calls?queue=open_complaints')->assertOk()->assertJsonPath('data.total', 2);
+        $call = CallLog::first();
+        $this->patchJson(self::BASE . '/calls/' . $call->id, ['status' => 'closed'])->assertUnprocessable()->assertJsonValidationErrors('status');
+        $this->postJson(self::BASE . '/calls', ['category' => 'C', 'shift' => 1, 'remarks' => 'Issue', 'status' => 'closed'])->assertUnprocessable();
+        foreach ([[], ['resolution_remarks' => '   '], ['resolution_remarks' => str_repeat('x', 5001)]] as $payload) {
+            $this->postJson(self::BASE . '/calls/' . $call->id . '/close-complaint', $payload)->assertUnprocessable()->assertJsonValidationErrors('resolution_remarks');
+        }
+        $this->assertSame('new', $call->fresh()->status);
+        $count = CallLog::count();
+        $this->postJson(self::BASE . '/calls', ['category' => 'FU', 'shift' => 1, 'parent_call_id' => $call->id, 'outcome' => 'finish', 'resolve_parent' => true])
+            ->assertUnprocessable()->assertJsonValidationErrors('remarks');
+        $this->assertSame($count, CallLog::count());
+        $this->assertSame('new', $call->fresh()->status);
+    }
+
+    public function test_closing_complaint_preserves_description_records_actor_and_is_idempotent(): void
+    {
+        $owner = $this->agent(); $assignee = $this->agent(2); Sanctum::actingAs($assignee);
+        $call = $this->logCall($owner, ['category' => 'C', 'remarks' => 'Luggage missing', 'assigned_to' => 2, 'callback_at' => '2026-10-13 12:00:00']);
+        $endpoint = self::BASE . '/calls/' . $call->id . '/close-complaint';
+        $this->postJson($endpoint, ['resolution_remarks' => '  Luggage returned to caller.  ', 'resolved_by' => 999])->assertOk()
+            ->assertJsonPath('data.status', 'closed')->assertJsonPath('data.remarks', 'Luggage missing')
+            ->assertJsonPath('data.resolution_remarks', 'Luggage returned to caller.')->assertJsonPath('data.resolved_by', 2)
+            ->assertJsonPath('data.resolved_at', '2026-10-13 09:00:00')->assertJsonPath('data.resolver.name', 'Agent 2')->assertJsonPath('data.callback_at', null);
+        $this->postJson($endpoint, ['resolution_remarks' => 'Duplicate click'])->assertOk()->assertJsonPath('data.resolution_remarks', 'Luggage returned to caller.');
+        $this->assertDatabaseCount('call_center_audits', 1);
+        $audit = json_decode(DB::table('call_center_audits')->value('changes'), true);
+        $this->assertSame(['from' => 'new', 'to' => 'closed'], $audit['status']);
+        $this->assertSame('Luggage returned to caller.', $audit['resolution_remarks']['to']);
+        $this->getJson(self::BASE . '/calls?queue=open_complaints')->assertOk()->assertJsonPath('data.total', 0);
+        $this->getJson(self::BASE . '/calls?queue=all&category=C&status=closed')->assertOk()->assertJsonPath('data.data.0.id', $call->id);
+        Sanctum::actingAs($owner);
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-13')->assertOk()->assertJsonPath('data.complaints.closed', 1)->assertJsonPath('data.complaints.pending', 0);
+    }
+
+    public function test_complaint_closure_obeys_scope_and_invalidates_review(): void
+    {
+        $owner = $this->agent(); $other = $this->agent(2); $foreign = $this->agent(3, 2, 20);
+        $hidden = [$this->logCall($other, ['category' => 'C']), $this->logCall($foreign, ['category' => 'C']),
+            $this->logCall($owner, ['category' => 'C', 'terminal_id' => 11])];
+        Sanctum::actingAs($owner);
+        foreach ($hidden as $call) { $this->postJson(self::BASE . '/calls/' . $call->id . '/close-complaint', ['resolution_remarks' => 'Done'])->assertNotFound(); }
+        $general = $this->logCall($owner);
+        $this->postJson(self::BASE . '/calls/' . $general->id . '/close-complaint', ['resolution_remarks' => 'Done'])->assertUnprocessable();
+        $supervisor = $this->agent(4, 1, 10, true); Sanctum::actingAs($supervisor);
+        $call = $hidden[0];
+        $this->postJson(self::BASE . '/daily-review', ['date' => '2026-10-13', 'snapshot_token' => $this->snapshot()])->assertOk();
+        $this->postJson(self::BASE . '/calls/' . $call->id . '/close-complaint', ['resolution_remarks' => 'Resolved by supervisor'])->assertOk();
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-13')->assertOk()->assertJsonPath('data.review.stale', true);
+    }
+
+    private function informationSchema(): void
+    {
+        Schema::table('cities', function (Blueprint $t) { $t->integer('company_id')->default(1); $t->integer('hide')->default(0); });
+        Schema::table('terminals', function (Blueprint $t) { $t->integer('city_id')->default(1); $t->string('address')->default('Terminal address'); $t->string('contact')->default('03000000000'); $t->string('available_seats')->nullable(); });
+        Schema::table('users', function (Blueprint $t) { $t->boolean('check_allowed_seats')->default(false); });
+        Schema::table('tickets', function (Blueprint $t) { $t->integer('schedule_id')->nullable(); });
+        Schema::create('routes_fares', function (Blueprint $t) { $t->id(); $t->integer('company_id'); $t->integer('route_id'); $t->integer('departure_city_id'); $t->integer('destination_city_id'); $t->softDeletes(); });
+        Schema::create('schedules', function (Blueprint $t) { $t->id(); $t->integer('company_id'); $t->integer('route_id'); $t->string('name'); $t->integer('hide')->default(0); $t->softDeletes(); });
+        Schema::create('schedule_details', function (Blueprint $t) { $t->id(); $t->integer('company_id'); $t->integer('schedule_id'); $t->integer('bus_class_id'); $t->integer('departure_id'); $t->integer('destination_id'); $t->date('departure_date'); $t->date('schedule_date'); $t->time('departure_time'); $t->softDeletes(); });
+        Schema::create('schedule_terminal_visibilities', function (Blueprint $t) { $t->id(); $t->integer('company_id'); $t->integer('schedule_id'); $t->integer('terminal_id'); $t->integer('visibility')->default(1); $t->softDeletes(); });
+        Schema::create('drop_schedules', function (Blueprint $t) { $t->id(); $t->integer('company_id'); $t->integer('schedule_id'); $t->date('schedule_date'); $t->softDeletes(); });
+        Schema::create('bus_classes', function (Blueprint $t) { $t->id(); $t->string('name'); $t->text('seat_map')->nullable(); $t->softDeletes(); });
+        Schema::create('fare_classes', function (Blueprint $t) { $t->id(); $t->string('name'); $t->softDeletes(); });
+        Schema::create('fare_tables', function (Blueprint $t) { $t->id(); $t->integer('company_id'); $t->integer('fare_class'); $t->integer('from_city_id'); $t->integer('to_city_id'); $t->decimal('fare'); $t->softDeletes(); });
+        Schema::create('terminal_time_differences', function (Blueprint $t) { $t->id(); $t->integer('company_id'); $t->integer('terminal_id'); $t->integer('route_id'); $t->integer('time_difference'); $t->softDeletes(); });
+        $seats = array_map(function ($number) { return ['seatNo' => $number, 'reserved' => true, 'type' => 0]; }, range(1, 6));
+        $seats[] = ['reserved' => false, 'type' => 0];
+        $seats[] = ['seatNo' => 7, 'reserved' => true, 'type' => 'not_for_sale'];
+        DB::table('bus_classes')->insert(['id' => 1, 'name' => 'Executive', 'seat_map' => json_encode([$seats])]); DB::table('fare_classes')->insert(['id' => 1, 'name' => 'Standard']);
+        DB::table('routes_fares')->insert([['company_id' => 1, 'route_id' => 1, 'departure_city_id' => 1, 'destination_city_id' => 2], ['company_id' => 1, 'route_id' => 2, 'departure_city_id' => 1, 'destination_city_id' => 2]]);
+        DB::table('fare_tables')->insert(['company_id' => 1, 'fare_class' => 1, 'from_city_id' => 1, 'to_city_id' => 2, 'fare' => 2400]);
+        DB::table('terminal_time_differences')->insert(['company_id' => 1, 'terminal_id' => 10, 'route_id' => 1, 'time_difference' => 30]);
+        for ($id = 1; $id <= 5; $id++) {
+            DB::table('schedules')->insert(['id' => $id, 'company_id' => 1, 'route_id' => $id === 2 ? 2 : 1, 'name' => 'Schedule ' . $id, 'hide' => $id === 3 ? 1 : 0]);
+            DB::table('schedule_details')->insert(['id' => $id, 'company_id' => 1, 'schedule_id' => $id, 'bus_class_id' => 1, 'departure_id' => 1, 'destination_id' => 2, 'departure_date' => '2026-10-13', 'schedule_date' => '2026-10-13', 'departure_time' => '12:00:00']);
+            DB::table('schedule_terminal_visibilities')->insert(['company_id' => 1, 'schedule_id' => $id, 'terminal_id' => 10, 'visibility' => $id === 5 ? 0 : 1]);
+        }
+        DB::table('drop_schedules')->insert(['company_id' => 1, 'schedule_id' => 4, 'schedule_date' => '2026-10-13']);
+    }
+
+    public function test_quick_answers_use_scoped_schedules_existing_base_fares_and_terminal_details(): void
+    {
+        $this->informationSchema(); $user = $this->agent(1, 1, 10, false, false, true, '[1]'); Sanctum::actingAs($user);
+        $this->getJson(self::BASE . '/quick-answers/options')->assertOk()->assertJsonCount(1, 'data.terminals')->assertJsonPath('data.terminals.0.address', 'Terminal address');
+        $url = self::BASE . '/quick-answers?departure_id=1&destination_id=2&date=2026-10-13';
+        $this->getJson($url)->assertOk()->assertJsonCount(1, 'data.departures')->assertJsonPath('data.departures.0.id', 1)
+            ->assertJsonPath('data.departures.0.departure_at', '2026-10-13 12:30:00')->assertJsonPath('data.fares.0.class_name', 'Standard')
+            ->assertJsonPath('data.departures.0.available_seats', 6);
+        $this->getJson($url . '&terminal_id=11')->assertForbidden();
+        $this->getJson(str_replace('destination_id=2', 'destination_id=999', $url))->assertUnprocessable();
+        $user->update(['route_ids' => 'invalid']);
+        $this->getJson($url)->assertOk()->assertJsonCount(0, 'data.departures')->assertJsonCount(0, 'data.fares');
+        $this->assertDatabaseCount('tickets', 0);
+    }
+
+    public function test_available_seats_count_unique_occupied_seats_for_each_service_across_terminals(): void
+    {
+        $this->informationSchema(); Sanctum::actingAs($this->agent());
+        $trip = ['schedule_id' => 1, 'schedule_date' => '2026-10-13'];
+        $this->ticket(100, $trip + ['seat_no' => 1]);
+        $this->ticket(101, $trip + ['seat_no' => 2, 'type' => 'advance booking', 'terminal_id' => 11]);
+        $this->ticket(102, $trip + ['seat_no' => 1, 'type' => 'over-issue']);
+        $this->ticket(103, $trip + ['seat_no' => 3, 'type' => 'canceled', 'deleted_at' => '2026-10-13 08:00:00']);
+        $this->ticket(104, ['schedule_id' => 1, 'schedule_date' => '2026-10-14', 'seat_no' => 4]);
+        $this->ticket(105, $trip + ['seat_no' => 5, 'company_id' => 2, 'terminal_id' => 20]);
+        $this->ticket(106, $trip + ['seat_no' => 99, 'type' => 'over-issue']);
+        $this->ticket(107, $trip + ['seat_no' => 3, 'type' => 'not_for_sale']);
+        $this->ticket(108, ['schedule_id' => 2, 'schedule_date' => '2026-10-13', 'seat_no' => 1]);
+        $response = $this->getJson(self::BASE . '/quick-answers?departure_id=1&destination_id=2&date=2026-10-13')->assertOk();
+        $counts = collect($response->json('data.departures'))->pluck('available_seats', 'id')->all();
+        $this->assertSame([1 => 3, 2 => 5], $counts);
+        $this->assertDatabaseCount('tickets', 9); // Availability is read-only.
+    }
+
+    public function test_available_seats_respect_partial_journeys_and_overnight_service_dates(): void
+    {
+        $this->informationSchema(); Sanctum::actingAs($this->agent(1, 1, 10, false, false, true, '[1]'));
+        DB::table('cities')->insert([['id' => 3, 'name' => 'Stop B', 'company_id' => 1], ['id' => 4, 'name' => 'Stop C', 'company_id' => 1]]);
+        DB::table('routes_fares')->where('route_id', 1)->delete();
+        foreach ([[1, 3], [1, 4], [1, 2], [3, 4], [3, 2], [4, 2]] as $pair) {
+            DB::table('routes_fares')->insert(['company_id' => 1, 'route_id' => 1, 'departure_city_id' => $pair[0], 'destination_city_id' => $pair[1]]);
+        }
+        DB::table('schedule_details')->where('id', 1)->update(['departure_id' => 3, 'destination_id' => 4, 'departure_date' => '2026-10-14']);
+        $trip = ['schedule_id' => 1, 'schedule_date' => '2026-10-13', 'is_partial' => true];
+        $this->ticket(100, $trip + ['seat_no' => 1, 'departure_city_id' => 1, 'destination_city_id' => 3]);
+        $this->ticket(101, $trip + ['seat_no' => 1, 'departure_city_id' => 4, 'destination_city_id' => 2]);
+        $this->ticket(102, $trip + ['seat_no' => 2, 'departure_city_id' => 1, 'destination_city_id' => 4]);
+        $this->ticket(103, $trip + ['seat_no' => 3, 'departure_city_id' => 3, 'destination_city_id' => 2]);
+        $this->ticket(104, $trip + ['seat_no' => 4, 'departure_city_id' => 1, 'destination_city_id' => 2]);
+        $this->ticket(105, $trip + ['seat_no' => 5, 'departure_city_id' => 3, 'destination_city_id' => 4]);
+        $this->ticket(106, ['schedule_id' => 1, 'schedule_date' => '2026-10-14', 'seat_no' => 6]);
+        $this->getJson(self::BASE . '/quick-answers?departure_id=3&destination_id=4&date=2026-10-14')
+            ->assertOk()->assertJsonPath('data.departures.0.available_seats', 2);
+    }
+
+    public function test_available_seats_honor_terminal_seat_restrictions_and_zero_availability(): void
+    {
+        $this->informationSchema(); $user = $this->agent(1, 1, 10, false, false, true, '[1]');
+        $user->update(['check_allowed_seats' => true]); Sanctum::actingAs($user);
+        DB::table('terminals')->where('id', 10)->update(['available_seats' => '1-2,4|6']);
+        $url = self::BASE . '/quick-answers?departure_id=1&destination_id=2&date=2026-10-13';
+        $this->getJson($url)->assertOk()->assertJsonPath('data.departures.0.available_seats', 4);
+        foreach ([1, 2, 4, 6] as $seat) { $this->ticket(100 + $seat, ['schedule_id' => 1, 'schedule_date' => '2026-10-13', 'seat_no' => $seat]); }
+        $this->getJson($url)->assertOk()->assertJsonPath('data.departures.0.available_seats', 0);
+        $user->update(['check_allowed_seats' => false]);
+        $this->getJson($url)->assertOk()->assertJsonPath('data.departures.0.available_seats', 2);
+    }
+
+    public function test_available_seats_are_unknown_when_map_or_journey_data_cannot_be_verified(): void
+    {
+        $this->informationSchema(); Sanctum::actingAs($this->agent(1, 1, 10, false, false, true, '[1]'));
+        $url = self::BASE . '/quick-answers?departure_id=1&destination_id=2&date=2026-10-13';
+        $this->ticket(100, ['schedule_id' => 1, 'schedule_date' => '2026-10-13', 'seat_no' => 1, 'departure_city_id' => 999]);
+        $this->getJson($url)->assertOk()->assertJsonPath('data.departures.0.available_seats', null);
+        DB::table('bus_classes')->where('id', 1)->update(['seat_map' => null]);
+        $this->getJson($url)->assertOk()->assertJsonPath('data.departures.0.available_seats', null);
+    }
+
+    private function grant(User $user, array $actions): void
+    {
+        $permissions = CallCenterPermissions::append([], true);
+        foreach ($permissions[0]['buttons'] as &$button) {
+            $button['allow'] = in_array(substr($button['name'], 12), $actions, true);
+        }
+        unset($button);
+        DB::table('roles')->where('id', $user->role_id)->update(['permissions' => json_encode($permissions)]);
+        $user->unsetRelation('role');
+    }
+
+    public function test_scope_grants_never_imply_actions_and_missing_flags_deny(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user);
+        $call = $this->logCall($user, ['category' => 'C', 'remarks' => 'Complaint']);
+        $this->grant($user, ['supervise', 'all-terminals']);
+        $this->getJson(self::BASE . '/options')->assertOk()->assertJsonPath('data.permissions.create', false)
+            ->assertJsonPath('data.permissions.review', false)->assertJsonPath('data.permissions.supervise', true);
+        foreach (['/calls', '/calls/' . $call->id, '/history?phone=03001234567', '/passengers?search_by=phone&q=03001234567',
+            '/quick-answers/options', '/quick-answers', '/summary?date=2026-10-13', '/daily-report?date=2026-10-13'] as $path) {
+            $this->getJson(self::BASE . $path)->assertForbidden();
+        }
+        $this->postJson(self::BASE . '/calls', ['category' => 'GI', 'shift' => 1])->assertForbidden();
+        $this->patchJson(self::BASE . '/calls/' . $call->id, ['remarks' => 'Changed'])->assertForbidden();
+        $this->postJson(self::BASE . '/calls/' . $call->id . '/close-complaint', ['resolution_remarks' => 'Resolved'])->assertForbidden();
+        foreach (['shift-review', 'daily-review'] as $path) { $this->postJson(self::BASE . '/' . $path, [])->assertForbidden(); }
+        $legacy = [['name' => 'ticketing', 'allow' => true, 'childs' => [['name' => 'call-center', 'allow' => true, 'buttons' => []]]]];
+        DB::table('roles')->where('id', $user->role_id)->update(['permissions' => json_encode($legacy)]); $user->unsetRelation('role');
+        $this->postJson(self::BASE . '/calls', ['category' => 'GI', 'shift' => 1])->assertForbidden();
+    }
+
+    public function test_complaint_view_and_closure_are_independent_of_call_editing(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user);
+        $ordinary = $this->logCall($user); $complaint = $this->logCall($user, ['category' => 'C', 'remarks' => 'Late bus']);
+        $this->grant($user, ['view-complaints']);
+        $this->getJson(self::BASE . '/calls')->assertOk()->assertJsonPath('data.total', 1)->assertJsonPath('data.data.0.id', $complaint->id);
+        $this->getJson(self::BASE . '/calls?category=GI')->assertOk()->assertJsonPath('data.total', 0);
+        $this->getJson(self::BASE . '/calls/' . $ordinary->id)->assertForbidden();
+        $this->assertArrayNotHasKey('audit', $this->getJson(self::BASE . '/calls/' . $complaint->id)->assertOk()->json('data'));
+        $this->postJson(self::BASE . '/calls/' . $complaint->id . '/close-complaint', ['resolution_remarks' => 'Resolved'])->assertForbidden();
+        $this->grant($user, ['view-complaints', 'close-complaints']);
+        $this->postJson(self::BASE . '/calls/' . $complaint->id . '/close-complaint', ['resolution_remarks' => 'Resolved'])->assertOk()->assertJsonPath('data.status', 'closed');
+        $this->patchJson(self::BASE . '/calls/' . $complaint->id, ['status' => 'new'])->assertForbidden();
+        $this->grant($user, ['view-complaints', 'edit-calls', 'close-complaints']);
+        $this->patchJson(self::BASE . '/calls/' . $complaint->id, ['category' => 'GI', 'status' => 'new'])->assertForbidden();
+        $this->grant($user, ['view-complaints', 'edit-calls']);
+        $this->patchJson(self::BASE . '/calls/' . $complaint->id, ['status' => 'new'])->assertForbidden();
+        $this->grant($user, ['view-complaints', 'edit-calls', 'reopen-complaints', 'view-audit']);
+        $this->patchJson(self::BASE . '/calls/' . $complaint->id, ['status' => 'new'])->assertOk()->assertJsonPath('data.resolved_by', null);
+        $this->getJson(self::BASE . '/calls/' . $complaint->id)->assertOk()->assertJsonCount(2, 'data.audit');
+    }
+
+    public function test_create_permission_does_not_allow_lookup_assignment_callbacks_or_followups(): void
+    {
+        $user = $this->agent(); $other = $this->agent(2); Sanctum::actingAs($user); $this->ticket();
+        $this->grant($user, ['create-calls']);
+        $base = ['category' => 'GI', 'shift' => 1, 'caller_phone' => '03001234567'];
+        $id = $this->postJson(self::BASE . '/calls', $base)->assertCreated()->json('data.id');
+        $this->getJson(self::BASE . '/calls/' . $id)->assertForbidden();
+        $this->postJson(self::BASE . '/calls', $base + ['ticket_id' => 100])->assertForbidden();
+        $this->postJson(self::BASE . '/calls', $base + ['assigned_to' => $other->id])->assertForbidden();
+        $this->postJson(self::BASE . '/calls', $base + ['callback_at' => '2026-10-13 12:00:00'])->assertForbidden();
+        $this->postJson(self::BASE . '/calls', ['category' => 'FU', 'shift' => 1, 'parent_call_id' => $id])->assertForbidden();
+        $this->assertSame(1, CallLog::count());
+        $this->grant($user, ['create-calls', 'passenger-lookup', 'assign-calls', 'manage-callbacks']);
+        $this->postJson(self::BASE . '/calls', $base + ['ticket_id' => 100, 'assigned_to' => $other->id, 'callback_at' => '2026-10-13 12:00:00', 'outcome' => 'follow_up'])
+            ->assertCreated()->assertJsonPath('data.status', 'waiting');
+    }
+
+    public function test_edit_permission_cannot_bypass_callback_assignment_or_complaint_closure(): void
+    {
+        $user = $this->agent(); $other = $this->agent(2); Sanctum::actingAs($user);
+        $call = $this->logCall($user, ['assigned_to' => 2, 'callback_at' => '2026-10-13 12:00:00']);
+        $complaint = $this->logCall($user, ['category' => 'C']);
+        $this->grant($user, ['view-calls', 'edit-calls']);
+        $this->patchJson(self::BASE . '/calls/' . $call->id, ['remarks' => 'Notes only'])->assertOk();
+        $this->patchJson(self::BASE . '/calls/' . $call->id, ['callback_at' => '2026-10-13 13:00:00'])->assertForbidden();
+        $this->patchJson(self::BASE . '/calls/' . $call->id, ['assigned_to' => 1])->assertForbidden();
+        $this->patchJson(self::BASE . '/calls/' . $call->id, ['assigned_to' => null])->assertForbidden();
+        $this->patchJson(self::BASE . '/calls/' . $complaint->id, ['category' => 'GI', 'outcome' => 'finish'])->assertForbidden();
+        $this->assertSame('new', $complaint->fresh()->status);
+        $this->grant($user, ['view-calls', 'edit-calls', 'view-complaints', 'close-complaints']);
+        $this->patchJson(self::BASE . '/calls/' . $complaint->id, ['category' => 'GI', 'outcome' => 'finish'])->assertUnprocessable();
+    }
+
+    public function test_followup_cannot_close_parent_without_the_parent_action_permission(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user);
+        $parent = $this->logCall($user, ['category' => 'C']);
+        $actions = ['create-calls', 'view-calls', 'follow-up', 'view-complaints'];
+        $this->grant($user, $actions);
+        $payload = ['category' => 'FU', 'shift' => 1, 'parent_call_id' => $parent->id, 'resolve_parent' => true, 'outcome' => 'finish', 'remarks' => 'Resolved by terminal'];
+        $this->postJson(self::BASE . '/calls', $payload)->assertForbidden();
+        $this->assertSame(1, CallLog::count()); $this->assertSame('new', $parent->fresh()->status);
+        $this->grant($user, array_merge($actions, ['close-complaints']));
+        $this->postJson(self::BASE . '/calls', $payload)->assertCreated();
+        $this->assertSame('closed', $parent->fresh()->status);
+        $ordinary = $this->logCall($user);
+        $payload['parent_call_id'] = $ordinary->id;
+        $this->postJson(self::BASE . '/calls', $payload)->assertForbidden();
+        $this->assertSame('new', $ordinary->fresh()->status);
+    }
+
+    public function test_report_access_review_and_scope_are_separate(): void
+    {
+        $user = $this->agent(); $other = $this->agent(2); Sanctum::actingAs($user);
+        $this->logCall($user); $this->logCall($other);
+        $this->grant($user, ['shift-report']);
+        $this->getJson(self::BASE . '/summary?date=2026-10-13')->assertOk()->assertJsonPath('data.totals.total', 1);
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-13')->assertForbidden();
+        $this->grant($user, ['shift-report', 'supervise']);
+        $token = $this->getJson(self::BASE . '/summary?date=2026-10-13')->assertOk()->assertJsonPath('data.totals.total', 2)->json('data.snapshot_tokens.1');
+        $payload = ['date' => '2026-10-13', 'shift' => 1, 'snapshot_token' => $token];
+        $this->postJson(self::BASE . '/shift-review', $payload)->assertForbidden();
+        $this->grant($user, ['shift-report', 'review-reports']);
+        $this->postJson(self::BASE . '/shift-review', $payload)->assertForbidden();
+        $this->grant($user, ['shift-report', 'supervise', 'review-reports']);
+        $this->postJson(self::BASE . '/shift-review', $payload)->assertOk();
+        $this->postJson(self::BASE . '/daily-review', $payload)->assertForbidden();
+        $this->getJson(self::BASE . '/calls')->assertForbidden();
+    }
+
+    public function test_company_module_and_action_denials_override_role_grants(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user);
+        $company = CallCenterPermissions::append([], true);
+        foreach ($company[0]['buttons'] as &$button) { if ($button['name'] === 'call-center-create-calls') $button['allow'] = false; }
+        unset($button);
+        DB::table('companies')->where('id', 1)->update(['modules' => json_encode($company)]); $user->unsetRelation('company');
+        $this->getJson(self::BASE . '/options')->assertOk()->assertJsonPath('data.permissions.create', false);
+        $this->postJson(self::BASE . '/calls', ['category' => 'GI', 'shift' => 1])->assertForbidden();
+        $company[0]['allow'] = false;
+        DB::table('companies')->where('id', 1)->update(['modules' => json_encode($company)]); $user->unsetRelation('company');
+        $this->getJson(self::BASE . '/options')->assertForbidden();
+    }
+
+    public function test_granular_migration_preserves_legacy_access_and_never_regrants_denials(): void
+    {
+        $legacy = [['name' => 'ticketing', 'allow' => true, 'childs' => [['name' => 'call-center', 'allow' => true, 'buttons' => [
+            ['name' => 'call-center-supervise', 'allow' => false], ['name' => 'call-center-all-terminals', 'allow' => false],
+        ]]]]];
+        DB::table('roles')->insert(['id' => 1, 'company_id' => 1, 'permissions' => json_encode($legacy)]);
+        DB::table('roles')->insert(['id' => 2, 'company_id' => 1, 'permissions' => '[]']);
+        require_once database_path('migrations/2026_10_15_000005_add_call_center_role_privileges.php');
+        (new \AddCallCenterRolePrivileges)->up();
+        $role = json_decode(DB::table('roles')->where('id', 1)->value('permissions'), true);
+        $flags = array_column($role[0]['buttons'], 'allow', 'name');
+        $this->assertCount(18, $flags); $this->assertTrue($flags['call-center-close-complaints']);
+        $this->assertFalse($flags['call-center-review-reports']); $this->assertFalse($flags['call-center-supervise']);
+        $new = json_decode(DB::table('roles')->where('id', 2)->value('permissions'), true);
+        $this->assertFalse($new[0]['allow']);
+        $this->assertSame([], array_filter(array_column($new[0]['buttons'], 'allow')));
+        foreach ($role[0]['buttons'] as &$button) { if ($button['name'] === 'call-center-create-calls') $button['allow'] = false; }
+        unset($button);
+        $role[0]['buttons'] = array_values(array_filter($role[0]['buttons'], function ($button) { return $button['name'] !== 'call-center-view-audit'; }));
+        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode($role)]);
+        (new \AddCallCenterRolePrivileges)->up();
+        $after = DB::table('roles')->where('id', 1)->value('permissions');
+        $flags = array_column(json_decode($after, true)[0]['buttons'], 'allow', 'name');
+        $this->assertFalse($flags['call-center-create-calls']); $this->assertFalse($flags['call-center-view-audit']);
+        (new \AddCallCenterRolePrivileges)->up();
+        $this->assertSame($after, DB::table('roles')->where('id', 1)->value('permissions'));
+    }
+
+
+    public function test_role_editor_defaults_and_saves_granular_grants_with_company_boundary(): void
+    {
+        // Legacy routes use require_once, so register this file for the rebuilt test application.
+        \Illuminate\Support\Facades\Route::middleware('api')->prefix('api')->group(function () { require base_path('routes/api/role.php'); });
+        Schema::create('activity_logs', function (Blueprint $t) {
+            $t->id(); $t->integer('activity_by'); $t->text('message'); $t->string('requested_host'); $t->integer('company_id'); $t->timestamps(); $t->softDeletes();
+        });
+        $user = $this->agent(); Sanctum::actingAs($user);
+        $permissions = $user->role->permissions;
+        $permissions[] = ['name' => 'users', 'allow' => true, 'childs' => [['name' => 'roles', 'allow' => true, 'buttons' => [['name' => 'edit-role', 'allow' => true]]]]];
+        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode($permissions)]); $user->unsetRelation('role');
+        DB::table('roles')->insert(['id' => 2, 'company_id' => 1, 'name' => 'Complaint reader', 'permissions' => '[]']);
+        DB::table('roles')->insert(['id' => 3, 'company_id' => 2, 'name' => 'Other company', 'permissions' => '[]']);
+        $result = $this->postJson('/api/web/v1/role/get', ['id' => 2])->assertOk()->assertJsonCount(18, 'call_center_privileges');
+        $new = $result->json('permissions');
+        $this->assertFalse($new[0]['allow']);
+        $this->assertSame([], array_filter(array_column($new[0]['buttons'], 'allow')));
+        $new[0]['allow'] = true;
+        foreach ($new[0]['buttons'] as &$button) { $button['allow'] = $button['name'] === 'call-center-view-complaints'; } unset($button);
+        $body = ['id' => 2, 'company_id' => 1, 'name' => 'Complaint reader', 'permissions' => $new];
+        $this->postJson('/api/web/v1/role/update', $body)->assertStatus(201);
+        $this->assertSame($new, $this->postJson('/api/web/v1/role/get', ['id' => 2])->assertOk()->json('permissions'));
+        $this->postJson('/api/web/v1/role/get', ['id' => 3])->assertNotFound();
+        $body['id'] = 3;
+        $this->postJson('/api/web/v1/role/update', $body)->assertNotFound();
+        foreach ($permissions as &$module) { if ($module['name'] === 'users') $module['allow'] = false; } unset($module);
+        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode($permissions)]); $user->unsetRelation('role');
+        $body['id'] = 2;
+        $this->postJson('/api/web/v1/role/update', $body)->assertForbidden();
+    }
+
+    public function test_call_center_is_independent_of_ticketing_and_migration_preserves_denials(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user);
+        $permissions = $user->role->permissions;
+        foreach ($permissions as &$module) { if ($module['name'] === 'ticketing') $module['allow'] = false; } unset($module);
+        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode($permissions)]); $user->unsetRelation('role');
+        $this->getJson(self::BASE . '/options')->assertOk()->assertJsonPath('data.permissions.create', true);
+        $this->postJson(self::BASE . '/calls', ['category' => 'GI', 'shift' => 1])->assertCreated();
+        $old = [['name' => 'ticketing', 'allow' => false, 'childs' => [
+            ['name' => 'bookings', 'allow' => true, 'buttons' => [['name' => 'add-booking', 'allow' => true]]],
+            ['name' => 'call-center', 'allow' => true, 'buttons' => [['name' => 'call-center-close-complaints', 'allow' => false]]],
+        ]]];
+        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode($old)]);
+        require_once database_path('migrations/2026_10_15_000006_separate_call_center_permissions.php');
+        (new \SeparateCallCenterPermissions)->up();
+        $moved = json_decode(DB::table('roles')->where('id', 1)->value('permissions'), true);
+        $this->assertSame('call-center', $moved[0]['name']); $this->assertFalse($moved[0]['allow']);
+        $this->assertSame([$old[0]['childs'][0]], $moved[1]['childs']); $this->assertFalse($moved[1]['allow']);
+        $this->assertFalse(array_column($moved[0]['buttons'], 'allow', 'name')['call-center-close-complaints']);
+        $user->unsetRelation('role'); $user->unsetRelation('company');
+        $this->getJson(self::BASE . '/options')->assertForbidden();
+        (new \SeparateCallCenterPermissions)->up();
+        $this->assertSame($moved, json_decode(DB::table('roles')->where('id', 1)->value('permissions'), true));
+        $old[0]['allow'] = true;
+        $both = array_merge($moved, $old);
+        $normalized = CallCenterPermissions::append($both, false, true);
+        $this->assertFalse($normalized[0]['allow']); // Explicit standalone denial beats old nested grants.
+        $this->assertSame(1, count(array_filter($normalized, function ($module) { return $module['name'] === 'call-center'; })));
+    }
+}

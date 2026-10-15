@@ -99,3 +99,5 @@ require_once('api/reports/confirmCancellationReports.php');
 require_once('api/onlineTerminalCancellations.php');
 // Inventory Routes
 require_once('api/inventory.php');
+// Call Center
+require('api/callCenter.php');
