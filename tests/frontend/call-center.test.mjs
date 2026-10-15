@@ -4,7 +4,7 @@ import test from 'node:test';
 
 // The legacy application is bundled by Mix and does not declare package type=module.
 const source = await readFile(new URL('../../resources/js/pages/callCenter/callCenter.js', import.meta.url), 'utf8');
-const { pakistanDate, inputDateTime, callbackValue, apiError, request, canAccessCallCenter, reviewSnapshot, callCenterScreens } =
+const { pakistanDate, inputDateTime, callbackValue, apiError, request, canAccessCallCenter, reviewSnapshot, callCenterScreens, seatChangeSummary, callQueueParams } =
     await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 
 test('shift business date uses Pakistan time at UTC midnight boundary', () => {
@@ -110,4 +110,21 @@ test('call center screens require individual grants, independent of supervisor s
     assert.deepEqual(callCenterScreens({ quick_answers: true }).map(s => s.name), ['call-center']);
     assert.deepEqual(callCenterScreens({ shift_report: true, daily_report: true }).map(s => s.name), ['call-center-shifts', 'call-center-daily']);
     assert.deepEqual(callCenterScreens({ view: true, update: true, close_complaints: true }), []);
+});
+
+test('customer agreement summaries show request details without calling them completed transactions', () => {
+    assert.equal(seatChangeSummary({ category: 'GI' }), '');
+    assert.equal(seatChangeSummary({ category: 'RF', customer_response: 'agreed', change_seat_count: 2, proposed_refund_amount: '2500.50' }), 'Customer agreed · 2 seats · Refund discussed: PKR 2,500.50');
+    assert.equal(seatChangeSummary({ category: 'RF', customer_response: 'declined', change_seat_count: 1, proposed_refund_amount: 0 }), 'Customer declined · 1 seat · Refund discussed: PKR 0.00');
+    assert.equal(seatChangeSummary({ category: 'RS', customer_response: 'not_reached', proposed_travel_date: '2026-10-17', proposed_bus_time: '18:30' }), 'No answer · 1 seat · New date: 2026-10-17 · New time: 18:30');
+});
+
+test('awaiting agreement includes older work and cannot inherit closed/date filters', () => {
+    const filters = { date: '2026-10-16', status: 'closed', shift: '', category: 'RF' };
+    const params = callQueueParams('awaiting_agreement', filters, 2);
+    assert.equal(params.date, undefined);
+    assert.equal(params.status, undefined);
+    assert.equal(params.category, 'RF');
+    assert.equal(params.page, 2);
+    assert.equal(filters.date, '2026-10-16');
 });

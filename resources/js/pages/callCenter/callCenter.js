@@ -80,9 +80,9 @@ export function bookingTime(value) {
 export function callQueueParams(queue, filters, page = 1) {
     const params = { ...filters, queue, page };
     if (!params.date) delete params.date;
-    if (queue === 'callbacks_due' || queue === 'open_complaints') delete params.date;
+    if (queue === 'callbacks_due' || queue === 'open_complaints' || queue === 'awaiting_agreement') delete params.date;
     if (queue === 'open_complaints') { delete params.category; delete params.status; }
-    if (queue === 'callbacks_due') delete params.status;
+    if (queue === 'callbacks_due' || queue === 'awaiting_agreement') delete params.status;
     return params;
 }
 
@@ -103,4 +103,17 @@ export function callCenterScreens(permissions = {}) {
         { name: 'call-center-shifts', label: 'Shift summary', allowed: permissions.shift_report },
         { name: 'call-center-daily', label: 'Daily report', allowed: permissions.daily_report },
     ].filter(screen => screen.allowed === true);
+}
+
+export function seatChangeSummary(call) {
+    if (!['RF', 'RS'].includes(call.category)) return '';
+    const response = { agreed: 'Customer agreed', declined: 'Customer declined', not_reached: 'No answer' }[call.customer_response] || 'Awaiting response';
+    const seats = Number(call.change_seat_count || 1);
+    const parts = [response, `${seats} ${seats === 1 ? 'seat' : 'seats'}`];
+    if (call.category === 'RF' && call.proposed_refund_amount != null && call.proposed_refund_amount !== '') parts.push(`Refund discussed: PKR ${Number(call.proposed_refund_amount).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+    if (call.category === 'RS') {
+        if (call.proposed_travel_date) parts.push(`New date: ${call.proposed_travel_date}`);
+        if (call.proposed_bus_time) parts.push(`New time: ${call.proposed_bus_time}`);
+    }
+    return parts.join(' · ');
 }

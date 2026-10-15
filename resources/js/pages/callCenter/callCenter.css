@@ -167,3 +167,12 @@
 @media (min-width: 1400px) { .cc-category-buttons { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
 .cc-workspace.cc-one-column { grid-template-columns: minmax(0, 1fr); }
+
+.cc-seat-change { margin: 0; padding: 16px; border: 1px solid #d1dfd7; border-radius: 8px; background: #f4f9f5; }
+.cc-seat-change legend { font-size: 15px; font-weight: 650; padding: 0 6px; }
+.cc-seat-change .cc-grid { margin-bottom: 16px; }
+.cc-seat-change > .cc-muted { margin: 10px 0 0; }
+@media (min-width: 1400px) { .cc-category-buttons.cc-six-categories { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media print { body.call-center-print .cc-stats { grid-template-columns: repeat(4, 1fr); } }
+
+.cc-complaint-journey > fieldset { border: 0; margin: 14px 0 0; padding: 0; }

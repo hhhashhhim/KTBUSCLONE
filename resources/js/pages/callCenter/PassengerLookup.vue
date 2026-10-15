@@ -14,7 +14,7 @@
         <div v-if="passengers.length" class="cc-results" aria-label="Passenger search results">
             <article v-for="passenger in passengers" :key="passenger.id" class="cc-passenger">
                 <div class="cc-card-header compact"><div><strong>{{ passenger.name }}</strong><p class="cc-muted">{{ passenger.contact }} · {{ passenger.cnic_masked }}</p></div><button type="button" class="cc-button secondary small" @click="select(passenger)" :disabled="disabled">Use passenger</button></div>
-                <details :open="category === 'BK'"><summary>Bookings ({{ passenger.tickets.length }})</summary>
+                <details :open="['BK', 'RF', 'RS'].includes(category)"><summary>Bookings ({{ passenger.tickets.length }})</summary>
                     <div v-for="ticket in passenger.tickets" :key="ticket.id" class="cc-ticket">
                         <strong>{{ ticket.booking_no || ticket.invoice_id || ticket.id }} · Seat {{ ticket.seat_no }}</strong>
                         <p>{{ ticket.departure || '—' }} → {{ ticket.destination || '—' }}</p><p>{{ ticket.schedule_date }} · {{ ticket.schedule_time }} · {{ ticket.terminal_name }}</p>

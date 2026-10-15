@@ -63,7 +63,7 @@ contact does not replace the number used for this call. The number is persisted
 with the call when **Save & finish** or **Save follow-up** succeeds. CNIC
 results are masked. Passenger and booking results show only accessible records.
 
-The four category buttons reveal the necessary fields:
+The six category buttons reveal the necessary fields:
 
 - **General Information:** Fare, Timings or Terminal location; notes and caller
   details are optional, and no passenger selection is required.
@@ -85,6 +85,10 @@ The four category buttons reveal the necessary fields:
   These details save with the complaint, remain editable when reopened and
   appear in work queues, caller history and the linked follow-up context.
   **Save complaint** keeps it open and shows a link to the **Complaints** tab.
+- **Refund / Reschedule:** choose Agreed, Declined or No answer and Save call.
+  Seats default to 1. Refund amount, new travel date/time, ticket linking and
+  journey details are optional. Journey details start collapsed for these calls.
+  The response records the conversation; Ticketing processes the actual change.
 - **Follow-up:** choose an earlier call by its reference/phone, or use its
   **Follow up** action in a queue/history. An optional checkbox also resolves
   that earlier call when the follow-up is finished.
@@ -142,7 +146,7 @@ send a message.
 
 ## Reports
 
-Counts and ratios come from the backend. GI + BK + C + FU equals total calls.
+Counts and ratios come from the backend. GI + BK + C + FU + RF + RS equals total calls.
 The booking ratio is the share of calls in the Confirmed Booking category.
 Seats attached to booking calls may recur across multiple calls; these are not
 unique seats sold. Complaint/follow-up outcomes describe current statuses of
@@ -247,3 +251,34 @@ information call saves successfully without fetching a call list.
 Files for detailed access: `resources/js/pages/roles/Permissions.vue`,
 `resources/js/pages/callCenter/{CallCenterPage.vue,CallLog.vue,Complaints.vue,callCenter.js,callCenter.css}`,
 `tests/frontend/call-center.test.mjs`, and this document.
+
+## Customer agreements for refund and reschedule calls
+
+Deploy the matching API and apply
+`2026_10_16_000001_add_call_center_customer_agreement` before these views.
+The local preview has the migration and both branches connected.
+
+Choose Refund or Reschedule, optionally enter the discussed amount or new journey,
+choose the customer's response and Save call. Missing response is highlighted;
+choosing one clears that error. Changing a proposal clears the selected response
+so it can be recorded for the revised terms. The queue/history cards show the
+response and proposal, and report category tables include RF and RS.
+
+No answer stays in **Awaiting agreement**, including older dates. **Follow up**
+opens a new call of the same request type, carries forward the proposal and asks
+for a fresh response. It needs create, view-calls, follow-up and edit-calls.
+The new record keeps its date/agent and links to the earlier attempt. The earlier
+unanswered record is closed without changing its response, so the queue shows
+only the latest outstanding attempt. Passenger/booking selection stays attached
+to that earlier request. A failed save keeps the draft for retry.
+
+Both reports show **Refund & reschedule calls**, grouped by response and seats
+agreed. The daily report's separate **Completed seat changes in Ticketing** table
+continues to count actual ERP events. Recording agreement never increases those
+completed counts or changes a ticket/payment.
+
+Verified with 13 helper tests, a successful Mix build and disposable browser
+fixtures: required response, refund proposal, save failure/retry, unanswered
+reschedule queue, proposal-carrying follow-up, clearing outstanding work and six
+category report totals. The authoritative API tests separately verify permissions
+and that Ticketing tables do not change.
