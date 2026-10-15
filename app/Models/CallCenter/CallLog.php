@@ -11,7 +11,7 @@ class CallLog extends Model
     protected $table = 'call_center_calls';
     protected $guarded = [];
     protected $appends = ['reference'];
-    protected $casts = ['shift' => 'integer', 'seat_count' => 'integer'];
+    protected $casts = ['shift' => 'integer', 'seat_count' => 'integer', 'change_seat_count' => 'integer', 'proposed_refund_amount' => 'decimal:2'];
 
     public function getReferenceAttribute() { return 'CC-' . $this->id; }
     public function agent() { return $this->belongsTo(User::class, 'agent_id')->select(['id', 'name']); }

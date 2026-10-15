@@ -35,6 +35,8 @@ class CallCenterTest extends TestCase
         (new \AddCallCenterComplaintJourney)->up();
         require_once database_path('migrations/2026_10_15_000004_add_call_center_complaint_resolution.php');
         (new \AddCallCenterComplaintResolution)->up();
+        require_once database_path('migrations/2026_10_16_000001_add_call_center_customer_agreement.php');
+        (new \AddCallCenterCustomerAgreement)->up();
         DB::table('companies')->insert([
             ['id' => 1, 'modules' => json_encode(CallCenterPermissions::append([], true))], ['id' => 2, 'modules' => json_encode(CallCenterPermissions::append([], true))],
         ]);
@@ -885,5 +887,164 @@ class CallCenterTest extends TestCase
         $normalized = CallCenterPermissions::append($both, false, true);
         $this->assertFalse($normalized[0]['allow']); // Explicit standalone denial beats old nested grants.
         $this->assertSame(1, count(array_filter($normalized, function ($module) { return $module['name'] === 'call-center'; })));
+    }
+    public function test_refund_and_reschedule_calls_record_agreement_without_touching_ticketing(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user); $this->ticket(100);
+        $before = DB::table('tickets')->get()->toJson();
+        $this->getJson(self::BASE . '/options')->assertOk()->assertJsonFragment(['value' => 'RF', 'label' => 'Refund'])
+            ->assertJsonFragment(['value' => 'RS', 'label' => 'Reschedule'])->assertJsonCount(3, 'data.customer_responses');
+        $refund = $this->postJson(self::BASE . '/calls', ['category' => 'RF', 'shift' => 1, 'customer_response' => 'agreed',
+            'change_seat_count' => 2, 'proposed_refund_amount' => '4500.50', 'seat_count' => 99, 'ticket_id' => 100,
+            'complaint_seat_number' => '12, 13', 'outcome' => 'record'])->assertCreated()->assertJsonPath('data.status', 'closed')
+            ->assertJsonPath('data.customer_response', 'agreed')->assertJsonPath('data.change_seat_count', 2)
+            ->assertJsonPath('data.proposed_refund_amount', '4500.50')->assertJsonPath('data.seat_count', 0)->json('data.id');
+        $reschedule = $this->postJson(self::BASE . '/calls', ['category' => 'RS', 'shift' => 1, 'customer_response' => 'agreed',
+            'proposed_travel_date' => '2026-10-15', 'proposed_bus_time' => '18:30', 'outcome' => 'record'])->assertCreated()
+            ->assertJsonPath('data.ticket_id', null)->assertJsonPath('data.change_seat_count', 1)->assertJsonPath('data.status', 'closed')
+            ->assertJsonPath('data.proposed_travel_date', '2026-10-15')->assertJsonPath('data.proposed_bus_time', '18:30')->json('data.id');
+        $this->getJson(self::BASE . '/calls/' . $refund)->assertOk()->assertJsonPath('data.complaint_seat_number', '12, 13')->assertJsonPath('data.audit.0.actor.id', $user->id);
+        $this->getJson(self::BASE . '/calls?category=RS')->assertOk()->assertJsonPath('data.total', 1)->assertJsonPath('data.data.0.id', $reschedule);
+        $this->assertSame($before, DB::table('tickets')->get()->toJson());
+        $this->assertSame(0, DB::table('booking_cancels')->count()); $this->assertSame(0, DB::table('ticket_reschedules')->count());
+    }
+
+    public function test_customer_response_and_proposal_validation_are_enforced_by_the_api(): void
+    {
+        Sanctum::actingAs($this->agent());
+        $base = ['category' => 'RF', 'shift' => 1, 'outcome' => 'record'];
+        $this->postJson(self::BASE . '/calls', $base)->assertUnprocessable()->assertJsonValidationErrors('customer_response');
+        foreach ([['customer_response' => 'paid'], ['customer_response' => 'agreed', 'change_seat_count' => 0],
+            ['customer_response' => 'agreed', 'change_seat_count' => 101], ['customer_response' => 'agreed', 'change_seat_count' => 1.5],
+            ['customer_response' => 'agreed', 'proposed_refund_amount' => -1], ['customer_response' => 'agreed', 'proposed_refund_amount' => '12.345'],
+            ['customer_response' => 'agreed', 'proposed_refund_amount' => '10000000000']] as $fields) {
+            $this->postJson(self::BASE . '/calls', $base + $fields)->assertUnprocessable();
+        }
+        $this->postJson(self::BASE . '/calls', ['category' => 'RS', 'shift' => 1, 'customer_response' => 'agreed', 'proposed_travel_date' => '2026-02-30'])->assertUnprocessable();
+        $this->postJson(self::BASE . '/calls', ['category' => 'RS', 'shift' => 1, 'customer_response' => 'agreed', 'proposed_bus_time' => '25:00'])->assertUnprocessable();
+        $this->assertSame(0, CallLog::count());
+        $this->postJson(self::BASE . '/calls', $base + ['customer_response' => 'declined', 'proposed_refund_amount' => '0.00'])
+            ->assertCreated()->assertJsonPath('data.status', 'closed')->assertJsonPath('data.proposed_refund_amount', '0.00');
+    }
+
+    public function test_unanswered_requests_remain_in_date_independent_scoped_queue(): void
+    {
+        $user = $this->agent(); $other = $this->agent(2); Sanctum::actingAs($user);
+        $id = $this->postJson(self::BASE . '/calls', ['category' => 'RF', 'shift' => 1, 'customer_response' => 'not_reached',
+            'call_date' => '2026-10-12', 'outcome' => 'record'])->assertCreated()->assertJsonPath('data.status', 'waiting')
+            ->assertJsonPath('data.assigned_to', $user->id)->json('data.id');
+        $this->logCall($user, ['category' => 'RS', 'customer_response' => 'agreed', 'status' => 'closed']);
+        $this->logCall($other, ['category' => 'RS', 'customer_response' => 'not_reached']);
+        $this->getJson(self::BASE . '/calls?queue=awaiting_agreement&date=2026-10-13')->assertOk()->assertJsonPath('data.total', 1)->assertJsonPath('data.data.0.id', $id);
+        $this->getJson(self::BASE . '/calls?queue=awaiting_agreement&terminal_id=11')->assertForbidden();
+        $this->patchJson(self::BASE . '/calls/' . $id, ['customer_response' => 'agreed', 'outcome' => 'record'])->assertOk()->assertJsonPath('data.status', 'closed');
+        $this->getJson(self::BASE . '/calls?queue=awaiting_agreement')->assertOk()->assertJsonPath('data.total', 0);
+    }
+
+    public function test_proposal_edits_are_audited_and_cleared_when_changing_call_type(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user);
+        $id = $this->postJson(self::BASE . '/calls', ['category' => 'RF', 'shift' => 1, 'customer_response' => 'agreed',
+            'proposed_refund_amount' => '2500', 'change_seat_count' => 3])->assertCreated()->json('data.id');
+        $this->patchJson(self::BASE . '/calls/' . $id, ['remarks' => 'Customer confirmed again'])->assertOk()->assertJsonPath('data.proposed_refund_amount', '2500.00');
+        $this->patchJson(self::BASE . '/calls/' . $id, ['category' => 'RS'])->assertUnprocessable()->assertJsonValidationErrors('customer_response');
+        $this->patchJson(self::BASE . '/calls/' . $id, ['category' => 'RS', 'customer_response' => 'declined', 'proposed_travel_date' => '2026-10-15', 'proposed_bus_time' => '16:00'])->assertOk()
+            ->assertJsonPath('data.proposed_refund_amount', null)->assertJsonPath('data.customer_response', 'declined')->assertJsonPath('data.change_seat_count', 3);
+        $this->getJson(self::BASE . '/calls/' . $id)->assertOk()->assertJsonPath('data.audit.2.changes.customer_response.to', 'declined');
+        $this->patchJson(self::BASE . '/calls/' . $id, ['category' => 'GI'])->assertOk()->assertJsonPath('data.customer_response', null)
+            ->assertJsonPath('data.change_seat_count', null)->assertJsonPath('data.proposed_travel_date', null)->assertJsonPath('data.proposed_bus_time', null);
+    }
+
+    public function test_refund_and_reschedule_calls_use_existing_action_and_booking_boundaries(): void
+    {
+        $user = $this->agent(); $other = $this->agent(2); Sanctum::actingAs($user);
+        $this->ticket(100, ['terminal_id' => 11]); $this->ticket(101, ['company_id' => 2, 'terminal_id' => 20]);
+        $this->grant($user, ['view-calls']);
+        $base = ['category' => 'RF', 'shift' => 1, 'customer_response' => 'agreed'];
+        $this->postJson(self::BASE . '/calls', $base)->assertForbidden();
+        $this->grant($user, ['create-calls']);
+        $id = $this->postJson(self::BASE . '/calls', $base)->assertCreated()->json('data.id');
+        $this->postJson(self::BASE . '/calls', $base + ['ticket_id' => 100])->assertForbidden();
+        $this->grant($user, ['create-calls', 'passenger-lookup']);
+        foreach ([100, 101] as $ticket) { $this->postJson(self::BASE . '/calls', $base + ['ticket_id' => $ticket])->assertUnprocessable(); }
+        $this->patchJson(self::BASE . '/calls/' . $id, ['customer_response' => 'declined'])->assertForbidden();
+        $this->grant($user, ['view-calls', 'edit-calls']);
+        $this->patchJson(self::BASE . '/calls/' . $id, ['customer_response' => 'declined'])->assertOk();
+        $foreign = $this->logCall($other, ['category' => 'RS', 'customer_response' => 'agreed']);
+        $this->getJson(self::BASE . '/calls/' . $foreign->id)->assertNotFound();
+    }
+
+    public function test_agreement_totals_are_separate_from_completed_ticket_changes_and_invalidate_reviews(): void
+    {
+        $supervisor = $this->agent(1, 1, 10, true); $agent = $this->agent(2);
+        $this->ticket(100, ['type' => 'canceled', 'deleted_at' => now(), 'refund_amount' => 2000]);
+        DB::table('booking_cancels')->insert(['company_id' => 1, 'ticket_id' => 100, 'added_by' => 2, 'type' => 'booked', 'created_at' => now()]);
+        $this->logCall($agent, ['category' => 'RF', 'customer_response' => 'agreed', 'change_seat_count' => 3, 'status' => 'closed']);
+        $this->logCall($agent, ['category' => 'RF', 'customer_response' => 'declined', 'change_seat_count' => 2, 'status' => 'closed']);
+        $waiting = $this->logCall($agent, ['category' => 'RS', 'customer_response' => 'not_reached', 'change_seat_count' => 4]);
+        $this->logCall($agent, ['category' => 'RS', 'customer_response' => 'agreed', 'change_seat_count' => 2, 'status' => 'closed']);
+        Sanctum::actingAs($supervisor);
+        foreach (['/summary', '/daily-report'] as $endpoint) {
+            $this->getJson(self::BASE . $endpoint . '?date=2026-10-13')->assertOk()->assertJsonPath('data.totals.total', 4)
+                ->assertJsonPath('data.totals.RF', 2)->assertJsonPath('data.totals.RS', 2)->assertJsonPath('data.totals.seats', 0)
+                ->assertJsonPath('data.customer_agreements.refund.calls', 2)->assertJsonPath('data.customer_agreements.refund.agreed', 1)
+                ->assertJsonPath('data.customer_agreements.refund.declined', 1)->assertJsonPath('data.customer_agreements.refund.agreed_seats', 3)
+                ->assertJsonPath('data.customer_agreements.reschedule.not_reached', 1)->assertJsonPath('data.customer_agreements.reschedule.agreed_seats', 2);
+        }
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-13')->assertOk()->assertJsonPath('data.seat_movements.0.refunded', 1);
+        $this->postJson(self::BASE . '/daily-review', ['date' => '2026-10-13', 'snapshot_token' => $this->snapshot()])->assertOk();
+        $this->patchJson(self::BASE . '/calls/' . $waiting->id, ['customer_response' => 'agreed', 'outcome' => 'record'])->assertOk();
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-13')->assertOk()->assertJsonPath('data.review.stale', true)
+            ->assertJsonPath('data.customer_agreements.reschedule.agreed_seats', 6)->assertJsonPath('data.seat_movements.0.refunded', 1);
+        Sanctum::actingAs($agent);
+        $this->getJson(self::BASE . '/summary?date=2026-10-13&shift=2')->assertOk()->assertJsonPath('data.customer_agreements.refund.calls', 0);
+    }
+
+    public function test_followup_cannot_hide_an_unanswered_customer_agreement(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user);
+        $call = $this->logCall($user, ['category' => 'RF', 'customer_response' => 'not_reached', 'change_seat_count' => 1, 'status' => 'waiting']);
+        $this->postJson(self::BASE . '/calls', ['category' => 'FU', 'shift' => 1, 'parent_call_id' => $call->id,
+            'resolve_parent' => true, 'outcome' => 'finish', 'remarks' => 'Could not reach customer'])->assertUnprocessable()->assertJsonValidationErrors('resolve_parent');
+        $this->assertSame(1, CallLog::count()); $this->assertSame('waiting', $call->fresh()->status);
+        $this->patchJson(self::BASE . '/calls/' . $call->id, ['status' => 'closed'])->assertOk()->assertJsonPath('data.status', 'waiting');
+    }
+
+
+    public function test_new_agreement_followups_keep_call_history_and_only_latest_attempt_pending(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user);
+        $parent = $this->logCall($user, ['category' => 'RF', 'customer_response' => 'not_reached', 'change_seat_count' => 2,
+            'status' => 'waiting', 'call_date' => '2026-10-12', 'called_at' => '2026-10-12 20:00:00']);
+        $base = ['category' => 'RF', 'shift' => 1, 'parent_call_id' => $parent->id, 'customer_response' => 'not_reached', 'outcome' => 'record'];
+        $this->grant($user, ['create-calls', 'view-calls', 'follow-up']);
+        $this->postJson(self::BASE . '/calls', $base)->assertForbidden();
+        $this->assertSame(1, CallLog::count());
+        $this->grant($user, ['create-calls', 'view-calls', 'follow-up', 'edit-calls']);
+        $next = $this->postJson(self::BASE . '/calls', $base)->assertCreated()->assertJsonPath('data.status', 'waiting')->json('data.id');
+        $this->assertSame('closed', $parent->fresh()->status); $this->assertSame('not_reached', $parent->fresh()->customer_response);
+        $this->getJson(self::BASE . '/calls?queue=awaiting_agreement')->assertOk()->assertJsonPath('data.total', 1)->assertJsonPath('data.data.0.id', $next);
+        $base['parent_call_id'] = $next; $base['customer_response'] = 'agreed'; $base['change_seat_count'] = 2;
+        $agreed = $this->postJson(self::BASE . '/calls', $base)->assertCreated()->assertJsonPath('data.status', 'closed')->json('data.id');
+        $this->getJson(self::BASE . '/calls?queue=awaiting_agreement')->assertOk()->assertJsonPath('data.total', 0);
+        $this->patchJson(self::BASE . '/calls/' . $parent->id, ['remarks' => 'First attempt, later followed up'])->assertOk()->assertJsonPath('data.status', 'closed');
+        $this->grant($user, ['shift-report', 'view-calls', 'view-audit']);
+        $this->getJson(self::BASE . '/summary?date=2026-10-13')->assertOk()->assertJsonPath('data.totals.RF', 2)
+            ->assertJsonPath('data.customer_agreements.refund.agreed', 1)->assertJsonPath('data.customer_agreements.refund.not_reached', 1);
+        $audit = $this->getJson(self::BASE . '/calls/' . $next)->assertOk()->json('data.audit');
+        $this->assertSame($agreed, $audit[1]['changes']['resolved_by_call']);
+    }
+
+    public function test_agreement_followups_inherit_booking_access_but_cannot_change_the_booking(): void
+    {
+        $user = $this->agent(); Sanctum::actingAs($user); $this->ticket(100); $this->ticket(101);
+        $parent = $this->logCall($user, ['category' => 'RF', 'customer_response' => 'not_reached', 'customer_id' => 100, 'ticket_id' => 100, 'status' => 'waiting']);
+        $payload = ['category' => 'RF', 'shift' => 1, 'customer_response' => 'agreed', 'parent_call_id' => $parent->id,
+            'customer_id' => 100, 'ticket_id' => 100, 'outcome' => 'record'];
+        $this->postJson(self::BASE . '/calls', array_merge($payload, ['ticket_id' => 101, 'customer_id' => 101]))->assertUnprocessable()->assertJsonValidationErrors('ticket_id');
+        $this->postJson(self::BASE . '/calls', array_merge($payload, ['category' => 'RS']))->assertUnprocessable()->assertJsonValidationErrors('parent_call_id');
+        $this->grant($user, ['create-calls', 'view-calls', 'edit-calls', 'follow-up']);
+        $this->postJson(self::BASE . '/calls', $payload)->assertCreated()->assertJsonPath('data.ticket_id', 100);
+        $this->assertSame('closed', $parent->fresh()->status);
     }
 }

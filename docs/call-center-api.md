@@ -20,6 +20,8 @@ Information topic, and `2026_10_15_000003_add_call_center_complaint_journey`
 for the optional complaint journey details. Run
 `2026_10_15_000004_add_call_center_complaint_resolution` before enabling the
 Complaints tab; it adds closing remarks, closing time and closing agent.
+Run `2026_10_16_000001_add_call_center_customer_agreement` before enabling
+Refund/Reschedule call recording; it adds five nullable request/response columns.
 Phone/CNIC lookup resolves exact customer
 matches first, then checks their tickets within the caller's access scope.
 Run `2026_10_15_000005_add_call_center_role_privileges` and
@@ -90,7 +92,7 @@ change original agent, terminal or business date attribution.
 ## Options and lookup
 
 - `GET /options`: `data` contains `categories:[{value,label}]`,
-  `statuses:[{value,label}]`, `shifts:[1,2,3]`, `agents:[{id,name,terminal_id}]`,
+  `statuses:[{value,label}]`, `customer_responses:[{value,label}]`, `shifts:[1,2,3]`, `agents:[{id,name,terminal_id}]`,
   `terminals:[{id,name}]`, `current_user:{id,name,terminal_id}`, timezone
   `Asia/Karachi`, and `permissions`. Each privilege above appears without the
   prefix and with underscores (for example `view_calls`, `close_complaints`).
@@ -117,7 +119,8 @@ change original agent, terminal or business date attribution.
   last_page,total,per_page` (25 per page). Optional filters: `date` YYYY-MM-DD,
   `shift` 1/2/3, `category`, `status`, `terminal_id`, `agent_id`, `search`
   (CC-reference, caller phone/name or exact external reference),
-  `pending_callbacks=1`, `page`, `queue=today|callbacks_due|open_complaints|all`.
+  `pending_callbacks=1`, `page`, `queue=today|callbacks_due|open_complaints|awaiting_agreement|all`.
+  `awaiting_agreement` contains nonclosed RF/RS calls with No answer and ignores date filters.
   `today` defaults to the current Pakistan business date (an explicit date can
   override it). `callbacks_due` includes nonclosed callbacks due now or earlier,
   oldest callback first; `open_complaints` includes all nonclosed complaints.
@@ -129,7 +132,8 @@ change original agent, terminal or business date attribution.
 - `POST /calls`: required `shift,category`; optional `status,caller_name,
   caller_phone,customer_id,ticket_id,seat_count,remarks,assigned_to,callback_at,
   parent_call_id,external_reference,call_date,inquiry_topic,outcome,resolve_parent,
-  complaint_from_city,complaint_to_city,complaint_bus_time,complaint_seat_number`. Returns HTTP 201.
+  complaint_from_city,complaint_to_city,complaint_bus_time,complaint_seat_number,
+  customer_response,change_seat_count,proposed_refund_amount,proposed_travel_date,proposed_bus_time`. Returns HTTP 201.
 - `PATCH /calls/{id}`: same editable fields except `call_date`; only submitted
   fields update. Original agent/date/terminal remain unchanged. Audit stores
   changed fields, previous/new values and actor atomically.
@@ -143,7 +147,7 @@ change original agent, terminal or business date attribution.
   for pending work and `queue=all&category=C&status=closed` for closed complaints.
 
 Categories are exactly `GI` General Information (fares/timings/terminal location),
-`BK` Confirmed Booking, `C` Complaint, `FU` Follow-up. Statuses are `new`,
+`BK` Confirmed Booking, `C` Complaint, `FU` Follow-up, `RF` Refund and `RS` Reschedule. Statuses are `new`,
 `in_progress`, `waiting`, `closed`. GI and BK both permit calls without a passenger
 or ticket. If a ticket is linked to BK, it must be an existing active booked
 ticket and `customer_id` must match it. BK seats are derived from active booked
@@ -166,17 +170,17 @@ assignee defaults to the recording agent. Complaints with an explicit outcome
 require notes. Existing clients can omit outcome and retain the legacy status
 workflow, but setting a new/open complaint directly to closed is rejected:
 use the close-complaint endpoint with closing remarks. Existing closed complaints
-can still have their details edited. `record` is restricted to complaints.
+can still have their details edited. `record` is supported for complaints and Refund/Reschedule calls, as detailed below.
 `inquiry_topic` accepts `fare|timings|terminal` or null; non-GI calls
 clear it. The current UI requires a GI topic, while the API accepts null for
 older clients and records.
 
-Complaints and Confirmed Booking calls accept four independently optional,
+Complaints, Confirmed Booking, Refund and Reschedule calls accept four independently optional,
 nullable journey details (the existing `complaint_*` field names are retained
 for compatibility):
 `complaint_from_city` and `complaint_to_city` are city names (up to 120 characters),
 `complaint_bus_time` is `HH:mm` in Pakistan time, and `complaint_seat_number` is
-text up to 20 characters. Both categories can be saved without a linked ticket.
+text up to 20 characters. Each category can be saved without a linked ticket.
 These values describe the reported
 journey and do not change the linked booking or its derived seat count. A PATCH
 preserves omitted fields; explicit null clears a field. GI and FU clear all four.
@@ -201,7 +205,8 @@ Call fields: `id,reference,company_id,terminal_id,agent_id,call_date,called_at,
 shift,category,inquiry_topic,status,caller_name,caller_phone,customer_id,ticket_id,seat_count,
 remarks,assigned_to,callback_at,parent_call_id,external_reference,created_at,
 updated_at,complaint_from_city,complaint_to_city,complaint_bus_time,
-complaint_seat_number,resolution_remarks,resolved_at,resolved_by,
+complaint_seat_number,resolution_remarks,resolved_at,resolved_by,customer_response,
+change_seat_count,proposed_refund_amount,proposed_travel_date,proposed_bus_time,
 agent:{id,name},assignee:{id,name}|null,terminal:{id,name}|null`.
 Call list/detail and complaint-close responses also include `resolver:{id,name}|null`.
 
@@ -244,8 +249,8 @@ Call list/detail and complaint-close responses also include `resolver:{id,name}|
 ## Reports and review
 
 - `GET /summary?date=YYYY-MM-DD&shift=1&terminal_id=...`: shift and terminal are
-  optional. `data={rows:[{agent_id,agent_name,shift,GI,BK,C,FU,total,seats}],
-  totals:{GI,BK,C,FU,total,seats},reviews:[review],snapshot_tokens:{1:hash,2:hash,3:hash}}`. Seats counts BK seats only. Tokens for shifts excluded by the shift filter are null; load that shift or all shifts before reviewing.
+  optional. `data={rows:[{agent_id,agent_name,shift,GI,BK,C,FU,RF,RS,total,seats}],
+  totals:{GI,BK,C,FU,RF,RS,total,seats},reviews:[review],snapshot_tokens:{1:hash,2:hash,3:hash}}`. Seats counts BK seats only. Tokens for shifts excluded by the shift filter are null; load that shift or all shifts before reviewing.
 - `GET /daily-report?date=YYYY-MM-DD&terminal_id=...`: same rows/totals plus
   `complaints:{closed,pending},followups:{closed,pending},ratios:{booking,
   general_information},seat_movements:[{terminal_id,terminal_name,shifted,
@@ -317,3 +322,52 @@ Files for detailed access: `app/Support/{CallCenterPermissions.php,CallCenterSco
 `database/migrations/2026_10_15_000005_add_call_center_role_privileges.php`,
 `database/migrations/2026_10_15_000006_separate_call_center_permissions.php`,
 `tests/Feature/CallCenterTest.php`, and this document.
+
+## Refund and reschedule customer calls (16 October 2026)
+
+The user-selected workflow records agreement and requests in Call Center;
+Ticketing remains responsible for executing seat changes and payments. No new
+booking, cancellation, reschedule or payment endpoint is called by this workflow.
+`create-calls` / `edit-calls` and all existing visibility restrictions apply.
+There are still 18 role privileges; the Record calls description now includes RF/RS.
+
+RF/RS require `customer_response=agreed|declined|not_reached`. This records the
+agent's report of the conversation. `change_seat_count` is an integer from 1 to
+100, defaults to 1, and is separate from the verified BK `seat_count` (RF/RS store
+zero there). Each call may be saved without linking a ticket or passenger.
+Optional linked records are checked against the usual company, terminal and route
+scope. Lookup is required to newly link records, except inheriting a visible
+parent's existing link in a permitted follow-up.
+
+RF supports nullable `proposed_refund_amount` (0 to 9,999,999,999.99, at most two
+decimal places); RS supports nullable `proposed_travel_date` (YYYY-MM-DD) and
+`proposed_bus_time` (HH:mm, Pakistan time). These are discussed proposals, not
+completed transactions. Opposite-type proposal fields are cleared, and all five
+agreement fields clear when switching away from RF/RS. Switching into a different
+request category requires an explicitly supplied customer response. Changes are
+included in the existing call audit and report snapshot.
+
+`outcome=record` or finish closes an agreed/declined call; No answer stays waiting
+and appears in the date-independent `awaiting_agreement` queue. `follow_up` keeps
+the existing complete-phone/future-callback requirements. A new RF/RS follow-up
+uses the same category and `parent_call_id`, needs create + follow-up + view-calls
++ edit-calls, requires a fresh response, and preserves the parent's passenger and
+booking when linked. The new call atomically closes an earlier unanswered attempt
+and clears its old callback, retaining the earlier No answer response and call date.
+A second No answer leaves only the new attempt pending. Generic FU closure cannot
+hide an unanswered RF/RS request. Notes edits do not reopen superseded attempts.
+
+Both summary and daily-report include `customer_agreements`:
+`{refund:{calls,agreed,declined,not_reached,agreed_seats},reschedule:{...}}`.
+These totals use the report's existing date/agent/shift/terminal scope and count
+conversation records; agreed_seats sums the discussed seat counts on agreed calls.
+Repeat calls can discuss the same seats. RF and RS also appear in category totals,
+so total calls is GI + BK + C + FU + RF + RS. Completed ERP seat movements remain
+separate and are never increased by recording an agreement.
+
+Validation on 16 October: the isolated suite passed with 65 tests / 643 assertions
+including the permission checks for new follow-ups. New coverage includes agreement and
+proposal validation, optional proposal fields, action/booking boundaries, daily
+and shift totals, unchanged Ticketing tables, fresh-response follow-ups, failed
+transaction rollback and report review staleness. The migration is applied only
+to the local imported preview database.

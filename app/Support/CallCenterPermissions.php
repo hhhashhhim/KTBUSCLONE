@@ -9,9 +9,9 @@ class CallCenterPermissions
         $groups = [
             'Calls' => [
                 'view-calls' => ['View call log', 'Read calls in your permitted scope, including complaints.'],
-                'create-calls' => ['Record calls', 'Record general information, booking and complaint calls.'],
+                'create-calls' => ['Record calls', 'Record general information, booking, complaint, refund and reschedule calls.'],
                 'edit-calls' => ['Edit calls', 'Update existing calls in your permitted scope. Requires access to view the call.'],
-                'follow-up' => ['Record follow-ups', 'Link a follow-up to an earlier call. Also requires Record calls and View call log.'],
+                'follow-up' => ['Record follow-ups', 'Link a follow-up to an earlier call. Also requires Record calls and View call log; refund/reschedule follow-ups also require Edit calls.'],
                 'manage-callbacks' => ['Schedule callbacks', 'Set or change callback times. Also requires Record calls or Edit calls.'],
                 'assign-calls' => ['Assign to other agents', 'Choose or change another responsible person. Self-assignment is available without this privilege.'],
             ],

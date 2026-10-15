@@ -16,7 +16,8 @@ use Illuminate\Validation\ValidationException;
 
 class CallCenterController extends Controller
 {
-    private const CATEGORIES = ['GI' => 'General Information', 'BK' => 'Confirmed Booking', 'C' => 'Complaint', 'FU' => 'Follow-up'];
+    private const CATEGORIES = ['GI' => 'General Information', 'BK' => 'Confirmed Booking', 'C' => 'Complaint', 'FU' => 'Follow-up', 'RF' => 'Refund', 'RS' => 'Reschedule'];
+    private const RESPONSES = ['agreed' => 'Agreed', 'declined' => 'Declined', 'not_reached' => 'No answer'];
     private const STATUSES = ['new' => 'New', 'in_progress' => 'In progress', 'waiting' => 'Waiting', 'closed' => 'Closed'];
 
     private function authorizeAccess(Request $request, ?string $action = null): void
@@ -51,6 +52,7 @@ class CallCenterController extends Controller
             ->when(!$all, function ($q) use ($user) { $q->where('id', $user->terminal_id); })->get(['id', 'name']);
         return $this->response([
             'categories' => $this->choices(self::CATEGORIES), 'statuses' => $this->choices(self::STATUSES),
+            'customer_responses' => $this->choices(self::RESPONSES),
             'shifts' => [1, 2, 3], 'agents' => $agents, 'terminals' => $terminals,
             'permissions' => $this->permissions($request),
             'current_user' => $user->only(['id', 'name', 'terminal_id']), 'timezone' => 'Asia/Karachi',
@@ -137,6 +139,7 @@ class CallCenterController extends Controller
         $query = Scope::calls($request)->with(['agent', 'assignee', 'terminal', 'resolver']);
         if (!$viewCalls) { $query->where('category', 'C'); }
         $this->applyFilters($query, $request);
+        if ($request->queue === 'awaiting_agreement') { $query->whereIn('category', ['RF', 'RS'])->where('customer_response', 'not_reached')->where('status', '!=', 'closed'); }
         if ($request->queue === 'today') { $query->where('call_date', $request->date ?: $this->now()->toDateString()); }
         if ($request->queue === 'callbacks_due') {
             $query->whereNotNull('callback_at')->where('callback_at', '<=', $this->now()->format('Y-m-d H:i:s'))->where('status', '!=', 'closed')->orderBy('callback_at');
@@ -283,15 +286,20 @@ class CallCenterController extends Controller
             'inquiry_topic' => ['nullable', Rule::in(['fare', 'timings', 'terminal'])],
             'complaint_from_city' => 'nullable|string|max:120', 'complaint_to_city' => 'nullable|string|max:120',
             'complaint_bus_time' => 'nullable|date_format:H:i', 'complaint_seat_number' => 'nullable|string|max:20',
+            'customer_response' => ['nullable', Rule::in(array_keys(self::RESPONSES))],
+            'change_seat_count' => 'nullable|integer|min:1|max:100',
+            'proposed_refund_amount' => 'nullable|numeric|min:0|max:9999999999.99|regex:/^\d+(?:\.\d{1,2})?$/',
+            'proposed_travel_date' => 'nullable|date_format:Y-m-d', 'proposed_bus_time' => 'nullable|date_format:H:i',
             'outcome' => ['sometimes', Rule::in(['finish', 'follow_up', 'record'])], 'resolve_parent' => 'sometimes|boolean',
         ];
         if (!$existing) { $rules['call_date'] = ['sometimes', 'date_format:Y-m-d', 'after_or_equal:' . $this->now()->subDay()->toDateString(), 'before_or_equal:' . $this->now()->toDateString()]; }
         $data = $request->validate($rules);
         $merged = array_merge($existing ? $existing->getAttributes() : ['status' => 'new'], $data);
         unset($data['outcome'], $data['resolve_parent']);
-        if ($merged['category'] === 'FU') {
+        if ($merged['category'] === 'FU' || (in_array($merged['category'], ['RF', 'RS'], true) && !empty($merged['parent_call_id']))) {
             $this->authorizeAccess($request, 'follow-up');
             $this->authorizeAccess($request, 'view-calls');
+            if ($merged['category'] !== 'FU') { $this->authorizeAccess($request, 'edit-calls'); }
         }
         if ($existing && $existing->category === 'C' && $merged['category'] !== 'C') {
             $this->authorizeAccess($request, 'view-complaints');
@@ -304,7 +312,7 @@ class CallCenterController extends Controller
         // Linking passenger data is an action too: guessing an ID cannot bypass lookup permission.
         foreach (['ticket_id', 'customer_id'] as $field) {
             if (!empty($merged[$field]) && (int) $merged[$field] !== (int) ($existing->$field ?? 0)) {
-                $inherited = $merged['category'] === 'FU' && !empty($merged['parent_call_id'])
+                $inherited = in_array($merged['category'], ['FU', 'RF', 'RS'], true) && !empty($merged['parent_call_id'])
                     ? Scope::calls($request)->find($merged['parent_call_id']) : null;
                 if (!$inherited || (int) $inherited->$field !== (int) $merged[$field]) { $this->authorizeAccess($request, 'passenger-lookup'); }
             }
@@ -322,11 +330,11 @@ class CallCenterController extends Controller
             $this->authorizeAccess($request, 'manage-callbacks');
         }
         if ($merged['category'] !== 'GI') { $data['inquiry_topic'] = null; }
-        if (!in_array($merged['category'], ['C', 'BK'], true)) {
+        if (!in_array($merged['category'], ['C', 'BK', 'RF', 'RS'], true)) {
             foreach (['complaint_from_city', 'complaint_to_city', 'complaint_bus_time', 'complaint_seat_number'] as $field) { $data[$field] = null; }
         }
-        if ($request->outcome === 'record' && $merged['category'] !== 'C') {
-            throw ValidationException::withMessages(['outcome' => 'Record is only available for complaints.']);
+        if ($request->outcome === 'record' && !in_array($merged['category'], ['C', 'RF', 'RS'], true)) {
+            throw ValidationException::withMessages(['outcome' => 'Record is only available for complaints, refund calls and reschedule calls.']);
         }
         if ($request->outcome === 'finish' && $merged['category'] !== 'C') { $data['status'] = 'closed'; $data['callback_at'] = null; }
         if ($request->outcome === 'follow_up') {
@@ -336,6 +344,25 @@ class CallCenterController extends Controller
             }
             $data['status'] = 'waiting';
             $data['assigned_to'] = $merged['assigned_to'] ?? $request->user()->id;
+        }
+        if (in_array($merged['category'], ['RF', 'RS'], true)) {
+            if (($existing && $existing->category !== $merged['category'] && !$request->filled('customer_response')) || empty($merged['customer_response'])) {
+                throw ValidationException::withMessages(['customer_response' => 'Record whether the customer agreed, declined or did not answer.']);
+            }
+            $data['change_seat_count'] = $merged['change_seat_count'] ?? 1;
+            $data['seat_count'] = 0;
+            $data[$merged['category'] === 'RF' ? 'proposed_travel_date' : 'proposed_refund_amount'] = null;
+            if ($merged['category'] === 'RF') { $data['proposed_bus_time'] = null; }
+            // These are call outcomes, never a cancellation, payment or seat change.
+            // No answer stays visible until the customer can be reached.
+            if ($merged['customer_response'] === 'not_reached') {
+                $data['status'] = $existing && $existing->status === 'closed' && $existing->customer_response === 'not_reached' && $request->outcome !== 'follow_up' ? 'closed' : 'waiting';
+                $data['assigned_to'] = $data['assigned_to'] ?? $merged['assigned_to'] ?? $request->user()->id;
+            } elseif ($request->outcome !== 'follow_up' && (!$existing || $request->filled('outcome') || $request->has('customer_response'))) {
+                $data['status'] = 'closed'; $data['callback_at'] = null;
+            }
+        } else {
+            foreach (['customer_response', 'change_seat_count', 'proposed_refund_amount', 'proposed_travel_date', 'proposed_bus_time'] as $field) { $data[$field] = null; }
         }
         if ($request->filled('outcome') && $merged['category'] === 'C' && !trim($merged['remarks'] ?? '')) {
             throw ValidationException::withMessages(['remarks' => 'Describe the complaint.']);
@@ -385,6 +412,15 @@ class CallCenterController extends Controller
             if (!$parent || ($existing && (int) $parent->id >= (int) $existing->id)) {
                 throw ValidationException::withMessages(['parent_call_id' => 'Select a visible earlier call.']);
             }
+            if (in_array($merged['category'], ['RF', 'RS'], true)) {
+                if ($parent->category !== $merged['category']) {
+                    throw ValidationException::withMessages(['parent_call_id' => 'Choose an earlier call for the same request type.']);
+                }
+                if ((!empty($parent->ticket_id) && (int) $parent->ticket_id !== (int) ($merged['ticket_id'] ?? 0))
+                    || (!empty($parent->customer_id) && (int) $parent->customer_id !== (int) ($data['customer_id'] ?? $merged['customer_id'] ?? 0))) {
+                    throw ValidationException::withMessages(['ticket_id' => 'Keep the passenger and booking from the earlier call.']);
+                }
+            }
         } elseif ($merged['category'] === 'FU') {
             throw ValidationException::withMessages(['parent_call_id' => 'Follow-up must link to an earlier call.']);
         }
@@ -411,14 +447,21 @@ class CallCenterController extends Controller
 
     private function resolveParent(CallLog $call, Request $request): void
     {
-        if (!$request->boolean('resolve_parent')) { return; }
+        $agreementFollowup = in_array($call->category, ['RF', 'RS'], true) && $call->parent_call_id
+            && in_array($call->customer_response, array_keys(self::RESPONSES), true);
+        if (!$request->boolean('resolve_parent') && !$agreementFollowup) { return; }
         $parent = Scope::calls($request)->lockForUpdate()->findOrFail($call->parent_call_id);
         if ($parent->status === 'closed') { return; }
+        if ($agreementFollowup && ($parent->category !== $call->category || $parent->customer_response !== 'not_reached')) { return; }
         if ($parent->category === 'C') {
             $this->finishComplaint($parent, $request, $call->remarks ?? '', 'remarks', $call->id);
             return;
         }
         $this->authorizeAccess($request, 'edit-calls');
+        if (in_array($parent->category, ['RF', 'RS'], true) && $parent->customer_response === 'not_reached' && !$agreementFollowup) {
+            throw ValidationException::withMessages(['resolve_parent' => 'Open the refund or reschedule call and record the customer response first.']);
+        }
+        // A new attempt supersedes the unanswered attempt, preserving its response.
         $before = $parent->status;
         $callback = $parent->callback_at;
         $parent->update(['status' => 'closed', 'callback_at' => null]);
@@ -437,13 +480,13 @@ class CallCenterController extends Controller
             'shift' => 'nullable|integer|between:1,3', 'terminal_id' => 'nullable|integer|min:0', 'agent_id' => 'nullable|integer|min:1',
             'category' => ['nullable', 'string', Rule::in(array_keys(self::CATEGORIES))], 'status' => ['nullable', 'string', Rule::in(array_keys(self::STATUSES))],
             'search' => 'nullable|string|max:100', 'page' => 'nullable|integer|min:1', 'pending_callbacks' => 'nullable|boolean',
-            'queue' => $dateRequired ? 'prohibited' : ['nullable', Rule::in(['today', 'callbacks_due', 'open_complaints', 'all'])]]);
+            'queue' => $dateRequired ? 'prohibited' : ['nullable', Rule::in(['today', 'callbacks_due', 'open_complaints', 'awaiting_agreement', 'all'])]]);
     }
 
     private function applyFilters($query, Request $request): void
     {
         foreach (['date' => 'call_date', 'shift' => 'shift', 'category' => 'category', 'status' => 'status', 'agent_id' => 'agent_id'] as $input => $column) {
-            if ($input === 'date' && in_array($request->queue, ['callbacks_due', 'open_complaints'], true)) { continue; }
+            if ($input === 'date' && in_array($request->queue, ['callbacks_due', 'open_complaints', 'awaiting_agreement'], true)) { continue; }
             if ($request->filled($input)) { $query->where($column, $request->input($input)); }
         }
     }
@@ -453,7 +496,7 @@ class CallCenterController extends Controller
         $query = Scope::calls($request, true);
         $this->applyFilters($query, $request);
         $calls = $query->with('agent')->orderBy('id')->get();
-        $totals = ['GI' => 0, 'BK' => 0, 'C' => 0, 'FU' => 0, 'total' => 0, 'seats' => 0];
+        $totals = array_fill_keys(array_keys(self::CATEGORIES), 0) + ['total' => 0, 'seats' => 0];
         $rows = [];
         foreach ($calls as $call) {
             $key = $call->agent_id . ':' . $call->shift;
@@ -461,7 +504,21 @@ class CallCenterController extends Controller
             $rows[$key][$call->category]++; $rows[$key]['total']++; $rows[$key]['seats'] += $call->category === 'BK' ? $call->seat_count : 0;
         }
         foreach ($rows as $row) { foreach ($totals as $key => $value) { $totals[$key] += $row[$key]; } }
-        return ['rows' => array_values($rows), 'totals' => $totals, 'calls' => $calls];
+        return ['rows' => array_values($rows), 'totals' => $totals, 'customer_agreements' => $this->customerAgreements($calls), 'calls' => $calls];
+    }
+
+    private function customerAgreements($calls): array
+    {
+        $result = [];
+        foreach (['RF' => 'refund', 'RS' => 'reschedule'] as $category => $key) {
+            $selected = $calls->where('category', $category);
+            $agreed = $selected->where('customer_response', 'agreed');
+            $result[$key] = ['calls' => $selected->count(), 'agreed' => $agreed->count(),
+                'declined' => $selected->where('customer_response', 'declined')->count(),
+                'not_reached' => $selected->where('customer_response', 'not_reached')->count(),
+                'agreed_seats' => (int) $agreed->sum('change_seat_count')];
+        }
+        return $result;
     }
 
     public function summary(Request $request)
