@@ -9,7 +9,7 @@ After signing in, company users with the independent `call-center` module enable
 **Call Center** menu. Granted privileges determine which screens appear:
 
 - `/call-center`: call log, passenger lookup, new calls, updates and callbacks.
-- `/call-center/complaints`: open complaints, closing remarks and closed history.
+- `/call-center/complaints`: open complaints, progress updates, closing remarks and history.
 - `/call-center/shifts`: agent/shift totals and in-charge reviews.
 - `/call-center/daily`: daily totals, complaint/follow-up outcomes, recorded seat
   movements, operational remarks and next-day actions.
@@ -21,7 +21,7 @@ Permission/validation errors are shown in the workspace. The backend enforces
 company, terminal, route and agent scope for all actions.
 
 **Users → Roles → Permissions → Call Center** is a separate top-level section;
-Ticketing can remain disabled. Its 18 checkboxes have plain-language labels,
+Ticketing can remain disabled. Its 19 checkboxes have plain-language labels,
 short explanations and five groups: Calls, Passenger assistance, Complaints,
 Reports and audit, and Access scope. Definitions come from `role/get` so UI
 labels and the API contract stay aligned. New roles default to no privileges.
@@ -107,24 +107,55 @@ complaints appear first and can be followed up directly.
 
 ## Complaints
 
-With View complaints workspace, the **Complaints** header tab opens all accessible open complaints, including
-older dates. The original description, caller, journey details and responsible
-person appear beside a **Closing remarks (required)** box. Type what was done,
-then click **Close complaint** once; no confirmation step is added. The button
-is unavailable for blank remarks or while saving. A failed request retains the
-remarks for retry. Leaving with unsaved remarks prompts Keep editing / Discard
-changes. The **Closed** tab retains the description and closing remarks with
-who closed it and when. Existing closed complaints without resolution records
-remain visible as older records; no historical status is changed automatically.
+With View complaints workspace, the **Complaints** header tab opens all accessible
+open complaints, including older dates. The original description, caller, journey
+details and responsible person appear beside one **Update / closing remarks
+(required)** box. It offers independent actions according to role privileges:
 
-Without Close complaints, this workspace is read-only. With that privilege,
-closing requires remarks but does not require generic Edit calls. The Closed
-list offers **Reopen complaint** only with both Reopen complaints and Edit calls.
-Closing clears callbacks and updates reports. If a follow-up explicitly resolves
-an earlier complaint, its notes are required and become that complaint's closing
-remarks. The backend enforces the same permission scope and remarks requirement.
-Deploy the new API and run `2026_10_15_000004_add_call_center_complaint_resolution`
-before deploying these views. The local imported preview database is migrated.
+- **Save update** (Add complaint updates): saves a progress note and keeps the
+  complaint in Open, preserving its exact status, assignee and callback.
+- **Close complaint** (Close complaints): saves the text as closing remarks,
+  clears the callback and moves the complaint to Closed with one click.
+
+Both require nonblank remarks. The box clears only after a successful save;
+failed requests retain the draft. Updates carry a UUID per draft so retrying an
+uncertain response cannot duplicate the note. Editing the text starts a new
+request. Both buttons are disabled during a save. The default form submission
+saves an update when available; closing remains an explicit action. Leaving
+with unsaved remarks prompts Keep editing / Discard changes.
+
+The latest progress update appears below the original complaint, with the agent
+and Pakistan date/time. **View history** expands progress updates, linked follow-up
+calls and previous closing remarks, newest event first, 25 at a time, with More
+history and a retry option. A **Follow-up call · CC-number** entry shows the
+conversation notes, recording staff member, call date/time and next callback if
+still scheduled. Older linked calls and follow-ups to those calls appear too.
+The notes are read from the call itself, so staff do not need to copy them into
+Save update. Editing the follow-up updates its entry without adding a duplicate.
+A complaint with only linked follow-ups also offers View history.
+The original description and earlier notes are never replaced by progress notes.
+Readers can see this curated history without the separate audit privilege;
+unrelated changes and retry IDs are not exposed. Closing remarks and prior notes
+remain visible under Closed, and previous closing events survive reopening.
+Existing older complaints without resolution/audit records remain visible.
+
+Without Add complaint updates or Close complaints, this workspace is read-only.
+Neither action requires generic Edit calls. The Closed list offers **Reopen
+complaint** only with both Reopen complaints and Edit calls. A follow-up that
+explicitly resolves an earlier complaint still requires notes and records them
+as the closing remarks. Access to the complaint retains normal company,
+terminal, route and agent/assignee scope. Its related FU summaries can include
+other staff's linked calls within the viewer's company/terminal/route boundaries;
+this does not grant direct access to those staff's full or unrelated calls.
+Reading history requires View complaints workspace; View calls and the separate
+audit privilege are not needed for these conversation summaries.
+
+Deploy the API and run
+`2026_10_16_000002_add_call_center_complaint_updates_permission` before these
+views. This uses the existing audit table and adds one independent role grant.
+Existing complaint closers receive it unless already explicitly denied; new
+roles and other roles start denied. Configure it under Users → Roles →
+Permissions → Call Center → Add complaint updates.
 
 ## Work queues and quick answers
 
@@ -282,3 +313,76 @@ fixtures: required response, refund proposal, save failure/retry, unanswered
 reschedule queue, proposal-carrying follow-up, clearing outstanding work and six
 category report totals. The authoritative API tests separately verify permissions
 and that Ticketing tables do not change.
+
+
+## Website complaint notification bell
+
+A green bell beside the user menu appears across company/admin website screens
+after the notification API confirms Call Center + View complaints workspace
+access for the signed-in user. Login does not include company modules, so the bell
+does not depend on cached browser permission data. It displays the unread assignment count and a dropdown of dated
+notifications. The website checks every 30 seconds while visible and the dropdown
+is closed, on returning to the tab, and when opening/refreshing the dropdown.
+Older notifications can be loaded with More notifications. Network errors offer
+Retry; revoked access clears and hides the inbox. Subsequent checks can restore
+the bell if access is granted again, without requiring a new login.
+
+Selecting an assignment opens `/call-center/complaints?complaint=<call_id>&notification=<id>`.
+The workspace fetches that exact complaint, even if it was closed or lies outside
+the first list page, then marks the notification read and refreshes the bell.
+Failed/blocked navigation does not mark read. Existing unsaved-remarks protection
+also applies between complaint links; All complaints returns to the normal queue.
+Reading an alert does not close the complaint. A read-state failure offers retry
+without blocking work on the opened complaint.
+
+Backend dependency: the notification endpoints and
+`2026_10_16_000003_create_call_center_notifications_table` migration on `api` must
+be deployed before the new `mix` bundle. No browser notification permission,
+mobile app, email configuration or background worker is required.
+
+
+The linked-follow-up display also needs the combined-history API and
+`2026_10_16_000004_add_call_center_parent_lookup_index` migration. That migration
+adds only an index, with no new notes storage or permission changes. Saving a
+follow-up counts one call and keeps the original complaint open unless the agent
+explicitly chooses to resolve it. No extra Save update step is needed.
+
+
+### Changing complaint responsibility
+
+On an open complaint, use **Change** beside Responsible, choose the next person,
+and click **Assign**. This needs View complaints workspace, Edit calls and Assign
+calls. The list loads eligible recipients for that specific complaint from
+`GET calls/{id}/complaint-assignees`, respecting company, terminal and route access.
+`POST calls/{id}/assign-complaint` sends only the selected person and the expected
+previous person. A stale assignment or closed complaint is rejected; Refresh
+loads the latest details. Failed saves retain the selected person for retry.
+Save any drafted remarks before handing over; other complaints' drafts remain.
+
+A successful handover opens **View history**, showing Responsibility changed,
+previous/new person, actor and Pakistan time alongside updates and follow-up
+calls. Existing assignment audits from the call log appear too. Original notes,
+status and callbacks are preserved. The new recipient gets the existing bell
+notification (self-assignment does not notify); the previous alert is retired.
+If handing over removes the user's access, the card leaves their list with a
+confirmation message. Closed complaints must be reopened before assigning here.
+Deploy with the matching API endpoints/history response; this feature adds no
+new migration or role privilege. Existing complaint notification migrations
+still apply.
+
+
+### Production build — 16 October 2026
+
+The committed `public/js/app.js` was regenerated with `npm run production`, using
+`MIX_MAIN_URL=https://portal.kainattravels.net/`,
+`MIX_API_URL=https://api.kainattravels.net/` and `MIX_API_URL_ROUTE=/`, matching the
+previous production bundle. Rebuild with the target deployment's own base URLs
+when installing on another host. Environment files and local preview settings
+are not part of the release. Existing Sass deprecation warnings do not prevent
+compilation.
+
+The 24 frontend tests and production build passed. Deploy the matching `api`
+changes and its three pending complaint-workflow migrations (000002–000004 on
+16 October 2026) before serving this bundle. The release includes progress notes,
+follow-up and assignment history, the notification bell, and responsibility
+changes directly from Complaints.

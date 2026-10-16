@@ -33,7 +33,7 @@ export default {
     },
     mounted() { this.loadOptions(); },
     beforeRouteLeave() { return (this.$refs.callLog || this.$refs.complaints)?.confirmLeave() ?? true; },
-    beforeRouteUpdate(to, from) { return to.name === from.name || ((this.$refs.callLog || this.$refs.complaints)?.confirmLeave() ?? true); },
+    beforeRouteUpdate(to, from) { return (to.name === from.name && to.query.complaint === from.query.complaint) || ((this.$refs.callLog || this.$refs.complaints)?.confirmLeave() ?? true); },
     methods: {
         async loadOptions() {
             this.loading = true;

@@ -4,7 +4,7 @@ import test from 'node:test';
 
 // The legacy application is bundled by Mix and does not declare package type=module.
 const source = await readFile(new URL('../../resources/js/pages/callCenter/callCenter.js', import.meta.url), 'utf8');
-const { pakistanDate, inputDateTime, callbackValue, apiError, request, canAccessCallCenter, reviewSnapshot, callCenterScreens, seatChangeSummary, callQueueParams } =
+const { pakistanDate, inputDateTime, callbackValue, apiError, request, canAccessCallCenter, reviewSnapshot, callCenterScreens, seatChangeSummary, callQueueParams, complaintUpdateRequest, complaintNotificationRoute } =
     await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 
 test('shift business date uses Pakistan time at UTC midnight boundary', () => {
@@ -127,4 +127,194 @@ test('awaiting agreement includes older work and cannot inherit closed/date filt
     assert.equal(params.category, 'RF');
     assert.equal(params.page, 2);
     assert.equal(filters.date, '2026-10-16');
+});
+
+test('complaint update retries reuse a request ID while new drafts remain separate', () => {
+    const drafts = {};
+    const first = complaintUpdateRequest(drafts, 7, '  Contacted the terminal.  ');
+    assert.match(first.request_id, /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/);
+    assert.equal(first.remarks, 'Contacted the terminal.');
+    assert.deepEqual(complaintUpdateRequest(drafts, 7, first.remarks), first);
+    first.remarks = 'Changed outside the form';
+    assert.equal(drafts[7].remarks, 'Contacted the terminal.');
+    assert.notEqual(complaintUpdateRequest(drafts, 8, drafts[7].remarks).request_id, first.request_id);
+    assert.notEqual(complaintUpdateRequest(drafts, 7, 'Terminal replied.').request_id, first.request_id);
+});
+
+const complaintsSource = await readFile(new URL('../../resources/js/pages/callCenter/Complaints.vue', import.meta.url), 'utf8');
+const complaintsScript = complaintsSource.match(/<script>([\s\S]*?)<\/script>/)[1]
+    .replace("'./callCenter'", JSON.stringify(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`));
+const { default: complaints } = await import(`data:text/javascript;base64,${Buffer.from(complaintsScript).toString('base64')}`);
+
+function complaintVm(callApi, permissions = { update_complaints: true, close_complaints: true }) {
+    const vm = { ...complaints.data(), options: { permissions }, callApi };
+    for (const [name, method] of Object.entries(complaints.methods)) vm[name] = method.bind(vm);
+    return vm;
+}
+
+test('complaint updates retain failed drafts and retry once without closing or replacing the description', async () => {
+    const requests = []; let fail = true;
+    const call = { id: 7, reference: 'CC-7', status: 'waiting', remarks: 'Original complaint' };
+    const vm = complaintVm(async (method, endpoint, payload) => {
+        requests.push({ method, endpoint, payload });
+        if (fail) { fail = false; return { status: 503, data: { message: 'Try again' } }; }
+        return { status: 200, data: { status: true, data: { ...call, latest_complaint_update: { remarks: payload.remarks }, complaint_history_count: 1 } } };
+    });
+    vm.drafts[7] = 'Contacted operations.';
+    await vm.saveRemarks(call);
+    assert.equal(vm.drafts[7], 'Contacted operations.'); assert.equal(vm.errors[7], 'Try again'); assert.equal(vm.saving, null);
+    await vm.saveRemarks(call);
+    assert.equal(requests.length, 2); assert.equal(requests[0].payload.request_id, requests[1].payload.request_id);
+    assert.equal(requests[1].endpoint, 'call-center/calls/7/complaint-updates');
+    assert.equal(call.status, 'waiting'); assert.equal(call.remarks, 'Original complaint');
+    assert.equal(call.latest_complaint_update.remarks, 'Contacted operations.'); assert.equal(vm.drafts[7], undefined);
+});
+
+test('complaint closure uses its separate endpoint and clears stale history when the queue reloads', async () => {
+    const requests = [];
+    const vm = complaintVm(async (method, endpoint, payload) => {
+        requests.push({ method, endpoint, payload });
+        return { status: 200, data: { status: true, data: method === 'post' ? { status: 'closed' } : { data: [], total: 0, current_page: 1, last_page: 1 } } };
+    });
+    vm.drafts[7] = 'Issue resolved.'; vm.histories[7] = { items: [{ remarks: 'Old progress note' }] }; vm.historyOpen[7] = true;
+    await vm.saveRemarks({ id: 7, reference: 'CC-7' }, true);
+    assert.equal(requests[0].endpoint, 'call-center/calls/7/close-complaint');
+    assert.deepEqual(requests[0].payload, { resolution_remarks: 'Issue resolved.' });
+    assert.deepEqual(vm.histories, {}); assert.deepEqual(vm.historyOpen, {}); assert.equal(vm.drafts[7], undefined);
+    const readOnly = complaintVm(async () => { throw new Error('Unexpected request'); }, {});
+    readOnly.drafts[7] = 'Note'; await readOnly.saveRemarks({ id: 7 }); await readOnly.saveRemarks({ id: 7 }, true);
+    assert.equal(readOnly.drafts[7], 'Note');
+});
+
+
+
+const notificationSource = await readFile(new URL('../../resources/js/components/ComplaintNotifications.vue', import.meta.url), 'utf8');
+const notificationScript = notificationSource.match(/<script>([\s\S]*?)<\/script>/)[1]
+    .replace("'../pages/callCenter/callCenter'", JSON.stringify(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`));
+const { default: notifications } = await import(`data:text/javascript;base64,${Buffer.from(notificationScript).toString('base64')}`);
+function notificationVm(callApi) {
+    const vm = { ...notifications.data(), sessionKey: 'user-session', callApi, $refs: {} };
+    for (const [name, method] of Object.entries(notifications.methods)) vm[name] = method.bind(vm);
+    return vm;
+}
+
+test('bell retains unread state until complaint opens and respects cancelled navigation', async () => {
+    const vm = notificationVm(async () => { throw new Error('Clicking must not mark unread prematurely'); });
+    vm.open = true; vm.unread = 1; vm.$route = { name: 'call-center', query: {} };
+    let cancel = true; vm.$router = { async push(target) { assert.equal(target.query.complaint, '7'); return cancel ? { type: 4 } : undefined; } };
+    await vm.openNotification({ id: 9, call_id: 7 });
+    assert.equal(vm.open, true); assert.equal(vm.unread, 1);
+    cancel = false; await vm.openNotification({ id: 9, call_id: 7 });
+    assert.equal(vm.open, false); assert.equal(vm.unread, 1); assert.equal(vm.opening, null);
+});
+
+test('notification fetch clears data when access is revoked and ignores stale session responses', async () => {
+    const vm = notificationVm(async () => ({ status: 403, data: {} }));
+    vm.items = [{ id: 1 }]; vm.unread = 1; vm.open = true; vm.available = true;
+    await vm.refresh(); assert.equal(vm.available, false); assert.deepEqual(vm.items, []); assert.equal(vm.unread, 0); assert.equal(vm.open, false);
+    const stale = notificationVm(async () => { stale.sequence++; return { status: 200, data: { status: true, data: { unread_count: 99, notifications: { data: [{ id: 2 }], current_page: 1, last_page: 1 } } } }; });
+    await stale.refresh(); assert.equal(stale.unread, 0); assert.deepEqual(stale.items, []);
+});
+
+test('notification links fetch the exact complaint before marking read, including closed complaints', async () => {
+    const requests = [], events = [];
+    const savedDocument = globalThis.document, savedWindow = globalThis.window;
+    globalThis.document = { getElementById: () => ({ focus() {} }) }; globalThis.window = { dispatchEvent: event => events.push(event.type) };
+    try {
+        const vm = complaintVm(async (method, endpoint) => {
+            requests.push(endpoint);
+            return { status: 200, data: { status: true, data: method === 'get' ? { id: 7, category: 'C', status: 'closed' } : {} } };
+        });
+        vm.targetId = '7'; vm.$route = { query: { complaint: '7', notification: '9' } }; vm.$nextTick = async () => {};
+        await vm.fetchCalls();
+        assert.deepEqual(requests, ['call-center/calls/7', 'call-center/notifications/9/read']);
+        assert.equal(vm.mode, 'closed'); assert.equal(vm.calls[0].id, 7); assert.deepEqual(events, ['call-center-notifications-changed']);
+        const unavailable = complaintVm(async (method, endpoint) => { assert.equal(endpoint, 'call-center/calls/8'); return { status: 404, data: { message: 'Complaint unavailable' } }; });
+        unavailable.targetId = '8'; await unavailable.fetchCalls(); assert.equal(unavailable.error, 'Complaint unavailable');
+    } finally { globalThis.document = savedDocument; globalThis.window = savedWindow; }
+});
+
+
+test('real login payload without company modules still checks the server and shows an empty bell', async () => {
+    const state = { token: 'test-session', user: { id: 55, name: 'Test admin', role: { permissions: [] } }, permissions: [], companyModules: [] };
+    const key = notifications.computed.sessionKey.call({ $store: { state } });
+    assert.equal(key, '55:test-session');
+    const vm = notificationVm(async (method, endpoint) => {
+        assert.equal(endpoint, 'call-center/notifications');
+        return { status: 200, data: { status: true, data: { unread_count: 0, notifications: { data: [], current_page: 1, last_page: 1 } } } };
+    });
+    vm.sessionKey = key; await vm.refresh();
+    assert.equal(vm.available, true); assert.equal(vm.unread, 0); assert.deepEqual(vm.items, []);
+    assert.deepEqual(complaintNotificationRoute({ id: 9, call_id: 7 }), { name: 'call-center-complaints', query: { complaint: '7', notification: '9' } });
+    state.token = ''; assert.equal(notifications.computed.sessionKey.call({ $store: { state } }), '');
+});
+
+test('live permission grant restores the bell after an earlier denial without signing in again', async () => {
+    let allow = false;
+    const vm = notificationVm(async () => allow ? { status: 200, data: { status: true, data: { unread_count: 1, notifications: { data: [{ id: 1 }], current_page: 1, last_page: 1 } } } } : { status: 403, data: {} });
+    await vm.refresh(); assert.equal(vm.available, false);
+    allow = true; await vm.refresh(); assert.equal(vm.available, true); assert.equal(vm.unread, 1);
+});
+
+test('complaint history retains follow-up calls alongside audit notes across pages', async () => {
+    const update = { id: 2, kind: 'update', remarks: 'Terminal contacted.' };
+    const followup = { id: 'follow-up-2', kind: 'follow_up', call_id: 2, reference: 'CC-2', remarks: 'Customer asked for an update.', callback_at: '2026-10-16 18:30:00', actor: { id: 1, name: 'Agent' } };
+    const closure = { id: 3, kind: 'closed', remarks: 'Resolved.' };
+    const vm = complaintVm(async (method, endpoint, body, config) => {
+        assert.equal(method, 'get'); assert.equal(endpoint, 'call-center/calls/1/complaint-updates');
+        const page = config.params.page;
+        return { status: 200, data: { status: true, data: { data: page === 1 ? [update, followup] : [followup, closure], current_page: page, last_page: 2 } } };
+    });
+    await vm.loadHistory({ id: 1 });
+    await vm.loadHistory({ id: 1 }, 2);
+    assert.deepEqual(vm.histories[1].items, [update, followup, closure]);
+    assert.equal(vm.histories[1].items[1].callback_at, '2026-10-16 18:30:00');
+    assert.equal(vm.histories[1].page, 2); assert.equal(vm.histories[1].error, '');
+});
+
+
+test('complaint assignment saves only the person, preserves drafts, retries safely and refreshes history', async () => {
+    const originalWindow = globalThis.window;
+    globalThis.window = { dispatchEvent() {} };
+    try {
+        let fail = true; const requests = [];
+        const call = { id: 7, reference: 'CC-7', category: 'C', status: 'waiting', assigned_to: 1, remarks: 'Original complaint' };
+        const vm = complaintVm(async (method, endpoint, payload) => {
+            requests.push({ method, endpoint, payload });
+            if (endpoint.endsWith('complaint-assignees')) return { status: 200, data: { status: true, data: [{ id: 1, name: 'First person' }, { id: 2, name: 'Next person' }] } };
+            if (endpoint.endsWith('complaint-updates')) return { status: 200, data: { status: true, data: { data: [{ id: 4, kind: 'assignment', from_assignee: { name: 'First person' }, to_assignee: { name: 'Next person' } }], current_page: 1, last_page: 1 } } };
+            if (fail) { fail = false; return { status: 503, data: { message: 'Try again' } }; }
+            return { status: 200, data: { status: true, data: { ...call, assigned_to: 2, assignee: { id: 2, name: 'Next person' }, can_view: true } } };
+        }, { view_complaints: true, update: true, assign_calls: true });
+        vm.canAssign = complaints.computed.canAssign.call(vm); vm.calls = [call];
+        await vm.loadAssignees(call); assert.equal(vm.assignments[7].selected, 1);
+        vm.assignments[7].selected = 2; vm.drafts[7] = 'Unsaved update';
+        await vm.assignComplaint(call); assert.equal(requests.length, 1);
+        assert.equal(vm.drafts[7], 'Unsaved update'); delete vm.drafts[7];
+        vm.drafts[8] = 'Another complaint draft';
+        assert.equal(complaints.computed.dirty.call(vm), true);
+        await vm.assignComplaint(call); assert.equal(call.assigned_to, 1); assert.equal(vm.assignments[7].selected, 2); assert.equal(vm.assignments[7].error, 'Try again');
+        await vm.assignComplaint(call);
+        assert.deepEqual(requests[1].payload, { assigned_to: 2, expected_assigned_to: 1 });
+        assert.deepEqual(requests[2].payload, requests[1].payload);
+        assert.equal(call.assigned_to, 2); assert.equal(call.status, 'waiting'); assert.equal(call.remarks, 'Original complaint');
+        assert.equal(vm.drafts[8], 'Another complaint draft'); assert.equal(vm.assignments[7], undefined);
+        assert.equal(vm.histories[7].items[0].kind, 'assignment'); assert.equal(vm.historyOpen[7], true);
+        assert.equal(vm.saving, null);
+    } finally { globalThis.window = originalWindow; }
+});
+
+test('complaint reassignment removes work that left the users scope and enforces UI privileges', async () => {
+    const originalWindow = globalThis.window; globalThis.window = { dispatchEvent() {} };
+    try {
+        const call = { id: 7, reference: 'CC-7', status: 'new', assigned_to: 1 };
+        const vm = complaintVm(async () => ({ status: 200, data: { status: true, data: { ...call, assigned_to: 2, assignee: { name: 'Next person' }, can_view: false } } }));
+        vm.canAssign = true; vm.calls = [call]; vm.pagination.total = 1; vm.assignments[7] = { selected: 2 };
+        await vm.assignComplaint(call); assert.equal(vm.calls.length, 0); assert.equal(vm.pagination.total, 0); assert.match(vm.notice, /outside your assigned work/);
+        for (const permissions of [{}, { view_complaints: true, update: true }, { view_complaints: true, assign_calls: true }]) {
+            const readOnly = complaintVm(async () => { throw new Error('Must not assign'); }, permissions);
+            readOnly.canAssign = complaints.computed.canAssign.call(readOnly); readOnly.assignments[7] = { selected: 2 };
+            assert.equal(readOnly.canAssign, false); await readOnly.assignComplaint(call);
+        }
+    } finally { globalThis.window = originalWindow; }
 });

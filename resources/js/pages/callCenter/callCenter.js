@@ -31,6 +31,18 @@ export function reviewSnapshot(report, daily, shift) {
     return token;
 }
 
+export function complaintUpdateRequest(requests, callId, remarks) {
+    const text = remarks.trim();
+    if (!requests[callId] || requests[callId].remarks !== text) {
+        const bytes = globalThis.crypto.getRandomValues(new Uint8Array(16));
+        bytes[6] = (bytes[6] & 15) | 64; bytes[8] = (bytes[8] & 63) | 128;
+        const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+        const id = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+        requests[callId] = { remarks: text, request_id: id };
+    }
+    return { ...requests[callId] };
+}
+
 export async function request(vm, method, endpoint, payload = null, params = {}) {
     // Keep validation and access failures on this page, where the agent can act on them.
     const response = await vm.callApi(method, `call-center/${endpoint}`, payload, {
@@ -38,6 +50,7 @@ export async function request(vm, method, endpoint, payload = null, params = {})
     });
     if (!response || response.status < 200 || response.status >= 300 || response.data?.status !== true) {
         const error = new Error(apiError(response));
+        error.status = response?.status;
         error.fields = response?.data?.errors || {};
         throw error;
     }
@@ -46,6 +59,10 @@ export async function request(vm, method, endpoint, payload = null, params = {})
 
 export function canAccessCallCenter(permissions = []) {
     return permissions.some((module) => module.name === 'call-center' && Boolean(Number(module.allow)));
+}
+
+export function complaintNotificationRoute(notification) {
+    return { name: 'call-center-complaints', query: { complaint: String(notification.call_id), notification: String(notification.id) } };
 }
 
 export function displayTime(value) {
