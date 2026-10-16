@@ -29,6 +29,30 @@ use Illuminate\Support\Facades\Log;
 
 class ScheduleController extends Controller
 {
+    public function updateQuota(Request $request)
+    {
+        if (!checkForSubmenu('schedules') || !checkPermissionButtons('edit-schedule')) {
+            return response()->json(['message' => 'You are not authorized to update schedule quotas.'], 403);
+        }
+        $data = $request->validate([
+            'id' => ['required', 'integer'],
+            'intermediate_quota' => ['present', 'nullable', 'integer', 'min:0', 'max:100000'],
+        ]);
+        return DB::transaction(function () use ($data, $request) {
+            $schedule = Schedule::where('company_id', Auth::user()->company_id)->whereKey($data['id'])->lockForUpdate()->firstOrFail();
+            $old = $schedule->intermediate_quota;
+            $schedule->update(['intermediate_quota' => $data['intermediate_quota'], 'updated_by' => Auth::id()]);
+            ActivityLog::create([
+                'company_id' => Auth::user()->company_id,
+                'activity_by' => Auth::id(),
+                'requested_host' => $request->ip(),
+                'message' => 'Schedule ' . $schedule->id . ' intermediate quota changed from ' . ($old ?? 'unlimited') .
+                    ' to ' . ($schedule->intermediate_quota ?? 'unlimited') . ' by ' . Auth::user()->name,
+            ]);
+            return response()->json(['message' => 'Schedule quota saved.', 'intermediate_quota' => $schedule->intermediate_quota]);
+        });
+    }
+
     public function syncUpcomingSchedules(\App\Services\UpcomingScheduleService $service)
     {
         if (!checkForSubmenu('schedules') || (!checkPermissionButtons('edit-schedule') && !checkPermissionButtons('add-schedule'))) {

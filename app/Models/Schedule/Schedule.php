@@ -24,6 +24,7 @@ class Schedule extends Model
 
     protected $casts = [
         'route_city_terminal' => 'array',
+        'intermediate_quota' => 'integer',
     ];
 
     public function addedBy()

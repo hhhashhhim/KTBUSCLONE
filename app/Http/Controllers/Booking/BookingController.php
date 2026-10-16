@@ -51,6 +51,8 @@ use App\Models\Invoice;
 use App\Models\User;
 use App\Services\TicketCancellationService;
 use App\Services\UpcomingScheduleService;
+use App\Services\ScheduleQuotaService;
+use Illuminate\Validation\ValidationException;
 use App\Jobs\VerifyTravelEyeTicket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -344,6 +346,7 @@ class BookingController extends Controller
 
         $scheduleId = $request->schedule;
         $lockName = "stayLock:" . $scheduleId;  // Dynamic lock based on schedule ID
+        $transactionLevel = DB::transactionLevel();
         try {
             $lock = Cache::lock($lockName, 7);  // 7-second timeout
 
@@ -365,6 +368,29 @@ class BookingController extends Controller
                     ->where('company_id', Auth::user()->company_id)
                     ->where('departure_time', date("H:i:s", strtotime($request->departure_time)))
                     ->first();
+
+                if (!$detail) {
+                    throw ValidationException::withMessages(['schedule' => 'The selected departure no longer exists. Please refresh schedules.']);
+                }
+                if ($request->flag == 1 || $request->type === 'booked') {
+                    $field = $request->flag == 1 ? 'alreadyBookedId' : 'selectedSeats';
+                    $request->validate([$field => ['required', 'array', 'min:1'], $field . '.*' => ['required', 'distinct']]);
+                    $quota = app(ScheduleQuotaService::class);
+                    // Take the same schedule-row lock before loading reservations or counting paid tickets.
+                    $quota->context($detail, true);
+                    $replacedIds = [];
+                    if ($request->flag == 1) {
+                        $reservations = Ticket::where('company_id', Auth::user()->company_id)
+                            ->where('schedule_id', $detail->schedule_id)->where('schedule_date', $detail->schedule_date)
+                            ->whereIn('type', ['advance booking', 'booked'])
+                            ->whereIn('id', $request->alreadyBookedId)->lockForUpdate()->get();
+                        if ($reservations->count() !== count($request->alreadyBookedId)) {
+                            throw ValidationException::withMessages(['quota' => 'One or more selected reservations changed. Please refresh and select them again.']);
+                        }
+                        $replacedIds = $reservations->pluck('id')->all();
+                    }
+                    $quota->assertAvailable($detail, count($request->input($field)), $replacedIds);
+                }
 
                 //  $schedule_time_exact ( Date At which bus will leave from first terminal )
                 $schedule_time_exact = ScheduleDetail::where(["schedule_id" => $detail->schedule_id, "schedule_date" => $detail->schedule_date])->first();
@@ -739,10 +765,20 @@ class BookingController extends Controller
             } else {
                 return response()->json(["errors" => ["Error" => ['System is busy. Please try again.']]], 422);
             }
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Database transaction error: ' . $e->getMessage());
             return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        } finally {
+            // Early validation returns must not leave a transaction (and quota lock) open.
+            while (DB::transactionLevel() > $transactionLevel) {
+                DB::rollBack();
+            }
+            if (isset($lock)) {
+                $lock->release();
+            }
         }
     }
 
@@ -831,7 +867,12 @@ class BookingController extends Controller
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
 
+        $transactionLevel = DB::transactionLevel();
         try {
+            $request->validate([
+                'data' => ['required', 'array', 'min:1'],
+                'data.*.dataAll.id' => ['required', 'integer', 'distinct'],
+            ]);
             DB::beginTransaction();
             $scheduleDetail = ScheduleDetail::where([
                 'company_id' => Auth::user()->company_id,
@@ -841,6 +882,28 @@ class BookingController extends Controller
                 'schedule_id' => $request->data[0]['rescheduleSchedule'],
                 'departure_time' =>  date("H:i:s", strtotime($request->data[0]['departure_time'])),
             ])->first();
+            if (!$scheduleDetail) {
+                throw ValidationException::withMessages(['schedule' => 'The selected departure no longer exists. Please refresh schedules.']);
+            }
+            foreach ($request->data as $item) {
+                if ((int) $item['newDepartureTime'] !== (int) $scheduleDetail->schedule_id
+                    || (int) $item['rescheduleSchedule'] !== (int) $scheduleDetail->schedule_id
+                    || (int) $item['dataDepartureCity'] !== (int) $scheduleDetail->departure_id
+                    || (int) $item['dataDestination'] !== (int) $scheduleDetail->destination_id
+                    || $item['rescheduleDate'] !== $request->data[0]['rescheduleDate']
+                    || $item['departure_time'] !== $request->data[0]['departure_time']) {
+                    throw ValidationException::withMessages(['schedule' => 'Please reschedule all selected tickets to the same departure.']);
+                }
+            }
+            $quota = app(ScheduleQuotaService::class);
+            $quota->context($scheduleDetail, true);
+            $oldTickets = Ticket::where('company_id', Auth::user()->company_id)
+                ->whereIn('id', array_column(array_column($request->data, 'dataAll'), 'id'))
+                ->lockForUpdate()->get()->keyBy('id');
+            if ($oldTickets->count() !== count($request->data)) {
+                throw ValidationException::withMessages(['tickets' => 'A selected ticket has changed. Please refresh and select the tickets again.']);
+            }
+            $quota->assertAvailable($scheduleDetail, $oldTickets->where('type', 'booked')->count(), $oldTickets->keys()->all());
             $schedule_time_exact = ScheduleDetail::where(["schedule_id" => $scheduleDetail->schedule_id, "schedule_date" => $scheduleDetail->schedule_date])->first();
             $schedule = Schedule::where('id', $scheduleDetail->schedule_id)->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             /*
@@ -1007,7 +1070,7 @@ class BookingController extends Controller
                     'route_id' => $schedule->route_id,
                     'remarks' => $item['reason'] ?? "",
                     'gender' => $ticket['gender'],
-                    'type' => $ticket['type'],
+                    'type' => $oldTickets->get($ticket['id'])->type,
                     'reschedule_type' => $item['overIssueReschedule'],
                     'added_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,
@@ -1060,10 +1123,16 @@ class BookingController extends Controller
             DB::commit();
             ticketRescheduledMessage($old_tickets, $new_tickets);
             return response()->json(['success' => 'Success'], 200);
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Database transaction error: ' . $e->getMessage());
             return response()->json(["errors" => ["Error" => ['An error occurred during the database transaction.']]], 422);
+        } finally {
+            while (DB::transactionLevel() > $transactionLevel) {
+                DB::rollBack();
+            }
         }
     }
 
@@ -1787,7 +1856,9 @@ class BookingController extends Controller
         // A bus class can be changed for one dated service without changing the
         // master schedule. Return the class from that dated schedule detail so
         // its id/name and seat map always describe the same layout.
-        $scheduleDetail->bus_class->seat_map = $seatMap;
+        $quotaPreview = app(ScheduleQuotaService::class)->preview($scheduleDetail, $tickets, $seatMap);
+        $schedule->quota = $quotaPreview['quota'];
+        $scheduleDetail->bus_class->seat_map = $quotaPreview['seat_map'];
         $schedule->setRelation('bus_class', $scheduleDetail->bus_class);
         $assignedBus = $this->assignedBus($scheduleDetail->schedule_id, $scheduleDetail->schedule_date);
         $schedule->bus_no = $assignedBus ? $assignedBus->bus_number : "N/A";
@@ -2877,19 +2948,24 @@ class BookingController extends Controller
         if (!checkPermissionButtons("overissue-seat")) {
             return response()->json(["Error" => ['You are not authorized to access this url']], 403);
         }
-        $ticket = Ticket::where([
-            'schedule_id' => $request->schedule_id,
-            'schedule_date' => $request->schedule_date,
-            'seat_no' => $request->seat_no,
-        ])->first();
-        if (!$ticket) {
-            Ticket::withTrashed()->where('id', $request->ticket_id)->update([
-                'type' => 'booked',
-                'deleted_at' => null,
-            ]);
-            return TicketsOverIssue::where('ticket_id', $request->ticket_id)->delete();
-        } else {
-            return response()->json(["errors" => ["Revert Error" => ["This seat has been booked by Someone Else! \n You can't Revert This Seat"]]], 422);
+        try {
+            return DB::transaction(function () use ($request) {
+                $old = Ticket::withTrashed()->where('company_id', Auth::user()->company_id)
+                    ->where('type', 'over-issue')->whereNotNull('deleted_at')->findOrFail($request->ticket_id);
+                $detail = ScheduleDetail::where('company_id', $old->company_id)
+                    ->where('schedule_id', $old->schedule_id)->where('schedule_date', $old->schedule_date)
+                    ->where('departure_id', $old->departure_city_id)->where('destination_id', $old->destination_city_id)->firstOrFail();
+                app(ScheduleQuotaService::class)->assertAvailable($detail, 1);
+                $ticket = Ticket::where('company_id', $old->company_id)->where('schedule_id', $old->schedule_id)
+                    ->where('schedule_date', $old->schedule_date)->where('seat_no', $old->seat_no)->lockForUpdate()->first();
+                if ($ticket) {
+                    throw ValidationException::withMessages(['Revert Error' => "This seat has been booked by someone else. You cannot revert this seat."]);
+                }
+                $old->update(['type' => 'booked', 'deleted_at' => null]);
+                return TicketsOverIssue::where('ticket_id', $old->id)->delete();
+            });
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
         }
     }
 
