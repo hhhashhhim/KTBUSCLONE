@@ -95,7 +95,7 @@ export default {
     data() {
         const form = blankCall(savedShift(this.options.current_user.id));
         return { journeyCities: [], citiesLoaded: false, citiesLoading: false, callerDetailsOpen: false, discardVisible: false, discardResolve: null, returnFocus: null, form, baseline: JSON.stringify(form), editing: null, calls: [], queue: 'today', filters: { date: pakistanDate(), shift: '', category: '', status: '', search: '', terminal_id: '' }, pagination: { total: 0, current_page: 1, last_page: 1 }, loading: false, listError: '', requestNumber: 0, saving: false, savingOutcome: '', opening: false, openNumber: 0, formError: '', fieldErrors: {}, notice: '', lastSavedComplaint: false, selectedPassenger: null, selectedTicket: null, lookupKey: 0, needsFollowup: false, resolveParent: false, parentCall: null, showParentSearch: false, earlierSearch: '', earlierCalls: [], parentError: '', parentLoading: false, parentSearched: false, parentNumber: 0, history: null, historyError: '', historyLoading: false, historyNumber: 0,
-            topics: [{ value: 'fare', label: 'Fare' }, { value: 'timings', label: 'Timings' }, { value: 'terminal', label: 'Terminal location' }], queues: [{ value: 'today', label: 'Today’s calls' }, { value: 'callbacks_due', label: 'Callbacks due' }, { value: 'open_complaints', label: 'Open complaints' }, { value: 'awaiting_agreement', label: 'Awaiting agreement' }, { value: 'all', label: 'All calls' }] };
+            topics: [{ value: 'fare', label: 'Fare' }, { value: 'timings', label: 'Timings' }, { value: 'terminal', label: 'Terminal location' }, { value: 'other', label: 'Other' }], queues: [{ value: 'today', label: 'Today’s calls' }, { value: 'callbacks_due', label: 'Callbacks due' }, { value: 'open_complaints', label: 'Open complaints' }, { value: 'awaiting_agreement', label: 'Awaiting agreement' }, { value: 'all', label: 'All calls' }] };
     },
     computed: {
         hasJourneyDetails() { return ['C', 'BK', 'RF', 'RS'].includes(this.form.category); },
@@ -154,7 +154,7 @@ export default {
             this.formError = ''; this.fieldErrors = {}; this.notice = '';
             if (outcome === 'follow_up' && !this.needsFollowup) { this.needsFollowup = true; this.form.assigned_to ||= this.options.current_user.id; this.$nextTick(() => this.$el.querySelector('#call-callback')?.focus()); return; }
             if (!this.form.shift) this.fieldErrors.shift = ['Choose your shift.'];
-            if (this.form.category === 'GI' && !this.form.inquiry_topic) this.fieldErrors.inquiry_topic = ['Choose Fare, Timings, or Terminal location.'];
+            if (this.form.category === 'GI' && !this.form.inquiry_topic) this.fieldErrors.inquiry_topic = ['Choose Fare, Timings, Terminal location, or Other.'];
             if (this.form.category === 'BK' && this.selectedTicket && !this.selectedTicket.can_link_booking) this.fieldErrors.ticket_id = ['Choose an active confirmed booking.'];
             if (this.form.category === 'C' && !this.form.remarks) this.fieldErrors.remarks = ['Describe the complaint.'];
             if (this.isSeatChange && !this.form.customer_response) this.fieldErrors.customer_response = ['Choose Agreed, Declined or No answer.'];

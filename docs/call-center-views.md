@@ -65,7 +65,7 @@ results are masked. Passenger and booking results show only accessible records.
 
 The six category buttons reveal the necessary fields:
 
-- **General Information:** Fare, Timings or Terminal location; notes and caller
+- **General Information:** Fare, Timings, Terminal location or Other; notes and caller
   details are optional, and no passenger selection is required.
 - **Confirmed Booking:** record the call with or without linking a passenger
   or ticket. Lookup and ticket selection are optional; no match still permits
