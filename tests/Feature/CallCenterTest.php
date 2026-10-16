@@ -37,6 +37,10 @@ class CallCenterTest extends TestCase
         (new \AddCallCenterComplaintResolution)->up();
         require_once database_path('migrations/2026_10_16_000001_add_call_center_customer_agreement.php');
         (new \AddCallCenterCustomerAgreement)->up();
+        require_once database_path('migrations/2026_10_16_000003_create_call_center_notifications_table.php');
+        (new \CreateCallCenterNotificationsTable)->up();
+        require_once database_path('migrations/2026_10_16_000004_add_call_center_parent_lookup_index.php');
+        (new \AddCallCenterParentLookupIndex)->up();
         DB::table('companies')->insert([
             ['id' => 1, 'modules' => json_encode(CallCenterPermissions::append([], true))], ['id' => 2, 'modules' => json_encode(CallCenterPermissions::append([], true))],
         ]);
@@ -107,6 +111,171 @@ class CallCenterTest extends TestCase
     {
         return $this->getJson(self::BASE . ($shift ? '/summary' : '/daily-report') . '?date=2026-10-13')->assertOk()
             ->json($shift ? 'data.snapshot_tokens.' . $shift : 'data.snapshot_token');
+    }
+
+    public function test_complaint_workspace_handover_preserves_history_and_notifies_only_new_person(): void
+    {
+        $owner = $this->agent(); $first = $this->agent(2); $second = $this->agent(3);
+        $call = $this->logCall($owner, ['category' => 'C', 'assigned_to' => 2, 'remarks' => 'Original complaint', 'status' => 'waiting', 'callback_at' => '2026-10-13 12:00:00']);
+        $followup = $this->logCall($owner, ['category' => 'FU', 'parent_call_id' => $call->id, 'remarks' => 'Customer called again.']);
+        DB::table('call_center_audits')->insert(['call_id' => $call->id, 'actor_id' => 1, 'action' => 'complaint_update', 'changes' => json_encode(['remarks' => 'Checking with terminal.']), 'created_at' => '2026-10-13 08:30:00']);
+        $this->grant($first, ['view-complaints', 'edit-calls', 'assign-calls']); Sanctum::actingAs($first);
+        $url = self::BASE . '/calls/' . $call->id . '/assign-complaint';
+        $this->postJson($url, ['assigned_to' => 3, 'expected_assigned_to' => 2, 'remarks' => 'Must be ignored', 'status' => 'closed'])
+            ->assertOk()->assertJsonPath('data.can_view', false)->assertJsonPath('data.assignee.name', 'Agent 3')->assertJsonPath('data.status', 'waiting')
+            ->assertJsonPath('data.remarks', 'Original complaint')->assertJsonPath('data.callback_at', '2026-10-13 12:00:00')->assertJsonPath('data.complaint_history_count', 3);
+        $this->getJson(self::BASE . '/calls/' . $call->id)->assertNotFound();
+        Sanctum::actingAs($second);
+        $this->getJson(self::BASE . '/notifications')->assertJsonPath('data.unread_count', 1);
+        $history = $this->getJson(self::BASE . '/calls/' . $call->id . '/complaint-updates')->assertOk()->assertJsonPath('data.total', 3)->json('data.data');
+        $assignment = collect($history)->firstWhere('kind', 'assignment');
+        $this->assertSame(2, $assignment['from_assignee']['id']); $this->assertSame(3, $assignment['to_assignee']['id']); $this->assertSame(2, $assignment['actor']['id']);
+        $this->assertSame(1, collect($history)->where('kind', 'follow_up')->count());
+        Sanctum::actingAs($owner);
+        $this->postJson($url, ['assigned_to' => 3, 'expected_assigned_to' => 2])->assertOk(); // retry
+        $this->assertSame(1, DB::table('call_center_audits')->where('action', 'updated')->count());
+        $this->assertSame(1, DB::table('call_center_notifications')->count());
+        $this->patchJson(self::BASE . '/calls/' . $call->id, ['assigned_to' => 2])->assertOk(); // existing call-log flow
+        $this->getJson(self::BASE . '/calls/' . $call->id . '/complaint-updates')->assertJsonPath('data.total', 4)->assertJsonPath('data.data.0.to_assignee.id', 2);
+        Sanctum::actingAs($second); $this->getJson(self::BASE . '/notifications')->assertJsonPath('data.unread_count', 0);
+        Sanctum::actingAs($first); $this->getJson(self::BASE . '/notifications')->assertJsonPath('data.unread_count', 1);
+        $this->assertSame('Original complaint', $call->fresh()->remarks);
+        $this->assertDatabaseCount('call_center_calls', 2);
+    }
+
+    public function test_complaint_assignment_rejects_stale_closed_forbidden_and_out_of_scope_changes(): void
+    {
+        $owner = $this->agent(); $other = $this->agent(2); $foreign = $this->agent(3, 2, 20);
+        $call = $this->logCall($owner, ['category' => 'C', 'assigned_to' => 1]);
+        $url = self::BASE . '/calls/' . $call->id . '/assign-complaint';
+        Sanctum::actingAs($owner);
+        foreach ([['view-complaints', 'edit-calls'], ['view-complaints', 'assign-calls'], ['edit-calls', 'assign-calls']] as $grants) {
+            $this->grant($owner, $grants);
+            $this->postJson($url, ['assigned_to' => 2, 'expected_assigned_to' => 1])->assertForbidden();
+            $this->getJson(self::BASE . '/calls/' . $call->id . '/complaint-assignees')->assertForbidden();
+        }
+        $this->grant($owner, ['view-complaints', 'edit-calls', 'assign-calls']);
+        $this->postJson($url, ['assigned_to' => 2])->assertUnprocessable();
+        $this->postJson($url, ['assigned_to' => null, 'expected_assigned_to' => 1])->assertUnprocessable();
+        $this->postJson($url, ['assigned_to' => 2, 'expected_assigned_to' => null])->assertStatus(409);
+        $call->update(['status' => 'closed']);
+        $this->postJson($url, ['assigned_to' => 2, 'expected_assigned_to' => 1])->assertStatus(409);
+        $call->update(['status' => 'new']);
+        foreach ([$this->logCall($other, ['category' => 'C']), $this->logCall($foreign, ['category' => 'C']), $this->logCall($owner, ['category' => 'C', 'terminal_id' => 11])] as $hidden) {
+            $this->postJson(self::BASE . '/calls/' . $hidden->id . '/assign-complaint', ['assigned_to' => 2, 'expected_assigned_to' => null])->assertNotFound();
+            $this->getJson(self::BASE . '/calls/' . $hidden->id . '/complaint-assignees')->assertNotFound();
+        }
+        $general = $this->logCall($owner);
+        $this->postJson(self::BASE . '/calls/' . $general->id . '/assign-complaint', ['assigned_to' => 2, 'expected_assigned_to' => null])->assertUnprocessable();
+        $this->assertSame(1, $call->fresh()->assigned_to);
+        $this->assertDatabaseCount('call_center_audits', 0); $this->assertDatabaseCount('call_center_notifications', 0);
+    }
+
+    public function test_complaint_assignee_choices_and_save_enforce_recipient_access(): void
+    {
+        $owner = $this->agent(); $eligible = $this->agent(2); $wrongTerminal = $this->agent(3, 1, 11);
+        $foreign = $this->agent(4, 2, 20); $wrongRoute = $this->agent(5, 1, 10, false, false, true, '[2]');
+        $hidden = $this->agent(6); $hidden->update(['hide' => 1]); $noView = $this->agent(7); $this->grant($noView, ['view-calls']);
+        $crossTerminal = $this->agent(8, 1, 11, false, true);
+        $this->ticket(); $call = $this->logCall($owner, ['category' => 'C', 'ticket_id' => 100]); Sanctum::actingAs($owner);
+        $choices = $this->getJson(self::BASE . '/calls/' . $call->id . '/complaint-assignees')->assertOk()->json('data');
+        $this->assertSame([1, 2, 8], array_column($choices, 'id'));
+        foreach ([3, 4, 5, 6, 7, 999] as $id) {
+            $this->postJson(self::BASE . '/calls/' . $call->id . '/assign-complaint', ['assigned_to' => $id, 'expected_assigned_to' => null])->assertUnprocessable()->assertJsonValidationErrors('assigned_to');
+        }
+        $this->postJson(self::BASE . '/calls/' . $call->id . '/assign-complaint', ['assigned_to' => 8, 'expected_assigned_to' => null])->assertOk()->assertJsonPath('data.can_view', true);
+        $this->grant($owner, ['view-complaints']);
+        $this->getJson(self::BASE . '/calls/' . $call->id . '/complaint-updates')->assertOk()->assertJsonPath('data.data.0.from_assignee', null)->assertJsonPath('data.data.0.to_assignee.name', 'Agent 8');
+        DB::table('users')->where('id', 8)->delete();
+        $this->getJson(self::BASE . '/calls/' . $call->id . '/complaint-updates')->assertOk()->assertJsonPath('data.data.0.to_assignee.name', 'Former user #8');
+    }
+
+    public function test_complaint_assignment_notifications_are_persistent_private_and_read_idempotently(): void
+    {
+        $owner = $this->agent(); $recipient = $this->agent(2); $outsider = $this->agent(3);
+        Sanctum::actingAs($owner);
+        $callId = $this->postJson(self::BASE . '/calls', ['category' => 'C', 'shift' => 1, 'remarks' => 'Luggage missing', 'assigned_to' => 2])->assertCreated()->json('data.id');
+        $this->getJson(self::BASE . '/notifications')->assertOk()->assertJsonPath('data.unread_count', 0);
+        $this->patchJson(self::BASE . '/calls/' . $callId, ['remarks' => 'Luggage still missing'])->assertOk();
+        $this->assertSame(1, DB::table('call_center_notifications')->count());
+        Sanctum::actingAs($recipient);
+        $list = $this->getJson(self::BASE . '/notifications')->assertOk()->assertJsonPath('data.unread_count', 1)
+            ->assertJsonPath('data.notifications.data.0.message', 'Complaint CC-' . $callId . ' assigned to you by Agent 1.')
+            ->assertJsonPath('data.notifications.data.0.call_id', $callId);
+        $id = $list->json('data.notifications.data.0.id');
+        $this->getJson(self::BASE . '/calls/' . $callId)->assertOk();
+        Sanctum::actingAs($outsider);
+        $this->postJson(self::BASE . '/notifications/' . $id . '/read')->assertNotFound();
+        $this->getJson(self::BASE . '/notifications')->assertJsonPath('data.unread_count', 0);
+        Sanctum::actingAs($recipient);
+        $this->postJson(self::BASE . '/notifications/' . $id . '/read')->assertOk();
+        $readAt = DB::table('call_center_notifications')->where('id', $id)->value('read_at');
+        Carbon::setTestNow(Carbon::now('Asia/Karachi')->addMinute());
+        $this->postJson(self::BASE . '/notifications/' . $id . '/read')->assertOk();
+        $this->assertSame($readAt, DB::table('call_center_notifications')->where('id', $id)->value('read_at'));
+        $this->getJson(self::BASE . '/notifications')->assertJsonPath('data.unread_count', 0)->assertJsonCount(1, 'data.notifications.data');
+    }
+
+    public function test_reassignment_retires_old_notifications_and_does_not_notify_for_self_or_other_categories(): void
+    {
+        $owner = $this->agent(); $first = $this->agent(2); $second = $this->agent(3);
+        Sanctum::actingAs($owner);
+        $id = $this->postJson(self::BASE . '/calls', ['category' => 'C', 'shift' => 1, 'assigned_to' => 2])->assertCreated()->json('data.id');
+        $oldNotification = DB::table('call_center_notifications')->value('id');
+        $this->patchJson(self::BASE . '/calls/' . $id, ['assigned_to' => 3])->assertOk();
+        Sanctum::actingAs($first);
+        $this->getJson(self::BASE . '/notifications')->assertJsonPath('data.unread_count', 0);
+        $this->postJson(self::BASE . '/notifications/' . $oldNotification . '/read')->assertNotFound();
+        Sanctum::actingAs($second);
+        $this->getJson(self::BASE . '/notifications')->assertJsonPath('data.unread_count', 1);
+        Sanctum::actingAs($owner);
+        $this->patchJson(self::BASE . '/calls/' . $id, ['assigned_to' => 2])->assertOk();
+        Sanctum::actingAs($first);
+        $this->getJson(self::BASE . '/notifications')->assertJsonPath('data.unread_count', 1)->assertJsonCount(1, 'data.notifications.data');
+        Sanctum::actingAs($owner);
+        $this->patchJson(self::BASE . '/calls/' . $id, ['assigned_to' => 1])->assertOk();
+        $this->postJson(self::BASE . '/calls', ['category' => 'GI', 'inquiry_topic' => 'other', 'shift' => 1, 'assigned_to' => 2])->assertCreated();
+        $this->postJson(self::BASE . '/calls', ['category' => 'C', 'shift' => 1, 'assigned_to' => 1])->assertCreated();
+        $this->assertSame(0, DB::table('call_center_notifications')->whereNull('superseded_at')->count());
+    }
+
+    public function test_notifications_recheck_company_terminal_route_and_role_access(): void
+    {
+        $owner = $this->agent(); $recipient = $this->agent(2); $foreign = $this->agent(3, 2, 20);
+        $this->ticket(); Sanctum::actingAs($owner);
+        $callId = $this->postJson(self::BASE . '/calls', ['category' => 'C', 'shift' => 1, 'ticket_id' => 100, 'assigned_to' => 2])->assertCreated()->json('data.id');
+        $id = DB::table('call_center_notifications')->value('id');
+        Sanctum::actingAs($foreign);
+        $this->getJson(self::BASE . '/notifications')->assertJsonPath('data.unread_count', 0);
+        $this->postJson(self::BASE . '/notifications/' . $id . '/read')->assertNotFound();
+        Sanctum::actingAs($recipient);
+        $recipient->route_ids = '[2]'; $recipient->save();
+        $this->getJson(self::BASE . '/notifications')->assertJsonPath('data.unread_count', 0);
+        $this->postJson(self::BASE . '/notifications/' . $id . '/read')->assertNotFound();
+        $recipient->route_ids = 'all'; $recipient->terminal_id = 11; $recipient->save();
+        $this->getJson(self::BASE . '/notifications')->assertJsonPath('data.unread_count', 0);
+        $recipient->terminal_id = 10; $recipient->save();
+        $this->getJson(self::BASE . '/notifications')->assertJsonPath('data.unread_count', 1);
+        $this->grant($recipient, ['view-calls']);
+        $this->getJson(self::BASE . '/notifications')->assertForbidden();
+        $this->postJson(self::BASE . '/notifications/' . $id . '/read')->assertForbidden();
+        Sanctum::actingAs($owner);
+        $this->postJson(self::BASE . '/calls', ['category' => 'C', 'shift' => 1, 'assigned_to' => 2])->assertUnprocessable()->assertJsonValidationErrors('assigned_to');
+        $this->assertSame(1, DB::table('call_center_notifications')->count());
+    }
+
+    public function test_notification_pagination_counts_all_unread_and_closed_complaint_links_still_work(): void
+    {
+        $owner = $this->agent(); $recipient = $this->agent(2); Sanctum::actingAs($owner);
+        for ($i = 0; $i < 22; $i++) {
+            $id = $this->postJson(self::BASE . '/calls', ['category' => 'C', 'shift' => 1, 'assigned_to' => 2])->assertCreated()->json('data.id');
+        }
+        $this->postJson(self::BASE . '/calls/' . $id . '/close-complaint', ['resolution_remarks' => 'Resolved'])->assertOk();
+        Sanctum::actingAs($recipient);
+        $this->getJson(self::BASE . '/notifications')->assertJsonPath('data.unread_count', 22)->assertJsonCount(20, 'data.notifications.data');
+        $this->getJson(self::BASE . '/notifications?page=2')->assertJsonCount(2, 'data.notifications.data');
+        $this->getJson(self::BASE . '/notifications?page=0')->assertUnprocessable();
+        $this->getJson(self::BASE . '/calls/' . $id)->assertOk()->assertJsonPath('data.status', 'closed');
     }
 
     public function test_access_requires_authentication_and_enabled_company_role_parent(): void
@@ -565,6 +734,202 @@ class CallCenterTest extends TestCase
         $this->getJson(self::BASE . '/daily-report?date=2026-10-13')->assertOk()->assertJsonPath('data.review.stale', true);
     }
 
+    public function test_complaint_updates_preserve_original_details_and_are_visible_without_audit_access(): void
+    {
+        $owner = $this->agent(); $agent = $this->agent(2); Sanctum::actingAs($agent);
+        $this->grant($agent, ['view-complaints', 'update-complaints']);
+        $call = $this->logCall($owner, ['category' => 'C', 'status' => 'waiting', 'remarks' => 'Luggage missing', 'assigned_to' => 2, 'callback_at' => '2026-10-13 12:00:00']);
+        $before = $call->fresh()->getAttributes();
+        $url = self::BASE . '/calls/' . $call->id . '/complaint-updates';
+        $this->postJson($url, ['remarks' => '  Contacted the terminal.  ', 'request_id' => (string) \Illuminate\Support\Str::uuid(), 'actor_id' => 999, 'status' => 'closed'])
+            ->assertOk()->assertJsonPath('data.status', 'waiting')->assertJsonPath('data.remarks', 'Luggage missing')
+            ->assertJsonPath('data.latest_complaint_update.remarks', 'Contacted the terminal.')->assertJsonPath('data.latest_complaint_update.actor.id', 2);
+        $this->postJson($url, ['remarks' => 'Terminal is checking the luggage room.', 'request_id' => (string) \Illuminate\Support\Str::uuid()])->assertOk();
+        $this->assertSame($before, $call->fresh()->getAttributes());
+        $this->assertDatabaseCount('call_center_audits', 2);
+        $history = $this->getJson($url)->assertOk()->assertJsonPath('data.total', 2)
+            ->assertJsonPath('data.data.0.remarks', 'Terminal is checking the luggage room.')->assertJsonPath('data.data.1.actor.name', 'Agent 2')
+            ->assertJsonPath('data.data.1.created_at', '2026-10-13 09:00:00')->json('data.data');
+        $this->assertArrayNotHasKey('request_id', $history[0]); $this->assertArrayNotHasKey('changes', $history[0]);
+        $this->getJson(self::BASE . '/calls?queue=open_complaints')->assertOk()->assertJsonPath('data.total', 1)
+            ->assertJsonPath('data.data.0.complaint_history_count', 2)->assertJsonPath('data.data.0.latest_complaint_update.remarks', $history[0]['remarks']);
+        $detail = $this->getJson(self::BASE . '/calls/' . $call->id)->assertOk()->json('data');
+        $this->assertArrayNotHasKey('audit', $detail);
+        $this->postJson(self::BASE . '/calls/' . $call->id . '/close-complaint', ['resolution_remarks' => 'Done'])->assertForbidden();
+    }
+
+    public function test_complaint_updates_are_idempotent_and_remain_in_history_after_closure_and_reopening(): void
+    {
+        $agent = $this->agent(); Sanctum::actingAs($agent);
+        $call = $this->logCall($agent, ['category' => 'C', 'remarks' => 'Late bus']);
+        $url = self::BASE . '/calls/' . $call->id . '/complaint-updates';
+        $payload = ['remarks' => 'Contacted operations.', 'request_id' => (string) \Illuminate\Support\Str::uuid()];
+        $this->postJson($url, $payload)->assertOk(); $this->postJson($url, $payload)->assertOk();
+        $this->assertDatabaseCount('call_center_audits', 1);
+        $this->postJson($url, array_merge($payload, ['remarks' => 'Different note']))->assertStatus(409);
+        $this->postJson(self::BASE . '/calls/' . $call->id . '/close-complaint', ['resolution_remarks' => 'Customer informed of the revised departure.'])->assertOk();
+        $this->postJson($url, $payload)->assertOk()->assertJsonPath('data.status', 'closed');
+        $this->postJson($url, ['remarks' => 'New note', 'request_id' => (string) \Illuminate\Support\Str::uuid()])->assertStatus(409);
+        $this->assertDatabaseCount('call_center_audits', 2);
+        $this->patchJson(self::BASE . '/calls/' . $call->id, ['status' => 'new'])->assertOk();
+        $this->getJson($url)->assertOk()->assertJsonPath('data.total', 2)->assertJsonPath('data.data.0.kind', 'closed')
+            ->assertJsonPath('data.data.0.remarks', 'Customer informed of the revised departure.')->assertJsonPath('data.data.1.remarks', 'Contacted operations.');
+        $this->getJson(self::BASE . '/calls?queue=open_complaints')->assertOk()->assertJsonPath('data.data.0.complaint_history_count', 2);
+    }
+
+    public function test_complaint_update_validation_permissions_and_scope_are_enforced(): void
+    {
+        $owner = $this->agent(1, 1, 10, false, false, true, '[1]'); $other = $this->agent(2); $foreign = $this->agent(3, 2, 20);
+        $this->ticket(200, ['route_id' => 2]); Sanctum::actingAs($owner);
+        $call = $this->logCall($owner, ['category' => 'C']); $url = self::BASE . '/calls/' . $call->id . '/complaint-updates';
+        $uuid = (string) \Illuminate\Support\Str::uuid();
+        foreach ([[], ['remarks' => '   ', 'request_id' => $uuid], ['remarks' => str_repeat('x', 5001), 'request_id' => $uuid], ['remarks' => ['text'], 'request_id' => $uuid], ['remarks' => 'Note'], ['remarks' => 'Note', 'request_id' => 'bad-id']] as $payload) {
+            $this->postJson($url, $payload)->assertUnprocessable();
+        }
+        $hidden = [$this->logCall($other, ['category' => 'C']), $this->logCall($foreign, ['category' => 'C']),
+            $this->logCall($owner, ['category' => 'C', 'terminal_id' => 11]), $this->logCall($owner, ['category' => 'C', 'ticket_id' => 200])];
+        foreach ($hidden as $hiddenCall) {
+            $endpoint = self::BASE . '/calls/' . $hiddenCall->id . '/complaint-updates';
+            $this->postJson($endpoint, ['remarks' => 'Note', 'request_id' => $uuid])->assertNotFound();
+            $this->getJson($endpoint)->assertNotFound();
+        }
+        $general = $this->logCall($owner);
+        $this->postJson(self::BASE . '/calls/' . $general->id . '/complaint-updates', ['remarks' => 'Note', 'request_id' => $uuid])->assertUnprocessable();
+        $this->getJson(self::BASE . '/calls/' . $general->id . '/complaint-updates')->assertUnprocessable();
+        $this->grant($owner, ['view-complaints', 'edit-calls', 'close-complaints']);
+        $this->postJson($url, ['remarks' => 'Note', 'request_id' => $uuid])->assertForbidden();
+        $this->getJson($url)->assertOk();
+        $this->grant($owner, ['update-complaints']);
+        $this->postJson($url, ['remarks' => 'Note', 'request_id' => $uuid])->assertForbidden(); $this->getJson($url)->assertForbidden();
+        $this->assertDatabaseCount('call_center_audits', 0);
+    }
+
+    public function test_complaint_history_paginates_and_hides_unrelated_audit_changes(): void
+    {
+        $agent = $this->agent(); Sanctum::actingAs($agent); $this->grant($agent, ['view-complaints', 'update-complaints']);
+        $call = $this->logCall($agent, ['category' => 'C']); $url = self::BASE . '/calls/' . $call->id . '/complaint-updates';
+        DB::table('call_center_audits')->insert(['call_id' => $call->id, 'actor_id' => $agent->id, 'action' => 'updated', 'changes' => json_encode(['caller_phone' => ['to' => 'private']]), 'created_at' => '2026-10-13 09:00:00']);
+        for ($i = 1; $i <= 26; $i++) {
+            DB::table('call_center_audits')->insert(['call_id' => $call->id, 'actor_id' => $agent->id, 'action' => 'complaint_update', 'changes' => json_encode(['remarks' => 'Update ' . $i]), 'created_at' => '2026-10-13 09:00:00']);
+        }
+        $this->getJson($url)->assertOk()->assertJsonPath('data.total', 26)->assertJsonCount(25, 'data.data')->assertJsonPath('data.data.0.remarks', 'Update 26');
+        $this->getJson($url . '?page=2')->assertOk()->assertJsonCount(1, 'data.data')->assertJsonPath('data.data.0.remarks', 'Update 1');
+        $this->getJson($url . '?page=0')->assertUnprocessable();
+        $this->getJson(self::BASE . '/calls?queue=open_complaints')->assertOk()->assertJsonPath('data.data.0.complaint_history_count', 26);
+    }
+
+    public function test_complaint_update_permission_upgrade_preserves_existing_grants_and_denials(): void
+    {
+        $agent = $this->agent();
+        $permissions = $agent->role->permissions;
+        foreach ($permissions as &$module) { if ($module['name'] === 'call-center') $module['buttons'] = array_values(array_filter($module['buttons'], function ($button) { return $button['name'] !== 'call-center-update-complaints'; })); } unset($module);
+        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode($permissions)]);
+        $this->agent(2); $other = $this->agent(3); $this->grant($other, ['view-complaints']);
+        require_once database_path('migrations/2026_10_16_000002_add_call_center_complaint_updates_permission.php');
+        (new \AddCallCenterComplaintUpdatesPermission)->up();
+        $after = json_decode(DB::table('roles')->where('id', 1)->value('permissions'), true);
+        $flags = array_column($after[0]['buttons'], 'allow', 'name');
+        $this->assertTrue($flags['call-center-update-complaints']);
+        $this->assertFalse(array_column(json_decode(DB::table('roles')->where('id', 3)->value('permissions'), true)[0]['buttons'], 'allow', 'name')['call-center-update-complaints']);
+        foreach ($after[0]['buttons'] as &$button) { if ($button['name'] === 'call-center-update-complaints') $button['allow'] = false; } unset($button);
+        DB::table('roles')->where('id', 1)->update(['permissions' => json_encode($after)]);
+        (new \AddCallCenterComplaintUpdatesPermission)->up();
+        $this->assertSame($after, json_decode(DB::table('roles')->where('id', 1)->value('permissions'), true));
+        $agent->unsetRelation('role'); $agent->unsetRelation('company'); Sanctum::actingAs($agent);
+        $this->getJson(self::BASE . '/options')->assertOk()->assertJsonPath('data.permissions.update_complaints', false);
+        $this->assertTrue(array_column(CallCenterPermissions::append([], true)[0]['buttons'], 'allow', 'name')['call-center-update-complaints']);
+        $this->assertFalse(array_column(CallCenterPermissions::append([])[0]['buttons'], 'allow', 'name')['call-center-update-complaints']);
+    }
+
+    public function test_complaint_history_includes_existing_and_nested_followups_from_other_staff(): void
+    {
+        $owner = $this->agent(); $reader = $this->agent(2); $other = $this->agent(3);
+        $complaint = $this->logCall($owner, ['category' => 'C', 'assigned_to' => $reader->id, 'remarks' => 'Missing luggage']);
+        $before = $complaint->fresh()->getAttributes();
+        $first = $this->logCall($other, ['category' => 'FU', 'parent_call_id' => $complaint->id, 'status' => 'closed', 'remarks' => 'Customer requested an update.', 'called_at' => '2026-10-13 10:00:00']);
+        $second = $this->logCall($other, ['category' => 'FU', 'parent_call_id' => $first->id, 'status' => 'waiting', 'remarks' => 'Terminal will call the customer.', 'called_at' => '2026-10-13 12:00:00', 'callback_at' => '2026-10-13 15:00:00']);
+        DB::table('call_center_audits')->insert(['call_id' => $complaint->id, 'actor_id' => $owner->id, 'action' => 'complaint_update', 'changes' => json_encode(['remarks' => 'Contacted the terminal.']), 'created_at' => '2026-10-13 11:00:00']);
+        $this->grant($reader, ['view-complaints']); Sanctum::actingAs($reader);
+        $history = $this->getJson(self::BASE . '/calls/' . $complaint->id . '/complaint-updates')->assertOk()->assertJsonPath('data.total', 3)
+            ->assertJsonPath('data.data.0.kind', 'follow_up')->assertJsonPath('data.data.0.id', 'follow-up-' . $second->id)
+            ->assertJsonPath('data.data.0.reference', $second->reference)->assertJsonPath('data.data.0.remarks', $second->remarks)
+            ->assertJsonPath('data.data.0.actor.name', $other->name)->assertJsonPath('data.data.0.created_at', '2026-10-13 12:00:00')
+            ->assertJsonPath('data.data.0.callback_at', '2026-10-13 15:00:00')->assertJsonPath('data.data.1.kind', 'update')
+            ->assertJsonPath('data.data.2.call_id', $first->id)->assertJsonPath('data.data.2.callback_at', null)->json('data.data');
+        $this->getJson(self::BASE . '/calls/' . $first->id)->assertNotFound();
+        $this->getJson(self::BASE . '/calls?queue=open_complaints')->assertOk()->assertJsonPath('data.data.0.complaint_history_count', 3);
+        $this->getJson(self::BASE . '/calls/' . $complaint->id)->assertOk()->assertJsonPath('data.complaint_history_count', 3)
+            ->assertJsonPath('data.latest_complaint_update.remarks', 'Contacted the terminal.');
+        $this->assertSame($before, $complaint->fresh()->getAttributes());
+        $this->assertDatabaseCount('call_center_audits', 1);
+        foreach (['caller_phone', 'ticket_id', 'customer_id', 'changes'] as $private) { $this->assertArrayNotHasKey($private, $history[0]); }
+    }
+
+    public function test_followup_saved_once_appears_in_complaint_history_and_edits_do_not_duplicate_it(): void
+    {
+        $agent = $this->agent(); Sanctum::actingAs($agent);
+        $complaint = $this->logCall($agent, ['category' => 'C', 'remarks' => 'Late departure']);
+        $id = $this->postJson(self::BASE . '/calls', ['category' => 'FU', 'parent_call_id' => $complaint->id, 'shift' => 1,
+            'remarks' => 'Customer asked for an update.', 'outcome' => 'finish'])->assertCreated()->json('data.id');
+        $history = self::BASE . '/calls/' . $complaint->id . '/complaint-updates';
+        $this->getJson($history)->assertOk()->assertJsonPath('data.total', 1)->assertJsonPath('data.data.0.remarks', 'Customer asked for an update.');
+        $this->patchJson(self::BASE . '/calls/' . $id, ['remarks' => 'Customer informed of the new departure time.'])->assertOk();
+        $this->getJson($history)->assertOk()->assertJsonPath('data.total', 1)->assertJsonPath('data.data.0.remarks', 'Customer informed of the new departure time.');
+        $this->assertSame('new', $complaint->fresh()->status);
+        $this->assertSame(0, DB::table('call_center_audits')->where('call_id', $complaint->id)->count());
+        Carbon::setTestNow(Carbon::parse('2026-10-13 10:00:00', 'Asia/Karachi'));
+        $second = $this->postJson(self::BASE . '/calls', ['category' => 'FU', 'parent_call_id' => $id, 'shift' => 1,
+            'remarks' => 'Promised a callback.', 'caller_phone' => '03001234567', 'callback_at' => '2026-10-13 15:00:00', 'outcome' => 'follow_up'])->assertCreated()->json('data.id');
+        $this->getJson($history)->assertJsonPath('data.total', 2)->assertJsonPath('data.data.0.callback_at', '2026-10-13 15:00:00');
+        $this->patchJson(self::BASE . '/calls/' . $second, ['outcome' => 'finish'])->assertOk();
+        $this->getJson($history)->assertJsonPath('data.total', 2)->assertJsonPath('data.data.0.callback_at', null);
+        $this->postJson(self::BASE . '/calls/' . $complaint->id . '/close-complaint', ['resolution_remarks' => 'Resolved.'])->assertOk();
+        $this->getJson($history)->assertJsonPath('data.total', 3)->assertJsonPath('data.data.0.kind', 'closed')->assertJsonPath('data.data.1.kind', 'follow_up');
+        $this->patchJson(self::BASE . '/calls/' . $complaint->id, ['status' => 'new'])->assertOk();
+        $this->getJson($history)->assertJsonPath('data.total', 3);
+        $this->getJson(self::BASE . '/daily-report?date=2026-10-13')->assertOk()->assertJsonPath('data.totals.FU', 2)->assertJsonPath('data.totals.C', 1);
+    }
+
+    public function test_related_history_preserves_company_terminal_route_and_parent_access_boundaries(): void
+    {
+        $agent = $this->agent(1, 1, 10, false, false, true, '[1]'); $other = $this->agent(2); $foreign = $this->agent(3, 2, 20);
+        $this->ticket(200, ['route_id' => 2]);
+        $complaint = $this->logCall($agent, ['category' => 'C']);
+        $visible = $this->logCall($other, ['category' => 'FU', 'parent_call_id' => $complaint->id]);
+        $this->logCall($foreign, ['category' => 'FU', 'parent_call_id' => $complaint->id]);
+        $hidden = $this->logCall($other, ['category' => 'FU', 'parent_call_id' => $complaint->id, 'terminal_id' => 11]);
+        $this->logCall($other, ['category' => 'FU', 'parent_call_id' => $hidden->id]);
+        $this->logCall($other, ['category' => 'FU', 'parent_call_id' => $complaint->id, 'ticket_id' => 200]);
+        $this->logCall($other, ['category' => 'GI', 'parent_call_id' => $complaint->id]);
+        $unrelated = $this->logCall($other, ['category' => 'C']);
+        $this->logCall($agent, ['category' => 'FU', 'parent_call_id' => $unrelated->id]);
+        Sanctum::actingAs($agent); $this->grant($agent, ['view-complaints']);
+        $this->getJson(self::BASE . '/calls/' . $complaint->id . '/complaint-updates')->assertOk()->assertJsonPath('data.total', 1)->assertJsonPath('data.data.0.call_id', $visible->id);
+        $this->getJson(self::BASE . '/calls/' . $complaint->id)->assertJsonPath('data.complaint_history_count', 1);
+        $this->getJson(self::BASE . '/calls/' . $unrelated->id . '/complaint-updates')->assertNotFound();
+        $this->grant($agent, ['view-calls']);
+        $this->getJson(self::BASE . '/calls/' . $complaint->id . '/complaint-updates')->assertForbidden();
+    }
+
+    public function test_mixed_complaint_history_paginates_in_time_order_with_distinct_entry_ids(): void
+    {
+        $agent = $this->agent(); Sanctum::actingAs($agent); $complaint = $this->logCall($agent, ['category' => 'C']);
+        for ($i = 1; $i <= 26; $i++) {
+            DB::table('call_center_audits')->insert(['id' => $i, 'call_id' => $complaint->id, 'actor_id' => $agent->id,
+                'action' => 'complaint_update', 'changes' => json_encode(['remarks' => 'Note ' . $i]), 'created_at' => sprintf('2026-10-13 09:%02d:00', $i)]);
+        }
+        $followup = $this->logCall($agent, ['category' => 'FU', 'parent_call_id' => $complaint->id, 'called_at' => '2026-10-13 09:10:30', 'remarks' => 'Follow-up conversation']);
+        $endpoint = self::BASE . '/calls/' . $complaint->id . '/complaint-updates';
+        $first = $this->getJson($endpoint)->assertOk()->assertJsonPath('data.total', 27)->assertJsonCount(25, 'data.data')->json('data.data');
+        $second = $this->getJson($endpoint . '?page=2')->assertOk()->assertJsonCount(2, 'data.data')->json('data.data');
+        $all = array_merge($first, $second);
+        $this->assertCount(27, array_unique(array_column($all, 'id')));
+        $this->assertSame('follow-up-' . $followup->id, $all[16]['id']);
+        $this->assertSame('Note 10', $all[17]['remarks']);
+        $this->assertSame('Note 1', $all[26]['remarks']);
+        $this->getJson(self::BASE . '/calls?queue=open_complaints')->assertJsonPath('data.data.0.complaint_history_count', 27);
+    }
+
     private function informationSchema(): void
     {
         Schema::table('cities', function (Blueprint $t) { $t->integer('company_id')->default(1); $t->integer('hide')->default(0); });
@@ -821,7 +1186,7 @@ class CallCenterTest extends TestCase
         (new \AddCallCenterRolePrivileges)->up();
         $role = json_decode(DB::table('roles')->where('id', 1)->value('permissions'), true);
         $flags = array_column($role[0]['buttons'], 'allow', 'name');
-        $this->assertCount(18, $flags); $this->assertTrue($flags['call-center-close-complaints']);
+        $this->assertCount(19, $flags); $this->assertTrue($flags['call-center-close-complaints']);
         $this->assertFalse($flags['call-center-review-reports']); $this->assertFalse($flags['call-center-supervise']);
         $new = json_decode(DB::table('roles')->where('id', 2)->value('permissions'), true);
         $this->assertFalse($new[0]['allow']);
@@ -852,7 +1217,7 @@ class CallCenterTest extends TestCase
         DB::table('roles')->where('id', 1)->update(['permissions' => json_encode($permissions)]); $user->unsetRelation('role');
         DB::table('roles')->insert(['id' => 2, 'company_id' => 1, 'name' => 'Complaint reader', 'permissions' => '[]']);
         DB::table('roles')->insert(['id' => 3, 'company_id' => 2, 'name' => 'Other company', 'permissions' => '[]']);
-        $result = $this->postJson('/api/web/v1/role/get', ['id' => 2])->assertOk()->assertJsonCount(18, 'call_center_privileges');
+        $result = $this->postJson('/api/web/v1/role/get', ['id' => 2])->assertOk()->assertJsonCount(19, 'call_center_privileges');
         $new = $result->json('permissions');
         $this->assertFalse($new[0]['allow']);
         $this->assertSame([], array_filter(array_column($new[0]['buttons'], 'allow')));

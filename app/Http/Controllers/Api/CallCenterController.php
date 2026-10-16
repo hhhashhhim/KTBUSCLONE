@@ -160,7 +160,9 @@ class CallCenterController extends Controller
             });
         }
         if ($request->boolean('pending_callbacks')) { $query->whereNotNull('callback_at')->where('status', '!=', 'closed'); }
-        return $this->response($query->orderByDesc('called_at')->orderByDesc('id')->paginate(25));
+        $calls = $query->orderByDesc('called_at')->orderByDesc('id')->paginate(25);
+        if (Scope::allows($request->user(), 'call-center-view-complaints')) { $this->attachComplaintUpdates($calls->getCollection(), $request); }
+        return $this->response($calls);
     }
 
     public function history(Request $request)
@@ -198,6 +200,7 @@ class CallCenterController extends Controller
         $this->authorizeAccess($request);
         $call = Scope::calls($request)->with(['agent', 'assignee', 'terminal', 'resolver'])->findOrFail($id);
         $this->authorizeRead($request, $call);
+        if ($call->category === 'C' && Scope::allows($request->user(), 'call-center-view-complaints')) { $this->attachComplaintUpdates(collect([$call]), $request); }
         if (Scope::allows($request->user(), 'call-center-view-audit')) { $call->setAttribute('audit', DB::table('call_center_audits')->where('call_id', $call->id)->orderBy('id')->get()->map(function ($audit) use ($request) {
             $audit->changes = json_decode($audit->changes, true);
             $audit->actor = User::where('company_id', $request->user()->company_id)->find($audit->actor_id, ['id', 'name']);
@@ -219,6 +222,7 @@ class CallCenterController extends Controller
             ]));
             $this->audit($call, $request, 'created', $call->getAttributes());
             $this->resolveParent($call, $request);
+            \App\Support\CallCenterNotifications::assigned($call, $user);
             return $call;
         });
         return $this->response($call->load(['agent', 'assignee', 'terminal']), 201);
@@ -236,9 +240,187 @@ class CallCenterController extends Controller
             foreach ($call->getDirty() as $key => $value) { $changes[$key] = ['from' => $before[$key] ?? null, 'to' => $value]; }
             if ($changes) { $call->save(); $this->audit($call, $request, 'updated', $changes); }
             $this->resolveParent($call, $request);
+            \App\Support\CallCenterNotifications::assigned($call, $request->user(), $before);
             return $call;
         });
         return $this->response($call->load(['agent', 'assignee', 'terminal']));
+    }
+
+    public function complaintAssignees(Request $request, int $id)
+    {
+        $this->authorizeComplaintAssignment($request);
+        $call = Scope::calls($request)->findOrFail($id);
+        abort_unless($call->category === 'C', 422, 'This call is not a complaint.');
+        $agents = User::with(['role', 'company'])->where('company_id', $call->company_id)->where('hide', 0)->orderBy('name')->get()
+            ->filter(function ($agent) use ($call) {
+                if (!Scope::allows($agent, 'call-center-view-complaints')) { return false; }
+                $recipient = Request::create('/');
+                $recipient->setUserResolver(function () use ($agent) { return $agent; });
+                return Scope::callsWithinBoundaries($recipient)->whereKey($call->id)->exists();
+            })->map(function ($agent) { return $agent->only(['id', 'name']); })->values();
+        return $this->response($agents);
+    }
+
+    private function authorizeComplaintAssignment(Request $request): void
+    {
+        $this->authorizeAccess($request, 'view-complaints');
+        $this->authorizeAccess($request, 'edit-calls');
+        $this->authorizeAccess($request, 'assign-calls');
+    }
+
+    public function assignComplaint(Request $request, int $id)
+    {
+        $this->authorizeComplaintAssignment($request);
+        $request->validate(['assigned_to' => 'required|integer|min:1', 'expected_assigned_to' => 'present|nullable|integer|min:1']);
+        $call = DB::transaction(function () use ($request, $id) {
+            $call = Scope::calls($request)->lockForUpdate()->findOrFail($id);
+            abort_unless($call->category === 'C', 422, 'This call is not a complaint.');
+            abort_if($call->status === 'closed', 409, 'This complaint has been closed. Refresh before assigning it.');
+            // Retries of a successful handover do not duplicate history or notifications.
+            if ((int) $call->assigned_to === (int) $request->assigned_to) { return $call; }
+            abort_if((int) $call->assigned_to !== (int) $request->expected_assigned_to, 409, 'The responsible person has changed. Refresh before assigning it.');
+            // Reuse existing assignment validation, accepting only the responsible person.
+            $assignment = Request::create('/', 'PATCH', ['assigned_to' => $request->assigned_to]);
+            $assignment->setUserResolver(function () use ($request) { return $request->user(); });
+            $data = $this->validatedCall($assignment, $call);
+            $before = $call->getAttributes();
+            $call->assigned_to = $data['assigned_to'];
+            $call->save();
+            $this->audit($call, $request, 'updated', ['assigned_to' => ['from' => $before['assigned_to'], 'to' => $call->assigned_to]]);
+            \App\Support\CallCenterNotifications::assigned($call, $request->user(), $before);
+            return $call;
+        });
+        $this->attachComplaintUpdates(collect([$call]), $request);
+        $call->setAttribute('can_view', Scope::calls($request)->whereKey($call->id)->exists());
+        return $this->response($call->load(['agent', 'assignee', 'terminal', 'resolver']));
+    }
+
+    private function complaintHistoryAudits(array $callIds)
+    {
+        return DB::table('call_center_audits')->whereIn('call_id', $callIds)->where(function ($query) {
+            $query->whereIn('action', ['complaint_update', 'closed'])->orWhere(function ($assignment) {
+                $assignment->where('action', 'updated')->whereNotNull('changes->assigned_to');
+            });
+        });
+    }
+
+    public function complaintUpdates(Request $request, int $id)
+    {
+        $this->authorizeAccess($request, 'view-complaints');
+        $request->validate(['page' => 'nullable|integer|min:1']);
+        $call = Scope::calls($request)->findOrFail($id);
+        abort_unless($call->category === 'C', 422, 'This call is not a complaint.');
+        $followupIds = array_keys($this->complaintFollowups([$call->id], $request));
+        $audits = $this->complaintHistoryAudits([$call->id])
+            ->select(['id', 'actor_id', 'created_at', 'call_id', 'changes', 'action'])
+            ->selectRaw("'audit' as source, 1 as source_order, NULL as remarks, NULL as callback_at, NULL as status");
+        $followups = Scope::callsWithinBoundaries($request)->where('category', 'FU')->whereIn('id', $followupIds)->toBase()
+            ->select(['id', 'agent_id as actor_id', 'called_at as created_at', 'id as call_id'])
+            ->selectRaw("NULL as changes, 'follow_up' as action, 'follow_up' as source, 0 as source_order")
+            ->addSelect(['remarks', 'callback_at', 'status']);
+        $history = DB::query()->fromSub($audits->unionAll($followups), 'complaint_history')
+            ->orderByDesc('created_at')->orderByDesc('source_order')->orderByDesc('id')->paginate(25);
+        $history->setCollection($this->complaintEntries($history->getCollection(), $request));
+        return $this->response($history);
+    }
+
+    public function addComplaintUpdate(Request $request, int $id)
+    {
+        $this->authorizeAccess($request, 'view-complaints');
+        $this->authorizeAccess($request, 'update-complaints');
+        $request->validate(['remarks' => 'required|string|max:5000', 'request_id' => 'required|uuid']);
+        $remarks = trim($request->remarks);
+        if ($remarks === '') { throw ValidationException::withMessages(['remarks' => 'Enter an update (up to 5000 characters).']); }
+        $call = DB::transaction(function () use ($request, $id, $remarks) {
+            $call = Scope::calls($request)->lockForUpdate()->findOrFail($id);
+            abort_unless($call->category === 'C', 422, 'This call is not a complaint.');
+            // A retry of the same draft must not append the same update twice.
+            $saved = DB::table('call_center_audits')->where('call_id', $call->id)->where('action', 'complaint_update')
+                ->where('changes->request_id', $request->request_id)->first();
+            if ($saved) {
+                abort_unless((json_decode($saved->changes, true)['remarks'] ?? null) === $remarks, 409, 'This update request has already been used. Refresh before saving again.');
+                return $call;
+            }
+            abort_if($call->status === 'closed', 409, 'This complaint has been closed. Refresh the list to see its resolution.');
+            $this->audit($call, $request, 'complaint_update', ['remarks' => $remarks, 'request_id' => $request->request_id]);
+            return $call;
+        });
+        $this->attachComplaintUpdates(collect([$call]), $request);
+        return $this->response($call->load(['agent', 'assignee', 'terminal', 'resolver']));
+    }
+
+    private function complaintEntries($entries, Request $request)
+    {
+        $personIds = $entries->pluck('actor_id')->all();
+        foreach ($entries as $entry) {
+            $change = json_decode($entry->changes ?? '{}', true)['assigned_to'] ?? [];
+            foreach (['from', 'to'] as $side) { if (!empty($change[$side])) { $personIds[] = $change[$side]; } }
+        }
+        $actors = User::where('company_id', $request->user()->company_id)->whereIn('id', $personIds)->get(['id', 'name'])->keyBy('id');
+        return $entries->map(function ($entry) use ($actors) {
+            if (($entry->source ?? null) === 'follow_up') {
+                return ['id' => 'follow-up-' . $entry->id, 'kind' => 'follow_up', 'call_id' => (int) $entry->call_id,
+                    'reference' => 'CC-' . $entry->call_id, 'remarks' => $entry->remarks,
+                    'created_at' => $entry->created_at, 'actor' => $actors->get($entry->actor_id),
+                    'callback_at' => $entry->status === 'closed' ? null : $entry->callback_at];
+            }
+            $changes = json_decode($entry->changes, true) ?: [];
+            if ($entry->action === 'updated' && isset($changes['assigned_to'])) {
+                $person = function ($id) use ($actors) {
+                    return $id ? ($actors->get($id) ?: ['id' => (int) $id, 'name' => 'Former user #' . $id]) : null;
+                };
+                return ['id' => $entry->id, 'kind' => 'assignment', 'created_at' => $entry->created_at,
+                    'actor' => $actors->get($entry->actor_id), 'from_assignee' => $person($changes['assigned_to']['from'] ?? null),
+                    'to_assignee' => $person($changes['assigned_to']['to'] ?? null)];
+            }
+            return ['id' => $entry->id, 'kind' => $entry->action === 'closed' ? 'closed' : 'update',
+                'remarks' => $entry->action === 'closed' ? ($changes['resolution_remarks']['to'] ?? '') : ($changes['remarks'] ?? ''),
+                'created_at' => $entry->created_at, 'actor' => $actors->get($entry->actor_id)];
+        });
+    }
+
+    private function complaintFollowups(array $complaintIds, Request $request): array
+    {
+        // The roots were authorized by Scope::calls. Their conversation history
+        // includes other staff's related calls without granting access to those
+        // staff's unrelated calls. Company, terminal and ticket-route limits remain.
+        $roots = array_combine($complaintIds, $complaintIds);
+        $parents = $complaintIds;
+        $followups = [];
+        while ($parents) {
+            $next = [];
+            foreach (array_chunk($parents, 500) as $chunk) {
+                $children = Scope::callsWithinBoundaries($request)->where('category', 'FU')->whereIn('parent_call_id', $chunk)
+                    ->whereColumn('id', '>', 'parent_call_id')->get(['id', 'parent_call_id']);
+                foreach ($children as $child) {
+                    if (isset($roots[$child->id])) { continue; }
+                    $roots[$child->id] = $roots[$child->parent_call_id];
+                    $followups[$child->id] = $roots[$child->id];
+                    $next[] = $child->id;
+                }
+            }
+            $parents = $next;
+        }
+        return $followups;
+    }
+
+    private function attachComplaintUpdates($calls, Request $request): void
+    {
+        $complaints = $calls->where('category', 'C');
+        if ($complaints->isEmpty()) { return; }
+        $ids = DB::table('call_center_audits')->whereIn('call_id', $complaints->pluck('id'))->where('action', 'complaint_update')
+            ->selectRaw('MAX(id)')->groupBy('call_id');
+        $entries = DB::table('call_center_audits')->whereIn('id', $ids)->get();
+        $counts = $this->complaintHistoryAudits($complaints->pluck('id')->all())
+            ->select('call_id')->selectRaw('COUNT(*) as total')->groupBy('call_id')->pluck('total', 'call_id');
+        $followupCounts = array_count_values($this->complaintFollowups($complaints->pluck('id')->all(), $request));
+        $formatted = $this->complaintEntries($entries, $request)->keyBy('id');
+        $entries = $entries->keyBy('call_id');
+        foreach ($complaints as $call) {
+            $entry = $entries->get($call->id);
+            $call->setAttribute('latest_complaint_update', $entry ? $formatted->get($entry->id) : null);
+            $call->setAttribute('complaint_history_count', (int) $counts->get($call->id, 0) + ($followupCounts[$call->id] ?? 0));
+        }
     }
 
     public function closeComplaint(Request $request, int $id)
@@ -437,6 +619,10 @@ class CallCenterController extends Controller
                 if (!Scope::tickets($assigneeRequest)->where('tickets.id', $merged['ticket_id'])->exists()) {
                     throw ValidationException::withMessages(['assigned_to' => 'Selected agent cannot access this booking.']);
                 }
+            }
+            if ($merged['category'] === 'C' && (!$existing || $existing->category !== 'C' || $previousAssignee !== $nextAssignee)
+                && !Scope::allows($agent, 'call-center-view-complaints')) {
+                throw ValidationException::withMessages(['assigned_to' => 'Choose a user with View complaints workspace permission.']);
             }
         }
         if (!empty($merged['callback_at']) && empty($merged['assigned_to'])) {

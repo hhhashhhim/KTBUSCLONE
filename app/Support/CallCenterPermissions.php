@@ -22,6 +22,7 @@ class CallCenterPermissions
             ],
             'Complaints' => [
                 'view-complaints' => ['View complaints workspace', 'Open the Complaints tab and read open and closed complaints.'],
+                'update-complaints' => ['Add complaint updates', 'Add progress remarks without closing a complaint. Also requires View complaints workspace.'],
                 'close-complaints' => ['Close complaints', 'Close with required remarks, including through a follow-up, or reclassify a complaint. Also requires View complaints workspace.'],
                 'reopen-complaints' => ['Reopen complaints', 'Reopen a closed complaint. Also requires View complaints workspace and Edit calls.'],
             ],

@@ -33,7 +33,7 @@ company, and hidden users are denied. An active own terminal is required for
 recording calls. No cross-company mode is provided.
 
 Company templates make the module available. New roles start with the module
-and all 18 action/scope privileges disabled. The upgrade migrates the previous
+and all 19 action/scope privileges disabled. The upgrade migrates the previous
 `ticketing > call-center` entry into its own module, removes the nested entry,
 and preserves its effective enabled state (including an old disabled Ticketing
 parent). Existing granular denials remain denied. Older enabled module-wide
@@ -65,6 +65,7 @@ All identifiers below have the prefix `call-center-`.
 | `view-history` | Read a caller's previous calls and complaints within scope. |
 | `quick-answers` | Read fares, departures, seats and terminal details. |
 | `view-complaints` | Read the dedicated complaints workspace. Without view-calls, list/detail access is restricted to complaints. |
+| `update-complaints` | Append progress remarks without closing a complaint; requires view-complaints. Does not require edit-calls or close-complaints. |
 | `close-complaints` | Close complaints with remarks or reclassify them; requires view-complaints. No generic edit grant is needed for dedicated closure. |
 | `reopen-complaints` | Reopen or reclassify closed complaints; also requires edit-calls and view-complaints. Reclassification additionally requires close-complaints. |
 | `shift-report` | Read/print shift totals. |
@@ -137,6 +138,56 @@ change original agent, terminal or business date attribution.
 - `PATCH /calls/{id}`: same editable fields except `call_date`; only submitted
   fields update. Original agent/date/terminal remain unchanged. Audit stores
   changed fields, previous/new values and actor atomically.
+- `GET /calls/{id}/complaint-assignees`: requires view-complaints, edit-calls
+  and assign-calls plus access to the complaint. Returns `[{id,name}]` for active
+  users with complaint access within its company, terminal and ticket-route
+  boundaries, including cross-terminal staff only when their role permits it.
+- `POST /calls/{id}/assign-complaint`: same permissions, for an open complaint.
+  Send `assigned_to` and `expected_assigned_to` (current user ID, or null if
+  unassigned). Under a row lock, rejects a stale responsible person or a closed
+  complaint with 409, validates recipient access, changes only responsibility,
+  appends the standard assignment audit, and notifies the new assignee.
+  Repeating the same current target is a no-op. Extra call fields are ignored.
+  Returns the complaint with history metadata and `can_view`: false means the
+  previous assignee has handed over their only basis for access; remove that
+  card from their view. Original description, notes, callbacks and status stay
+  unchanged. No additional migration is required for this assignment feature.
+- `GET /calls/{id}/complaint-updates`: requires view-complaints and an accessible
+  complaint; returns 25 entries per page, newest first, with
+  `{id,kind:update|closed|follow_up|assignment,remarks,created_at,actor:{id,name}|null}`.
+  Includes progress updates, responsibility changes, previous closing remarks and linked FU calls,
+  including follow-ups to those FU calls. These remain visible after reopening.
+  FU entries additionally include `call_id,reference,callback_at`; their `id` is
+  `follow-up-{call_id}` to avoid collisions with numeric audit IDs. Their time is
+  the original `called_at`, their actor is the recording agent, and callback_at
+  is present only while that call has a pending callback. Notes are read from
+  the linked call, so edits appear once and old linked records need no backfill.
+  Assignment entries read existing `updated` audits containing `assigned_to` and
+  include `from_assignee` and `to_assignee` (`{id,name}` or null for unassigned).
+  Names are resolved within the current company; deleted users retain a user-ID
+  label. Assignment changes from the call log also appear, with no backfill.
+  Only FU links are followed; unrelated calls and audit fields are excluded.
+  Parent access requires view-complaints and normal own/assigned/team scope.
+  Related FU summaries may include other staff's calls within the viewer's
+  company, terminal and ticket-route boundaries; this does not grant direct
+  access to their full calls. Restricted intermediate links are not traversed.
+  View calls and View call change history are not needed for these summaries.
+  `page` must be a positive integer. Sorting uses event time descending, then
+  audit-before-FU for equal timestamps, then ID descending within the source.
+- `POST /calls/{id}/complaint-updates`: requires view-complaints and
+  update-complaints. Requires nonblank `remarks` (up to 5000 characters) and
+  `request_id` (UUID). Appends an immutable `complaint_update` audit event with
+  the server's agent and Pakistan timestamp; leaves description, status,
+  assignee, callbacks, call counts and report totals unchanged. Returns the call
+  with `latest_complaint_update` and `complaint_history_count`. Retrying the same
+  call/request ID and trimmed text returns the saved call without a duplicate;
+  reusing an ID for different text returns 409. New updates on closed complaints
+  return 409. Scoped call locking serializes updates with closure.
+  List/detail responses include the latest progress entry and total history
+  count (including permitted linked FU calls) when the user has view-complaints.
+  The latest progress entry still refers to a saved progress note. Older closing events already in the
+  audit trail appear in history; legacy complaints without audit events still
+  retain their existing resolution display.
 - `POST /calls/{id}/close-complaint`: requires `resolution_remarks` (nonblank
   text, at most 5000 characters). Applies only to accessible complaints. Closes
   the complaint, clears its callback, preserves the original `remarks`, and sets
@@ -329,7 +380,7 @@ The user-selected workflow records agreement and requests in Call Center;
 Ticketing remains responsible for executing seat changes and payments. No new
 booking, cancellation, reschedule or payment endpoint is called by this workflow.
 `create-calls` / `edit-calls` and all existing visibility restrictions apply.
-There are still 18 role privileges; the Record calls description now includes RF/RS.
+RF/RS use the existing Record calls and Edit calls privileges; no separate financial-action privilege is granted.
 
 RF/RS require `customer_response=agreed|declined|not_reached`. This records the
 agent's report of the conversation. `change_seat_count` is an integer from 1 to
@@ -371,3 +422,85 @@ proposal validation, optional proposal fields, action/booking boundaries, daily
 and shift totals, unchanged Ticketing tables, fresh-response follow-ups, failed
 transaction rollback and report review staleness. The migration is applied only
 to the local imported preview database.
+
+## Complaint progress updates (16 October 2026)
+
+Deploy the API and run `2026_10_16_000002_add_call_center_complaint_updates_permission`
+before the matching complaints screen. Progress notes use the existing append-only
+`call_center_audits` records, so no new table or column is required. There are now
+19 granular Call Center privileges. The additive permission migration makes
+Add complaint updates available to companies, enables it for existing roles with
+both View complaints workspace and Close complaints, and preserves explicit
+grants/denials. Other existing roles and new roles start denied; administrators
+can enable Add complaint updates independently in Roles. Rerunning the migration
+never restores a revoked grant.
+
+
+## Complaint assignment notifications
+
+Run `php artisan migrate --path=database/migrations/2026_10_16_000003_create_call_center_notifications_table.php --force`
+after the existing Call Center migrations, before serving the new API. The new
+`call_center_notifications` table stores recipient, assigning user, complaint,
+creation/read time and superseded time; no existing complaints are rewritten or
+backfilled with alerts. The migration has no permission changes.
+
+Recording or reassigning an open complaint to another user creates a notification
+inside the same transaction as the call and audit. Ordinary saves, self-assignment
+and other categories do not notify. Previous alerts for that complaint are retired
+on reassignment, removal of the assignee or category change, so they cannot
+reappear if a user is later assigned the complaint again. Assignment now requires
+the recipient to have View complaints workspace permission; existing terminal,
+route, company and assignment-action checks still apply.
+
+- `GET /notifications?page=1`: requires module + `view-complaints`; returns
+  `data: {unread_count, notifications: <paginator>}`. Pages contain 20 items,
+  newest first. Each item has `id, call_id, reference, message, created_at, read_at`.
+  The unread count covers all pages. Only the signed-in recipient's current
+  assignments within their live company/terminal/route scope are exposed.
+  Closed complaints remain accessible from earlier notifications.
+- `POST /notifications/{id}/read`: same access checks; marks only the signed-in
+  recipient's visible notification read, retaining its first read time on retries.
+  Returns `data: {id}`; unavailable/other-user notifications return 404.
+
+These are database-backed website notifications, independent of email, browser
+push permission, workers or a mobile app. Reading an alert does not close or
+otherwise change its complaint.
+
+
+## Linked follow-up history deployment
+
+Run `php artisan migrate --path=database/migrations/2026_10_16_000004_add_call_center_parent_lookup_index.php --force`
+after the previous Call Center migrations. This adds only a lookup index on
+company/parent/category for linked conversations; no records or role grants change.
+Deploy the combined-history API on `api` with the corresponding `mix` display.
+Older linked FU calls appear immediately. The history query does not create
+additional calls or copy notes into audits, and does not change complaint status,
+callback scheduling, assignment or reporting. History discovery batches complaint
+roots and traverses indexed parent links instead of scanning all company calls.
+
+
+## Complaint workflow release — 16 October 2026
+
+This release includes progress updates, combined complaint/follow-up/assignment
+history, assignment notifications, and reassignment from the complaint workspace.
+Deploy `api` before serving the matching production bundle from `mix`.
+For installations already running the earlier Call Center/customer-agreement
+migrations, apply these pending migrations in order using the deployment's
+existing database configuration:
+
+```bash
+php artisan migrate --path=database/migrations/2026_10_16_000002_add_call_center_complaint_updates_permission.php --force
+php artisan migrate --path=database/migrations/2026_10_16_000003_create_call_center_notifications_table.php --force
+php artisan migrate --path=database/migrations/2026_10_16_000004_add_call_center_parent_lookup_index.php --force
+```
+
+These changes preserve existing calls and history. A fresh installation also
+needs the earlier Call Center migrations documented above. Assignment itself
+adds no further migration. Review Call Center role privileges after deployment;
+workspace assignment uses View complaints, Edit calls and Assign calls.
+
+Release validation: 82 backend tests / 938 assertions and PHP syntax checks passed.
+The companion frontend passed 24 tests and a production Mix build. Local MySQL
+verification covered mixed history and complaint assignment/notifications inside
+transactions that were rolled back; browser fixtures verified successive
+handovers while preserving updates and linked follow-up history.

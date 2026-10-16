@@ -53,7 +53,9 @@ class CallCenterScope
         return $query;
     }
 
-    public static function calls(Request $request, bool $report = false)
+    // Internal scope building block. Callers must separately authorize the parent
+    // complaint when using this for related history instead of ordinary call access.
+    public static function callsWithinBoundaries(Request $request)
     {
         $user = $request->user();
         $query = CallLog::where('company_id', $user->company_id);
@@ -62,6 +64,13 @@ class CallCenterScope
         $query->where(function ($q) use ($request) {
             $q->whereNull('ticket_id')->orWhereIn('ticket_id', self::tickets($request, false)->select('tickets.id'));
         });
+        return $query;
+    }
+
+    public static function calls(Request $request, bool $report = false)
+    {
+        $user = $request->user();
+        $query = self::callsWithinBoundaries($request);
         if (!self::allows($user, 'call-center-supervise')) {
             $query->where(function ($q) use ($user, $report) {
                 $q->where('agent_id', $user->id);
