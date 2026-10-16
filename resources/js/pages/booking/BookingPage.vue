@@ -426,6 +426,19 @@
                                                     {{ getSchedule ? "Loading..." : 'Refresh' }}
                                                 </button>
                                             </div>
+                                            <div v-if="schedule && schedule.quota && schedule.quota.limit !== null" class="alert alert-info mt-3 mb-0" role="status">
+                                                <div class="d-flex justify-content-between flex-wrap">
+                                                    <strong>Advance intermediate-ticket quota</strong>
+                                                    <span class="badge badge-primary">{{ schedule.quota.used }} / {{ schedule.quota.limit }} used</span>
+                                                </div>
+                                                <div v-if="schedule.quota.departed" class="mt-2">Main departure time has passed. The quota no longer limits bookings.</div>
+                                                <div v-else class="mt-2">
+                                                    {{ schedule.quota.remaining }} paid ticket(s) remaining across all terminals.
+                                                    <strong v-if="!schedule.quota.intermediate">This full-route journey is exempt.</strong>
+                                                    Limit lifts at {{ schedule.quota.departure_at }}.
+                                                </div>
+                                                <small class="d-block mt-1">Unpaid reservations do not count; confirming payment checks the quota. Each onward ticket counts separately.</small>
+                                            </div>
                                             <div v-if="!hideDivButtonsDrop || dropHistory.length" class="alert dropped-schedule-alert mt-3 mb-0" :class="hideDivButtonsDrop ? 'alert-info schedule-reactivated-alert' : 'alert-warning'" role="alert">
                                                 <div class="d-flex align-items-start">
                                                     <i class="fas fa-exclamation-triangle mr-3 mt-1" aria-hidden="true"></i>
@@ -574,6 +587,10 @@
                                                     <div class="my-1">
                                                         <div class="partial-seat circles mr-1 border shadow"></div>
                                                         <span class="text-wrap">Partial Seat</span>
+                                                    </div>
+                                                    <div class="my-1" v-if="schedule && schedule.quota && schedule.quota.limit !== null">
+                                                        <div class="quota-reuse-seat circles mr-1 border shadow"></div>
+                                                        <span class="text-wrap" title="An advance paid intermediate ticket used this seat earlier. It is available for your onward journey; prefer this seat first.">Available onward — reuse first</span>
                                                     </div>
                                                 </div>
                                                 <!-- <div class="border-bottom w-100">
@@ -4305,7 +4322,8 @@ export default {
             let partial = col.partial == 1 ? "partial" : "";
             let over = col.type == 'over-issue' ? "bg-secondary" : "";
             let disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
-            return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
+            let reuse = col.quota_reuse && !col.type && !col.selected ? 'quota-reuse-seat' : '';
+            return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat + " " + reuse;
         },
 
         getClassesReschedule: function (col) {
@@ -4342,10 +4360,14 @@ export default {
             let partial = col.partial == 1 ? "partial" : "";
             let over = col.type == 'over-issue' ? "bg-secondary" : "";
             let disabledSeat = col.type == 'not_for_sale' ? 'not-for-sale' : "";
-            return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat;
+            let reuse = col.quota_reuse && !col.type && !col.alreadyBooked ? 'quota-reuse-seat' : '';
+            return gender + " " + selected + " " + partial + " " + over + " " + disabledSeat + " " + reuse;
         },
 
         getTitle: function (col) {
+            if (col.quota_reuse && !col.type) {
+                return 'Available for this onward journey. Prefer this seat: it was already used for an advance paid intermediate journey. A new paid ticket still counts separately towards the quota.';
+            }
             if (col.type == 'booked' || col.type == 'advance booking' || col.type == 'over-issue' || col.id) {
                 return "Name : " + col.customer_name + '\n' + "Phone : " + (this.auth_terminal.other_terminal_passenger_detail == 1 || col.terminal == this.auth_terminal.id ? col.customer_phone : "---") + '\n' + "Seat Fare : " + col.seat_fare + '\n' + "Remarks : " + col.remarks + '\n' + "Terminal : " + (col.terminal_name || "N/A") + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
             }
@@ -5848,6 +5870,10 @@ export default {
 </script>
 
 <style scoped>
+.quota-reuse-seat {
+    background: #f8cddd !important;
+    color: #64243e !important;
+}
 .dropped-schedule-alert { border: 1px solid #efd398; border-left: 4px solid #d69b24; border-radius: 8px; background: #fff8e8; color: #775316; text-align: left; }
 .dropped-schedule-alert .alert-heading { color: #775316; font-weight: 700; }
 .dropped-schedule-alert small { font-size: 11px; text-transform: uppercase; letter-spacing: .3px; margin-bottom: 3px; }

@@ -128,6 +128,12 @@
                                                                     class="btn btn-primary mr-1 btn-sm"><i
                                                                 class="far fa-edit"></i>
                                                             </button>
+                                                            <button v-if="checkForSubmenuButtons('edit-schedule')"
+                                                                    type="button" class="btn btn-outline-primary btn-sm mr-1"
+                                                                    title="Set advance paid intermediate-ticket quota"
+                                                                    @click="openQuota(schedule.schedule)">
+                                                                Quota: {{ schedule.schedule.intermediate_quota == null ? 'Unlimited' : schedule.schedule.intermediate_quota }}
+                                                            </button>
                                                             <button class="btn btn-success btn-sm mr-1"
                                                                     v-if="checkForSubmenuButtons('update-time')"
                                                                     @click="editTime(schedule)"
@@ -153,6 +159,36 @@
                             <!-- END TABLE -->
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="scheduleQuotaModal" tabindex="-1" aria-labelledby="scheduleQuotaTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <form class="modal-content" @submit.prevent="saveQuota">
+                        <div class="modal-header">
+                            <h5 id="scheduleQuotaTitle" class="modal-title">Schedule Quota</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" :disabled="quotaSaving"><span aria-hidden="true">&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="border rounded bg-light p-3 mb-3">
+                                <strong class="d-block">{{ quotaForm.name }}</strong>
+                                <small>{{ quotaForm.route }}</small>
+                            </div>
+                            <label for="intermediateQuota">Advance paid intermediate tickets per departure</label>
+                            <input id="intermediateQuota" v-model="quotaForm.limit" type="number" min="0" max="100000" step="1"
+                                   class="form-control" placeholder="Unlimited" :disabled="quotaSaving" aria-describedby="quotaHelp" />
+                            <small id="quotaHelp" class="form-text text-muted">Leave blank for unlimited. Enter 0 to prevent advance paid intermediate bookings.</small>
+                            <div class="alert alert-info mt-3 mb-0">
+                                <p class="mb-2">Shared across all terminals, separately for each dated departure of this schedule. Each paid ticket counts once—even when the same seat is sold for two onward journeys.</p>
+                                <p class="mb-0">Full-route tickets and unpaid reservations are exempt. The limit ends at the main starting-city departure time. Cancelled tickets release their quota.</p>
+                            </div>
+                            <div v-if="quotaError" class="alert alert-danger mt-3 mb-0" role="alert">{{ quotaError }}</div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" :disabled="quotaSaving">Close</button>
+                            <button type="submit" class="btn btn-primary" :disabled="quotaSaving">{{ quotaSaving ? 'Saving...' : 'Save Quota' }}</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -880,6 +916,9 @@ export default {
             },
             loading: false,
             syncingUpcoming: false,
+            quotaForm: { id: null, name: '', route: '', limit: '' },
+            quotaSaving: false,
+            quotaError: '',
             upcomingSyncMessage: '',
             todayDate: today,
             schedules: [],
@@ -1017,6 +1056,40 @@ export default {
         this.destroyScheduleTable();
     },
     methods: {
+        openQuota(schedule) {
+            this.quotaForm = {
+                id: schedule.id,
+                name: schedule.name,
+                route: schedule.route ? schedule.route.name : '',
+                limit: schedule.intermediate_quota == null ? '' : schedule.intermediate_quota,
+            };
+            this.quotaError = '';
+            $('#scheduleQuotaModal').modal('show');
+        },
+        async saveQuota() {
+            if (this.quotaSaving) return;
+            const limit = this.quotaForm.limit === '' ? null : Number(this.quotaForm.limit);
+            if (limit !== null && (!Number.isInteger(limit) || limit < 0 || limit > 100000)) {
+                this.quotaError = 'Enter a whole number from 0 to 100000, or leave blank for unlimited.';
+                return;
+            }
+            this.quotaSaving = true;
+            this.quotaError = '';
+            try {
+                const res = await this.callApi('post', 'schedule/quota', { id: this.quotaForm.id, intermediate_quota: limit });
+                if (res.status === 200) {
+                    $('#scheduleQuotaModal').modal('hide');
+                    this.upcomingSyncMessage = res.data.message;
+                    await this.fetchSchedule();
+                } else {
+                    this.quotaError = res.data.errors ? Object.values(res.data.errors).flat().join(' ') : (res.data.message || 'Unable to save the quota.');
+                }
+            } catch (error) {
+                this.quotaError = 'Unable to save the quota. Please try again.';
+            } finally {
+                this.quotaSaving = false;
+            }
+        },
         async syncUpcomingSchedules() {
             if (this.syncingUpcoming) return;
             this.syncingUpcoming = true;
