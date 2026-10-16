@@ -365,6 +365,17 @@ class CallCenterTest extends TestCase
         $this->postJson(self::BASE . '/calls', ['category' => 'C', 'shift' => 1, 'outcome' => 'finish'])->assertUnprocessable()->assertJsonValidationErrors('remarks');
     }
 
+    public function test_other_information_topic_is_saved_and_can_be_selected_when_editing(): void
+    {
+        Sanctum::actingAs($this->agent());
+        $call = $this->postJson(self::BASE . '/calls', ['category' => 'GI', 'inquiry_topic' => 'other', 'shift' => 1, 'outcome' => 'finish'])
+            ->assertCreated()->assertJsonPath('data.status', 'closed')->assertJsonPath('data.inquiry_topic', 'other')->json('data.id');
+        $this->getJson(self::BASE . '/calls/' . $call)->assertOk()->assertJsonPath('data.inquiry_topic', 'other');
+        $this->patchJson(self::BASE . '/calls/' . $call, ['inquiry_topic' => 'fare'])->assertOk()->assertJsonPath('data.inquiry_topic', 'fare');
+        $this->patchJson(self::BASE . '/calls/' . $call, ['inquiry_topic' => 'other'])->assertOk()->assertJsonPath('data.inquiry_topic', 'other');
+        $this->assertDatabaseHas('call_center_calls', ['id' => $call, 'inquiry_topic' => 'other']);
+    }
+
     public function test_work_queues_include_overdue_work_from_earlier_days_and_keep_scope(): void
     {
         $user = $this->agent(); $other = $this->agent(2); Sanctum::actingAs($user);

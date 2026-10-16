@@ -283,7 +283,7 @@ class CallCenterController extends Controller
             'ticket_id' => 'nullable|integer|min:1', 'seat_count' => 'sometimes|integer|min:0|max:100', 'remarks' => 'nullable|string|max:5000',
             'assigned_to' => 'nullable|integer|min:1', 'callback_at' => 'nullable|date_format:Y-m-d H:i:s',
             'parent_call_id' => 'nullable|integer|min:1', 'external_reference' => 'nullable|string|max:100',
-            'inquiry_topic' => ['nullable', Rule::in(['fare', 'timings', 'terminal'])],
+            'inquiry_topic' => ['nullable', Rule::in(['fare', 'timings', 'terminal', 'other'])],
             'complaint_from_city' => 'nullable|string|max:120', 'complaint_to_city' => 'nullable|string|max:120',
             'complaint_bus_time' => 'nullable|date_format:H:i', 'complaint_seat_number' => 'nullable|string|max:20',
             'customer_response' => ['nullable', Rule::in(array_keys(self::RESPONSES))],

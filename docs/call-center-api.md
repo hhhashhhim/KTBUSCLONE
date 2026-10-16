@@ -171,7 +171,7 @@ require notes. Existing clients can omit outcome and retain the legacy status
 workflow, but setting a new/open complaint directly to closed is rejected:
 use the close-complaint endpoint with closing remarks. Existing closed complaints
 can still have their details edited. `record` is supported for complaints and Refund/Reschedule calls, as detailed below.
-`inquiry_topic` accepts `fare|timings|terminal` or null; non-GI calls
+`inquiry_topic` accepts `fare|timings|terminal|other` or null; non-GI calls
 clear it. The current UI requires a GI topic, while the API accepts null for
 older clients and records.
 
