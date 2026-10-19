@@ -9,7 +9,10 @@
                 <form class="cc-form-stack" @submit.prevent="search">
                     <div class="cc-grid"><div class="cc-field"><label for="quick-from">From</label><select v-cc-select2 id="quick-from" v-model="form.departure_id" required><option value="">Choose city</option><option v-for="city in info.cities" :key="city.id" :value="city.id">{{ city.name }}</option></select></div><div class="cc-field"><label for="quick-to">To</label><select v-cc-select2 id="quick-to" v-model="form.destination_id" required><option value="">Choose city</option><option v-for="city in info.cities" :key="city.id" :value="city.id">{{ city.name }}</option></select></div></div>
                     <div class="cc-grid"><div class="cc-field"><label for="quick-date">Travel date</label><input id="quick-date" type="date" v-model="form.date" :min="today()" required></div><div v-if="info.terminals.length > 1" class="cc-field"><label for="quick-terminal">Booking terminal</label><select v-cc-select2 id="quick-terminal" v-model="form.terminal_id" required><option value="">Choose terminal</option><option v-for="terminal in info.terminals" :key="terminal.id" :value="terminal.id">{{ terminal.name }}</option></select></div></div>
-                    <button class="cc-button secondary" :disabled="searching">{{ searching ? 'Checking…' : 'Check fares, departures & seats' }}</button>
+                    <div class="cc-actions">
+                        <button type="submit" class="cc-button" :disabled="searching">{{ searching ? 'Checking…' : 'Check fares, departures & seats' }}</button>
+                        <button type="button" class="cc-button secondary" @click="reset">Reset</button>
+                    </div>
                 </form>
                 <p v-if="searchError" class="cc-field-error" role="alert">{{ searchError }}</p>
                 <div v-if="answer" aria-live="polite">
@@ -33,11 +36,21 @@ export default {
     beforeUnmount() { this.sequence++; },
     methods: {
         today: pakistanDate, time: displayTime,
+        defaultTerminal() {
+            const terminals = this.info?.terminals || [];
+            return terminals.find(t => Number(t.id) === Number(this.currentUser?.terminal_id))?.id || terminals[0]?.id || '';
+        },
+        reset() {
+            // Ignore any outstanding search so it cannot restore results after reset.
+            this.sequence++;
+            this.form = { departure_id: '', destination_id: '', date: this.today(), terminal_id: this.defaultTerminal() };
+            this.answer = null; this.active = {}; this.error = ''; this.searchError = ''; this.searching = false;
+        },
         cityName(id) { return this.info.cities.find(city => Number(city.id) === Number(id))?.name || ''; },
         onToggle(event) { if (event.target.open && !this.info && !this.loading) this.loadOptions(); },
         async loadOptions() {
             this.loading = true; this.error = '';
-            try { this.info = await request(this, 'get', 'quick-answers/options'); this.form.terminal_id = this.info.terminals.find(t => t.id === this.currentUser.terminal_id)?.id || this.info.terminals[0]?.id || ''; }
+            try { this.info = await request(this, 'get', 'quick-answers/options'); this.form.terminal_id = this.defaultTerminal(); }
             catch (error) { this.error = error.message; } finally { this.loading = false; }
         },
         async search() {

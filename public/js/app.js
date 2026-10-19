@@ -48829,6 +48829,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   methods: {
     today: _callCenter__WEBPACK_IMPORTED_MODULE_1__.pakistanDate,
     time: _callCenter__WEBPACK_IMPORTED_MODULE_1__.displayTime,
+    defaultTerminal: function defaultTerminal() {
+      var _this$info,
+          _terminals$find,
+          _this = this,
+          _terminals$;
+
+      var terminals = ((_this$info = this.info) === null || _this$info === void 0 ? void 0 : _this$info.terminals) || [];
+      return ((_terminals$find = terminals.find(function (t) {
+        var _this$currentUser;
+
+        return Number(t.id) === Number((_this$currentUser = _this.currentUser) === null || _this$currentUser === void 0 ? void 0 : _this$currentUser.terminal_id);
+      })) === null || _terminals$find === void 0 ? void 0 : _terminals$find.id) || ((_terminals$ = terminals[0]) === null || _terminals$ === void 0 ? void 0 : _terminals$.id) || '';
+    },
+    reset: function reset() {
+      // Ignore any outstanding search so it cannot restore results after reset.
+      this.sequence++;
+      this.form = {
+        departure_id: '',
+        destination_id: '',
+        date: this.today(),
+        terminal_id: this.defaultTerminal()
+      };
+      this.answer = null;
+      this.active = {};
+      this.error = '';
+      this.searchError = '';
+      this.searching = false;
+    },
     cityName: function cityName(id) {
       var _this$info$cities$fin;
 
@@ -48840,37 +48868,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (event.target.open && !this.info && !this.loading) this.loadOptions();
     },
     loadOptions: function loadOptions() {
-      var _this = this;
+      var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var _this$info$terminals$, _this$info$terminals$2;
-
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _this.loading = true;
-                _this.error = '';
+                _this2.loading = true;
+                _this2.error = '';
                 _context.prev = 2;
                 _context.next = 5;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this, 'get', 'quick-answers/options');
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this2, 'get', 'quick-answers/options');
 
               case 5:
-                _this.info = _context.sent;
-                _this.form.terminal_id = ((_this$info$terminals$ = _this.info.terminals.find(function (t) {
-                  return t.id === _this.currentUser.terminal_id;
-                })) === null || _this$info$terminals$ === void 0 ? void 0 : _this$info$terminals$.id) || ((_this$info$terminals$2 = _this.info.terminals[0]) === null || _this$info$terminals$2 === void 0 ? void 0 : _this$info$terminals$2.id) || '';
+                _this2.info = _context.sent;
+                _this2.form.terminal_id = _this2.defaultTerminal();
                 _context.next = 12;
                 break;
 
               case 9:
                 _context.prev = 9;
                 _context.t0 = _context["catch"](2);
-                _this.error = _context.t0.message;
+                _this2.error = _context.t0.message;
 
               case 12:
                 _context.prev = 12;
-                _this.loading = false;
+                _this2.loading = false;
                 return _context.finish(12);
 
               case 15:
@@ -48882,7 +48906,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     search: function search() {
-      var _this2 = this;
+      var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         var sequence, params, answer;
@@ -48890,20 +48914,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                sequence = ++_this2.sequence, params = _objectSpread({}, _this2.form);
-                _this2.searchError = '';
-                _this2.answer = null;
-                _this2.searching = true;
+                sequence = ++_this3.sequence, params = _objectSpread({}, _this3.form);
+                _this3.searchError = '';
+                _this3.answer = null;
+                _this3.searching = true;
                 _context2.prev = 4;
                 _context2.next = 7;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this2, 'get', 'quick-answers', null, params);
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this3, 'get', 'quick-answers', null, params);
 
               case 7:
                 answer = _context2.sent;
 
-                if (sequence === _this2.sequence) {
-                  _this2.answer = answer;
-                  _this2.active = params;
+                if (sequence === _this3.sequence) {
+                  _this3.answer = answer;
+                  _this3.active = params;
                 }
 
                 _context2.next = 14;
@@ -48912,11 +48936,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 11:
                 _context2.prev = 11;
                 _context2.t0 = _context2["catch"](4);
-                if (sequence === _this2.sequence) _this2.searchError = _context2.t0.message;
+                if (sequence === _this3.sequence) _this3.searchError = _context2.t0.message;
 
               case 14:
                 _context2.prev = 14;
-                if (sequence === _this2.sequence) _this2.searching = false;
+                if (sequence === _this3.sequence) _this3.searching = false;
                 return _context2.finish(14);
 
               case 17:
@@ -114538,40 +114562,43 @@ var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_23 = ["value"];
-var _hoisted_24 = ["disabled"];
-var _hoisted_25 = {
+var _hoisted_24 = {
+  "class": "cc-actions"
+};
+var _hoisted_25 = ["disabled"];
+var _hoisted_26 = {
   key: 0,
   "class": "cc-field-error",
   role: "alert"
 };
-var _hoisted_26 = {
+var _hoisted_27 = {
   key: 1,
   "aria-live": "polite"
 };
-var _hoisted_27 = {
+var _hoisted_28 = {
   "class": "cc-muted"
 };
-var _hoisted_28 = {
+var _hoisted_29 = {
   key: 0,
   "class": "cc-note"
 };
-var _hoisted_29 = {
+var _hoisted_30 = {
   "class": "cc-departure-heading"
 };
-var _hoisted_30 = {
+var _hoisted_31 = {
   "class": "cc-muted"
 };
 
-var _hoisted_31 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", {
+var _hoisted_32 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", {
   "class": "cc-spaced"
 }, "Base fares", -1
 /* HOISTED */
 );
 
-var _hoisted_32 = {
+var _hoisted_33 = {
   key: 0
 };
-var _hoisted_33 = {
+var _hoisted_34 = {
   "class": "cc-note"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -114579,7 +114606,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("details", {
     "class": "cc-card cc-quick",
-    onToggle: _cache[6] || (_cache[6] = function () {
+    onToggle: _cache[7] || (_cache[7] = function () {
       return $options.onToggle && $options.onToggle.apply($options, arguments);
     })
   }, [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [_ctx.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.error) + " ", 1
@@ -114607,7 +114634,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* KEYED_FRAGMENT */
   )), !_ctx.info.terminals.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_6, "No terminal details available for your access.")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     "class": "cc-form-stack",
-    onSubmit: _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onSubmit: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.search && $options.search.apply($options, arguments);
     }, ["prevent"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
@@ -114665,26 +114692,33 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_23);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, _ctx.form.terminal_id]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    "class": "cc-button secondary",
+  ))])), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, _ctx.form.terminal_id]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "submit",
+    "class": "cc-button",
     disabled: _ctx.searching
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.searching ? 'Checking…' : 'Check fares, departures & seats'), 9
   /* TEXT, PROPS */
-  , _hoisted_24)], 32
+  , _hoisted_25), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "cc-button secondary",
+    onClick: _cache[5] || (_cache[5] = function () {
+      return $options.reset && $options.reset.apply($options, arguments);
+    })
+  }, "Reset")])], 32
   /* HYDRATE_EVENTS */
-  ), _ctx.searchError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.searchError), 1
+  ), _ctx.searchError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.searchError), 1
   /* TEXT */
-  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.answer ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cityName(_ctx.active.departure_id)) + " → " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cityName(_ctx.active.destination_id)) + " · " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.active.date), 1
+  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.answer ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cityName(_ctx.active.departure_id)) + " → " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cityName(_ctx.active.destination_id)) + " · " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.active.date), 1
   /* TEXT */
-  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.answer.terminal.name) + " · Checked " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.time(_ctx.answer.checked_at)), 1
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.answer.terminal.name) + " · Checked " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.time(_ctx.answer.checked_at)), 1
   /* TEXT */
-  ), !_ctx.answer.departures.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_28, "No upcoming departures found for this date and your permitted routes.")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  ), !_ctx.answer.departures.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_29, "No upcoming departures found for this date and your permitted routes.")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
   }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.answer.departures, function (departure) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       key: departure.id,
       "class": "cc-ticket"
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.time(departure.departure_at)), 1
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.time(departure.departure_at)), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["cc-seat-count", {
@@ -114698,9 +114732,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     )]);
   }), 128
   /* KEYED_FRAGMENT */
-  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_30, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.answer.schedule_note), 1
+  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_31, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.answer.schedule_note), 1
   /* TEXT */
-  ), _hoisted_31, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.answer.fares, function (fare) {
+  ), _hoisted_32, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.answer.fares, function (fare) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
       key: fare.class_name
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(fare.class_name) + " · PKR " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(Number(fare.base_fare).toLocaleString('en-PK')), 1
@@ -114708,7 +114742,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     );
   }), 128
   /* KEYED_FRAGMENT */
-  )), !_ctx.answer.fares.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_32, "Fare not recorded for this journey.")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_33, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.answer.fare_note), 1
+  )), !_ctx.answer.fares.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_33, "Fare not recorded for this journey.")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.answer.fare_note), 1
   /* TEXT */
   )], 64
   /* STABLE_FRAGMENT */
