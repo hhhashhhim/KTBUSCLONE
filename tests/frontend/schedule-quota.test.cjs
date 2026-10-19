@@ -27,7 +27,19 @@ assert.match(classes({ quota_reuse: true, type: 'booked', gender: 0, online_term
 assert.doesNotMatch(classes({ quota_reuse: true, type: 'not_for_sale' }), /quota-reuse-seat/);
 assert.match(rescheduleClasses({ quota_reuse: true }), /quota-reuse-seat/);
 assert.doesNotMatch(rescheduleClasses({ quota_reuse: true, alreadyBooked: true }), /quota-reuse-seat/);
-assert.match(seatMethod('getTitle')({ quota_reuse: true }), /counts separately/);
+assert.match(seatMethod('getTitle')({ quota_reuse: true }), /does not use additional quota/);
+const bookingSource = fs.readFileSync(files[0], 'utf8');
+assert.ok(!bookingSource.includes('Advance intermediate-ticket quota'));
+assert.ok(bookingSource.includes('Passengers by Departure City'));
+assert.ok(bookingSource.includes('No booked passengers.'));
+assert.ok(bookingSource.indexOf('Quota {{ schedule.quota.used }}') > bookingSource.indexOf('{{ seatClass.name }}'));
+const popups = [];
+const errorBody = scripts[0].match(/showQuotaError\(response\) \{([\s\S]*?)\n        \},/)[1];
+const showError = vm.runInNewContext('(function(response) {' + errorBody + '})', { swal: popup => popups.push(popup) });
+assert.equal(showError({ data: { errors: { quota: ['Quota for midway routes is completed.'] } } }), true);
+assert.equal(popups[0].text, 'Quota for midway routes is completed.');
+assert.equal(showError({ data: { errors: { quota: ['Please refresh reservations.'] } } }), false);
+assert.equal(showError({ data: {} }), false);
 
 const modalEvents = [];
 const saveBody = scripts[1].match(/async saveQuota\(\) \{([\s\S]*?)\n        \},/)[1];

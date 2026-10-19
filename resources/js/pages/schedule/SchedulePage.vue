@@ -130,7 +130,7 @@
                                                             </button>
                                                             <button v-if="checkForSubmenuButtons('edit-schedule')"
                                                                     type="button" class="btn btn-outline-primary btn-sm mr-1"
-                                                                    title="Set advance paid intermediate-ticket quota"
+                                                                    title="Set advance paid intermediate-seat quota"
                                                                     @click="openQuota(schedule.schedule)">
                                                                 Quota: {{ schedule.schedule.intermediate_quota == null ? 'Unlimited' : schedule.schedule.intermediate_quota }}
                                                             </button>
@@ -174,13 +174,13 @@
                                 <strong class="d-block">{{ quotaForm.name }}</strong>
                                 <small>{{ quotaForm.route }}</small>
                             </div>
-                            <label for="intermediateQuota">Advance paid intermediate tickets per departure</label>
+                            <label for="intermediateQuota">Advance paid intermediate seats per departure</label>
                             <input id="intermediateQuota" v-model="quotaForm.limit" type="number" min="0" max="100000" step="1"
                                    class="form-control" placeholder="Unlimited" :disabled="quotaSaving" aria-describedby="quotaHelp" />
                             <small id="quotaHelp" class="form-text text-muted">Leave blank for unlimited. Enter 0 to prevent advance paid intermediate bookings.</small>
                             <div class="alert alert-info mt-3 mb-0">
-                                <p class="mb-2">Shared across all terminals, separately for each dated departure of this schedule. Each paid ticket counts once—even when the same seat is sold for two onward journeys.</p>
-                                <p class="mb-0">Full-route tickets and unpaid reservations are exempt. The limit ends at the main starting-city departure time. Cancelled tickets release their quota.</p>
+                                <p class="mb-2">Shared across all terminals, separately for each dated departure. Each seat number counts once. Reusing seats 1 and 2 for onward journeys still uses only 2 quota seats.</p>
+                                <p class="mb-0">Full-route tickets and unpaid reservations are exempt. The limit ends at the main starting-city departure time. A seat's quota is released when all its qualifying tickets are cancelled or moved.</p>
                             </div>
                             <div v-if="quotaError" class="alert alert-danger mt-3 mb-0" role="alert">{{ quotaError }}</div>
                         </div>

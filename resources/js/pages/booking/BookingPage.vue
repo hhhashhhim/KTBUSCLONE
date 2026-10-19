@@ -426,18 +426,19 @@
                                                     {{ getSchedule ? "Loading..." : 'Refresh' }}
                                                 </button>
                                             </div>
-                                            <div v-if="schedule && schedule.quota && schedule.quota.limit !== null" class="alert alert-info mt-3 mb-0" role="status">
-                                                <div class="d-flex justify-content-between flex-wrap">
-                                                    <strong>Advance intermediate-ticket quota</strong>
-                                                    <span class="badge badge-primary">{{ schedule.quota.used }} / {{ schedule.quota.limit }} used</span>
+                                            <div v-if="showBookingDiv && schedule && schedule.departure_passenger_summary" class="border rounded mt-3 overflow-hidden">
+                                                <div class="bg-light px-3 py-2 font-weight-bold">Passengers by Departure City</div>
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm table-bordered mb-0">
+                                                        <thead><tr><th scope="col">Departure City</th><th scope="col" class="text-center">No. of Passengers</th></tr></thead>
+                                                        <tbody>
+                                                            <tr v-for="city in schedule.departure_passenger_summary" :key="city.city_id">
+                                                                <td>{{ city.city_name }}</td><td class="text-center">{{ city.passengers }}</td>
+                                                            </tr>
+                                                            <tr v-if="!schedule.departure_passenger_summary.length"><td colspan="2" class="text-center text-muted">No booked passengers.</td></tr>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
-                                                <div v-if="schedule.quota.departed" class="mt-2">Main departure time has passed. The quota no longer limits bookings.</div>
-                                                <div v-else class="mt-2">
-                                                    {{ schedule.quota.remaining }} paid ticket(s) remaining across all terminals.
-                                                    <strong v-if="!schedule.quota.intermediate">This full-route journey is exempt.</strong>
-                                                    Limit lifts at {{ schedule.quota.departure_at }}.
-                                                </div>
-                                                <small class="d-block mt-1">Unpaid reservations do not count; confirming payment checks the quota. Each onward ticket counts separately.</small>
                                             </div>
                                             <div v-if="!hideDivButtonsDrop || dropHistory.length" class="alert dropped-schedule-alert mt-3 mb-0" :class="hideDivButtonsDrop ? 'alert-info schedule-reactivated-alert' : 'alert-warning'" role="alert">
                                                 <div class="d-flex align-items-start">
@@ -632,6 +633,9 @@
                                                         :style="{ border: '2px solid ' + seatClass.color + ' !important' }">
                                                     </div>
                                                     <span class="text-wrap">{{ seatClass.name }}</span>
+                                                </div>
+                                                <div v-if="showBookingDiv && schedule && schedule.quota && schedule.quota.limit !== null" class="my-2 w-100" role="status">
+                                                    <strong>Quota {{ schedule.quota.used }}/{{ schedule.quota.limit }} used</strong>
                                                 </div>
                                                 <div class="my-1 border-top w-100" v-if="showBookingDiv">
                                                     <br>
@@ -2374,6 +2378,13 @@ export default {
         }, 2000);
     },
     methods: {
+        showQuotaError(response) {
+            if (response?.data?.errors?.quota?.includes('Quota for midway routes is completed.')) {
+                swal({ title: 'Quota completed', text: 'Quota for midway routes is completed.', icon: 'warning' });
+                return true;
+            }
+            return false;
+        },
         async fetchUser() {
             const res = await this.callApi("post", "booking/users");
             console.log("USER RESPONSE:", res);
@@ -3424,6 +3435,7 @@ export default {
 
             } else if (resFinalRevert.status == 422) {
                 this.loadingRevertButton = false
+                if (this.showQuotaError(resFinalRevert)) return;
                 let errorContent = "";
                 let count = 0;
                 for (const key in resFinalRevert.data.errors) {
@@ -4366,7 +4378,7 @@ export default {
 
         getTitle: function (col) {
             if (col.quota_reuse && !col.type) {
-                return 'Available for this onward journey. Prefer this seat: it was already used for an advance paid intermediate journey. A new paid ticket still counts separately towards the quota.';
+                return 'Available for this onward journey. Prefer this seat: it is already counted in the quota, so reusing it does not use additional quota.';
             }
             if (col.type == 'booked' || col.type == 'advance booking' || col.type == 'over-issue' || col.id) {
                 return "Name : " + col.customer_name + '\n' + "Phone : " + (this.auth_terminal.other_terminal_passenger_detail == 1 || col.terminal == this.auth_terminal.id ? col.customer_phone : "---") + '\n' + "Seat Fare : " + col.seat_fare + '\n' + "Remarks : " + col.remarks + '\n' + "Terminal : " + (col.terminal_name || "N/A") + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
@@ -4585,6 +4597,10 @@ export default {
             } else {
                 ``
                 if (resTicket.status == 422) {
+                    if (this.showQuotaError(resTicket)) {
+                        this.bookingLoading = false;
+                        return;
+                    }
                     let errorContent = "";
                     let count = 0;
                     for (const key in resTicket.data.errors) {
@@ -5486,6 +5502,7 @@ export default {
             } else {
                 if (resReschedule.status == 422) {
                     this.loadingRescheduleButton = false;
+                    if (this.showQuotaError(resReschedule)) return;
                     let errorContent = "";
                     let count = 0;
                     for (const key in resReschedule.data.errors) {
