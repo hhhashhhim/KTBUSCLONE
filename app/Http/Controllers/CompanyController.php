@@ -37,7 +37,7 @@ class CompanyController extends Controller
                     'user_name' => $request->userName,
                     'contact' => plainContactAndCnic($request->contact),
                     'location' => $request->location,
-                    'modules' => $request->modules,
+                    'modules' => \App\Support\CallCenterPermissions::append($request->modules ?? [], true),
                     'logo' => $request->logo,
                     'added_by' => auth()->user()->id,
                 ]);
@@ -45,7 +45,7 @@ class CompanyController extends Controller
                 $role = Role::create([
                     'name' => 'admin',
                     'company_id' => $company->id,
-                    'permissions' => $request->modules,
+                    'permissions' => \App\Support\CallCenterPermissions::forCompanyAdmin($request->modules ?? []),
                 ]);
 
                 $user = User::create([
@@ -101,7 +101,7 @@ class CompanyController extends Controller
                     'user_name' => $request->user_name,
                     'contact' => plainContactAndCnic($request->contact),
                     'location' => $request->location,
-                    'modules' => $request->modules,
+                    'modules' => \App\Support\CallCenterPermissions::append($request->modules ?? [], true),
                     'whatsapp_auth_key' => $request->whatsapp_auth_key,
                     'added_by' => auth()->user()->id,
                 ]);
@@ -120,9 +120,13 @@ class CompanyController extends Controller
                         'password' => Hash::make($request->password),
                     ]);
                 }
-                Role::where('company_id', $request->id)->where('name', 'admin')->update([
-                    'permissions' => $request->modules,
-                ]);
+                foreach (Role::where('company_id', $request->id)->where('name', 'admin')->get() as $adminRole) {
+                    $adminRole->update([
+                        'permissions' => \App\Support\CallCenterPermissions::forCompanyAdmin(
+                            $request->modules ?? [], $adminRole->permissions ?? []
+                        ),
+                    ]);
+                }
                 ActivityLog::create([
                     "activity_by" => Auth::user()->id,
                     "message" => Auth::user()->name." | updated company ($company->name)",
