@@ -36,22 +36,34 @@
                                                         <div class="alert alert-info" style="background-color: #d9edf7 !important">
                                                             <div class="row">
                                                                 <div class="col-md-2">
-                                                                    <input :checked="mod" type="checkbox" :value="true"
+                                                                    <input type="checkbox" :value="true"
                                                                            v-model="moduleName.allow"
                                                                            :id="moduleName.name"/>
                                                                     <label class="text-capitalize text-bold ml-1"
                                                                            :for="moduleName.name" style="color: black">
                                                                         {{
-                                                                            moduleName.name
+                                                                            displayPermissionName(moduleName.name)
                                                                         }}</label>
                                                                 </div>
                                                                 <div class="col-md-10" v-if="moduleName.allow">
+                                                                                <div v-if="moduleName.name === 'call-center'" class="cc-role-permissions">
+                                                                                    <p class="cc-role-help">Choose the actions this role can use. Access scope controls whose records they can work with; it does not grant actions.</p>
+                                                                                    <fieldset v-for="group in callCenterGroups(moduleName.buttons)" :key="group.name">
+                                                                                        <legend>{{ group.name }}</legend>
+                                                                                        <label v-for="item in group.items" :key="item.button.name" class="cc-role-option" :for="item.button.name">
+                                                                                            <input type="checkbox" v-model="item.button.allow" :id="item.button.name">
+                                                                                            <span><strong>{{ item.label }}</strong><small>{{ item.description }}</small></span>
+                                                                                        </label>
+                                                                                    </fieldset>
+                                                                                </div>
+
+                                                                    <template v-else>
                                                                     <div class="alert alert-success" style="background-color: #dff0d8 !important"
                                                                          v-for="(menus, j) in moduleName.childs"
                                                                          :key="j">
                                                                         <div class="row">
                                                                             <div class="col-md-2">
-                                                                                <input :checked="menus" type="checkbox"
+                                                                                <input type="checkbox"
                                                                                        :value="true"
                                                                                        v-model="menus.allow"
                                                                                        :id="menus.name"/>
@@ -67,7 +79,7 @@
                                                                                      style="background-color: #f2dede !important">
                                                                                     <div v-if="menus.buttons">
                                                                 <span v-for="(button, k) in menus.buttons" :key="j">
-                                                                    <input :checked="button.allow" type="checkbox"
+                                                                    <input type="checkbox"
                                                                            :value="true"
                                                                            v-model="button.allow" :id="button.name"/>
                                                                     <label class="text-capitalize text-bold mx-2"
@@ -84,6 +96,7 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
+                                                                    </template>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -166,6 +179,7 @@ export default {
         return {
             role: "",
             permissions: [],
+            callCenterPrivileges: [],
             success: false,
         };
     },
@@ -184,6 +198,7 @@ export default {
         if (res.status == 200) {
             this.role = res.data.role;
             this.permissions = res.data.permissions;
+            this.callCenterPrivileges = res.data.call_center_privileges || [];
         } else {
             console.log(res);
         }
@@ -191,7 +206,16 @@ export default {
 
     methods: {
         displayPermissionName(name) {
-            return name === 'sales' ? 'Advance Sale' : name;
+            return name === 'sales' ? 'Advance Sale' : name === 'call-center' ? 'Call Center' : name;
+        },
+        callCenterGroups(buttons = []) {
+            const groups = {};
+            for (const button of buttons) {
+                const definition = this.callCenterPrivileges.find(item => item.name === button.name);
+                const group = definition?.group || 'Other privileges';
+                (groups[group] ||= []).push({ button, label: definition?.label || button.name, description: definition?.description || '' });
+            }
+            return Object.entries(groups).map(([name, items]) => ({ name, items }));
         },
         async save() {
             const res = await this.callApi("post", "role/update", {
@@ -217,3 +241,14 @@ export default {
 
 };
 </script>
+
+<style scoped>
+.cc-role-permissions { padding: 18px; background: #dff0d8; border: 1px solid #cbded6; border-radius: 8px; color: #243c34; }
+.cc-role-help { margin: 0 0 16px; color: #526b61; }
+.cc-role-permissions fieldset { border: 0; border-top: 1px solid #dce7e1; padding: 16px 0 4px; margin: 0; }
+.cc-role-permissions legend { float: none; width: auto; padding-right: 12px; font-size: 15px; font-weight: 700; }
+.cc-role-option { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; cursor: pointer; }
+.cc-role-option input { flex: none; margin-top: 4px; width: 17px; height: 17px; accent-color: #196953; }
+.cc-role-option strong, .cc-role-option small { display: block; }
+.cc-role-option small { margin-top: 2px; color: #526b61; line-height: 1.45; font-size: 13px; }
+</style>

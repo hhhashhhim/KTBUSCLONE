@@ -20,6 +20,7 @@
             </ul>
         </div>
         <ul class="navbar-nav navbar-right">
+            <ComplaintNotifications />
 
 
             <li class="dropdown"><a href="#" data-toggle="dropdown"
@@ -40,7 +41,9 @@
     </nav>
 </template>
 <script>
+import ComplaintNotifications from '../../components/ComplaintNotifications.vue';
 export default {
+    components: { ComplaintNotifications },
     data() {
         return {
             

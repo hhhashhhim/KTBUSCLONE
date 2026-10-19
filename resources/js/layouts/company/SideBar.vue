@@ -269,6 +269,9 @@
                     </ul>
                 </li>
                 <!-- Tickting panel -->
+                <li class="dropdown" v-if="canAccessCallCenter" :class="{ active: String($route.name || '').startsWith('call-center') }">
+                    <router-link class="nav-link" :to="{ name: 'call-center' }"><i class="fas fa-headset"></i><span>Call Center</span></router-link>
+                </li>
                 <li class="dropdown" v-if="checkPermission('ticketing')">
                     <a href="#" class="menu-toggle nav-link has-dropdown ticketing-menu-link"><i class="fas fa-ticket-alt"></i>
                         <span class="ticketing-menu-label">
@@ -604,9 +607,15 @@
 </template>
 <script>
 import SidebarMenuSearch from "../../components/SidebarMenuSearch.vue";
+import { canAccessCallCenter } from "../../pages/callCenter/callCenter";
 
 export default {
     components: { SidebarMenuSearch },
+    computed: {
+        canAccessCallCenter() {
+            return this.callCenterAccess ?? canAccessCallCenter(this.$store.state.permissions);
+        },
+    },
     data() {
         return {
             iconsClass: {
@@ -616,12 +625,14 @@ export default {
                 company: "fa-building",
             },
             permissions: [],
+            callCenterAccess: null,
             terminalCancellationPendingCount: 0,
             pendingDockCount: 0, // 🚀 new
         }
     },
     created() {
         this.permissions = this.$store.state.permissions;
+        this.refreshCallCenterAccess();
         if (this.checkForSubmenu('online-terminal-cancellation')) {
             this.getTerminalCancellationPendingCount();
         }
@@ -645,6 +656,18 @@ export default {
         },
     },
     methods: {
+        async refreshCallCenterAccess() {
+            try {
+                // Fetch live access: the login permission snapshot may predate module activation.
+                const response = await this.callApi('get', 'call-center/options', null, {
+                    headers: { Accept: 'application/json' }, validateStatus: () => true,
+                });
+                this.callCenterAccess = response?.status === 200 && response.data?.data?.permissions?.view === true;
+                this.syncActiveMenu();
+            } catch (error) {
+                this.callCenterAccess = false;
+            }
+        },
         activateClickedMenu(event) {
             const link = event.target.closest('a.nav-link[href]');
             const menu = this.$el.querySelector('.sidebar-menu');

@@ -8,7 +8,7 @@
             <CompanySideBar v-if="$store.state.user.is_super_admin == 0" />
             <!-- Main Content -->
             <div class="main-content">
-                <transition  mode="out-in" enter-active-class="loader" leave-active-class="loader" >
+                <transition mode="out-in" :enter-active-class="isCallCenterRoute ? 'cc-route-enter' : 'loader'" :leave-active-class="isCallCenterRoute ? 'cc-route-leave' : 'loader'">
                     <router-view></router-view>
                 </transition>
             </div>
@@ -36,6 +36,11 @@ export default {
         Login,
         CompanyNavBar,
         CompanySideBar,
+    },
+    computed: {
+        // The legacy asset script hides .loader on window load. Never apply that
+        // splash-screen class to a call center page arriving through a route.
+        isCallCenterRoute() { return String(this.$route.name || '').startsWith('call-center'); },
     },
     created(){
         this.$store.commit('updateAppUrl',this.app_url);

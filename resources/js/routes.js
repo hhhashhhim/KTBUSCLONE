@@ -89,6 +89,7 @@ import PR from "./pages/inventory/products/PurchaseRequisitionNote.vue";
 import JazzCashRefund from "./pages/booking/JazzCashRefund.vue";
 import DiscountCardAssignPage from "./pages/discountType/DiscountCardAssignPage.vue";
 import DiscountType from "./pages/discountType/DiscountCardTypePage.vue";
+import CallCenterPage from "./pages/callCenter/CallCenterPage.vue";
 // Normalize the configured subdirectory so every Vue Router path is absolute.
 // This supports values such as "kainat-travel-front", "/kainat-travel-front",
 // or "/kainat-travel-front/" without producing invalid route paths.
@@ -99,6 +100,26 @@ const url = normalizedBasePath
     : "/";
 
 const routes = [
+    {
+        path: url + "call-center",
+        component: CallCenterPage,
+        name: "call-center",
+    },
+    {
+        path: url + "call-center/complaints",
+        component: CallCenterPage,
+        name: "call-center-complaints",
+    },
+    {
+        path: url + "call-center/shifts",
+        component: CallCenterPage,
+        name: "call-center-shifts",
+    },
+    {
+        path: url + "call-center/daily",
+        component: CallCenterPage,
+        name: "call-center-daily",
+    },
     {
         path: url + "",  
         component: Users,
