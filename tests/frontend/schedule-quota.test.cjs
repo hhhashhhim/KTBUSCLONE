@@ -28,7 +28,10 @@ assert.doesNotMatch(classes({ quota_reuse: true, type: 'not_for_sale' }), /quota
 assert.match(rescheduleClasses({ quota_reuse: true }), /quota-reuse-seat/);
 assert.doesNotMatch(rescheduleClasses({ quota_reuse: true, alreadyBooked: true }), /quota-reuse-seat/);
 assert.match(seatMethod('getTitle')({ quota_reuse: true }), /does not use additional quota/);
+assert.match(seatMethod('getTitle')({ quota_reuse: true }), /before or after/);
 const bookingSource = fs.readFileSync(files[0], 'utf8');
+assert.ok(bookingSource.includes('Available segment — reuse first'));
+assert.ok(!bookingSource.includes('Available onward — reuse first'));
 assert.ok(!bookingSource.includes('Advance intermediate-ticket quota'));
 assert.ok(bookingSource.includes('Passengers by Departure City'));
 assert.ok(bookingSource.includes('No booked passengers.'));

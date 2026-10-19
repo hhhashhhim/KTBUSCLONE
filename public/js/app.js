@@ -40409,7 +40409,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     getTitle: function getTitle(col) {
       if (col.quota_reuse && !col.type) {
-        return 'Available for this onward journey. Prefer this seat: it is already counted in the quota, so reusing it does not use additional quota.';
+        return 'Available for this selected journey, before or after the existing booking. Prefer this seat: it is already counted in the quota, so reusing it does not use additional quota.';
       }
 
       if (col.type == 'booked' || col.type == 'advance booking' || col.type == 'over-issue' || col.id) {
@@ -99526,8 +99526,8 @@ var _hoisted_213 = /*#__PURE__*/_withScopeId(function () {
 var _hoisted_214 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "text-wrap",
-    title: "An advance paid intermediate ticket used this seat earlier. It is available for your onward journey; prefer this seat first."
-  }, "Available onward — reuse first", -1
+    title: "This seat is already used on a non-overlapping part of the route. It is available for your selected journey; prefer this seat first."
+  }, "Available segment — reuse first", -1
   /* HOISTED */
   );
 });

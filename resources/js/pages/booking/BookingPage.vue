@@ -591,7 +591,7 @@
                                                     </div>
                                                     <div class="my-1" v-if="schedule && schedule.quota && schedule.quota.limit !== null">
                                                         <div class="quota-reuse-seat circles mr-1 border shadow"></div>
-                                                        <span class="text-wrap" title="An advance paid intermediate ticket used this seat earlier. It is available for your onward journey; prefer this seat first.">Available onward — reuse first</span>
+                                                        <span class="text-wrap" title="This seat is already used on a non-overlapping part of the route. It is available for your selected journey; prefer this seat first.">Available segment — reuse first</span>
                                                     </div>
                                                 </div>
                                                 <!-- <div class="border-bottom w-100">
@@ -4378,7 +4378,7 @@ export default {
 
         getTitle: function (col) {
             if (col.quota_reuse && !col.type) {
-                return 'Available for this onward journey. Prefer this seat: it is already counted in the quota, so reusing it does not use additional quota.';
+                return 'Available for this selected journey, before or after the existing booking. Prefer this seat: it is already counted in the quota, so reusing it does not use additional quota.';
             }
             if (col.type == 'booked' || col.type == 'advance booking' || col.type == 'over-issue' || col.id) {
                 return "Name : " + col.customer_name + '\n' + "Phone : " + (this.auth_terminal.other_terminal_passenger_detail == 1 || col.terminal == this.auth_terminal.id ? col.customer_phone : "---") + '\n' + "Seat Fare : " + col.seat_fare + '\n' + "Remarks : " + col.remarks + '\n' + "Terminal : " + (col.terminal_name || "N/A") + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
