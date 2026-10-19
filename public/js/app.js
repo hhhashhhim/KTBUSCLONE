@@ -46682,9 +46682,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _PassengerLookup_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PassengerLookup.vue */ "./resources/js/pages/callCenter/PassengerLookup.vue");
-/* harmony import */ var _QuickAnswers_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./QuickAnswers.vue */ "./resources/js/pages/callCenter/QuickAnswers.vue");
-/* harmony import */ var _callCenter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./callCenter */ "./resources/js/pages/callCenter/callCenter.js");
+/* harmony import */ var _callCenterSelect2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./callCenterSelect2 */ "./resources/js/pages/callCenter/callCenterSelect2.js");
+/* harmony import */ var _PassengerLookup_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./PassengerLookup.vue */ "./resources/js/pages/callCenter/PassengerLookup.vue");
+/* harmony import */ var _QuickAnswers_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./QuickAnswers.vue */ "./resources/js/pages/callCenter/QuickAnswers.vue");
+/* harmony import */ var _callCenter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./callCenter */ "./resources/js/pages/callCenter/callCenter.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
@@ -46715,10 +46716,11 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 
+
 function blankCall() {
   var shift = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
   return {
-    call_date: (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.pakistanDate)(),
+    call_date: (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.pakistanDate)(),
     shift: shift,
     category: 'GI',
     inquiry_topic: '',
@@ -46746,9 +46748,12 @@ function blankCall() {
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  directives: {
+    ccSelect2: _callCenterSelect2__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
   components: {
-    PassengerLookup: _PassengerLookup_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-    QuickAnswers: _QuickAnswers_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
+    PassengerLookup: _PassengerLookup_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
+    QuickAnswers: _QuickAnswers_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   props: {
     options: {
@@ -46757,7 +46762,7 @@ function blankCall() {
     }
   },
   data: function data() {
-    var form = blankCall((0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.savedShift)(this.options.current_user.id));
+    var form = blankCall((0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.savedShift)(this.options.current_user.id));
     return {
       journeyCities: [],
       citiesLoaded: false,
@@ -46772,7 +46777,7 @@ function blankCall() {
       calls: [],
       queue: 'today',
       filters: {
-        date: (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.pakistanDate)(),
+        date: (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.pakistanDate)(),
         shift: '',
         category: '',
         status: '',
@@ -46895,9 +46900,9 @@ function blankCall() {
     window.removeEventListener('beforeunload', this.beforeUnload);
   },
   methods: {
-    time: _callCenter__WEBPACK_IMPORTED_MODULE_2__.displayTime,
-    today: _callCenter__WEBPACK_IMPORTED_MODULE_2__.pakistanDate,
-    seatChangeSummary: _callCenter__WEBPACK_IMPORTED_MODULE_2__.seatChangeSummary,
+    time: _callCenter__WEBPACK_IMPORTED_MODULE_3__.displayTime,
+    today: _callCenter__WEBPACK_IMPORTED_MODULE_3__.pakistanDate,
+    seatChangeSummary: _callCenter__WEBPACK_IMPORTED_MODULE_3__.seatChangeSummary,
     invalidateAgreement: function invalidateAgreement() {
       this.form.customer_response = '';
       delete this.fieldErrors.customer_response;
@@ -46911,7 +46916,7 @@ function blankCall() {
       return this.canFollowup && (!['RF', 'RS'].includes(call.category) || this.options.permissions.update);
     },
     yesterday: function yesterday() {
-      return (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.pakistanDate)(new Date(Date.now() - 86400000));
+      return (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.pakistanDate)(new Date(Date.now() - 86400000));
     },
     categoryLabel: function categoryLabel(value) {
       var _this$options$categor;
@@ -46979,7 +46984,7 @@ function blankCall() {
       if (buttons !== null && buttons !== void 0 && buttons.length) (document.activeElement === buttons[0] ? buttons[1] : buttons[0]).focus();
     },
     setShift: function setShift() {
-      (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.rememberShift)(this.options.current_user.id, this.form.shift);
+      (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.rememberShift)(this.options.current_user.id, this.form.shift);
 
       if (!this.editing) {
         var baseline = JSON.parse(this.baseline);
@@ -47030,7 +47035,7 @@ function blankCall() {
                 _this4.citiesLoading = true;
                 _context.prev = 3;
                 _context.next = 6;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.request)(_this4, 'get', 'quick-answers/options');
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.request)(_this4, 'get', 'quick-answers/options');
 
               case 6:
                 info = _context.sent;
@@ -47062,7 +47067,7 @@ function blankCall() {
       if (!ticket) return;
       (_this$form2 = this.form).complaint_from_city || (_this$form2.complaint_from_city = ticket.departure || '');
       (_this$form3 = this.form).complaint_to_city || (_this$form3.complaint_to_city = ticket.destination || '');
-      (_this$form4 = this.form).complaint_bus_time || (_this$form4.complaint_bus_time = (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.bookingTime)(ticket.schedule_time));
+      (_this$form4 = this.form).complaint_bus_time || (_this$form4.complaint_bus_time = (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.bookingTime)(ticket.schedule_time));
       (_this$form5 = this.form).complaint_seat_number || (_this$form5.complaint_seat_number = ticket.seat_no == null ? '' : String(ticket.seat_no));
     },
     journeySummary: function journeySummary(call) {
@@ -47071,7 +47076,7 @@ function blankCall() {
     selectQueue: function selectQueue(value) {
       this.queue = value;
       this.filters = {
-        date: value === 'today' ? (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.pakistanDate)() : '',
+        date: value === 'today' ? (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.pakistanDate)() : '',
         shift: '',
         category: '',
         status: '',
@@ -47105,7 +47110,7 @@ function blankCall() {
                 _this5.listError = '';
                 _context2.prev = 6;
                 _context2.next = 9;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.request)(_this5, 'get', 'calls', null, (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.callQueueParams)(_this5.queue, _this5.filters, page));
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.request)(_this5, 'get', 'calls', null, (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.callQueueParams)(_this5.queue, _this5.filters, page));
 
               case 9:
                 data = _context2.sent;
@@ -47218,7 +47223,7 @@ function blankCall() {
                 _this6.history = null;
                 _context3.prev = 6;
                 _context3.next = 9;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.request)(_this6, 'get', 'history', null, params);
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.request)(_this6, 'get', 'history', null, params);
 
               case 9:
                 data = _context3.sent;
@@ -47250,7 +47255,7 @@ function blankCall() {
       this.historyNumber++;
       this.parentNumber++;
       this.opening = false;
-      this.form = blankCall((0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.savedShift)(this.options.current_user.id));
+      this.form = blankCall((0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.savedShift)(this.options.current_user.id));
       this.baseline = JSON.stringify(this.form);
       this.editing = null;
       this.formError = '';
@@ -47393,7 +47398,7 @@ function blankCall() {
                 _this9.earlierCalls = [];
                 _context6.prev = 5;
                 _context6.next = 8;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.request)(_this9, 'get', 'calls', null, {
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.request)(_this9, 'get', 'calls', null, {
                   search: _this9.earlierSearch
                 });
 
@@ -47454,7 +47459,7 @@ function blankCall() {
                 _this10.formError = '';
                 _context7.prev = 7;
                 _context7.next = 10;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.request)(_this10, 'get', "calls/".concat(id));
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.request)(_this10, 'get', "calls/".concat(id));
 
               case 10:
                 call = _context7.sent;
@@ -47475,7 +47480,7 @@ function blankCall() {
 
                   return [key, (_call$key2 = call[key]) !== null && _call$key2 !== void 0 ? _call$key2 : blankCall()[key]];
                 }))), {}, {
-                  callback_at: (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.inputDateTime)(call.callback_at)
+                  callback_at: (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.inputDateTime)(call.callback_at)
                 });
                 _this10.baseline = JSON.stringify(_this10.form);
                 _this10.needsFollowup = call.status !== 'closed' && !!call.callback_at;
@@ -47581,7 +47586,7 @@ function blankCall() {
                   inquiry_topic: _this11.form.category === 'GI' ? _this11.form.inquiry_topic : null,
                   assigned_to: _this11.form.assigned_to || null,
                   parent_call_id: _this11.form.category === 'FU' || _this11.isSeatChange ? _this11.form.parent_call_id || null : null,
-                  callback_at: outcome === 'follow_up' || outcome === 'record' ? (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.callbackValue)(_this11.form.callback_at) : null,
+                  callback_at: outcome === 'follow_up' || outcome === 'record' ? (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.callbackValue)(_this11.form.callback_at) : null,
                   resolve_parent: outcome === 'finish' && _this11.form.category === 'FU' && _this11.resolveParent
                 });
 
@@ -47602,7 +47607,7 @@ function blankCall() {
                 _this11.savingOutcome = outcome;
                 _context8.prev = 36;
                 _context8.next = 39;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_2__.request)(_this11, _this11.editing ? 'patch' : 'post', _this11.editing ? "calls/".concat(_this11.editing.id) : 'calls', payload);
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_3__.request)(_this11, _this11.editing ? 'patch' : 'post', _this11.editing ? "calls/".concat(_this11.editing.id) : 'calls', payload);
 
               case 39:
                 call = _context8.sent;
@@ -47660,7 +47665,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _callCenter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./callCenter */ "./resources/js/pages/callCenter/callCenter.js");
+/* harmony import */ var _callCenterSelect2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./callCenterSelect2 */ "./resources/js/pages/callCenter/callCenterSelect2.js");
+/* harmony import */ var _callCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./callCenter */ "./resources/js/pages/callCenter/callCenter.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return generator._invoke = function (innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; }(innerFn, self, context), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; this._invoke = function (method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (object) { var keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
@@ -47676,7 +47682,11 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  directives: {
+    ccSelect2: _callCenterSelect2__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
   props: {
     options: {
       type: Object,
@@ -47687,7 +47697,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   data: function data() {
     return {
       filters: {
-        date: (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.pakistanDate)(),
+        date: (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.pakistanDate)(),
         shift: '',
         terminal_id: ''
       },
@@ -47729,7 +47739,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     document.body.classList.remove('call-center-print');
   },
   methods: {
-    time: _callCenter__WEBPACK_IMPORTED_MODULE_0__.displayTime,
+    time: _callCenter__WEBPACK_IMPORTED_MODULE_1__.displayTime,
     percent: function percent(value) {
       return Number(value || 0).toFixed(1);
     },
@@ -47751,12 +47761,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 if (_this2.daily) delete params.shift;
                 _context.prev = 6;
                 _context.next = 9;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.request)(_this2, 'get', _this2.daily ? 'daily-report' : 'summary', null, params);
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this2, 'get', _this2.daily ? 'daily-report' : 'summary', null, params);
 
               case 9:
                 _this2.report = _context.sent;
                 _this2.activeFilters = params;
-                _this2.generatedAt = (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.displayTime)(new Date().toISOString());
+                _this2.generatedAt = (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.displayTime)(new Date().toISOString());
                 _this2.reviewForm = {
                   shift: Number(params.shift || 1),
                   remarks: _this2.daily ? ((_this2$report$review = _this2.report.review) === null || _this2$report$review === void 0 ? void 0 : _this2$report$review.remarks) || '' : '',
@@ -47805,7 +47815,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this4.reviewError = '';
                 _this4.notice = '';
                 _context2.prev = 2;
-                snapshotToken = (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.reviewSnapshot)(_this4.report, _this4.daily, _this4.reviewForm.shift);
+                snapshotToken = (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.reviewSnapshot)(_this4.report, _this4.daily, _this4.reviewForm.shift);
                 _context2.next = 10;
                 break;
 
@@ -47826,7 +47836,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 if (_this4.daily) payload.next_day_actions = _this4.reviewForm.next_day_actions;else payload.shift = _this4.reviewForm.shift;
                 _context2.prev = 13;
                 _context2.next = 16;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.request)(_this4, 'post', _this4.daily ? 'daily-review' : 'shift-review', payload);
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this4, 'post', _this4.daily ? 'daily-review' : 'shift-review', payload);
 
               case 16:
                 _this4.notice = 'Review saved successfully.'; // Reload exactly the selection just reviewed, even if the filter controls were edited.
@@ -47882,7 +47892,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _callCenter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./callCenter */ "./resources/js/pages/callCenter/callCenter.js");
+/* harmony import */ var _callCenterSelect2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./callCenterSelect2 */ "./resources/js/pages/callCenter/callCenterSelect2.js");
+/* harmony import */ var _callCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./callCenter */ "./resources/js/pages/callCenter/callCenter.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
@@ -47910,7 +47921,11 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  directives: {
+    ccSelect2: _callCenterSelect2__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
   props: {
     options: {
       type: Object,
@@ -47987,7 +48002,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     window.removeEventListener('beforeunload', this.beforeUnload);
   },
   methods: {
-    time: _callCenter__WEBPACK_IMPORTED_MODULE_0__.displayTime,
+    time: _callCenter__WEBPACK_IMPORTED_MODULE_1__.displayTime,
     journeySummary: function journeySummary(call) {
       return [call.complaint_from_city || call.complaint_to_city ? "".concat(call.complaint_from_city || '—', " \u2192 ").concat(call.complaint_to_city || '—') : '', call.complaint_bus_time ? "Bus ".concat(call.complaint_bus_time) : '', call.complaint_seat_number ? "Seat ".concat(call.complaint_seat_number) : ''].filter(Boolean).join(' · ');
     },
@@ -48026,7 +48041,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 8:
                 _context.next = 10;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.request)(_this2, 'get', "calls/".concat(_this2.targetId));
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this2, 'get', "calls/".concat(_this2.targetId));
 
               case 10:
                 call = _context.sent;
@@ -48083,7 +48098,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   status: 'closed'
                 };
                 _context.next = 32;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.request)(_this2, 'get', 'calls', null, _objectSpread(_objectSpread({}, params), {}, {
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this2, 'get', 'calls', null, _objectSpread(_objectSpread({}, params), {}, {
                   search: _this2.search,
                   page: page
                 }));
@@ -48161,7 +48176,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 sequence = _this3.sequence;
                 _context2.prev = 4;
                 _context2.next = 7;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.request)(_this3, 'post', "notifications/".concat(id, "/read"));
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this3, 'post', "notifications/".concat(id, "/read"));
 
               case 7:
                 if (sequence === _this3.sequence) _this3.notificationError = '';
@@ -48205,7 +48220,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 state = _this4.assignments[call.id];
                 _context3.prev = 2;
                 _context3.next = 5;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.request)(_this4, 'get', "calls/".concat(call.id, "/complaint-assignees"));
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this4, 'get', "calls/".concat(call.id, "/complaint-assignees"));
 
               case 5:
                 agents = _context3.sent;
@@ -48276,7 +48291,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this5.notice = '';
                 _context4.prev = 7;
                 _context4.next = 10;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.request)(_this5, 'post', "calls/".concat(call.id, "/assign-complaint"), {
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this5, 'post', "calls/".concat(call.id, "/assign-complaint"), {
                   assigned_to: Number(state.selected),
                   expected_assigned_to: call.assigned_to || null
                 });
@@ -48352,7 +48367,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this6.notice = '';
                 _context5.prev = 5;
                 _context5.next = 8;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.request)(_this6, 'patch', "calls/".concat(call.id), {
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this6, 'patch', "calls/".concat(call.id), {
                   status: 'new'
                 });
 
@@ -48422,9 +48437,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 endpoint = close ? "calls/".concat(call.id, "/close-complaint") : "calls/".concat(call.id, "/complaint-updates");
                 payload = close ? {
                   resolution_remarks: remarks
-                } : (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.complaintUpdateRequest)(_this7.updateRequests, call.id, remarks);
+                } : (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.complaintUpdateRequest)(_this7.updateRequests, call.id, remarks);
                 _context6.next = 16;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.request)(_this7, 'post', endpoint, payload);
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this7, 'post', endpoint, payload);
 
               case 16:
                 saved = _context6.sent;
@@ -48515,7 +48530,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 state = _this8.histories[call.id];
                 _context7.prev = 6;
                 _context7.next = 9;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.request)(_this8, 'get', "calls/".concat(call.id, "/complaint-updates"), null, {
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this8, 'get', "calls/".concat(call.id, "/complaint-updates"), null, {
                   page: page
                 });
 
@@ -48765,7 +48780,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _callCenter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./callCenter */ "./resources/js/pages/callCenter/callCenter.js");
+/* harmony import */ var _callCenterSelect2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./callCenterSelect2 */ "./resources/js/pages/callCenter/callCenterSelect2.js");
+/* harmony import */ var _callCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./callCenter */ "./resources/js/pages/callCenter/callCenter.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
@@ -48781,7 +48797,11 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  directives: {
+    ccSelect2: _callCenterSelect2__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
   props: {
     currentUser: Object
   },
@@ -48797,7 +48817,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       form: {
         departure_id: '',
         destination_id: '',
-        date: (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.pakistanDate)(),
+        date: (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.pakistanDate)(),
         terminal_id: ''
       },
       sequence: 0
@@ -48807,8 +48827,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     this.sequence++;
   },
   methods: {
-    today: _callCenter__WEBPACK_IMPORTED_MODULE_0__.pakistanDate,
-    time: _callCenter__WEBPACK_IMPORTED_MODULE_0__.displayTime,
+    today: _callCenter__WEBPACK_IMPORTED_MODULE_1__.pakistanDate,
+    time: _callCenter__WEBPACK_IMPORTED_MODULE_1__.displayTime,
     cityName: function cityName(id) {
       var _this$info$cities$fin;
 
@@ -48833,7 +48853,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this.error = '';
                 _context.prev = 2;
                 _context.next = 5;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.request)(_this, 'get', 'quick-answers/options');
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this, 'get', 'quick-answers/options');
 
               case 5:
                 _this.info = _context.sent;
@@ -48876,7 +48896,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this2.searching = true;
                 _context2.prev = 4;
                 _context2.next = 7;
-                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_0__.request)(_this2, 'get', 'quick-answers', null, params);
+                return (0,_callCenter__WEBPACK_IMPORTED_MODULE_1__.request)(_this2, 'get', 'quick-answers', null, params);
 
               case 7:
                 answer = _context2.sent;
@@ -112068,6 +112088,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   var _component_QuickAnswers = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("QuickAnswers");
 
+  var _directive_cc_select2 = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("cc-select2");
+
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [$data.discardVisible ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", {
     ref: "discardDialog",
     "class": "cc-dialog",
@@ -112131,7 +112153,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.opening ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_14, "Opening call…")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 2
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
     id: "call-shift",
     "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
       return $data.form.shift = $event;
@@ -112152,7 +112174,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* KEYED_FRAGMENT */
   ))], 40
   /* PROPS, HYDRATE_EVENTS */
-  , _hoisted_18), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.shift, void 0, {
+  , _hoisted_18)), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.shift, void 0, {
     number: true
   }]]), $data.fieldErrors.shift ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.fieldErrors.shift[0]), 1
   /* TEXT */
@@ -112585,7 +112607,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* PROPS */
   , _hoisted_103)], 8
   /* PROPS */
-  , _hoisted_101)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.form.category === 'C' || $data.needsFollowup ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_124, [_hoisted_125, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  , _hoisted_101)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.form.category === 'C' || $data.needsFollowup ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_124, [_hoisted_125, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
     id: "call-assignee",
     "onUpdate:modelValue": _cache[31] || (_cache[31] = function ($event) {
       return $data.form.assigned_to = $event;
@@ -112603,7 +112625,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* KEYED_FRAGMENT */
   ))], 8
   /* PROPS */
-  , _hoisted_126), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.assigned_to]]), $data.fieldErrors.assigned_to ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_129, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.fieldErrors.assigned_to[0]), 1
+  , _hoisted_126)), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.assigned_to]]), $data.fieldErrors.assigned_to ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_129, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.fieldErrors.assigned_to[0]), 1
   /* TEXT */
   )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.needsFollowup ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_130, [_hoisted_131, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     id: "call-callback",
@@ -112773,7 +112795,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.date]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_171, [_hoisted_172, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.date]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_171, [_hoisted_172, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
     id: "filter-shift",
     "onUpdate:modelValue": _cache[40] || (_cache[40] = function ($event) {
       return $data.filters.shift = $event;
@@ -112787,9 +112809,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_174);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.shift]])]), $data.queue !== 'open_complaints' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_175, [_hoisted_176, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  ))])), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.shift]])]), $data.queue !== 'open_complaints' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_175, [_hoisted_176, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
     id: "filter-category",
     "onUpdate:modelValue": _cache[41] || (_cache[41] = function ($event) {
       return $data.filters.category = $event;
@@ -112803,9 +112823,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_178);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.category]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.queue === 'today' || $data.queue === 'all' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_179, [_hoisted_180, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  ))])), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.category]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.queue === 'today' || $data.queue === 'all' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_179, [_hoisted_180, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
     id: "filter-status",
     "onUpdate:modelValue": _cache[42] || (_cache[42] = function ($event) {
       return $data.filters.status = $event;
@@ -112819,9 +112837,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_182);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.status]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.options.permissions.all_terminals ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_183, [_hoisted_184, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  ))])), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.status]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.options.permissions.all_terminals ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_183, [_hoisted_184, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
     id: "filter-terminal",
     "onUpdate:modelValue": _cache[43] || (_cache[43] = function ($event) {
       return $data.filters.terminal_id = $event;
@@ -112835,9 +112851,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_186);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.terminal_id]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ))])), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.terminal_id]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "cc-button secondary small",
     disabled: $data.loading
   }, "Apply filters", 8
@@ -113358,6 +113372,8 @@ var _hoisted_101 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _$data$report$review$;
 
+  var _directive_cc_select2 = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("cc-select2");
+
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.daily ? 'Daily management report' : 'Agent shift summary'), 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.options.permissions.supervise ? 'Review calls across your permitted team.' : 'Your own calls, grouped by shift.'), 1
@@ -113384,7 +113400,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     required: ""
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.date]])]), !$props.daily ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_7, [_hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.filters.date]])]), !$props.daily ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_7, [_hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
     id: "report-shift",
     "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
       return $data.filters.shift = $event;
@@ -113398,9 +113414,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_10);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.shift]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.options.permissions.all_terminals ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, [_hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  ))])), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.shift]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.options.permissions.all_terminals ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, [_hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
     id: "report-terminal",
     "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
       return $data.filters.terminal_id = $event;
@@ -113414,9 +113428,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_14);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.terminal_id]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ))])), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filters.terminal_id]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "cc-button",
     disabled: $data.loading
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loading ? 'Loading…' : 'View report'), 9
@@ -113580,7 +113592,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, ["prevent"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_92, "Reviewing " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.activeFilters.date) + " · " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.terminalLabel) + ". " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.daily ? 'Save operational remarks and the next steps for tomorrow.' : 'Choose the shift you have checked.'), 1
   /* TEXT */
-  ), !$props.daily ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_93, [_hoisted_94, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  ), !$props.daily ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_93, [_hoisted_94, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
     id: "review-shift",
     "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
       return $data.reviewForm.shift = $event;
@@ -113598,9 +113610,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_95);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 544
-  /* HYDRATE_EVENTS, NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.reviewForm.shift, void 0, {
+  ))], 32
+  /* HYDRATE_EVENTS */
+  )), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.reviewForm.shift, void 0, {
     number: true
   }]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_96, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_97, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.daily ? 'Operational remarks' : 'In-charge remarks'), 1
   /* TEXT */
@@ -113887,6 +113899,8 @@ var _hoisted_75 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_router_link = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("router-link");
 
+  var _directive_cc_select2 = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("cc-select2");
+
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_1, [_ctx.discardVisible ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", {
     ref: "discardDialog",
     "class": "cc-dialog",
@@ -114050,7 +114064,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "for": 'complaint-assignee-' + call.id
     }, "Responsible person", 8
     /* PROPS */
-    , _hoisted_31), _ctx.assignments[call.id].loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_32, "Loading people…")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    , _hoisted_31), _ctx.assignments[call.id].loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_32, "Loading people…")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
       id: 'complaint-assignee-' + call.id,
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return _ctx.assignments[call.id].selected = $event;
@@ -114067,7 +114081,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* KEYED_FRAGMENT */
     ))], 8
     /* PROPS */
-    , _hoisted_34), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, _ctx.assignments[call.id].selected]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    , _hoisted_34)), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, _ctx.assignments[call.id].selected]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
       type: "submit",
       "class": "cc-button small",
       disabled: !!_ctx.saving || !_ctx.assignments[call.id].selected || Number(_ctx.assignments[call.id].selected) === Number(call.assigned_to) || !!((_ctx$drafts$call$id = _ctx.drafts[call.id]) !== null && _ctx$drafts$call$id !== void 0 && _ctx$drafts$call$id.trim())
@@ -114561,6 +114575,8 @@ var _hoisted_33 = {
   "class": "cc-note"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _directive_cc_select2 = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("cc-select2");
+
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("details", {
     "class": "cc-card cc-quick",
     onToggle: _cache[6] || (_cache[6] = function () {
@@ -114594,7 +114610,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onSubmit: _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.search && $options.search.apply($options, arguments);
     }, ["prevent"]))
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
     id: "quick-from",
     "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
       return _ctx.form.departure_id = $event;
@@ -114609,9 +114625,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_11);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, _ctx.form.departure_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [_hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  ))])), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, _ctx.form.departure_id]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [_hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
     id: "quick-to",
     "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
       return _ctx.form.destination_id = $event;
@@ -114626,9 +114640,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_15);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, _ctx.form.destination_id]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [_hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  ))])), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, _ctx.form.destination_id]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [_hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     id: "quick-date",
     type: "date",
     "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
@@ -114638,7 +114650,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     required: ""
   }, null, 8
   /* PROPS */
-  , _hoisted_19), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, _ctx.form.date]])]), _ctx.info.terminals.length > 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_20, [_hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  , _hoisted_19), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, _ctx.form.date]])]), _ctx.info.terminals.length > 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_20, [_hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
     id: "quick-terminal",
     "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
       return _ctx.form.terminal_id = $event;
@@ -114653,9 +114665,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , _hoisted_23);
   }), 128
   /* KEYED_FRAGMENT */
-  ))], 512
-  /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, _ctx.form.terminal_id]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ))])), [[_directive_cc_select2], [vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, _ctx.form.terminal_id]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "cc-button secondary",
     disabled: _ctx.searching
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.searching ? 'Checking…' : 'Check fares, departures & seats'), 9
@@ -160672,6 +160682,101 @@ function seatChangeSummary(call) {
 
 /***/ }),
 
+/***/ "./resources/js/pages/callCenter/callCenterSelect2.js":
+/*!************************************************************!*\
+  !*** ./resources/js/pages/callCenter/callCenterSelect2.js ***!
+  \************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+// Enhance native selects so Vue keeps its v-model types, validation and change handlers.
+var controls = new WeakMap();
+
+var optionSignature = function optionSignature(el) {
+  return JSON.stringify(Array.from(el.options, function (option) {
+    return [option.value, option.text, option.disabled];
+  }));
+};
+
+function sync(el, state) {
+  state.control.trigger('change.select2');
+  var selection = state.control.next('.select2-container').find('.select2-selection');
+  selection.attr('aria-invalid', el.getAttribute('aria-invalid') || 'false');
+  selection.attr('aria-required', el.required ? 'true' : 'false');
+  var label = el.getAttribute('aria-label') || Array.from(el.labels || [], function (item) {
+    return item.textContent.trim();
+  }).join(' ');
+  if (label) selection.attr('aria-label', label);
+}
+
+function mount(el) {
+  var _$$fn;
+
+  var $ = typeof window !== 'undefined' && (window.jQuery || window.$);
+  if (!($ !== null && $ !== void 0 && (_$$fn = $.fn) !== null && _$$fn !== void 0 && _$$fn.select2)) return;
+  var control = $(el);
+  control.select2({
+    width: '100%',
+    minimumResultsForSearch: 0,
+    // Cards clip overflow. Keep dropdowns outside cards, but inside the styled page.
+    dropdownParent: $(el.closest('.cc-page') || el.parentElement)
+  });
+  var state = {
+    control: control,
+    signature: optionSignature(el),
+    dispatching: false
+  };
+  controls.set(el, state);
+  control.on('change.ccSelect2', function (event) {
+    if (state.dispatching || event.originalEvent || el.disabled) return;
+    state.dispatching = true;
+
+    try {
+      // Select2 emits jQuery events; Vue's native v-model needs a DOM event.
+      el.dispatchEvent(new window.Event('change', {
+        bubbles: true
+      }));
+    } finally {
+      state.dispatching = false;
+    }
+  });
+  control.on('select2:open.ccSelect2', function () {
+    var _control$data;
+
+    (_control$data = control.data('select2')) === null || _control$data === void 0 ? void 0 : _control$data.$dropdown.find('.select2-search__field').trigger('focus');
+  });
+  sync(el, state);
+}
+
+function destroy(el) {
+  var state = controls.get(el);
+  if (!state) return;
+  state.control.off('.ccSelect2');
+  if (state.control.hasClass('select2-hidden-accessible')) state.control.select2('destroy');
+  controls["delete"](el);
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  mounted: mount,
+  updated: function updated(el) {
+    var state = controls.get(el);
+
+    if (!state || state.signature !== optionSignature(el)) {
+      destroy(el);
+      mount(el);
+    } else {
+      sync(el, state);
+    }
+  },
+  beforeUnmount: destroy
+});
+
+/***/ }),
+
 /***/ "./resources/js/routes.js":
 /*!********************************!*\
   !*** ./resources/js/routes.js ***!
@@ -168195,7 +168300,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".cc-page { --cc-green: #176750; --cc-ink: #20362f; --cc-muted: #65756f; color: var(--cc-ink); box-sizing: border-box; width: 100%; min-width: 0; padding: 24px 24px 36px;\n}\n.cc-page * { box-sizing: border-box;\n}\n.cc-heading, .cc-card-header, .cc-actions, .cc-pagination { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;\n}\n.cc-heading { margin-bottom: 22px;\n}\n.cc-page > .cc-heading { margin-top: 0;\n}\n.cc-heading h1 { font-size: 30px; font-weight: 700; margin: 0 0 6px; color: var(--cc-ink);\n}\n.cc-page h2 { font-size: 18px; color: var(--cc-ink); margin: 0; font-weight: 700;\n}\n.cc-page h3 { font-size: 15px; margin: 0 0 10px; color: var(--cc-ink); font-weight: 700;\n}\n.cc-eyebrow { color: var(--cc-green); font-size: 10px; font-weight: 800; letter-spacing: 1.8px; margin: 0 0 8px;\n}\n.cc-muted { color: var(--cc-muted); margin: 0; font-size: 13px;\n}\n.cc-timezone { font-size: 12px; border: 1px solid #d9e4de; padding: 7px 12px; border-radius: 20px; background: white;\n}\n.cc-tabs { display: flex; gap: 22px; border-bottom: 1px solid #dce4df; margin-bottom: 22px; overflow: auto;\n}\n.cc-tabs a { padding: 0 2px 13px; color: var(--cc-muted); font-size: 14px; font-weight: 600; white-space: nowrap; border-bottom: 3px solid transparent; text-decoration: none;\n}\n.cc-tabs a.router-link-exact-active { color: var(--cc-green); border-bottom-color: var(--cc-green);\n}\n.cc-card { background: #fff; border: 1px solid #e0e7e2; border-radius: 12px; margin-bottom: 18px; box-shadow: 0 3px 14px #233f3110; overflow: hidden;\n}\n.cc-card-header { padding: 18px 20px; border-bottom: 1px solid #edf1ee;\n}\n.cc-card-body { padding: 20px;\n}\n.cc-workspace { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(340px, 1fr); gap: 20px; align-items: start;\n}\n.cc-workspace > * { min-width: 0;\n}\n.cc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;\n}\n.cc-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; min-width: 0;\n}\n.cc-grid .cc-field { margin-bottom: 0;\n}\n.cc-page label, .cc-label { font-size: 12px; font-weight: 650; color: #41554b; margin: 0;\n}\n.cc-page input, .cc-page select, .cc-page textarea { border: 1px solid #d6e0da; border-radius: 6px; background: #fff; padding: 9px 10px; font-size: 13px; color: var(--cc-ink); width: 100%; min-height: 39px;\n}\n.cc-page input:focus, .cc-page select:focus, .cc-page textarea:focus { outline: 2px solid #2d80632f; border-color: var(--cc-green);\n}\n.cc-page textarea { resize: vertical;\n}\n.cc-page input:disabled, .cc-page select:disabled, .cc-page textarea:disabled { background: #f3f5f3;\n}\n.cc-page button:focus-visible, .cc-page a:focus-visible { outline: 3px solid #53a2df; outline-offset: 2px;\n}\n.cc-button { border: 1px solid var(--cc-green); border-radius: 6px; color: white; background: var(--cc-green); padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer; line-height: 1.4;\n}\n.cc-button:hover { background: #0f503d;\n}\n.cc-button.secondary { background: white; color: var(--cc-green); border-color: #c9d9d0;\n}\n.cc-button.small { padding: 5px 9px; font-size: 12px;\n}\n.cc-button:disabled { opacity: .5; cursor: not-allowed;\n}\n.cc-link { border: 0; background: none; color: var(--cc-green); text-decoration: underline; font-size: 12px; padding: 3px 0; cursor: pointer;\n}\n.cc-filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; padding: 17px 20px; background: #f8faf8; border-bottom: 1px solid #e4ebe6;\n}\n.cc-filters .cc-field { flex: 1 1 110px; margin: 0;\n}\n.cc-filters .cc-filter-search { flex-basis: 180px;\n}\n.cc-table-wrap { overflow-x: auto;\n}\n.cc-table { width: 100%; font-size: 12px; border-collapse: collapse;\n}\n.cc-table th { background: #f7f9f7; color: #5a6c62; font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; padding: 12px 14px; border-bottom: 1px solid #dfe7e1; text-align: left; white-space: nowrap;\n}\n.cc-table td { padding: 14px; border-bottom: 1px solid #edf1ee; vertical-align: top;\n}\n.cc-table tbody tr:hover { background: #fafcfb;\n}\n.cc-table tfoot { background: #edf5ef; font-weight: 700;\n}\n.cc-table .cc-numeric { text-align: right; font-variant-numeric: tabular-nums;\n}\n.cc-table small, .cc-table strong { display: block;\n}\n.cc-table small { color: var(--cc-muted); margin-top: 3px; font-size: 11px;\n}\n.cc-pagination { padding: 14px 20px; font-size: 12px; color: var(--cc-muted);\n}\n.cc-status { display: inline-block; padding: 4px 8px; font-size: 10px; border-radius: 20px; font-weight: 700; white-space: nowrap; background: #eaf1fa; color: #385a8d;\n}\n.cc-status.in_progress { background: #eaf1fa; color: #385a8d;\n}\n.cc-status.waiting { background: #fff3d9; color: #886111;\n}\n.cc-status.closed { background: #e6f2eb; color: #2d6d4a;\n}\n.cc-empty { text-align: center; padding: 40px 24px; color: var(--cc-muted);\n}\n.cc-empty p { margin-top: 10px;\n}\n.cc-alert { padding: 12px 16px; border-radius: 7px; margin: 0 0 16px; font-size: 13px; background: #fff1ee; color: #913b2c; border: 1px solid #f0d2ca; overflow-wrap: anywhere;\n}\n.cc-alert.success { background: #eaf5ec; color: #2d6d4a; border-color: #cce5d1;\n}\n.cc-note { padding: 12px; background: #f3f7f4; border-radius: 6px; font-size: 12px; color: #53665a; margin: 0 0 16px;\n}\n.cc-divider { margin: 20px 0; border: 0; border-top: 1px solid #e4ebe6;\n}\n.cc-results { max-height: 280px; overflow: auto; border: 1px solid #dce5df; border-radius: 6px; margin: 12px 0;\n}\n.cc-passenger { padding: 12px; border-bottom: 1px solid #e4ebe6;\n}\n.cc-passenger:last-child { border: 0;\n}\n.cc-ticket { margin-top: 8px; padding: 10px; background: #f7faf8; border-radius: 5px; font-size: 12px;\n}\n.cc-ticket p { margin: 3px 0;\n}\n.cc-selected { border: 1px solid #b3d5c2; padding: 12px; border-radius: 6px; background: #f0f8f3; margin: 12px 0; font-size: 12px;\n}\n.cc-form-stack { display: grid; gap: 14px;\n}\n.cc-stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 18px 0;\n}\n.cc-stat { background: white; border: 1px solid #dfe7e1; border-radius: 8px; padding: 15px;\n}\n.cc-stat:first-child { background: #176750; border-color: #176750; color: white;\n}\n.cc-stat span { display: block; font-size: 11px; margin-bottom: 8px;\n}\n.cc-stat strong { font-size: 25px; line-height: 1; font-variant-numeric: tabular-nums;\n}\n.cc-report { padding: 22px;\n}\n.cc-report-title { display: flex; justify-content: space-between; gap: 16px; padding-bottom: 15px; border-bottom: 2px solid #176750;\n}\n.cc-report-title h2 { font-size: 22px; margin: 4px 0;\n}\n.cc-report-title .cc-muted { margin-top: 4px;\n}\n.cc-report-section { margin-top: 24px;\n}\n.cc-report-panels { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; margin-top: 18px;\n}\n.cc-report-panel { border: 1px solid #dfe7e1; border-radius: 8px; padding: 16px;\n}\n.cc-report-panel p { margin: 5px 0; font-size: 13px;\n}\n.cc-review { padding: 16px; border-left: 3px solid #75a38a; background: #f3f7f4; margin-top: 16px;\n}\n.cc-review p { margin: 6px 0 0; white-space: pre-wrap; font-size: 12px;\n}\n.cc-audit { padding-left: 18px; margin: 12px 0 0; font-size: 12px;\n}\n.cc-audit li { margin-bottom: 7px;\n}\n@media (max-width: 1180px) {\n.cc-workspace { grid-template-columns: minmax(0, 1fr);\n}\n}\n@media (max-width: 600px) {\n.cc-page { padding: 16px 12px 24px;\n}\n.cc-heading h1 { font-size: 25px;\n}\n.cc-grid, .cc-report-panels { grid-template-columns: 1fr;\n}\n.cc-stats { grid-template-columns: repeat(2, minmax(0, 1fr));\n}\n.cc-card-body, .cc-report { padding: 14px;\n}\n.cc-report-title { flex-direction: column;\n}\n}\n@media print {\n@page { size: A4 portrait; margin: 12mm;\n}\nbody.call-center-print .main-sidebar, body.call-center-print .navbar, body.call-center-print .navbar-bg, body.call-center-print .main-footer, body.call-center-print .cc-no-print { display: none !important;\n}\nbody.call-center-print, body.call-center-print .main-content, body.call-center-print .main-wrapper { background: white !important; padding: 0 !important; margin: 0 !important; width: 100% !important; min-height: 0 !important;\n}\nbody.call-center-print .cc-page { padding: 0; color: #000;\n}\nbody.call-center-print .cc-card { box-shadow: none; border: 0; margin: 0; overflow: visible;\n}\nbody.call-center-print .cc-report { padding: 0;\n}\nbody.call-center-print .cc-table-wrap { overflow: visible;\n}\nbody.call-center-print .cc-table { font-size: 9px;\n}\nbody.call-center-print .cc-table th { font-size: 8px;\n}\nbody.call-center-print .cc-table td, body.call-center-print .cc-table th { padding: 6px;\n}\nbody.call-center-print .cc-table thead { display: table-header-group;\n}\nbody.call-center-print .cc-table tr, body.call-center-print .cc-review, body.call-center-print .cc-report-panel { -moz-column-break-inside: avoid; break-inside: avoid;\n}\nbody.call-center-print .cc-stats { grid-template-columns: repeat(5, 1fr); gap: 6px;\n}\nbody.call-center-print .cc-stat { padding: 9px;\n}\nbody.call-center-print .cc-stat:first-child { background: white; color: black;\n}\nbody.call-center-print .cc-stat strong { font-size: 18px;\n}\nbody.call-center-print .cc-report-title { flex-direction: row;\n}\nbody.call-center-print .cc-report-panels { grid-template-columns: repeat(2,1fr);\n}\nbody.call-center-print .cc-report-section { margin-top: 16px;\n}\n}\n/* The call form leads; work queues stay within reach. */\n.cc-simple-workspace { grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr);\n}\n.cc-page fieldset { border: 0; padding: 0; margin: 0 0 20px; min-width: 0;\n}\n.cc-page legend { font-size: 13px; font-weight: 700; margin-bottom: 9px;\n}\n.cc-page details > summary { cursor: pointer; font-size: 13px; font-weight: 650; color: var(--cc-green); padding: 10px 0;\n}\n.cc-page details > summary:focus-visible { outline: 2px solid #53a2df;\n}\n.cc-page details > summary .cc-muted { display: inline-block; font-weight: 400; margin-left: 5px;\n}\n.cc-page details[open] > summary { margin-bottom: 8px;\n}\n.cc-category-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;\n}\n.cc-category { min-height: 48px; padding: 10px; border-radius: 8px; border: 1px solid #d1dfd7; color: var(--cc-green); background: white; font-size: 13px; font-weight: 650; cursor: pointer;\n}\n.cc-category.selected, .cc-button.cc-chosen { color: white; background: var(--cc-green); border-color: var(--cc-green);\n}\n.cc-category:disabled { opacity: .6; cursor: not-allowed;\n}\n.cc-topic-picker, .cc-parent-picker, .cc-lookup { margin-bottom: 20px;\n}\n.cc-topic-picker .cc-actions { justify-content: flex-start; gap: 7px; margin-top: 8px;\n}\n.cc-shift-bar { display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #edf1ee;\n}\n.cc-shift-bar .cc-field { margin: 0; width: 170px;\n}\n.cc-shift-details { padding-top: 15px; flex: 1; min-width: 180px;\n}\n.cc-search-row { display: flex; align-items: center; gap: 8px; margin: 7px 0 9px;\n}\n.cc-search-row input { min-width: 0; flex: 1;\n}\n.cc-search-row button { flex-shrink: 0;\n}\n.cc-choice-note { margin-top: 8px;\n}\n.cc-choice-note p { margin: 0 0 8px;\n}\n.cc-choice-note .cc-actions { justify-content: flex-start;\n}\n.cc-card-header.compact { padding: 0; border: 0; margin-bottom: 6px;\n}\n.cc-field-error { color: #993d2a; font-size: 12px; margin: 4px 0;\n}\n.cc-page [aria-invalid=\"true\"] { border-color: #bc503b;\n}\n.cc-checkbox { display: flex; align-items: flex-start; gap: 9px; cursor: pointer;\n}\n.cc-checkbox input { width: 17px; height: 17px; min-height: 0; flex-shrink: 0; margin-top: 1px;\n}\n.cc-save-bar { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 6px;\n}\n.cc-save-bar .cc-button { flex: 1; min-height: 44px;\n}\n.cc-history { border-top: 1px solid #e0e8e3; margin-top: 20px; padding-top: 7px;\n}\n.cc-history-note { white-space: pre-wrap;\n}\n.cc-open-count { color: #9a4c1a; font-size: 11px; margin-left: 7px;\n}\n.cc-queue-tabs { display: flex; gap: 7px; flex-wrap: wrap; padding: 16px 16px 6px;\n}\n.cc-queue-tabs button { border: 1px solid #d9e4dd; background: #f7faf8; border-radius: 20px; padding: 8px 11px; color: #496154; font-size: 12px; cursor: pointer;\n}\n.cc-queue-tabs button.selected { background: #e3f0e8; color: #14583f; border-color: #82b69b; font-weight: 700;\n}\n.cc-list-tools { padding: 0 16px 12px; border-bottom: 1px solid #e5ece7;\n}\n.cc-list-tools details .cc-button { margin-top: 10px;\n}\n.cc-work-item { padding: 17px 18px; border-bottom: 1px solid #e8eeea; font-size: 12px; overflow-wrap: anywhere;\n}\n.cc-work-item p { margin: 5px 0;\n}\n.cc-work-item .cc-actions { justify-content: flex-start; margin-top: 12px;\n}\n.cc-work-item .cc-muted { font-size: 11px;\n}\n.cc-work-note { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: #526659;\n}\n.cc-complaint-item { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(260px, 1fr); gap: 24px; padding: 22px;\n}\n.cc-complaint-item h3 { margin: 0;\n}\n.cc-complaint-text { white-space: pre-wrap; overflow-wrap: anywhere; margin: 14px 0 !important;\n}\n.cc-complaint-close { display: grid; gap: 8px; align-content: start;\n}\n.cc-complaint-close .cc-button { justify-self: start; min-height: 42px;\n}\n.cc-complaint-resolution { background: #f3f7f4; padding: 14px; border-radius: 8px;\n}\n.cc-complaint-update { margin: 18px 0 12px; padding: 14px; background: #f3f7f4; border-left: 3px solid #1b7059; border-radius: 4px;\n}\n.cc-complaint-update .cc-complaint-text, .cc-complaint-history .cc-complaint-text { margin: 8px 0 !important;\n}\n.cc-complaint-history { margin-top: 12px;\n}\n.cc-complaint-history ol { list-style: none; padding: 0 0 0 16px; margin: 0; border-left: 2px solid #e1eae6;\n}\n.cc-complaint-history li { padding: 8px 0 14px;\n}\n@media (max-width: 800px) {\n.cc-complaint-item { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px;\n}\n}\n.cc-overdue { color: #a0442d; font-weight: 700;\n}\n.cc-quick > summary { padding: 17px 20px !important;\n}\n.cc-quick .cc-form-stack { margin: 15px 0;\n}\n.cc-spaced { margin-top: 18px !important;\n}\n.cc-departure-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;\n}\n.cc-seat-count { display: inline-block; padding: 5px 9px; border-radius: 16px; background: #e3f0e8; color: #14583f; font-weight: 700; font-size: 12px;\n}\n.cc-seat-count.empty { background: #fff0df; color: #854b13;\n}\n.cc-seat-count.unknown { background: #edf0ee; color: #53665a;\n}\n@media (max-width: 1180px) {\n.cc-simple-workspace { grid-template-columns: minmax(0, 1fr);\n}\n}\n@media (max-width: 600px) {\n.cc-shift-bar { gap: 8px;\n}\n.cc-shift-details { padding-top: 0;\n}\n.cc-save-bar .cc-button { min-width: 140px;\n}\n.cc-quick > summary .cc-muted { display: block; margin: 4px 0 0;\n}\n}\n.cc-dialog-backdrop { position: fixed; inset: 0; z-index: 10000; background: #142d2470; display: flex; align-items: center; justify-content: center; padding: 20px;\n}\n.cc-dialog { width: 420px; max-width: 100%; padding: 24px; border-radius: 12px; background: white; box-shadow: 0 12px 50px #0003;\n}\n.cc-dialog p { margin: 12px 0 20px;\n}\n.cc-dialog .cc-actions { justify-content: flex-start;\n}\n@media (min-width: 1400px) {\n.cc-category-buttons { grid-template-columns: repeat(4, minmax(0, 1fr));\n}\n}\n.cc-workspace.cc-one-column { grid-template-columns: minmax(0, 1fr);\n}\n.cc-seat-change { margin: 0; padding: 16px; border: 1px solid #d1dfd7; border-radius: 8px; background: #f4f9f5;\n}\n.cc-seat-change legend { font-size: 15px; font-weight: 650; padding: 0 6px;\n}\n.cc-seat-change .cc-grid { margin-bottom: 16px;\n}\n.cc-seat-change > .cc-muted { margin: 10px 0 0;\n}\n@media (min-width: 1400px) {\n.cc-category-buttons.cc-six-categories { grid-template-columns: repeat(3, minmax(0, 1fr));\n}\n}\n@media print {\nbody.call-center-print .cc-stats { grid-template-columns: repeat(4, 1fr);\n}\n}\n.cc-complaint-journey > fieldset { border: 0; margin: 14px 0 0; padding: 0;\n}\n.cc-complaint-assignment { display: grid; gap: 8px; margin: 14px 0;\n}\n.cc-complaint-assignment select { min-width: 0; flex: 1;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".cc-page { --cc-green: #176750; --cc-ink: #20362f; --cc-muted: #65756f; color: var(--cc-ink); box-sizing: border-box; width: 100%; min-width: 0; padding: 24px 24px 36px;\n}\n.cc-page * { box-sizing: border-box;\n}\n.cc-heading, .cc-card-header, .cc-actions, .cc-pagination { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;\n}\n.cc-heading { margin-bottom: 22px;\n}\n.cc-page > .cc-heading { margin-top: 0;\n}\n.cc-heading h1 { font-size: 30px; font-weight: 700; margin: 0 0 6px; color: var(--cc-ink);\n}\n.cc-page h2 { font-size: 18px; color: var(--cc-ink); margin: 0; font-weight: 700;\n}\n.cc-page h3 { font-size: 15px; margin: 0 0 10px; color: var(--cc-ink); font-weight: 700;\n}\n.cc-eyebrow { color: var(--cc-green); font-size: 10px; font-weight: 800; letter-spacing: 1.8px; margin: 0 0 8px;\n}\n.cc-muted { color: var(--cc-muted); margin: 0; font-size: 13px;\n}\n.cc-timezone { font-size: 12px; border: 1px solid #d9e4de; padding: 7px 12px; border-radius: 20px; background: white;\n}\n.cc-tabs { display: flex; gap: 22px; border-bottom: 1px solid #dce4df; margin-bottom: 22px; overflow: auto;\n}\n.cc-tabs a { padding: 0 2px 13px; color: var(--cc-muted); font-size: 14px; font-weight: 600; white-space: nowrap; border-bottom: 3px solid transparent; text-decoration: none;\n}\n.cc-tabs a.router-link-exact-active { color: var(--cc-green); border-bottom-color: var(--cc-green);\n}\n.cc-card { background: #fff; border: 1px solid #e0e7e2; border-radius: 12px; margin-bottom: 18px; box-shadow: 0 3px 14px #233f3110; overflow: hidden;\n}\n.cc-card-header { padding: 18px 20px; border-bottom: 1px solid #edf1ee;\n}\n.cc-card-body { padding: 20px;\n}\n.cc-workspace { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(340px, 1fr); gap: 20px; align-items: start;\n}\n.cc-workspace > * { min-width: 0;\n}\n.cc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;\n}\n.cc-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; min-width: 0;\n}\n.cc-grid .cc-field { margin-bottom: 0;\n}\n.cc-page label, .cc-label { font-size: 12px; font-weight: 650; color: #41554b; margin: 0;\n}\n.cc-page input, .cc-page select, .cc-page textarea { border: 1px solid #d6e0da; border-radius: 6px; background: #fff; padding: 9px 10px; font-size: 13px; color: var(--cc-ink); width: 100%; min-height: 39px;\n}\n.cc-page input:focus, .cc-page select:focus, .cc-page textarea:focus { outline: 2px solid #2d80632f; border-color: var(--cc-green);\n}\n.cc-page textarea { resize: vertical;\n}\n.cc-page input:disabled, .cc-page select:disabled, .cc-page textarea:disabled { background: #f3f5f3;\n}\n.cc-page select + .select2-container { width: 100% !important; max-width: 100%; min-width: 0;\n}\n.cc-page .select2-selection--single { height: 40px; border: 1px solid #d6e0da; border-radius: 6px; background: #fff;\n}\n.cc-page .select2-selection--single .select2-selection__rendered { line-height: 38px; padding-left: 10px; padding-right: 28px; color: var(--cc-ink); font-size: 13px;\n}\n.cc-page .select2-selection--single .select2-selection__arrow { height: 38px; right: 5px;\n}\n.cc-page .select2-container--focus .select2-selection, .cc-page .select2-container--open .select2-selection { border-color: var(--cc-green); outline: 2px solid #2d80632f;\n}\n.cc-page .select2-container--disabled .select2-selection { background: #f3f5f3; cursor: not-allowed;\n}\n.cc-page .select2-dropdown { border-color: #c9d9d0; box-shadow: 0 6px 18px #233f3120; font-size: 13px;\n}\n.cc-page .select2-search--dropdown { padding: 8px;\n}\n.cc-page .select2-results__option { padding: 8px 10px; overflow-wrap: anywhere;\n}\n.cc-page .select2-container--default .select2-results__option--highlighted[aria-selected] { background: var(--cc-green); color: white;\n}\n.cc-page button:focus-visible, .cc-page a:focus-visible { outline: 3px solid #53a2df; outline-offset: 2px;\n}\n.cc-button { border: 1px solid var(--cc-green); border-radius: 6px; color: white; background: var(--cc-green); padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer; line-height: 1.4;\n}\n.cc-button:hover { background: #0f503d;\n}\n.cc-button.secondary { background: white; color: var(--cc-green); border-color: #c9d9d0;\n}\n.cc-button.small { padding: 5px 9px; font-size: 12px;\n}\n.cc-button:disabled { opacity: .5; cursor: not-allowed;\n}\n.cc-link { border: 0; background: none; color: var(--cc-green); text-decoration: underline; font-size: 12px; padding: 3px 0; cursor: pointer;\n}\n.cc-filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; padding: 17px 20px; background: #f8faf8; border-bottom: 1px solid #e4ebe6;\n}\n.cc-filters .cc-field { flex: 1 1 110px; margin: 0;\n}\n.cc-filters .cc-filter-search { flex-basis: 180px;\n}\n.cc-table-wrap { overflow-x: auto;\n}\n.cc-table { width: 100%; font-size: 12px; border-collapse: collapse;\n}\n.cc-table th { background: #f7f9f7; color: #5a6c62; font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; padding: 12px 14px; border-bottom: 1px solid #dfe7e1; text-align: left; white-space: nowrap;\n}\n.cc-table td { padding: 14px; border-bottom: 1px solid #edf1ee; vertical-align: top;\n}\n.cc-table tbody tr:hover { background: #fafcfb;\n}\n.cc-table tfoot { background: #edf5ef; font-weight: 700;\n}\n.cc-table .cc-numeric { text-align: right; font-variant-numeric: tabular-nums;\n}\n.cc-table small, .cc-table strong { display: block;\n}\n.cc-table small { color: var(--cc-muted); margin-top: 3px; font-size: 11px;\n}\n.cc-pagination { padding: 14px 20px; font-size: 12px; color: var(--cc-muted);\n}\n.cc-status { display: inline-block; padding: 4px 8px; font-size: 10px; border-radius: 20px; font-weight: 700; white-space: nowrap; background: #eaf1fa; color: #385a8d;\n}\n.cc-status.in_progress { background: #eaf1fa; color: #385a8d;\n}\n.cc-status.waiting { background: #fff3d9; color: #886111;\n}\n.cc-status.closed { background: #e6f2eb; color: #2d6d4a;\n}\n.cc-empty { text-align: center; padding: 40px 24px; color: var(--cc-muted);\n}\n.cc-empty p { margin-top: 10px;\n}\n.cc-alert { padding: 12px 16px; border-radius: 7px; margin: 0 0 16px; font-size: 13px; background: #fff1ee; color: #913b2c; border: 1px solid #f0d2ca; overflow-wrap: anywhere;\n}\n.cc-alert.success { background: #eaf5ec; color: #2d6d4a; border-color: #cce5d1;\n}\n.cc-note { padding: 12px; background: #f3f7f4; border-radius: 6px; font-size: 12px; color: #53665a; margin: 0 0 16px;\n}\n.cc-divider { margin: 20px 0; border: 0; border-top: 1px solid #e4ebe6;\n}\n.cc-results { max-height: 280px; overflow: auto; border: 1px solid #dce5df; border-radius: 6px; margin: 12px 0;\n}\n.cc-passenger { padding: 12px; border-bottom: 1px solid #e4ebe6;\n}\n.cc-passenger:last-child { border: 0;\n}\n.cc-ticket { margin-top: 8px; padding: 10px; background: #f7faf8; border-radius: 5px; font-size: 12px;\n}\n.cc-ticket p { margin: 3px 0;\n}\n.cc-selected { border: 1px solid #b3d5c2; padding: 12px; border-radius: 6px; background: #f0f8f3; margin: 12px 0; font-size: 12px;\n}\n.cc-form-stack { display: grid; gap: 14px;\n}\n.cc-stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 18px 0;\n}\n.cc-stat { background: white; border: 1px solid #dfe7e1; border-radius: 8px; padding: 15px;\n}\n.cc-stat:first-child { background: #176750; border-color: #176750; color: white;\n}\n.cc-stat span { display: block; font-size: 11px; margin-bottom: 8px;\n}\n.cc-stat strong { font-size: 25px; line-height: 1; font-variant-numeric: tabular-nums;\n}\n.cc-report { padding: 22px;\n}\n.cc-report-title { display: flex; justify-content: space-between; gap: 16px; padding-bottom: 15px; border-bottom: 2px solid #176750;\n}\n.cc-report-title h2 { font-size: 22px; margin: 4px 0;\n}\n.cc-report-title .cc-muted { margin-top: 4px;\n}\n.cc-report-section { margin-top: 24px;\n}\n.cc-report-panels { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; margin-top: 18px;\n}\n.cc-report-panel { border: 1px solid #dfe7e1; border-radius: 8px; padding: 16px;\n}\n.cc-report-panel p { margin: 5px 0; font-size: 13px;\n}\n.cc-review { padding: 16px; border-left: 3px solid #75a38a; background: #f3f7f4; margin-top: 16px;\n}\n.cc-review p { margin: 6px 0 0; white-space: pre-wrap; font-size: 12px;\n}\n.cc-audit { padding-left: 18px; margin: 12px 0 0; font-size: 12px;\n}\n.cc-audit li { margin-bottom: 7px;\n}\n@media (max-width: 1180px) {\n.cc-workspace { grid-template-columns: minmax(0, 1fr);\n}\n}\n@media (max-width: 600px) {\n.cc-page { padding: 16px 12px 24px;\n}\n.cc-heading h1 { font-size: 25px;\n}\n.cc-grid, .cc-report-panels { grid-template-columns: 1fr;\n}\n.cc-stats { grid-template-columns: repeat(2, minmax(0, 1fr));\n}\n.cc-card-body, .cc-report { padding: 14px;\n}\n.cc-report-title { flex-direction: column;\n}\n}\n@media print {\n@page { size: A4 portrait; margin: 12mm;\n}\nbody.call-center-print .main-sidebar, body.call-center-print .navbar, body.call-center-print .navbar-bg, body.call-center-print .main-footer, body.call-center-print .cc-no-print { display: none !important;\n}\nbody.call-center-print, body.call-center-print .main-content, body.call-center-print .main-wrapper { background: white !important; padding: 0 !important; margin: 0 !important; width: 100% !important; min-height: 0 !important;\n}\nbody.call-center-print .cc-page { padding: 0; color: #000;\n}\nbody.call-center-print .cc-card { box-shadow: none; border: 0; margin: 0; overflow: visible;\n}\nbody.call-center-print .cc-report { padding: 0;\n}\nbody.call-center-print .cc-table-wrap { overflow: visible;\n}\nbody.call-center-print .cc-table { font-size: 9px;\n}\nbody.call-center-print .cc-table th { font-size: 8px;\n}\nbody.call-center-print .cc-table td, body.call-center-print .cc-table th { padding: 6px;\n}\nbody.call-center-print .cc-table thead { display: table-header-group;\n}\nbody.call-center-print .cc-table tr, body.call-center-print .cc-review, body.call-center-print .cc-report-panel { -moz-column-break-inside: avoid; break-inside: avoid;\n}\nbody.call-center-print .cc-stats { grid-template-columns: repeat(5, 1fr); gap: 6px;\n}\nbody.call-center-print .cc-stat { padding: 9px;\n}\nbody.call-center-print .cc-stat:first-child { background: white; color: black;\n}\nbody.call-center-print .cc-stat strong { font-size: 18px;\n}\nbody.call-center-print .cc-report-title { flex-direction: row;\n}\nbody.call-center-print .cc-report-panels { grid-template-columns: repeat(2,1fr);\n}\nbody.call-center-print .cc-report-section { margin-top: 16px;\n}\n}\n/* The call form leads; work queues stay within reach. */\n.cc-simple-workspace { grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr);\n}\n.cc-page fieldset { border: 0; padding: 0; margin: 0 0 20px; min-width: 0;\n}\n.cc-page legend { font-size: 13px; font-weight: 700; margin-bottom: 9px;\n}\n.cc-page details > summary { cursor: pointer; font-size: 13px; font-weight: 650; color: var(--cc-green); padding: 10px 0;\n}\n.cc-page details > summary:focus-visible { outline: 2px solid #53a2df;\n}\n.cc-page details > summary .cc-muted { display: inline-block; font-weight: 400; margin-left: 5px;\n}\n.cc-page details[open] > summary { margin-bottom: 8px;\n}\n.cc-category-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;\n}\n.cc-category { min-height: 48px; padding: 10px; border-radius: 8px; border: 1px solid #d1dfd7; color: var(--cc-green); background: white; font-size: 13px; font-weight: 650; cursor: pointer;\n}\n.cc-category.selected, .cc-button.cc-chosen { color: white; background: var(--cc-green); border-color: var(--cc-green);\n}\n.cc-category:disabled { opacity: .6; cursor: not-allowed;\n}\n.cc-topic-picker, .cc-parent-picker, .cc-lookup { margin-bottom: 20px;\n}\n.cc-topic-picker .cc-actions { justify-content: flex-start; gap: 7px; margin-top: 8px;\n}\n.cc-shift-bar { display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #edf1ee;\n}\n.cc-shift-bar .cc-field { margin: 0; width: 170px;\n}\n.cc-shift-details { padding-top: 15px; flex: 1; min-width: 180px;\n}\n.cc-search-row { display: flex; align-items: center; gap: 8px; margin: 7px 0 9px;\n}\n.cc-search-row input { min-width: 0; flex: 1;\n}\n.cc-search-row button { flex-shrink: 0;\n}\n.cc-choice-note { margin-top: 8px;\n}\n.cc-choice-note p { margin: 0 0 8px;\n}\n.cc-choice-note .cc-actions { justify-content: flex-start;\n}\n.cc-card-header.compact { padding: 0; border: 0; margin-bottom: 6px;\n}\n.cc-field-error { color: #993d2a; font-size: 12px; margin: 4px 0;\n}\n.cc-page [aria-invalid=\"true\"] { border-color: #bc503b;\n}\n.cc-checkbox { display: flex; align-items: flex-start; gap: 9px; cursor: pointer;\n}\n.cc-checkbox input { width: 17px; height: 17px; min-height: 0; flex-shrink: 0; margin-top: 1px;\n}\n.cc-save-bar { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 6px;\n}\n.cc-save-bar .cc-button { flex: 1; min-height: 44px;\n}\n.cc-history { border-top: 1px solid #e0e8e3; margin-top: 20px; padding-top: 7px;\n}\n.cc-history-note { white-space: pre-wrap;\n}\n.cc-open-count { color: #9a4c1a; font-size: 11px; margin-left: 7px;\n}\n.cc-queue-tabs { display: flex; gap: 7px; flex-wrap: wrap; padding: 16px 16px 6px;\n}\n.cc-queue-tabs button { border: 1px solid #d9e4dd; background: #f7faf8; border-radius: 20px; padding: 8px 11px; color: #496154; font-size: 12px; cursor: pointer;\n}\n.cc-queue-tabs button.selected { background: #e3f0e8; color: #14583f; border-color: #82b69b; font-weight: 700;\n}\n.cc-list-tools { padding: 0 16px 12px; border-bottom: 1px solid #e5ece7;\n}\n.cc-list-tools details .cc-button { margin-top: 10px;\n}\n.cc-work-item { padding: 17px 18px; border-bottom: 1px solid #e8eeea; font-size: 12px; overflow-wrap: anywhere;\n}\n.cc-work-item p { margin: 5px 0;\n}\n.cc-work-item .cc-actions { justify-content: flex-start; margin-top: 12px;\n}\n.cc-work-item .cc-muted { font-size: 11px;\n}\n.cc-work-note { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: #526659;\n}\n.cc-complaint-item { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(260px, 1fr); gap: 24px; padding: 22px;\n}\n.cc-complaint-item h3 { margin: 0;\n}\n.cc-complaint-text { white-space: pre-wrap; overflow-wrap: anywhere; margin: 14px 0 !important;\n}\n.cc-complaint-close { display: grid; gap: 8px; align-content: start;\n}\n.cc-complaint-close .cc-button { justify-self: start; min-height: 42px;\n}\n.cc-complaint-resolution { background: #f3f7f4; padding: 14px; border-radius: 8px;\n}\n.cc-complaint-update { margin: 18px 0 12px; padding: 14px; background: #f3f7f4; border-left: 3px solid #1b7059; border-radius: 4px;\n}\n.cc-complaint-update .cc-complaint-text, .cc-complaint-history .cc-complaint-text { margin: 8px 0 !important;\n}\n.cc-complaint-history { margin-top: 12px;\n}\n.cc-complaint-history ol { list-style: none; padding: 0 0 0 16px; margin: 0; border-left: 2px solid #e1eae6;\n}\n.cc-complaint-history li { padding: 8px 0 14px;\n}\n@media (max-width: 800px) {\n.cc-complaint-item { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px;\n}\n}\n.cc-overdue { color: #a0442d; font-weight: 700;\n}\n.cc-quick > summary { padding: 17px 20px !important;\n}\n.cc-quick .cc-form-stack { margin: 15px 0;\n}\n.cc-spaced { margin-top: 18px !important;\n}\n.cc-departure-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;\n}\n.cc-seat-count { display: inline-block; padding: 5px 9px; border-radius: 16px; background: #e3f0e8; color: #14583f; font-weight: 700; font-size: 12px;\n}\n.cc-seat-count.empty { background: #fff0df; color: #854b13;\n}\n.cc-seat-count.unknown { background: #edf0ee; color: #53665a;\n}\n@media (max-width: 1180px) {\n.cc-simple-workspace { grid-template-columns: minmax(0, 1fr);\n}\n}\n@media (max-width: 600px) {\n.cc-shift-bar { gap: 8px;\n}\n.cc-shift-details { padding-top: 0;\n}\n.cc-save-bar .cc-button { min-width: 140px;\n}\n.cc-quick > summary .cc-muted { display: block; margin: 4px 0 0;\n}\n}\n.cc-dialog-backdrop { position: fixed; inset: 0; z-index: 10000; background: #142d2470; display: flex; align-items: center; justify-content: center; padding: 20px;\n}\n.cc-dialog { width: 420px; max-width: 100%; padding: 24px; border-radius: 12px; background: white; box-shadow: 0 12px 50px #0003;\n}\n.cc-dialog p { margin: 12px 0 20px;\n}\n.cc-dialog .cc-actions { justify-content: flex-start;\n}\n@media (min-width: 1400px) {\n.cc-category-buttons { grid-template-columns: repeat(4, minmax(0, 1fr));\n}\n}\n.cc-workspace.cc-one-column { grid-template-columns: minmax(0, 1fr);\n}\n.cc-seat-change { margin: 0; padding: 16px; border: 1px solid #d1dfd7; border-radius: 8px; background: #f4f9f5;\n}\n.cc-seat-change legend { font-size: 15px; font-weight: 650; padding: 0 6px;\n}\n.cc-seat-change .cc-grid { margin-bottom: 16px;\n}\n.cc-seat-change > .cc-muted { margin: 10px 0 0;\n}\n@media (min-width: 1400px) {\n.cc-category-buttons.cc-six-categories { grid-template-columns: repeat(3, minmax(0, 1fr));\n}\n}\n@media print {\nbody.call-center-print .cc-stats { grid-template-columns: repeat(4, 1fr);\n}\n}\n.cc-complaint-journey > fieldset { border: 0; margin: 14px 0 0; padding: 0;\n}\n.cc-complaint-assignment { display: grid; gap: 8px; margin: 14px 0;\n}\n.cc-complaint-assignment select { min-width: 0; flex: 1;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

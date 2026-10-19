@@ -30,7 +30,7 @@
                         <label :for="'complaint-assignee-' + call.id">Responsible person</label>
                         <p v-if="assignments[call.id].loading" class="cc-muted" role="status">Loading people…</p>
                         <div v-else class="cc-search-row">
-                            <select :id="'complaint-assignee-' + call.id" v-model="assignments[call.id].selected" :disabled="!!saving || !assignments[call.id].agents.length">
+                            <select v-cc-select2 :id="'complaint-assignee-' + call.id" v-model="assignments[call.id].selected" :disabled="!!saving || !assignments[call.id].agents.length">
                                 <option value="" disabled>Choose person</option>
                                 <option v-for="agent in assignments[call.id].agents" :key="agent.id" :value="agent.id">{{ agent.name }}</option>
                             </select>
@@ -79,9 +79,11 @@
 </template>
 
 <script>
+import callCenterSelect2 from './callCenterSelect2';
 import { request, displayTime, complaintUpdateRequest } from './callCenter';
 
 export default {
+    directives: { ccSelect2: callCenterSelect2 },
     props: { options: { type: Object, required: true } },
     data: () => ({ mode: 'open', search: '', calls: [], drafts: {}, errors: {}, loading: false, saving: null, savingAction: '', assignments: {}, updateRequests: {}, histories: {}, historyOpen: {}, error: '', notice: '', sequence: 0, notificationError: '',
         pagination: { total: 0, current_page: 1, last_page: 1 }, discardVisible: false, discardResolve: null, returnFocus: null }),

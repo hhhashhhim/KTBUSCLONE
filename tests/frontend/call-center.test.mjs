@@ -146,7 +146,9 @@ test('complaint update retries reuse a request ID while new drafts remain separa
 });
 
 const complaintsSource = await readFile(new URL('../../resources/js/pages/callCenter/Complaints.vue', import.meta.url), 'utf8');
+const select2Source = await readFile(new URL('../../resources/js/pages/callCenter/callCenterSelect2.js', import.meta.url), 'utf8');
 const complaintsScript = complaintsSource.match(/<script>([\s\S]*?)<\/script>/)[1]
+    .replace("'./callCenterSelect2'", JSON.stringify(`data:text/javascript;base64,${Buffer.from(select2Source).toString('base64')}`))
     .replace("'./callCenter'", JSON.stringify(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`));
 const { default: complaints } = await import(`data:text/javascript;base64,${Buffer.from(complaintsScript).toString('base64')}`);
 

@@ -7,8 +7,8 @@
             <template v-else-if="info">
                 <details><summary>Terminal addresses & phone numbers</summary><div v-for="terminal in info.terminals" :key="terminal.id" class="cc-ticket"><strong>{{ terminal.name }}</strong><p>{{ terminal.address || 'Address not recorded' }}</p><p>{{ terminal.contact || 'Phone not recorded' }}</p></div><p v-if="!info.terminals.length">No terminal details available for your access.</p></details>
                 <form class="cc-form-stack" @submit.prevent="search">
-                    <div class="cc-grid"><div class="cc-field"><label for="quick-from">From</label><select id="quick-from" v-model="form.departure_id" required><option value="">Choose city</option><option v-for="city in info.cities" :key="city.id" :value="city.id">{{ city.name }}</option></select></div><div class="cc-field"><label for="quick-to">To</label><select id="quick-to" v-model="form.destination_id" required><option value="">Choose city</option><option v-for="city in info.cities" :key="city.id" :value="city.id">{{ city.name }}</option></select></div></div>
-                    <div class="cc-grid"><div class="cc-field"><label for="quick-date">Travel date</label><input id="quick-date" type="date" v-model="form.date" :min="today()" required></div><div v-if="info.terminals.length > 1" class="cc-field"><label for="quick-terminal">Booking terminal</label><select id="quick-terminal" v-model="form.terminal_id" required><option value="">Choose terminal</option><option v-for="terminal in info.terminals" :key="terminal.id" :value="terminal.id">{{ terminal.name }}</option></select></div></div>
+                    <div class="cc-grid"><div class="cc-field"><label for="quick-from">From</label><select v-cc-select2 id="quick-from" v-model="form.departure_id" required><option value="">Choose city</option><option v-for="city in info.cities" :key="city.id" :value="city.id">{{ city.name }}</option></select></div><div class="cc-field"><label for="quick-to">To</label><select v-cc-select2 id="quick-to" v-model="form.destination_id" required><option value="">Choose city</option><option v-for="city in info.cities" :key="city.id" :value="city.id">{{ city.name }}</option></select></div></div>
+                    <div class="cc-grid"><div class="cc-field"><label for="quick-date">Travel date</label><input id="quick-date" type="date" v-model="form.date" :min="today()" required></div><div v-if="info.terminals.length > 1" class="cc-field"><label for="quick-terminal">Booking terminal</label><select v-cc-select2 id="quick-terminal" v-model="form.terminal_id" required><option value="">Choose terminal</option><option v-for="terminal in info.terminals" :key="terminal.id" :value="terminal.id">{{ terminal.name }}</option></select></div></div>
                     <button class="cc-button secondary" :disabled="searching">{{ searching ? 'Checking…' : 'Check fares, departures & seats' }}</button>
                 </form>
                 <p v-if="searchError" class="cc-field-error" role="alert">{{ searchError }}</p>
@@ -24,8 +24,10 @@
     </details>
 </template>
 <script>
+import callCenterSelect2 from './callCenterSelect2';
 import { request, pakistanDate, displayTime } from './callCenter';
 export default {
+    directives: { ccSelect2: callCenterSelect2 },
     props: { currentUser: Object },
     data: () => ({ info: null, loading: false, error: '', searching: false, searchError: '', answer: null, active: {}, form: { departure_id: '', destination_id: '', date: pakistanDate(), terminal_id: '' }, sequence: 0 }),
     beforeUnmount() { this.sequence++; },

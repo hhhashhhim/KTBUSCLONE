@@ -4,8 +4,8 @@
             <div class="cc-card-header"><div><h2>{{ daily ? 'Daily management report' : 'Agent shift summary' }}</h2><p class="cc-muted">{{ options.permissions.supervise ? 'Review calls across your permitted team.' : 'Your own calls, grouped by shift.' }}</p></div><button class="cc-button secondary" @click="printReport" :disabled="!report || loading">Print A4</button></div>
             <form class="cc-filters" @submit.prevent="loadReport">
                 <div class="cc-field"><label for="report-date">Shift date</label><input id="report-date" type="date" v-model="filters.date" required></div>
-                <div v-if="!daily" class="cc-field"><label for="report-shift">Shift</label><select id="report-shift" v-model="filters.shift"><option value="">All shifts</option><option v-for="shift in options.shifts" :key="shift" :value="shift">Shift {{ shift }}</option></select></div>
-                <div v-if="options.permissions.all_terminals" class="cc-field"><label for="report-terminal">Terminal</label><select id="report-terminal" v-model="filters.terminal_id"><option value="">All permitted terminals</option><option v-for="terminal in options.terminals" :key="terminal.id" :value="terminal.id">{{ terminal.name }}</option></select></div>
+                <div v-if="!daily" class="cc-field"><label for="report-shift">Shift</label><select v-cc-select2 id="report-shift" v-model="filters.shift"><option value="">All shifts</option><option v-for="shift in options.shifts" :key="shift" :value="shift">Shift {{ shift }}</option></select></div>
+                <div v-if="options.permissions.all_terminals" class="cc-field"><label for="report-terminal">Terminal</label><select v-cc-select2 id="report-terminal" v-model="filters.terminal_id"><option value="">All permitted terminals</option><option v-for="terminal in options.terminals" :key="terminal.id" :value="terminal.id">{{ terminal.name }}</option></select></div>
                 <button class="cc-button" :disabled="loading">{{ loading ? 'Loading…' : 'View report' }}</button>
             </form>
         </section>
@@ -32,7 +32,7 @@
             <div class="cc-card-header"><h2>{{ daily ? 'Record management review' : 'Record shift review' }}</h2></div>
             <form class="cc-card-body cc-form-stack" @submit.prevent="saveReview">
                 <p class="cc-note">Reviewing {{ activeFilters.date }} · {{ terminalLabel }}. {{ daily ? 'Save operational remarks and the next steps for tomorrow.' : 'Choose the shift you have checked.' }}</p>
-                <div v-if="!daily" class="cc-field"><label for="review-shift">Shift reviewed</label><select id="review-shift" v-model.number="reviewForm.shift" @change="prefillShiftReview" required><option v-for="shift in reviewableShifts" :key="shift" :value="shift">Shift {{ shift }}</option></select></div>
+                <div v-if="!daily" class="cc-field"><label for="review-shift">Shift reviewed</label><select v-cc-select2 id="review-shift" v-model.number="reviewForm.shift" @change="prefillShiftReview" required><option v-for="shift in reviewableShifts" :key="shift" :value="shift">Shift {{ shift }}</option></select></div>
                 <div class="cc-field"><label for="review-remarks">{{ daily ? 'Operational remarks' : 'In-charge remarks' }}</label><textarea id="review-remarks" v-model.trim="reviewForm.remarks" maxlength="5000" rows="3"></textarea></div>
                 <div v-if="daily" class="cc-field"><label for="review-actions">Next-day actions</label><textarea id="review-actions" v-model.trim="reviewForm.next_day_actions" maxlength="5000" rows="2"></textarea></div>
                 <div v-if="reviewError" class="cc-alert" role="alert">{{ reviewError }}</div>
@@ -43,9 +43,11 @@
 </template>
 
 <script>
+import callCenterSelect2 from './callCenterSelect2';
 import { request, pakistanDate, displayTime, reviewSnapshot } from './callCenter';
 
 export default {
+    directives: { ccSelect2: callCenterSelect2 },
     props: { options: { type: Object, required: true }, daily: Boolean },
     data() {
         return { filters: { date: pakistanDate(), shift: '', terminal_id: '' }, activeFilters: {}, report: null, loading: false, error: '', reviewError: '', notice: '', saving: false, generatedAt: '', reviewForm: { shift: 1, remarks: '', next_day_actions: '' } };
