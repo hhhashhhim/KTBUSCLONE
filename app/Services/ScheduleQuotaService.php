@@ -106,10 +106,12 @@ class ScheduleQuotaService
                     return $start === false || $end === false || ($start < $to && $end > $from);
                 });
                 if (!$overlap) {
-                    $seat['quota_reuse'] = $paid->contains(function ($ticket) use ($seat, $cities, $from) {
+                    // Reuse is useful on either side of an existing intermediate journey.
+                    $seat['quota_reuse'] = $paid->contains(function ($ticket) use ($seat, $cities, $from, $to) {
+                        $start = array_search($ticket->departure_city_id, $cities, false);
                         $end = array_search($ticket->destination_city_id, $cities, false);
                         return SeatNumber::normalize($ticket->seat_no) === SeatNumber::normalize($seat['seatNo'])
-                            && $end !== false && $end <= $from;
+                            && $start !== false && $end !== false && ($end <= $from || $to <= $start);
                     });
                 }
             }

@@ -253,6 +253,29 @@ class ScheduleQuotaTest extends TestCase
         $this->assertFalse($before['seat_map'][0][0]['quota_reuse']);
     }
 
+    public function test_middle_segment_marks_free_seat_pink_before_and_after_but_never_overlapping()
+    {
+        // RWP (10) -> FSD (20) -> Multan (30) -> Karachi (40).
+        DB::table('routes_fares')->insert(['route_id' => 1, 'departure_city_id' => 30, 'destination_city_id' => 40]);
+        DB::table('schedule_details')->where('id', 1)->update(['destination_id' => 40]);
+        $this->detail(4, 30, 40, '2026-10-21', '05:00:00');
+        $this->detail(5, 10, 30, '2026-10-20', '23:00:00');
+        $this->detail(6, 20, 40, '2026-10-21', '01:00:00');
+        $this->ticket(['departure_city_id' => 20, 'destination_city_id' => 30]);
+        $map = [[['seatNo' => ' 1-dn ']]];
+        foreach ([2 => true, 4 => true, 1 => false, 3 => false, 5 => false, 6 => false] as $detailId => $expected) {
+            $preview = $this->service->preview(ScheduleDetail::find($detailId), Ticket::all(), $map);
+            $this->assertSame($expected, $preview['seat_map'][0][0]['quota_reuse'], 'Selected segment ' . $detailId);
+            $this->assertSame(1, $preview['quota']['used']);
+        }
+        // An earlier reservation still blocks the seat, even if the paid midway ticket allows reuse.
+        $this->ticket(['type' => 'advance booking']);
+        $before = $this->service->preview(ScheduleDetail::find(2), Ticket::all(), $map);
+        $this->assertFalse($before['seat_map'][0][0]['quota_reuse']);
+        $after = $this->service->preview(ScheduleDetail::find(4), Ticket::all(), $map);
+        $this->assertTrue($after['seat_map'][0][0]['quota_reuse']);
+    }
+
     public function test_paid_booking_and_reservation_confirmation_return_clear_quota_error_without_writes()
     {
         DB::table('schedules')->update(['intermediate_quota' => 0]);
