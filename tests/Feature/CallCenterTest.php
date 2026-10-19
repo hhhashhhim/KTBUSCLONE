@@ -290,6 +290,28 @@ class CallCenterTest extends TestCase
         $this->getJson(self::BASE . '/options')->assertForbidden();
     }
 
+    public function test_admin_has_all_call_center_actions_without_manual_grants_and_cannot_save_denials(): void
+    {
+        $user = $this->agent(1, 1, 10, false, false, false);
+        DB::table('roles')->where('id', 1)->update(['name' => 'admin']);
+        Sanctum::actingAs($user);
+        $this->getJson(self::BASE . '/options')->assertOk()->assertJsonPath('data.permissions.view', true);
+        foreach (\App\Support\CallCenterPermissions::definitions() as $definition) {
+            $this->assertTrue(\App\Support\CallCenterScope::allows($user, $definition['name']));
+        }
+        $this->assertFalse(\App\Support\CallCenterScope::allows($user, 'call-center-unknown'));
+        $role = \App\Models\admin\Role::findOrFail(1);
+        $role->update(['permissions' => \App\Support\CallCenterPermissions::append([])]);
+        $saved = $role->fresh()->permissions;
+        $this->assertTrue($saved[0]['allow']);
+        foreach ($saved[0]['buttons'] as $button) { $this->assertTrue($button['allow']); }
+        $user->hide = 1;
+        $this->assertFalse(\App\Support\CallCenterScope::allows($user, 'call-center'));
+        $user->hide = 0;
+        $user->company_id = 2;
+        $this->assertFalse(\App\Support\CallCenterScope::allows($user, 'call-center'));
+    }
+
     public function test_lookup_masks_cnic_and_enforces_company_terminal_and_route_boundaries(): void
     {
         $user = $this->agent(1, 1, 10, false, false, true, '[1]'); Sanctum::actingAs($user);

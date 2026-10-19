@@ -14,13 +14,14 @@ php artisan call-center:install --force
 php artisan route:clear
 ```
 
-The installer runs only the 12 Call Center migrations, not unrelated pending
+The installer runs only the 13 Call Center migrations, not unrelated pending
 migrations. It is safe to rerun after successful installation. The passenger
 lookup index is added to `tickets`; schedule deployment for a quiet period on
 large databases because building that index may take time.
 
-Existing role permissions are preserved. The module becomes available to
-companies but is disabled for existing roles until configured in
+Existing non-Call-Center permissions are preserved. Company `admin` roles always
+receive all Call Center actions, including existing admins after installation.
+The module becomes available to companies but is disabled for other roles until configured in
 **Users > Roles > Permissions > Call Center**. Enable the module and select
 the required actions. Call Center does not require Ticketing access.
 

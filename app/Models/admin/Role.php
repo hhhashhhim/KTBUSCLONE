@@ -16,6 +16,14 @@ class Role extends Model
     protected $casts = [
         'permissions' => 'array'
     ];
+    protected static function booted()
+    {
+        static::saving(function ($role) {
+            if (\App\Support\CallCenterPermissions::isAdminRole($role->name)) {
+                $role->permissions = \App\Support\CallCenterPermissions::forCompanyAdmin($role->permissions ?? []);
+            }
+        });
+    }
     public function company(){
         return $this->hasOne( Company::class,'id','company_id' );
     }

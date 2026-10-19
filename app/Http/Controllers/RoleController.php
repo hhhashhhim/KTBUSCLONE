@@ -70,6 +70,9 @@ class RoleController extends Controller
             }
 
             $modules = \App\Support\CallCenterPermissions::append($modules);
+            if (\App\Support\CallCenterPermissions::isAdminRole($role->name)) {
+                $modules = \App\Support\CallCenterPermissions::forCompanyAdmin($modules);
+            }
             $modules = $this->stripUserWisePermissions($this->addMissingPermissions($modules));
 
             return response()->json([

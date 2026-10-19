@@ -23,7 +23,7 @@ class InstallCallCenter extends Command
             '--force' => (bool) $this->option('force'),
         ]);
         if ($result === 0) {
-            $this->info('Call Center is installed. Enable its module and actions under Users > Roles > Permissions for the required roles.');
+            $this->info('Call Center is installed. Admin roles have all Call Center permissions. Configure other roles under Users > Roles > Permissions.');
         }
         return $result;
     }

@@ -79,15 +79,20 @@ class CallCenterPermissions
         return $clean;
     }
 
-    public static function forCompanyAdmin(array $modules, array $existingPermissions = []): array
+    public static function isAdminRole(?string $name): bool
     {
-        // Company availability is not a role grant. Preserve deliberately assigned
-        // Call Center actions when the company profile/modules are edited.
-        $saved = array_values(array_filter(self::append($existingPermissions), function ($menu) {
-            return ($menu['name'] ?? '') === 'call-center';
-        }))[0];
-        return array_map(function ($menu) use ($saved) {
-            return ($menu['name'] ?? '') === 'call-center' ? $saved : $menu;
+        return strtolower(trim($name ?? '')) === 'admin';
+    }
+
+    public static function forCompanyAdmin(array $modules): array
+    {
+        return array_map(function ($menu) {
+            if (($menu['name'] ?? '') === 'call-center') {
+                $menu['allow'] = true;
+                foreach ($menu['buttons'] as &$button) { $button['allow'] = true; }
+                unset($button);
+            }
+            return $menu;
         }, self::append($modules));
     }
 

@@ -123,7 +123,7 @@ class CompanyController extends Controller
                 foreach (Role::where('company_id', $request->id)->where('name', 'admin')->get() as $adminRole) {
                     $adminRole->update([
                         'permissions' => \App\Support\CallCenterPermissions::forCompanyAdmin(
-                            $request->modules ?? [], $adminRole->permissions ?? []
+                            $request->modules ?? []
                         ),
                     ]);
                 }

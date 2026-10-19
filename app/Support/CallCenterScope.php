@@ -15,7 +15,10 @@ class CallCenterScope
         if (!$role || (int) $role->company_id !== (int) $user->company_id || $user->hide) {
             return false;
         }
-        return self::granted($user->company->modules ?? [], $name) && self::granted($role->permissions ?? [], $name);
+        $permissions = CallCenterPermissions::isAdminRole($role->name)
+            ? CallCenterPermissions::forCompanyAdmin($role->permissions ?? [])
+            : ($role->permissions ?? []);
+        return self::granted($user->company->modules ?? [], $name) && self::granted($permissions, $name);
     }
 
     private static function granted(array $permissions, string $name): bool
