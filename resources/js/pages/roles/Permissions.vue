@@ -38,6 +38,7 @@
                                                                 <div class="col-md-2">
                                                                     <input type="checkbox" :value="true"
                                                                            v-model="moduleName.allow"
+                                                                           :disabled="isAdminRole && moduleName.name === 'call-center'"
                                                                            :id="moduleName.name"/>
                                                                     <label class="text-capitalize text-bold ml-1"
                                                                            :for="moduleName.name" style="color: black">
@@ -47,11 +48,12 @@
                                                                 </div>
                                                                 <div class="col-md-10" v-if="moduleName.allow">
                                                                                 <div v-if="moduleName.name === 'call-center'" class="cc-role-permissions">
-                                                                                    <p class="cc-role-help">Choose the actions this role can use. Access scope controls whose records they can work with; it does not grant actions.</p>
+                                                                                    <p v-if="isAdminRole" class="cc-role-help">Admin always has all Call Center permissions. These rights cannot be disabled.</p>
+                                                                                    <p v-else class="cc-role-help">Choose the actions this role can use. Access scope controls whose records they can work with; it does not grant actions.</p>
                                                                                     <fieldset v-for="group in callCenterGroups(moduleName.buttons)" :key="group.name">
                                                                                         <legend>{{ group.name }}</legend>
                                                                                         <label v-for="item in group.items" :key="item.button.name" class="cc-role-option" :for="item.button.name">
-                                                                                            <input type="checkbox" v-model="item.button.allow" :id="item.button.name">
+                                                                                            <input type="checkbox" v-model="item.button.allow" :id="item.button.name" :disabled="isAdminRole">
                                                                                             <span><strong>{{ item.label }}</strong><small>{{ item.description }}</small></span>
                                                                                         </label>
                                                                                     </fieldset>
@@ -175,6 +177,9 @@
 
 export default {
     name: "Role",
+    computed: {
+        isAdminRole() { return String(this.role?.name || '').trim().toLowerCase() === 'admin'; },
+    },
     data() {
         return {
             role: "",
