@@ -52,6 +52,7 @@ use App\Models\User;
 use App\Services\TicketCancellationService;
 use App\Services\UpcomingScheduleService;
 use App\Services\ScheduleQuotaService;
+use App\Services\PassengerSummaryService;
 use Illuminate\Validation\ValidationException;
 use App\Jobs\VerifyTravelEyeTicket;
 use Illuminate\Http\Request;
@@ -389,7 +390,8 @@ class BookingController extends Controller
                         }
                         $replacedIds = $reservations->pluck('id')->all();
                     }
-                    $quota->assertAvailable($detail, count($request->input($field)), $replacedIds);
+                    $paidSeats = $request->flag == 1 ? $reservations->pluck('seat_no')->all() : $request->selectedSeats;
+                    $quota->assertAvailable($detail, $paidSeats, $replacedIds);
                 }
 
                 //  $schedule_time_exact ( Date At which bus will leave from first terminal )
@@ -903,7 +905,10 @@ class BookingController extends Controller
             if ($oldTickets->count() !== count($request->data)) {
                 throw ValidationException::withMessages(['tickets' => 'A selected ticket has changed. Please refresh and select the tickets again.']);
             }
-            $quota->assertAvailable($scheduleDetail, $oldTickets->where('type', 'booked')->count(), $oldTickets->keys()->all());
+            $paidSeats = collect($request->data)->filter(function ($item) use ($oldTickets) {
+                return $oldTickets->get($item['dataAll']['id'])->type === 'booked';
+            })->pluck('selected_seatNo')->all();
+            $quota->assertAvailable($scheduleDetail, $paidSeats, $oldTickets->keys()->all());
             $schedule_time_exact = ScheduleDetail::where(["schedule_id" => $scheduleDetail->schedule_id, "schedule_date" => $scheduleDetail->schedule_date])->first();
             $schedule = Schedule::where('id', $scheduleDetail->schedule_id)->where('company_id', Auth::user()->company_id)->select('id', 'route_id', 'bus_class_id')->with('route:id,name', 'route.fares:id,route_id,departure_city_id,destination_city_id')->first();
             /*
@@ -1858,6 +1863,7 @@ class BookingController extends Controller
         // its id/name and seat map always describe the same layout.
         $quotaPreview = app(ScheduleQuotaService::class)->preview($scheduleDetail, $tickets, $seatMap);
         $schedule->quota = $quotaPreview['quota'];
+        $schedule->departure_passenger_summary = app(PassengerSummaryService::class)->byDepartureCity($tickets);
         $scheduleDetail->bus_class->seat_map = $quotaPreview['seat_map'];
         $schedule->setRelation('bus_class', $scheduleDetail->bus_class);
         $assignedBus = $this->assignedBus($scheduleDetail->schedule_id, $scheduleDetail->schedule_date);
@@ -2955,7 +2961,7 @@ class BookingController extends Controller
                 $detail = ScheduleDetail::where('company_id', $old->company_id)
                     ->where('schedule_id', $old->schedule_id)->where('schedule_date', $old->schedule_date)
                     ->where('departure_id', $old->departure_city_id)->where('destination_id', $old->destination_city_id)->firstOrFail();
-                app(ScheduleQuotaService::class)->assertAvailable($detail, 1);
+                app(ScheduleQuotaService::class)->assertAvailable($detail, [$old->seat_no]);
                 $ticket = Ticket::where('company_id', $old->company_id)->where('schedule_id', $old->schedule_id)
                     ->where('schedule_date', $old->schedule_date)->where('seat_no', $old->seat_no)->lockForUpdate()->first();
                 if ($ticket) {

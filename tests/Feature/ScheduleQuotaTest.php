@@ -111,8 +111,9 @@ class ScheduleQuotaTest extends TestCase
 
     private function guard($detailId, $count, array $excluded = [])
     {
-        return DB::transaction(function () use ($detailId, $count, $excluded) {
-            return $this->service->assertAvailable(ScheduleDetail::findOrFail($detailId), $count, $excluded);
+        $seats = is_array($count) ? $count : ($count ? array_map(function ($i) { return 'NEW-' . $i; }, range(1, $count)) : []);
+        return DB::transaction(function () use ($detailId, $seats, $excluded) {
+            return $this->service->assertAvailable(ScheduleDetail::findOrFail($detailId), $seats, $excluded);
         });
     }
 
@@ -122,18 +123,65 @@ class ScheduleQuotaTest extends TestCase
             $this->guard($detailId, $count, $excluded);
             $this->fail('An over-quota booking was accepted.');
         } catch (ValidationException $e) {
-            $this->assertStringContainsString('quota reached', $e->errors()['quota'][0]);
+            $this->assertSame('Quota for midway routes is completed.', $e->errors()['quota'][0]);
         }
     }
 
-    public function test_same_seat_on_two_segments_counts_as_two_across_terminals()
+    public function test_same_seats_on_onward_segments_count_once_across_terminals()
     {
         $this->ticket();
-        $this->assertSame(2, $this->guard(3, 1)['limit']);
-        $this->ticket(['terminal_id' => 99, 'departure_city_id' => 20, 'destination_city_id' => 30]);
+        $this->ticket(['seat_no' => '2']);
+        $this->assertSame(2, $this->guard(3, [' 1-dn ', '2'])['limit']);
+        $this->ticket(['terminal_id' => 99, 'departure_city_id' => 20, 'destination_city_id' => 30, 'seat_no' => ' 1-dn ']);
+        $this->ticket(['terminal_id' => 99, 'departure_city_id' => 20, 'destination_city_id' => 30, 'seat_no' => '2']);
+        $preview = $this->service->preview(ScheduleDetail::find(3), Ticket::all(), []);
+        $this->assertSame(2, $preview['quota']['used']);
+        $this->assertSame(0, $preview['quota']['remaining']);
+        $this->assertSame(2, $this->guard(3, ['1-DN', '2'])['limit']);
         $this->rejects(2, 1);
         $this->rejects(3, 1);
+        $this->rejects(3, ['1-DN', '3']);
         $this->assertFalse($this->guard(1, 40)['intermediate']);
+    }
+
+    public function test_seat_is_released_only_after_its_last_qualifying_ticket_is_removed()
+    {
+        DB::table('schedules')->update(['intermediate_quota' => 1]);
+        $first = $this->ticket();
+        $onward = $this->ticket(['departure_city_id' => 20, 'destination_city_id' => 30]);
+        $first->delete();
+        $this->rejects(2, ['2']);
+        $this->assertSame(1, $this->guard(3, ['1-DN'])['limit']);
+        $onward->delete();
+        $this->assertSame(1, $this->guard(2, ['2'])['limit']);
+    }
+
+    public function test_rescheduling_checks_replacement_seats_not_old_seat_numbers()
+    {
+        DB::table('schedules')->update(['intermediate_quota' => 1]);
+        $first = $this->ticket();
+        $onward = $this->ticket(['departure_city_id' => 20, 'destination_city_id' => 30]);
+        $this->assertSame(1, $this->guard(3, ['1-DN'], [$onward->id])['limit']);
+        $this->rejects(3, ['2'], [$onward->id]);
+        $this->assertSame(1, $this->guard(3, ['2'], [$first->id, $onward->id])['limit']);
+    }
+
+    public function test_departure_summary_counts_booked_passenger_journeys_not_unique_seats()
+    {
+        $this->ticket();
+        $this->ticket(['seat_no' => '2']);
+        $this->ticket(['departure_city_id' => 20, 'destination_city_id' => 30]);
+        $this->ticket(['seat_no' => '2', 'departure_city_id' => 20, 'destination_city_id' => 30]);
+        $this->ticket(['type' => 'advance booking']);
+        $this->ticket(['type' => 'canceled']);
+        $this->ticket(['deleted_at' => now()]);
+        $tickets = Ticket::withTrashed()->get()->each(function ($ticket) {
+            $ticket->setRelation('departure_city', (new \App\Models\City())->forceFill(['name' => $ticket->departure_city_id == 10 ? 'Karachi' : 'Multan']));
+        });
+        $summary = (new \App\Services\PassengerSummaryService())->byDepartureCity($tickets);
+        $this->assertSame(['Karachi', 'Multan'], array_column($summary, 'city_name'));
+        $this->assertSame([2, 2], array_column($summary, 'passengers'));
+        $this->assertSame([], (new \App\Services\PassengerSummaryService())->byDepartureCity(collect()));
     }
 
     public function test_only_active_paid_intermediate_tickets_for_this_company_and_departure_count()
@@ -217,7 +265,7 @@ class ScheduleQuotaTest extends TestCase
             $response = app(BookingController::class)->store($request);
             $this->assertSame(422, $response->status());
             $this->assertArrayHasKey('quota', $response->getData(true)['errors'], $response->getContent());
-            $this->assertStringContainsString('0 remaining', $response->getData(true)['errors']['quota'][0]);
+            $this->assertSame('Quota for midway routes is completed.', $response->getData(true)['errors']['quota'][0]);
             $this->assertSame(0, DB::transactionLevel());
             $this->assertSame('advance booking', $reserved->fresh()->type);
         }
@@ -232,9 +280,10 @@ class ScheduleQuotaTest extends TestCase
             'dataAll' => ['id' => $old->id, 'type' => 'advance booking'], // client type cannot bypass the paid quota
             'dataDepartureCity' => 10, 'dataDestination' => 20, 'rescheduleDate' => '2026-10-20',
             'rescheduleSchedule' => 1, 'newDepartureTime' => 1, 'departure_time' => '23:00:00',
+            'selected_seatNo' => '1-DN',
         ]]]));
         $this->assertSame(422, $response->status());
-        $this->assertStringContainsString('quota reached', $response->getData(true)['errors']['quota'][0]);
+        $this->assertSame('Quota for midway routes is completed.', $response->getData(true)['errors']['quota'][0]);
         $this->assertSame(0, DB::transactionLevel());
         $this->assertNotNull($old->fresh());
     }
@@ -277,7 +326,7 @@ class ScheduleQuotaTest extends TestCase
         $other = DB::connection('quota_second');
         $other->statement('SET SESSION innodb_lock_wait_timeout = 1');
         DB::beginTransaction();
-        $this->service->assertAvailable(ScheduleDetail::find(2), 2);
+        $this->service->assertAvailable(ScheduleDetail::find(2), ['1', '2']);
         try {
             $other->transaction(function () use ($other) { $other->table('schedules')->where('id', 1)->lockForUpdate()->first(); });
             $this->fail('Concurrent connection should not acquire the quota lock.');

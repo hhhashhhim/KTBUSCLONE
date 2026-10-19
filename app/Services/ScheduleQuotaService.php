@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
-/** Portal quota: confirmed intermediate tickets, shared by every terminal of a dated trip. */
+/** Portal quota: distinct advance-paid intermediate seats across every terminal of a dated trip. */
 class ScheduleQuotaService
 {
     public function context(ScheduleDetail $detail, bool $lock = false): array
@@ -47,28 +47,31 @@ class ScheduleQuotaService
         ];
     }
 
-    public function assertAvailable(ScheduleDetail $detail, int $paidTickets, array $replacedIds = []): array
+    public function assertAvailable(ScheduleDetail $detail, array $paidSeats, array $replacedIds = []): array
     {
         $context = $this->context($detail, true);
-        if ($paidTickets <= 0 || $context['limit'] === null || $context['departed'] || !$context['intermediate']) {
+        if (!$paidSeats || $context['limit'] === null || $context['departed'] || !$context['intermediate']) {
             return $context;
         }
         // A locking/current read avoids an older REPEATABLE READ snapshot after waiting for the schedule lock.
         $tickets = Ticket::where('company_id', $detail->company_id)
             ->where('schedule_id', $detail->schedule_id)->where('schedule_date', $detail->schedule_date)
             ->where('type', 'booked')->whereNotIn('id', $replacedIds)
-            ->lockForUpdate()->get(['id', 'type', 'departure_city_id', 'destination_city_id', 'booked_time', 'deleted_at']);
-        $used = $tickets->filter(function ($ticket) use ($context) {
+            ->lockForUpdate()->get(['id', 'seat_no', 'type', 'departure_city_id', 'destination_city_id', 'booked_time', 'deleted_at']);
+        $usedSeats = $this->seatNumbers($tickets->filter(function ($ticket) use ($context) {
             return $this->counts($ticket, $context);
-        })->count();
-        if ($used + $paidTickets > $context['limit']) {
-            $remaining = max(0, $context['limit'] - $used);
-            throw ValidationException::withMessages(['quota' =>
-                "Intermediate-route quota reached: {$used} of {$context['limit']} paid tickets used; {$remaining} remaining. " .
-                "You selected {$paidTickets} paid ticket(s). Full-route tickets are not limited. " .
-                "This limit lifts at the main departure ({$context['departure_at']})."]);
+        })->pluck('seat_no')->all());
+        $additionalSeats = array_diff($this->seatNumbers($paidSeats), $usedSeats);
+        // Reusing an already counted seat costs no additional quota. Normal overlap validation still applies.
+        if ($additionalSeats && count($usedSeats) + count($additionalSeats) > $context['limit']) {
+            throw ValidationException::withMessages(['quota' => 'Quota for midway routes is completed.']);
         }
         return $context;
+    }
+
+    private function seatNumbers(array $seats): array
+    {
+        return array_values(array_unique(array_map([SeatNumber::class, 'normalize'], $seats)));
     }
 
     public function counts($ticket, array $context): bool
@@ -114,7 +117,7 @@ class ScheduleQuotaService
         }
         unset($row);
         unset($context['cities']);
-        $context['used'] = $paid->count();
+        $context['used'] = count($this->seatNumbers($paid->pluck('seat_no')->all()));
         $context['remaining'] = $context['limit'] === null ? null : max(0, $context['limit'] - $context['used']);
         return ['quota' => $context, 'seat_map' => $seatMap];
     }
