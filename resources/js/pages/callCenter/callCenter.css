@@ -1,7 +1,8 @@
-.cc-page { --cc-green: #176750; --cc-ink: #20362f; --cc-muted: #65756f; color: var(--cc-ink); padding-bottom: 35px; }
+.cc-page { --cc-green: #176750; --cc-ink: #20362f; --cc-muted: #65756f; color: var(--cc-ink); box-sizing: border-box; width: 100%; min-width: 0; padding: 24px 24px 36px; }
 .cc-page * { box-sizing: border-box; }
 .cc-heading, .cc-card-header, .cc-actions, .cc-pagination { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .cc-heading { margin-bottom: 22px; }
+.cc-page > .cc-heading { margin-top: 0; }
 .cc-heading h1 { font-size: 30px; font-weight: 700; margin: 0 0 6px; color: var(--cc-ink); }
 .cc-page h2 { font-size: 18px; color: var(--cc-ink); margin: 0; font-weight: 700; }
 .cc-page h3 { font-size: 15px; margin: 0 0 10px; color: var(--cc-ink); font-weight: 700; }
@@ -15,6 +16,7 @@
 .cc-card-header { padding: 18px 20px; border-bottom: 1px solid #edf1ee; }
 .cc-card-body { padding: 20px; }
 .cc-workspace { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(340px, 1fr); gap: 20px; align-items: start; }
+.cc-workspace > * { min-width: 0; }
 .cc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .cc-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; min-width: 0; }
 .cc-grid .cc-field { margin-bottom: 0; }
@@ -78,7 +80,7 @@
 .cc-audit { padding-left: 18px; margin: 12px 0 0; font-size: 12px; }
 .cc-audit li { margin-bottom: 7px; }
 @media (max-width: 1180px) { .cc-workspace { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 600px) { .cc-heading h1 { font-size: 25px; } .cc-grid, .cc-report-panels { grid-template-columns: 1fr; } .cc-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cc-card-body, .cc-report { padding: 14px; } .cc-report-title { flex-direction: column; } }
+@media (max-width: 600px) { .cc-page { padding: 16px 12px 24px; } .cc-heading h1 { font-size: 25px; } .cc-grid, .cc-report-panels { grid-template-columns: 1fr; } .cc-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cc-card-body, .cc-report { padding: 14px; } .cc-report-title { flex-direction: column; } }
 @media print {
     @page { size: A4 portrait; margin: 12mm; }
     body.call-center-print .main-sidebar, body.call-center-print .navbar, body.call-center-print .navbar-bg, body.call-center-print .main-footer, body.call-center-print .cc-no-print { display: none !important; }
