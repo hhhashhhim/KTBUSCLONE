@@ -26,6 +26,10 @@ class CallCenterInformationController extends Controller
         $this->authorizeAccess($request);
         $terminal = Scope::terminal($request);
         return response()->json(['status' => true, 'data' => [
+            // Contact directory only: booking/schedule terminal scope remains below.
+            'terminal_directory' => Terminal::where('company_id', $request->user()->company_id)->where('hide', 0)
+                ->whereIn('city_id', City::where('company_id', $request->user()->company_id)->where('hide', 0)->select('id'))
+                ->orderBy('name')->get(['id', 'name', 'city_id', 'address', 'contact']),
             'cities' => City::where('company_id', $request->user()->company_id)->where('hide', 0)->orderBy('name')->get(['id', 'name']),
             'terminals' => Terminal::where('company_id', $request->user()->company_id)->where('hide', 0)
                 ->when($terminal !== null, function ($q) use ($terminal) { $q->where('id', $terminal); })

@@ -504,3 +504,12 @@ The companion frontend passed 24 tests and a production Mix build. Local MySQL
 verification covered mixed history and complaint assignment/notifications inside
 transactions that were rolled back; browser fixtures verified successive
 handovers while preserving updates and linked follow-up history.
+
+
+### Terminal contact directory (19 October 2026)
+
+Quick-answer options now include `terminal_directory`: active same-company
+terminals with an active same-company city, containing only id, name, city_id,
+address and contact. Quick answers permission is required. This directory is
+for answering address enquiries across cities; the existing `terminals` booking
+list and all schedule/seat access checks remain scoped. No migration is needed.

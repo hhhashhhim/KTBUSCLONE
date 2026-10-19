@@ -960,6 +960,20 @@ class CallCenterTest extends TestCase
         DB::table('drop_schedules')->insert(['company_id' => 1, 'schedule_id' => 4, 'schedule_date' => '2026-10-13']);
     }
 
+    public function test_terminal_contact_directory_spans_company_cities_without_expanding_booking_access(): void
+    {
+        $this->informationSchema(); $user = $this->agent(); Sanctum::actingAs($user);
+        DB::table('terminals')->where('id', 11)->update(['city_id' => 2]);
+        DB::table('terminals')->insert(['id' => 12, 'company_id' => 1, 'city_id' => 2, 'name' => 'Hidden terminal', 'hide' => 1]);
+        $response = $this->getJson(self::BASE . '/quick-answers/options')->assertOk()->assertJsonCount(1, 'data.terminals')->assertJsonCount(2, 'data.terminal_directory');
+        $this->assertEqualsCanonicalizing([10, 11], array_column($response->json('data.terminal_directory'), 'id'));
+        $this->getJson(self::BASE . '/quick-answers?departure_id=1&destination_id=2&date=2026-10-13&terminal_id=11')->assertForbidden();
+        DB::table('cities')->where('id', 2)->update(['hide' => 1]);
+        $this->getJson(self::BASE . '/quick-answers/options')->assertJsonCount(1, 'data.terminal_directory');
+        $this->grant($user, ['view-calls']);
+        $this->getJson(self::BASE . '/quick-answers/options')->assertForbidden();
+    }
+
     public function test_quick_answers_use_scoped_schedules_existing_base_fares_and_terminal_details(): void
     {
         $this->informationSchema(); $user = $this->agent(1, 1, 10, false, false, true, '[1]'); Sanctum::actingAs($user);
