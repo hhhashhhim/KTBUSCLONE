@@ -5,7 +5,15 @@
             <p v-if="error" class="cc-alert" role="alert">{{ error }} <button type="button" class="cc-link" @click="loadOptions">Retry</button></p>
             <p v-if="loading" role="status">Loading travel information…</p>
             <template v-else-if="info">
-                <details><summary>Terminal addresses & phone numbers</summary><div v-for="terminal in info.terminals" :key="terminal.id" class="cc-ticket"><strong>{{ terminal.name }}</strong><p>{{ terminal.address || 'Address not recorded' }}</p><p>{{ terminal.contact || 'Phone not recorded' }}</p></div><p v-if="!info.terminals.length">No terminal details available for your access.</p></details>
+                <details><summary>Terminal addresses & phone numbers</summary>
+                    <div class="cc-grid cc-spaced">
+                        <div class="cc-field"><label for="address-city">City</label><select id="address-city" v-model="addressCity" @change="addressTerminal = ''"><option value="">Choose city</option><option v-for="city in info.cities" :key="city.id" :value="city.id">{{ city.name }}</option></select></div>
+                        <div class="cc-field"><label for="address-terminal">Terminal</label><select id="address-terminal" v-model="addressTerminal" :disabled="!addressCity || !addressTerminals.length"><option value="">Choose terminal</option><option v-for="terminal in addressTerminals" :key="terminal.id" :value="terminal.id">{{ terminal.name }}</option></select></div>
+                    </div>
+                    <p v-if="!addressCity" class="cc-muted">Choose a city, then a terminal to see its address.</p>
+                    <p v-else-if="!addressTerminals.length" class="cc-muted">No terminal details recorded for this city.</p>
+                    <div v-if="selectedAddress" class="cc-ticket" aria-live="polite"><strong>{{ selectedAddress.name }}</strong><p>{{ selectedAddress.address || 'Address not recorded' }}</p><p>{{ selectedAddress.contact || 'Phone not recorded' }}</p></div>
+                </details>
                 <form class="cc-form-stack" @submit.prevent="search">
                     <div class="cc-grid"><div class="cc-field"><label for="quick-from">From</label><select id="quick-from" v-model="form.departure_id" required><option value="">Choose city</option><option v-for="city in info.cities" :key="city.id" :value="city.id">{{ city.name }}</option></select></div><div class="cc-field"><label for="quick-to">To</label><select id="quick-to" v-model="form.destination_id" required><option value="">Choose city</option><option v-for="city in info.cities" :key="city.id" :value="city.id">{{ city.name }}</option></select></div></div>
                     <div class="cc-grid"><div class="cc-field"><label for="quick-date">Travel date</label><input id="quick-date" type="date" v-model="form.date" :min="today()" required></div><div v-if="info.terminals.length > 1" class="cc-field"><label for="quick-terminal">Booking terminal</label><select id="quick-terminal" v-model="form.terminal_id" required><option value="">Choose terminal</option><option v-for="terminal in info.terminals" :key="terminal.id" :value="terminal.id">{{ terminal.name }}</option></select></div></div>
@@ -27,14 +35,18 @@
 import { request, pakistanDate, displayTime } from './callCenter';
 export default {
     props: { currentUser: Object },
-    data: () => ({ info: null, loading: false, error: '', searching: false, searchError: '', answer: null, active: {}, form: { departure_id: '', destination_id: '', date: pakistanDate(), terminal_id: '' }, sequence: 0 }),
+    data: () => ({ addressCity: '', addressTerminal: '', info: null, loading: false, error: '', searching: false, searchError: '', answer: null, active: {}, form: { departure_id: '', destination_id: '', date: pakistanDate(), terminal_id: '' }, sequence: 0 }),
+    computed: {
+        addressTerminals() { return this.addressCity ? (this.info?.terminal_directory || []).filter(t => Number(t.city_id) === Number(this.addressCity)) : []; },
+        selectedAddress() { return this.addressTerminals.find(t => Number(t.id) === Number(this.addressTerminal)) || null; },
+    },
     beforeUnmount() { this.sequence++; },
     methods: {
         today: pakistanDate, time: displayTime,
         cityName(id) { return this.info.cities.find(city => Number(city.id) === Number(id))?.name || ''; },
         onToggle(event) { if (event.target.open && !this.info && !this.loading) this.loadOptions(); },
         async loadOptions() {
-            this.loading = true; this.error = '';
+            this.loading = true; this.error = ''; this.addressCity = ''; this.addressTerminal = '';
             try { this.info = await request(this, 'get', 'quick-answers/options'); this.form.terminal_id = this.info.terminals.find(t => t.id === this.currentUser.terminal_id)?.id || this.info.terminals[0]?.id || ''; }
             catch (error) { this.error = error.message; } finally { this.loading = false; }
         },

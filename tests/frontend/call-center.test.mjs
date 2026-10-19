@@ -318,3 +318,18 @@ test('complaint reassignment removes work that left the users scope and enforces
         }
     } finally { globalThis.window = originalWindow; }
 });
+
+test('terminal address selection uses city and terminal without changing booking scope', async () => {
+    const source = await readFile(new URL('../../resources/js/pages/callCenter/QuickAnswers.vue', import.meta.url), 'utf8');
+    const script = source.match(/<script>([\s\S]*?)<\/script>/)[1].replace("'./callCenter'", JSON.stringify(`data:text/javascript;base64,${Buffer.from(await readFile(new URL('../../resources/js/pages/callCenter/callCenter.js', import.meta.url), 'utf8')).toString('base64')}`));
+    const { default: quick } = await import(`data:text/javascript;base64,${Buffer.from(script).toString('base64')}`);
+    const vm = { ...quick.data(), info: { terminal_directory: [{ id: 1, city_id: 10, address: 'First' }, { id: 2, city_id: 10, address: 'Second' }, { id: 3, city_id: 20, address: 'Third' }], terminals: [{ id: 1 }] } };
+    Object.defineProperty(vm, 'addressTerminals', { get: () => quick.computed.addressTerminals.call(vm) });
+    assert.deepEqual(vm.addressTerminals, []);
+    vm.addressCity = '10'; assert.equal(vm.addressTerminals.length, 2);
+    vm.addressTerminal = '2'; assert.equal(quick.computed.selectedAddress.call(vm).address, 'Second');
+    vm.addressCity = '20'; assert.equal(quick.computed.selectedAddress.call(vm), null);
+    vm.addressTerminal = '3'; assert.equal(quick.computed.selectedAddress.call(vm).address, 'Third');
+    assert.deepEqual(vm.info.terminals, [{ id: 1 }]);
+    vm.addressCity = '99'; assert.deepEqual(vm.addressTerminals, []);
+});

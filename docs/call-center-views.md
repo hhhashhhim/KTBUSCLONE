@@ -386,3 +386,13 @@ changes and its three pending complaint-workflow migrations (000002–000004 on
 16 October 2026) before serving this bundle. The release includes progress notes,
 follow-up and assignment history, the notification bell, and responsibility
 changes directly from Complaints.
+
+
+### Terminal address selection (19 October 2026)
+
+Quick answers → Terminal addresses & phone numbers asks for City, then Terminal.
+Only the selected terminal's address and phone appear. Changing city clears the
+terminal selection. Empty cities and missing contact fields have explicit messages.
+The directory uses the API's new same-company `terminal_directory`; the separate
+booking-terminal selection and fare/seat scope are unchanged. Deploy matching
+API and views together; no migration is required.
