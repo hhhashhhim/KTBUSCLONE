@@ -269,9 +269,9 @@
                     </ul>
                 </li>
                 <!-- Tickting panel -->
-                <li class="dropdown" v-if="mobileAppScreens.length" :class="{ active: String($route.name || '').startsWith('mobile-app') }">
-                    <router-link class="nav-link" :to="{ name: mobileAppScreens[0].name }" data-testid="mobile-app-sidebar-link"><i class="fas fa-mobile-alt"></i><span>Mobile App</span></router-link>
-                    <ul class="dropdown-menu"><li v-for="screen in mobileAppScreens" :key="screen.name"><router-link class="nav-link" :to="{name:screen.name}"><i :class="screen.icon"></i><span class="ma-sidebar-label">{{ screen.label }}</span></router-link></li></ul>
+                <li class="dropdown ma-mobile-menu" v-if="mobileAppScreens.length" :class="{ active: String($route.name || '').startsWith('mobile-app'), 'ma-menu-collapsed': !mobileAppExpanded }">
+                    <a href="#" class="nav-link ma-menu-toggle" role="button" :aria-expanded="String(mobileAppExpanded)" aria-controls="mobile-app-sidebar-menu" @click.prevent.stop="toggleMobileAppMenu" @keydown.space.prevent="toggleMobileAppMenu" data-testid="mobile-app-sidebar-link"><i class="fas fa-mobile-alt"></i><span>Mobile App</span><i class="fas ma-menu-indicator" :class="mobileAppExpanded ? 'fa-minus' : 'fa-plus'" aria-hidden="true"></i></a>
+                    <ul id="mobile-app-sidebar-menu" class="dropdown-menu" v-show="mobileAppExpanded"><li v-for="screen in mobileAppScreens" :key="screen.name"><router-link class="nav-link" :to="{name:screen.name}"><i :class="screen.icon"></i><span class="ma-sidebar-label">{{ screen.label }}</span></router-link></li></ul>
                 </li>
                 <li class="dropdown" v-if="canAccessCallCenter" :class="{ active: String($route.name || '').startsWith('call-center') }">
                     <router-link class="nav-link" :to="{ name: 'call-center' }"><i class="fas fa-headset"></i><span>Call Center</span></router-link>
@@ -636,6 +636,7 @@ export default {
             permissions: [],
             callCenterAccess: null,
             mobileAppAccess: null,
+            mobileAppExpanded: String(this.$route?.name || '').startsWith('mobile-app'),
             terminalCancellationPendingCount: 0,
             pendingDockCount: 0, // 🚀 new
         }
@@ -660,6 +661,7 @@ export default {
     },
     watch: {
         '$route.fullPath'() {
+            this.mobileAppExpanded = String(this.$route.name || '').startsWith('mobile-app');
             this.syncActiveMenu();
             if (this.checkForSubmenu('online-terminal-cancellation')) {
                 this.getTerminalCancellationPendingCount();
@@ -667,6 +669,9 @@ export default {
         },
     },
     methods: {
+        toggleMobileAppMenu() {
+            this.mobileAppExpanded = !this.mobileAppExpanded;
+        },
         async refreshMobileAppAccess() {
             try {
                 const response = await this.callApi('get', 'mobile-app/options', null, {headers:{Accept:'application/json'},validateStatus:()=>true});
@@ -791,6 +796,28 @@ export default {
 </script>
 
 <style scoped>
+.main-sidebar .sidebar-menu li a.ma-menu-toggle > span {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+}
+.main-sidebar .sidebar-menu li a.ma-menu-toggle .ma-menu-indicator {
+    flex: 0 0 14px;
+    width: 14px;
+    margin: 0 0 0 8px;
+    font-size: 12px;
+}
+/* Keep route highlighting and legacy menu scripts from reopening a collapsed group. */
+.ma-mobile-menu.ma-menu-collapsed > .dropdown-menu {
+    display: none !important;
+}
+.ma-mobile-menu:not(.ma-menu-collapsed) > .dropdown-menu {
+    display: block !important;
+}
+.sidebar-mini .main-sidebar .sidebar-menu li a.ma-menu-toggle .ma-menu-indicator {
+    display: none;
+}
+
 .main-sidebar .sidebar-menu li a.ticketing-menu-link {
     padding-right: 40px;
 }

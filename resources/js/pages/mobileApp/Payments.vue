@@ -1,6 +1,6 @@
 <template>
     <div class="ma-panel"><div class="ma-panel-head"><div><h2>Payments & Exceptions</h2><p class="ma-muted">Gateway transaction records and booking links. No payment is marked paid from this screen.</p></div></div>
-        <MobileFilters id="ma-payments" v-model="filters" :options="options" search="Invoice or transaction reference" dates environments terminals :statuses="['pending','paid','failed','expired','cancelled','review_required']" :busy="loading" @apply="load(1,true)"><div class="ma-field"><label for="ma-review">Review</label><select id="ma-review" class="form-control" v-model="filters.exceptions"><option value="">All transactions</option><option value="1">Exceptions requiring review</option></select></div></MobileFilters>
+        <MobileFilters id="ma-payments" v-model="filters" :options="options" search="Invoice or transaction reference" dates environments terminals :statuses="['pending','paid','failed','expired','cancelled','review_required']" :busy="loading" @apply="load(1,true)"><div class="ma-field"><label for="ma-review">Review</label><select v-ma-select2 id="ma-review" class="form-control" v-model="filters.exceptions"><option value="">All transactions</option><option value="1">Exceptions requiring review</option></select></div></MobileFilters>
         <div v-if="error" class="ma-error m-3" role="alert">{{ error }} <button class="btn btn-outline-danger btn-sm ml-2" @click="load()">Retry</button></div>
         <p class="ma-note m-3">Payment and booking states are separate. Review a paid transaction with an unconfirmed ticket through the existing finance workflow. Historical payment methods remain visible.</p>
         <div class="ma-table-wrap"><table class="ma-table"><thead><tr><th>Transaction</th><th>Booking / Passenger</th><th>Provider</th><th>Status</th><th class="ma-numeric">Amount</th><th>Payment time</th><th>Verification</th></tr></thead><tbody>
@@ -9,8 +9,10 @@
     </div>
 </template>
 <script>
+import mobileAppSelect2 from './mobileAppSelect2';
 import MobileFilters from './MobileFilters.vue'; import MobilePagination from './MobilePagination.vue'; import { request,today,label,number,displayTime } from './mobileApp';
 export default {
+    directives: { maSelect2: mobileAppSelect2 },
     components:{MobileFilters,MobilePagination},props:{options:Object},data:()=>({filters:{from:today(),to:today(),environment:'live',search:'',status:'',terminal_id:'',exceptions:''},applied:null,items:[],pagination:null,loading:false,error:'',sequence:0}),
     mounted(){this.load(1,true);},beforeUnmount(){this.sequence++;},methods:{label,number,amount(value){return value===null||value===undefined?'—':new Intl.NumberFormat('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2}).format(value);},time:displayTime,async load(page=1,apply=false){if(apply||!this.applied)this.applied={...this.filters};const sequence=++this.sequence;this.loading=true;this.error='';this.items=[];try{const data=await request(this,'get','payments',null,{...this.applied,page});if(sequence===this.sequence){this.items=data.items;this.pagination=data.pagination;}}catch(error){if(sequence===this.sequence){this.error=error.message;this.pagination=null;}}finally{if(sequence===this.sequence)this.loading=false;}}},
 };

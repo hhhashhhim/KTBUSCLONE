@@ -20,7 +20,7 @@
                 <div v-if="canChangeStatus || options.permissions.users_sessions_revoke" class="ma-panel ma-panel-body">
                     <h3>Account controls</h3><p class="ma-muted mb-3">Changes require a reason and are recorded in the Mobile App audit log.</p>
                     <form class="ma-form" @submit.prevent="saveStatus">
-                        <div class="ma-grid"><div class="ma-field" v-if="canChangeStatus"><label for="ma-user-status">Account status</label><select id="ma-user-status" class="form-control" v-model="status" :disabled="saving || controlsSaving"><option value="active">Active</option><option value="blocked">Blocked</option><option v-if="options.permissions.users_blacklist" value="blacklisted">Blacklisted</option></select></div><div class="ma-field"><label for="ma-user-reason">Reason</label><input id="ma-user-reason" class="form-control" v-model.trim="reason" minlength="3" maxlength="1000" :disabled="saving || controlsSaving" required placeholder="Explain the account action"></div></div>
+                        <div class="ma-grid"><div class="ma-field" v-if="canChangeStatus"><label for="ma-user-status">Account status</label><select v-ma-select2 id="ma-user-status" class="form-control" v-model="status" :disabled="saving || controlsSaving"><option value="active">Active</option><option value="blocked">Blocked</option><option v-if="options.permissions.users_blacklist" value="blacklisted">Blacklisted</option></select></div><div class="ma-field"><label for="ma-user-reason">Reason</label><input id="ma-user-reason" class="form-control" v-model.trim="reason" minlength="3" maxlength="1000" :disabled="saving || controlsSaving" required placeholder="Explain the account action"></div></div>
                         <p v-if="status === 'blocked' && detail.user.status !== 'blocked'" class="ma-note ma-warning">Blocking prevents this passenger from using the mobile account. Existing bookings remain in the ERP.</p>
                         <p v-if="status === 'blacklisted'" class="ma-note ma-warning">Blacklisting restricts this account and prevents registration with its phone number or CNIC. Only staff with blacklist privileges can remove this restriction.</p>
                         <div class="ma-actions"><button v-if="canChangeStatus" class="btn btn-success" :disabled="saving || controlsSaving || !statusAllowed || status === detail.user.status || reason.length < 3">{{ saving ? 'Saving…' : 'Save account status' }}</button><button v-if="options.permissions.users_sessions_revoke" type="button" class="btn btn-outline-danger" :disabled="saving || controlsSaving || reason.length < 3" @click="revoke">Revoke all mobile sessions</button></div>
@@ -36,11 +36,13 @@
     </div>
 </template>
 <script>
+import mobileAppSelect2 from './mobileAppSelect2';
 import PassengerLimits from './PassengerLimits.vue';
 import PassengerWallet from './PassengerWallet.vue';
 import MobileFilters from './MobileFilters.vue'; import MobilePagination from './MobilePagination.vue'; import MobileDialog from './MobileDialog.vue';
 import { request, label, number, displayTime, formatCnic } from './mobileApp';
 export default {
+    directives: { maSelect2: mobileAppSelect2 },
     components: { PassengerLimits, PassengerWallet, MobileFilters, MobilePagination, MobileDialog }, props: { options: Object },
     data: () => ({ filters: { search: '', status: '' }, applied: null, items: [], pagination: null, loading: false, error: '', notice: '', sequence: 0, openingSequence: 0, selectedId: null, detail: null, opening: false, detailError: '', saving: false, controlsSaving: false, walletSaving: false, walletDirty: false, status: '', reason: '' }),
     computed: {

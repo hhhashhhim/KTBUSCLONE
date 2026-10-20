@@ -3,9 +3,9 @@
         <div class="ma-panel-head"><div><h2>Routes &amp; Schedules</h2><p class="ma-muted">See what the mobile app can show, and why a departure is unavailable.</p></div><span class="ma-badge" :class="context?.confirmed ? 'active' : 'pending'">{{ context?.confirmed ? 'App connection reported' : 'ERP preview' }}</span></div>
         <form class="ma-filters" @submit.prevent="load(true)">
             <div class="ma-field"><label for="ma-availability-date">Travel date</label><input id="ma-availability-date" type="date" class="form-control" v-model="filters.date" :min="today()" required></div>
-            <div class="ma-field"><label for="ma-availability-terminal">App terminal</label><select id="ma-availability-terminal" class="form-control" v-model="filters.mobile_terminal_id"><option value="">{{ context?.confirmed ? 'Reported app terminal' : 'Choose online terminal' }}</option><option v-for="terminal in context?.terminals || []" :key="terminal.id" :value="terminal.id">{{ terminal.name }}</option></select></div>
+            <div class="ma-field"><label for="ma-availability-terminal">App terminal</label><select v-ma-select2 id="ma-availability-terminal" class="form-control" v-model="filters.mobile_terminal_id"><option value="">{{ context?.confirmed ? 'Reported app terminal' : 'Choose online terminal' }}</option><option v-for="terminal in context?.terminals || []" :key="terminal.id" :value="terminal.id">{{ terminal.name }}</option></select></div>
             <div v-if="!selectedRoute" class="ma-field ma-search"><label for="ma-availability-search">Route</label><input id="ma-availability-search" class="form-control" v-model="filters.search" placeholder="Search route name" maxlength="100"></div>
-            <div class="ma-field"><label for="ma-availability-status">Show</label><select id="ma-availability-status" class="form-control" v-model="filters.status"><option value="">All</option><option value="allowed">Allowed</option><option value="not_allowed">Not allowed</option><option v-if="selectedRoute" value="not_open">Not open yet</option><option value="needs_setup">Needs setup</option></select></div>
+            <div class="ma-field"><label for="ma-availability-status">Show</label><select v-ma-select2 id="ma-availability-status" class="form-control" v-model="filters.status"><option value="">All</option><option value="allowed">Allowed</option><option value="not_allowed">Not allowed</option><option v-if="selectedRoute" value="not_open">Not open yet</option><option value="needs_setup">Needs setup</option></select></div>
             <button class="btn btn-success" :disabled="loading">{{ loading ? 'Loading…' : 'Show availability' }}</button>
         </form>
         <p v-if="context?.booking_notice" class="ma-note ma-warning">{{ context.booking_notice }}</p>
@@ -25,9 +25,11 @@
     </div>
 </template>
 <script>
+import mobileAppSelect2 from './mobileAppSelect2';
 import MobilePagination from './MobilePagination.vue';
 import { request, today, number } from './mobileApp';
 export default {
+    directives: { maSelect2: mobileAppSelect2 },
     components: { MobilePagination }, props: { options: Object },
     data: () => ({ filters: { date: today(), mobile_terminal_id: '', search: '', status: '' }, applied: null, selectedRoute: null, context: null, data: null, loading: false, error: '', sequence: 0 }),
     mounted() { this.load(true); }, beforeUnmount() { this.sequence++; },

@@ -64,8 +64,8 @@
                     <p class="ma-muted">Choose one or more places. Publishing takes effect when the updated app refreshes its content.</p>
                 </fieldset>
                 <div class="ma-grid">
-                    <div class="ma-field"><label for="ma-content-type">Image category</label><select id="ma-content-type" class="form-control" v-model="form.media_type" :disabled="saving"><option v-for="type in ['exterior','interior','seats','lounge']" :key="type" :value="type">{{ label(type) }}</option></select></div>
-                    <div class="ma-field"><label for="ma-content-class">Bus class</label><select id="ma-content-class" class="form-control" v-model="form.bus_class_id" :disabled="saving"><option value="">All bus classes</option><option v-for="category in busClasses" :key="category.id" :value="category.id">{{ category.name }}</option></select></div>
+                    <div class="ma-field"><label for="ma-content-type">Image category</label><select v-ma-select2 id="ma-content-type" class="form-control" v-model="form.media_type" :disabled="saving"><option v-for="type in ['exterior','interior','seats','lounge']" :key="type" :value="type">{{ label(type) }}</option></select></div>
+                    <div class="ma-field"><label for="ma-content-class">Bus class</label><select v-ma-select2 id="ma-content-class" class="form-control" v-model="form.bus_class_id" :disabled="saving"><option value="">All bus classes</option><option v-for="category in busClasses" :key="category.id" :value="category.id">{{ category.name }}</option></select></div>
                     <div class="ma-field"><label for="ma-content-order">Display order</label><input id="ma-content-order" class="form-control" v-model.number="form.sort_order" type="number" min="0" step="1" :disabled="saving" required><small>Lower numbers appear first within each placement.</small></div>
                 </div>
                 <label class="ma-check"><input type="checkbox" v-model="form.is_active" :disabled="saving"><span>Publish this image in the mobile app</span></label>
@@ -79,12 +79,14 @@
     </div>
 </template>
 <script>
+import mobileAppSelect2 from './mobileAppSelect2';
 import MobileFilters from './MobileFilters.vue';
 import MobilePagination from './MobilePagination.vue';
 import MobileDialog from './MobileDialog.vue';
 import { request, label, displayTime } from './mobileApp';
 
 export default {
+    directives: { maSelect2: mobileAppSelect2 },
     components: { MobileFilters, MobilePagination, MobileDialog }, props: { options: Object },
     data: () => ({
         filters: { search: '', status: '' }, applied: null, items: [], pagination: null, busClasses: [], loading: false,

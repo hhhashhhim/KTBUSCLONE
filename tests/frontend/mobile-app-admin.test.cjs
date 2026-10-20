@@ -28,7 +28,7 @@ function load(name) {
     parser.parse(parsed.descriptor.script.content, { sourceType: 'module' });
     const context = {
         URL, FormData, Blob, crypto: require('node:crypto'), ...api, module: { exports: {} }, request: (...args) => requestHandler(...args),
-        AppControls: {}, PassengerLimits: {}, PassengerWallet: {}, MobileFilters: {}, MobilePagination: {}, MobileDialog: {},
+        AppControls: {}, PassengerLimits: {}, PassengerWallet: {}, MobileFilters: {}, MobilePagination: {}, MobileDialog: {}, mobileAppSelect2: {},
         Availability: {}, LoginActivity: {}, Overview: {}, Passengers: {}, Bookings: {}, Payments: {}, Reports: {}, Settings: {}, Content: {}, Activity: {}, Notifications: {},
         window: { confirm: () => true },
     };
