@@ -20,7 +20,7 @@ class Role extends Model
     {
         static::saving(function ($role) {
             if (\App\Support\CallCenterPermissions::isAdminRole($role->name)) {
-                $role->permissions = \App\Support\CallCenterPermissions::forCompanyAdmin($role->permissions ?? []);
+                $role->permissions = \App\Support\MobileAppPermissions::forCompanyAdmin(\App\Support\CallCenterPermissions::forCompanyAdmin($role->permissions ?? []));
             }
         });
     }

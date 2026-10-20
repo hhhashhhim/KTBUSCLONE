@@ -43,7 +43,7 @@ class RoleController extends Controller
                         // If Main Module is not in permission then don't check its sub modules and return back to next module.
                     }
                     $module['allow'] = false;
-                    if (($module['name'] ?? '') === 'call-center') {
+                    if (in_array($module['name'] ?? '', ['call-center', 'mobile-app'], true)) {
                         foreach ($module['buttons'] ?? [] as $k => $button) { $module['buttons'][$k]['allow'] = false; }
                     }
                     // Setting default false value of main module so that the role does't inherit true as per from company permissions
@@ -55,6 +55,9 @@ class RoleController extends Controller
                             // If sub module is false then vanish it from the permissions also
                         }
                         $module['childs'][$j]['allow'] = false;
+                        if (($module['name'] ?? '') === 'mobile-app') {
+                            foreach ($module['childs'][$j]['buttons'] ?? [] as $k => $button) { $module['childs'][$j]['buttons'][$k]['allow'] = false; }
+                        }
                         if ($childModule['name'] === 'call-center') {
                             foreach ($module['childs'][$j]['buttons'] ?? [] as $k => $button) {
                                 $module['childs'][$j]['buttons'][$k]['allow'] = false;
@@ -69,9 +72,9 @@ class RoleController extends Controller
 
             }
 
-            $modules = \App\Support\CallCenterPermissions::append($modules);
+            $modules = \App\Support\MobileAppPermissions::append(\App\Support\CallCenterPermissions::append($modules));
             if (\App\Support\CallCenterPermissions::isAdminRole($role->name)) {
-                $modules = \App\Support\CallCenterPermissions::forCompanyAdmin($modules);
+                $modules = \App\Support\MobileAppPermissions::forCompanyAdmin(\App\Support\CallCenterPermissions::forCompanyAdmin($modules));
             }
             $modules = $this->stripUserWisePermissions($this->addMissingPermissions($modules));
 
@@ -79,6 +82,9 @@ class RoleController extends Controller
                 'role' => $role,
                 'permissions' => $modules,
                 'call_center_privileges' => \App\Support\CallCenterPermissions::definitions(),
+                'mobile_app_privileges' => \App\Support\MobileAppPermissions::definitions(),
+                'mobile_app_company_permissions' => collect(\App\Support\MobileAppPermissions::append($company->modules ?? []))->firstWhere('name', 'mobile-app'),
+                'can_update_permissions' => (bool) checkPermissionButtons('edit-role'),
             ], 200);
 
         }else{
@@ -124,7 +130,7 @@ class RoleController extends Controller
         })->findOrFail($request->id)->update([
             'name' => $request->name,
             'company_id' => auth()->user()->is_super_admin == 0 ? auth()->user()->company_id : $request->company_id,
-            'permissions' => \App\Support\CallCenterPermissions::append($request->permissions),
+            'permissions' => \App\Support\MobileAppPermissions::append(\App\Support\CallCenterPermissions::append($request->permissions)),
         ]);
         ActivityLog::create([
             "activity_by" => Auth::user()->id,
