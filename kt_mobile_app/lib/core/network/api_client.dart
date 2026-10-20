@@ -29,9 +29,14 @@ class ApiClient {
         },
         onError: (error, handler) async {
           if (error.response?.statusCode == 401) {
-            final hadToken = (await _tokenStorage.read())?.isNotEmpty == true;
-            await _tokenStorage.clear();
-            if (hadToken) _unauthorized.add(null);
+            final token = await _tokenStorage.read();
+            // A late response from the previous token must not end a renewed session.
+            if (token != null &&
+                error.requestOptions.headers['Authorization'] ==
+                    'Bearer $token') {
+              await _tokenStorage.clear();
+              _unauthorized.add(null);
+            }
           }
           handler.next(error);
         },

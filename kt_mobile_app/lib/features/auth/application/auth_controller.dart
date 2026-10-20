@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers.dart';
 import '../data/auth_repository.dart';
+import '../data/biometric_login_repository.dart';
 import '../domain/passenger.dart';
 
 class AuthState {
@@ -37,6 +38,15 @@ final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepository(
     ref.watch(apiClientProvider),
     ref.watch(tokenStorageProvider),
+    biometricVault: ref.watch(biometricVaultProvider),
+  ),
+);
+
+final biometricLoginRepositoryProvider = Provider<BiometricLoginRepository>(
+  (ref) => BiometricLoginRepository(
+    ref.watch(apiClientProvider),
+    ref.watch(tokenStorageProvider),
+    ref.watch(biometricVaultProvider),
   ),
 );
 
@@ -47,6 +57,23 @@ final authControllerProvider = NotifierProvider<AuthController, AuthState>(
 class AuthController extends Notifier<AuthState> {
   @override
   AuthState build() => const AuthState();
+
+  Future<bool> loginWithBiometrics() async {
+    if (state.isLoading) return false;
+    state = const AuthState(isLoading: true);
+    try {
+      final passenger = await ref
+          .read(biometricLoginRepositoryProvider)
+          .login();
+      state = AuthState(passenger: passenger);
+      return true;
+    } catch (error) {
+      state = AuthState(error: error.toString());
+      return false;
+    } finally {
+      ref.invalidate(biometricStatusProvider);
+    }
+  }
 
   Future<bool> restoreSession() async {
     final passenger = await ref.read(authRepositoryProvider).restore();
@@ -65,6 +92,7 @@ class AuthController extends Notifier<AuthState> {
           .read(authRepositoryProvider)
           .login(mobile: mobile, password: password);
       state = AuthState(passenger: passenger);
+      ref.invalidate(biometricStatusProvider);
       return true;
     } catch (error) {
       state = AuthState(error: error.toString());
@@ -96,6 +124,7 @@ class AuthController extends Notifier<AuthState> {
         passenger: result.passenger,
         otpDeliveryMessage: result.deliveryMessage,
       );
+      ref.invalidate(biometricStatusProvider);
       return true;
     } catch (error) {
       state = AuthState(error: error.toString());
@@ -105,8 +134,14 @@ class AuthController extends Notifier<AuthState> {
 
   Future<void> logout() async {
     state = state.copyWith(isLoading: true, clearError: true);
-    await ref.read(authRepositoryProvider).logout();
-    state = const AuthState();
+    try {
+      await ref.read(authRepositoryProvider).logout();
+      state = const AuthState();
+      ref.invalidate(biometricStatusProvider);
+    } catch (error) {
+      state = state.copyWith(isLoading: false, error: error.toString());
+      rethrow;
+    }
   }
 
   void replacePassenger(PassengerAccount passenger) {
@@ -122,6 +157,8 @@ class AuthController extends Notifier<AuthState> {
       await ref.read(authRepositoryProvider).clearLocalSession();
     } catch (_) {
       // Session restoration will reject and remove the revoked token.
+    } finally {
+      ref.invalidate(biometricStatusProvider);
     }
   }
 
@@ -129,5 +166,9 @@ class AuthController extends Notifier<AuthState> {
     state = const AuthState(
       error: 'Your session expired. Please sign in again.',
     );
+  }
+
+  void lockForQuickLogin() {
+    state = const AuthState();
   }
 }

@@ -117,6 +117,7 @@ final appRouter = GoRouter(
       builder: (_, state) => AppShell(
         child: PaymentScreen(
           bookingId: int.tryParse(state.pathParameters['bookingId'] ?? '') ?? 0,
+          openCheckoutOnEntry: state.uri.queryParameters['checkout'] == '1',
           initialBooking: state.extra is BookingSummary
               ? state.extra as BookingSummary
               : null,

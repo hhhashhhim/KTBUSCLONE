@@ -28,7 +28,8 @@ class PaymentMethodSelector extends StatelessWidget {
     final sandbox = environment == 'sandbox';
     // Show supported gateways even before setup, but only the API can
     // enable a method for this quote.
-    final methods = <String>{...availableMethods, 'jazzcash', 'bank_alfalah'};
+    final available = availableMethods.where(isSelectablePaymentMethod).toSet();
+    final methods = <String>{...available, 'bank_alfalah'};
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -63,14 +64,13 @@ class PaymentMethodSelector extends StatelessWidget {
             child: _PaymentMethodCard(
               method: method,
               sandbox: sandbox,
-              selected:
-                  availableMethods.contains(method) && selectedMethod == method,
-              onTap: availableMethods.contains(method)
+              selected: available.contains(method) && selectedMethod == method,
+              onTap: available.contains(method)
                   ? () => onSelected(method)
                   : null,
             ),
           ),
-        if (availableMethods.isEmpty)
+        if (available.isEmpty)
           AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +138,6 @@ class _PaymentMethodCard extends StatelessWidget {
                     : AppColors.muted,
                 child: Icon(switch (method) {
                   'bank_alfalah' => Icons.credit_card_rounded,
-                  'jazzcash' => Icons.phone_android_rounded,
                   _ => Icons.payments_outlined,
                 }),
               ),
@@ -155,12 +154,10 @@ class _PaymentMethodCard extends StatelessWidget {
                         color: enabled ? AppColors.foreground : AppColors.muted,
                       ),
                     ),
-                    if (method == 'jazzcash' || method == 'bank_alfalah') ...[
+                    if (method == 'bank_alfalah') ...[
                       const SizedBox(height: 4),
                       Text(
-                        method == 'jazzcash'
-                            ? 'Pay from your JazzCash mobile account.'
-                            : 'Pay securely through Bank Alfalah checkout.',
+                        'Pay securely through Bank Alfalah checkout.',
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.muted,

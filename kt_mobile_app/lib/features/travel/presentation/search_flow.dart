@@ -14,7 +14,7 @@ import '../domain/travel_models.dart';
 String formatPkr(num amount) => NumberFormat.currency(
   locale: 'en_PK',
   symbol: 'PKR ',
-  decimalDigits: 0,
+  decimalDigits: amount % 1 == 0 ? 0 : 2,
 ).format(amount);
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -1106,6 +1106,9 @@ class _FareSummary extends StatelessWidget {
         _line('Taxes', quote.taxes),
         _line('Service fees', quote.fees),
         if (quote.discount > 0) _line('Discount', -quote.discount),
+        if (quote.surcharge != 0) _line('Surcharge', quote.surcharge),
+        if (quote.roundingAdjustment != 0)
+          _line('Rounding adjustment', quote.roundingAdjustment),
         if (quote.walletDeduction > 0) _line('Wallet', -quote.walletDeduction),
         const Divider(),
         Row(

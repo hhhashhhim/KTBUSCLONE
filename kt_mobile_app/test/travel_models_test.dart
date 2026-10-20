@@ -2,6 +2,49 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kt_mobile_app/features/travel/domain/travel_models.dart';
 
 void main() {
+  test(
+    'new quotes exclude JazzCash and unsupported methods from an old API',
+    () {
+      final quote = FareQuote.fromJson({
+        'quote_token': 'legacy-methods',
+        'base_fare': 2500,
+        'total': 2500,
+        'payment_methods': ['jazzcash', 'counter', 'bank_alfalah', 'unknown'],
+      });
+      expect(quote.paymentMethods, ['counter', 'bank_alfalah']);
+    },
+  );
+
+  test('quote preserves separate adjustments and the authoritative total', () {
+    final quote = FareQuote.fromJson({
+      'quote_token': 'test-quote',
+      'base_fare': 2500,
+      'discount': 31.25,
+      'surcharge': 0,
+      'rounding_adjustment': -18.75,
+      'wallet_deduction': 100.25,
+      'total': 2349.75,
+    });
+
+    expect(quote.discount, 31.25);
+    expect(quote.surcharge, 0);
+    expect(quote.roundingAdjustment, -18.75);
+    expect(quote.walletDeduction, 100.25);
+    expect(quote.total, 2349.75);
+  });
+
+  test('older quote responses default new adjustments to zero', () {
+    final quote = FareQuote.fromJson({
+      'quote_token': 'old-quote',
+      'base_fare': 2500,
+      'total': 2600,
+    });
+
+    expect(quote.surcharge, 0);
+    expect(quote.roundingAdjustment, 0);
+    expect(quote.total, 2600);
+  });
+
   test('schedule parser preserves server-provided fare and availability', () {
     final schedule = TravelSchedule.fromJson({
       'id': 7,

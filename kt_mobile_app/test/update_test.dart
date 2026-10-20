@@ -37,6 +37,46 @@ class ReadyStartupController extends StartupController {
 }
 
 void main() {
+  test('blank optional configuration values are treated as unavailable', () {
+    final config = MobileAppConfig.fromJson({
+      'support_phone': '',
+      'support_whatsapp': '   ',
+      'support_email': ' info@kainattravels.com ',
+      'android_store_url': '',
+      'ios_store_url': ' ',
+    });
+    expect(config.supportPhone, isNull);
+    expect(config.supportWhatsapp, isNull);
+    expect(config.supportEmail, 'info@kainattravels.com');
+    expect(config.androidStoreUrl, isNull);
+    expect(config.iosStoreUrl, isNull);
+  });
+
+  testWidgets('missing store link retains the update gate and offers support', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          mobileAppConfigProvider.overrideWithValue(release()),
+          immediateUpdateProvider.overrideWithValue(() async => false),
+        ],
+        child: const MaterialApp(home: ForceUpdateScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Update now'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('The update link is unavailable. Please contact support.'),
+      findsOneWidget,
+    );
+    expect(find.text('Contact support'), findsOneWidget);
+    expect(find.text('Check again'), findsOneWidget);
+    expect(tester.widget<PopScope>(find.byType(PopScope)).canPop, isFalse);
+    expect(find.text('Update required'), findsOneWidget);
+  });
+
   testWidgets('routine policy refresh preserves the active search route', (
     tester,
   ) async {

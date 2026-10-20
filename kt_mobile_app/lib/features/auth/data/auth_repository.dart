@@ -1,12 +1,16 @@
 import '../../../core/network/api_client.dart';
+import '../../../core/network/api_exception.dart';
 import '../../../core/storage/token_storage.dart';
+import '../../../core/storage/biometric_vault.dart';
 import '../domain/passenger.dart';
 
 class AuthRepository {
-  AuthRepository(this._api, this._tokens);
+  AuthRepository(this._api, this._tokens, {BiometricVault? biometricVault})
+    : _biometricVault = biometricVault;
 
   final ApiClient _api;
   final TokenStorage _tokens;
+  final BiometricVault? _biometricVault;
 
   Future<PassengerAccount> login({
     required String mobile,
@@ -18,6 +22,7 @@ class AuthRepository {
         data: {'mobile': mobile, 'password': password},
       ),
     );
+    await _biometricVault?.clear();
     await _tokens.write(data['token'].toString());
     return PassengerAccount.fromJson(_asMap(data['passenger']));
   }
@@ -43,6 +48,7 @@ class AuthRepository {
         },
       ),
     );
+    await _biometricVault?.clear();
     await _tokens.write(data['token'].toString());
     return RegistrationResult(
       passenger: PassengerAccount.fromJson(_asMap(data['passenger'])),
@@ -54,11 +60,13 @@ class AuthRepository {
   }
 
   Future<PassengerAccount?> restore() async {
+    if ((await _biometricVault?.status())?.enabled == true) return null;
     final token = await _tokens.read();
     if (token == null || token.isEmpty) return null;
     try {
       return PassengerAccount.fromJson(_asMap(await _api.get('/profile')));
-    } catch (_) {
+    } on ApiException catch (error) {
+      if (error.statusCode != 401) rethrow;
       await _tokens.clear();
       return null;
     }
@@ -67,8 +75,11 @@ class AuthRepository {
   Future<void> logout() async {
     try {
       await _api.post('/auth/logout');
+    } on ApiException {
+      // Signing out locally must still work when the server is unreachable.
     } finally {
       await _tokens.clear();
+      await _biometricVault?.clear();
     }
   }
 
@@ -82,7 +93,10 @@ class AuthRepository {
     );
   }
 
-  Future<void> clearLocalSession() => _tokens.clear();
+  Future<void> clearLocalSession() async {
+    await _tokens.clear();
+    await _biometricVault?.clear();
+  }
 
   Future<PasswordResetSession> verifyPasswordResetOtp({
     required String mobile,

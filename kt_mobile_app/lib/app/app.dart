@@ -20,6 +20,7 @@ class _KainatTravelsAppState extends ConsumerState<KainatTravelsApp>
     with WidgetsBindingObserver {
   late final StreamSubscription<void> _unauthorizedSubscription;
   Timer? _updateTimer;
+  DateTime? _backgroundedAt;
 
   @override
   void initState() {
@@ -48,9 +49,26 @@ class _KainatTravelsAppState extends ConsumerState<KainatTravelsApp>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) _backgroundedAt = DateTime.now();
     if (state == AppLifecycleState.resumed) {
+      final away = _backgroundedAt;
+      _backgroundedAt = null;
+      if (away != null &&
+          DateTime.now().difference(away) >= const Duration(minutes: 1)) {
+        unawaited(_lockQuickLogin());
+      }
       ref.read(startupControllerProvider.notifier).checkForUpdates();
     }
+  }
+
+  Future<void> _lockQuickLogin() async {
+    if (!(await ref.read(biometricVaultProvider).status()).enabled || !mounted) {
+      return;
+    }
+    await ref.read(tokenStorageProvider).clear();
+    if (!mounted) return;
+    ref.read(authControllerProvider.notifier).lockForQuickLogin();
+    appRouter.go('/login');
   }
 
   @override

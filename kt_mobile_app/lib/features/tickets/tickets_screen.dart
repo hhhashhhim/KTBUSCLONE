@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +11,7 @@ import '../../core/theme/app_gradients.dart';
 import '../../core/theme/app_radius.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/app_widgets.dart';
+import '../payments/domain/booking_payment_action.dart';
 import '../startup/application/startup_controller.dart';
 import '../travel/application/travel_providers.dart';
 import '../travel/domain/travel_models.dart';
@@ -21,8 +24,32 @@ class TicketsScreen extends ConsumerStatefulWidget {
   ConsumerState<TicketsScreen> createState() => _TicketsScreenState();
 }
 
-class _TicketsScreenState extends ConsumerState<TicketsScreen> {
+class _TicketsScreenState extends ConsumerState<TicketsScreen>
+    with WidgetsBindingObserver {
   int _tab = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.invalidate(bookingsProvider);
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed &&
+        ModalRoute.of(context)?.isCurrent == true) {
+      ref.invalidate(bookingsProvider);
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,13 +190,16 @@ class _TripsTab extends StatelessWidget {
   );
 }
 
-class _BookingCard extends StatelessWidget {
+class _BookingCard extends ConsumerWidget {
   const _BookingCard({required this.booking});
   final BookingSummary booking;
 
   @override
-  Widget build(BuildContext context) => AppCard(
-    onTap: () => context.push('/tickets/${booking.id}'),
+  Widget build(BuildContext context, WidgetRef ref) => AppCard(
+    onTap: () async {
+      await context.push('/tickets/${booking.id}');
+      if (context.mounted) ref.invalidate(bookingsProvider);
+    },
     child: Column(
       children: [
         Row(
@@ -245,13 +275,110 @@ class TicketDetailScreen extends ConsumerStatefulWidget {
   ConsumerState<TicketDetailScreen> createState() => _TicketDetailScreenState();
 }
 
-class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
+class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen>
+    with WidgetsBindingObserver {
   late Future<BookingSummary> _request;
+  BookingSummary? _lastBooking;
+  String? _paymentError;
+  bool _loading = false;
+  bool _openingPayment = false;
+  Timer? _timer;
+  String? _checkedExpiry;
 
   @override
   void initState() {
     super.initState();
-    _request = ref.read(travelRepositoryProvider).booking(widget.bookingId);
+    WidgetsBinding.instance.addObserver(this);
+    _request = _fetchBooking();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      final payment = _lastBooking?.payment;
+      if (payment?.status != 'pending' ||
+          ModalRoute.of(context)?.isCurrent != true ||
+          WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed) {
+        return;
+      }
+      setState(() {});
+      if (!_loading &&
+          !payment!.expiresAt.isAfter(DateTime.now()) &&
+          _checkedExpiry != payment.id) {
+        _checkedExpiry = payment.id;
+        _reload();
+      }
+    });
+  }
+
+  Future<BookingSummary> _fetchBooking() async {
+    _loading = true;
+    _paymentError = null;
+    try {
+      final repository = ref.read(travelRepositoryProvider);
+      var booking = await repository.booking(widget.bookingId);
+      if (booking.payment != null &&
+          ['pending', 'expired'].contains(booking.payment!.status)) {
+        try {
+          booking = await repository.refreshPayment(widget.bookingId);
+        } catch (error) {
+          // Keep the booking visible, but require a successful status check
+          // before offering checkout or a replacement booking.
+          _paymentError = error.toString();
+        }
+      }
+      if (mounted) {
+        _lastBooking = booking;
+        ref.invalidate(bookingsProvider);
+      }
+      return booking;
+    } finally {
+      _loading = false;
+    }
+  }
+
+  Future<void> _reload() async {
+    if (_loading) return;
+    setState(() {
+      _request = _fetchBooking();
+    });
+    // FutureBuilder displays failures and provides a retry action.
+    try {
+      await _request;
+    } catch (_) {}
+  }
+
+  Future<void> _openPayment(
+    BookingSummary booking, {
+    bool checkout = false,
+  }) async {
+    if (_openingPayment) return;
+    _openingPayment = true;
+    try {
+      await context.push(
+        '/payments/${booking.id}${checkout ? '?checkout=1' : ''}',
+        extra: booking,
+      );
+      if (mounted) await _reload();
+    } finally {
+      _openingPayment = false;
+    }
+  }
+
+  void _bookAgain() {
+    ref.read(bookingFlowProvider.notifier).reset();
+    context.go('/search');
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed &&
+        ModalRoute.of(context)?.isCurrent == true) {
+      _reload();
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -268,178 +395,220 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
             icon: Icons.error_outline_rounded,
             title: 'Ticket unavailable',
             message: snapshot.error.toString(),
+            actionLabel: 'Try again',
+            onAction: _reload,
           );
         }
         final booking = snapshot.data!;
+        final action = _paymentError != null
+            ? BookingPaymentAction.checkPaymentStatus
+            : bookingPaymentAction(booking);
         final support = ref.watch(mobileAppConfigProvider);
-        return ListView(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          children: [
-            Container(
-              decoration: const BoxDecoration(
-                gradient: AppGradients.ticket,
-                borderRadius: AppRadius.card,
-              ),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            const Text(
-                              'E-TICKET',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 10,
-                                letterSpacing: 1.2,
+        return RefreshIndicator(
+          onRefresh: _reload,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(AppSpacing.md),
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  gradient: AppGradients.ticket,
+                  borderRadius: AppRadius.card,
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              const Text(
+                                'E-TICKET',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 10,
+                                  letterSpacing: 1.2,
+                                ),
                               ),
-                            ),
-                            const Spacer(),
-                            Text(
-                              booking.reference,
-                              style: const TextStyle(
-                                color: AppColors.gold,
-                                fontWeight: FontWeight.w800,
+                              const Spacer(),
+                              Text(
+                                booking.reference,
+                                style: const TextStyle(
+                                  color: AppColors.gold,
+                                  fontWeight: FontWeight.w800,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _ticketCity(booking.originName, false),
-                            ),
-                            const Icon(
-                              Icons.directions_bus_rounded,
-                              color: AppColors.gold,
-                            ),
-                            Expanded(
-                              child: _ticketCity(booking.destinationName, true),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          DateFormat(
-                            'EEEE, d MMMM yyyy · h:mm a',
-                          ).format(booking.departureAt),
-                          style: const TextStyle(color: Colors.white70),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      children: [
-                        if (booking.status == 'confirmed' &&
-                            booking.paymentStatus == 'paid' &&
-                            booking.qrValue != null)
-                          QrImageView(data: booking.qrValue!, size: 150)
-                        else
-                          const Icon(
-                            Icons.qr_code_2_rounded,
-                            size: 120,
-                            color: AppColors.muted,
+                            ],
                           ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          booking.status == 'confirmed' &&
-                                  booking.paymentStatus == 'paid'
-                              ? 'Show this code at boarding'
-                              : 'A boarding code is available after ticket confirmation.',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        const Divider(height: AppSpacing.lg),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Seats ${booking.seats.join(', ')}'),
-                            Text(
-                              formatPkr(booking.total),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w800,
+                          const SizedBox(height: AppSpacing.lg),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _ticketCity(booking.originName, false),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Booking: ${booking.status}'),
-                            Text('Payment: ${booking.paymentStatus}'),
-                          ],
-                        ),
-                        if (booking.passengers.isNotEmpty) ...[
-                          const Divider(height: AppSpacing.lg),
-                          ...booking.passengers.map(
-                            (passenger) => Padding(
-                              padding: const EdgeInsets.only(
-                                bottom: AppSpacing.xxs,
+                              const Icon(
+                                Icons.directions_bus_rounded,
+                                color: AppColors.gold,
                               ),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.person_outline_rounded,
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: AppSpacing.xs),
-                                  Expanded(child: Text(passenger.fullName)),
-                                  Text('Seat ${passenger.seatNumber}'),
-                                ],
+                              Expanded(
+                                child: _ticketCity(
+                                  booking.destinationName,
+                                  true,
+                                ),
                               ),
-                            ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            DateFormat(
+                              'EEEE, d MMMM yyyy · h:mm a',
+                            ).format(booking.departureAt),
+                            style: const TextStyle(color: Colors.white70),
                           ),
                         ],
-                      ],
+                      ),
                     ),
+                    Container(
+                      color: Colors.white,
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
+                        children: [
+                          if (booking.status == 'confirmed' &&
+                              booking.paymentStatus == 'paid' &&
+                              booking.qrValue != null)
+                            QrImageView(data: booking.qrValue!, size: 150)
+                          else
+                            const Icon(
+                              Icons.qr_code_2_rounded,
+                              size: 120,
+                              color: AppColors.muted,
+                            ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            booking.status == 'confirmed' &&
+                                    booking.paymentStatus == 'paid'
+                                ? 'Show this code at boarding'
+                                : 'A boarding code is available after ticket confirmation.',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          const Divider(height: AppSpacing.lg),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Seats ${booking.seats.join(', ')}',
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.xs),
+                              Text(
+                                formatPkr(booking.total),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text('Booking: ${booking.status}'),
+                              ),
+                              const SizedBox(width: AppSpacing.xs),
+                              Expanded(
+                                child: Text(
+                                  'Payment: ${booking.paymentStatus}',
+                                  textAlign: TextAlign.right,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (booking.passengers.isNotEmpty) ...[
+                            const Divider(height: AppSpacing.lg),
+                            ...booking.passengers.map(
+                              (passenger) => Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: AppSpacing.xxs,
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.person_outline_rounded,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: AppSpacing.xs),
+                                    Expanded(child: Text(passenger.fullName)),
+                                    Text('Seat ${passenger.seatNumber}'),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (_paymentError != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'Could not verify payment. $_paymentError',
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ],
+              if (action == BookingPaymentAction.completePayment) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Text(paymentTimeRemaining(booking.payment!.expiresAt)),
+              ],
+              if (action != BookingPaymentAction.none &&
+                  action != BookingPaymentAction.viewTicket) ...[
+                const SizedBox(height: AppSpacing.sm),
+                FilledButton(
+                  onPressed: action == BookingPaymentAction.bookAgain
+                      ? _bookAgain
+                      : () => _openPayment(
+                          booking,
+                          checkout:
+                              action == BookingPaymentAction.completePayment,
+                        ),
+                  child: Text(action.label),
+                ),
+                if (action == BookingPaymentAction.bookAgain) ...[
+                  const Text(
+                    'Your reservation expired. Select seats again at the current fare. If you were charged, check payment status or contact support first.',
+                  ),
+                  TextButton(
+                    onPressed: () => _openPayment(booking),
+                    child: const Text('View payment status'),
                   ),
                 ],
-              ),
-            ),
-            if (booking.payment != null &&
-                booking.payment!.status != 'paid') ...[
+              ],
               const SizedBox(height: AppSpacing.sm),
-              FilledButton(
-                onPressed: () async {
-                  await context.push('/payments/${booking.id}', extra: booking);
-                  if (mounted) {
-                    setState(
-                      () => _request = ref
-                          .read(travelRepositoryProvider)
-                          .booking(widget.bookingId),
-                    );
-                  }
-                },
-                child: const Text('View payment status'),
+              AppCard(
+                color: const Color(0xFFFFF8E8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.info_outline_rounded,
+                      color: AppColors.goldDark,
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Expanded(
+                      child: Text(
+                        'For cancellation, refund, or rescheduling, please contact Kainat Travels Call Centre or the nearest branch.${support?.supportPhone == null ? '' : ' Call ${support!.supportPhone}.'}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
-            const SizedBox(height: AppSpacing.sm),
-            AppCard(
-              color: const Color(0xFFFFF8E8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(
-                    Icons.info_outline_rounded,
-                    color: AppColors.goldDark,
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Expanded(
-                    child: Text(
-                      'For cancellation, refund, or rescheduling, please contact Kainat Travels Call Centre or the nearest branch.${support?.supportPhone == null ? '' : ' Call ${support!.supportPhone}.'}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         );
       },
     ),

@@ -37,6 +37,8 @@ final schedulesProvider =
 
 final bookingsProvider = FutureProvider<List<BookingSummary>>(
   (ref) => ref.watch(travelRepositoryProvider).bookings(),
+  // Surface failures immediately so My Trips can offer an explicit retry.
+  retry: (retryCount, error) => null,
 );
 
 class BookingFlowState {

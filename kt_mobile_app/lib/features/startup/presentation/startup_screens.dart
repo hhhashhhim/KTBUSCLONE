@@ -9,6 +9,7 @@ import '../../auth/application/auth_controller.dart';
 import '../../../core/theme/app_gradients.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_widgets.dart';
+import '../../../core/widgets/support_links.dart';
 import '../application/startup_controller.dart';
 import '../application/immediate_update.dart';
 
@@ -42,67 +43,82 @@ class SplashScreen extends ConsumerWidget {
             data: (_) => const Center(
               child: CircularProgressIndicator(color: Colors.white),
             ),
-            loading: () => const Padding(
-              padding: EdgeInsets.fromLTRB(24, 80, 24, 28),
-              child: Column(
-                children: [
-                  Spacer(flex: 3),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(28)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0x33002A12),
-                          blurRadius: 28,
-                          offset: Offset(0, 10),
+            loading: () => CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(24, 80, 24, 28),
+                    child: Column(
+                      children: [
+                        Spacer(flex: 3),
+                        Container(
+                          width: 288,
+                          padding: const EdgeInsets.all(20),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(28)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0x33002A12),
+                                blurRadius: 28,
+                                offset: Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: Image.asset(
+                            'assets/images/kainat-start-logo.png',
+                            fit: BoxFit.contain,
+                            semanticLabel: 'Kainat Travels',
+                          ),
                         ),
+                        SizedBox(height: 28),
+                        Text(
+                          'Kainat Travels',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -.4,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Comfortable intercity travel across Pakistan',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white70, fontSize: 13),
+                        ),
+                        SizedBox(height: 28),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Flexible(
+                              child: Text(
+                                'Checking for updates…',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Spacer(flex: 4),
                       ],
                     ),
-                    child: SizedBox(
-                      width: 116,
-                      height: 116,
-                      child: Center(child: AppLogo(height: 64)),
-                    ),
                   ),
-                  SizedBox(height: 28),
-                  Text(
-                    'Kainat Travels',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -.4,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Comfortable intercity travel across Pakistan',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white70, fontSize: 13),
-                  ),
-                  SizedBox(height: 28),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Text(
-                        'Checking for updates…',
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  Spacer(flex: 4),
-                ],
-              ),
+                ),
+              ],
             ),
             error: (error, _) => Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
@@ -178,7 +194,11 @@ class _ForceUpdateScreenState extends ConsumerState<ForceUpdateScreen> {
           : config?.androidStoreUrl;
       if (url == null || url.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Store link is not configured yet.')),
+          const SnackBar(
+            content: Text(
+              'The update link is unavailable. Please contact support.',
+            ),
+          ),
         );
         return;
       }
@@ -213,6 +233,38 @@ class _ForceUpdateScreenState extends ConsumerState<ForceUpdateScreen> {
               'A newer version of Kainat Travels is required to continue safely.',
           actionLabel: _busy ? 'Checking for update…' : 'Update now',
           onAction: _busy ? null : () => _update(),
+        ),
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              spacing: AppSpacing.md,
+              children: [
+                TextButton.icon(
+                  onPressed: _busy
+                      ? null
+                      : () async {
+                          setState(() => _busy = true);
+                          try {
+                            await ref
+                                .read(startupControllerProvider.notifier)
+                                .checkForUpdates();
+                          } finally {
+                            if (mounted) setState(() => _busy = false);
+                          }
+                        },
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Check again'),
+                ),
+                TextButton.icon(
+                  onPressed: () => SupportLinks.open(context),
+                  icon: const Icon(Icons.support_agent_rounded),
+                  label: const Text('Contact support'),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

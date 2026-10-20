@@ -12,6 +12,8 @@ import '../auth/application/auth_controller.dart';
 import '../startup/application/startup_controller.dart';
 import '../travel/application/travel_providers.dart';
 import '../travel/domain/travel_models.dart';
+import 'fleet_photos.dart';
+import 'app_media_strip.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -24,7 +26,17 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: () => ref.refresh(bookingsProvider.future),
+          onRefresh: () async {
+            // Refresh both requests even when one fails; each section owns its error state.
+            await Future.wait([
+              ref
+                  .refresh(bookingsProvider.future)
+                  .then<void>((_) {}, onError: (Object _, StackTrace __) {}),
+              ref
+                  .refresh(fleetGalleryProvider.future)
+                  .then<void>((_) {}, onError: (Object _, StackTrace __) {}),
+            ]);
+          },
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
             children: [
@@ -113,6 +125,7 @@ class HomeScreen extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 14),
+              const AppMediaStrip(placement: 'home_banner'),
               AppCard(
                 padding: const EdgeInsets.all(16),
                 onTap: () => context.go('/search'),
@@ -239,6 +252,10 @@ class HomeScreen extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 18),
+              const AppMediaStrip(
+                placement: 'home_promotion',
+                heading: 'Travel highlights',
+              ),
               const _BusSeatGuideBanner(),
               const SizedBox(height: 16),
               const _FleetSection(),
@@ -480,9 +497,8 @@ class _QuickAction extends StatelessWidget {
 }
 
 class _FleetCard extends StatelessWidget {
-  const _FleetCard({required this.imageUrl, required this.label});
-  final String imageUrl;
-  final String label;
+  const _FleetCard({required this.photo});
+  final FleetPhoto photo;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -497,20 +513,7 @@ class _FleetCard extends StatelessWidget {
     child: Stack(
       fit: StackFit.expand,
       children: [
-        Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => const ColoredBox(
-            color: AppColors.primarySoft,
-            child: Center(
-              child: Icon(
-                Icons.directions_bus_rounded,
-                size: 42,
-                color: AppColors.primary,
-              ),
-            ),
-          ),
-        ),
+        FleetPhotoImage(photo: photo),
         const DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -526,7 +529,7 @@ class _FleetCard extends StatelessWidget {
           right: 13,
           bottom: 11,
           child: Text(
-            label,
+            photo.title,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 12,
@@ -577,7 +580,7 @@ class _FleetSectionState extends ConsumerState<_FleetSection> {
 
   @override
   Widget build(BuildContext context) {
-    final gallery = ref.watch(fleetGalleryProvider);
+    final photos = ref.watch(appPhotosProvider('home_carousel'));
     return Column(
       children: [
         Align(
@@ -590,48 +593,21 @@ class _FleetSectionState extends ConsumerState<_FleetSection> {
         ),
         SizedBox(
           height: 158,
-          child: gallery.when(
-            loading: () => const Center(
-              child: SizedBox(
-                height: 26,
-                width: 26,
-                child: CircularProgressIndicator(strokeWidth: 2),
+          child: Scrollbar(
+            controller: _controller,
+            child: ListView.builder(
+              controller: _controller,
+              primary: false,
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              itemCount: photos.length,
+              itemBuilder: (context, index) => InkWell(
+                onTap: () => context.push('/fleet'),
+                child: _FleetCard(photo: photos[index]),
               ),
             ),
-            error: (_, _) => Center(
-              child: TextButton.icon(
-                onPressed: () => ref.invalidate(fleetGalleryProvider),
-                icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Could not load fleet gallery'),
-              ),
-            ),
-            data: (items) {
-              if (items.isEmpty) {
-                return const Center(
-                  child: Text(
-                    'Fleet photos will appear here when added by Kainat Travels.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: AppColors.muted, fontSize: 12),
-                  ),
-                );
-              }
-              return Scrollbar(
-                controller: _controller,
-                child: ListView.builder(
-                  controller: _controller,
-                  primary: false,
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics(),
-                  ),
-                  itemCount: items.length,
-                  itemBuilder: (context, index) => _FleetCard(
-                    imageUrl: items[index].imageUrl,
-                    label: items[index].title,
-                  ),
-                ),
-              );
-            },
           ),
         ),
       ],

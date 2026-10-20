@@ -11,33 +11,43 @@ import 'package:kt_mobile_app/features/travel/data/travel_repository.dart';
 import 'package:kt_mobile_app/features/travel/domain/travel_models.dart';
 import 'package:kt_mobile_app/features/travel/presentation/lovable_search_flow.dart';
 
-BookingSummary booking({String state = 'pending', String? checkoutUrl}) =>
-    BookingSummary.fromJson({
-      'id': 42,
-      'reference': 'KT-00000042',
-      'status': state == 'paid' ? 'confirmed' : state,
-      'payment_status': ['paid', 'review_required'].contains(state)
-          ? 'paid'
-          : state,
-      'origin_name': 'Lahore',
-      'destination_name': 'Islamabad',
-      'departure_at': '2099-09-12T12:00:00+05:00',
-      'seats': ['1'],
-      'total': 2500,
-      'payment': {
-        'id': 'payment-test',
-        'method': 'jazzcash',
-        'status': state,
-        'expires_at': '2099-09-12T12:00:00+05:00',
-        'checkout_url': checkoutUrl,
-      },
-    });
+BookingSummary booking({
+  String state = 'pending',
+  String? bookingStatus,
+  String? paymentStatus,
+  String? checkoutUrl,
+  String expiresAt = '2099-09-12T12:00:00+05:00',
+  String? qrValue,
+}) => BookingSummary.fromJson({
+  'id': 42,
+  'reference': 'KT-00000042',
+  'status': bookingStatus ?? (state == 'paid' ? 'confirmed' : state),
+  'payment_status':
+      paymentStatus ??
+      (['paid', 'review_required'].contains(state) ? 'paid' : state),
+  'origin_name': 'Lahore',
+  'destination_name': 'Islamabad',
+  'departure_at': '2099-09-12T12:00:00+05:00',
+  'seats': ['1'],
+  'total': 2500,
+  'qr_value': qrValue,
+  'payment': {
+    'id': 'payment-test',
+    'method': 'jazzcash',
+    'status': state,
+    'expires_at': expiresAt,
+    'checkout_url': checkoutUrl,
+  },
+});
 
 class FakeTravelRepository implements TravelRepository {
   FakeTravelRepository(this.result);
   BookingSummary result;
   int refreshes = 0;
+  int bookingReads = 0;
+  int listReads = 0;
   bool failRefresh = false;
+  bool failBooking = false;
   @override
   Future<BookingSummary> refreshPayment(int id) async {
     refreshes++;
@@ -46,7 +56,18 @@ class FakeTravelRepository implements TravelRepository {
   }
 
   @override
-  Future<BookingSummary> booking(int id) async => result;
+  Future<BookingSummary> booking(int id) async {
+    bookingReads++;
+    if (failBooking) throw Exception('Unable to load booking.');
+    return result;
+  }
+
+  @override
+  Future<List<BookingSummary>> bookings() async {
+    listReads++;
+    return [result];
+  }
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -90,7 +111,6 @@ class PreviewTravelRepository extends FakeTravelRepository {
 void main() {
   for (final scenario in [
     (preview: true, method: 'bank_alfalah'),
-    (preview: false, method: 'jazzcash'),
     (preview: false, method: 'bank_alfalah'),
   ]) {
     testWidgets(
@@ -103,9 +123,26 @@ void main() {
         final repository = PreviewTravelRepository(
           previewOnly: scenario.preview,
         );
+        final api = Uri.parse(AppEnvironmentConfig.apiBaseUrl);
+        repository.result = booking(
+          checkoutUrl: api
+              .replace(
+                scheme: 'https',
+                port: api.port,
+                path: '${api.path}/payments/payment-test/checkout',
+                query: 'signature=test',
+              )
+              .toString(),
+        );
+        var launches = 0;
         final container = ProviderContainer(
           overrides: [
             travelRepositoryProvider.overrideWithValue(repository),
+            paymentLauncherProvider.overrideWithValue((_, uri) async {
+              launches++;
+              repository.result = booking();
+              return true;
+            }),
             loyaltyWalletProvider.overrideWith(
               (ref) async => LoyaltyWallet.fromJson({'active': false}),
             ),
@@ -155,10 +192,11 @@ void main() {
             GoRoute(path: '/', builder: (_, _) => const CheckoutScreen()),
             GoRoute(
               path: '/payments/:bookingId',
-              builder: (_, state) => Scaffold(
-                body: Text(
-                  'Payment for booking ${state.pathParameters['bookingId']}',
-                ),
+              builder: (_, state) => PaymentScreen(
+                bookingId: int.parse(state.pathParameters['bookingId']!),
+                initialBooking: state.extra as BookingSummary,
+                openCheckoutOnEntry:
+                    state.uri.queryParameters['checkout'] == '1',
               ),
             ),
           ],
@@ -175,8 +213,7 @@ void main() {
           find.text('Live preview · No payments'),
           scenario.preview ? findsOneWidget : findsNothing,
         );
-        expect(find.text(paymentMethodLabel('jazzcash')), findsOneWidget);
-        expect(find.text('JazzCash Mobile Account'), findsOneWidget);
+        expect(find.text(paymentMethodLabel('jazzcash')), findsNothing);
         expect(find.text('Debit / Credit Card'), findsOneWidget);
         await tester.tap(find.text(paymentMethodLabel(scenario.method)));
         await tester.pumpAndSettle();
@@ -193,10 +230,12 @@ void main() {
         await tester.tap(submit);
         await tester.pumpAndSettle();
         expect(repository.submissions, scenario.preview ? 0 : 1);
+        expect(launches, scenario.preview ? 0 : 1);
         if (!scenario.preview) {
           expect(repository.submittedMethod, scenario.method);
           expect(repository.submittedQuote, 'preview-test');
-          expect(find.text('Payment for booking 42'), findsOneWidget);
+          expect(find.text('Payment awaiting verification'), findsOneWidget);
+          expect(repository.refreshes, 2);
         }
         await tester.pumpWidget(const SizedBox());
       },
@@ -220,9 +259,9 @@ void main() {
           ),
         ),
       );
-      expect(find.text('Currently unavailable'), findsNWidgets(2));
+      expect(find.text('Currently unavailable'), findsOneWidget);
       expect(find.text('Currently unavailable in sandbox'), findsNothing);
-      await tester.tap(find.text('JazzCash Mobile Account'));
+      expect(find.text('JazzCash Mobile Account'), findsNothing);
       await tester.tap(find.text('Debit / Credit Card'));
       expect(selected, isNull);
       await tester.tap(find.text('Pay at Branch'));
@@ -249,37 +288,38 @@ void main() {
       ),
     );
     expect(find.text('Sandbox · Test payments'), findsOneWidget);
-    expect(find.text('Currently unavailable in sandbox'), findsNWidgets(2));
-    await tester.tap(find.text(paymentMethodLabel('jazzcash')));
+    expect(find.text('Currently unavailable in sandbox'), findsOneWidget);
+    expect(find.text(paymentMethodLabel('jazzcash')), findsNothing);
     await tester.tap(find.text(paymentMethodLabel('bank_alfalah')));
     expect(selected, isNull);
     await tester.tap(find.text('Check again'));
     expect(retries, 1);
   });
 
-  testWidgets('only gateways offered by the API can be selected', (
-    tester,
-  ) async {
-    String? selected;
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: PaymentMethodSelector(
-            availableMethods: const ['jazzcash'],
-            environment: 'sandbox',
-            selectedMethod: null,
-            onSelected: (method) => selected = method,
-            onRetry: () {},
+  testWidgets(
+    'an older API offering only JazzCash has no selectable checkout',
+    (tester) async {
+      String? selected;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PaymentMethodSelector(
+              availableMethods: const ['jazzcash'],
+              environment: 'sandbox',
+              selectedMethod: null,
+              onSelected: (method) => selected = method,
+              onRetry: () {},
+            ),
           ),
         ),
-      ),
-    );
-    await tester.tap(find.text(paymentMethodLabel('bank_alfalah')));
-    expect(selected, isNull);
-    await tester.tap(find.text(paymentMethodLabel('jazzcash')));
-    expect(selected, 'jazzcash');
-    expect(find.text('Check again'), findsNothing);
-  });
+      );
+      await tester.tap(find.text(paymentMethodLabel('bank_alfalah')));
+      expect(selected, isNull);
+      expect(find.text(paymentMethodLabel('jazzcash')), findsNothing);
+      expect(selected, isNull);
+      expect(find.text('Check again'), findsOneWidget);
+    },
+  );
 
   test(
     'HTTP checkout is accepted only with explicit local sandbox permission',
@@ -336,7 +376,7 @@ void main() {
   ) async {
     final repository = FakeTravelRepository(booking());
     await pumpPayment(tester, repository);
-    expect(find.text('Complete your payment'), findsOneWidget);
+    expect(find.text('Payment awaiting verification'), findsOneWidget);
     expect(find.text('View ticket'), findsNothing);
     repository.result = booking(state: 'paid');
     await tester.tap(find.text('Check payment status'));
@@ -368,7 +408,7 @@ void main() {
     ) async {
       await pumpPayment(tester, FakeTravelRepository(booking(state: state)));
       expect(find.text('View ticket'), findsNothing);
-      expect(find.text('Open secure checkout'), findsNothing);
+      expect(find.text('Complete payment'), findsNothing);
       expect(find.text('Booking details & support'), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
     });
@@ -396,7 +436,7 @@ void main() {
         return true;
       },
     );
-    await tester.tap(find.text('Open secure checkout'));
+    await tester.tap(find.text('Complete payment'));
     await tester.pumpAndSettle();
     expect(launches, 1);
     expect(find.text('View ticket'), findsNothing);
@@ -409,13 +449,18 @@ Future<void> pumpPayment(
   WidgetTester tester,
   FakeTravelRepository repository, {
   Future<bool> Function(Uri)? launcher,
+  bool openCheckoutOnEntry = false,
+  bool settle = true,
 }) async {
   final router = GoRouter(
     routes: [
       GoRoute(
         path: '/',
-        builder: (_, _) =>
-            PaymentScreen(bookingId: 42, initialBooking: repository.result),
+        builder: (_, _) => PaymentScreen(
+          bookingId: 42,
+          initialBooking: repository.result,
+          openCheckoutOnEntry: openCheckoutOnEntry,
+        ),
       ),
     ],
   );
@@ -425,10 +470,10 @@ Future<void> pumpPayment(
       overrides: [
         travelRepositoryProvider.overrideWithValue(repository),
         if (launcher != null)
-          paymentLauncherProvider.overrideWithValue(launcher),
+          paymentLauncherProvider.overrideWithValue((_, uri) => launcher(uri)),
       ],
       child: MaterialApp.router(routerConfig: router),
     ),
   );
-  await tester.pumpAndSettle();
+  if (settle) await tester.pumpAndSettle();
 }

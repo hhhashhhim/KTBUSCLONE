@@ -2,6 +2,6 @@
 <resources>
     <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowSplashScreenBackground">@color/kainat_green</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/launch_image</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/launch_image_android12</item>
     </style>
 </resources>

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_gradients.dart';
@@ -9,8 +8,10 @@ import '../../core/theme/app_radius.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/app_widgets.dart';
 import '../../core/widgets/legal_links.dart';
+import '../../core/widgets/support_links.dart';
 import '../auth/application/auth_controller.dart';
 import '../startup/application/startup_controller.dart';
+import 'biometric_login_tile.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -85,6 +86,8 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
+          const BiometricLoginTile(),
+          const SizedBox(height: AppSpacing.md),
           AppCard(
             child: Column(
               children: [
@@ -136,11 +139,13 @@ class ProfileScreen extends ConsumerWidget {
                 _tile(
                   Icons.support_agent_rounded,
                   'Help & support',
-                  config?.supportPhone ?? 'Contact details not configured',
-                  onTap: config?.supportPhone == null
-                      ? null
-                      : () =>
-                            launchUrl(Uri.parse('tel:${config!.supportPhone}')),
+                  config?.supportPhone ?? 'Contact Kainat Travels',
+                  onTap: () => SupportLinks.open(
+                    context,
+                    config?.supportPhone == null
+                        ? null
+                        : Uri.parse('tel:${config!.supportPhone}'),
+                  ),
                 ),
                 if (config?.supportWhatsapp != null) ...[
                   const Divider(),
@@ -148,11 +153,11 @@ class ProfileScreen extends ConsumerWidget {
                     Icons.chat_outlined,
                     'WhatsApp support',
                     config!.supportWhatsapp!,
-                    onTap: () => launchUrl(
+                    onTap: () => SupportLinks.open(
+                      context,
                       Uri.parse(
                         'https://wa.me/${config.supportWhatsapp!.replaceAll(RegExp(r'\D'), '')}',
                       ),
-                      mode: LaunchMode.externalApplication,
                     ),
                   ),
                 ],
@@ -162,8 +167,10 @@ class ProfileScreen extends ConsumerWidget {
                     Icons.email_outlined,
                     'Email support',
                     config!.supportEmail!,
-                    onTap: () =>
-                        launchUrl(Uri.parse('mailto:${config.supportEmail}')),
+                    onTap: () => SupportLinks.open(
+                      context,
+                      Uri(scheme: 'mailto', path: config.supportEmail!),
+                    ),
                   ),
                 ],
               ],
@@ -191,10 +198,23 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           OutlinedButton.icon(
-            onPressed: () async {
-              await ref.read(authControllerProvider.notifier).logout();
-              if (context.mounted) context.go('/login');
-            },
+            onPressed: ref.watch(authControllerProvider).isLoading
+                ? null
+                : () async {
+                    try {
+                      await ref.read(authControllerProvider.notifier).logout();
+                      if (context.mounted) context.go('/login');
+                    } catch (_) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Unable to sign out. Please try again.',
+                          ),
+                        ),
+                      );
+                    }
+                  },
             icon: const Icon(Icons.logout_rounded),
             label: const Text('Sign out'),
           ),

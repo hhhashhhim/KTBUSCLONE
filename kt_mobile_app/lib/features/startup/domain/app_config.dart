@@ -54,14 +54,19 @@ class MobileAppConfig {
             .toString(),
         forceUpdate: json['force_update'] == true,
         maintenanceMode: json['maintenance_mode'] == true,
-        maintenanceMessage: json['maintenance_message']?.toString(),
-        androidStoreUrl: json['android_store_url']?.toString(),
-        iosStoreUrl: json['ios_store_url']?.toString(),
-        supportPhone: json['support_phone']?.toString(),
-        supportWhatsapp: json['support_whatsapp']?.toString(),
-        supportEmail: json['support_email']?.toString(),
+        maintenanceMessage: _nonEmpty(json['maintenance_message']),
+        androidStoreUrl: _nonEmpty(json['android_store_url']),
+        iosStoreUrl: _nonEmpty(json['ios_store_url']),
+        supportPhone: _nonEmpty(json['support_phone']),
+        supportWhatsapp: _nonEmpty(json['support_whatsapp']),
+        supportEmail: _nonEmpty(json['support_email']),
         features: AppFeatureFlags.fromJson(
           (json['features'] as Map?)?.cast<String, dynamic>() ?? const {},
         ),
       );
+
+  static String? _nonEmpty(dynamic value) {
+    final text = value?.toString().trim();
+    return text == null || text.isEmpty ? null : text;
+  }
 }

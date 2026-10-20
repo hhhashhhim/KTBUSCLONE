@@ -244,6 +244,8 @@ class FareQuote {
     required this.taxes,
     required this.fees,
     required this.discount,
+    this.surcharge = 0,
+    this.roundingAdjustment = 0,
     required this.walletDeduction,
     this.walletPointsUsed = 0,
     required this.total,
@@ -258,6 +260,8 @@ class FareQuote {
   final double taxes;
   final double fees;
   final double discount;
+  final double surcharge;
+  final double roundingAdjustment;
   final double walletDeduction;
   final int walletPointsUsed;
   final double total;
@@ -272,6 +276,8 @@ class FareQuote {
     taxes: (json['taxes'] as num?)?.toDouble() ?? 0,
     fees: (json['fees'] as num?)?.toDouble() ?? 0,
     discount: (json['discount'] as num?)?.toDouble() ?? 0,
+    surcharge: (json['surcharge'] as num?)?.toDouble() ?? 0,
+    roundingAdjustment: (json['rounding_adjustment'] as num?)?.toDouble() ?? 0,
     walletDeduction: (json['wallet_deduction'] as num?)?.toDouble() ?? 0,
     walletPointsUsed: (json['wallet_points_used'] as num?)?.toInt() ?? 0,
     total: (json['total'] as num).toDouble(),
@@ -280,6 +286,7 @@ class FareQuote {
     paymentPreview: json['payment_preview'] == true,
     paymentMethods: ((json['payment_methods'] as List?) ?? const [])
         .map((item) => item.toString())
+        .where(isSelectablePaymentMethod)
         .toList(),
   );
 }
@@ -291,6 +298,7 @@ class FleetMedia {
     required this.mediaType,
     required this.imageUrl,
     this.busClassName,
+    this.placements = const ['home_carousel', 'bus_guide'],
   });
 
   final int id;
@@ -298,6 +306,7 @@ class FleetMedia {
   final String mediaType;
   final String imageUrl;
   final String? busClassName;
+  final List<String> placements;
 
   factory FleetMedia.fromJson(Map<String, dynamic> json) {
     final busClass = (json['bus_class'] as Map?)?.cast<String, dynamic>();
@@ -307,6 +316,21 @@ class FleetMedia {
       mediaType: (json['media_type'] ?? 'exterior').toString(),
       imageUrl: (json['image_url'] ?? '').toString(),
       busClassName: busClass?['name']?.toString(),
+      placements: json['placements'] == null
+          ? const ['home_carousel', 'bus_guide']
+          : (json['placements'] is List
+                ? (json['placements'] as List)
+                      .whereType<String>()
+                      .where(
+                        (value) => const [
+                          'home_banner',
+                          'home_carousel',
+                          'bus_guide',
+                          'home_promotion',
+                        ].contains(value),
+                      )
+                      .toList()
+                : const []),
     );
   }
 }

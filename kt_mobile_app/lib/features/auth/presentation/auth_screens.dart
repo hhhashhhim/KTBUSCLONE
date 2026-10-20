@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/providers.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_widgets.dart';
 import '../../../core/widgets/legal_links.dart';
@@ -32,6 +33,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authControllerProvider);
+    final quickLogin = ref.watch(biometricStatusProvider).value;
     return _AuthScaffold(
       child: Form(
         key: _formKey,
@@ -103,6 +105,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               onPressed: auth.isLoading ? null : _submit,
               child: Text(auth.isLoading ? 'Signing in…' : 'Sign in'),
             ),
+            if (quickLogin?.enabled == true) ...[
+              const SizedBox(height: AppSpacing.sm),
+              OutlinedButton.icon(
+                onPressed: auth.isLoading ? null : _quickLogin,
+                icon: const Icon(Icons.fingerprint_rounded),
+                label: Text('Sign in with ${quickLogin!.label}'),
+              ),
+            ],
             const SizedBox(height: AppSpacing.lg),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -133,6 +143,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ref.read(authControllerProvider).passenger?.mobileVerified == true;
       context.go(verified ? '/home' : '/verify-otp');
     }
+  }
+
+  Future<void> _quickLogin() async {
+    final success = await ref
+        .read(authControllerProvider.notifier)
+        .loginWithBiometrics();
+    if (success && mounted) context.go('/home');
   }
 }
 

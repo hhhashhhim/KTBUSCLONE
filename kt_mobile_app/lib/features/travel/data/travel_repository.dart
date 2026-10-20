@@ -1,4 +1,6 @@
 import '../../../core/network/api_client.dart';
+import '../../../core/network/api_exception.dart';
+import '../../payments/domain/booking_payment.dart';
 import '../domain/travel_models.dart';
 
 class TravelRepository {
@@ -11,7 +13,7 @@ class TravelRepository {
   ).map((item) => CityOption.fromJson(_map(item))).toList();
 
   Future<List<FleetMedia>> fleet() async => _list(
-    await _api.get('/fleet'),
+    await _api.get('/fleet', queryParameters: {'include_placements': 1}),
   ).map((item) => FleetMedia.fromJson(_map(item))).toList();
 
   Future<LoyaltyWallet> wallet() async =>
@@ -110,14 +112,21 @@ class TravelRepository {
   Future<BookingSummary> createBooking({
     required String quoteToken,
     required String paymentMethod,
-  }) async => BookingSummary.fromJson(
-    _map(
-      await _api.post(
-        '/bookings',
-        data: {'quote_token': quoteToken, 'payment_method': paymentMethod},
+  }) async {
+    if (!isSelectablePaymentMethod(paymentMethod)) {
+      throw const ApiException(
+        'This payment method is no longer available. Please choose another method.',
+      );
+    }
+    return BookingSummary.fromJson(
+      _map(
+        await _api.post(
+          '/bookings',
+          data: {'quote_token': quoteToken, 'payment_method': paymentMethod},
+        ),
       ),
-    ),
-  );
+    );
+  }
 
   Future<List<BookingSummary>> bookings() async {
     final raw = await _api.get('/bookings');

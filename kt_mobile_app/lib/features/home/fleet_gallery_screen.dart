@@ -7,7 +7,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_shadows.dart';
 import '../../core/widgets/app_widgets.dart';
 import '../travel/application/travel_providers.dart';
-import '../travel/domain/travel_models.dart';
+import 'fleet_photos.dart';
 
 class FleetGalleryScreen extends ConsumerStatefulWidget {
   const FleetGalleryScreen({super.key});
@@ -22,56 +22,64 @@ class _FleetGalleryScreenState extends ConsumerState<FleetGalleryScreen> {
   @override
   Widget build(BuildContext context) {
     final gallery = ref.watch(fleetGalleryProvider);
+    final photos = ref.watch(fleetPhotosProvider);
+    final filtered = _filter == 'all'
+        ? photos
+        : photos
+              .where(
+                (photo) =>
+                    photo.mediaType == _filter || photo.category == _filter,
+              )
+              .toList();
     return Scaffold(
       appBar: AppBar(title: const Text('Bus & seat guide')),
       body: RefreshIndicator(
-        onRefresh: () => ref.refresh(fleetGalleryProvider.future),
-        child: gallery.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => AppStateView(
-            icon: Icons.directions_bus_outlined,
-            title: 'Could not load the guide',
-            message: error.toString(),
-            actionLabel: 'Try again',
-            onAction: () => ref.invalidate(fleetGalleryProvider),
-          ),
-          data: (items) {
-            final filtered = _filter == 'all'
-                ? items
-                : items.where((item) => item.mediaType == _filter).toList();
-            return ListView(
-              padding: const EdgeInsets.all(AppSpacing.md),
+        onRefresh: () async {
+          try {
+            final reload = ref.refresh(fleetGalleryProvider.future);
+            await reload;
+          } catch (_) {
+            // Bundled photos remain usable; the retry control reflects errors.
+          }
+        },
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(AppSpacing.md),
+          children: [
+            const Text(
+              'Explore our executive buses, sleeper cabins and waiting lounge.',
+              style: TextStyle(color: AppColors.muted),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
               children: [
-                const Text(
-                  'See the available bus types, cabin features and seating options before you book.',
-                  style: TextStyle(color: AppColors.muted),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    _filterChip('all', 'All'),
-                    _filterChip('exterior', 'Buses'),
-                    _filterChip('interior', 'Interiors'),
-                    _filterChip('seats', 'Seats'),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.md),
-                if (filtered.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 90),
-                    child: AppStateView(
-                      icon: Icons.photo_library_outlined,
-                      title: 'Guide coming soon',
-                      message:
-                          'Bus and seat photos will appear here when Kainat Travels adds them.',
-                    ),
-                  )
-                else
-                  ...filtered.map((item) => _MediaCard(item: item)),
+                _filterChip('all', 'All'),
+                _filterChip('Executive', 'Executive'),
+                _filterChip('Sleeper', 'Sleeper'),
+                _filterChip('lounge', 'Waiting Lounge'),
+                _filterChip('exterior', 'Buses'),
+                _filterChip('interior', 'Interiors'),
+                _filterChip('seats', 'Seats'),
               ],
-            );
-          },
+            ),
+            if (gallery.hasError)
+              TextButton.icon(
+                onPressed: () => ref.invalidate(fleetGalleryProvider),
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Retry online photos'),
+              ),
+            const SizedBox(height: AppSpacing.md),
+            if (filtered.isEmpty)
+              const AppStateView(
+                icon: Icons.photo_library_outlined,
+                title: 'No photos in this category',
+                message: 'Choose another category to explore our photos.',
+              )
+            else
+              ...filtered.map((photo) => _MediaCard(item: photo)),
+          ],
         ),
       ),
     );
@@ -92,7 +100,7 @@ class _FleetGalleryScreenState extends ConsumerState<FleetGalleryScreen> {
 class _MediaCard extends StatelessWidget {
   const _MediaCard({required this.item});
 
-  final FleetMedia item;
+  final FleetPhoto item;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -108,20 +116,7 @@ class _MediaCard extends StatelessWidget {
       children: [
         AspectRatio(
           aspectRatio: 16 / 9,
-          child: Image.network(
-            item.imageUrl,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => const ColoredBox(
-              color: AppColors.primarySoft,
-              child: Center(
-                child: Icon(
-                  Icons.directions_bus_rounded,
-                  color: AppColors.primary,
-                  size: 48,
-                ),
-              ),
-            ),
-          ),
+          child: FleetPhotoImage(photo: item),
         ),
         Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
@@ -132,10 +127,10 @@ class _MediaCard extends StatelessWidget {
                 item.title,
                 style: const TextStyle(fontWeight: FontWeight.w800),
               ),
-              if (item.busClassName != null) ...[
+              if (item.category != null) ...[
                 const SizedBox(height: 3),
                 Text(
-                  item.busClassName!,
+                  item.category!,
                   style: const TextStyle(color: AppColors.muted),
                 ),
               ],

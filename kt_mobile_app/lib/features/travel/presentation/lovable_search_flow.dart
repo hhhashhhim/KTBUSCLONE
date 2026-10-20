@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,8 +14,11 @@ import '../../payments/presentation/payment_method_selector.dart';
 import '../application/travel_providers.dart';
 import '../domain/travel_models.dart';
 
-String formatPkr(num amount) =>
-    'Rs. ${NumberFormat.decimalPattern('en_PK').format(amount.round())}';
+String formatPkr(num amount) => NumberFormat.currency(
+  locale: 'en_PK',
+  symbol: 'Rs. ',
+  decimalDigits: amount % 1 == 0 ? 0 : 2,
+).format(amount);
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -136,15 +141,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _DateTile(date: _date, onTap: _pickDate),
-                            ),
-                            const SizedBox(width: 10),
-                            const Expanded(child: _PassengerTile()),
-                          ],
-                        ),
+                        _DateTile(date: _date, onTap: _pickDate),
                       ],
                     ),
                   ),
@@ -494,17 +491,6 @@ class _DateTile extends StatelessWidget {
   );
 }
 
-class _PassengerTile extends StatelessWidget {
-  const _PassengerTile();
-
-  @override
-  Widget build(BuildContext context) => const _InfoTile(
-    label: 'PASSENGERS',
-    icon: Icons.people_outline_rounded,
-    value: '1',
-  );
-}
-
 class _InfoTile extends StatelessWidget {
   const _InfoTile({
     required this.label,
@@ -821,6 +807,8 @@ class _ScheduleStop extends StatelessWidget {
   );
 }
 
+const _unavailableSeatColor = Color(0xFF687A70);
+
 class SeatSelectionScreen extends ConsumerStatefulWidget {
   const SeatSelectionScreen({super.key});
 
@@ -887,26 +875,23 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
             children: [
               const _SeatLegend(),
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
-                  child: _SeatGrid(
-                    seats: result.seats,
-                    selected: flow.selectedSeats,
-                    onTap: (seat) {
-                      final changed = ref
-                          .read(bookingFlowProvider.notifier)
-                          .toggleSeat(seat, result.maximumSelectable);
-                      if (!changed && seat.selectable) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Select up to ${result.maximumSelectable} seats.',
-                            ),
+                child: _SeatGrid(
+                  seats: result.seats,
+                  selected: flow.selectedSeats,
+                  onTap: (seat) {
+                    final changed = ref
+                        .read(bookingFlowProvider.notifier)
+                        .toggleSeat(seat, result.maximumSelectable);
+                    if (!changed && seat.selectable) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Select up to ${result.maximumSelectable} seats.',
                           ),
-                        );
-                      }
-                    },
-                  ),
+                        ),
+                      );
+                    }
+                  },
                 ),
               ),
               AppStickyAction(child: _SeatFooter(flow: flow)),
@@ -923,14 +908,14 @@ class _SeatLegend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Padding(
-    padding: EdgeInsets.fromLTRB(16, 14, 16, 12),
+    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
     child: Wrap(
       spacing: 14,
       runSpacing: 8,
       children: [
         _Legend(color: AppColors.surfaceAlt, label: 'Available', border: true),
         _Legend(color: AppColors.primary, label: 'Selected'),
-        _Legend(color: Color(0xFFBCC8C0), label: 'Booked'),
+        _Legend(color: _unavailableSeatColor, label: 'Booked'),
         _Legend(color: Color(0xFFFFD48A), label: 'Ladies'),
       ],
     ),
@@ -996,75 +981,161 @@ class _SeatGrid extends StatelessWidget {
     final maxColumn = seats
         .map((seat) => seat.column)
         .reduce((a, b) => a > b ? a : b);
-    return Center(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 330),
-        padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: AppColors.border),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x1220442E),
-              blurRadius: 18,
-              offset: Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            const Row(
-              children: [
-                Text(
-                  'Front',
-                  style: TextStyle(color: AppColors.muted, fontSize: 11),
-                ),
-                Spacer(),
-                Icon(
-                  Icons.directions_bus_rounded,
-                  size: 16,
-                  color: AppColors.muted,
-                ),
-                SizedBox(width: 4),
-                Text(
-                  'Driver',
-                  style: TextStyle(color: AppColors.muted, fontSize: 11),
-                ),
-              ],
-            ),
-            const SizedBox(height: 18),
-            for (final row in rowKeys)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (var column = 0; column <= maxColumn; column++) ...[
-                      _SeatCell(
-                        seat: rows[row]!.cast<TravelSeat?>().firstWhere(
-                          (seat) => seat!.column == column,
-                          orElse: () => null,
-                        ),
-                        selected: rows[row]!.any(
-                          (seat) =>
-                              seat.column == column &&
-                              selected.any(
-                                (item) => item.number == seat.number,
-                              ),
-                        ),
-                        onTap: onTap,
+    final lookup = {
+      for (final seat in seats) '${seat.row}:${seat.column}': seat,
+    };
+    final selectedNumbers = selected.map((seat) => seat.number).toSet();
+    final textScaler = MediaQuery.textScalerOf(context);
+    final headerHeight = math.max(16.0, textScaler.scale(11) * 1.2);
+    final minimumSeatHeight = math.max(36.0, textScaler.scale(12) * 1.2 + 16);
+    final preferredSeatHeight = math.max(44.0, minimumSeatHeight);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Size against the actual space between the legend and sticky footer.
+        // Keep text at its requested scale and scroll instead of shrinking
+        // seats below their minimum usable size.
+        const outerPadding = EdgeInsets.symmetric(horizontal: 12, vertical: 4);
+        const cardPadding = EdgeInsets.symmetric(horizontal: 12, vertical: 6);
+        const headerGap = 4.0;
+        const borderWidth = 2.0;
+        final heightForRows =
+            constraints.maxHeight -
+            outerPadding.vertical -
+            cardPadding.vertical -
+            borderWidth -
+            headerHeight -
+            headerGap;
+        final rowGap = rowKeys.length == 1
+            ? 0.0
+            : ((heightForRows - rowKeys.length * preferredSeatHeight) /
+                      (rowKeys.length - 1))
+                  .clamp(0.0, 6.0);
+        final seatHeight =
+            ((heightForRows - rowGap * (rowKeys.length - 1)) / rowKeys.length)
+                .clamp(minimumSeatHeight, preferredSeatHeight);
+        final columnCount = maxColumn + 1;
+        const columnGap = 7.0;
+        final aisleGap = maxColumn >= 3 ? 16.0 : 0.0;
+        final cardWidth = math.min(
+          330.0,
+          constraints.maxWidth - outerPadding.horizontal,
+        );
+        final minimumSeatWidth = math.max(44.0, textScaler.scale(12) * 2 + 16);
+        final seatWidth =
+            ((cardWidth -
+                        cardPadding.horizontal -
+                        borderWidth -
+                        aisleGap -
+                        columnGap * maxColumn) /
+                    columnCount)
+                .clamp(minimumSeatWidth, math.max(48.0, minimumSeatWidth))
+                .toDouble();
+        final contentWidth = math.max(
+          cardWidth,
+          seatWidth * columnCount +
+              columnGap * maxColumn +
+              aisleGap +
+              cardPadding.horizontal +
+              borderWidth,
+        );
+
+        return SingleChildScrollView(
+          key: const ValueKey('seat-map-vertical-scroll'),
+          padding: outerPadding,
+          child: SingleChildScrollView(
+            key: const ValueKey('seat-map-horizontal-scroll'),
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: math.max(
+                constraints.maxWidth - outerPadding.horizontal,
+                contentWidth,
+              ),
+              child: Center(
+                child: Container(
+                  width: contentWidth,
+                  padding: cardPadding,
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: AppColors.border),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x1220442E),
+                        blurRadius: 18,
+                        offset: Offset(0, 5),
                       ),
-                      if (column == 1 && maxColumn >= 3)
-                        const SizedBox(width: 16),
-                      if (column < maxColumn) const SizedBox(width: 7),
                     ],
-                  ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        height: headerHeight,
+                        child: const Row(
+                          children: [
+                            Text(
+                              'Front',
+                              style: TextStyle(
+                                color: AppColors.muted,
+                                fontSize: 11,
+                                height: 1.2,
+                              ),
+                            ),
+                            Spacer(),
+                            Icon(
+                              Icons.directions_bus_rounded,
+                              size: 16,
+                              color: AppColors.muted,
+                            ),
+                            SizedBox(width: 4),
+                            Text(
+                              'Driver',
+                              style: TextStyle(
+                                color: AppColors.muted,
+                                fontSize: 11,
+                                height: 1.2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: headerGap),
+                      for (var index = 0; index < rowKeys.length; index++) ...[
+                        if (index > 0) SizedBox(height: rowGap),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            for (
+                              var column = 0;
+                              column < columnCount;
+                              column++
+                            ) ...[
+                              _SeatCell(
+                                seat: lookup['${rowKeys[index]}:$column'],
+                                selected: selectedNumbers.contains(
+                                  lookup['${rowKeys[index]}:$column']?.number,
+                                ),
+                                width: seatWidth,
+                                height: seatHeight,
+                                onTap: onTap,
+                              ),
+                              if (column == 1 && maxColumn >= 3)
+                                SizedBox(width: aisleGap),
+                              if (column < maxColumn)
+                                const SizedBox(width: columnGap),
+                            ],
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
-          ],
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -1073,17 +1144,21 @@ class _SeatCell extends StatelessWidget {
   const _SeatCell({
     required this.seat,
     required this.selected,
+    required this.width,
+    required this.height,
     required this.onTap,
   });
   final TravelSeat? seat;
   final bool selected;
+  final double width;
+  final double height;
   final ValueChanged<TravelSeat> onTap;
 
   @override
   Widget build(BuildContext context) {
     final value = seat;
     if (value == null || value.status == SeatAvailability.empty) {
-      return const SizedBox(width: 43, height: 42);
+      return SizedBox(width: width, height: height);
     }
     final booked = !value.selectable && !selected;
     final color = selected
@@ -1091,7 +1166,7 @@ class _SeatCell extends StatelessWidget {
         : value.status == SeatAvailability.female
         ? const Color(0xFFFFE0A6)
         : booked
-        ? const Color(0xFFC6CDC8)
+        ? _unavailableSeatColor
         : AppColors.surfaceAlt;
     return Semantics(
       label: 'Seat ${value.number}, ${value.status.name}',
@@ -1101,8 +1176,8 @@ class _SeatCell extends StatelessWidget {
         borderRadius: BorderRadius.circular(13),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
-          width: 43,
-          height: 42,
+          width: width,
+          height: height,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: color,
@@ -1119,7 +1194,8 @@ class _SeatCell extends StatelessWidget {
             value.number,
             style: TextStyle(
               color: selected || booked ? Colors.white : AppColors.foreground,
-              fontSize: 10.5,
+              fontSize: 12,
+              height: 1.2,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -1185,7 +1261,7 @@ class _SeatFooter extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         FilledButton(
           onPressed: flow.selectedSeats.isEmpty
               ? null
@@ -1937,7 +2013,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       if (mounted) {
         context.go(
           booking.payment != null
-              ? '/payments/${booking.id}'
+              ? '/payments/${booking.id}?checkout=1'
               : '/booking-confirmed',
           extra: booking,
         );
@@ -2027,6 +2103,9 @@ class _FareSummary extends StatelessWidget {
         if (quote.taxes != 0) _fareRow('Taxes', quote.taxes),
         if (quote.fees != 0) _fareRow('Service fee', quote.fees),
         if (quote.discount != 0) _fareRow('Discount', -quote.discount),
+        if (quote.surcharge != 0) _fareRow('Surcharge', quote.surcharge),
+        if (quote.roundingAdjustment != 0)
+          _fareRow('Rounding adjustment', quote.roundingAdjustment),
         if (quote.walletDeduction != 0)
           _fareRow('Wallet', -quote.walletDeduction),
         if (quote.walletPointsUsed != 0)

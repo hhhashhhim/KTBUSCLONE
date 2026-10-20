@@ -25,6 +25,11 @@ class BookingPayment {
   );
 }
 
+// Legacy payment methods remain readable on existing bookings, but are not
+// available for a new booking, even when an older server still advertises them.
+bool isSelectablePaymentMethod(String method) =>
+    const {'counter', 'pay_at_branch', 'bank_alfalah'}.contains(method);
+
 String paymentMethodLabel(String method) => switch (method) {
   'counter' || 'pay_at_branch' => 'Pay at Branch',
   'jazzcash' => 'JazzCash Mobile Account',
