@@ -69,7 +69,8 @@ class AuthRepository {
     final token = await _tokens.read();
     if (token == null || token.isEmpty) return null;
     try {
-      return PassengerAccount.fromJson(_asMap(await _api.get('/profile')));
+      final data = _asMap(await _api.get('/auth/session'));
+      return PassengerAccount.fromJson(_asMap(data['passenger']));
     } on ApiException catch (error) {
       if (error.statusCode != 401) rethrow;
       await _tokens.clear();
@@ -138,7 +139,18 @@ class AuthRepository {
     final data = _asMap(
       await _api.post('/auth/verify-otp', data: {'code': code}),
     );
-    return PassengerAccount.fromJson(_asMap(data['passenger']));
+    final token = data['token'];
+    if (token is! String || token.isEmpty) {
+      throw const FormatException(
+        'Verification did not return an access token.',
+      );
+    }
+    final passenger = PassengerAccount.fromJson(_asMap(data['passenger']));
+    if (!passenger.mobileVerified) {
+      throw const FormatException('Mobile verification was not confirmed.');
+    }
+    await _tokens.write(token);
+    return passenger;
   }
 
   Future<void> resendOtp() => _api.post('/auth/resend-otp');

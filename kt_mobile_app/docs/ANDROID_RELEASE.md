@@ -57,7 +57,9 @@ flutter build apk --release --dart-define-from-file=dart_defines.production.json
 
 ## Test build
 
-Version 1.0.3 (build 4) includes optional biometric quick login. Without a configured
+Version 1.0.4 (build 5) adds verified signup and replacement-token persistence.
+It requires the pending-registration migration and matching backend authentication
+changes documented in `MOBILE_DEPLOYMENT.md`. Without a configured
 upload key, produce an installable debug-signed Android APK and an iOS simulator
 app using the same API configuration:
 

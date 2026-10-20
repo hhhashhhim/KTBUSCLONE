@@ -28,6 +28,7 @@ class OtpApi implements ApiClient {
   Completer<void>? resendPending;
   int resends = 0;
   String? submittedCode;
+  bool failVerification = false;
 
   Map<String, dynamic> passenger(bool verified) => {
     'id': 1,
@@ -58,8 +59,14 @@ class OtpApi implements ApiClient {
         if (failResend) throw const ApiException('Please try again shortly.');
         return null;
       case '/auth/verify-otp':
+        if (failVerification) {
+          throw const ApiException(
+            'The verification code is invalid or expired.',
+            statusCode: 422,
+          );
+        }
         submittedCode = (data as Map)['code'] as String;
-        return {'passenger': passenger(true)};
+        return {'passenger': passenger(true), 'token': 'verified-token'};
       default:
         throw StateError('Unexpected endpoint $path');
     }
@@ -80,6 +87,21 @@ Future<bool> register(ProviderContainer container) => container
     );
 
 void main() {
+  test('verification replaces the pending token only after success', () async {
+    final tokens = MemoryTokens()..token = 'pending-token';
+    final api = OtpApi()..failVerification = true;
+    final repository = AuthRepository(api, tokens);
+    await expectLater(
+      repository.verifyOtp('123456'),
+      throwsA(isA<ApiException>()),
+    );
+    expect(tokens.token, 'pending-token');
+    api.failVerification = false;
+    final passenger = await repository.verifyOtp('123456');
+    expect(tokens.token, 'verified-token');
+    expect(passenger.mobileVerified, isTrue);
+  });
+
   test(
     'signup keeps the session and surfaces WhatsApp delivery failure',
     () async {

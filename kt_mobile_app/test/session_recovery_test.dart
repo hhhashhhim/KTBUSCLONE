@@ -39,8 +39,9 @@ class SessionApi implements ApiClient {
     CancelToken? cancelToken,
   }) async {
     profileReads++;
+    expect(path, '/auth/session');
     if (error != null) throw error!;
-    return profile;
+    return {'passenger': profile};
   }
 
   @override
@@ -59,6 +60,14 @@ class SessionApi implements ApiClient {
 }
 
 void main() {
+  test('pending registration restores to an unverified session', () async {
+    final tokens = SessionTokens();
+    final api = SessionApi()..profile['mobile_verified'] = false;
+    final passenger = await AuthRepository(api, tokens).restore();
+    expect(passenger!.mobileVerified, isFalse);
+    expect(tokens.token, 'saved-session');
+  });
+
   test('a stale JazzCash selection never sends a new booking request', () async {
     // SessionApi.post would succeed; the repository must reject before sending.
     final api = SessionApi();
