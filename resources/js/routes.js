@@ -90,6 +90,8 @@ import JazzCashRefund from "./pages/booking/JazzCashRefund.vue";
 import DiscountCardAssignPage from "./pages/discountType/DiscountCardAssignPage.vue";
 import DiscountType from "./pages/discountType/DiscountCardTypePage.vue";
 import CallCenterPage from "./pages/callCenter/CallCenterPage.vue";
+import MobileAppPage from "./pages/mobileApp/MobileAppPage.vue";
+import { mobileScreens } from "./pages/mobileApp/mobileApp";
 // Normalize the configured subdirectory so every Vue Router path is absolute.
 // This supports values such as "kainat-travel-front", "/kainat-travel-front",
 // or "/kainat-travel-front/" without producing invalid route paths.
@@ -100,6 +102,7 @@ const url = normalizedBasePath
     : "/";
 
 const routes = [
+    ...mobileScreens.map(screen => ({ path: url + 'mobile-app' + (screen.path ? '/' + screen.path : ''), component: MobileAppPage, name: screen.name })),
     {
         path: url + "call-center",
         component: CallCenterPage,

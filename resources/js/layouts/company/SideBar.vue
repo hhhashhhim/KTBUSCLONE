@@ -269,6 +269,10 @@
                     </ul>
                 </li>
                 <!-- Tickting panel -->
+                <li class="dropdown" v-if="mobileAppScreens.length" :class="{ active: String($route.name || '').startsWith('mobile-app') }">
+                    <router-link class="nav-link" :to="{ name: mobileAppScreens[0].name }" data-testid="mobile-app-sidebar-link"><i class="fas fa-mobile-alt"></i><span>Mobile App</span></router-link>
+                    <ul class="dropdown-menu"><li v-for="screen in mobileAppScreens" :key="screen.name"><router-link class="nav-link" :to="{name:screen.name}"><i :class="screen.icon"></i><span class="ma-sidebar-label">{{ screen.label }}</span></router-link></li></ul>
+                </li>
                 <li class="dropdown" v-if="canAccessCallCenter" :class="{ active: String($route.name || '').startsWith('call-center') }">
                     <router-link class="nav-link" :to="{ name: 'call-center' }"><i class="fas fa-headset"></i><span>Call Center</span></router-link>
                 </li>
@@ -608,12 +612,17 @@
 <script>
 import SidebarMenuSearch from "../../components/SidebarMenuSearch.vue";
 import { canAccessCallCenter } from "../../pages/callCenter/callCenter";
+import { mobileScreens } from "../../pages/mobileApp/mobileApp";
 
 export default {
     components: { SidebarMenuSearch },
     computed: {
         canAccessCallCenter() {
             return this.callCenterAccess ?? canAccessCallCenter(this.$store.state.permissions);
+        },
+        mobileAppScreens() {
+            // Live grants include company activation and scope checks, including for older login sessions.
+            return mobileScreens.filter(screen => this.mobileAppAccess?.[screen.permission] === true);
         },
     },
     data() {
@@ -626,6 +635,7 @@ export default {
             },
             permissions: [],
             callCenterAccess: null,
+            mobileAppAccess: null,
             terminalCancellationPendingCount: 0,
             pendingDockCount: 0, // 🚀 new
         }
@@ -633,6 +643,7 @@ export default {
     created() {
         this.permissions = this.$store.state.permissions;
         this.refreshCallCenterAccess();
+        this.refreshMobileAppAccess();
         if (this.checkForSubmenu('online-terminal-cancellation')) {
             this.getTerminalCancellationPendingCount();
         }
@@ -656,6 +667,13 @@ export default {
         },
     },
     methods: {
+        async refreshMobileAppAccess() {
+            try {
+                const response = await this.callApi('get', 'mobile-app/options', null, {headers:{Accept:'application/json'},validateStatus:()=>true});
+                this.mobileAppAccess = response?.status === 200 && response.data?.status === true ? response.data.data.permissions : {};
+                this.syncActiveMenu();
+            } catch (error) { this.mobileAppAccess = {}; }
+        },
         async refreshCallCenterAccess() {
             try {
                 // Fetch live access: the login permission snapshot may predate module activation.
