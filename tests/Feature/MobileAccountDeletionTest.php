@@ -61,6 +61,7 @@ class MobileAccountDeletionTest extends TestCase
         $account = PassengerAccount::create([
             'id' => $id, 'customer_id' => $id, 'company_id' => $company,
             'mobile' => '0300123456' . $id, 'password' => Hash::make('current-password'),
+            'mobile_verified_at' => now(),
             'otp_digest' => 'private-code', 'email' => 'test@example.com',
         ]);
         $account->savedPassengers()->create([

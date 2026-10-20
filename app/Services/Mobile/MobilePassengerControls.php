@@ -3,6 +3,7 @@
 namespace App\Services\Mobile;
 
 use App\Models\PassengerAccount;
+use App\Models\PendingPassengerRegistration;
 use Illuminate\Http\Request;
 use RuntimeException;
 
@@ -148,7 +149,8 @@ class MobilePassengerControls
     public static function otpLimits(Request $request): array
     {
         $account = self::requestAccount($request);
-        $policy = self::policy($account ? (int) $account->company_id : (int) config('mobile.company_id'));
+        $pending = $request->user() instanceof PendingPassengerRegistration ? $request->user() : null;
+        $policy = self::policy($account ? (int) $account->company_id : ($pending ? (int) $pending->company_id : (int) config('mobile.company_id')));
         $control = $account ? self::controls($account) : self::USER_DEFAULTS;
         return ['minute' => (int) $policy['otp_per_minute'], 'hour' => (int) $policy['otp_per_hour'],
             'day' => (int) ($control['otp_daily_limit'] ?? $policy['otp_per_day']),

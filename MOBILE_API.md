@@ -2,7 +2,57 @@
 
 Base path: `/api/mobile/v1`
 
-The mobile API is isolated from the staff-facing `/api/web/v1` routes. Passenger tokens are issued to `PassengerAccount`, never to ERP `User` records. `MOBILE_COMPANY_ID`, `MOBILE_TERMINAL_ID`, and `MOBILE_BOOKING_USER_ID` must all point to records in the same company.
+The mobile API is isolated from the staff-facing `/api/web/v1` routes. Full passenger tokens are issued to verified `PassengerAccount` records; temporary signup tokens belong to `PendingPassengerRegistration`. Both types are rejected by staff authentication middleware. `MOBILE_COMPANY_ID`, `MOBILE_TERMINAL_ID`, and `MOBILE_BOOKING_USER_ID` must all point to records in the same company.
+
+## Registration security (21 October 2026)
+
+Registration stores submitted details and a password hash in the separate
+`pending_passenger_registrations` table. It never exposes, creates, links or changes
+an ERP customer before successful OTP verification, and creates no passenger
+account at that stage. Phone numbers are normalized to `923xxxxxxxxx`; existing
+accounts are checked using equivalent Pakistani formats within the same company.
+Independent pending attempts may share a number: one attempt cannot change another
+attempt's password/code or prevent the number's owner from starting their own signup.
+
+The 201 response keeps `data.token` and `data.passenger` for client compatibility,
+but this is a **verification-only token**, with `registration:verify` ability.
+The passenger object contains only submitted name/mobile/email, a temporary ID,
+`cnic: null`, and `mobile_verified: false`. Its ID is not a passenger-account ID.
+`registration_expires_at` is also returned. Allowed authenticated operations are:
+
+- `GET /auth/session`: returns `{passenger, verification_pending}` for restoring
+  both pending and verified sessions without reading a pending customer's profile.
+- `POST /auth/resend-otp` and `POST /auth/verify-otp` (`code`, six digits).
+- `POST /auth/logout`: revokes the current token.
+- `DELETE /auth/registration`: cancels only this temporary signup and its tokens.
+
+All other protected mobile endpoints reject pending and legacy unverified accounts
+with 403, regardless of token abilities. A passenger from another company or an ERP
+user cannot use these mobile routes. Legacy unverified accounts can resume OTP via
+login/session; their responses hide customer name/CNIC. They are never auto-deleted.
+
+Successful verification atomically creates/links the customer, creates a verified
+passenger account, deletes this pending registration and its tokens, and returns
+`{passenger, token, verification_pending: false}`. **Flutter must persist the new
+token before navigating to the app.** Legacy account verification also revokes
+every old token and returns a new one. Existing customer name/CNIC are preserved
+when linking. A competing signup cannot overwrite an account already completed.
+
+Codes expire after `MOBILE_OTP_TTL_MINUTES` (default 10). Five wrong codes invalidate
+the pending code. A resend replaces it; shared phone/company attempt limits persist
+across resends, IPs and independent signup attempts. Provider delivery failure keeps
+only a restricted pending registration, allowing resend. A registration expires
+after `MOBILE_REGISTRATION_TTL_HOURS` (default 24); requests reject it immediately
+even when the scheduler is stopped. The existing Sanctum token TTL can expire sooner.
+
+`mobile:prune-pending-registrations` runs hourly through Laravel's scheduler and
+removes only expired temporary rows and their tokens. It never deletes customer,
+passenger-account, invoice, ticket, payment or loyalty records.
+
+Deploy migration `2026_10_21_000009_create_pending_passenger_registrations.php`
+and these backend files together, then release the matching Flutter token/session
+changes. Old apps do not save the replacement verification token and must be updated.
+The schema migration creates a table only; it does not erase historical accounts.
 
 ## Public endpoints
 
@@ -313,17 +363,17 @@ See [MOBILE_PAYMENTS.md](MOBILE_PAYMENTS.md) for configuration, lifecycle, respo
 
 Set `MOBILE_OTP_DRIVER=whatsapp` and `MOBILE_WHATSAPP_API_KEY` in the backend environment. Use the existing SAR Zone middleware credential, not `companies.whatsapp_auth_key` (that field belongs to the older messaging integration). Never put this key in Flutter or tracked files. Defaults are client `kainat-travels`, template `otp`, language `en`; override with `MOBILE_WHATSAPP_CLIENT_CODE`, `MOBILE_WHATSAPP_OTP_TEMPLATE`, and `MOBILE_WHATSAPP_LANGUAGE`. Clear/rebuild Laravel configuration cache after deployment and restart long-running PHP workers if applicable.
 
-The backend POSTs to `https://wa.sarzone.com/api/v1/whatsapp/send-template` with Bearer authentication and the same template fields as the existing booking OTP helper. It accepts Pakistani mobile forms `03xxxxxxxxx`, `3xxxxxxxxx`, and `923xxxxxxxxx` (formatting is stripped for delivery). It does not change passenger account lookup/uniqueness semantics. Codes use cryptographic randomness, are stored hashed in passenger-account fields, expire after `MOBILE_OTP_TTL_MINUTES` (default 10), and are consumed on verification. Signup and password reset use separate fields. Resending replaces the previous code. Provider acceptance requires HTTP 2xx and JSON `success: true`; it does not prove handset delivery. No automatic HTTP retry is performed.
+The backend POSTs to `https://wa.sarzone.com/api/v1/whatsapp/send-template` with Bearer authentication and the same template fields as the existing booking OTP helper. It accepts Pakistani mobile forms `03xxxxxxxxx`, `3xxxxxxxxx`, and `923xxxxxxxxx` (formatting is stripped for delivery). Signup normalizes equivalent phone formats and defers account linking until verification. Codes use cryptographic randomness, are stored hashed in pending-registration fields (legacy verification and password reset use passenger-account fields), expire after `MOBILE_OTP_TTL_MINUTES` (default 10), and are consumed on verification. Signup and password reset use separate fields. Resending replaces the previous code. Provider acceptance requires HTTP 2xx and JSON `success: true`; it does not prove handset delivery. No automatic HTTP retry is performed.
 
 Existing JSON endpoints and request bodies remain unchanged:
 
-- `POST /auth/register`: `full_name`, `mobile`, `cnic`, `password`, `password_confirmation`, optional `email`; returns 201 with passenger, token, and `verification_pending: true`. Additional data fields: `verification_delivery_sent` (boolean, provider accepted) and `verification_message` (nullable safe failure explanation). Delivery failure keeps the unverified account/token so the app can offer resend; it never marks the passenger verified.
-- `POST /auth/resend-otp`: Bearer passenger token, no body; success 200, delivery/configuration failure 503 or invalid delivery number 422.
-- `POST /auth/verify-otp`: Bearer passenger token, `{ "code": "123456" }`; success 200 with `data.passenger` including `mobile_verified: true`; invalid/expired code 422.
+- `POST /auth/register`: `full_name`, `mobile`, `cnic`, `password`, `password_confirmation`, optional `email`; returns 201 with passenger, token, and `verification_pending: true`. Additional data fields: `verification_delivery_sent` (boolean, provider accepted) and `verification_message` (nullable safe failure explanation). Delivery failure keeps only the temporary registration and verification-only token so the app can offer resend; it never marks the passenger verified.
+- `POST /auth/resend-otp`: Bearer verification-only or legacy passenger token, no body; success 200, delivery/configuration failure 503 or invalid delivery number 422.
+- `POST /auth/verify-otp`: Bearer verification-only or legacy passenger token, `{ "code": "123456" }`; success 200 with a replacement `data.token` and `data.passenger` including `mobile_verified: true`; invalid/expired code 422. The client must save the replacement token.
 - `POST /auth/forgot-password`: `{ "mobile": "03001234567" }`; 202 with generic account-existence wording; delivery/configuration failures use the mobile error envelope (503, or 422 for invalid delivery number).
 - `POST /auth/verify-reset-otp`: `mobile`, `code`; returns the existing one-time reset token. `POST /auth/reset-password` continues to consume it and revoke passenger sessions.
 
-WhatsApp mode never logs OTPs, API keys, full phone numbers, or provider response bodies. `disabled` remains the safe default for unconfigured deployments. Existing staff booking/loyalty/discount WhatsApp flows are unchanged. No migration is needed. Run `php vendor/bin/phpunit --do-not-cache-result --filter 'MobileOtpTest|MobileApiContractTest'`; tests use a disposable SQLite database and fake HTTP, never send a real WhatsApp message.
+WhatsApp mode never logs OTPs, API keys, full phone numbers, or provider response bodies. `disabled` remains the safe default for unconfigured deployments. Existing staff booking/loyalty/discount WhatsApp delivery is unchanged. Pending signup requires the migration described under Registration security. Run `php vendor/bin/phpunit --do-not-cache-result --filter 'MobileOtpTest|MobileApiContractTest'`; tests use a disposable SQLite database and fake HTTP, never send a real WhatsApp message.
 
 
 ## Account deletion
@@ -429,8 +479,8 @@ persistent `mobile_app_login_events` and the company-scoped `mobile_app_runtime`
 configuration report. The ERP `api` branch includes the same idempotent migration
 name, so a shared database only applies it once.
 
-Successful `POST auth/login` and automatic sign-in after `POST auth/register`
-record an event after token creation. Failed/blocked authentication, OTP requests,
+Successful `POST auth/login` and completed signup through `POST auth/verify-otp`
+record an event after full token creation. Pending `POST auth/register` does not record a successful signup. Failed/blocked authentication, OTP requests,
 password-reset requests and ordinary app opens do not count. Event kind is
 `login` or `signup`; `first_login` means the first recorded successful sign-in
 for that company/account since tracking was enabled. A locked passenger record

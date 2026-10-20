@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\PassengerAccount;
+use App\Models\PendingPassengerRegistration;
 use App\Services\Mobile\MobilePassengerControls as Controls;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
@@ -66,7 +67,7 @@ class RouteServiceProvider extends ServiceProvider
         // Share account budgets across IP addresses and OTP delivery endpoints.
         $accountKey = function (Request $request) {
             $passenger = $request->user();
-            $authenticatedOtp = $passenger instanceof PassengerAccount && $request->is(
+            $authenticatedOtp = ($passenger instanceof PassengerAccount || $passenger instanceof PendingPassengerRegistration) && $request->is(
                 'api/mobile/v1/auth/resend-otp', 'api/mobile/v1/auth/verify-otp'
             );
             $mobile = $authenticatedOtp ? $passenger->mobile : $request->input('mobile', '');

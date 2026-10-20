@@ -171,7 +171,7 @@ class MobileBiometricLoginTest extends TestCase
         $secret = $this->enroll();
         config()->set('mobile.company_id', 2);
         $this->renew($secret)->assertUnauthorized();
-        $this->request('POST', 'auth/biometric', ['password' => 'password-123'], $this->access)->assertUnauthorized();
+        $this->request('POST', 'auth/biometric', ['password' => 'password-123'], $this->access)->assertForbidden();
         $this->renew('short')->assertUnprocessable();
         $this->renew(str_repeat('a', 96))->assertUnauthorized();
     }

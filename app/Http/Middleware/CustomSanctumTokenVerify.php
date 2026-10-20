@@ -34,6 +34,9 @@ class CustomSanctumTokenVerify
         if ($accessToken) {
             // Token is valid, retrieve the user
             $user = $accessToken->tokenable;
+            if ($user instanceof \App\Models\PendingPassengerRegistration || $user instanceof \App\Models\PassengerAccount) {
+                return response()->json(['message' => 'Passenger tokens are only valid for the mobile API.'], 403);
+            }
             if ($user) {
                 // Manually login the user using Auth facade
                 Auth::login($user);

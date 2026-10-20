@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Mobile;
 
-use Illuminate\Validation\Rule;
+use App\Services\Mobile\MobilePassengerControls;
 
 class RegisterPassengerRequest extends MobileFormRequest
 {
@@ -14,7 +14,7 @@ class RegisterPassengerRequest extends MobileFormRequest
     protected function prepareForValidation()
     {
         $this->merge([
-            'mobile' => preg_replace('/\D+/', '', (string) $this->mobile),
+            'mobile' => MobilePassengerControls::mobile((string) $this->mobile),
             'cnic' => preg_replace('/\D+/', '', (string) $this->cnic),
         ]);
     }
@@ -26,11 +26,7 @@ class RegisterPassengerRequest extends MobileFormRequest
             'mobile' => [
                 'required',
                 'string',
-                'min:10',
-                'max:15',
-                Rule::unique('passenger_accounts', 'mobile')->where(function ($query) {
-                    return $query->where('company_id', config('mobile.company_id'));
-                }),
+                'regex:/^923[0-9]{9}$/',
             ],
             'email' => ['nullable', 'email', 'max:190'],
             'cnic' => ['required', 'digits:13'],

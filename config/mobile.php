@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'registration_ttl_hours' => (int) env('MOBILE_REGISTRATION_TTL_HOURS', 24),
     'biometric_login_enabled' => (bool) env('MOBILE_BIOMETRIC_LOGIN_ENABLED', true),
     'biometric_session_days' => (int) env('MOBILE_BIOMETRIC_SESSION_DAYS', 30),
     'company_id' => env('MOBILE_COMPANY_ID'),

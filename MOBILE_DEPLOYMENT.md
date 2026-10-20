@@ -32,6 +32,77 @@ perform the deployment steps below. Building does not deploy or migrate a server
 Push source and build tooling to `origin/mobile-backend`. Keep generated ZIPs
 and `vendor/` out of Git; distribute the ZIP separately as a deployment artifact.
 
+## Pending registration security rollout (21 October 2026)
+
+Deploy the backend authentication files and the matching Flutter build together.
+The app now restores sessions through `GET /auth/session` and persists the new
+full token returned by OTP verification. Older builds retain a revoked pending
+token after verification and need updating.
+
+After the existing mobile schema is installed, apply this additional migration:
+
+```bash
+php artisan migrate --force --path=database/migrations/2026_10_21_000009_create_pending_passenger_registrations.php
+```
+
+It creates a separate pending-registration table; it does not migrate or delete
+existing ERP/customer/passenger data. `MOBILE_REGISTRATION_TTL_HOURS` defaults to
+24. Codes still default to 10 minutes through `MOBILE_OTP_TTL_MINUTES`. Clear and
+rebuild route/config caches. Keep a persistent shared cache for rate limits.
+
+The scheduler invokes `mobile:prune-pending-registrations` hourly. The command
+can also be run manually after migration. It deletes only expired temporary
+signups and their tokens. Expired signups are denied immediately even if cleanup
+has not run. Legacy unverified accounts are restricted and their customer details
+are hidden until verification; they are not automatically removed. Review any
+customer edits made before this fix separately; this rollout cannot undo them.
+
+### Files changed for pending registration security
+
+- `.env.example`
+- `MOBILE_API.md`
+- `MOBILE_DEPLOYMENT.md`
+- `app/Console/Commands/PrunePendingPassengerRegistrations.php`
+- `app/Console/Kernel.php`
+- `app/Http/Controllers/Mobile/MobileAuthController.php`
+- `app/Http/Middleware/Authenticate.php`
+- `app/Http/Middleware/CustomSanctumTokenVerify.php`
+- `app/Http/Middleware/EnforceMobilePassengerControls.php`
+- `app/Http/Requests/Mobile/RegisterPassengerRequest.php`
+- `app/Http/Resources/Mobile/PassengerResource.php`
+- `app/Models/PendingPassengerRegistration.php`
+- `app/Providers/RouteServiceProvider.php`
+- `app/Services/Mobile/MobileOtpService.php`
+- `app/Services/Mobile/MobilePassengerControls.php`
+- `app/Services/Mobile/MobileRegistrationService.php`
+- `config/mobile.php`
+- `database/migrations/2026_10_21_000009_create_pending_passenger_registrations.php`
+- `routes/api/mobile.php`
+- `tests/Feature/MobileAccountDeletionTest.php`
+- `tests/Feature/MobileApiContractTest.php`
+- `tests/Feature/MobileBiometricLoginTest.php`
+- `tests/Feature/MobileOtpTest.php`
+- `tests/Feature/MobileSchedulingRulesTest.php`
+
+The separate `mobile-frontend` work unit changes only:
+
+- `kt_mobile_app/lib/features/auth/data/auth_repository.dart`
+- `kt_mobile_app/test/auth_otp_test.dart`
+- `kt_mobile_app/test/session_recovery_test.dart`
+- `kt_mobile_app/docs/WHATSAPP_OTP.md`
+- `kt_mobile_app/pubspec.yaml` (version `1.0.4+5`)
+- `kt_mobile_app/docs/ANDROID_RELEASE.md` (matching test-build instructions)
+
+Local checks: the full backend suite passed with two optional MySQL checks skipped
+(no dedicated MySQL test database configured), followed by additional OTP/linking
+regression checks. PHP syntax checks and Git whitespace checks passed. The full
+Flutter suite passed; additional OTP/session-recovery tests and `flutter analyze`
+also passed. Backend tests use disposable SQLite databases and fake WhatsApp HTTP.
+The existing PHP dependency emits a nullable-parameter deprecation on PHP 8.4;
+it did not fail the tests. No real OTP, production database migration or deployment
+was performed. Backend and Flutter changes remain separate in their respective
+worktrees/branches; source commits and build artifacts are prepared separately.
+
 ## Server environment
 
 Preserve the server's existing `APP_KEY`, database connection, and ERP settings.

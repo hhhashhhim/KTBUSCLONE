@@ -10,10 +10,10 @@ class PassengerResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'full_name' => optional($this->customer)->name,
+            'full_name' => $this->mobile_verified_at ? optional($this->customer)->name : null,
             'mobile' => $this->mobile,
             'email' => $this->email,
-            'cnic' => optional($this->customer)->cnic,
+            'cnic' => $this->mobile_verified_at ? optional($this->customer)->cnic : null,
             'gender' => $this->gender,
             'mobile_verified' => !is_null($this->mobile_verified_at),
         ];

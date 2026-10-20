@@ -764,10 +764,10 @@ class MobileSchedulingRulesTest extends TestCase
     {
         $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
         $payment = \App\Models\MobilePayment::first();
-        Sanctum::actingAs(new PassengerAccount(['id' => 100, 'company_id' => 1]));
+        Sanctum::actingAs(new PassengerAccount(['id' => 100, 'company_id' => 1, 'mobile_verified_at' => now()]));
         $this->postJson('/api/mobile/v1/bookings/' . $payment->invoice_id . '/payment/refresh')->assertNotFound();
-        Sanctum::actingAs(new PassengerAccount(['id' => 99, 'company_id' => 2]));
-        $this->postJson('/api/mobile/v1/bookings/' . $payment->invoice_id . '/payment/refresh')->assertNotFound();
+        Sanctum::actingAs(new PassengerAccount(['id' => 99, 'company_id' => 2, 'mobile_verified_at' => now()]));
+        $this->postJson('/api/mobile/v1/bookings/' . $payment->invoice_id . '/payment/refresh')->assertForbidden();
     }
 
     /** @dataProvider reservationDeadlines */
@@ -818,7 +818,7 @@ class MobileSchedulingRulesTest extends TestCase
         ]);
         $this->assertSoftDeleted('tickets', ['id' => $ticket->id, 'type' => 'canceled']);
 
-        Sanctum::actingAs(new PassengerAccount(['id' => 99, 'company_id' => 1]));
+        Sanctum::actingAs(new PassengerAccount(['id' => 99, 'company_id' => 1, 'mobile_verified_at' => now()]));
         $this->getJson('/api/mobile/v1/bookings/' . $payment->invoice_id)->assertOk()
             ->assertJsonPath('data.status', 'canceled')->assertJsonPath('data.payment.checkout_url', null)
             ->assertJsonPath('data.qr_value', null);

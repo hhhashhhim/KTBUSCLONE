@@ -32,6 +32,8 @@ Route::prefix('mobile/v1')->group(function () {
     });
 
     Route::middleware(['auth:sanctum', \App\Http\Middleware\EnforceMobilePassengerControls::class])->group(function () {
+        Route::get('auth/session', [MobileAuthController::class, 'session']);
+        Route::delete('auth/registration', [MobileAuthController::class, 'cancelRegistration']);
         Route::post('auth/biometric', [MobileBiometricController::class, 'enroll'])->middleware('throttle:5,1');
         Route::delete('auth/biometric', [MobileBiometricController::class, 'disable'])->middleware('throttle:10,1');
         Route::post('auth/logout', [MobileAuthController::class, 'logout']);

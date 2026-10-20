@@ -29,6 +29,7 @@ class MobileApiContractTest extends TestCase
         ]);
         config()->set('database.default', 'mobile_contract_testing');
         config()->set('cache.default', 'array');
+        config()->set('mobile.company_id', 1);
     }
 
     public function test_public_app_configuration_uses_safe_response_contract()
