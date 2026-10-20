@@ -43,7 +43,7 @@ function component(file, imports = {}) {
     async function renderTicketing(count, allowed = true) {
         const app = createSSRApp({
             render: compile(ticketingTemplate),
-            data: () => ({ terminalCancellationPendingCount: count }),
+            data: () => ({ terminalCancellationPendingCount: count, mobileAppScreens: [] }),
             methods: { checkPermission: () => true, checkForSubmenu: () => allowed },
         });
         app.component('router-link', { template: '<a><slot /></a>' });
