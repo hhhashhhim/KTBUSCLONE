@@ -101,3 +101,6 @@ require_once('api/onlineTerminalCancellations.php');
 require_once('api/inventory.php');
 // Call Center
 require('api/callCenter.php');
+
+// Mobile passenger app administration
+require('api/mobileApp.php');
