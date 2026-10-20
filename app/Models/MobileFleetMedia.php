@@ -16,6 +16,7 @@ class MobileFleetMedia extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'sort_order' => 'integer',
+        'placements' => 'array',
     ];
 
     public function busClass()

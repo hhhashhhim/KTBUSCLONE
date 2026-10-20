@@ -6,12 +6,31 @@ use App\Models\MobileBookingQuote;
 use App\Models\PassengerAccount;
 use App\Services\Mobile\MobileBookingService;
 use App\Services\Mobile\MobileTravelService;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Mockery;
 use Tests\TestCase;
 
 class MobileApiContractTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        DB::purge('mobile_contract_testing');
+        parent::tearDown();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Policy middleware reads schema metadata; keep contract/error tests
+        // isolated from the developer's configured database.
+        config()->set('database.connections.mobile_contract_testing', [
+            'driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '',
+        ]);
+        config()->set('database.default', 'mobile_contract_testing');
+        config()->set('cache.default', 'array');
+    }
+
     public function test_public_app_configuration_uses_safe_response_contract()
     {
         config()->set('mobile.company_id', null);

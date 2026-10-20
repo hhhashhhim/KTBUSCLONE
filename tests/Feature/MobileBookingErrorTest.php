@@ -6,6 +6,7 @@ use App\Models\PassengerAccount;
 use App\Services\Mobile\MobileBookingService;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Mockery;
 use RuntimeException;
@@ -14,9 +15,22 @@ use Throwable;
 
 class MobileBookingErrorTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        DB::purge('mobile_contract_testing');
+        parent::tearDown();
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
+        // Policy middleware reads schema metadata; keep contract/error tests
+        // isolated from the developer's configured database.
+        config()->set('database.connections.mobile_contract_testing', [
+            'driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '',
+        ]);
+        config()->set('database.default', 'mobile_contract_testing');
+        config()->set('cache.default', 'array');
         config()->set('mobile.company_id', 1);
         config()->set('cache.default', 'array');
         Sanctum::actingAs(new PassengerAccount([

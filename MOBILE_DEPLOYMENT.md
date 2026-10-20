@@ -45,7 +45,7 @@ APP_URL=https://mobile-api.kainattravels.com
 MOBILE_PAYMENT_ENVIRONMENT=live
 MOBILE_ONLINE_PAYMENTS_ENABLED=true
 MOBILE_PAYMENT_PREVIEW_ONLY=false
-MOBILE_PAYMENT_METHODS=jazzcash,bank_alfalah
+MOBILE_PAYMENT_METHODS=bank_alfalah
 MOBILE_JAZZCASH_CHECKOUT_URL=https://onlinepayments.jazzcash.com.pk/payment-orchestrator/CustomerPortal/transactionmanagement/merchantform
 MOBILE_JAZZCASH_STATUS_URL=https://onlinepayments.jazzcash.com.pk/payment-orchestrator/api/v2/rest/payments/status/inquiry
 MOBILE_ALFALAH_BASE_URL=https://payments.bankalfalah.com
@@ -56,7 +56,22 @@ Transfer the existing merchant credentials privately into the corresponding
 Retain the WhatsApp OTP settings described in `MOBILE_API.md`. Set
 `MOBILE_COMPANY_ID`, `MOBILE_TERMINAL_ID`, and `MOBILE_BOOKING_USER_ID` to valid
 records in the same company. A company row in `mobile_app_configs` can override
-`payment_methods`; it must include the desired online methods.
+`payment_methods`; it must include `bank_alfalah` for card checkout and may include
+`counter` for branch reservations. JazzCash is excluded from new mobile bookings
+even if a previous environment/company list still contains it. Retain JazzCash
+credentials/callbacks for existing payments until reconciliation is complete.
+
+The 19 October 2026 changes also add mobile-only authentication rate limits and
+official support phone/email defaults. Deploy `app/Providers/RouteServiceProvider.php`,
+`routes/api/mobile.php`, `app/Services/Mobile/MobileBookingService.php` and
+`config/mobile.php` together; clear route/config caches and rebuild config cache.
+These changes require no new migration. Use a persistent shared cache for the
+authentication attempt budgets. Review `MOBILE_API.md` for the 429 contract.
+
+Configure approved `MOBILE_ANDROID_STORE_URL`, `MOBILE_IOS_STORE_URL` and optional
+`MOBILE_SUPPORT_WHATSAPP`. The public site's legacy Play package differs from the
+Flutter project; confirm the correct store identity and upload key before release.
+Keep mandatory updates disabled until the corresponding store URLs work.
 
 ## Install and migrate
 
@@ -217,3 +232,63 @@ php artisan migrate:status --path=database/migrations/2026_09_18_000012_align_mo
 git log -1 --oneline
 curl --fail --silent --show-error https://mobile-api.kainattravels.com/api/mobile/v1/app/config
 ```
+
+
+### ERP user/app controls
+
+Deploy the passenger-control middleware, service, authentication limiters, and
+booking/OTP changes together. Apply only the reviewed control migration via:
+
+```sh
+php artisan migrate --path=database/migrations/2026_10_20_000005_create_mobile_passenger_control_policies.php --force
+php artisan route:clear
+```
+
+The matching ERP controls/privileges are on `api`, and the screens on `mix`.
+They must share company data with this runtime. If ERP already created these
+tables, the migration preserves existing policies and restrictions. Retain the
+shared persistent cache; do not clear it during ordinary releases, as that resets
+OTP attempt budgets. Existing departure locks and the new per-account database
+lock must remain active. Rollback intentionally retains restrictions and usage.
+
+### Login analytics and ERP route monitoring
+
+1. Apply only `database/migrations/2026_10_20_000006_create_mobile_app_monitoring.php`
+   using the normal reviewed deployment procedure. The same migration name on
+   ERP `api` is safe to deploy against the shared database; do not run unrelated
+   legacy migrations to install this feature.
+2. Deploy `MobileAppTelemetry`, `MobileAuthController` and `MobileAppController`.
+   Verify MOBILE_COMPANY_ID, MOBILE_TERMINAL_ID and MOBILE_BOOKING_USER_ID point
+   to the intended company and active online terminal/service user. The mobile
+   backend and ERP monitoring must read the same company database.
+3. A normal app-config request reports runtime configuration. Subsequent
+   successful logins/signup sign-ins populate the durable event history. Never
+   backfill “total logins” from active tokens or call app opens downloads.
+4. Deploy ERP monitoring endpoints and the rebuilt `mix` bundle. Until the
+   runtime report arrives, availability is clearly marked as a terminal preview
+   and login totals are unavailable. Actual store downloads require a separate
+   Google Play / App Store reporting connection.
+
+Local validation: 183 OTP, authentication rate-limit and scheduling tests passed
+(1,529 assertions). No live mobile deployment or store connection was performed.
+
+
+## Biometric quick login rollout
+
+1. Deploy the mobile-backend biometric service/controller, routes, command,
+   configuration, and migration with existing passenger-control code.
+2. Run `php artisan migrate --path=database/migrations/2026_10_20_000007_create_mobile_biometric_sessions.php`.
+   Rebuild configuration/route caches using the deployment's normal process.
+3. Optional environment settings: `MOBILE_BIOMETRIC_LOGIN_ENABLED=true`,
+   `MOBILE_BIOMETRIC_SESSION_DAYS=30`. Keep existing access-token expiry at 600 minutes.
+4. Run the existing Laravel scheduler for daily expired-family cleanup.
+5. Release the updated Android/iOS app. Existing app versions still use password
+   login. The new app can continue password login if this API is not yet deployed.
+6. On real devices, verify enrollment, cancellation, biometric lockout, enrollment
+   changes, cold launch, expiry renewal, logout, password reset and ERP revocation.
+   No production account or device biometric setup should be changed for automated QA.
+
+This source change does not deploy the API, run production migrations, or publish
+an app release. Biometric credentials require an online server check and never
+contain the passenger password. Redact `refresh_token` anywhere request bodies
+could be logged. Rollback should disable the feature first; password login remains.

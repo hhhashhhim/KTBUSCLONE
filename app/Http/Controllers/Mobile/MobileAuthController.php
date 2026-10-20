@@ -14,7 +14,9 @@ use App\Http\Resources\Mobile\PassengerResource;
 use App\Models\Customer;
 use App\Models\PassengerAccount;
 use App\Services\Mobile\MobileOtpService;
+use App\Services\Mobile\MobilePassengerControls as Controls;
 use App\Services\Mobile\MobileTravelService;
+use App\Services\Mobile\MobileAppTelemetry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -32,6 +34,7 @@ class MobileAuthController extends Controller
         try {
             $companyId = $travel->companyId();
             $account = DB::transaction(function () use ($request, $companyId) {
+                Controls::assertRegistration($companyId, $request->mobile, $request->cnic);
                 $customer = Customer::firstOrNew([
                     'company_id' => $companyId,
                     'contact' => $request->mobile,
@@ -61,10 +64,15 @@ class MobileAuthController extends Controller
                 $verificationMessage = $exception->getMessage();
             }
             $account->load('customer');
+            $token = DB::transaction(function () use ($account) {
+                $token = $account->createToken('passenger-mobile')->plainTextToken;
+                app(MobileAppTelemetry::class)->recordLogin($account, 'signup');
+                return $token;
+            });
 
             return $this->success([
                 'passenger' => (new PassengerResource($account))->resolve(),
-                'token' => $account->createToken('passenger-mobile')->plainTextToken,
+                'token' => $token,
                 'verification_pending' => true,
                 'verification_delivery_sent' => $verificationDeliverySent,
                 'verification_message' => $verificationMessage,
@@ -77,19 +85,25 @@ class MobileAuthController extends Controller
     public function login(LoginPassengerRequest $request, MobileTravelService $travel)
     {
         try {
-            $account = PassengerAccount::with('customer')
-                ->where('company_id', $travel->companyId())
-                ->where('mobile', $request->mobile)
-                ->first();
-            if (!$account || !Hash::check($request->password, $account->password)) {
-                return $this->failure('The mobile number or password is incorrect.', [], 401);
-            }
-            $account->tokens()->delete();
+            return DB::transaction(function () use ($request, $travel) {
+                $account = PassengerAccount::with('customer')
+                    ->where('company_id', $travel->companyId())
+                    ->where('mobile', $request->mobile)
+                    ->lockForUpdate()->first();
+                if (!$account || !Hash::check($request->password, $account->password)) {
+                    return $this->failure('The mobile number or password is incorrect.', [], 401);
+                }
+                Controls::assertAccount($account);
+                if (!Controls::policy((int) $account->company_id)['logins_enabled']) { throw new RuntimeException('Mobile sign-in is temporarily unavailable.', 403); }
+                $account->tokens()->delete();
+                $token = $account->createToken('passenger-mobile')->plainTextToken;
+                app(MobileAppTelemetry::class)->recordLogin($account, 'login');
 
-            return $this->success([
-                'passenger' => (new PassengerResource($account))->resolve(),
-                'token' => $account->createToken('passenger-mobile')->plainTextToken,
-            ], 'Signed in successfully.');
+                return $this->success([
+                    'passenger' => (new PassengerResource($account))->resolve(),
+                    'token' => $token,
+                ], 'Signed in successfully.');
+            });
         } catch (RuntimeException $exception) {
             return $this->failure($exception->getMessage(), [], $exception->getCode() ?: 422);
         }

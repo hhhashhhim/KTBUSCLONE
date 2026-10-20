@@ -218,15 +218,17 @@ class MobileSchedulingRulesTest extends TestCase
         config()->set('mobile_payments.preview_only', true);
         config()->set('mobile_payments.environment', 'live');
         config()->set('app.url', 'http://127.0.0.1:8000');
+        config()->set('mobile_payments.bank_alfalah.base_url', 'https://payments.bankalfalah.com');
         config()->set('mobile_payments.jazzcash.checkout_url', 'https://onlinepayments.jazzcash.com.pk/merchantform');
         config()->set('mobile_payments.jazzcash.status_url', 'https://onlinepayments.jazzcash.com.pk/status');
         \Illuminate\Support\Facades\Http::fake();
         $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())
             ->assertOk()->assertJsonPath('data.payment_preview', true)
             ->assertJsonPath('data.payment_environment', 'live');
-        $this->assertContains('jazzcash', $quote->json('data.payment_methods'));
+        $this->assertContains('bank_alfalah', $quote->json('data.payment_methods'));
+        $this->assertNotContains('jazzcash', $quote->json('data.payment_methods'));
         $this->postJson('/api/mobile/v1/bookings', [
-            'quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'jazzcash',
+            'quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'bank_alfalah',
         ])->assertStatus(409)->assertJsonPath('message', 'Payment preview only. No booking or payment will be submitted.');
         $this->assertDatabaseCount('invoices', 0);
         $this->assertDatabaseCount('tickets', 0);
@@ -295,7 +297,7 @@ class MobileSchedulingRulesTest extends TestCase
 
     public static function bookingGenderMethods(): array
     {
-        return [['counter'], ['jazzcash'], ['bank_alfalah']];
+        return [['counter'], ['bank_alfalah']];
     }
 
     public function test_unsupported_booking_gender_returns_validation_error_without_creating_quote()
@@ -564,7 +566,7 @@ class MobileSchedulingRulesTest extends TestCase
         $first = $this->postJson('/api/mobile/v1/bookings', $input)->assertCreated();
         $this->postJson('/api/mobile/v1/bookings', $input)->assertCreated()->assertJsonPath('data.id', $first->json('data.id'));
         $first->assertJsonPath('data.payment_status', 'pending')->assertJsonPath('data.qr_value', null)
-            ->assertJsonPath('data.payment.method', 'jazzcash');
+            ->assertJsonPath('data.payment.method', 'bank_alfalah');
         $this->assertDatabaseCount('mobile_payments', 1);
         $this->assertDatabaseCount('invoices', 1);
         $this->assertDatabaseHas('tickets', ['type' => 'advance booking', 'transaction_id' => null]);
@@ -593,13 +595,15 @@ class MobileSchedulingRulesTest extends TestCase
 
     public function test_mobile_payment_checkout_requires_signature_and_uses_server_amount()
     {
+        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response([
+            'success' => 'true', 'AuthToken' => 'test-token',
+        ])]);
         $booking = $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
         $url = $booking->json('data.payment.checkout_url');
         $this->get(strtok($url, '?'))->assertForbidden();
         $response = $this->get($url)->assertOk()->assertHeader('Cache-Control', 'no-store, private');
-        $response->assertSee('name="pp_Amount" value="250000"', false)
-            ->assertSee('name="pp_BankID" value=""', false)
-            ->assertSee('name="pp_ProductID" value=""', false);
+        $response->assertSee('name="TransactionAmount" value="2500.00"', false)
+            ->assertSee('name="TransactionTypeId" value="3"', false);
         $this->get($url)->assertStatus(409)
             ->assertDontSee('<script', false)->assertDontSee('<form', false);
         $this->assertDatabaseHas('tickets', ['type' => 'advance booking']);
@@ -669,6 +673,45 @@ class MobileSchedulingRulesTest extends TestCase
         $this->postJson($url)->assertOk();
         $this->assertDatabaseHas('tickets', ['type' => 'booked', 'transaction_id' => $payment->transaction_reference]);
         $this->assertSame(1, DB::table('activity_logs')->where('message', 'like', 'Payment verified;%')->count());
+        \Illuminate\Support\Facades\Http::assertSentCount(1);
+    }
+
+    public function test_jazzcash_cannot_be_offered_or_booked_even_with_company_override_or_old_quote()
+    {
+        $input = $this->paymentInput();
+        require_once base_path('database/migrations/2026_07_18_000002_create_mobile_app_configs_table.php');
+        (new \CreateMobileAppConfigsTable())->up();
+        $config = \App\Models\MobileAppConfig::create([
+            'company_id' => 1, 'payment_methods' => ['jazzcash', 'bank_alfalah'],
+        ]);
+        \Illuminate\Support\Facades\Http::fake();
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk()
+            ->assertJsonPath('data.payment_methods', ['bank_alfalah']);
+        $this->postJson('/api/mobile/v1/bookings', array_merge($input, ['payment_method' => 'jazzcash']))
+            ->assertStatus(422)->assertJsonPath('message', 'The selected payment method is not available.');
+        $this->assertDatabaseCount('invoices', 0);
+        $this->assertDatabaseCount('mobile_payments', 0);
+        $this->assertDatabaseHas('mobile_booking_quotes', ['token' => $input['quote_token'], 'used_at' => null]);
+        $config->update(['payment_methods' => ['jazzcash']]);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk()
+            ->assertJsonPath('data.payment_methods', []);
+        $this->getJson('/api/mobile/v1/app/config')->assertOk()
+            ->assertJsonPath('data.features.online_payments', false);
+        \Illuminate\Support\Facades\Http::assertNothingSent();
+    }
+
+    public function test_existing_jazzcash_payment_can_still_be_verified_after_removal()
+    {
+        $booking = $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
+        // Model a reservation created before JazzCash was removed from mobile.
+        $payment = \App\Models\MobilePayment::first();
+        $payment->update(['method' => 'jazzcash', 'started_at' => now()]);
+        $this->assertNotContains('jazzcash', app(\App\Services\Mobile\MobileBookingService::class)->paymentMethods());
+        $this->fakePaidPayment($payment);
+        $this->postJson('/api/mobile/v1/bookings/' . $booking->json('data.id') . '/payment/refresh')
+            ->assertOk()->assertJsonPath('data.status', 'confirmed')
+            ->assertJsonPath('data.payment.method', 'jazzcash')
+            ->assertJsonPath('data.payment_status', 'paid');
         \Illuminate\Support\Facades\Http::assertSentCount(1);
     }
 
@@ -1010,22 +1053,34 @@ class MobileSchedulingRulesTest extends TestCase
         \Illuminate\Support\Facades\URL::forceRootUrl('https://mobile.example.test');
         \Illuminate\Support\Facades\URL::forceScheme('https');
         config()->set('mobile_payments.enabled', true);
-        config()->set('mobile.payment_methods', ['counter', 'jazzcash']);
+        config()->set('mobile.payment_methods', ['counter', 'jazzcash', 'bank_alfalah']);
         config()->set('mobile_payments.jazzcash', ['merchant_id' => 'test-merchant', 'password' => 'test-password',
             'integrity_salt' => 'test-salt', 'checkout_url' => 'https://sandbox.jazzcash.com.pk/merchantform',
             'status_url' => 'https://sandbox.jazzcash.com.pk/status']);
+        config()->set('mobile_payments.bank_alfalah', [
+            'merchant_id' => '123', 'store_id' => '000456', 'merchant_hash' => 'test-hash',
+            'username' => 'test-user', 'password' => 'test-password',
+            'key1' => '1234567890123456', 'key2' => 'abcdefghijklmnop',
+            'base_url' => 'https://sandbox.bankalfalah.com',
+        ]);
         $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
-        $quote->assertJsonPath('data.payment_methods.1', 'jazzcash');
-        return ['quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'jazzcash'];
+        $quote->assertJsonPath('data.payment_methods', ['counter', 'bank_alfalah']);
+        return ['quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'bank_alfalah'];
     }
 
     private function fakePaidPayment($payment): void
     {
-        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response([
+        $response = $payment->method === 'jazzcash' ? [
             'pp_ResponseCode' => '000', 'pp_PaymentResponseCode' => '121', 'pp_Status' => 'Completed',
             'pp_TxnRefNo' => $payment->transaction_reference, 'pp_Amount' => (string) $payment->amount_minor,
             'pp_MerchantID' => 'test-merchant', 'pp_TxnCurrency' => 'PKR', 'pp_BillReference' => (string) $payment->invoice_id,
-        ])]);
+        ] : [
+            'ResponseCode' => '00', 'TransactionStatus' => 'Paid',
+            'TransactionReferenceNumber' => $payment->transaction_reference,
+            'TransactionAmount' => number_format($payment->amount_minor / 100, 2, '.', ''),
+            'MerchantId' => '123', 'StoreId' => '000456',
+        ];
+        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response($response)]);
     }
 
     public function test_search_query_count_stays_bounded_as_matching_buses_increase()
@@ -1304,12 +1359,15 @@ class MobileSchedulingRulesTest extends TestCase
 
     public function test_payment_amount_uses_adjusted_fare_once()
     {
+        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response([
+            'success' => 'true', 'AuthToken' => 'test-token',
+        ])]);
         $this->seedSearchAdjustments();
         $booking = $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
         $this->assertEquals(2600, $booking->json('data.total'));
         $this->assertDatabaseHas('mobile_payments', ['amount_minor' => 260000]);
         $this->get($booking->json('data.payment.checkout_url'))->assertOk()
-            ->assertSee('name="pp_Amount" value="260000"', false);
+            ->assertSee('name="TransactionAmount" value="2600.00"', false);
     }
 
     public function test_wallet_is_deducted_after_discounts_surcharges_and_rounding()
@@ -1498,5 +1556,59 @@ class MobileSchedulingRulesTest extends TestCase
         }
         require_once base_path('database/migrations/2026_07_18_000003_create_mobile_booking_quotes_table.php');
         (new \CreateMobileBookingQuotesTable())->up();
+    }
+
+    private function installPassengerQuota(array $limits = []): void
+    {
+        require_once database_path('migrations/2026_10_20_000005_create_mobile_passenger_control_policies.php');
+        (new \CreateMobilePassengerControlPolicies())->up();
+        Schema::create('passenger_accounts', function (Blueprint $table) { $table->id(); $table->integer('company_id'); $table->string('mobile'); });
+        DB::table('passenger_accounts')->insert(['id' => 99, 'company_id' => 1, 'mobile' => '03001234567']);
+        DB::table('mobile_app_passenger_controls')->insert(['company_id' => 1, 'passenger_account_id' => 99] + $limits);
+    }
+
+    public function test_passenger_daily_quota_records_bookings_and_cancellations_do_not_restore_allowance(): void
+    {
+        $this->installPassengerQuota(['daily_seat_limit' => 1]);
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        $this->assertDatabaseCount('mobile_app_seat_usage', 0);
+        $this->postJson('/api/mobile/v1/bookings', ['quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter'])->assertCreated();
+        $this->assertDatabaseHas('mobile_app_seat_usage', ['passenger_account_id' => 99, 'seats' => 1]);
+        DB::table('tickets')->update(['type' => 'canceled', 'deleted_at' => now()]);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput(['2']))->assertForbidden()->assertJsonPath('message', 'Your daily seat limit has been reached. Please contact passenger support.');
+        $this->assertSame(['daily' => 1, 'monthly' => 1], \App\Services\Mobile\MobilePassengerControls::usage(1, 99));
+    }
+
+    public function test_existing_quote_rechecks_new_limits_and_does_not_consume_seats_on_failure(): void
+    {
+        $this->installPassengerQuota();
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        DB::table('mobile_app_passenger_controls')->update(['daily_seat_limit' => 0]);
+        $this->postJson('/api/mobile/v1/bookings', ['quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter'])->assertForbidden();
+        $this->assertDatabaseCount('mobile_app_seat_usage', 0); $this->assertDatabaseCount('invoices', 0); $this->assertDatabaseCount('tickets', 0);
+    }
+
+    public function test_monthly_limit_uses_creation_month_in_pakistan_and_global_defaults_can_be_overridden(): void
+    {
+        $this->installPassengerQuota();
+        DB::table('mobile_app_policies')->insert(['company_id' => 1, 'settings' => json_encode(['monthly_seat_limit' => 1])]);
+        $timestamp = Carbon::parse('2026-09-01 00:00:00', 'Asia/Karachi')->setTimezone(config('app.timezone'))->toDateTimeString();
+        DB::table('mobile_app_seat_usage')->insert(['company_id' => 1, 'passenger_account_id' => 99, 'invoice_id' => 900, 'seats' => 1, 'booked_at' => $timestamp]);
+        $this->assertSame(['daily' => 0, 'monthly' => 1], \App\Services\Mobile\MobilePassengerControls::usage(1, 99));
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertForbidden()->assertJsonPath('message', 'Your monthly seat limit has been reached. Please contact passenger support.');
+        DB::table('mobile_app_passenger_controls')->update(['monthly_seat_limit' => 2]);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        DB::table('mobile_app_policies')->update(['settings' => json_encode(['bookings_enabled' => false])]);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertForbidden();
+    }
+
+    public function test_failed_booking_rolls_back_quota_ledger_with_invoice_and_tickets(): void
+    {
+        $this->installPassengerQuota(['daily_seat_limit' => 10]);
+        $input = $this->paymentInput();
+        $quote = \App\Models\MobileBookingQuote::where('token', $input['quote_token'])->firstOrFail();
+        $payload = $quote->payload; $payload['passengers'][0]['gender'] = 'unsupported'; $quote->update(['payload' => $payload]);
+        $this->postJson('/api/mobile/v1/bookings', $input)->assertStatus(422);
+        $this->assertDatabaseCount('mobile_app_seat_usage', 0); $this->assertDatabaseCount('invoices', 0);
     }
 }

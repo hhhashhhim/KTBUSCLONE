@@ -251,4 +251,166 @@ class MobileOtpTest extends TestCase
     {
         return Http::recorded()->last()[0]['variables']['code'];
     }
+
+    private function installPassengerControls(): void
+    {
+        require_once database_path('migrations/2026_10_20_000005_create_mobile_passenger_control_policies.php');
+        (new \CreateMobilePassengerControlPolicies())->up();
+    }
+
+    private function restrictAccount(PassengerAccount $account, array $values): void
+    {
+        DB::table('mobile_app_passenger_controls')->updateOrInsert(['company_id' => $account->company_id, 'passenger_account_id' => $account->id], $values);
+    }
+
+    public function test_erp_block_applies_to_login_existing_sessions_and_password_recovery(): void
+    {
+        $this->installPassengerControls(); $account = $this->account();
+        $this->restrictAccount($account, ['status' => 'blocked']);
+        $this->postJson('/api/mobile/v1/auth/login', ['mobile' => $account->mobile, 'password' => 'password-123'])->assertForbidden();
+        $this->postJson('/api/mobile/v1/auth/forgot-password', ['mobile' => $account->mobile])->assertForbidden();
+        Sanctum::actingAs($account);
+        $this->getJson('/api/mobile/v1/profile')->assertForbidden();
+        Http::assertNothingSent();
+    }
+
+    public function test_blacklist_prevents_reregistration_with_phone_variants_or_cnic_but_is_company_scoped(): void
+    {
+        $this->installPassengerControls();
+        foreach (['mobile' => '03001234567', 'cnic' => '3520212345671'] as $kind => $value) {
+            DB::table('mobile_app_blacklist_entries')->insert(['company_id' => 1, 'passenger_account_id' => 99, 'kind' => $kind,
+                'identity_hash' => \App\Services\Mobile\MobilePassengerControls::identity($kind, $value), 'created_at' => now()]);
+        }
+        foreach (['03001234567', '923001234567', '00923001234567', '3001234567'] as $mobile) {
+            \Illuminate\Support\Facades\Cache::flush();
+            $this->postJson('/api/mobile/v1/auth/register', array_replace($this->signup(), ['mobile' => $mobile]))->assertForbidden();
+        }
+        $this->postJson('/api/mobile/v1/auth/register', array_replace($this->signup(), ['mobile' => '03007654321']))->assertForbidden();
+        $this->assertDatabaseCount('passenger_accounts', 0); Http::assertNothingSent();
+        DB::table('mobile_app_blacklist_entries')->update(['company_id' => 2]);
+        \Illuminate\Support\Facades\Cache::flush();
+        $this->postJson('/api/mobile/v1/auth/register', $this->signup())->assertCreated();
+    }
+
+    public function test_identity_blacklist_restricts_an_existing_alternate_account(): void
+    {
+        $this->installPassengerControls(); $account = $this->account('03007654321');
+        DB::table('customers')->insert(['id' => 9, 'company_id' => 1, 'name' => 'Fixture', 'contact' => $account->mobile, 'cnic' => '35202-1234567-1']);
+        $account->update(['customer_id' => 9]);
+        DB::table('mobile_app_blacklist_entries')->insert(['company_id' => 1, 'passenger_account_id' => 99, 'kind' => 'cnic',
+            'identity_hash' => \App\Services\Mobile\MobilePassengerControls::identity('cnic', '3520212345671'), 'created_at' => now()]);
+        $this->postJson('/api/mobile/v1/auth/login', ['mobile' => $account->mobile, 'password' => 'password-123'])->assertForbidden();
+    }
+
+    public function test_required_password_reset_allows_verified_recovery_and_rejects_old_reset_state(): void
+    {
+        $this->installPassengerControls(); $account = $this->account();
+        $this->restrictAccount($account, ['password_reset_required' => true]);
+        $this->postJson('/api/mobile/v1/auth/login', ['mobile' => $account->mobile, 'password' => 'password-123'])->assertForbidden()
+            ->assertJsonPath('message', 'A password reset is required. Use Forgot password to verify your mobile number and set a new password.');
+        $this->postJson('/api/mobile/v1/auth/forgot-password', ['mobile' => $account->mobile])->assertStatus(202);
+        $token = $this->postJson('/api/mobile/v1/auth/verify-reset-otp', ['mobile' => $account->mobile, 'code' => $this->sentCode()])->assertOk()->json('data.reset_token');
+        $stale = $account->fresh();
+        // A later ERP action invalidates the token while a passenger request still has the old model.
+        DB::table('passenger_accounts')->where('id', $account->id)->update(['password_reset_token_digest' => null, 'password_reset_token_expires_at' => null]);
+        $this->assertFalse(app(MobileOtpService::class)->resetPassword($stale, $token, 'unsafe-new-password'));
+        $this->assertDatabaseHas('mobile_app_passenger_controls', ['passenger_account_id' => $account->id, 'password_reset_required' => 1]);
+        $this->postJson('/api/mobile/v1/auth/forgot-password', ['mobile' => $account->mobile])->assertStatus(202);
+        $token = $this->postJson('/api/mobile/v1/auth/verify-reset-otp', ['mobile' => $account->mobile, 'code' => $this->sentCode()])->assertOk()->json('data.reset_token');
+        $this->postJson('/api/mobile/v1/auth/reset-password', ['mobile' => $account->mobile, 'reset_token' => $token,
+            'password' => 'new-password-123', 'password_confirmation' => 'new-password-123'])->assertOk();
+        $this->assertDatabaseHas('mobile_app_passenger_controls', ['passenger_account_id' => $account->id, 'password_reset_required' => 0]);
+        $this->postJson('/api/mobile/v1/auth/login', ['mobile' => $account->mobile, 'password' => 'new-password-123'])->assertOk();
+    }
+
+    public function test_app_controls_pause_registration_login_and_otp_without_sending(): void
+    {
+        $this->installPassengerControls(); $account = $this->account();
+        DB::table('mobile_app_policies')->insert(['company_id' => 1, 'settings' => json_encode(['registrations_enabled' => false, 'logins_enabled' => false, 'otp_enabled' => false])]);
+        $this->postJson('/api/mobile/v1/auth/register', array_replace($this->signup(), ['mobile' => '03007654321']))->assertForbidden();
+        $this->postJson('/api/mobile/v1/auth/login', ['mobile' => $account->mobile, 'password' => 'password-123'])->assertForbidden();
+        $this->postJson('/api/mobile/v1/auth/forgot-password', ['mobile' => $account->mobile])->assertForbidden();
+        $this->assertDatabaseCount('passenger_accounts', 1); Http::assertNothingSent();
+    }
+
+    public function test_personal_otp_daily_budget_is_shared_across_endpoints_ips_and_phone_formats(): void
+    {
+        $this->installPassengerControls(); $account = $this->account();
+        $this->restrictAccount($account, ['otp_daily_limit' => 2]);
+        $this->postJson('/api/mobile/v1/auth/forgot-password', ['mobile' => $account->mobile])->assertStatus(202);
+        Sanctum::actingAs($account);
+        $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.77'])->postJson('/api/mobile/v1/auth/resend-otp')->assertOk();
+        $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.78'])->postJson('/api/mobile/v1/auth/forgot-password', ['mobile' => '923001234567'])->assertStatus(429)->assertHeader('Retry-After');
+        Http::assertSentCount(2);
+    }
+
+    public function test_zero_otp_limit_and_personal_switch_stop_delivery(): void
+    {
+        $this->installPassengerControls(); $account = $this->account();
+        $this->restrictAccount($account, ['otp_daily_limit' => 0]);
+        $response = $this->postJson('/api/mobile/v1/auth/forgot-password', ['mobile' => $account->mobile]);
+        $this->assertContains($response->status(), [403, 429]);
+        $this->restrictAccount($account, ['otp_daily_limit' => null, 'otp_enabled' => false]);
+        $this->postJson('/api/mobile/v1/auth/forgot-password', ['mobile' => $account->mobile])->assertForbidden();
+        Http::assertNothingSent();
+    }
+
+    private function installMonitoring(): void
+    {
+        require_once database_path('migrations/2026_10_20_000006_create_mobile_app_monitoring.php');
+        (new \CreateMobileAppMonitoring())->up();
+        config(['mobile.terminal_id'=>24,'mobile.booking_user_id'=>20]);
+    }
+
+    public function test_successful_logins_survive_token_replacement_and_first_login_is_counted_once(): void
+    {
+        $this->installMonitoring();
+        $account=$this->account();
+        $account->update(['password'=>Hash::make('correct-password')]);
+        for ($i=0;$i<2;$i++) {
+            $this->postJson('/api/mobile/v1/auth/login',['mobile'=>$account->mobile,'password'=>'correct-password'])->assertOk();
+        }
+        $events=DB::table('mobile_app_login_events')->orderBy('id')->get();
+        $this->assertCount(2,$events);$this->assertSame([1,0],$events->pluck('first_login')->map(function($v){return (int)$v;})->all());
+        $this->assertSame(1,$account->tokens()->count());
+        $account->tokens()->delete();$this->assertSame(2,DB::table('mobile_app_login_events')->count());
+        $this->assertSame(['id','company_id','passenger_account_id','kind','first_login','occurred_at'],Schema::getColumnListing('mobile_app_login_events'));
+        $this->assertSame(24,(int)DB::table('mobile_app_runtime')->value('terminal_id'));
+    }
+
+    public function test_failed_and_blocked_logins_do_not_create_success_events(): void
+    {
+        $this->installMonitoring();$account=$this->account();$account->update(['password'=>Hash::make('correct-password')]);
+        $this->postJson('/api/mobile/v1/auth/login',['mobile'=>$account->mobile,'password'=>'wrong-password'])->assertUnauthorized();
+        $this->installPassengerControls();
+        $this->restrictAccount($account,['status'=>'blocked']);
+        $this->postJson('/api/mobile/v1/auth/login',['mobile'=>$account->mobile,'password'=>'correct-password'])->assertForbidden();
+        $this->assertSame(0,DB::table('mobile_app_login_events')->count());
+    }
+
+    public function test_registration_records_automatic_sign_in_and_missing_migration_keeps_auth_working(): void
+    {
+        $this->installMonitoring();
+        $this->postJson('/api/mobile/v1/auth/register',$this->signup())->assertCreated();
+        $event=DB::table('mobile_app_login_events')->first();$this->assertSame('signup',$event->kind);$this->assertSame(1,(int)$event->first_login);
+        Schema::drop('mobile_app_login_events');
+        $account=PassengerAccount::first();$account->update(['password'=>Hash::make('correct-password')]);
+        $this->postJson('/api/mobile/v1/auth/login',['mobile'=>$account->mobile,'password'=>'correct-password'])->assertOk();
+    }
+
+    public function test_runtime_reporting_keeps_original_start_and_uses_utc_without_counting_app_opens(): void
+    {
+        $this->installMonitoring();
+        \Carbon\Carbon::setTestNow(\Carbon\Carbon::parse('2026-10-20 00:30:00','Asia/Karachi'));
+        try {
+            $telemetry=app(\App\Services\Mobile\MobileAppTelemetry::class);$telemetry->syncRuntime();
+            $this->assertSame('2026-10-19 19:30:00',DB::table('mobile_app_runtime')->value('tracking_started_at'));
+            \Carbon\Carbon::setTestNow(\Carbon\Carbon::parse('2026-10-20 01:30:00','Asia/Karachi'));
+            $telemetry->syncRuntime();
+            $this->assertSame('2026-10-19 19:30:00',DB::table('mobile_app_runtime')->value('tracking_started_at'));
+            $this->assertSame('2026-10-19 20:30:00',DB::table('mobile_app_runtime')->value('last_seen_at'));
+            $this->assertSame(0,DB::table('mobile_app_login_events')->count());
+        } finally { \Carbon\Carbon::setTestNow(); }
+    }
+
 }

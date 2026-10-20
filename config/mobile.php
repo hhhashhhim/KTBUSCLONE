@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'biometric_login_enabled' => (bool) env('MOBILE_BIOMETRIC_LOGIN_ENABLED', true),
+    'biometric_session_days' => (int) env('MOBILE_BIOMETRIC_SESSION_DAYS', 30),
     'company_id' => env('MOBILE_COMPANY_ID'),
     'terminal_id' => env('MOBILE_TERMINAL_ID'),
     'booking_user_id' => env('MOBILE_BOOKING_USER_ID'),
@@ -12,9 +14,9 @@ return [
     'maintenance_message' => env('MOBILE_MAINTENANCE_MESSAGE'),
     'android_store_url' => env('MOBILE_ANDROID_STORE_URL'),
     'ios_store_url' => env('MOBILE_IOS_STORE_URL'),
-    'support_phone' => env('MOBILE_SUPPORT_PHONE'),
+    'support_phone' => env('MOBILE_SUPPORT_PHONE') ?: '+923111777333',
     'support_whatsapp' => env('MOBILE_SUPPORT_WHATSAPP'),
-    'support_email' => env('MOBILE_SUPPORT_EMAIL'),
+    'support_email' => env('MOBILE_SUPPORT_EMAIL') ?: 'info@kainattravels.com',
     'payment_methods' => array_values(array_filter(array_map(
         'trim',
         explode(',', (string) env('MOBILE_PAYMENT_METHODS', ''))

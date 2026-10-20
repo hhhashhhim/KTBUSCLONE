@@ -51,7 +51,9 @@ class MobileBookingService
             && Schema::hasColumn('mobile_payments', 'environment')
             && (config('mobile_payments.preview_only') || app(MobilePaymentGateway::class)->checkoutHostAllowed())) {
             $gateway = app(MobilePaymentGateway::class);
-            foreach (['jazzcash', 'bank_alfalah'] as $method) {
+            // JazzCash is retained by the payment service for old reservations
+            // and reconciliation only. Never offer it for a new mobile booking.
+            foreach (['bank_alfalah'] as $method) {
                 if ($gateway->configured($method)) { $available[] = $method; }
             }
         }
@@ -73,6 +75,7 @@ class MobileBookingService
 
     public function quote(PassengerAccount $account, array $input): MobileBookingQuote
     {
+        MobilePassengerControls::assertBooking($account, count($input['seats']));
         $detail = $this->travel->findDetail(
             (int) $input['schedule_detail_id'],
             (int) $input['origin_id'],
@@ -193,6 +196,7 @@ class MobileBookingService
 
         try {
             return DB::transaction(function () use ($account, $quote, $payload, $systemUser, $paymentMethod) {
+                MobilePassengerControls::lockForBooking($account, count($payload['seats']));
                 $quote->refresh();
                 if ($quote->used_at || $quote->expires_at->isPast()) {
                     throw new RuntimeException('This fare quote has expired. Request a new quote.', 409);
@@ -256,6 +260,7 @@ class MobileBookingService
                     'passenger_account_id' => $account->id,
                     'added_by' => $systemUser->id,
                 ]);
+                MobilePassengerControls::recordSeats($account, (int) $invoice->id, count($payload['seats']));
                 $bookingNumber = ((int) Ticket::whereDate('date', $payload['date'])->max('booking_no')) + 1;
                 $sequence = optional(optional($detail->schedule)->route)->fares ?: collect();
                 $firstCity = optional($sequence->first())->departure_city_id;

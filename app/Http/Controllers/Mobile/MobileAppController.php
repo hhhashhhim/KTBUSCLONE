@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Mobile\Concerns\RespondsWithMobileApi;
 use App\Models\MobileAppConfig;
 use App\Services\Mobile\MobileBookingService;
+use App\Services\Mobile\MobileAppTelemetry;
 use Illuminate\Support\Facades\Schema;
 
 class MobileAppController extends Controller
@@ -14,6 +15,7 @@ class MobileAppController extends Controller
 
     public function show(MobileBookingService $bookings)
     {
+        app(MobileAppTelemetry::class)->syncRuntime();
         $row = null;
         $companyId = (int) config('mobile.company_id');
         if ($companyId > 0 && Schema::hasTable('mobile_app_configs')) {

@@ -4,6 +4,15 @@ Implemented for `hhhashhhim/KTBUSCLONE`, branch `mobile-backend`. The Flutter cl
 
 ## Gateway choices and source
 
+As of 19 October 2026, new mobile bookings offer only configured card
+(`bank_alfalah`) and branch (`counter`) methods. JazzCash is removed from
+`MobileBookingService::paymentMethods()` regardless of environment or company
+overrides; stale JazzCash booking submissions return HTTP 422. Existing JazzCash
+reservations keep their stored method, signed checkout, callbacks and server-side
+verification/reconciliation so removal cannot strand received payments. The
+website and ERP methods remain unchanged. JazzCash integration details below
+describe support for those existing reservations.
+
 The reference website at `/Users/malik/Desktop/Codes/KTC Website Public/app` uses JazzCash wallet page redirection and Bank Alfalah's handshake/card page redirection. No website files or credentials were copied into the Flutter app. The Bank Alfalah flow uses `TransactionTypeId=3` (cards); the website's OneLink label is not a separately verified mobile method.
 
 Provider references: [JazzCash merchant integration guide](https://payments.jazzcash.com.pk/SandboxDocumentation/Content/documentation/Payment%20Gateway%20Integration%20Guide%20for%20Merchants-v4.2.pdf), [JazzCash page redirection reference](https://sandbox.jazzcash.com.pk/SandboxDocumentation/v4.2/index.html), and [Bank Alfalah APG integration guide](https://merchants.bankalfalah.com/MerchantPortal/Content/APG%20Merchant%20Integration%20Guide%20v1.1.PDF). JazzCash's status inquiry URL and detailed `pp_PaymentResponseCode=121` / `pp_Status=Completed` contract follow the existing backend's `confirmJazzcashPendingPayment` flow. These must be verified against the merchant's sandbox/orchestrator account before production activation.
@@ -16,7 +25,7 @@ Online methods remain disabled by default. Do these steps on the intended backen
 2. Configure `MOBILE_COMPANY_ID`, `MOBILE_TERMINAL_ID`, and `MOBILE_BOOKING_USER_ID` as documented in `MOBILE_API.md`. Existing route, terminal, quota, and service-user rules still apply. Provider identity is stored on the payment record; terminal attribution remains the configured mobile terminal.
 3. Set a public HTTPS `APP_URL`. Flutter's `API_BASE_URL` must use the same host/port and end in `/api/mobile/v1`. Configure trusted reverse proxies appropriately so signed URLs retain HTTPS. No passenger token is placed in browser URLs.
 4. Fill the relevant `MOBILE_JAZZCASH_*` or `MOBILE_ALFALAH_*` values from the merchant's environment-specific configuration. Use secrets management or the server's ignored environment file, never Flutter defines or committed source. `.env.example` lists the variables without credentials. No legacy hard-coded credential is automatically reused.
-5. Set `MOBILE_PAYMENT_METHODS=counter,jazzcash,bank_alfalah` (or the desired subset). A company's `mobile_app_configs.payment_methods` array overrides this list when present. Set `MOBILE_ONLINE_PAYMENTS_ENABLED=true` after sandbox acceptance. Missing credentials, an invalid gateway host, a missing ledger table, or non-HTTPS `APP_URL` prevent online methods from being advertised.
+5. Set `MOBILE_PAYMENT_METHODS=counter,bank_alfalah` (or the desired subset). A company's `mobile_app_configs.payment_methods` array overrides this list when present, but JazzCash is always excluded from new mobile bookings. Set `MOBILE_ONLINE_PAYMENTS_ENABLED=true` after sandbox acceptance. Missing credentials, an invalid gateway host, a missing ledger table, or non-HTTPS `APP_URL` prevent online methods from being advertised.
 6. Register/allow the mobile return URL pattern `/api/mobile/v1/payments/{payment-uuid}/return` with the providers. It accepts GET and POST. Providers must allow the dynamic payment path used in the submitted return URL. It is an API route and does not require a browser session or CSRF cookie. Refresh configuration/route caches as appropriate for deployment.
 7. Ensure the Laravel scheduler runs every minute and uses a shared lock-capable cache (such as Redis) across application instances. The scheduler runs `mobile:reconcile-payments`. Do not enable online reservations without this job: it verifies payments when the app/browser does not return, and releases expired reservations.
 8. Exercise sandbox checkout, provider return, app resume, failed/abandoned checkout, timeout, expiry, duplicate callbacks, and delayed settlement for both providers. Then separately select production merchant credentials/endpoints and perform the merchant's production acceptance process.
@@ -33,7 +42,7 @@ JazzCash URLs have no default: configure the URLs supplied for the selected merc
 
 All passenger endpoints require `Authorization: Bearer <passenger-token>` and `Accept: application/json`. JSON POST bodies use `Content-Type: application/json`.
 
-- `POST /api/mobile/v1/bookings/quote`: existing request; `data.payment_methods` may include `counter`, `jazzcash`, `bank_alfalah` when configured.
+- `POST /api/mobile/v1/bookings/quote`: existing request; `data.payment_methods` may include `counter` and `bank_alfalah` when configured. JazzCash is never offered for a new booking.
 - `POST /api/mobile/v1/bookings`: existing `{quote_token, payment_method}` body. The backend recalculates/revalidates fares and seats, creates ERP reserved tickets (`type=advance booking`) and one payment ledger row in one transaction. A retry of the same used online quote and method returns the existing invoice. A pending quote is not itself a seat lock. Online gateway payments require a positive amount.
 - `GET /api/mobile/v1/bookings/{invoice}` and booking listing: return the existing booking fields plus `payment` (`null` for counter reservations).
 - `POST /api/mobile/v1/bookings/{invoice}/payment/refresh`: no body fields required. Verifies the owned payment and returns the updated booking in the existing `success/message/data/errors` envelope. A passenger cannot access another passenger's or company's payment.
@@ -45,7 +54,7 @@ Illustrative `payment` object:
 ```json
 {
   "id": "server-generated-uuid",
-  "method": "jazzcash",
+  "method": "bank_alfalah",
   "status": "pending",
   "expires_at": "2026-09-12T12:10:00+05:00",
   "checkout_url": "https://YOUR_API_HOST/api/mobile/v1/payments/UUID/checkout?expires=TIMESTAMP&signature=SIGNATURE"

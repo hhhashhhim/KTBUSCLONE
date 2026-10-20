@@ -4,6 +4,8 @@ namespace App\Services\Mobile;
 
 use App\Models\PassengerAccount;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Log;
@@ -16,88 +18,117 @@ class MobileOtpService
     {
         $this->ensureConfigured();
         $code = (string) random_int(100000, 999999);
-        $account->forceFill([
-            'otp_digest' => Hash::make($code),
-            'otp_expires_at' => now()->addMinutes((int) config('mobile.otp.ttl_minutes', 10)),
-        ])->save();
+        DB::transaction(function () use ($account, $code) {
+            $fresh = PassengerAccount::whereKey($account->id)->lockForUpdate()->firstOrFail();
+            $account->setRawAttributes($fresh->getAttributes(), true);
+            MobilePassengerControls::assertOtp($account, (int) $account->company_id);
+            $account->forceFill([
+                'otp_digest' => Hash::make($code),
+                'otp_expires_at' => now()->addMinutes((int) config('mobile.otp.ttl_minutes', 10)),
+            ])->save();
+        });
 
         $this->deliver($account, $code, 'signup');
     }
 
     public function verify(PassengerAccount $account, string $code): bool
     {
-        if (!$account->otp_digest || !$account->otp_expires_at || $account->otp_expires_at->isPast()) {
-            return false;
-        }
+        return DB::transaction(function () use ($account, $code) {
+            $fresh = PassengerAccount::whereKey($account->id)->lockForUpdate()->firstOrFail();
+            $account->setRawAttributes($fresh->getAttributes(), true);
+            MobilePassengerControls::assertOtp($account, (int) $account->company_id);
+            if (!$account->otp_digest || !$account->otp_expires_at || $account->otp_expires_at->isPast()) {
+                return false;
+            }
 
-        if (!Hash::check($code, $account->otp_digest)) {
-            return false;
-        }
+            if (!Hash::check($code, $account->otp_digest)) {
+                return false;
+            }
 
-        $account->forceFill([
-            'mobile_verified_at' => now(),
-            'otp_digest' => null,
-            'otp_expires_at' => null,
-        ])->save();
+            $account->forceFill([
+                'mobile_verified_at' => now(),
+                'otp_digest' => null,
+                'otp_expires_at' => null,
+            ])->save();
 
-        return true;
+            return true;
+        });
     }
 
     public function issuePasswordReset(PassengerAccount $account): void
     {
         $this->ensureConfigured();
         $code = (string) random_int(100000, 999999);
-        $account->forceFill([
-            'password_reset_otp_digest' => Hash::make($code),
-            'password_reset_otp_expires_at' => now()->addMinutes((int) config('mobile.otp.ttl_minutes', 10)),
-            'password_reset_token_digest' => null,
-            'password_reset_token_expires_at' => null,
-        ])->save();
+        DB::transaction(function () use ($account, $code) {
+            $fresh = PassengerAccount::whereKey($account->id)->lockForUpdate()->firstOrFail();
+            $account->setRawAttributes($fresh->getAttributes(), true);
+            MobilePassengerControls::assertOtp($account, (int) $account->company_id);
+            $account->forceFill([
+                'password_reset_otp_digest' => Hash::make($code),
+                'password_reset_otp_expires_at' => now()->addMinutes((int) config('mobile.otp.ttl_minutes', 10)),
+                'password_reset_token_digest' => null,
+                'password_reset_token_expires_at' => null,
+            ])->save();
+        });
 
         $this->deliver($account, $code, 'password_reset');
     }
 
     public function verifyPasswordReset(PassengerAccount $account, string $code): ?string
     {
-        if (
-            !$account->password_reset_otp_digest ||
-            !$account->password_reset_otp_expires_at ||
-            $account->password_reset_otp_expires_at->isPast() ||
-            !Hash::check($code, $account->password_reset_otp_digest)
-        ) {
-            return null;
-        }
+        return DB::transaction(function () use ($account, $code) {
+            $fresh = PassengerAccount::whereKey($account->id)->lockForUpdate()->firstOrFail();
+            $account->setRawAttributes($fresh->getAttributes(), true);
+            MobilePassengerControls::assertOtp($account, (int) $account->company_id);
+            if (
+                !$account->password_reset_otp_digest ||
+                !$account->password_reset_otp_expires_at ||
+                $account->password_reset_otp_expires_at->isPast() ||
+                !Hash::check($code, $account->password_reset_otp_digest)
+            ) {
+                return null;
+            }
 
-        $token = Str::random(64);
-        $account->forceFill([
-            'password_reset_otp_digest' => null,
-            'password_reset_otp_expires_at' => null,
-            'password_reset_token_digest' => Hash::make($token),
-            'password_reset_token_expires_at' => now()->addMinutes(15),
-        ])->save();
+            $token = Str::random(64);
+            $account->forceFill([
+                'password_reset_otp_digest' => null,
+                'password_reset_otp_expires_at' => null,
+                'password_reset_token_digest' => Hash::make($token),
+                'password_reset_token_expires_at' => now()->addMinutes(15),
+            ])->save();
 
-        return $token;
+            return $token;
+        });
     }
 
     public function resetPassword(PassengerAccount $account, string $token, string $password): bool
     {
-        if (
-            !$account->password_reset_token_digest ||
-            !$account->password_reset_token_expires_at ||
-            $account->password_reset_token_expires_at->isPast() ||
-            !Hash::check($token, $account->password_reset_token_digest)
-        ) {
-            return false;
-        }
+        return DB::transaction(function () use ($account, $token, $password) {
+            $fresh = PassengerAccount::whereKey($account->id)->lockForUpdate()->firstOrFail();
+            $account->setRawAttributes($fresh->getAttributes(), true);
+            MobilePassengerControls::assertOtp($account, (int) $account->company_id);
+            if (
+                !$account->password_reset_token_digest ||
+                !$account->password_reset_token_expires_at ||
+                $account->password_reset_token_expires_at->isPast() ||
+                !Hash::check($token, $account->password_reset_token_digest)
+            ) {
+                return false;
+            }
 
-        $account->forceFill([
-            'password' => Hash::make($password),
-            'password_reset_token_digest' => null,
-            'password_reset_token_expires_at' => null,
-        ])->save();
-        $account->tokens()->delete();
+            $account->forceFill([
+                'password' => Hash::make($password),
+                'password_reset_token_digest' => null,
+                'password_reset_token_expires_at' => null,
+            ])->save();
+            $account->tokens()->delete();
+            if (Schema::hasColumn('mobile_app_passenger_controls', 'password_reset_required')) {
+                DB::table('mobile_app_passenger_controls')->where('company_id', $account->company_id)->where('passenger_account_id', $account->id)
+                    ->update(['password_reset_required' => false, 'updated_at' => now()]);
+            }
 
-        return true;
+            return true;
+        });
     }
 
     public function ensureConfigured(): void

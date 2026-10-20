@@ -41,6 +41,57 @@ All successful mobile responses use:
 
 Validation failures use the same envelope with status `422` and field errors.
 
+## Mobile authentication limits
+
+Mobile authentication routes have dedicated limits in addition to the existing
+general API limit. Staff, website and ERP authentication routes are unchanged.
+
+| Routes | Account budget | IP budget |
+| --- | --- | --- |
+| `POST /auth/login` | 5/minute | 20/minute |
+| `POST /auth/register`, `/auth/forgot-password`, `/auth/resend-otp` | Shared 3/minute and 10/hour | Shared 10/minute |
+| `POST /auth/verify-otp`, `/auth/verify-reset-otp` | Shared 5/10 minutes | Shared 30/minute |
+| `POST /auth/reset-password` | 5/minute | 20/minute |
+
+Account keys include company and digits-only mobile number and are hashed before
+being used in the cache. The authenticated passenger's number is used for signup
+verification/resend. Changing IP, formatting a number differently, requesting a
+new code, or switching between signup and password-reset verification does not
+reset the account attempt budget. Validation failures also count. Limit storage
+must be persistent and shared between application instances; do not use the array
+cache outside tests. The existing API limit remains unchanged.
+
+An exceeded mobile auth budget returns HTTP `429` with `Retry-After` and the
+existing JSON envelope: `success: false`, `data: null`, empty `errors`, and a
+passenger-facing message containing the retry delay. No new request fields or
+database migration are required. Clear route/config caches during deployment.
+
+Public support phone and email default to `+923111777333` and
+`info@kainattravels.com`, as published on the
+[official contact page](https://www.kainattravels.com/contact) on 19 October 2026.
+Company configuration and `MOBILE_SUPPORT_*` environment values can override them.
+WhatsApp and store URLs need approved values; no number or store identity is
+inferred. Do not enable a mandatory update before verifying its store link.
+
+New booking payment methods are `counter` and `bank_alfalah`, when configured and
+available. JazzCash is excluded even from company overrides. `POST /bookings`
+rejects `payment_method: jazzcash` with HTTP 422 before creating a reservation.
+Existing JazzCash booking details, callbacks and verification remain supported;
+see `MOBILE_PAYMENTS.md`.
+
+Files changed for the 19 October 2026 local readiness work, all on
+`mobile-backend` in `KTBUSCLONE-mobile-backend`:
+
+- `app/Providers/RouteServiceProvider.php`, `routes/api/mobile.php`:
+  mobile authentication limits and their 429 response.
+- `app/Services/Mobile/MobileBookingService.php`: excludes new JazzCash bookings.
+- `config/mobile.php`, `.env.example`: support defaults and supported method setup.
+- `tests/Feature/MobileAuthRateLimitTest.php`,
+  `tests/Feature/MobileSchedulingRulesTest.php`: abuse limits, supported new
+  payments and compatibility with old JazzCash reservations.
+- `MOBILE_API.md`, `MOBILE_PAYMENTS.md`, `MOBILE_DEPLOYMENT.md`: contract and
+  deployment documentation. No migration, commit, push or deployment is included.
+
 Booking quote, creation, list and detail endpoints preserve intentional business-error messages and their 4xx statuses (for example, expired quotes and unavailable seats). Database errors and unexpected failures are reported through Laravel's server-side exception logger and return HTTP `500` with `{"success":false,"message":"Something went wrong. Please try again.","data":null,"errors":{}}`, regardless of `APP_DEBUG`. Intentional service failures with a 5xx status retain that status but use the same generic message and are also reported. SQL, bindings, passenger details and stack traces are never included in these booking error responses. This change requires backend deployment only; no migration or Flutter change is required.
 
 ## City dropdowns
@@ -313,3 +364,127 @@ Mobile-created tickets and their advance/partial records use the ERP's
 their separate payment lifecycle; API summary labels remain compatible with
 existing clients. See `MOBILE_PAYMENTS.md` for the scoped data repair migration,
 terminal reservation deadline and scheduler deployment requirements.
+
+
+### Image placements (ERP content integration)
+
+`GET /api/mobile/v1/fleet?include_placements=1` uses the existing passenger Bearer
+session. Its `success`, `message`, `data`, `errors` envelope is unchanged. Each
+published item adds `placements` (array) and `sort_order` (integer) to the existing
+`id`, `title`, `media_type`, `image_url`, and optional `bus_class` fields.
+
+Placements: `home_banner` (top of Home), `home_carousel` (Home photos), `bus_guide`
+(Bus & Seat Guide), and `home_promotion` (Home travel highlights). Results remain
+ordered by `sort_order`, then `id`. Hidden, deleted, other-company, hidden-class,
+and inactive-class records are excluded. Legacy null placements mean
+`["home_carousel", "bus_guide"]`. Requests without `include_placements=1` exclude
+banner/promotion-only records so older installed apps retain their gallery.
+Invalid query values return the normal 422 mobile validation envelope.
+
+The `api` branch owns staff image uploads and migration
+`2026_10_20_000003_add_mobile_media_placements.php`. Deploy that migration against
+the shared database; this reader remains compatible before it runs. The staff
+API stores validated JPG/PNG/WebP files on its public disk and saves absolute
+URLs, so the passenger API need not share its filesystem. Ensure those URLs are
+reachable over HTTPS from phones. Local ERP changes affect only apps configured
+to use the same database/backend environment. New placement-aware rendering
+requires the corresponding mobile-frontend app release.
+
+
+## ERP passenger controls
+
+`mobile-backend` enforces the shared ERP policies installed by
+`2026_10_20_000005_create_mobile_passenger_control_policies.php`. The ERP editors
+are on `api` and `mix`; deploy those separately against the same company data.
+There are no new public administration endpoints or secrets in app/config.
+
+- Blocked/blacklisted passengers receive the existing mobile JSON error envelope
+  with HTTP 403. Blacklist phone (canonical Pakistani number) and CNIC hashes
+  also prevent registration and matching alternate accounts. Checks are company scoped.
+- An ERP-required password reset returns 403 with instructions to use Forgot
+  password. Existing forgot/verify-reset-otp/reset-password contracts are unchanged.
+  Successful verified reset clears the flag and revokes tokens atomically.
+- Company switches pause registration, sign-in, new bookings, or OTP operations.
+  Disabling sign-in does not revoke existing sessions. Payment checkout/return
+  callbacks remain available for existing transactions.
+- Booking quotes check the allowance; booking creation locks the account and
+  rechecks controls. Daily/monthly allowances use Pakistan calendar periods and
+  invoice creation time, including later cancellations. Ledger writes roll back
+  with failed bookings. Legacy tickets without ledger entries also count.
+- OTP request limits share normalized phone/company keys across register, resend,
+  and Forgot password. Per-account 24-hour/30-day overrides inherit company
+  defaults when null; zero disallows requests. Windows start on first attempt.
+  Minute/hour limits and fixed IP limits also apply. Login/code-check/reset
+  attempt limits are independently configurable. HTTP 429 includes Retry-After.
+
+Use shared persistent cache across API replicas so OTP budgets survive requests
+and deployments. Cache clearing resets these budgets. Default seat allowances
+are unlimited; default OTP budgets are 3/minute, 10/hour, 20/24h and 100/30d.
+The current Flutter client can use these controls without an API shape change.
+
+## ERP login and route monitoring (20 October 2026)
+
+Deploy migration `2026_10_20_000006_create_mobile_app_monitoring.php` to enable
+persistent `mobile_app_login_events` and the company-scoped `mobile_app_runtime`
+configuration report. The ERP `api` branch includes the same idempotent migration
+name, so a shared database only applies it once.
+
+Successful `POST auth/login` and automatic sign-in after `POST auth/register`
+record an event after token creation. Failed/blocked authentication, OTP requests,
+password-reset requests and ordinary app opens do not count. Event kind is
+`login` or `signup`; `first_login` means the first recorded successful sign-in
+for that company/account since tracking was enabled. A locked passenger record
+serializes classification. Revoking/replacing tokens does not remove events.
+No password, token, OTP, contact details, CNIC, IP address or device fingerprint
+is written to the event table. Times are UTC; the ERP groups days in PKT.
+
+`GET app/config` and successful authentication also report the configured
+company, mobile terminal and booking service user to the shared runtime table.
+The ERP uses this to explain the existing MobileSchedulePolicy without guessing
+which online terminal the app uses. This does not count downloads or add fields
+to the passenger API response. When monitoring tables are absent, existing
+configuration and login responses remain compatible and recording is skipped.
+No Flutter client update is required. Old login history cannot be recovered
+from the replaced/deleted token records; download counts require store reports.
+
+
+## Biometric quick login (20 October 2026)
+
+The native app optionally protects a rotating renewal secret with Face ID / Touch ID
+or Android Class 3 biometrics. The server never receives biometrics and never treats
+a client boolean as proof of authentication. All endpoints use the normal mobile
+`success/message/data/errors` envelope. Secrets and passwords must be redacted in
+request logging, proxy tracing, and crash reporting.
+
+| Endpoint under `/api/mobile/v1` | Authentication / input | Result |
+| --- | --- | --- |
+| `POST /auth/biometric` | Valid passenger Bearer token; `{password}`; verified mobile; active account | `{refresh_token, expires_at}`. Enrolls/replaces quick login for this access session. |
+| `POST /auth/biometric/renew` | No Bearer token needed; `{refresh_token}` (96 lowercase hex characters) | `{token, refresh_token, expires_at, passenger}`. Both secrets rotate; save the new renewal secret before using the access token. |
+| `DELETE /auth/biometric` | Valid passenger Bearer token | Disables renewal for this access session; retains ordinary access until expiry/logout. |
+
+Access tokens keep Sanctum's existing 600-minute lifetime. Renewal lasts **30 days
+from enrollment**, with no sliding extension (`MOBILE_BIOMETRIC_SESSION_DAYS`, bounded
+1–90 days). `MOBILE_BIOMETRIC_LOGIN_ENABLED=false` disables enrollment and renewal.
+Default is enabled after migration. Missing tables return 503; existing password
+login is unchanged.
+
+Only SHA-256 hashes of high-entropy renewal secrets are stored. A successful renewal
+consumes its secret and rotates the existing Sanctum token in place. Keeping that
+token ID stable makes existing ERP session deletion authoritative: renewal cannot
+recreate a revoked token. Account blocks, blacklists, required password resets,
+unverified mobile numbers, tenant boundaries, and the global login switch are
+checked again inside the renewal transaction. Existing password login (including
+another device), password reset, logout and account deletion revoke the anchor.
+Renewal is rate-limited by IP and by the account's configured login-attempt budget.
+
+Reusing **any** consumed renewal secret revokes the entire quick-login session.
+Never automatically retry renewal after an ambiguous network outcome. If the
+response was lost, the passenger may need password sign-in. Cancellation before
+the network request does not consume the secret. Biometric renewals record
+`kind=biometric` in the existing mobile login report.
+
+The daily `mobile:prune-biometric-sessions` command removes expired/revoked renewal
+families and their consumed-secret records. Keep the Laravel scheduler running.
+Do not separately prune expired Sanctum token rows backing an unexpired biometric
+session: the expired access row is the revocation anchor until renewal expires.
+Deleting that row is safe but forces password sign-in.
