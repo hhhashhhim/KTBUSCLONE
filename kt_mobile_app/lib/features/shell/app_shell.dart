@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../notifications/notification_providers.dart';
+import '../startup/application/startup_controller.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_gradients.dart';
 
-class AppShell extends StatelessWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({required this.child, super.key});
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final path = GoRouterState.of(context).uri.path;
     final index = path.startsWith('/tickets')
         ? 1
@@ -25,6 +28,10 @@ class AppShell extends StatelessWidget {
       body: child,
       bottomNavigationBar: _LovableBottomBar(
         selectedIndex: index,
+        unread:
+            ref.watch(mobileAppConfigProvider)?.features.notifications == true
+            ? ref.watch(notificationPageProvider(1)).value?.unread ?? 0
+            : 0,
         onSelected: (selected) {
           const routes = [
             '/home',
@@ -43,10 +50,12 @@ class AppShell extends StatelessWidget {
 class _LovableBottomBar extends StatelessWidget {
   const _LovableBottomBar({
     required this.selectedIndex,
+    this.unread = 0,
     required this.onSelected,
   });
 
   final int selectedIndex;
+  final int unread;
   final ValueChanged<int> onSelected;
 
   @override
@@ -129,10 +138,14 @@ class _LovableBottomBar extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                selected ? selectedIcon : icon,
-                size: 23,
-                color: selected ? AppColors.primary : AppColors.muted,
+              Badge(
+                isLabelVisible: index == 3 && unread > 0,
+                label: Text(unread > 99 ? '99+' : '$unread'),
+                child: Icon(
+                  selected ? selectedIcon : icon,
+                  size: 23,
+                  color: selected ? AppColors.primary : AppColors.muted,
+                ),
               ),
               const SizedBox(height: 3),
               Text(

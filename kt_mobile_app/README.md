@@ -101,3 +101,10 @@ Account after password confirmation and mobile verification. The server renews
 the existing 10-hour access session for up to 30 days from enrollment by default.
 See [BIOMETRIC_LOGIN.md](docs/BIOMETRIC_LOGIN.md) for platform protection, behavior,
 API rollout and real-device verification.
+
+## Passenger notifications
+
+Alerts now supports a private inbox, unread counts, booking links and optional
+Firebase phone alerts. See [NOTIFICATIONS.md](docs/NOTIFICATIONS.md) for Firebase
+and Apple setup, API contracts, deployment dependencies and device verification.
+The Firebase integration raises the minimum supported iOS version to 15.

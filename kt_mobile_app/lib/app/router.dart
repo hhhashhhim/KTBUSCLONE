@@ -144,6 +144,14 @@ final appRouter = GoRouter(
       ),
     ),
     GoRoute(
+      path: '/notifications/:id',
+      builder: (_, state) => AppShell(
+        child: NotificationDetailScreen(
+          id: int.tryParse(state.pathParameters['id'] ?? '') ?? 0,
+        ),
+      ),
+    ),
+    GoRoute(
       path: '/notifications',
       builder: (_, _) => const AppShell(child: NotificationsScreen()),
     ),

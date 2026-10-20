@@ -3,12 +3,14 @@ class AppFeatureFlags {
     this.wallet = false,
     this.onlinePayments = false,
     this.notifications = false,
+    this.pushNotifications = false,
     this.promotions = false,
   });
 
   final bool wallet;
   final bool onlinePayments;
   final bool notifications;
+  final bool pushNotifications;
   final bool promotions;
 
   factory AppFeatureFlags.fromJson(Map<String, dynamic> json) =>
@@ -16,6 +18,7 @@ class AppFeatureFlags {
         wallet: json['wallet'] == true,
         onlinePayments: json['online_payments'] == true,
         notifications: json['notifications'] == true,
+        pushNotifications: json['push_notifications'] == true,
         promotions: json['promotions'] == true,
       );
 }

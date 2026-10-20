@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers.dart';
+import '../../notifications/notification_push.dart';
 import '../data/auth_repository.dart';
 import '../data/biometric_login_repository.dart';
 import '../domain/passenger.dart';
@@ -39,6 +40,7 @@ final authRepositoryProvider = Provider<AuthRepository>(
     ref.watch(apiClientProvider),
     ref.watch(tokenStorageProvider),
     biometricVault: ref.watch(biometricVaultProvider),
+    beforeLogout: () => ref.read(notificationPushProvider).detach(),
   ),
 );
 
@@ -150,6 +152,7 @@ class AuthController extends Notifier<AuthState> {
 
   Future<void> deleteAccount(String password) async {
     await ref.read(authRepositoryProvider).deleteAccount(password);
+    await ref.read(notificationPushProvider).detach();
     // The server has confirmed deletion. Clear in-memory state even if secure
     // storage is temporarily unavailable; its old token is already revoked.
     state = const AuthState();

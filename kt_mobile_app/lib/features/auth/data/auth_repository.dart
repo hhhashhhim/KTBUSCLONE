@@ -5,12 +5,17 @@ import '../../../core/storage/biometric_vault.dart';
 import '../domain/passenger.dart';
 
 class AuthRepository {
-  AuthRepository(this._api, this._tokens, {BiometricVault? biometricVault})
-    : _biometricVault = biometricVault;
+  AuthRepository(
+    this._api,
+    this._tokens, {
+    BiometricVault? biometricVault,
+    this.beforeLogout,
+  }) : _biometricVault = biometricVault;
 
   final ApiClient _api;
   final TokenStorage _tokens;
   final BiometricVault? _biometricVault;
+  final Future<void> Function()? beforeLogout;
 
   Future<PassengerAccount> login({
     required String mobile,
@@ -73,6 +78,7 @@ class AuthRepository {
   }
 
   Future<void> logout() async {
+    await beforeLogout?.call();
     try {
       await _api.post('/auth/logout');
     } on ApiException {
