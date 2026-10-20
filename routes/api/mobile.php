@@ -62,5 +62,10 @@ Route::prefix('mobile/v1')->group(function () {
         Route::get('bookings/{invoice}', [MobileBookingController::class, 'show']);
 
         Route::get('notifications', [MobileNotificationController::class, 'index']);
+        Route::get('notifications/{id}', [MobileNotificationController::class, 'show'])->whereNumber('id');
+        Route::post('notifications/read-all', [MobileNotificationController::class, 'readAll']);
+        Route::post('notifications/{id}/read', [MobileNotificationController::class, 'read'])->whereNumber('id');
+        Route::put('notifications/device', [MobileNotificationController::class, 'registerDevice'])->middleware('throttle:10,1');
+        Route::delete('notifications/device', [MobileNotificationController::class, 'unregisterDevice'])->middleware('throttle:10,1');
     });
 });

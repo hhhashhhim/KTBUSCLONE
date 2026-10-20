@@ -25,7 +25,8 @@ class MobileAppController extends Controller
         $features = array_merge((array) config('mobile.features', []), (array) optional($row)->features);
         $paymentMethods = $companyId > 0 ? $bookings->paymentMethods() : [];
         // Do not advertise modules that do not have a compatible mobile backend yet.
-        $features['notifications'] = false;
+        $features['notifications'] = \App\Services\Mobile\MobileNotificationInbox::enabled();
+        $features['push_notifications'] = $features['notifications'] && app(\App\Services\Mobile\MobilePushGateway::class)->configured();
         $features['promotions'] = false;
         $features['online_payments'] = !config('mobile_payments.preview_only') && count(array_diff($paymentMethods, ['counter'])) > 0;
 

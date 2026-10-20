@@ -292,3 +292,42 @@ This source change does not deploy the API, run production migrations, or publis
 an app release. Biometric credentials require an online server check and never
 contain the passenger password. Redact `refresh_token` anywhere request bodies
 could be logged. Rollback should disable the feature first; password login remains.
+
+### Recover from biometric migration error 1067
+
+On legacy MySQL/MariaDB timestamp settings, the original biometric token table
+can fail with `Invalid default value for 'created_at'`. The sessions table has
+already been created, but Laravel has not recorded the migration as complete.
+The repaired migration uses `DATETIME` for token creation time and creates each
+table only when missing, preserving existing rows when the migration resumes.
+
+Keep the API in maintenance mode and preserve the database backup. Deploy the
+repaired migration from `mobile-backend`; do not drop the sessions table, roll
+back the earlier successful control/monitoring migrations, or change SQL modes.
+Review `php artisan migrate:status` and run only the remaining migration:
+
+```bash
+php artisan config:clear &&
+php artisan migrate --force --path=database/migrations/2026_10_20_000007_create_mobile_biometric_sessions.php &&
+php artisan route:clear &&
+php artisan config:cache &&
+php artisan queue:restart &&
+php artisan up
+```
+
+If any command fails, leave the API in maintenance mode and resolve the error.
+After success, confirm that the migration is recorded with `migrate:status` and
+that `https://mobile-api.kainattravels.com/api/mobile/v1/app/config` returns JSON.
+Then verify biometric enrollment and renewal using the updated app on a real
+device; successful schema deployment alone does not establish that device flow.
+
+
+## Passenger notifications rollout
+
+Deploy the notification schema, inbox/controller, booking-change scanner and scheduled
+command from `mobile-backend`, the administration endpoints/privileges from `api`,
+and rebuilt screens from `mix`. See [MOBILE_NOTIFICATIONS.md](MOBILE_NOTIFICATIONS.md)
+for scoped migration commands, Firebase environment settings, scheduling and staged
+verification. Flutter has a matching setup guide in `kt_mobile_app/docs/NOTIFICATIONS.md`.
+The inbox does not require Firebase; phone delivery does. No deployment or live
+message send is implied by a successful local build.
