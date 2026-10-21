@@ -561,7 +561,7 @@ class TicketingApiController extends Controller
                         $seatMap[$i][$j]['fare'] = customRound($seatMap[$i][$j]['fare']??0);
                     }
                 }
-                $schedule->bus_class->seat_map = $seatMap;
+                $schedule->bus_class->seat_map = app(\App\Services\ScheduleQuotaDiscountService::class)->preview($scheduleDetail, $tickets, $seatMap, Auth::user());
                 $data = $schedule->bus_class;
 
 
@@ -583,6 +583,7 @@ class TicketingApiController extends Controller
 
     public function bookSeat(Request $request)
     {
+        $transactionLevel = DB::transactionLevel();
         try {
                 $companyId = Auth::user()->company_id;
                 $terminalId = Auth::user()->terminal_id;
@@ -700,6 +701,7 @@ class TicketingApiController extends Controller
                 }
 
                 $request->merge(['selected_seats' => $canonicalSeats]);
+                $quotaDiscountQuotes = app(\App\Services\ScheduleQuotaDiscountService::class)->bookingQuotes($detail, $request, 'legacy');
                 
                 $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$detail->schedule_id,"schedule_date"=>$detail->schedule_date])->first();
                 $existingTicket = Ticket::where(['company_id' => $companyId, 'schedule_date' => $detail->schedule_date, 'schedule_id' => $request->schedule_id])->latest()->first(['bus_id', 'ticket_closing_id','ticket_merge_id']);
@@ -811,7 +813,7 @@ class TicketingApiController extends Controller
                             'destination_city_id' => $request->destination_city_id,
                             'seat_no' => $seat,
                             'bus_class_id' => $request->selected_seats_class[$i],
-                            'seat_fare' => $request->selected_seats_fare[$i],
+                            'seat_fare' => $request->selected_seats_fare[$i] + ($quotaDiscountQuotes[$i]['quota_discount'] ?? 0),
                             'is_partial' => $isPartial,
                             'booking_no' => $bookingNo,
                             'invoice_id' => $invoice->id,
@@ -836,11 +838,14 @@ class TicketingApiController extends Controller
                             'booked_time' => date("Y-m-d H:i:s"),
                             'added_by' => Auth::user()->id,
                             'updated_by' => Auth::user()->id,
-                            'discount' => 0,
+                            'discount' => $quotaDiscountQuotes[$i]['quota_discount'] ?? 0,
                             'surcharge' => $surcharge,
                             'points_usage' => 0,
                              'transaction_id' => $request->pp_TxnRefNo ?? null,
                         ]);
+                        if (!empty($quotaDiscountQuotes[$i]['quota_discount'])) {
+                            $ticket->update(['quota_discount' => $quotaDiscountQuotes[$i]['quota_discount']]);
+                        }
                         if ($isPartial == 1) {
 
                             TicketIsPartial::create([
@@ -890,8 +895,12 @@ class TicketingApiController extends Controller
 
                 return new CreatedResource(["invoice_id"=>$invoice->id]);
 
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                return response()->json(['message' => 'Please refresh the seat map.', 'errors' => $e->errors()], 422);
             } catch (\Exception $e) {
                 return new BreakResource($e->getMessage());
-        }
+            } finally {
+                while (DB::transactionLevel() > $transactionLevel) { DB::rollBack(); }
+            }
     }
 }

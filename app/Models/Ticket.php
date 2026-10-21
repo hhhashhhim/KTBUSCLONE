@@ -54,6 +54,7 @@ class Ticket extends Model
         'online_terminal', // Online terminal associated with the booking.
         'reschedule_type', // Type or source of ticket rescheduling.
         'discount', // Direct discount applied to the seat fare.
+        'quota_discount', // Included in discount; retained separately for reservation confirmation/audit.
         'terminal_discount', // Discount configured by the terminal.
         'schedule_discount', // Discount configured for the schedule.
         'surcharge', // Surcharge applied when the ticket was booked.
