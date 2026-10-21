@@ -1,0 +1,46 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const { parse, compileTemplate } = require('@vue/compiler-sfc');
+const file = 'resources/js/pages/schedule/QuotaDiscountModal.vue';
+const { descriptor, errors } = parse(fs.readFileSync(file, 'utf8'));
+assert.deepEqual(errors, []);
+assert.deepEqual(compileTemplate({ source: descriptor.template.content, filename: file, id: 'quota-discount' }).errors, []);
+const events = [];
+const context = { module: { exports: {} }, $: selector => ({ modal: action => events.push([selector, action]) }) };
+vm.runInNewContext(descriptor.script.content.replace('export default', 'module.exports ='), context);
+const component = context.module.exports;
+function view() {
+    const state = component.data();
+    for (const [key, method] of Object.entries(component.methods)) state[key] = method.bind(state);
+    return state;
+}
+(async () => {
+    const state = view();
+    let calls = [];
+    state.callApi = async (method, path, data) => { calls.push({ method, path, data }); return { status: 200, data: { users: [{ id: 1, name: 'Website', user_name: 'web' }], discounts: [{ user_id: 1, percentage: '2.00' }] } }; };
+    await state.open({ id: 5, name: 'Test schedule' });
+    assert.equal(state.loaded, true); assert.equal(state.rows[0].user_id, '1');
+    assert.equal(component.computed.selectSettings().minimumResultsForSearch, 0);
+    assert.equal(component.computed.selectSettings().dropdownParent, '#scheduleQuotaDiscountModal');
+    assert.equal(component.computed.userOptions.call(state)[1].text, 'Website (web)');
+    for (const value of ['', '-1', '101', '2.555', 'invalid']) {
+        state.rows[0].percentage = value; await state.save(); assert.equal(calls.length, 1); assert.ok(state.error);
+    }
+    state.rows[0].percentage = '2'; state.addRow(); state.rows[1].user_id = '1'; state.rows[1].percentage = '3';
+    await state.save(); assert.equal(calls.length, 1, 'Duplicate users cannot save');
+    state.rows.splice(1, 1); await state.save();
+    assert.equal(calls[1].path, 'schedule/quota-discount/save');
+    assert.equal(calls[1].data.id, 5); assert.equal(calls[1].data.discounts[0].percentage, 2);
+    assert.equal(events.at(-1)[1], 'hide');
+    state.rows = []; await state.save(); assert.equal(calls[2].data.discounts.length, 0, 'Removing all rules sends an explicit empty list');
+    state.callApi = async () => ({ status: 422, data: { errors: { user: ['User is not permitted.'] } } });
+    await state.save(); assert.equal(state.error, 'User is not permitted.'); assert.equal(state.saving, false);
+    state.callApi = async () => { throw new Error('Unavailable'); }; await state.open({ id: 6 });
+    assert.equal(state.loaded, false); assert.equal(state.loading, false); assert.equal(state.rows.length, 0);
+    assert.equal(state.error, 'Unavailable');
+    const source = fs.readFileSync('resources/js/pages/schedule/SchedulePage.vue', 'utf8');
+    assert.match(source, /checkForSubmenuButtons\('edit-schedule'\)[^\n]+\$refs.quotaDiscount.open/);
+    assert.match(source, /<QuotaDiscountModal ref="quotaDiscount"/);
+    console.log('PASS quota discount modal, searchable users, percentage validation, add/remove rules, save failures and role-gated schedule button');
+})().catch(error => { console.error(error); process.exitCode = 1; });

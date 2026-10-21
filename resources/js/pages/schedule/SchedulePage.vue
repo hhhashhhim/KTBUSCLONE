@@ -134,6 +134,7 @@
                                                                     @click="openQuota(schedule.schedule)">
                                                                 Quota: {{ schedule.schedule.intermediate_quota == null ? 'Unlimited' : schedule.schedule.intermediate_quota }}
                                                             </button>
+                                                            <button v-if="checkForSubmenuButtons('edit-schedule')" type="button" class="btn btn-outline-success btn-sm mr-1" @click="$refs.quotaDiscount.open(schedule.schedule)">Quota Discount</button>
                                                             <button class="btn btn-success btn-sm mr-1"
                                                                     v-if="checkForSubmenuButtons('update-time')"
                                                                     @click="editTime(schedule)"
@@ -162,6 +163,7 @@
                 </div>
             </div>
 
+            <QuotaDiscountModal ref="quotaDiscount" />
             <div class="modal fade" id="scheduleQuotaModal" tabindex="-1" aria-labelledby="scheduleQuotaTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <form class="modal-content" @submit.prevent="saveQuota">
@@ -891,6 +893,7 @@
 
 <script>
 import Add from "../../components/Add.vue";
+import QuotaDiscountModal from './QuotaDiscountModal.vue';
 import Edit from "../../components/Edit.vue";
 import Hide from "../../components/Hide.vue";
 import vueMask from 'vue-jquery-mask';
@@ -899,6 +902,7 @@ import {mapGetters} from "vuex";
 export default {
     name: "SchedulePage",
     components: {
+        QuotaDiscountModal,
         Add,
         Edit,
         Hide,
