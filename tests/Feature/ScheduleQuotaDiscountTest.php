@@ -30,7 +30,7 @@ class ScheduleQuotaDiscountTest extends TestCase
         $this->table('routes_fares', ['route_id','departure_city_id','destination_city_id']);
         $this->table('schedule_details', ['company_id','schedule_id','departure_id','destination_id'], ['schedule_date','departure_date','departure_time']);
         $this->table('tickets', ['company_id','schedule_id','departure_city_id','destination_city_id'], ['seat_no','schedule_date','type','booked_time']);
-        $this->table('users', ['company_id','hide','terminal_id'], ['name','user_name']);
+        $this->table('users', ['company_id','hide','terminal_id'], ['name','email','password']);
         $this->table('roles', [], ['permissions']);
         $this->table('activity_logs', ['company_id','activity_by'], ['message','requested_host']);
         require_once database_path('migrations/2026_10_21_000001_create_schedule_quota_discounts.php');
@@ -39,7 +39,7 @@ class ScheduleQuotaDiscountTest extends TestCase
         DB::table('routes')->insert(['id'=>1]);
         foreach ([[10,20],[20,30],[30,40]] as $pair) DB::table('routes_fares')->insert(['route_id'=>1,'departure_city_id'=>$pair[0],'destination_city_id'=>$pair[1]]);
         foreach ([[1,10,40],[2,10,20],[3,20,30],[4,30,40],[5,10,30]] as $d) DB::table('schedule_details')->insert(['id'=>$d[0],'company_id'=>1,'schedule_id'=>1,'departure_id'=>$d[1],'destination_id'=>$d[2],'schedule_date'=>'2026-10-21','departure_date'=>'2026-10-21','departure_time'=>'23:00:00']);
-        foreach ([[1,1,0],[2,1,0],[3,2,0],[4,1,1]] as $u) DB::table('users')->insert(['id'=>$u[0],'company_id'=>$u[1],'hide'=>$u[2],'name'=>'Test user '.$u[0],'user_name'=>'test'.$u[0]]);
+        foreach ([[1,1,0],[2,1,0],[3,2,0],[4,1,1]] as $u) DB::table('users')->insert(['id'=>$u[0],'company_id'=>$u[1],'hide'=>$u[2],'name'=>'Test user '.$u[0],'email'=>'test'.$u[0].'@example.test','password'=>'test-only-password']);
         DB::table('roles')->insert(['id'=>1,'permissions'=>json_encode([['allow'=>true,'childs'=>[['name'=>'schedules','allow'=>true,'buttons'=>[['name'=>'edit-schedule','allow'=>true]]]]]])]);
         Auth::setUser((new User)->forceFill(['id'=>1,'company_id'=>1,'hide'=>0,'role_id'=>1]));
         DB::table('schedule_quota_discounts')->insert(['company_id'=>1,'schedule_id'=>1,'user_id'=>1,'percentage'=>2,'updated_by'=>1]);
@@ -115,6 +115,18 @@ class ScheduleQuotaDiscountTest extends TestCase
         $this->assertSame(0,DB::table('schedule_quota_discounts')->where('active',true)->count());
         $this->assertSame(2,DB::table('schedule_quota_discounts')->count());
         $this->assertSame('No',$this->preview()[0][0]['is_special']);
+    }
+    public function test_editor_loads_email_login_without_a_user_name_database_column(): void {
+        $this->assertFalse(Schema::hasColumn('users', 'user_name'));
+        $data = (new ScheduleQuotaDiscountController)->show($this->request(['id'=>1]))->getData(true);
+        $this->assertSame([1, 2], array_column($data['users'], 'id'));
+        $this->assertSame(['test1@example.test', 'test2@example.test'], array_column($data['users'], 'user_name'));
+        foreach ($data['users'] as $user) {
+            $this->assertSame(['id', 'name', 'user_name', 'terminal_id'], array_keys($user));
+            $this->assertArrayNotHasKey('password', $user);
+        }
+        $this->assertSame(1, count($data['discounts']));
+        $this->assertEquals(2, $data['discounts'][0]['percentage']);
     }
     public function test_duplicate_cross_company_hidden_users_and_invalid_percentages_cannot_be_saved(): void {
         $c=new ScheduleQuotaDiscountController;

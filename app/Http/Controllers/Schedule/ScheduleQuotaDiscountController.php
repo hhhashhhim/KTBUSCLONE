@@ -27,7 +27,9 @@ class ScheduleQuotaDiscountController extends Controller
         $company = $request->user()->company_id;
         $schedule = Schedule::where('company_id', $company)->findOrFail($request->id);
         return response()->json([
-            'users' => User::where('company_id', $company)->where('hide', 0)->orderBy('name')->get(['id', 'name', 'user_name', 'terminal_id']),
+            // User logins are stored in email. Preserve the dropdown's response key,
+            // without querying a user_name column (which only exists on companies).
+            'users' => User::where('company_id', $company)->where('hide', 0)->orderBy('name')->get(['id', 'name', 'email as user_name', 'terminal_id']),
             'discounts' => DB::table('schedule_quota_discounts')->where('company_id', $company)->where('schedule_id', $schedule->id)->where('active', true)->orderBy('id')->get(['user_id', 'percentage']),
         ]);
     }
