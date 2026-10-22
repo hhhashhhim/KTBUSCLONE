@@ -110,44 +110,44 @@
                                                               }}
                                                         </td>
                                                         <td>
-                                                            <button class="btn btn-secondary btn-sm mr-1"
-                                                                    title="View Schedule Details"
+                                                            <ScheduleActions :label="schedule.schedule.name || 'schedule'">
+                                                            <button type="button" role="menuitem"
                                                                     :disabled="viewLoading"
                                                                     @click="viewSchedule(schedule.schedule.id)">
-                                                                <i class="fas fa-eye"></i>
+                                                                <i class="fas fa-eye" aria-hidden="true"></i> View Details
                                                             </button>
-                                                            <button class="btn btn-info btn-sm mr-1"
+                                                            <button type="button" role="menuitem"
                                                                     v-if="checkForSubmenuButtons('extend-schedule')"
-                                                                    @click="addDays(schedule.schedule), this.extendDate.extended_days == ''"
+                                                                    @click="addDays(schedule.schedule); extendDate.extended_days = ''"
                                                                     data-target="#addDaysModal" data-toggle="modal"
                                                                     title="Extend Schedule Range"><i
-                                                                class="fas fa-plus"></i></button>
-                                                            <button title="Edit Schedule"
+                                                                class="fas fa-plus" aria-hidden="true"></i> Extend Schedule</button>
+                                                            <button type="button" role="menuitem" title="Edit Schedule"
                                                                     v-if="checkForSubmenuButtons('edit-schedule')"
                                                                     @click=" edit(schedule.schedule); genericData(); "
-                                                                    class="btn btn-primary mr-1 btn-sm"><i
-                                                                class="far fa-edit"></i>
+                                                                    ><i class="far fa-edit" aria-hidden="true"></i> Edit Schedule
                                                             </button>
                                                             <button v-if="checkForSubmenuButtons('edit-schedule')"
-                                                                    type="button" class="btn btn-outline-primary btn-sm mr-1"
+                                                                    type="button" role="menuitem"
                                                                     title="Set advance paid intermediate-seat quota"
                                                                     @click="openQuota(schedule.schedule)">
-                                                                Quota: {{ schedule.schedule.intermediate_quota == null ? 'Unlimited' : schedule.schedule.intermediate_quota }}
+                                                                <i class="fas fa-chair" aria-hidden="true"></i> Quota: {{ schedule.schedule.intermediate_quota == null ? 'Unlimited' : schedule.schedule.intermediate_quota }}
                                                             </button>
-                                                            <button v-if="checkForSubmenuButtons('edit-schedule')" type="button" class="btn btn-outline-success btn-sm mr-1" @click="$refs.quotaDiscount.open(schedule.schedule)">Quota Discount</button>
-                                                            <button class="btn btn-success btn-sm mr-1"
+                                                            <button v-if="checkForSubmenuButtons('edit-schedule')" type="button" role="menuitem" @click="$refs.quotaDiscount.open(schedule.schedule)"><i class="fas fa-percent" aria-hidden="true"></i> Quota Discount</button>
+                                                            <button type="button" role="menuitem"
                                                                     v-if="checkForSubmenuButtons('update-time')"
                                                                     @click="editTime(schedule)"
                                                                     data-target="#editTimeModal" data-toggle="modal"
                                                                     title="Edit Time"><i
-                                                                class="fas fa-clock"></i></button>
-                                                            <button title="Delete Terminal"
+                                                                class="fas fa-clock" aria-hidden="true"></i> Edit Time</button>
+                                                            <button type="button" role="menuitem" title="Delete Schedule"
                                                                     v-if="checkForSubmenuButtons('delete-schedule')"
                                                                     :data-target="'#' + hideFormID" @click="delId = schedule.schedule.id" data-toggle="modal"
-                                                                    class="btn btn-danger btn-sm mr-1"
+                                                                    class="text-danger"
                                                             >
-                                                                <i class="far fas fa-trash"></i>
+                                                                <i class="fas fa-trash" aria-hidden="true"></i> Delete Schedule
                                                             </button>
+                                                            </ScheduleActions>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -894,6 +894,7 @@
 <script>
 import Add from "../../components/Add.vue";
 import QuotaDiscountModal from './QuotaDiscountModal.vue';
+import ScheduleActions from './ScheduleActions.vue';
 import Edit from "../../components/Edit.vue";
 import Hide from "../../components/Hide.vue";
 import vueMask from 'vue-jquery-mask';
@@ -903,6 +904,7 @@ export default {
     name: "SchedulePage",
     components: {
         QuotaDiscountModal,
+        ScheduleActions,
         Add,
         Edit,
         Hide,

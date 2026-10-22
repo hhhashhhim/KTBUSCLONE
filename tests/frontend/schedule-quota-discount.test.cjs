@@ -20,6 +20,7 @@ function view() {
     let calls = [];
     state.callApi = async (method, path, data) => { calls.push({ method, path, data }); return { status: 200, data: { users: [{ id: 1, name: 'Website', user_name: 'web' }], discounts: [{ user_id: 1, percentage: '2.00' }] } }; };
     await state.open({ id: 5, name: 'Test schedule' });
+    assert.equal(events.at(-1)[1], 'show', 'Bootstrap 5 requires an explicit show, not just modal options');
     assert.equal(state.loaded, true); assert.equal(state.rows[0].user_id, '1');
     assert.equal(component.computed.selectSettings().minimumResultsForSearch, 0);
     assert.equal(component.computed.selectSettings().dropdownParent, '#scheduleQuotaDiscountModal');
@@ -39,6 +40,17 @@ function view() {
     state.callApi = async () => { throw new Error('Unavailable'); }; await state.open({ id: 6 });
     assert.equal(state.loaded, false); assert.equal(state.loading, false); assert.equal(state.rows.length, 0);
     assert.equal(state.error, 'Unavailable');
+    assert.equal(events.at(-1)[1], 'show', 'Load errors must be displayed in a visible modal');
+    state.close(); assert.equal(events.at(-1)[1], 'hide');
+    state.callApi = async () => ({ status: 503, data: { message: 'Install the quota discount migration first.' } });
+    await state.open({ id: 7 });
+    assert.equal(state.error, 'Install the quota discount migration first.');
+    assert.equal(state.loaded, false);
+    assert.equal(events.at(-1)[1], 'show', 'Reopening after a failed load must show the modal');
+    state.saving = true;
+    const eventCount = events.length;
+    state.close(); await state.open({ id: 8 });
+    assert.equal(events.length, eventCount, 'Cannot dismiss or change schedules while saving');
     const source = fs.readFileSync('resources/js/pages/schedule/SchedulePage.vue', 'utf8');
     assert.match(source, /checkForSubmenuButtons\('edit-schedule'\)[^\n]+\$refs.quotaDiscount.open/);
     assert.match(source, /<QuotaDiscountModal ref="quotaDiscount"/);
