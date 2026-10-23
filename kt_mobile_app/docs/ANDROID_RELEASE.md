@@ -57,9 +57,14 @@ flutter build apk --release --dart-define-from-file=dart_defines.production.json
 
 ## Test build
 
-Version 1.0.4 (build 5) adds verified signup and replacement-token persistence.
-It requires the pending-registration migration and matching backend authentication
-changes documented in `MOBILE_DEPLOYMENT.md`. Without a configured
+Version 1.0.5 (build 6) includes refreshed schedule cards and booked-seat colours,
+responsive Home and authentication layouts, media refreshes, updated icons and
+startup motion, Android biometric setup guidance, in-app legal pages, and the
+Travel Points wallet label. It retains verified signup
+and replacement-token persistence from 1.0.4 (build 5).
+It requires the pending-registration migration and matching backend authentication,
+schedule arrival, and booked-gender changes documented in `MOBILE_DEPLOYMENT.md`.
+Without a configured
 upload key, produce an installable debug-signed Android APK and an iOS simulator
 app using the same API configuration:
 

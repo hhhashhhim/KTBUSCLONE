@@ -44,6 +44,11 @@ List<TravelSeat> _mixedLayout() {
           status: number < 20
               ? SeatAvailability.booked
               : SeatAvailability.available,
+          bookedGender: number == 1
+              ? 'male'
+              : number == 2
+              ? 'female'
+              : null,
           price: 2500,
           classId: 1,
         ),
@@ -260,6 +265,33 @@ void main() {
     tester,
   ) async {
     final container = await _showSeats(tester, size: const Size(412, 915));
+    expect(find.text('Male'), findsOneWidget);
+    expect(find.text('Female'), findsOneWidget);
+    expect(find.text('(booked)'), findsNWidgets(2));
+    expect(find.text('Booked'), findsNothing);
+    for (final entry in {
+      '1': const Color(0xFFD7E8FF),
+      '2': const Color(0xFFFFD8E8),
+      '3': const Color(0xFFD7E8FF),
+    }.entries) {
+      final cell = tester.widget<AnimatedContainer>(
+        find.descendant(
+          of: _seat(entry.key),
+          matching: find.byType(AnimatedContainer),
+        ),
+      );
+      expect((cell.decoration! as BoxDecoration).color, entry.value);
+      await tester.tap(_seat(entry.key));
+      expect(container.read(bookingFlowProvider).selectedSeats, isEmpty);
+    }
+    expect(
+      tester.widget<Semantics>(_seat('1')).properties.label,
+      'Seat 1, male booked',
+    );
+    expect(
+      tester.widget<Semantics>(_seat('2')).properties.label,
+      'Seat 2, female booked',
+    );
     expect(
       tester.getCenter(_seat('3')).dx,
       lessThan(tester.getCenter(_seat('2')).dx),

@@ -13,6 +13,7 @@ import '../../auth/application/auth_controller.dart';
 import '../../payments/presentation/payment_method_selector.dart';
 import '../application/travel_providers.dart';
 import '../domain/travel_models.dart';
+import 'schedule_result_card.dart';
 
 String formatPkr(num amount) => NumberFormat.currency(
   locale: 'en_PK',
@@ -571,16 +572,23 @@ class _ScheduleResultsScreenState extends ConsumerState<ScheduleResultsScreen> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
               children: [
-                const _ResultChip(label: 'Filters', icon: Icons.tune_rounded),
-                const SizedBox(width: 8),
+                const Center(
+                  child: Text(
+                    'Sort by',
+                    style: TextStyle(color: AppColors.muted, fontSize: 12),
+                  ),
+                ),
+                const SizedBox(width: 12),
                 _ResultChip(
                   label: 'Earliest',
+                  icon: Icons.schedule_rounded,
                   selected: !_sortByPrice,
                   onTap: () => setState(() => _sortByPrice = false),
                 ),
                 const SizedBox(width: 8),
                 _ResultChip(
                   label: 'Cheapest',
+                  icon: Icons.payments_outlined,
                   selected: _sortByPrice,
                   onTap: () => setState(() => _sortByPrice = true),
                 ),
@@ -624,18 +632,45 @@ class _ScheduleResultsScreenState extends ConsumerState<ScheduleResultsScreen> {
                     );
                   }
                   return ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(16),
-                    itemCount: sorted.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) => _ScheduleCard(
-                      schedule: sorted[index],
-                      onTap: () {
-                        ref
-                            .read(bookingFlowProvider.notifier)
-                            .begin(query, sorted[index]);
-                        context.push('/search/seats');
-                      },
-                    ),
+                    itemCount: sorted.length + 1,
+                    separatorBuilder: (_, _) => const SizedBox(height: 14),
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return Row(
+                          children: [
+                            const Expanded(
+                              child: Text(
+                                'Available buses',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              '${sorted.length} ${sorted.length == 1 ? 'departure' : 'departures'}',
+                              style: const TextStyle(
+                                color: AppColors.muted,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      final schedule = sorted[index - 1];
+                      return ScheduleResultCard(
+                        key: ValueKey(schedule.scheduleDetailId),
+                        schedule: schedule,
+                        onTap: () {
+                          ref
+                              .read(bookingFlowProvider.notifier)
+                              .begin(query, schedule);
+                          context.push('/search/seats');
+                        },
+                      );
+                    },
                   );
                 },
               ),
@@ -671,7 +706,11 @@ class _ResultChip extends StatelessWidget {
         child: Row(
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 16),
+              Icon(
+                icon,
+                size: 16,
+                color: selected ? Colors.white : AppColors.muted,
+              ),
               const SizedBox(width: 5),
             ],
             Text(
@@ -689,125 +728,10 @@ class _ResultChip extends StatelessWidget {
   );
 }
 
-class _ScheduleCard extends StatelessWidget {
-  const _ScheduleCard({required this.schedule, required this.onTap});
-  final TravelSchedule schedule;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => AppCard(
-    padding: const EdgeInsets.all(16),
-    onTap: onTap,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          schedule.busClassName,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 15),
-        Row(
-          children: [
-            _ScheduleStop(
-              city: schedule.origin.name,
-              time: schedule.departureAt,
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 3,
-                      backgroundColor: AppColors.gold,
-                    ),
-                    const Expanded(child: Divider(color: AppColors.border)),
-                    Icon(
-                      Icons.arrow_forward_rounded,
-                      size: 17,
-                      color: AppColors.muted.withValues(alpha: .8),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            _ScheduleStop(
-              city: schedule.destination.name,
-              time: schedule.arrivalAt,
-              right: true,
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        const Divider(height: 1),
-        const SizedBox(height: 13),
-        Row(
-          children: [
-            const Icon(
-              Icons.event_seat_outlined,
-              color: AppColors.muted,
-              size: 17,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              '${schedule.availableSeats} seats left',
-              style: const TextStyle(color: AppColors.muted, fontSize: 11),
-            ),
-            const Spacer(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  formatPkr(schedule.minimumFare),
-                  style: const TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const Text(
-                  'per seat',
-                  style: TextStyle(color: AppColors.muted, fontSize: 9.5),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
-
-class _ScheduleStop extends StatelessWidget {
-  const _ScheduleStop({
-    required this.city,
-    required this.time,
-    this.right = false,
-  });
-  final String city;
-  final DateTime? time;
-  final bool right;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: right
-        ? CrossAxisAlignment.end
-        : CrossAxisAlignment.start,
-    children: [
-      Text(
-        time == null ? '—' : DateFormat('HH:mm').format(time!),
-        style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800),
-      ),
-      const SizedBox(height: 3),
-      Text(
-        city,
-        style: const TextStyle(color: AppColors.muted, fontSize: 10.5),
-      ),
-    ],
-  );
-}
-
-const _unavailableSeatColor = Color(0xFF687A70);
+const _maleBookedSeatColor = Color(0xFFD7E8FF);
+const _femaleBookedSeatColor = Color(0xFFFFD8E8);
+const _maleSeatAccent = Color(0xFF3269A8);
+const _femaleSeatAccent = Color(0xFFA6416A);
 
 class SeatSelectionScreen extends ConsumerStatefulWidget {
   const SeatSelectionScreen({super.key});
@@ -840,7 +764,7 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
       appBar: AppPageHeader(
         title: 'Select seats',
         subtitle:
-            '${schedule.busClassName} · ${DateFormat('HH:mm').format(schedule.departureAt)}',
+            '${schedule.busClassName} · ${DateFormat('h:mm a').format(schedule.departureAt)}',
       ),
       body: FutureBuilder<SeatLayoutResult>(
         future: _request,
@@ -908,15 +832,36 @@ class _SeatLegend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Padding(
-    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-    child: Wrap(
-      spacing: 14,
-      runSpacing: 8,
+    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+    child: Row(
       children: [
-        _Legend(color: AppColors.surfaceAlt, label: 'Available', border: true),
-        _Legend(color: AppColors.primary, label: 'Selected'),
-        _Legend(color: _unavailableSeatColor, label: 'Booked'),
-        _Legend(color: Color(0xFFFFD48A), label: 'Ladies'),
+        Expanded(
+          child: _Legend(
+            color: AppColors.surface,
+            label: 'Available',
+            border: true,
+          ),
+        ),
+        SizedBox(width: 6),
+        Expanded(
+          child: _Legend(color: AppColors.primary, label: 'Selected'),
+        ),
+        SizedBox(width: 6),
+        Expanded(
+          child: _Legend(
+            color: _maleBookedSeatColor,
+            label: 'Male',
+            detail: '(booked)',
+          ),
+        ),
+        SizedBox(width: 6),
+        Expanded(
+          child: _Legend(
+            color: _femaleBookedSeatColor,
+            label: 'Female',
+            detail: '(booked)',
+          ),
+        ),
       ],
     ),
   );
@@ -926,29 +871,53 @@ class _Legend extends StatelessWidget {
   const _Legend({
     required this.color,
     required this.label,
+    this.detail,
     this.border = false,
   });
   final Color color;
   final String label;
+  final String? detail;
   final bool border;
 
   @override
   Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
+    mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Container(
-        width: 18,
-        height: 18,
+        width: 12,
+        height: 16,
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(4),
           border: border ? Border.all(color: AppColors.border) : null,
         ),
       ),
-      const SizedBox(width: 6),
-      Text(
-        label,
-        style: const TextStyle(color: AppColors.muted, fontSize: 10.5),
+      const SizedBox(width: 5),
+      Flexible(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 10,
+                height: 1,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            if (detail != null) ...[
+              Text(
+                detail!,
+                style: const TextStyle(
+                  color: AppColors.muted,
+                  fontSize: 8.5,
+                  height: 1,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     ],
   );
@@ -1161,16 +1130,42 @@ class _SeatCell extends StatelessWidget {
       return SizedBox(width: width, height: height);
     }
     final booked = !value.selectable && !selected;
+    final bookedGender = switch (value.status) {
+      SeatAvailability.male => 'male',
+      SeatAvailability.female => 'female',
+      SeatAvailability.booked => value.bookedGender,
+      _ => null,
+    };
+    final hasBookedGender = bookedGender == 'male' || bookedGender == 'female';
+    final bookedColor = bookedGender == 'female'
+        ? _femaleBookedSeatColor
+        : _maleBookedSeatColor;
     final color = selected
         ? AppColors.primary
-        : value.status == SeatAvailability.female
-        ? const Color(0xFFFFE0A6)
         : booked
-        ? _unavailableSeatColor
-        : AppColors.surfaceAlt;
+        ? bookedColor
+        : AppColors.surface;
+    final foreground = selected
+        ? Colors.white
+        : booked
+        ? bookedGender == 'female'
+              ? _femaleSeatAccent
+              : _maleSeatAccent
+        : AppColors.foreground;
+    final borderColor = selected
+        ? AppColors.primaryDark
+        : booked
+        ? foreground.withValues(alpha: .38)
+        : AppColors.border;
     return Semantics(
-      label: 'Seat ${value.number}, ${value.status.name}',
+      label:
+          'Seat ${value.number}, ${selected
+              ? 'selected'
+              : hasBookedGender
+              ? '$bookedGender booked'
+              : value.status.name}',
       button: value.selectable,
+      selected: selected,
       child: InkWell(
         onTap: value.selectable || selected ? () => onTap(value) : null,
         borderRadius: BorderRadius.circular(13),
@@ -1181,23 +1176,61 @@ class _SeatCell extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(13),
-            border: Border.all(
-              color: selected
-                  ? AppColors.primary
-                  : value.status == SeatAvailability.female
-                  ? AppColors.gold
-                  : AppColors.border,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(12),
+              bottom: Radius.circular(9),
             ),
+            border: Border.all(color: borderColor, width: selected ? 1.5 : 1),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: .22),
+                      blurRadius: 7,
+                      offset: const Offset(0, 3),
+                    ),
+                  ]
+                : null,
           ),
-          child: Text(
-            value.number,
-            style: TextStyle(
-              color: selected || booked ? Colors.white : AppColors.foreground,
-              fontSize: 12,
-              height: 1.2,
-              fontWeight: FontWeight.w800,
-            ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    value.number,
+                    style: TextStyle(
+                      color: foreground,
+                      fontSize: 12,
+                      height: 1.2,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 9,
+                right: 9,
+                bottom: 5,
+                child: Container(
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: foreground.withValues(alpha: selected ? .45 : .18),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              if (selected || booked)
+                Positioned(
+                  top: 3,
+                  right: 3,
+                  child: Icon(
+                    selected ? Icons.check_rounded : Icons.lock_rounded,
+                    size: 9,
+                    color: foreground.withValues(alpha: selected ? 1 : .65),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -1870,7 +1903,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             children: [
-              _TripReview(flow: flow),
+              _BookingSummary(flow: flow, quote: quote),
               const SizedBox(height: 16),
               const AppSectionTitle('Payment method'),
               const SizedBox(height: 10),
@@ -1885,8 +1918,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 }),
               ),
               _walletSelector(wallet, flow),
-              const SizedBox(height: 6),
-              _FareSummary(quote: quote),
             ],
           );
         },
@@ -2030,9 +2061,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 }
 
-class _TripReview extends StatelessWidget {
-  const _TripReview({required this.flow});
+class _BookingSummary extends StatelessWidget {
+  const _BookingSummary({required this.flow, required this.quote});
   final BookingFlowState flow;
+  final FareQuote quote;
 
   @override
   Widget build(BuildContext context) {
@@ -2041,117 +2073,69 @@ class _TripReview extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Text(
+            'Booking summary',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 16),
+          _detailRow(
+            flow.selectedSeats.length == 1 ? 'Seat number' : 'Seat numbers',
+            flow.selectedSeats.map((seat) => seat.number).join(', '),
+          ),
+          _detailRow(
+            'Date & time',
+            DateFormat('EEE, d MMM yyyy · h:mm a').format(schedule.departureAt),
+          ),
+          _detailRow('Departure city', schedule.origin.name),
+          _detailRow('Arrival city', schedule.destination.name),
+          _detailRow('Bus type', schedule.busClassName),
+          const Divider(height: 24),
           Row(
             children: [
-              Expanded(
+              const Expanded(
                 child: Text(
-                  '${schedule.origin.name} → ${schedule.destination.name}',
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  'Total amount',
+                  style: TextStyle(fontWeight: FontWeight.w800),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                decoration: const BoxDecoration(
-                  color: AppColors.primarySoft,
-                  borderRadius: AppRadius.button,
-                ),
+              Flexible(
                 child: Text(
-                  '${flow.selectedSeats.length} seat${flow.selectedSeats.length == 1 ? '' : 's'}',
+                  formatPkr(quote.total),
+                  textAlign: TextAlign.end,
                   style: const TextStyle(
                     color: AppColors.primary,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 21,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 5),
-          Text(
-            DateFormat('EEE, d MMM yyyy · HH:mm').format(schedule.departureAt),
-            style: const TextStyle(color: AppColors.muted, fontSize: 11),
-          ),
-          const Divider(height: 26),
-          Text(
-            'Seats: ${flow.selectedSeats.map((seat) => seat.number).join(', ')}',
-            style: const TextStyle(color: AppColors.muted, fontSize: 11),
-          ),
         ],
       ),
     );
   }
-}
 
-class _FareSummary extends StatelessWidget {
-  const _FareSummary({required this.quote});
-  final FareQuote quote;
-
-  @override
-  Widget build(BuildContext context) => AppCard(
-    child: Column(
+  Widget _detailRow(String label, String value) => Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Fare summary',
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 16),
-        _fareRow('Fare', quote.baseFare),
-        if (quote.taxes != 0) _fareRow('Taxes', quote.taxes),
-        if (quote.fees != 0) _fareRow('Service fee', quote.fees),
-        if (quote.discount != 0) _fareRow('Discount', -quote.discount),
-        if (quote.surcharge != 0) _fareRow('Surcharge', quote.surcharge),
-        if (quote.roundingAdjustment != 0)
-          _fareRow('Rounding adjustment', quote.roundingAdjustment),
-        if (quote.walletDeduction != 0)
-          _fareRow('Wallet', -quote.walletDeduction),
-        if (quote.walletPointsUsed != 0)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              '${quote.walletPointsUsed} Kainat Points applied',
-              style: const TextStyle(color: AppColors.muted, fontSize: 11),
-            ),
-          ),
-        const Divider(height: 24),
-        Row(
-          children: [
-            const Expanded(
-              child: Text(
-                'Total',
-                style: TextStyle(fontWeight: FontWeight.w800),
-              ),
-            ),
-            Text(
-              formatPkr(quote.total),
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontSize: 21,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-
-  Widget _fareRow(String label, double value) => Padding(
-    padding: const EdgeInsets.only(bottom: 8),
-    child: Row(
-      children: [
         Expanded(
+          flex: 2,
           child: Text(
             label,
             style: const TextStyle(color: AppColors.muted, fontSize: 12),
           ),
         ),
-        Text(
-          formatPkr(value),
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+        const SizedBox(width: 12),
+        Expanded(
+          flex: 3,
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+          ),
         ),
       ],
     ),

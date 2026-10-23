@@ -46,18 +46,18 @@ def main():
     ))
     save(logo, ROOT / "assets/images/kainat-start-logo.png")
 
-    # Legacy Android and iOS icons use 88% of the square's width.
+    # Reduce launcher-only padding; keep the full supplied logo and wording.
     for density, scale in [("mdpi", 1), ("hdpi", 1.5), ("xhdpi", 2),
                            ("xxhdpi", 3), ("xxxhdpi", 4)]:
         folder = RES / f"mipmap-{density}"
         size = round(48 * scale)
-        save(centered(logo, (size, size), round(size * .88)).convert("RGB"),
+        save(centered(logo, (size, size), round(size * .94)).convert("RGB"),
              folder / "ic_launcher.png")
 
-        # The 58dp-wide logo (including text) fits inside Android's 66dp safe
-        # circle on a 108dp adaptive foreground, so round masks do not clip it.
+        # Use more of the launcher's visible 72dp circle on the 108dp canvas.
+        # At 64dp wide, the full artwork still fits the circular launcher mask.
         size = round(108 * scale)
-        save(centered(logo, (size, size), round(58 * scale), (0, 0, 0, 0)),
+        save(centered(logo, (size, size), round(64 * scale), (0, 0, 0, 0)),
              folder / "ic_launcher_foreground.png")
 
         # Pre-Android 12 launch tile matches the larger Flutter logo panel.
@@ -85,7 +85,7 @@ def main():
     for entry in catalog["images"]:
         size = round(float(entry["size"].split("x")[0]) *
                      float(entry["scale"].removesuffix("x")))
-        save(centered(logo, (size, size), round(size * .88)).convert("RGB"),
+        save(centered(logo, (size, size), round(size * .94)).convert("RGB"),
              IOS / "AppIcon.appiconset" / entry["filename"])
 
     for scale, suffix in [(1, ""), (2, "@2x"), (3, "@3x")]:

@@ -1,7 +1,11 @@
 package com.kainattravels.kt_mobile_app
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
+import android.provider.Settings
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
@@ -30,11 +34,8 @@ class BiometricVault(private val activity: FragmentActivity) {
     fun handle(call: MethodCall, result: MethodChannel.Result) {
         try {
             when (call.method) {
-                "status" -> result.success(mapOf(
-                    "available" to available(),
-                    "enabled" to prefs.contains("ciphertext"),
-                    "label" to "Face / fingerprint"
-                ))
+                "status" -> result.success(status())
+                "openSettings" -> openSettings(result)
                 "write" -> {
                     if (pending != null) { result.error("busy", "Authentication is in progress.", null); return }
                     val secret = call.argument<String>("secret")
@@ -73,6 +74,65 @@ class BiometricVault(private val activity: FragmentActivity) {
 
     private fun available(): Boolean = Build.VERSION.SDK_INT >= 28 &&
         BiometricManager.from(activity).canAuthenticate(strong) == BiometricManager.BIOMETRIC_SUCCESS
+
+    private fun status(): Map<String, Any?> {
+        val manager = BiometricManager.from(activity)
+        val supported = Build.VERSION.SDK_INT >= 28
+        val code = if (supported) manager.canAuthenticate(strong)
+            else BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED
+        val ready = code == BiometricManager.BIOMETRIC_SUCCESS
+        val weakReady = !ready && supported && manager.canAuthenticate(
+            BiometricManager.Authenticators.BIOMETRIC_WEAK
+        ) == BiometricManager.BIOMETRIC_SUCCESS
+        val hasFingerprint = activity.packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)
+        val needsEnrollment = code == BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED && !weakReady
+        val message = when {
+            ready -> null
+            !supported -> "Quick login requires Android 9 or newer. Use your password."
+            code == BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE ->
+                "Biometrics are temporarily unavailable. Unlock your device and check again."
+            code == BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED ->
+                "Install your device’s Android security updates before enabling quick login."
+            weakReady && !hasFingerprint ->
+                "Face unlock on this device cannot be used for secure app sign-in. Use your password."
+            weakReady ->
+                "The biometrics set up on this device cannot be used for secure app sign-in. Set up a supported fingerprint or use your password."
+            needsEnrollment ->
+                "Set up a fingerprint or supported face unlock in Android settings, then return here."
+            code == BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE ->
+                "This device has no supported fingerprint or face sensor for secure app sign-in. Use your password."
+            else -> "Biometrics are unavailable. Use your password or check again."
+        }
+        return mapOf(
+            "available" to ready,
+            "enabled" to prefs.contains("ciphertext"),
+            "label" to "Face / fingerprint",
+            "unavailableMessage" to message,
+            "canOpenSettings" to (supported && (needsEnrollment || (weakReady && hasFingerprint)))
+        )
+    }
+
+    private fun openSettings(result: MethodChannel.Result) {
+        val intent = if (Build.VERSION.SDK_INT >= 30) {
+            Intent(Settings.ACTION_BIOMETRIC_ENROLL).putExtra(
+                Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED, strong
+            )
+        } else if (Build.VERSION.SDK_INT >= 28) {
+            Intent(Settings.ACTION_FINGERPRINT_ENROLL)
+        } else {
+            Intent(Settings.ACTION_SECURITY_SETTINGS)
+        }
+        try {
+            try {
+                activity.startActivity(intent)
+            } catch (_: ActivityNotFoundException) {
+                activity.startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS))
+            }
+            result.success(null)
+        } catch (_: Exception) {
+            result.error("unavailable", "Open Android settings to set up a supported fingerprint.", null)
+        }
+    }
 
     private fun createKey() {
         val builder = KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_DECRYPT)

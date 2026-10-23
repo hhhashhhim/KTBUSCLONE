@@ -52,66 +52,55 @@ class SplashScreen extends ConsumerWidget {
                     child: Column(
                       children: [
                         Spacer(flex: 3),
-                        Container(
-                          width: 288,
-                          padding: const EdgeInsets.all(20),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(Radius.circular(28)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0x33002A12),
-                                blurRadius: 28,
-                                offset: Offset(0, 10),
+                        _StartupIntro(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Kainat Travels',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: -.4,
+                                ),
                               ),
-                            ],
-                          ),
-                          child: Image.asset(
-                            'assets/images/kainat-start-logo.png',
-                            fit: BoxFit.contain,
-                            semanticLabel: 'Kainat Travels',
-                          ),
-                        ),
-                        SizedBox(height: 28),
-                        Text(
-                          'Kainat Travels',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -.4,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Comfortable intercity travel across Pakistan',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white70, fontSize: 13),
-                        ),
-                        SizedBox(height: 28),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            Flexible(
-                              child: Text(
-                                'Checking for updates…',
+                              SizedBox(height: 8),
+                              Text(
+                                'Comfortable intercity travel across Pakistan',
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white70,
                                   fontSize: 13,
                                 ),
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 28),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                  SizedBox(width: 12),
+                                  Flexible(
+                                    child: Text(
+                                      'Checking for updates…',
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                         Spacer(flex: 4),
                       ],
@@ -137,6 +126,32 @@ class SplashScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _StartupIntro extends StatelessWidget {
+  const _StartupIntro({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: reduceMotion ? 1 : 0, end: 1),
+      duration: reduceMotion
+          ? Duration.zero
+          : const Duration(milliseconds: 480),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) => Opacity(
+        opacity: value,
+        child: Transform.translate(
+          offset: Offset(0, 12 * (1 - value)),
+          child: Transform.scale(scale: .96 + .04 * value, child: child),
+        ),
+      ),
+      child: child,
     );
   }
 }

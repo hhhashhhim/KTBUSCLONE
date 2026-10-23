@@ -71,7 +71,9 @@ void main() {
       testWidgets(
         '${useLegacy ? 'legacy' : 'current'} checkout: ${scenario.key}',
         (tester) async {
-          tester.view.physicalSize = const Size(1080, 2800);
+          tester.view.physicalSize = useLegacy
+              ? const Size(1080, 2800)
+              : const Size(780, 1688);
           tester.view.devicePixelRatio = 2;
           addTearDown(tester.view.resetPhysicalSize);
           addTearDown(tester.view.resetDevicePixelRatio);
@@ -144,27 +146,66 @@ void main() {
           );
           await tester.pumpAndSettle();
           final format = useLegacy ? legacy.formatPkr : current.formatPkr;
-          for (final entry in {
-            'Discount': -(scenario.value['discount'] as num? ?? 0),
-            'Surcharge': scenario.value['surcharge'] as num? ?? 0,
-            'Rounding adjustment':
-                scenario.value['rounding_adjustment'] as num? ?? 0,
-            'Wallet': -(scenario.value['wallet_deduction'] as num? ?? 0),
-          }.entries) {
-            if (entry.value == 0) {
-              expect(find.text(entry.key), findsNothing);
-              continue;
+          if (useLegacy) {
+            for (final entry in {
+              'Discount': -(scenario.value['discount'] as num? ?? 0),
+              'Surcharge': scenario.value['surcharge'] as num? ?? 0,
+              'Rounding adjustment':
+                  scenario.value['rounding_adjustment'] as num? ?? 0,
+              'Wallet': -(scenario.value['wallet_deduction'] as num? ?? 0),
+            }.entries) {
+              if (entry.value == 0) {
+                expect(find.text(entry.key), findsNothing);
+                continue;
+              }
+              final row = find
+                  .ancestor(
+                    of: find.text(entry.key),
+                    matching: find.byType(Row),
+                  )
+                  .first;
+              expect(
+                find.descendant(
+                  of: row,
+                  matching: find.text(format(entry.value)),
+                ),
+                findsOneWidget,
+              );
             }
-            final row = find
-                .ancestor(of: find.text(entry.key), matching: find.byType(Row))
-                .first;
-            expect(
-              find.descendant(
-                of: row,
-                matching: find.text(format(entry.value)),
-              ),
-              findsOneWidget,
-            );
+          } else {
+            expect(find.text('Booking summary'), findsOneWidget);
+            for (final entry in {
+              'Seat number': '1',
+              'Departure city': 'Lahore',
+              'Arrival city': 'Islamabad',
+              'Bus type': 'Test bus',
+            }.entries) {
+              final row = find
+                  .ancestor(
+                    of: find.text(entry.key),
+                    matching: find.byType(Row),
+                  )
+                  .first;
+              expect(
+                find.descendant(of: row, matching: find.text(entry.value)),
+                findsOneWidget,
+              );
+            }
+            expect(find.text('Date & time'), findsOneWidget);
+            expect(find.textContaining('12 Sep 2099 · 11:00'), findsOneWidget);
+            expect(find.text('Total amount'), findsOneWidget);
+            for (final label in [
+              'Fare summary',
+              'Fare',
+              'Taxes',
+              'Service fee',
+              'Discount',
+              'Surcharge',
+              'Rounding adjustment',
+              'Wallet',
+            ]) {
+              expect(find.text(label), findsNothing);
+            }
           }
           final total = format(scenario.value['total'] as num);
           expect(find.text(total), findsOneWidget);

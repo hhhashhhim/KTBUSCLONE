@@ -2,6 +2,71 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kt_mobile_app/features/travel/domain/travel_models.dart';
 
 void main() {
+  test('journey duration rounds to half hours and preserves arrival', () {
+    final departure = DateTime(2099, 10, 30, 23, 59);
+    for (final (minutes, rounded) in [
+      (1, 30),
+      (14, 30),
+      (15, 30),
+      (44, 30),
+      (45, 60),
+      (60, 60),
+      (314, 300),
+      (315, 330),
+      (344, 330),
+      (345, 360),
+    ]) {
+      final arrival = departure.add(Duration(minutes: minutes));
+      final schedule = TravelSchedule(
+        id: 1,
+        scheduleDetailId: 1,
+        origin: const CityOption(id: 1, name: 'Karachi'),
+        destination: const CityOption(id: 2, name: 'Rawalpindi'),
+        departureAt: departure,
+        arrivalAt: arrival,
+        busClassName: 'Executive',
+        availableSeats: 1,
+        totalSeats: 42,
+        fares: const [],
+      );
+      expect(
+        schedule.roundedJourneyDuration?.inMinutes,
+        rounded,
+        reason: '$minutes minutes',
+      );
+      expect(schedule.arrivalAt, arrival);
+      expect(schedule.arrivalDayOffset, 1);
+    }
+  });
+
+  test(
+    'missing or nonpositive arrival has no duration; long journeys retain day offset',
+    () {
+      final departure = DateTime(2099, 10, 30, 23, 59);
+      for (final minutes in [null, -1, 0, 1501]) {
+        final schedule = TravelSchedule(
+          id: 1,
+          scheduleDetailId: 1,
+          origin: const CityOption(id: 1, name: 'Karachi'),
+          destination: const CityOption(id: 2, name: 'Rawalpindi'),
+          departureAt: departure,
+          arrivalAt: minutes == null
+              ? null
+              : departure.add(Duration(minutes: minutes)),
+          busClassName: 'Executive',
+          availableSeats: 1,
+          totalSeats: 42,
+          fares: const [],
+        );
+        expect(
+          schedule.roundedJourneyDuration?.inMinutes,
+          minutes == 1501 ? 1500 : null,
+        );
+        expect(schedule.arrivalDayOffset, minutes == 1501 ? 2 : 0);
+      }
+    },
+  );
+
   test(
     'new quotes exclude JazzCash and unsupported methods from an old API',
     () {
@@ -58,6 +123,12 @@ void main() {
       'total_seats': 36,
       'fares': [
         {
+          'class_id': 4,
+          'class_name': 'Premium',
+          'amount': 4000,
+          'original_amount': 4800,
+        },
+        {
           'class_id': 3,
           'class_name': 'Business',
           'amount': 2500,
@@ -68,7 +139,8 @@ void main() {
 
     expect(schedule.availableSeats, 12);
     expect(schedule.minimumFare, 2500);
-    expect(schedule.fares.single.originalAmount, 2700);
+    expect(schedule.lowestFare?.classId, 3);
+    expect(schedule.lowestFare?.originalAmount, 2700);
   });
 
   test('only server-available seats are selectable', () {
@@ -91,5 +163,20 @@ void main() {
 
     expect(available.selectable, isTrue);
     expect(booked.selectable, isFalse);
+    expect(booked.bookedGender, isNull);
+    for (final gender in ['male', 'female']) {
+      final seat = TravelSeat.fromJson({
+        'number': 'A3',
+        'row': 0,
+        'column': 2,
+        'status': 'booked',
+        'booked_gender': gender,
+        'gender_restriction': 'female',
+      });
+      expect(seat.bookedGender, gender);
+      expect(seat.genderRestriction, 'female');
+      expect(seat.status, SeatAvailability.booked);
+      expect(seat.selectable, isFalse);
+    }
   });
 }

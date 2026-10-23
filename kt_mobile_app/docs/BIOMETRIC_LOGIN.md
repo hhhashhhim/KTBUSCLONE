@@ -7,6 +7,14 @@ lockout, unsupported hardware, or missing enrollment leaves password login avail
 Any authorized biometric enrolled on that phone can unlock this account; this is
 device authentication, not CNIC identity verification.
 
+On Android, the Account card explains why enrollment is unavailable: missing
+setup, unsupported sensors, temporary unavailability, or required security updates.
+When setup is possible, **Open biometric settings** opens Android enrollment for
+the strong biometrics this app accepts. Returning to Account refreshes the status;
+**Check again** also retries it. An enabled device lock or camera face unlock alone
+does not guarantee support for secure app sign-in. Devices with only unsupported
+face unlock must use password sign-in.
+
 The ordinary access session remains 10 hours. Quick login can renew it for 30 days
 from enrollment by default; the backend can configure this duration. It needs an
 internet connection and cannot bypass the ERP's blocked accounts, blacklist,
@@ -67,7 +75,8 @@ change does not publish an app or deploy the backend.
 
 Automated tests cover enrollment, secure-memory token behavior, cancellation,
 unavailable devices, credential rotation, invalidated enrollment, offline errors,
-server revocation, password fallback and sign-out. API tests cover expiry, replay,
+server revocation, password fallback, sign-out, settings return, unsupported-device
+messages and availability retries. API tests cover expiry, replay,
 tenant isolation, verification, restrictions, blacklist, global controls, logout,
 password reset, alternate-device login and cleanup.
 

@@ -671,10 +671,11 @@ class _AuthScaffold extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints(
             minHeight:
-                MediaQuery.sizeOf(context).height -
-                MediaQuery.paddingOf(context).vertical -
-                (appBar == null ? 0 : kToolbarHeight) -
-                AppSpacing.xxl,
+                (MediaQuery.sizeOf(context).height -
+                        MediaQuery.paddingOf(context).vertical -
+                        (appBar == null ? 0 : kToolbarHeight) -
+                        AppSpacing.xxl)
+                    .clamp(0.0, double.infinity),
           ),
           child: child,
         ),

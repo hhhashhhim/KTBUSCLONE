@@ -7,6 +7,7 @@ import '../core/providers.dart';
 import '../core/theme/app_theme.dart';
 import '../features/auth/application/auth_controller.dart';
 import '../features/startup/application/startup_controller.dart';
+import '../features/travel/application/travel_providers.dart';
 import 'router.dart';
 import '../features/notifications/notification_push.dart';
 import '../features/notifications/notification_providers.dart';
@@ -91,6 +92,8 @@ class _KainatTravelsAppState extends ConsumerState<KainatTravelsApp>
       }
       if (!mounted) return;
       await ref.read(startupControllerProvider.notifier).checkForUpdates();
+      if (!mounted) return;
+      ref.invalidate(fleetGalleryProvider);
       ref.invalidate(notificationPageProvider);
       _syncPush();
     } finally {

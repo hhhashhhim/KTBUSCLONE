@@ -7,11 +7,15 @@ class BiometricStatus {
     this.available = false,
     this.enabled = false,
     this.label = 'Face ID / fingerprint',
+    this.unavailableMessage,
+    this.canOpenSettings = false,
   });
 
   final bool available;
   final bool enabled;
   final String label;
+  final String? unavailableMessage;
+  final bool canOpenSettings;
 }
 
 class BiometricVault {
@@ -24,6 +28,8 @@ class BiometricVault {
         available: data?['available'] == true,
         enabled: data?['enabled'] == true,
         label: data?['label'] as String? ?? 'Face ID / fingerprint',
+        unavailableMessage: data?['unavailableMessage'] as String?,
+        canOpenSettings: data?['canOpenSettings'] == true,
       );
     } on MissingPluginException {
       return const BiometricStatus();
@@ -31,6 +37,7 @@ class BiometricVault {
   }
 
   Future<String?> unlock() => _channel.invokeMethod<String>('read');
+  Future<void> openSettings() => _channel.invokeMethod<void>('openSettings');
   Future<void> write(String secret) =>
       _channel.invokeMethod<void>('write', {'secret': secret});
   Future<void> release() async {
@@ -40,6 +47,7 @@ class BiometricVault {
       // Unsupported platforms have no native context to release.
     }
   }
+
   Future<void> clear() async {
     try {
       await _channel.invokeMethod<void>('clear');

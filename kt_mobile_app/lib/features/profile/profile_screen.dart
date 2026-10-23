@@ -110,7 +110,7 @@ class ProfileScreen extends ConsumerWidget {
                 _tile(
                   Icons.account_balance_wallet_outlined,
                   'Wallet',
-                  'Kainat Points, balance & rewards',
+                  'Travel Points, balance & rewards',
                   onTap: () => context.push('/wallet'),
                 ),
                 const Divider(height: 1),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+
+import 'legal_document_screen.dart';
 
 enum LegalDocument {
   terms('Terms & conditions', 'https://www.kainattravels.com/Terms'),
@@ -11,21 +12,9 @@ enum LegalDocument {
   final String url;
 
   Future<void> open(BuildContext context) async {
-    try {
-      if (await launchUrl(
-        Uri.parse(url),
-        mode: LaunchMode.externalApplication,
-      )) {
-        return;
-      }
-    } catch (_) {
-      // Show the same recovery message if the browser cannot be launched.
-    }
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Unable to open $label. Please try again.'),
-        action: SnackBarAction(label: 'Retry', onPressed: () => open(context)),
+    await Navigator.of(context, rootNavigator: true).push<void>(
+      MaterialPageRoute(
+        builder: (_) => LegalDocumentScreen(title: label, uri: Uri.parse(url)),
       ),
     );
   }

@@ -1,6 +1,8 @@
+import 'package:flutter/painting.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers.dart';
+import '../../auth/application/auth_controller.dart';
 import '../data/travel_repository.dart';
 import '../domain/travel_models.dart';
 
@@ -16,9 +18,25 @@ final savedPassengersProvider = FutureProvider<List<SavedPassenger>>(
   (ref) => ref.watch(travelRepositoryProvider).savedPassengers(),
 );
 
-final fleetGalleryProvider = FutureProvider<List<FleetMedia>>(
-  (ref) => ref.watch(travelRepositoryProvider).fleet(),
-);
+final fleetGalleryProvider = FutureProvider<List<FleetMedia>>((ref) async {
+  final passengerId = ref.watch(
+    authControllerProvider.select((state) => state.passenger?.id),
+  );
+  if (passengerId == null) return const [];
+
+  final items = await ref.watch(travelRepositoryProvider).fleet();
+  if (!ref.mounted) return const [];
+  // A published URL can keep its name while its image bytes change. Evict
+  // only catalog images so a successful refresh also reloads their pixels.
+  await Future.wait(
+    items
+        .map((item) => item.imageUrl)
+        .where((url) => url.isNotEmpty)
+        .toSet()
+        .map((url) => NetworkImage(url).evict()),
+  );
+  return items;
+}, retry: (_, _) => null);
 
 final loyaltyWalletProvider = FutureProvider<LoyaltyWallet>(
   (ref) => ref.watch(travelRepositoryProvider).wallet(),

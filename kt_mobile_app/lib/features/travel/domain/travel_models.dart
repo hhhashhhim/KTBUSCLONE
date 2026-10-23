@@ -78,9 +78,36 @@ class TravelSchedule {
   final int totalSeats;
   final List<FareOption> fares;
 
-  double get minimumFare => fares.isEmpty
-      ? 0
-      : fares.map((fare) => fare.amount).reduce((a, b) => a < b ? a : b);
+  // Keep the displayed current/original prices paired to the same seat class.
+  FareOption? get lowestFare => fares.isEmpty
+      ? null
+      : fares.reduce((a, b) => a.amount <= b.amount ? a : b);
+
+  double get minimumFare => lowestFare?.amount ?? 0;
+
+  Duration? get journeyDuration {
+    final arrival = arrivalAt;
+    if (arrival == null || !arrival.isAfter(departureAt)) return null;
+    return arrival.difference(departureAt);
+  }
+
+  // Presentation only: keep the server's arrival time unchanged.
+  Duration? get roundedJourneyDuration {
+    final duration = journeyDuration;
+    if (duration == null) return null;
+    final halfHours = (duration.inSeconds / 1800).round();
+    return Duration(minutes: (halfHours < 1 ? 1 : halfHours) * 30);
+  }
+
+  int get arrivalDayOffset {
+    if (journeyDuration == null) return 0;
+    final arrival = arrivalAt!;
+    return DateTime.utc(arrival.year, arrival.month, arrival.day)
+        .difference(
+          DateTime.utc(departureAt.year, departureAt.month, departureAt.day),
+        )
+        .inDays;
+  }
 
   factory TravelSchedule.fromJson(Map<String, dynamic> json) {
     final busClass =
@@ -134,6 +161,7 @@ class TravelSeat {
     this.className,
     this.type,
     this.deck,
+    this.bookedGender,
     this.genderRestriction,
   });
 
@@ -146,6 +174,7 @@ class TravelSeat {
   final String? className;
   final String? type;
   final String? deck;
+  final String? bookedGender;
   final String? genderRestriction;
 
   bool get selectable => status == SeatAvailability.available;
@@ -163,6 +192,7 @@ class TravelSeat {
     className: json['class_name']?.toString(),
     type: json['type']?.toString(),
     deck: json['deck']?.toString(),
+    bookedGender: json['booked_gender']?.toString(),
     genderRestriction: json['gender_restriction']?.toString(),
   );
 }

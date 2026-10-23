@@ -129,9 +129,16 @@ class FleetPhotoImage extends StatelessWidget {
   Widget build(BuildContext context) => ColoredBox(
     color: Colors.white,
     child: Image(
+      // Published photos are new objects after a catalog fetch. Re-resolve
+      // their image streams even when the refreshed URL has not changed.
+      key: ObjectKey(photo),
       image: photo.isAsset
           ? AssetImage(photo.source)
-          : NetworkImage(photo.source) as ImageProvider,
+          : NetworkImage(
+                  photo.source,
+                  headers: const {'Cache-Control': 'no-cache'},
+                )
+                as ImageProvider,
       // Keep the complete bus visible, including the tall front-facing photo.
       fit:
           fit ??

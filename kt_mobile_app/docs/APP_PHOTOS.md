@@ -44,8 +44,13 @@ they do not imply a booking discount or change server fares.
 Published images keep API order and precede bundled images. Bundled images stay
 in the carousel and guide; banners and promotions have no offline substitutes.
 Pull-to-refresh on Home reloads both bookings and media; the guide also refreshes
-media. Broken image URLs show the existing image placeholder. Hiding/removing
-an ERP image takes effect on the next content fetch; no new release is needed
+media. Media also reloads when the app resumes, and signing out clears the media
+catalog so signing back in fetches it again. Successful catalog fetches evict the
+returned image URLs from Flutter's image cache and re-resolve their image streams;
+image downloads request cache revalidation so replacements at the same public URL
+can update too. Failed Home media refreshes finish with a retry message, even when
+the bookings request also fails. Broken image URLs show the existing image
+placeholder. Hiding/removing an ERP image takes effect on the next content fetch; no new release is needed
 for subsequent image changes after this placement-aware app version is installed.
 
 Deploy the api branch's image-placement migration and storage link, the

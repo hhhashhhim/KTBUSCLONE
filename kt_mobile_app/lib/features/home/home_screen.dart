@@ -12,8 +12,14 @@ import '../auth/application/auth_controller.dart';
 import '../startup/application/startup_controller.dart';
 import '../travel/application/travel_providers.dart';
 import '../travel/domain/travel_models.dart';
+import 'adaptive_home_content.dart';
 import 'fleet_photos.dart';
 import 'app_media_strip.dart';
+
+final homeClockProvider = StreamProvider.autoDispose<DateTime>((ref) async* {
+  yield DateTime.now();
+  yield* Stream.periodic(const Duration(minutes: 1), (_) => DateTime.now());
+});
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -23,243 +29,290 @@ class HomeScreen extends ConsumerWidget {
     final passenger = ref.watch(authControllerProvider).passenger;
     final bookings = ref.watch(bookingsProvider);
     final config = ref.watch(mobileAppConfigProvider);
+    final now = ref.watch(homeClockProvider).value ?? DateTime.now();
+    BookingSummary? upcoming;
+    for (final booking in bookings.asData?.value ?? const <BookingSummary>[]) {
+      if (booking.status != 'confirmed' || !booking.departureAt.isAfter(now)) {
+        continue;
+      }
+      if (upcoming == null ||
+          booking.departureAt.isBefore(upcoming.departureAt)) {
+        upcoming = booking;
+      }
+    }
+    final nextTrip = upcoming;
+    final keepNextTripVisible =
+        nextTrip != null &&
+        nextTrip.departureAt.difference(now) <= const Duration(hours: 24);
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            // Refresh both requests even when one fails; each section owns its error state.
+            Object? mediaError;
+            // A trips failure must not prevent new ERP images from loading.
             await Future.wait([
               ref
                   .refresh(bookingsProvider.future)
                   .then<void>((_) {}, onError: (Object _, StackTrace __) {}),
               ref
                   .refresh(fleetGalleryProvider.future)
-                  .then<void>((_) {}, onError: (Object _, StackTrace __) {}),
+                  .then<void>(
+                    (_) {},
+                    onError: (Object error, StackTrace _) {
+                      mediaError = error;
+                    },
+                  ),
             ]);
+            if (mediaError != null && context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Could not refresh app images. Pull down to try again.',
+                  ),
+                ),
+              );
+            }
           },
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            children: [
-              Row(
-                children: [
-                  const AppLogo(height: 36),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Container(
-                      height: 48,
-                      padding: const EdgeInsets.fromLTRB(5, 4, 12, 4),
-                      decoration: const BoxDecoration(
-                        gradient: AppGradients.primary,
-                        borderRadius: AppRadius.button,
-                        boxShadow: AppShadows.card,
+          child: AdaptiveHomeContent(
+            keepNextTripVisible: keepNextTripVisible,
+            header: Column(
+              children: [
+                Row(
+                  children: [
+                    const AppLogo(height: 36),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Container(
+                        height: 48,
+                        padding: const EdgeInsets.fromLTRB(5, 4, 12, 4),
+                        decoration: const BoxDecoration(
+                          gradient: AppGradients.primary,
+                          borderRadius: AppRadius.button,
+                          boxShadow: AppShadows.card,
+                        ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 19,
+                              backgroundColor: Colors.white.withValues(
+                                alpha: .2,
+                              ),
+                              child: Text(
+                                (passenger?.fullName ?? 'T').characters.first
+                                    .toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'ASSALAM-O-ALAIKUM',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 8.5,
+                                      letterSpacing: .5,
+                                    ),
+                                  ),
+                                  Text(
+                                    passenger?.fullName ?? 'Traveller',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      height: 1.25,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      child: Row(
+                    ),
+                    if (config?.features.notifications == true) ...[
+                      const SizedBox(width: 9),
+                      Stack(
                         children: [
-                          CircleAvatar(
-                            radius: 19,
-                            backgroundColor: Colors.white.withValues(alpha: .2),
-                            child: Text(
-                              (passenger?.fullName ?? 'T').characters.first
-                                  .toUpperCase(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w800,
+                          Material(
+                            color: AppColors.surfaceAlt,
+                            shape: const CircleBorder(),
+                            child: IconButton(
+                              onPressed: () => context.go('/notifications'),
+                              icon: const Icon(
+                                Icons.notifications_none_rounded,
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
+                          const Positioned(
+                            right: 10,
+                            top: 8,
+                            child: CircleAvatar(
+                              radius: 3.5,
+                              backgroundColor: AppColors.gold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 14),
+              ],
+            ),
+            banner: const AppMediaStrip(
+              placement: 'home_banner',
+              showTitle: false,
+            ),
+            search: Column(
+              children: [
+                AppCard(
+                  padding: const EdgeInsets.all(16),
+                  onTap: () => context.go('/search'),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const Expanded(
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'ASSALAM-O-ALAIKUM',
+                                Text(
+                                  'Where to today?',
                                   style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 8.5,
-                                    letterSpacing: .5,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
                                   ),
                                 ),
+                                SizedBox(height: 2),
                                 Text(
-                                  passenger?.fullName ?? 'Traveller',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    height: 1.25,
-                                    fontWeight: FontWeight.w800,
+                                  'Search buses across Pakistan',
+                                  style: TextStyle(
+                                    color: AppColors.muted,
+                                    fontSize: 11.5,
                                   ),
                                 ),
                               ],
                             ),
                           ),
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: const BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.search_rounded,
+                              color: Colors.white,
+                              size: 25,
+                            ),
+                          ),
                         ],
                       ),
-                    ),
+                      const SizedBox(height: 13),
+                      const Row(
+                        children: [
+                          Expanded(
+                            child: _RouteField(
+                              label: 'FROM',
+                              value: 'Choose origin',
+                            ),
+                          ),
+                          SizedBox(width: 9),
+                          Expanded(
+                            child: _RouteField(
+                              label: 'TO',
+                              value: 'Choose destination',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  if (config?.features.notifications == true) ...[
-                    const SizedBox(width: 9),
-                    Stack(
-                      children: [
-                        Material(
-                          color: AppColors.surfaceAlt,
-                          shape: const CircleBorder(),
-                          child: IconButton(
-                            onPressed: () => context.go('/notifications'),
-                            icon: const Icon(Icons.notifications_none_rounded),
-                          ),
-                        ),
-                        const Positioned(
-                          right: 10,
-                          top: 8,
-                          child: CircleAvatar(
-                            radius: 3.5,
-                            backgroundColor: AppColors.gold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 14),
-              const AppMediaStrip(placement: 'home_banner'),
-              AppCard(
-                padding: const EdgeInsets.all(16),
-                onTap: () => context.go('/search'),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Where to today?',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              SizedBox(height: 2),
-                              Text(
-                                'Search buses across Pakistan',
-                                style: TextStyle(
-                                  color: AppColors.muted,
-                                  fontSize: 11.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: const BoxDecoration(
-                            color: AppColors.primary,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.search_rounded,
-                            color: Colors.white,
-                            size: 25,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 13),
-                    const Row(
-                      children: [
-                        Expanded(
-                          child: _RouteField(
-                            label: 'FROM',
-                            value: 'Choose origin',
-                          ),
-                        ),
-                        SizedBox(width: 9),
-                        Expanded(
-                          child: _RouteField(
-                            label: 'TO',
-                            value: 'Choose destination',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
                 ),
+                const SizedBox(height: 16),
+              ],
+            ),
+            nextTrip: bookings.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.only(bottom: 16),
+                child: _UpcomingSkeleton(),
               ),
-              const SizedBox(height: 16),
-              bookings.when(
-                loading: () => const _UpcomingSkeleton(),
-                error: (error, _) => AppCard(
+              error: (error, _) => Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: AppCard(
                   child: _InlineLoadFailure(
                     message: error.toString(),
                     onRetry: () => ref.invalidate(bookingsProvider),
                   ),
                 ),
-                data: (values) {
-                  BookingSummary? upcoming;
-                  for (final booking in values) {
-                    if (booking.departureAt.isAfter(DateTime.now())) {
-                      upcoming = booking;
-                      break;
-                    }
-                  }
-                  return upcoming == null
-                      ? const SizedBox.shrink()
-                      : _UpcomingTicket(booking: upcoming);
-                },
               ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: _QuickAction(
-                      icon: Icons.confirmation_number_outlined,
-                      label: 'My trips',
-                      onTap: () => context.go('/tickets'),
+              data: (_) => nextTrip == null
+                  ? const SizedBox.shrink()
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: _UpcomingTicket(booking: nextTrip),
                     ),
-                  ),
-                  const SizedBox(width: 9),
-                  Expanded(
-                    child: _QuickAction(
-                      icon: Icons.person_outline_rounded,
-                      label: 'Account',
-                      onTap: () => context.go('/profile'),
+            ),
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _QuickAction(
+                        icon: Icons.confirmation_number_outlined,
+                        label: 'My trips',
+                        onTap: () => context.go('/tickets'),
+                      ),
                     ),
-                  ),
-                  if (config?.features.notifications == true) ...[
                     const SizedBox(width: 9),
                     Expanded(
                       child: _QuickAction(
-                        icon: Icons.notifications_none_rounded,
-                        label: 'Alerts',
-                        onTap: () => context.go('/notifications'),
+                        icon: Icons.person_outline_rounded,
+                        label: 'Account',
+                        onTap: () => context.go('/profile'),
+                      ),
+                    ),
+                    if (config?.features.notifications == true) ...[
+                      const SizedBox(width: 9),
+                      Expanded(
+                        child: _QuickAction(
+                          icon: Icons.notifications_none_rounded,
+                          label: 'Alerts',
+                          onTap: () => context.go('/notifications'),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(width: 9),
+                    Expanded(
+                      child: _QuickAction(
+                        icon: Icons.headset_mic_outlined,
+                        label: 'Support',
+                        onTap: () => context.go('/profile'),
                       ),
                     ),
                   ],
-                  const SizedBox(width: 9),
-                  Expanded(
-                    child: _QuickAction(
-                      icon: Icons.headset_mic_outlined,
-                      label: 'Support',
-                      onTap: () => context.go('/profile'),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              const AppMediaStrip(
-                placement: 'home_promotion',
-                heading: 'Travel highlights',
-              ),
-              const _BusSeatGuideBanner(),
-              const SizedBox(height: 16),
-              const _FleetSection(),
-            ],
+                ),
+                const SizedBox(height: 18),
+                const AppMediaStrip(
+                  placement: 'home_promotion',
+                  heading: 'Travel highlights',
+                ),
+                const _BusSeatGuideBanner(),
+                const SizedBox(height: 16),
+                const _FleetSection(),
+              ],
+            ),
           ),
         ),
       ),
@@ -466,13 +519,14 @@ class _QuickAction extends StatelessWidget {
       onTap: onTap,
       borderRadius: AppRadius.card,
       child: Container(
-        height: 88,
+        constraints: const BoxConstraints(minHeight: 88),
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
         decoration: const BoxDecoration(
           borderRadius: AppRadius.card,
           boxShadow: AppShadows.card,
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CircleAvatar(
               radius: 20,
