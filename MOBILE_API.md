@@ -91,6 +91,30 @@ All successful mobile responses use:
 
 Validation failures use the same envelope with status `422` and field errors.
 
+## Estimated journey times (23 October 2026)
+
+Authenticated `GET /schedules` now populates the existing nullable `arrival_at`
+field using the ERP city-pair `fare_tables.time_difference`, the same journey-time
+source used by the existing booking API. The first live tariff row for the mobile
+company and requested origin/destination supplies the duration, independent of the
+selected seat class. It reuses the search's already-loaded tariff rows, without
+additional per-schedule queries. Terminal booking-window offsets are not journey
+times and are not used here.
+
+The duration accepts positive `H:mm`/`HH:mm` values (hours can exceed 23), with
+optional seconds. Arrival is the segment's actual `departure_date` and
+`departure_time` plus that duration, including overnight or multi-day rollover.
+Both timestamps use the existing application-local `YYYY-MM-DDTHH:mm:ss` format.
+Missing, zero, negative or malformed duration values leave `arrival_at: null`.
+No time is guessed and no fares, schedules, availability or booking rules change.
+
+The app labels arrival “Estimated”, marks arrivals on later dates, and rounds the
+displayed journey duration to the nearest 30 minutes (positive journeys under 15
+minutes display 30 minutes). The API retains the unrounded arrival timestamp.
+Deploy `app/Services/Mobile/MobileTravelService.php` from `mobile-backend` before
+expecting times to appear in the mobile app. No migration is required; city pairs
+without configured journey times need those values entered through the ERP.
+
 ## Mobile authentication limits
 
 Mobile authentication routes have dedicated limits in addition to the existing

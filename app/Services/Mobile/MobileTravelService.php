@@ -11,6 +11,7 @@ use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
 use App\Models\TerminalDiscount;
 use App\Models\Ticket;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use RuntimeException;
 
@@ -101,8 +102,10 @@ class MobileTravelService
             return collect();
         }
         $search->loadAvailability($details, $companyId, $terminalId, $originId, $destinationId, $date);
+        // Reuse the ERP city-pair journey time, already loaded and company-scoped.
+        $travelTime = optional($search->fareRows->sortBy('id')->first())->time_difference;
 
-        return $details->map(function ($detail) use ($originId, $destinationId, $companyId, $search) {
+        return $details->map(function ($detail) use ($originId, $destinationId, $companyId, $search, $travelTime) {
             $fares = $this->faresForDetail($detail, $originId, $destinationId, $search);
             $quota = $this->policy->remainingOnlineSeats($detail, $companyId, $search);
             $layout = $this->layoutForDetail($detail, $originId, $destinationId, $fares, $quota, $search, true);
@@ -121,7 +124,7 @@ class MobileTravelService
                     'name' => optional($detail->destination_city)->name,
                 ],
                 'departure_at' => $detail->departure_date . 'T' . $detail->departure_time,
-                'arrival_at' => null,
+                'arrival_at' => $this->estimatedArrivalAt($detail, $travelTime),
                 'bus_class' => [
                     'id' => $detail->bus_class_id,
                     'name' => optional($detail->bus_class)->name,
@@ -131,6 +134,21 @@ class MobileTravelService
                 'fares' => $fares,
             ];
         })->values();
+    }
+
+    private function estimatedArrivalAt(ScheduleDetail $detail, ?string $travelTime): ?string
+    {
+        // Unlike a clock time, the hour component can exceed 23 for long journeys.
+        if (!preg_match('/^(\d{1,3}):([0-5]\d)(?::([0-5]\d))?$/', trim($travelTime ?? ''), $parts)) {
+            return null;
+        }
+        $seconds = ((int) $parts[1] * 3600) + ((int) $parts[2] * 60) + (int) ($parts[3] ?? 0);
+        if ($seconds <= 0) {
+            return null;
+        }
+
+        return Carbon::parse($detail->departure_date . ' ' . $detail->departure_time, config('app.timezone'))
+            ->addSeconds($seconds)->format('Y-m-d\TH:i:s');
     }
 
     public function seatLayout(

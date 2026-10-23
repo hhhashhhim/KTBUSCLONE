@@ -32,13 +32,19 @@ perform the deployment steps below. Building does not deploy or migrate a server
 Push source and build tooling to `origin/mobile-backend`. Keep generated ZIPs
 and `vendor/` out of Git; distribute the ZIP separately as a deployment artifact.
 
-## cPanel update for the 23 October seat-map release
+## cPanel update for the 23 October journey-time and seat-map release
 
-This update adds `booked_gender` (`male`, `female`, or `null`) to occupied seat
-responses. It requires no new database migration or Composer dependency change.
-The corresponding Flutter seat picker displays the colours; older apps ignore
-the added field. Earlier registration, notification, and biometric migrations
-must already be installed; use their scoped rollout sections below if pending.
+This update populates schedule `arrival_at` from the existing ERP city-pair
+`fare_tables.time_difference`. Overnight and multi-day journeys are supported;
+missing or invalid durations keep `arrival_at` null. Configure journey durations
+through the ERP for city pairs that do not have them. No new database migration
+or Composer dependency change is required.
+
+The release also includes `booked_gender` (`male`, `female`, or `null`) on occupied
+seat responses. The corresponding Flutter screens display the estimated journey
+times and seat colours; older apps can ignore these fields. Earlier registration,
+notification, and biometric migrations must already be installed; use their
+scoped rollout sections below if pending.
 
 In cPanel Terminal, first check the existing API checkout:
 
@@ -52,19 +58,19 @@ git status --short
 Confirm `origin` is `hhhashhhim/KTBUSCLONE` and the branch is `mobile-backend`.
 Review any local source changes before continuing; do not discard them or switch
 branches automatically. Preserve the server's existing `.env`, `APP_KEY`, uploads,
-and storage. The following chain stops at the first failure:
+and storage. Run each command below separately, in order. Stop immediately if
+one fails; do not continue to the next command until the error is resolved:
 
 ```bash
-cd /home/wwwkaina/kt-mobile-api &&
-test "$(git branch --show-current)" = mobile-backend &&
-php artisan down &&
-git pull --ff-only origin mobile-backend &&
-composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader &&
-php artisan config:clear &&
-php artisan route:clear &&
-php artisan view:clear &&
-php artisan config:cache &&
-php artisan queue:restart &&
+cd /home/wwwkaina/kt-mobile-api
+php artisan down
+git pull --ff-only origin mobile-backend
+composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan config:cache
+php artisan queue:restart
 php artisan up
 ```
 

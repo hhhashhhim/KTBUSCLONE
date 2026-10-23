@@ -562,6 +562,45 @@ class MobileSchedulingRulesTest extends TestCase
         return '/api/mobile/v1/schedules?origin_id=1&destination_id=2&date=' . $this->date;
     }
 
+    /** @dataProvider journeyTimes */
+    public function test_search_returns_estimated_arrival_from_erp_journey_time($duration, $arrival): void
+    {
+        DB::table('fare_tables')->update(['time_difference' => $duration]);
+        $this->getJson($this->searchUrl())->assertOk()
+            ->assertJsonPath('data.0.departure_at', '2026-09-13T12:00:00')
+            ->assertJsonPath('data.0.arrival_at', $arrival);
+    }
+
+    public static function journeyTimes(): array
+    {
+        return [
+            'same day' => ['05:20', '2026-09-13T17:20:00'],
+            'overnight' => ['18:30', '2026-09-14T06:30:00'],
+            'more than 24 hours' => ['38:45', '2026-09-15T02:45:00'],
+            'optional seconds' => ['1:05:30', '2026-09-13T13:05:30'],
+            'missing' => [null, null],
+            'empty' => ['', null],
+            'zero' => ['00:00', null],
+            'invalid minutes' => ['04:75', null],
+            'invalid seconds' => ['04:00:90', null],
+            'negative' => ['-2:30', null],
+            'malformed' => ['five hours', null],
+        ];
+    }
+
+    public function test_arrival_uses_only_the_requested_company_and_city_pair_and_live_tariffs(): void
+    {
+        DB::table('fare_tables')->update(['time_difference' => '05:30']);
+        foreach ([['company_id' => 2], ['from_city_id' => 3], ['to_city_id' => 3], ['deleted_at' => now()]] as $changes) {
+            DB::table('fare_tables')->insert(array_merge([
+                'company_id' => 1, 'from_city_id' => 1, 'to_city_id' => 2,
+                'fare_class' => 70, 'fare' => 2500, 'time_difference' => '20:00',
+            ], $changes));
+        }
+        $this->getJson($this->searchUrl())->assertOk()
+            ->assertJsonPath('data.0.arrival_at', '2026-09-13T17:30:00');
+    }
+
     private function seatsUrl(): string
     {
         return '/api/mobile/v1/schedules/50/seats?origin_id=1&destination_id=2&date=' . $this->date;
@@ -1558,7 +1597,7 @@ class MobileSchedulingRulesTest extends TestCase
             'drop_schedules' => ['schedule_id', 'schedule_date'],
             'bus_classes' => ['', 'name seat_map'],
             'fare_classes' => ['is_active', 'name'],
-            'fare_tables' => ['from_city_id to_city_id fare_class fare', ''],
+            'fare_tables' => ['from_city_id to_city_id fare_class fare', 'time_difference'],
             'discounts' => ['is_active', 'type'],
             'schedule_terminal_discounts' => ['discount_id terminal_id', ''],
             'surcharges' => ['is_active', 'type'],
