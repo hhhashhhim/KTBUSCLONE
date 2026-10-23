@@ -32,6 +32,52 @@ perform the deployment steps below. Building does not deploy or migrate a server
 Push source and build tooling to `origin/mobile-backend`. Keep generated ZIPs
 and `vendor/` out of Git; distribute the ZIP separately as a deployment artifact.
 
+## cPanel update for the 23 October seat-map release
+
+This update adds `booked_gender` (`male`, `female`, or `null`) to occupied seat
+responses. It requires no new database migration or Composer dependency change.
+The corresponding Flutter seat picker displays the colours; older apps ignore
+the added field. Earlier registration, notification, and biometric migrations
+must already be installed; use their scoped rollout sections below if pending.
+
+In cPanel Terminal, first check the existing API checkout:
+
+```bash
+cd /home/wwwkaina/kt-mobile-api
+git remote -v
+git branch --show-current
+git status --short
+```
+
+Confirm `origin` is `hhhashhhim/KTBUSCLONE` and the branch is `mobile-backend`.
+Review any local source changes before continuing; do not discard them or switch
+branches automatically. Preserve the server's existing `.env`, `APP_KEY`, uploads,
+and storage. The following chain stops at the first failure:
+
+```bash
+cd /home/wwwkaina/kt-mobile-api &&
+test "$(git branch --show-current)" = mobile-backend &&
+php artisan down &&
+git pull --ff-only origin mobile-backend &&
+composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader &&
+php artisan config:clear &&
+php artisan route:clear &&
+php artisan view:clear &&
+php artisan config:cache &&
+php artisan queue:restart &&
+php artisan up
+```
+
+If a command fails after maintenance mode starts, resolve it before bringing
+the app back up. Do not clear the application cache: it holds OTP attempt budgets.
+Use the same PHP version for Composer and Artisan; the dependency lock requires
+PHP 8.2 or later. After a successful update, verify the commit and public API:
+
+```bash
+git log -1 --oneline
+curl --fail --silent --show-error https://mobile-api.kainattravels.com/api/mobile/v1/app/config
+```
+
 ## Pending registration security rollout (21 October 2026)
 
 Deploy the backend authentication files and the matching Flutter build together.

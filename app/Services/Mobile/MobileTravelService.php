@@ -202,6 +202,9 @@ class MobileTravelService
                     'surcharge' => (float) ($fare['surcharge'] ?? 0),
                     'rounding_adjustment' => (float) ($fare['rounding_adjustment'] ?? 0),
                     'status' => $status,
+                    'booked_gender' => $ticket
+                        ? ([1 => 'male', 0 => 'female'][(string) $ticket->gender] ?? null)
+                        : null,
                     'gender_restriction' => $column['gender'] ?? null,
                 ];
             }

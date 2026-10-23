@@ -251,6 +251,35 @@ class MobileSchedulingRulesTest extends TestCase
         $this->assertDatabaseHas('tickets', ['seat_no' => '1', 'online_terminal' => 1]);
     }
 
+    /** @dataProvider seatBookingGenders */
+    public function test_seat_map_reports_ticket_gender_without_changing_availability($gender, ?string $expected)
+    {
+        $this->addOnlineTicket('1', ['gender' => $gender]);
+        $this->getJson($this->seatsUrl())->assertOk()
+            ->assertJsonPath('data.seats.0.status', 'booked')
+            ->assertJsonPath('data.seats.0.booked_gender', $expected)
+            ->assertJsonPath('data.seats.1.status', 'available')
+            ->assertJsonPath('data.seats.1.booked_gender', null);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_seats', 2);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput(['1']))->assertStatus(409);
+
+        DB::table('tickets')->update(['type' => 'cancelled']);
+        $this->getJson($this->seatsUrl())->assertOk()
+            ->assertJsonPath('data.seats.0.status', 'available')
+            ->assertJsonPath('data.seats.0.booked_gender', null);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_seats', 3);
+    }
+
+    public static function seatBookingGenders(): array
+    {
+        return [
+            'male' => [1, 'male'],
+            'female' => [0, 'female'],
+            'unknown' => [null, null],
+            'unsupported legacy code' => [7, null],
+        ];
+    }
+
     /** @dataProvider bookingGenderMethods */
     public function test_booking_stores_erp_gender_codes_and_returns_mobile_labels(string $method)
     {
@@ -282,6 +311,11 @@ class MobileSchedulingRulesTest extends TestCase
             $this->assertSame([1, 0], DB::table($table)->orderBy('id')->pluck('gender')->all(), $table);
             $this->assertSame(['advance booking', 'advance booking'], DB::table($table)->orderBy('id')->pluck('type')->all(), $table);
         }
+        $this->getJson($this->seatsUrl())->assertOk()
+            ->assertJsonPath('data.seats.0.status', 'booked')
+            ->assertJsonPath('data.seats.0.booked_gender', 'male')
+            ->assertJsonPath('data.seats.1.status', 'booked')
+            ->assertJsonPath('data.seats.1.booked_gender', 'female');
         $this->getJson('/api/mobile/v1/bookings/' . $invoice)->assertOk()
             ->assertJsonPath('data.passengers.0.gender', 'male')
             ->assertJsonPath('data.passengers.1.gender', 'female');

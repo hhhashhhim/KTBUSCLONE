@@ -281,6 +281,28 @@ statuses are preserved; expired payments and released seats are not revived.
 New installations use DATETIME from the initial payment migration. No Flutter
 rebuild or API contract change is needed.
 
+## Seat map booked gender
+
+The authenticated `GET /api/mobile/v1/schedules/{scheduleDetail}/seats` endpoint
+keeps its existing `origin_id`, `destination_id`, and `date` query parameters,
+Bearer authentication, response envelope, and validation/error formats. Each
+`data.seats[]` item now includes `booked_gender`: `male`, `female`, or `null`.
+It comes from the existing overlapping ERP ticket for the requested journey
+(`tickets.gender`: `1 = male`, `0 = female`). Available/unavailable seats without
+a ticket and unrecognized or missing ticket genders return `null`. Cancelled
+and deleted tickets remain excluded by the existing availability query.
+
+`status` stays `booked` for occupied seats; availability, online quotas, and
+booking validation are unchanged. `gender_restriction` remains the separate
+seat-map restriction and must not be interpreted as the booked passenger's gender.
+No passenger names, contact details, or identification fields are added.
+
+The Flutter seat picker uses blue for male bookings, pink for female bookings,
+and neutral grey for occupied seats with unknown gender. Deploy
+`app/Services/Mobile/MobileTravelService.php` and the matching Flutter build to
+enable these colours. No database migration is required. Older app builds ignore
+the added field; newer app builds retain the neutral fallback on older APIs.
+
 ## Booking passenger gender
 
 Booking quote requests accept `passengers.*.gender` as `male` or `female`. The
