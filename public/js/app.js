@@ -77903,7 +77903,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     return {
       schedule: {},
       rows: [],
-      users: [],
+      terminals: [],
       loading: false,
       loaded: false,
       saving: false,
@@ -77913,14 +77913,14 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     };
   },
   computed: {
-    userOptions: function userOptions() {
+    terminalOptions: function terminalOptions() {
       return [{
         id: '',
-        text: 'Select user'
-      }].concat(_toConsumableArray(this.users.map(function (user) {
+        text: 'Select terminal'
+      }].concat(_toConsumableArray(this.terminals.map(function (terminal) {
         return {
-          id: String(user.id),
-          text: "".concat(user.name, " (").concat(user.user_name || '#' + user.id, ")")
+          id: String(terminal.id),
+          text: "".concat(terminal.name, " (#").concat(terminal.id, ")")
         };
       })));
     },
@@ -77939,7 +77939,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     addRow: function addRow() {
       this.rows.push({
         key: ++this.nextKey,
-        user_id: '',
+        terminal_id: '',
         percentage: ''
       });
     },
@@ -77964,7 +77964,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
                 requestId = ++_this.requestId;
                 _this.schedule = schedule;
                 _this.rows = [];
-                _this.users = [];
+                _this.terminals = [];
                 _this.error = '';
                 _this.loading = true;
                 _this.loaded = false;
@@ -77998,12 +77998,13 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
                 throw new Error((response === null || response === void 0 ? void 0 : (_response$data = response.data) === null || _response$data === void 0 ? void 0 : _response$data.message) || 'Unable to load quota discounts.');
 
               case 19:
-                _this.users = response.data.users;
+                _this.terminals = response.data.terminals;
                 _this.rows = response.data.discounts.map(function (row) {
                   return {
                     key: ++_this.nextKey,
-                    user_id: String(row.user_id),
-                    percentage: row.percentage
+                    terminal_id: String(row.terminal_id),
+                    percentage: row.percentage,
+                    migration_note: row.migration_note
                   };
                 });
                 _this.loaded = true;
@@ -78061,16 +78062,16 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
                 row = _step.value;
 
-                if (!(!row.user_id || seen.has(String(row.user_id)) || !/^\d+(\.\d{1,2})?$/.test(String(row.percentage)) || Number(row.percentage) > 100)) {
+                if (!(!row.terminal_id || seen.has(String(row.terminal_id)) || !/^\d+(\.\d{1,2})?$/.test(String(row.percentage)) || Number(row.percentage) > 100)) {
                   _context2.next = 12;
                   break;
                 }
 
-                _this2.error = 'Choose a different user for each row and enter a percentage from 0 to 100 (up to two decimal places).';
+                _this2.error = 'Choose a different terminal for each row and enter a percentage from 0 to 100 (up to two decimal places).';
                 return _context2.abrupt("return");
 
               case 12:
-                seen.add(String(row.user_id));
+                seen.add(String(row.terminal_id));
 
               case 13:
                 _context2.next = 7;
@@ -78101,7 +78102,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
                   id: _this2.schedule.id,
                   discounts: _this2.rows.map(function (row) {
                     return {
-                      user_id: Number(row.user_id),
+                      terminal_id: Number(row.terminal_id),
                       percentage: Number(row.percentage)
                     };
                   })
@@ -158773,13 +158774,13 @@ var _hoisted_10 = {
 
 var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "alert alert-info"
-}, "Only the selected user's available, already-used quota seats get this discount. For example, seats 1 and 2 booked Rawalpindi to Faisalabad can receive 2% off when reused Faisalabad to Multan. Other seats keep their normal fares.", -1
+}, "All users booking through the selected terminal receive this discount on available, already-used quota seats. For example, seats 1 and 2 booked Rawalpindi to Faisalabad can receive 2% off when reused Faisalabad to Multan. Other seats keep their normal fares.", -1
 /* HOISTED */
 );
 
 var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
   "class": "small text-muted"
-}, "Select each website/partner API login separately. The percentage applies after existing fare discounts, rounded to the nearest rupee. Both non-overlapping earlier and onward journeys qualify. An unlimited/blank quota disables these offers; 0% disables a user's discount.", -1
+}, "Select the Website, Sasta Ticket or Bookkaru terminal to enable its API offers. APIs use the terminal assigned to their login; portal bookings use the selected booking terminal. The percentage applies after existing fare discounts, rounded to the nearest rupee. Both non-overlapping earlier and onward journeys qualify. An unlimited/blank quota disables these offers; 0% disables a terminal's discount.", -1
 /* HOISTED */
 );
 
@@ -158789,33 +158790,41 @@ var _hoisted_13 = {
   "class": "text-center p-3"
 };
 var _hoisted_14 = {
+  key: 0,
+  "class": "col-12"
+};
+var _hoisted_15 = {
+  "class": "alert alert-warning",
+  role: "alert"
+};
+var _hoisted_16 = {
   "class": "col-md-7"
 };
-var _hoisted_15 = ["for"];
-var _hoisted_16 = {
+var _hoisted_17 = ["for"];
+var _hoisted_18 = {
   "class": "col-md-3"
 };
-var _hoisted_17 = ["for"];
-var _hoisted_18 = ["id", "onUpdate:modelValue", "disabled"];
-var _hoisted_19 = {
+var _hoisted_19 = ["for"];
+var _hoisted_20 = ["id", "onUpdate:modelValue", "disabled"];
+var _hoisted_21 = {
   "class": "col-md-2"
 };
-var _hoisted_20 = ["disabled", "onClick", "aria-label"];
-var _hoisted_21 = {
+var _hoisted_22 = ["disabled", "onClick", "aria-label"];
+var _hoisted_23 = {
   key: 0,
   "class": "text-muted"
 };
-var _hoisted_22 = ["disabled"];
-var _hoisted_23 = {
+var _hoisted_24 = ["disabled"];
+var _hoisted_25 = {
   key: 2,
   "class": "alert alert-danger mt-3 mb-0",
   role: "alert"
 };
-var _hoisted_24 = {
+var _hoisted_26 = {
   "class": "modal-footer"
 };
-var _hoisted_25 = ["disabled"];
-var _hoisted_26 = ["disabled"];
+var _hoisted_27 = ["disabled"];
+var _hoisted_28 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _ctx$schedule$route;
 
@@ -158840,32 +158849,34 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(((_ctx$schedule$route = _ctx.schedule.route) === null || _ctx$schedule$route === void 0 ? void 0 : _ctx$schedule$route.name) || ''), 1
   /* TEXT */
-  )]), _hoisted_11, _hoisted_12, _ctx.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, "Loading users and discounts...")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  )]), _hoisted_11, _hoisted_12, _ctx.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, "Loading terminals and discounts...")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
   }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.rows, function (row, index) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       key: row.key,
       "class": "row align-items-end mb-3"
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-      "for": 'quota-discount-user-' + row.key
-    }, "User / API account", 8
+    }, [row.migration_note ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(row.migration_note), 1
+    /* TEXT */
+    )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+      "for": 'quota-discount-terminal-' + row.key
+    }, "Terminal", 8
     /* PROPS */
-    , _hoisted_15), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select2, {
-      id: 'quota-discount-user-' + row.key,
-      modelValue: row.user_id,
+    , _hoisted_17), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select2, {
+      id: 'quota-discount-terminal-' + row.key,
+      modelValue: row.terminal_id,
       "onUpdate:modelValue": function onUpdateModelValue($event) {
-        return row.user_id = $event;
+        return row.terminal_id = $event;
       },
-      options: $options.userOptions,
+      options: $options.terminalOptions,
       settings: $options.selectSettings,
       disabled: _ctx.saving
     }, null, 8
     /* PROPS */
-    , ["id", "modelValue", "onUpdate:modelValue", "options", "settings", "disabled"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    , ["id", "modelValue", "onUpdate:modelValue", "options", "settings", "disabled"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
       "for": 'quota-discount-percent-' + row.key
     }, "Discount %", 8
     /* PROPS */
-    , _hoisted_17), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    , _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       id: 'quota-discount-percent-' + row.key,
       "class": "form-control",
       type: "number",
@@ -158879,7 +158890,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       disabled: _ctx.saving
     }, null, 8
     /* PROPS */
-    , _hoisted_18), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, row.percentage]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    , _hoisted_20), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, row.percentage]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
       type: "button",
       "class": "btn btn-outline-danger",
       disabled: _ctx.saving,
@@ -158889,21 +158900,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "aria-label": 'Remove discount row ' + (index + 1)
     }, "Remove", 8
     /* PROPS */
-    , _hoisted_20)])]);
+    , _hoisted_22)])]);
   }), 128
   /* KEYED_FRAGMENT */
-  )), _ctx.loaded && !_ctx.rows.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_21, "No user discounts configured. Add a user below.")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  )), _ctx.loaded && !_ctx.rows.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_23, "No terminal discounts configured. Add a terminal below.")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-outline-primary",
     disabled: _ctx.saving || !_ctx.loaded,
     onClick: _cache[1] || (_cache[1] = function () {
       return $options.addRow && $options.addRow.apply($options, arguments);
     })
-  }, "+ Add User", 8
+  }, "+ Add Terminal", 8
   /* PROPS */
-  , _hoisted_22)], 64
+  , _hoisted_24)], 64
   /* STABLE_FRAGMENT */
-  )), _ctx.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.error) + " ", 1
+  )), _ctx.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.error) + " ", 1
   /* TEXT */
   ), !_ctx.loaded && !_ctx.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 0,
@@ -158912,7 +158923,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[2] || (_cache[2] = function ($event) {
       return $options.open(_ctx.schedule);
     })
-  }, "Retry")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, "Retry")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn btn-secondary",
     onClick: _cache[3] || (_cache[3] = function () {
@@ -158921,13 +158932,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     disabled: _ctx.saving
   }, "Close", 8
   /* PROPS */
-  , _hoisted_25), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  , _hoisted_27), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "submit",
     "class": "btn btn-primary",
     disabled: _ctx.loading || _ctx.saving || !_ctx.loaded
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.saving ? 'Saving...' : 'Save Discounts'), 9
   /* TEXT, PROPS */
-  , _hoisted_26)])], 32
+  , _hoisted_28)])], 32
   /* HYDRATE_EVENTS */
   )])]);
 }
