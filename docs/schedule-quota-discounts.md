@@ -1,14 +1,17 @@
 # Schedule quota discounts
 
-On Schedule, **Quota Discount** opens per-user settings. Schedule edit permission
-is required. Users must belong to the same company and be active. Add one row
-per staff/API login with a percentage from 0 to 100 (at most two decimal places).
+On Schedule, **Quota Discount** opens per-terminal settings with searchable Select2.
+Schedule edit permission is required. Terminals must belong to the same company
+and must not be hidden or deleted. Add one row per terminal with a percentage
+from 0 to 100 (at most two decimal places).
 Zero disables the offer. Removing a row deactivates it and retains an audit trail.
 
 The rule belongs to the master schedule and applies separately to each dated
-departure. It is selected using the authenticated user, never a request-supplied
-user or terminal ID. Add the website, Sasta Ticket and Bookkaru login accounts
-separately when those channels should receive the offer.
+departure. Every user assigned to that terminal shares its rule. Third-party APIs
+use the authenticated API login's terminal, not a request-supplied terminal ID.
+Configure the Website, Sasta Ticket and Bookkaru terminals as needed. Portal
+preview and booking use the selected booking terminal (validated against the
+company), falling back to the logged-in user's terminal when not supplied.
 
 ## Eligibility and accounting
 
@@ -19,7 +22,7 @@ separately when those channels should receive the offer.
 - The selected journey must be non-overlapping with all active bookings of the
   same seat on that dated departure. Earlier and onward segments both qualify.
 - Full-route/overlapping/blocked seats, unpaid or cancelled qualifying bookings,
-  other dates, other companies, and users without a rule do not receive offers.
+  other dates, other companies, and terminals without a rule do not receive offers.
 - The percentage applies to the current net fare after existing discounts and
   surcharges, rounded to the nearest rupee. Rs 1,000 at 2% becomes Rs 980.
 - The discount remains available after departure on seats that were already
@@ -67,12 +70,22 @@ and details are not replaced. Existing historic tickets are not repriced.
 
 ## Deployment
 
-After pulling `api`, run only this migration in the API project:
+After pulling `api`, run these scoped migrations in the API project (already-run
+migrations are skipped):
 
 ```sh
 php artisan migrate --path=database/migrations/2026_10_21_000001_create_schedule_quota_discounts.php --force
+php artisan migrate --path=database/migrations/2026_10_24_000001_create_schedule_quota_terminal_discounts.php --force
 php artisan route:clear
 ```
 
 Pull `mix` for the modal and current frontend assets. No build command is required
 on production. No actual partner booking or payment is sent by the tests.
+
+Terminal rules are stored in `schedule_quota_terminal_discounts`. The migration
+preserves the original user table unchanged. Existing active user rules whose
+users map to a valid same-company terminal transfer automatically if the rates
+agree. Conflicting rates produce an inactive rule with a warning in the editor;
+set a percentage and save to resolve it. Users without a valid terminal cannot
+be transferred; configure their intended terminal explicitly. Migration retries
+do not overwrite existing terminal rules. No historical tickets are repriced.

@@ -1868,7 +1868,7 @@ class BookingController extends Controller
         $quotaPreview = app(ScheduleQuotaService::class)->preview($scheduleDetail, $tickets, $seatMap);
         $schedule->quota = $quotaPreview['quota'];
         $schedule->departure_passenger_summary = app(PassengerSummaryService::class)->byDepartureCity($tickets);
-        $scheduleDetail->bus_class->seat_map = app(\App\Services\ScheduleQuotaDiscountService::class)->preview($scheduleDetail, $tickets, $quotaPreview['seat_map'], Auth::user());
+        $scheduleDetail->bus_class->seat_map = app(\App\Services\ScheduleQuotaDiscountService::class)->preview($scheduleDetail, $tickets, $quotaPreview['seat_map'], Auth::user(), $request->dropTerminal);
         $schedule->setRelation('bus_class', $scheduleDetail->bus_class);
         $assignedBus = $this->assignedBus($scheduleDetail->schedule_id, $scheduleDetail->schedule_date);
         $schedule->bus_no = $assignedBus ? $assignedBus->bus_number : "N/A";

@@ -13,18 +13,20 @@ use Illuminate\Validation\ValidationException;
 
 class ScheduleQuotaDiscountService
 {
-    public function percentage(ScheduleDetail $detail, User $user): float
+    public function percentage(ScheduleDetail $detail, User $user, $terminalId = null): float
     {
-        if ((int) $detail->company_id !== (int) $user->company_id || $user->hide || !Schema::hasTable('schedule_quota_discounts')) {
+        if ((int) $detail->company_id !== (int) $user->company_id || $user->hide || !Schema::hasTable('schedule_quota_terminal_discounts')) {
             return 0;
         }
-        return (float) DB::table('schedule_quota_discounts')->where('company_id', $user->company_id)
-            ->where('schedule_id', $detail->schedule_id)->where('user_id', $user->id)->where('active', true)->value('percentage');
+        $terminalId = $terminalId ?? $user->terminal_id;
+        if (!\App\Models\Terminal::where('company_id', $user->company_id)->where('hide', 0)->whereKey($terminalId)->exists()) return 0;
+        return (float) DB::table('schedule_quota_terminal_discounts')->where('company_id', $user->company_id)
+            ->where('schedule_id', $detail->schedule_id)->where('terminal_id', $terminalId)->where('active', true)->value('percentage');
     }
 
-    public function preview(ScheduleDetail $detail, $tickets, array $map, User $user): array
+    public function preview(ScheduleDetail $detail, $tickets, array $map, User $user, $terminalId = null): array
     {
-        $percentage = $this->percentage($detail, $user);
+        $percentage = $this->percentage($detail, $user, $terminalId);
         if ($percentage > 0) {
             if (DB::transactionLevel() > 0) {
                 $tickets = \App\Models\Ticket::where('company_id', $detail->company_id)->where('schedule_id', $detail->schedule_id)
@@ -58,15 +60,20 @@ class ScheduleQuotaDiscountService
     public function bookingQuotes(ScheduleDetail $detail, Request $request, string $channel): array
     {
         $user = $request->user() ?: auth()->user();
-        if (!Schema::hasTable('schedule_quota_discounts')) { return []; }
+        if (!Schema::hasTable('schedule_quota_terminal_discounts')) { return []; }
         if (DB::transactionLevel() === 0) { throw new \LogicException('Quota discount validation requires a booking transaction.'); }
         Schedule::where('company_id', $user->company_id)->whereKey($detail->schedule_id)->lockForUpdate()->firstOrFail();
-        if (!DB::table('schedule_quota_discounts')->where('company_id', $user->company_id)
-            ->where('schedule_id', $detail->schedule_id)->where('user_id', $user->id)->exists()) { return []; }
+        $portal = $channel === 'portal';
+        $terminalId = $portal ? ($request->terminalId ?? $user->terminal_id) : $user->terminal_id;
+        if (!DB::table('schedule_quota_terminal_discounts')->where('company_id', $user->company_id)
+            ->where('schedule_id', $detail->schedule_id)->where('terminal_id', $terminalId)->exists()) { return []; }
+        if (!$portal && (($request->filled('terminal_id') && (int) $request->terminal_id !== (int) $terminalId)
+            || ($request->filled('terminalId') && (int) $request->terminalId !== (int) $terminalId))) {
+            throw ValidationException::withMessages(['quota_discount' => 'Please book using the terminal assigned to your API account.']);
+        }
         // Current reads avoid stale eligibility after another booking releases the schedule lock.
         $currentTickets = \App\Models\Ticket::where('company_id', $user->company_id)->where('schedule_id', $detail->schedule_id)
             ->where('schedule_date', $detail->schedule_date)->lockForUpdate()->get();
-        $portal = $channel === 'portal';
         $selected = (array) ($portal ? $request->selectedSeats : $request->selected_seats);
         $cities = app(ScheduleQuotaService::class)->context($detail)['cities'];
         $from = array_search($detail->departure_id, $cities, false);

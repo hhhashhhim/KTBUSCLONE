@@ -74,9 +74,9 @@ class UpcomingScheduleProjectionTest extends TestCase
         $this->table('cities', [], ['name']);
         $this->table('companies', [], ['name']);
         $this->table('customers', [], ['name']);
-        $this->table('users', [], ['name']);
+        $this->table('users', ['company_id', 'hide', 'terminal_id'], ['name']);
         $this->table('bus_classes', [], ['name', 'front_icons', 'seat_map']);
-        $this->table('terminals', ['company_id', 'advance_booking'], ['name', 'available_seats']);
+        $this->table('terminals', ['company_id', 'advance_booking', 'hide'], ['name', 'available_seats']);
         $this->table('schedule_terminal_visibilities', ['company_id', 'terminal_id', 'schedule_id', 'visibility']);
         $this->table('drop_schedules', ['company_id', 'schedule_id'], [], ['schedule_date']);
         $this->table('terminal_visibilities', ['route_id', 'departure_city_id', 'destination_city_id', 'online_visibilty']);
@@ -99,7 +99,7 @@ class UpcomingScheduleProjectionTest extends TestCase
             ['reserved' => true, 'type' => 0, 'class' => 1, 'seatNo' => '2'],
         ]])]);
         DB::table('schedules')->insert(['id' => 1, 'company_id' => 1, 'route_id' => 1, 'bus_class_id' => 1, 'discount_id' => 1, 'surcharge_id' => 1, 'hide' => 0, 'name' => 'Test schedule', 'time' => '18:00:00']);
-        DB::table('terminals')->insert(['id' => 1, 'company_id' => 1, 'advance_booking' => 90, 'name' => 'Test terminal']);
+        DB::table('terminals')->insert(['id' => 1, 'company_id' => 1, 'hide' => 0, 'advance_booking' => 90, 'name' => 'Test terminal']);
         DB::table('schedule_terminal_visibilities')->insert(['company_id' => 1, 'terminal_id' => 1, 'schedule_id' => 1, 'visibility' => 1]);
         DB::table('routes')->insert(['id' => 1, 'name' => 'Test route', 'online_seats' => 20]);
         DB::table('routes_fares')->insert(['route_id' => 1, 'departure_city_id' => 1, 'destination_city_id' => 2]);
@@ -306,6 +306,8 @@ class UpcomingScheduleProjectionTest extends TestCase
     {
         require_once database_path('migrations/2026_10_21_000001_create_schedule_quota_discounts.php');
         (new \CreateScheduleQuotaDiscounts)->up();
+        require_once database_path('migrations/2026_10_24_000001_create_schedule_quota_terminal_discounts.php');
+        (new \CreateScheduleQuotaTerminalDiscounts)->up();
         Schema::table('schedules', function (Blueprint $table) { $table->integer('intermediate_quota')->nullable(); });
         DB::table('schedules')->where('id',1)->update(['intermediate_quota'=>10]);
         DB::table('cities')->insert(['id'=>3,'name'=>'Onward city']);
@@ -313,7 +315,7 @@ class UpcomingScheduleProjectionTest extends TestCase
         DB::table('fare_tables')->insert(['company_id'=>1,'from_city_id'=>2,'to_city_id'=>3,'fare_class'=>1,'fare'=>1000,'time_difference'=>'02:00']);
         $date=today()->addDay()->toDateString();
         DB::table('schedule_details')->insert(['id'=>2,'company_id'=>1,'schedule_id'=>1,'departure_id'=>2,'destination_id'=>3,'bus_class_id'=>1,'departure_time'=>'20:00:00','schedule_date'=>$date,'departure_date'=>$date]);
-        DB::table('schedule_quota_discounts')->insert(['company_id'=>1,'schedule_id'=>1,'user_id'=>1,'percentage'=>2,'updated_by'=>1]);
+        DB::table('schedule_quota_terminal_discounts')->insert(['company_id'=>1,'schedule_id'=>1,'terminal_id'=>1,'percentage'=>2,'updated_by'=>1]);
         DB::table('tickets')->insert(['company_id'=>1,'schedule_id'=>1,'schedule_date'=>$date,'departure_city_id'=>1,'destination_city_id'=>2,'seat_no'=>'1','gender'=>'male','type'=>'booked','is_partial'=>1,'online_terminal'=>0,'booked_time'=>now()]);
         $request=Request::create('/', 'POST', ['schedule_id'=>1,'date'=>$date,'departure_time'=>'20:00:00','departure_city_id'=>2,'destination_city_id'=>3,'selected_seats'=>['1','2'],'selected_seats_class'=>[1,1],'selected_seats_fare'=>[980,1000]]);
         $request->setUserResolver(fn()=>Auth::user());
@@ -333,19 +335,38 @@ class UpcomingScheduleProjectionTest extends TestCase
             $this->table($model->getTable(),['company_id','departure_city_id','destination_city_id','ticket_id','booking_no','customer_id','schedule_id','added_by'],['seat_no','seat_fare','date','gender','type']);
         }
         foreach ([BookingApiController::class=>'api',TicketingApiController::class=>'legacy'] as $controller=>$channel) {
+            // A different login on the same terminal gets the same offer. Client
+            // terminal fields cannot switch partner pricing to another terminal.
+            Auth::setUser((new User)->forceFill(['id'=>99,'company_id'=>1,'terminal_id'=>1]));
+            $request->merge(['terminal_id'=>999]);
             $response=app($controller)->previewSchedule($request)->toResponse($request);
             $body=json_decode($response->getContent(),true);
             $this->assertSame('success',$body['status'],json_encode($body));
             $map=$body['data']['seat_map'];
             $this->assertEquals([980,1000],array_column($map[0],'fare'));
             $this->assertSame(['Yes','No'],array_column($map[0],'is_special'));
+            $this->assertSame(['Yes','No'],array_column($map[0],'is_speacial'));
+            DB::beginTransaction();
+            try {
+                try {
+                    (new \App\Services\ScheduleQuotaDiscountService)->bookingQuotes(ScheduleDetail::find(2),$request,$channel);
+                    $this->fail('Partner booking accepted a different terminal from its authenticated account');
+                } catch (\Illuminate\Validation\ValidationException $e) { $this->assertArrayHasKey('quota_discount', $e->errors()); }
+            } finally { DB::rollBack(); }
+            $request->request->remove('terminal_id');
+            DB::table('schedule_quota_terminal_discounts')->update(['terminal_id'=>2]);
+            $unconfigured = app($controller)->previewSchedule($request)->toResponse($request);
+            $unconfigured = json_decode($unconfigured->getContent(), true)['data']['seat_map'];
+            $this->assertEquals([1000,1000],array_column($unconfigured[0],'fare'));
+            $this->assertSame(['No','No'],array_column($unconfigured[0],'is_special'));
+            DB::table('schedule_quota_terminal_discounts')->update(['terminal_id'=>1]);
             DB::beginTransaction();
             try {
                 $service=new \App\Services\ScheduleQuotaDiscountService;
                 $quotes=$service->bookingQuotes(ScheduleDetail::find(2),$request,$channel);
                 $this->assertEquals(20,$quotes[0]['quota_discount']);
                 $this->assertEquals(980,$quotes[0]['fare_before_quota_discount']-$quotes[0]['quota_discount']);
-                DB::table('schedule_quota_discounts')->update(['active'=>false]);
+                DB::table('schedule_quota_terminal_discounts')->update(['active'=>false]);
                 try { $service->bookingQuotes(ScheduleDetail::find(2),$request,$channel); $this->fail('Removed rule accepted an old discounted quote'); }
                 catch (\Illuminate\Validation\ValidationException $e) { $this->assertArrayHasKey('quota_discount',$e->errors()); }
             } finally { DB::rollBack(); }
