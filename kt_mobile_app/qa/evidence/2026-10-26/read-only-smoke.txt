@@ -1,0 +1,13 @@
+2026-10-26, configured production base https://mobile-api.kainattravels.com/api/mobile/v1
+GET /app/config: 200, success envelope, JSON saved as production-config.json
+Unauthenticated GET /cities: 401
+Unauthenticated GET /wallet: 401
+Unauthenticated GET /bookings: 401
+Unauthenticated GET /notifications: 401
+Unauthenticated GET /saved-passengers: 401
+Unauthenticated GET /profile: 401
+Unauthenticated GET /auth/session: 401
+No authenticated requests, account registrations, OTP sends, bookings, notifications or payments were submitted.
+Simulator: iPhone 17 Pro, iOS 26.5, com.kainattravels.ktMobileApp, freshly built 1.0.5+6.
+Observed: startup reaches login; Create account opens signup fields; Privacy policy opens and loads https://www.kainattravels.com/privacy in the native WebView.
+No real-device biometrics, push, or banking checkout was exercised.

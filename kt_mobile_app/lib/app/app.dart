@@ -150,6 +150,14 @@ class _KainatTravelsAppState extends ConsumerState<KainatTravelsApp>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(passengerSessionProvider, (previous, next) {
+      if (previous?.passengerId != null && previous != next) {
+        // Discard private routes and their local forms/WebViews on logout,
+        // expiry, biometric lock, or a direct switch to another login session.
+        _pendingNotice = null;
+        appRouter.go(next.passengerId == null ? '/login' : '/home');
+      }
+    });
     ref.listen(authControllerProvider.select((state) => state.passenger?.id), (
       _,
       _,

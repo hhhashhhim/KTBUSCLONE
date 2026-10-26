@@ -3,7 +3,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kt_mobile_app/core/network/api_client.dart';
+import 'package:kt_mobile_app/core/theme/app_theme.dart';
 import 'package:kt_mobile_app/features/auth/application/auth_controller.dart';
 import 'package:kt_mobile_app/features/auth/domain/passenger.dart';
 import 'package:kt_mobile_app/features/notifications/notification_repository.dart';
@@ -288,5 +290,102 @@ void main() {
     expect(find.text('You’re all caught up'), findsOneWidget);
     expect(find.byType(RefreshIndicator), findsOneWidget);
     expect(find.text('Enable'), findsNothing);
+  });
+
+  testWidgets('small screen with large text can refresh and open trips', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    var loads = 0;
+    final router = GoRouter(
+      routes: [
+        GoRoute(path: '/', builder: (_, _) => const NotificationsScreen()),
+        GoRoute(
+          path: '/tickets',
+          builder: (_, _) => const Scaffold(body: Text('Trips destination')),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authControllerProvider.overrideWith(SignedIn.new),
+          mobileAppConfigProvider.overrideWithValue(config),
+          notificationPageProvider(1).overrideWith((ref) async {
+            loads++;
+            return const NotificationPage();
+          }),
+        ],
+        child: MaterialApp.router(
+          theme: AppTheme.light,
+          routerConfig: router,
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.linear(1.8)),
+            child: child!,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await tester.drag(find.byType(ListView), const Offset(0, 350));
+    await tester.pumpAndSettle();
+    expect(loads, 2);
+    await tester.scrollUntilVisible(find.text('View my trips'), 240);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('View my trips'));
+    await tester.pumpAndSettle();
+    expect(find.text('Trips destination'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('populated inbox keeps read watermark and pagination controls', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final api = NoticeApi();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authControllerProvider.overrideWith(SignedIn.new),
+          mobileAppConfigProvider.overrideWithValue(config),
+          notificationRepositoryProvider.overrideWithValue(
+            NotificationRepository(api),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.linear(1.8)),
+            child: child!,
+          ),
+          home: const NotificationsScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Confirmed'), findsOneWidget);
+    await tester.tap(find.text('Mark these and older as read'));
+    await tester.pumpAndSettle();
+    expect(api.lastData, {'through_id': 8});
+    await tester.scrollUntilVisible(find.text('Next'), 240);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Page 2 of 2'), 240);
+    await tester.pumpAndSettle();
+    expect(find.text('Page 2 of 2'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

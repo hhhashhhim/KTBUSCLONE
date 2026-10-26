@@ -49,7 +49,7 @@ Future<ProviderContainer> _showHome(
   final container = ProviderContainer(
     overrides: [
       homeClockProvider.overrideWith((ref) => clock ?? Stream.value(_now)),
-      bookingsProvider.overrideWith((ref) async => bookings),
+      bookingsProvider.overrideWith((ref, session) async => bookings),
       fleetGalleryProvider.overrideWith((ref) async => const []),
       appPhotosProvider('home_banner').overrideWith(
         (ref) => banner

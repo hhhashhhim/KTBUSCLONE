@@ -4,11 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/widgets/app_widgets.dart';
-import '../../core/theme/app_colors.dart';
 import '../auth/application/auth_controller.dart';
 import '../startup/application/startup_controller.dart';
 import 'notification_providers.dart';
 import 'notification_push.dart';
+import 'notification_widgets.dart';
 export 'notification_providers.dart' show notificationsProvider;
 
 String notificationTime(DateTime date) =>
@@ -74,155 +74,174 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     }
     final data = ref.watch(notificationPageProvider(page));
     return Scaffold(
-      appBar: const AppPageHeader(title: 'Alerts'),
-      body: Column(
-        children: [
-          if (config?.features.pushNotifications == true &&
-              ref.watch(pushClientProvider).available)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: Row(
-                children: [
-                  const Expanded(child: Text('Get updates on your phone')),
-                  TextButton(
-                    onPressed: busy
-                        ? null
-                        : () => perform(() async {
-                            await ref.read(notificationPushProvider).enable();
-                            if (mounted) {
-                              setState(() => message = 'Phone alerts enabled.');
-                            }
-                          }),
-                    child: const Text('Enable'),
+      appBar: const AppPageHeader(
+        title: 'Alerts',
+        subtitle: 'Your journey, up to date',
+      ),
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFEEF6F0), Color(0xFFFAFCFA)],
+            stops: [0, 0.7],
+          ),
+        ),
+        child: Column(
+          children: [
+            if (config?.features.pushNotifications == true &&
+                ref.watch(pushClientProvider).available)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                child: AlertSurface(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.notifications_active_outlined, size: 22),
+                      const SizedBox(width: 12),
+                      const Expanded(child: Text('Get updates on your phone')),
+                      TextButton(
+                        onPressed: busy
+                            ? null
+                            : () => perform(() async {
+                                await ref
+                                    .read(notificationPushProvider)
+                                    .enable();
+                                if (mounted) {
+                                  setState(
+                                    () => message = 'Phone alerts enabled.',
+                                  );
+                                }
+                              }),
+                        child: const Text('Enable'),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          if (message != null)
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(message!, semanticsLabel: message),
-            ),
-          Expanded(
-            child: data.when(
-              loading: () => const AppLoadingView(),
-              error: (error, _) => AppStateView(
-                icon: Icons.wifi_off,
-                title: 'Could not load alerts',
-                message: error.toString(),
-                actionLabel: 'Retry',
-                onAction: () => ref.invalidate(notificationPageProvider(page)),
+            if (message != null)
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Semantics(liveRegion: true, child: Text(message!)),
               ),
-              data: (value) => RefreshIndicator(
-                onRefresh: () async {
-                  ref.invalidate(notificationPageProvider);
-                  await ref.read(notificationPageProvider(page).future);
-                },
-                child: ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${value.unread} unread',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
+            Expanded(
+              child: data.when(
+                loading: () => const AppLoadingView(),
+                error: (error, _) => AppStateView(
+                  icon: Icons.wifi_off,
+                  title: 'Could not load alerts',
+                  message: error.toString(),
+                  actionLabel: 'Retry',
+                  onAction: () =>
+                      ref.invalidate(notificationPageProvider(page)),
+                ),
+                data: (value) => RefreshIndicator(
+                  onRefresh: () async {
+                    ref.invalidate(notificationPageProvider);
+                    await ref.read(notificationPageProvider(page).future);
+                  },
+                  child: LayoutBuilder(
+                    builder: (context, constraints) => ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.fromLTRB(
+                        ((constraints.maxWidth - 560) / 2).clamp(
+                          20.0,
+                          double.infinity,
                         ),
+                        24,
+                        ((constraints.maxWidth - 560) / 2).clamp(
+                          20.0,
+                          double.infinity,
+                        ),
+                        28,
+                      ),
+                      children: [
+                        AlertsInboxHeading(unread: value.unread),
                         if (value.unread > 0 && value.items.isNotEmpty)
-                          TextButton(
-                            onPressed: busy
-                                ? null
-                                : () => perform(() async {
-                                    await ref
-                                        .read(notificationRepositoryProvider)
-                                        .readThrough(value.items.first.id);
-                                    ref.invalidate(notificationPageProvider);
-                                  }),
-                            child: const Text('Mark these and older as read'),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton.icon(
+                              onPressed: busy
+                                  ? null
+                                  : () => perform(() async {
+                                      await ref
+                                          .read(notificationRepositoryProvider)
+                                          .readThrough(value.items.first.id);
+                                      ref.invalidate(notificationPageProvider);
+                                    }),
+                              icon: const Icon(
+                                Icons.done_all_rounded,
+                                size: 18,
+                              ),
+                              label: const Text('Mark these and older as read'),
+                            ),
                           ),
-                      ],
-                    ),
-                    if (value.items.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 60),
-                        child: Column(
+                        const SizedBox(height: 22),
+                        if (value.items.isEmpty)
+                          AlertsEmptyState(
+                            onViewTrips: () => context.go('/tickets'),
+                          ),
+                        for (final item in value.items)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: AlertInboxCard(
+                              item: item,
+                              timeLabel: notificationTime(item.createdAt),
+                              onTap: () =>
+                                  context.push('/notifications/${item.id}'),
+                            ),
+                          ),
+                        const SizedBox(height: 26),
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.notifications_none, size: 42),
-                            SizedBox(height: 12),
-                            Text('You’re all caught up'),
-                            SizedBox(height: 8),
-                            Text(
-                              'Booking updates and announcements will appear here.',
-                              textAlign: TextAlign.center,
+                            Icon(
+                              Icons.swipe_down_rounded,
+                              size: 16,
+                              color: Color(0xFF607568),
+                            ),
+                            SizedBox(width: 7),
+                            Flexible(
+                              child: Text(
+                                'Pull down to refresh',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF607568),
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                    for (final item in value.items)
-                      Card(
-                        color: item.readAt == null
-                            ? AppColors.primarySoft
-                            : null,
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(16),
-                          leading: Icon(
-                            item.readAt == null
-                                ? Icons.mark_email_unread_outlined
-                                : Icons.notifications_none,
+                        if (value.lastPage > 1)
+                          Wrap(
+                            alignment: WrapAlignment.spaceBetween,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 12,
+                            runSpacing: 8,
+                            children: [
+                              TextButton(
+                                onPressed: page > 1
+                                    ? () => setState(() => page--)
+                                    : null,
+                                child: const Text('Previous'),
+                              ),
+                              Text('Page $page of ${value.lastPage}'),
+                              TextButton(
+                                onPressed: page < value.lastPage
+                                    ? () => setState(() => page++)
+                                    : null,
+                                child: const Text('Next'),
+                              ),
+                            ],
                           ),
-                          title: Text(
-                            item.title,
-                            style: const TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item.body,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  notificationTime(item.createdAt),
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                          ),
-                          onTap: () =>
-                              context.push('/notifications/${item.id}'),
-                        ),
-                      ),
-                    if (value.lastPage > 1)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TextButton(
-                            onPressed: page > 1
-                                ? () => setState(() => page--)
-                                : null,
-                            child: const Text('Previous'),
-                          ),
-                          Text('Page $page of ${value.lastPage}'),
-                          TextButton(
-                            onPressed: page < value.lastPage
-                                ? () => setState(() => page++)
-                                : null,
-                            child: const Text('Next'),
-                          ),
-                        ],
-                      ),
-                  ],
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

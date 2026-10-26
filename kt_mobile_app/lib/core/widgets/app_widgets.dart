@@ -160,12 +160,17 @@ class AppSectionTitle extends StatelessWidget {
 }
 
 class AppStickyAction extends StatelessWidget {
-  const AppStickyAction({required this.child, super.key});
+  const AppStickyAction({
+    required this.child,
+    this.padding = const EdgeInsets.fromLTRB(16, 14, 16, 12),
+    super.key,
+  });
   final Widget child;
+  final EdgeInsetsGeometry padding;
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+    padding: padding,
     decoration: const BoxDecoration(
       color: Color(0xF7FAFCFA),
       border: Border(top: BorderSide(color: AppColors.border)),

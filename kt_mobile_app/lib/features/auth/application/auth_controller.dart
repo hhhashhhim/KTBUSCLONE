@@ -12,12 +12,14 @@ class AuthState {
     this.isLoading = false,
     this.error,
     this.otpDeliveryMessage,
+    this.sessionGeneration = 0,
   });
 
   final PassengerAccount? passenger;
   final bool isLoading;
   final String? error;
   final String? otpDeliveryMessage;
+  final int sessionGeneration;
 
   bool get isAuthenticated => passenger != null;
 
@@ -32,6 +34,7 @@ class AuthState {
     isLoading: isLoading ?? this.isLoading,
     error: clearError ? null : error ?? this.error,
     otpDeliveryMessage: otpDeliveryMessage,
+    sessionGeneration: sessionGeneration,
   );
 }
 
@@ -56,20 +59,43 @@ final authControllerProvider = NotifierProvider<AuthController, AuthState>(
   AuthController.new,
 );
 
+// A fresh login has a fresh cache scope, even when the same passenger returns.
+typedef PassengerSession = ({int? passengerId, int generation});
+
+final passengerSessionProvider = Provider<PassengerSession>((ref) {
+  return ref.watch(
+    authControllerProvider.select(
+      (state) => (
+        passengerId: state.passenger?.id,
+        generation: state.sessionGeneration,
+      ),
+    ),
+  );
+});
+
 class AuthController extends Notifier<AuthState> {
+  int _sessionGeneration = 0;
+  int _authOperation = 0;
+
   @override
   AuthState build() => const AuthState();
 
   Future<bool> loginWithBiometrics() async {
     if (state.isLoading) return false;
+    final operation = ++_authOperation;
     state = const AuthState(isLoading: true);
     try {
       final passenger = await ref
           .read(biometricLoginRepositoryProvider)
           .login();
-      state = AuthState(passenger: passenger);
+      if (!ref.mounted || operation != _authOperation) return false;
+      state = AuthState(
+        passenger: passenger,
+        sessionGeneration: ++_sessionGeneration,
+      );
       return true;
     } catch (error) {
+      if (!ref.mounted || operation != _authOperation) return false;
       state = AuthState(error: error.toString());
       return false;
     } finally {
@@ -78,25 +104,33 @@ class AuthController extends Notifier<AuthState> {
   }
 
   Future<bool> restoreSession() async {
+    final operation = ++_authOperation;
     final passenger = await ref.read(authRepositoryProvider).restore();
-    state = state.copyWith(
+    // A delayed restore must not undo a logout, lock or newer sign-in.
+    if (!ref.mounted || operation != _authOperation) return false;
+    state = AuthState(
       passenger: passenger,
-      clearPassenger: passenger == null,
-      clearError: true,
+      sessionGeneration: ++_sessionGeneration,
     );
     return passenger != null;
   }
 
   Future<bool> login(String mobile, String password) async {
+    final operation = ++_authOperation;
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final passenger = await ref
           .read(authRepositoryProvider)
           .login(mobile: mobile, password: password);
-      state = AuthState(passenger: passenger);
+      if (!ref.mounted || operation != _authOperation) return false;
+      state = AuthState(
+        passenger: passenger,
+        sessionGeneration: ++_sessionGeneration,
+      );
       ref.invalidate(biometricStatusProvider);
       return true;
     } catch (error) {
+      if (!ref.mounted || operation != _authOperation) return false;
       state = AuthState(error: error.toString());
       return false;
     }
@@ -110,6 +144,7 @@ class AuthController extends Notifier<AuthState> {
     required String passwordConfirmation,
     String? email,
   }) async {
+    final operation = ++_authOperation;
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final result = await ref
@@ -122,19 +157,23 @@ class AuthController extends Notifier<AuthState> {
             passwordConfirmation: passwordConfirmation,
             email: email,
           );
+      if (!ref.mounted || operation != _authOperation) return false;
       state = AuthState(
         passenger: result.passenger,
         otpDeliveryMessage: result.deliveryMessage,
+        sessionGeneration: ++_sessionGeneration,
       );
       ref.invalidate(biometricStatusProvider);
       return true;
     } catch (error) {
+      if (!ref.mounted || operation != _authOperation) return false;
       state = AuthState(error: error.toString());
       return false;
     }
   }
 
   Future<void> logout() async {
+    ++_authOperation;
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       await ref.read(authRepositoryProvider).logout();
@@ -147,10 +186,17 @@ class AuthController extends Notifier<AuthState> {
   }
 
   void replacePassenger(PassengerAccount passenger) {
-    state = AuthState(passenger: passenger);
+    ++_authOperation;
+    state = AuthState(
+      passenger: passenger,
+      sessionGeneration: state.passenger?.id == passenger.id
+          ? state.sessionGeneration
+          : ++_sessionGeneration,
+    );
   }
 
   Future<void> deleteAccount(String password) async {
+    ++_authOperation;
     await ref.read(authRepositoryProvider).deleteAccount(password);
     await ref.read(notificationPushProvider).detach();
     // The server has confirmed deletion. Clear in-memory state even if secure
@@ -166,12 +212,14 @@ class AuthController extends Notifier<AuthState> {
   }
 
   void expireSession() {
+    ++_authOperation;
     state = const AuthState(
       error: 'Your session expired. Please sign in again.',
     );
   }
 
   void lockForQuickLogin() {
+    ++_authOperation;
     state = const AuthState();
   }
 }

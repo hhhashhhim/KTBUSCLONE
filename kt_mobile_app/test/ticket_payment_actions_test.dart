@@ -8,6 +8,7 @@ import 'package:kt_mobile_app/core/config/app_environment.dart';
 import 'package:kt_mobile_app/features/payments/domain/booking_payment_action.dart';
 import 'package:kt_mobile_app/features/payments/presentation/payment_screen.dart';
 import 'package:kt_mobile_app/features/startup/application/startup_controller.dart';
+import 'package:kt_mobile_app/features/auth/application/auth_controller.dart';
 import 'package:kt_mobile_app/features/tickets/tickets_screen.dart';
 import 'package:kt_mobile_app/features/travel/application/travel_providers.dart';
 import 'package:kt_mobile_app/features/travel/domain/travel_models.dart';
@@ -193,15 +194,15 @@ void main() {
   ) async {
     final repository = FakeTravelRepository(booking());
     await pumpTickets(tester, repository, location: '/tickets');
-    expect(find.text('pending'), findsOneWidget);
+    expect(find.text('Pending'), findsOneWidget);
     repository.result = booking(state: 'expired');
     await tester.tap(find.text('KT-00000042'));
     await tester.pumpAndSettle();
     expect(find.text('Booking: expired'), findsOneWidget);
     await tester.tap(find.byIcon(Icons.chevron_left_rounded));
     await tester.pumpAndSettle();
-    expect(find.text('expired'), findsOneWidget);
-    expect(find.text('pending'), findsNothing);
+    expect(find.text('Expired'), findsOneWidget);
+    expect(find.text('Pending'), findsNothing);
     expect(repository.listReads, greaterThan(1));
     await tester.pumpWidget(const SizedBox());
   });
@@ -364,6 +365,10 @@ Future<void> pumpTickets(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        passengerSessionProvider.overrideWithValue((
+          passengerId: 1,
+          generation: 0,
+        )),
         travelRepositoryProvider.overrideWithValue(repository),
         paymentLauncherProvider.overrideWithValue((_, uri) async {
           onCheckout?.call();

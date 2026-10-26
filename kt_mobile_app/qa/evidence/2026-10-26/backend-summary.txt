@@ -1,0 +1,9 @@
+Command: APP_ENV=testing DB_CONNECTION=sqlite DB_DATABASE=:memory: CACHE_DRIVER=array SESSION_DRIVER=array QUEUE_CONNECTION=sync LOG_CHANNEL=stderr php vendor/bin/phpunit --filter Mobile --do-not-cache-result
+Repository: hhhashhhim/KTBUSCLONE
+Worktree: /Users/malik/Desktop/Codes/KTBUSCLONE-mobile-backend
+Branch: mobile-backend
+Commit: cc2e21d2
+Tests: 308; passed: 306; assertions: 2139; failures: 0; errors: 0; skipped: 2.
+Skips: legacy cPanel and fresh-install MySQL payment expiry tests. MOBILE_MYSQL_TEST_DATABASE was not configured.
+Database tests use disposable SQLite in-memory connections. Payment and OTP providers are faked.
+Raw local execution log: /tmp/kt-mobile-qa-20261026/backend-tests.log

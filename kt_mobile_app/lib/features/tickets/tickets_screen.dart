@@ -13,9 +13,11 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/app_widgets.dart';
 import '../payments/domain/booking_payment_action.dart';
 import '../startup/application/startup_controller.dart';
+import '../auth/application/auth_controller.dart';
 import '../travel/application/travel_providers.dart';
 import '../travel/domain/travel_models.dart';
 import '../travel/presentation/lovable_search_flow.dart';
+import 'trip_ticket_card.dart';
 
 class TicketsScreen extends ConsumerStatefulWidget {
   const TicketsScreen({super.key});
@@ -53,101 +55,214 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final bookings = ref.watch(bookingsProvider);
+    final bookings = ref.watch(
+      bookingsProvider(ref.watch(passengerSessionProvider)),
+    );
+    final now = DateTime.now();
+    final groups = <List<BookingSummary>>[[], [], []];
+    for (final booking in bookings.value ?? <BookingSummary>[]) {
+      final cancelled = booking.status.toLowerCase().contains('cancel');
+      final group = cancelled
+          ? 2
+          : booking.departureAt.isAfter(now)
+          ? 0
+          : 1;
+      groups[group].add(booking);
+    }
+    final filtered = groups[_tab];
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 70,
-        title: const Text('My trips'),
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, color: AppColors.border),
-        ),
-      ),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              _TripsTab(
-                label: 'Upcoming',
-                selected: _tab == 0,
-                onTap: () => setState(() => _tab = 0),
-              ),
-              _TripsTab(
-                label: 'Past',
-                selected: _tab == 1,
-                onTap: () => setState(() => _tab = 1),
-              ),
-              _TripsTab(
-                label: 'Cancelled',
-                selected: _tab == 2,
-                onTap: () => setState(() => _tab = 2),
-              ),
-            ],
-          ),
-          const Divider(height: 1, color: AppColors.border),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () => ref.refresh(bookingsProvider.future),
-              child: bookings.when(
-                loading: () =>
-                    const AppLoadingView(label: 'Loading your trips…'),
-                error: (error, _) => ListView(
-                  children: [
-                    AppStateView(
-                      icon: Icons.cloud_off_rounded,
-                      title: 'Could not load trips',
-                      message: error.toString(),
-                      actionLabel: 'Try again',
-                      onAction: () => ref.invalidate(bookingsProvider),
-                    ),
-                  ],
-                ),
-                data: (values) {
-                  final now = DateTime.now();
-                  final filtered = values.where((booking) {
-                    final cancelled = booking.status.toLowerCase().contains(
-                      'cancel',
-                    );
-                    return switch (_tab) {
-                      0 => booking.departureAt.isAfter(now) && !cancelled,
-                      1 => !booking.departureAt.isAfter(now) && !cancelled,
-                      _ => cancelled,
-                    };
-                  }).toList();
-                  if (filtered.isEmpty) {
-                    return ListView(
-                      children: [
-                        AppStateView(
-                          icon: Icons.confirmation_number_outlined,
-                          title: _tab == 0
-                              ? 'No upcoming trips'
-                              : _tab == 1
-                              ? 'No past trips'
-                              : 'No cancelled trips',
-                          message: _tab == 0
-                              ? 'Book a bus and your ticket will appear here.'
-                              : 'Trips in this category will appear here.',
-                          actionLabel: _tab == 0 ? 'Book a trip' : null,
-                          onAction: _tab == 0
-                              ? () => context.go('/search')
-                              : null,
+      backgroundColor: const Color(0xFFF0F5F1),
+      body: SafeArea(
+        bottom: false,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1100),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final columns =
+                    constraints.maxWidth >= 760 &&
+                        MediaQuery.textScalerOf(context).scale(20) <= 24
+                    ? 2
+                    : 1;
+                final padding = constraints.maxWidth >= 600 ? 28.0 : 20.0;
+                return RefreshIndicator(
+                  onRefresh: () => ref.refresh(
+                    bookingsProvider(ref.read(passengerSessionProvider)).future,
+                  ),
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      SliverPadding(
+                        padding: EdgeInsets.fromLTRB(padding, 20, padding, 0),
+                        sliver: SliverToBoxAdapter(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const _TripsHeader(),
+                              const SizedBox(height: 24),
+                              Container(
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE2EBE4),
+                                  borderRadius: BorderRadius.circular(18),
+                                  border: Border.all(color: Colors.white),
+                                ),
+                                child: Row(
+                                  children: [
+                                    for (var i = 0; i < 3; i++)
+                                      _TripsTab(
+                                        label: const [
+                                          'Upcoming',
+                                          'Past',
+                                          'Cancelled',
+                                        ][i],
+                                        count: bookings.hasValue
+                                            ? groups[i].length
+                                            : null,
+                                        selected: _tab == i,
+                                        onTap: () => setState(() => _tab = i),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  2,
+                                  24,
+                                  2,
+                                  16,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        const [
+                                          'Your next journeys',
+                                          'Your travel history',
+                                          'Cancelled bookings',
+                                        ][_tab],
+                                        style: const TextStyle(
+                                          color: AppColors.foreground,
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(
+                                      Icons.confirmation_number_outlined,
+                                      size: 20,
+                                      color: AppColors.primaryDark,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    );
-                  }
-                  return ListView.separated(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    itemCount: filtered.length,
-                    separatorBuilder: (_, _) =>
-                        const SizedBox(height: AppSpacing.sm),
-                    itemBuilder: (context, index) =>
-                        _BookingCard(booking: filtered[index]),
-                  );
-                },
-              ),
+                      ),
+                      ...bookings.when(
+                        loading: () => [
+                          const SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: AppLoadingView(label: 'Loading your trips…'),
+                          ),
+                        ],
+                        error: (error, _) => [
+                          SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: AppStateView(
+                              icon: Icons.cloud_off_rounded,
+                              title: 'Could not load trips',
+                              message: error.toString(),
+                              actionLabel: 'Try again',
+                              onAction: () => ref.invalidate(bookingsProvider),
+                            ),
+                          ),
+                        ],
+                        data: (_) {
+                          if (filtered.isEmpty) {
+                            return [
+                              SliverFillRemaining(
+                                hasScrollBody: false,
+                                child: AppStateView(
+                                  icon: Icons.confirmation_number_outlined,
+                                  title: _tab == 0
+                                      ? 'No upcoming trips'
+                                      : _tab == 1
+                                      ? 'No past trips'
+                                      : 'No cancelled trips',
+                                  message: _tab == 0
+                                      ? 'Book a bus and your ticket will appear here.'
+                                      : 'Trips in this category will appear here.',
+                                  actionLabel: _tab == 0 ? 'Book a trip' : null,
+                                  onAction: _tab == 0
+                                      ? () => context.go('/search')
+                                      : null,
+                                ),
+                              ),
+                            ];
+                          }
+                          return [
+                            SliverPadding(
+                              padding: EdgeInsets.fromLTRB(
+                                padding,
+                                0,
+                                padding,
+                                28,
+                              ),
+                              sliver: SliverList.builder(
+                                itemCount: (filtered.length / columns).ceil(),
+                                itemBuilder: (context, row) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 22),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      for (
+                                        var column = 0;
+                                        column < columns;
+                                        column++
+                                      ) ...[
+                                        if (column > 0)
+                                          const SizedBox(width: 22),
+                                        Expanded(
+                                          child:
+                                              row * columns + column <
+                                                  filtered.length
+                                              ? TripTicketCard(
+                                                  booking:
+                                                      filtered[row * columns +
+                                                          column],
+                                                  onTap: () async {
+                                                    await context.push(
+                                                      '/tickets/${filtered[row * columns + column].id}',
+                                                    );
+                                                    if (context.mounted) {
+                                                      ref.invalidate(
+                                                        bookingsProvider,
+                                                      );
+                                                    }
+                                                  },
+                                                )
+                                              : const SizedBox.shrink(),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ];
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -156,33 +271,84 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
 class _TripsTab extends StatelessWidget {
   const _TripsTab({
     required this.label,
+    required this.count,
     required this.selected,
     required this.onTap,
   });
   final String label;
+  final int? count;
   final bool selected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) => Expanded(
-    child: InkWell(
-      onTap: onTap,
-      child: Container(
-        height: 52,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          border: selected
-              ? const Border(
-                  bottom: BorderSide(color: AppColors.primary, width: 2.5),
-                )
-              : null,
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: selected ? AppColors.primary : AppColors.muted,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
+    child: Semantics(
+      selected: selected,
+      button: true,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: AnimatedContainer(
+            duration: MediaQuery.disableAnimationsOf(context)
+                ? Duration.zero
+                : const Duration(milliseconds: 180),
+            constraints: const BoxConstraints(minHeight: 52),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: selected ? Colors.white : Colors.transparent,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: selected
+                  ? const [
+                      BoxShadow(
+                        color: Color(0x18213F2A),
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 5,
+              runSpacing: 3,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: selected
+                        ? AppColors.primaryDeep
+                        : const Color(0xFF52675A),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                if (count != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: selected
+                          ? AppColors.primarySoft
+                          : const Color(0xFFD2DFD5),
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    child: Text(
+                      '$count',
+                      style: const TextStyle(
+                        color: AppColors.primaryDeep,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -190,77 +356,87 @@ class _TripsTab extends StatelessWidget {
   );
 }
 
-class _BookingCard extends ConsumerWidget {
-  const _BookingCard({required this.booking});
-  final BookingSummary booking;
+class _TripsHeader extends StatelessWidget {
+  const _TripsHeader();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => AppCard(
-    onTap: () async {
-      await context.push('/tickets/${booking.id}');
-      if (context.mounted) ref.invalidate(bookingsProvider);
-    },
-    child: Column(
+  Widget build(BuildContext context) => Container(
+    clipBehavior: Clip.antiAlias,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(26),
+      gradient: const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFF208D50), Color(0xFF075C32), Color(0xFF063E29)],
+      ),
+      border: Border.all(color: const Color(0xFF76BD8B)),
+      boxShadow: const [
+        BoxShadow(color: Color(0xFF064027), offset: Offset(0, 5)),
+        BoxShadow(
+          color: Color(0x2414472B),
+          blurRadius: 22,
+          offset: Offset(0, 12),
+        ),
+      ],
+    ),
+    child: Stack(
       children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              decoration: const BoxDecoration(
-                color: AppColors.primarySoft,
-                borderRadius: AppRadius.button,
-              ),
-              child: Text(
-                booking.reference,
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 11,
+        Positioned(
+          right: -24,
+          top: -46,
+          child: ExcludeSemantics(
+            child: Container(
+              width: 190,
+              height: 190,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.07),
+                  width: 26,
                 ),
               ),
             ),
-            const Spacer(),
-            Text(booking.status, style: Theme.of(context).textTheme.bodySmall),
-          ],
+          ),
         ),
-        const SizedBox(height: AppSpacing.sm),
-        Row(
-          children: [
-            const Icon(Icons.directions_bus_rounded, color: AppColors.primary),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${booking.originName} → ${booking.destinationName}',
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                  Text(
-                    DateFormat(
-                      'EEE, d MMM · h:mm a',
-                    ).format(booking.departureAt),
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
+        Padding(
+          padding: const EdgeInsets.all(24),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'YOUR TRAVEL COLLECTION',
+                      style: TextStyle(
+                        color: Color(0xFFBCE5C9),
+                        fontSize: 10,
+                        letterSpacing: 1.8,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'My trips',
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.7,
+                          ),
+                    ),
+                    const SizedBox(height: 7),
+                    const Text(
+                      'Every journey, all in one place.',
+                      style: TextStyle(color: Color(0xFFD1E9D9), fontSize: 12),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const Icon(Icons.chevron_right_rounded, color: AppColors.muted),
-          ],
-        ),
-        const Divider(),
-        Row(
-          children: [
-            Text(
-              'Seats ${booking.seats.join(', ')}',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            const Spacer(),
-            Text(
-              formatPkr(booking.total),
-              style: const TextStyle(fontWeight: FontWeight.w800),
-            ),
-          ],
+              const SizedBox(width: 14),
+              const TripTicketEmblem(),
+            ],
+          ),
         ),
       ],
     ),

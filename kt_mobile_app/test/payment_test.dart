@@ -144,7 +144,7 @@ void main() {
               return true;
             }),
             loyaltyWalletProvider.overrideWith(
-              (ref) async => LoyaltyWallet.fromJson({'active': false}),
+              (ref, session) async => LoyaltyWallet.fromJson({'active': false}),
             ),
           ],
         );

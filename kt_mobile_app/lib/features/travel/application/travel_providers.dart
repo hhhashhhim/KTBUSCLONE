@@ -14,9 +14,13 @@ final citiesProvider = FutureProvider<List<CityOption>>(
   (ref) => ref.watch(travelRepositoryProvider).cities(),
 );
 
-final savedPassengersProvider = FutureProvider<List<SavedPassenger>>(
-  (ref) => ref.watch(travelRepositoryProvider).savedPassengers(),
-);
+// Key private caches by login session. Separate provider instances also prevent
+// AsyncValue's previous-data loading/error state from exposing another account.
+final savedPassengersProvider = FutureProvider.autoDispose
+    .family<List<SavedPassenger>, PassengerSession>((ref, session) {
+      if (!_isCurrentSession(ref, session)) return const [];
+      return ref.watch(travelRepositoryProvider).savedPassengers();
+    });
 
 final fleetGalleryProvider = FutureProvider<List<FleetMedia>>((ref) async {
   final passengerId = ref.watch(
@@ -38,9 +42,13 @@ final fleetGalleryProvider = FutureProvider<List<FleetMedia>>((ref) async {
   return items;
 }, retry: (_, _) => null);
 
-final loyaltyWalletProvider = FutureProvider<LoyaltyWallet>(
-  (ref) => ref.watch(travelRepositoryProvider).wallet(),
-);
+final loyaltyWalletProvider = FutureProvider.autoDispose
+    .family<LoyaltyWallet, PassengerSession>((ref, session) {
+      if (!_isCurrentSession(ref, session)) {
+        return const LoyaltyWallet(active: false, pointsAvailable: 0);
+      }
+      return ref.watch(travelRepositoryProvider).wallet();
+    });
 
 final destinationsProvider = FutureProvider.family<List<CityOption>, int>(
   (ref, originId) => ref.watch(travelRepositoryProvider).destinations(originId),
@@ -53,11 +61,20 @@ final schedulesProvider =
       retry: (retryCount, error) => null,
     );
 
-final bookingsProvider = FutureProvider<List<BookingSummary>>(
-  (ref) => ref.watch(travelRepositoryProvider).bookings(),
-  // Surface failures immediately so My Trips can offer an explicit retry.
-  retry: (retryCount, error) => null,
-);
+final bookingsProvider = FutureProvider.autoDispose
+    .family<List<BookingSummary>, PassengerSession>(
+      (ref, session) {
+        if (!_isCurrentSession(ref, session)) return const [];
+        return ref.watch(travelRepositoryProvider).bookings();
+      },
+      // Surface failures immediately so My Trips can offer an explicit retry.
+      retry: (retryCount, error) => null,
+    );
+
+bool _isCurrentSession(Ref ref, PassengerSession session) {
+  final current = ref.watch(passengerSessionProvider);
+  return session.passengerId != null && current == session;
+}
 
 class BookingFlowState {
   const BookingFlowState({
@@ -101,7 +118,10 @@ final bookingFlowProvider =
 
 class BookingFlowController extends Notifier<BookingFlowState> {
   @override
-  BookingFlowState build() => const BookingFlowState();
+  BookingFlowState build() {
+    ref.watch(passengerSessionProvider);
+    return const BookingFlowState();
+  }
 
   void begin(SearchQuery query, TravelSchedule schedule) {
     state = BookingFlowState(query: query, schedule: schedule);

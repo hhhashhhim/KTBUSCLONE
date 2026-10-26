@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +14,11 @@ import '../../auth/application/auth_controller.dart';
 import '../../payments/presentation/payment_method_selector.dart';
 import '../application/travel_providers.dart';
 import '../domain/travel_models.dart';
+import 'checkout_widgets.dart';
+import 'journey_search_widgets.dart';
+import 'passenger_details_widgets.dart';
 import 'schedule_result_card.dart';
+import 'schedule_results_widgets.dart';
 
 String formatPkr(num amount) => NumberFormat.currency(
   locale: 'en_PK',
@@ -39,123 +44,150 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final destinations = _origin == null
         ? const AsyncValue<List<CityOption>>.data([])
         : ref.watch(destinationsProvider(_origin!.id));
-    return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.fromLTRB(
-              16,
-              MediaQuery.paddingOf(context).top + 12,
-              16,
-              42,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        body: DecoratedBox(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFFE8F2EB), AppColors.background],
             ),
-            color: AppColors.primary,
+          ),
+          child: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    _CircleBack(onTap: () => context.go('/home')),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Search buses',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                      ),
+                JourneySearchHeader(
+                  onBack: () => context.go('/home'),
+                  tripTypes: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF096639),
+                      borderRadius: AppRadius.button,
+                      border: Border.all(color: const Color(0xFF3C9760)),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: .16),
-                    borderRadius: AppRadius.button,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const _TripTypePill(label: 'One way', selected: true),
-                      _TripTypePill(
-                        label: 'Round trip',
-                        onTap: () => _message(
-                          'Round trips are not available from the mobile API yet.',
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Flexible(
+                          child: _TripTypePill(
+                            label: 'One way',
+                            selected: true,
+                          ),
                         ),
-                      ),
-                    ],
+                        Flexible(
+                          child: _TripTypePill(
+                            label: 'Round trip',
+                            onTap: () => _message(
+                              'Round trips are not available from the mobile API yet.',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Transform.translate(
+                    offset: const Offset(0, -26),
+                    child: Column(
+                      children: [
+                        JourneySearchCard(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 18),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.route_rounded,
+                                      color: AppColors.primary,
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 9),
+                                    Expanded(
+                                      child: Text(
+                                        'Your travel details',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              cities.when(
+                                loading: () => const LinearProgressIndicator(),
+                                error: (error, _) => _InlineLoadError(
+                                  error: error,
+                                  onRetry: () => ref.invalidate(citiesProvider),
+                                ),
+                                data: (values) => _CityField(
+                                  label: 'FROM',
+                                  iconColor: AppColors.primary,
+                                  value: _origin,
+                                  values: values,
+                                  onChanged: (city) => setState(() {
+                                    _origin = city;
+                                    _destination = null;
+                                  }),
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              destinations.when(
+                                loading: () => const LinearProgressIndicator(),
+                                error: (error, _) => _InlineLoadError(
+                                  error: error,
+                                  onRetry: () {
+                                    if (_origin != null) {
+                                      ref.invalidate(
+                                        destinationsProvider(_origin!.id),
+                                      );
+                                    }
+                                  },
+                                ),
+                                data: (values) => _CityField(
+                                  label: 'TO',
+                                  iconColor: AppColors.goldDark,
+                                  value: _destination,
+                                  values: values,
+                                  onChanged: _origin == null
+                                      ? null
+                                      : (city) =>
+                                            setState(() => _destination = city),
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              _DateTile(date: _date, onTap: _pickDate),
+                              const SizedBox(height: 24),
+                              JourneySearchButton(onPressed: _search),
+                            ],
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.fromLTRB(16, 28, 16, 0),
+                          child: Text(
+                            'Choose your route, then find your bus\nand your favourite seat.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppColors.muted,
+                              fontSize: 12,
+                              height: 1.6,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          Expanded(
-            child: Transform.translate(
-              offset: const Offset(0, -28),
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                children: [
-                  AppCard(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        cities.when(
-                          loading: () => const LinearProgressIndicator(),
-                          error: (error, _) => _InlineLoadError(
-                            error: error,
-                            onRetry: () => ref.invalidate(citiesProvider),
-                          ),
-                          data: (values) => _CityField(
-                            label: 'FROM',
-                            iconColor: AppColors.primary,
-                            value: _origin,
-                            values: values,
-                            onChanged: (city) => setState(() {
-                              _origin = city;
-                              _destination = null;
-                            }),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        destinations.when(
-                          loading: () => const LinearProgressIndicator(),
-                          error: (error, _) => _InlineLoadError(
-                            error: error,
-                            onRetry: () {
-                              if (_origin != null) {
-                                ref.invalidate(
-                                  destinationsProvider(_origin!.id),
-                                );
-                              }
-                            },
-                          ),
-                          data: (values) => _CityField(
-                            label: 'TO',
-                            iconColor: AppColors.goldDark,
-                            value: _destination,
-                            values: values,
-                            onChanged: _origin == null
-                                ? null
-                                : (city) => setState(() => _destination = city),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _DateTile(date: _date, onTap: _pickDate),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  FilledButton(
-                    onPressed: _search,
-                    child: const Text('Search buses'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -194,26 +226,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   ).showSnackBar(SnackBar(content: Text(value)));
 }
 
-class _CircleBack extends StatelessWidget {
-  const _CircleBack({required this.onTap});
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => Material(
-    color: Colors.white.withValues(alpha: .16),
-    shape: const CircleBorder(),
-    child: InkWell(
-      customBorder: const CircleBorder(),
-      onTap: onTap,
-      child: const SizedBox(
-        width: 42,
-        height: 42,
-        child: Icon(Icons.chevron_left_rounded, color: Colors.white, size: 27),
-      ),
-    ),
-  );
-}
-
 class _TripTypePill extends StatelessWidget {
   const _TripTypePill({required this.label, this.selected = false, this.onTap});
   final String label;
@@ -221,21 +233,51 @@ class _TripTypePill extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => InkWell(
-    borderRadius: AppRadius.button,
-    onTap: onTap,
+  Widget build(BuildContext context) => Semantics(
+    selected: selected,
+    button: true,
     child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
       decoration: BoxDecoration(
-        color: selected ? Colors.white : Colors.transparent,
         borderRadius: AppRadius.button,
+        boxShadow: selected
+            ? const [
+                BoxShadow(
+                  color: Color(0x55002816),
+                  offset: Offset(0, 2),
+                  blurRadius: 4,
+                ),
+              ]
+            : null,
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: selected ? AppColors.primary : Colors.white,
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: AppRadius.button,
+        clipBehavior: Clip.antiAlias,
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: selected
+                ? const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.white, Color(0xFFE2F0E6)],
+                  )
+                : null,
+            borderRadius: AppRadius.button,
+          ),
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: selected ? AppColors.primaryDeep : Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     ),
@@ -257,54 +299,15 @@ class _CityField extends StatelessWidget {
   final ValueChanged<CityOption?>? onChanged;
 
   @override
-  Widget build(BuildContext context) => Material(
-    color: AppColors.surfaceAlt,
-    borderRadius: AppRadius.field,
-    child: InkWell(
-      borderRadius: AppRadius.field,
-      onTap: onChanged == null ? null : () => _chooseCity(context),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: iconColor.withValues(alpha: .1),
-              foregroundColor: iconColor,
-              child: const Icon(Icons.location_on_outlined, size: 19),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      color: AppColors.muted,
-                      fontSize: 10.5,
-                      letterSpacing: .4,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    value?.name ?? 'Choose city',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: onChanged == null
-                          ? AppColors.muted
-                          : AppColors.foreground,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.expand_more_rounded, color: AppColors.muted),
-          ],
-        ),
-      ),
-    ),
+  Widget build(BuildContext context) => JourneyField(
+    label: label,
+    value: value?.name ?? 'Choose city',
+    icon: label == 'FROM'
+        ? Icons.my_location_rounded
+        : Icons.location_on_rounded,
+    gold: iconColor == AppColors.goldDark,
+    enabled: onChanged != null,
+    onTap: () => _chooseCity(context),
   );
 
   Future<void> _chooseCity(BuildContext context) async {
@@ -481,64 +484,12 @@ class _DateTile extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => InkWell(
-    borderRadius: AppRadius.field,
+  Widget build(BuildContext context) => JourneyField(
+    label: 'DEPARTURE',
+    icon: Icons.calendar_month_rounded,
+    value: DateFormat('EEE, d MMM yyyy').format(date),
+    isDate: true,
     onTap: onTap,
-    child: _InfoTile(
-      label: 'DEPARTURE',
-      icon: Icons.calendar_month_outlined,
-      value: DateFormat('dd/MM/yyyy').format(date),
-    ),
-  );
-}
-
-class _InfoTile extends StatelessWidget {
-  const _InfoTile({
-    required this.label,
-    required this.icon,
-    required this.value,
-  });
-  final String label;
-  final IconData icon;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    height: 76,
-    padding: const EdgeInsets.all(13),
-    decoration: const BoxDecoration(
-      color: AppColors.surfaceAlt,
-      borderRadius: AppRadius.field,
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: AppColors.muted,
-            fontSize: 9.5,
-            letterSpacing: .4,
-          ),
-        ),
-        const SizedBox(height: 7),
-        Row(
-          children: [
-            Icon(icon, color: AppColors.primary, size: 19),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    ),
   );
 }
 
@@ -558,174 +509,116 @@ class _ScheduleResultsScreenState extends ConsumerState<ScheduleResultsScreen> {
   Widget build(BuildContext context) {
     final query = widget.query;
     final schedules = ref.watch(schedulesProvider(query));
-    return Scaffold(
-      appBar: AppPageHeader(
-        title: '${query.origin.name} → ${query.destination.name}',
-        subtitle:
-            '${DateFormat('EEE, d MMM yyyy').format(query.date)} · 1 passenger',
-      ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: 60,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-              children: [
-                const Center(
-                  child: Text(
-                    'Sort by',
-                    style: TextStyle(color: AppColors.muted, fontSize: 12),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                _ResultChip(
-                  label: 'Earliest',
-                  icon: Icons.schedule_rounded,
-                  selected: !_sortByPrice,
-                  onTap: () => setState(() => _sortByPrice = false),
-                ),
-                const SizedBox(width: 8),
-                _ResultChip(
-                  label: 'Cheapest',
-                  icon: Icons.payments_outlined,
-                  selected: _sortByPrice,
-                  onTap: () => setState(() => _sortByPrice = true),
-                ),
-              ],
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFEFF5F0),
+        body: Column(
+          children: [
+            ScheduleResultsHeader(query: query),
+            ScheduleSortBar(
+              sortByPrice: _sortByPrice,
+              onChanged: (value) => setState(() => _sortByPrice = value),
             ),
-          ),
-          const Divider(height: 1, color: AppColors.border),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () => ref.refresh(schedulesProvider(query).future),
-              child: schedules.when(
-                loading: () =>
-                    const AppLoadingView(label: 'Finding available buses…'),
-                error: (error, _) => ListView(
-                  children: [
-                    AppStateView(
-                      icon: Icons.cloud_off_rounded,
-                      title: 'Could not load schedules',
-                      message: error.toString(),
-                      actionLabel: 'Try again',
-                      onAction: () => ref.invalidate(schedulesProvider(query)),
-                    ),
-                  ],
-                ),
-                data: (values) {
-                  final sorted = [...values]
-                    ..sort(
-                      (a, b) => _sortByPrice
-                          ? a.minimumFare.compareTo(b.minimumFare)
-                          : a.departureAt.compareTo(b.departureAt),
-                    );
-                  if (sorted.isEmpty) {
-                    return ListView(
-                      children: const [
-                        AppStateView(
-                          icon: Icons.event_busy_rounded,
-                          title: 'No buses found',
-                          message: 'Try another travel date or route.',
-                        ),
-                      ],
-                    );
-                  }
-                  return ListView.separated(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
-                    itemCount: sorted.length + 1,
-                    separatorBuilder: (_, _) => const SizedBox(height: 14),
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
-                        return Row(
-                          children: [
-                            const Expanded(
-                              child: Text(
-                                'Available buses',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () => ref.refresh(schedulesProvider(query).future),
+                child: schedules.when(
+                  loading: () =>
+                      const AppLoadingView(label: 'Finding available buses…'),
+                  error: (error, _) => ListView(
+                    children: [
+                      AppStateView(
+                        icon: Icons.cloud_off_rounded,
+                        title: 'Could not load schedules',
+                        message: error.toString(),
+                        actionLabel: 'Try again',
+                        onAction: () =>
+                            ref.invalidate(schedulesProvider(query)),
+                      ),
+                    ],
+                  ),
+                  data: (values) {
+                    final sorted = [...values]
+                      ..sort(
+                        (a, b) => _sortByPrice
+                            ? a.minimumFare.compareTo(b.minimumFare)
+                            : a.departureAt.compareTo(b.departureAt),
+                      );
+                    if (sorted.isEmpty) {
+                      return ListView(
+                        children: const [
+                          AppStateView(
+                            icon: Icons.event_busy_rounded,
+                            title: 'No buses found',
+                            message: 'Try another travel date or route.',
+                          ),
+                        ],
+                      );
+                    }
+                    return ListView.separated(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
+                      itemCount: sorted.length + 1,
+                      separatorBuilder: (_, _) => const SizedBox(height: 20),
+                      itemBuilder: (context, index) {
+                        if (index == 0) {
+                          return Row(
+                            children: [
+                              const Expanded(
+                                child: Text(
+                                  'Available buses',
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -.3,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Text(
-                              '${sorted.length} ${sorted.length == 1 ? 'departure' : 'departures'}',
-                              style: const TextStyle(
-                                color: AppColors.muted,
-                                fontSize: 12,
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE1ECE3),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.white),
+                                ),
+                                child: Text(
+                                  '${sorted.length} ${sorted.length == 1 ? 'departure' : 'departures'}',
+                                  style: const TextStyle(
+                                    color: AppColors.primaryDeep,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          );
+                        }
+                        final schedule = sorted[index - 1];
+                        return ScheduleResultCard(
+                          key: ValueKey(schedule.scheduleDetailId),
+                          schedule: schedule,
+                          onTap: () {
+                            ref
+                                .read(bookingFlowProvider.notifier)
+                                .begin(query, schedule);
+                            context.push('/search/seats');
+                          },
                         );
-                      }
-                      final schedule = sorted[index - 1];
-                      return ScheduleResultCard(
-                        key: ValueKey(schedule.scheduleDetailId),
-                        schedule: schedule,
-                        onTap: () {
-                          ref
-                              .read(bookingFlowProvider.notifier)
-                              .begin(query, schedule);
-                          context.push('/search/seats');
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ResultChip extends StatelessWidget {
-  const _ResultChip({
-    required this.label,
-    this.icon,
-    this.selected = false,
-    this.onTap,
-  });
-  final String label;
-  final IconData? icon;
-  final bool selected;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) => Material(
-    color: selected ? AppColors.primary : AppColors.surfaceAlt,
-    borderRadius: AppRadius.button,
-    child: InkWell(
-      onTap: onTap,
-      borderRadius: AppRadius.button,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        child: Row(
-          children: [
-            if (icon != null) ...[
-              Icon(
-                icon,
-                size: 16,
-                color: selected ? Colors.white : AppColors.muted,
-              ),
-              const SizedBox(width: 5),
-            ],
-            Text(
-              label,
-              style: TextStyle(
-                color: selected ? Colors.white : AppColors.foreground,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
+                      },
+                    );
+                  },
+                ),
               ),
             ),
           ],
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 const _maleBookedSeatColor = Color(0xFFD7E8FF);
@@ -818,7 +711,12 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                   },
                 ),
               ),
-              AppStickyAction(child: _SeatFooter(flow: flow)),
+              AppStickyAction(
+                // Preserve seat touch targets on phones with larger insets by
+                // keeping the footer's decorative spacing compact.
+                padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+                child: _SeatFooter(flow: flow),
+              ),
             ],
           );
         },
@@ -1383,36 +1281,47 @@ class _PassengerDetailsScreenState
       return const _MissingFlow();
     }
     return Scaffold(
-      appBar: const AppPageHeader(title: 'Passenger details'),
+      backgroundColor: const Color(0xFFEDF3EE),
       body: Form(
         key: _formKey,
-        child: ListView.separated(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          itemCount: _forms.length,
-          separatorBuilder: (_, _) => const SizedBox(height: 14),
-          itemBuilder: (context, index) => _PassengerCard(
-            index: index,
-            seat: flow.selectedSeats[index].number,
-            data: _forms[index],
-            onUseSaved: () => _useSavedPassenger(index),
-            onEdited: () => _markEdited(index),
-            onGenderChanged: (value) => setState(() {
-              _forms[index]
-                ..gender = value
-                ..loadedFromSaved = false;
-            }),
-            onSaveForFutureChanged: (value) =>
-                setState(() => _forms[index].saveForFuture = value),
-          ),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          children: [
+            const PassengerDetailsHeader(),
+            Transform.translate(
+              offset: const Offset(0, -18),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+                child: Column(
+                  children: [
+                    for (var index = 0; index < _forms.length; index++) ...[
+                      if (index > 0) const SizedBox(height: 24),
+                      _PassengerCard(
+                        index: index,
+                        seat: flow.selectedSeats[index].number,
+                        data: _forms[index],
+                        onUseSaved: () => _useSavedPassenger(index),
+                        onEdited: () => _markEdited(index),
+                        onGenderChanged: (value) => setState(() {
+                          _forms[index]
+                            ..gender = value
+                            ..loadedFromSaved = false;
+                        }),
+                        onSaveForFutureChanged: (value) =>
+                            setState(() => _forms[index].saveForFuture = value),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
-      bottomNavigationBar: AppStickyAction(
-        child: FilledButton(
-          onPressed: _submitting ? null : _continue,
-          child: Text(
-            _submitting ? 'Saving passenger…' : 'Continue to payment',
-          ),
-        ),
+      bottomNavigationBar: PassengerContinueAction(
+        submitting: _submitting,
+        onPressed: _continue,
       ),
     );
   }
@@ -1445,6 +1354,7 @@ class _PassengerDetailsScreenState
     if (!_formKey.currentState!.validate()) {
       return;
     }
+    final session = ref.read(passengerSessionProvider);
     final seats = ref.read(bookingFlowProvider).selectedSeats;
     final passengers = [
       for (var index = 0; index < _forms.length; index++)
@@ -1488,7 +1398,7 @@ class _PassengerDetailsScreenState
       }
     }
 
-    if (!mounted) return;
+    if (!mounted || ref.read(passengerSessionProvider) != session) return;
     ref.read(bookingFlowProvider.notifier).setPassengers(passengers);
     context.push('/search/checkout');
   }
@@ -1513,47 +1423,25 @@ class _PassengerCard extends StatelessWidget {
   final ValueChanged<bool> onSaveForFutureChanged;
 
   @override
-  Widget build(BuildContext context) => AppCard(
-    padding: const EdgeInsets.all(16),
+  Widget build(BuildContext context) => PassengerDetailsCard(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            const CircleAvatar(
-              backgroundColor: AppColors.primarySoft,
-              foregroundColor: AppColors.primary,
-              child: Icon(Icons.person_outline_rounded),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Passenger ${index + 1}',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  Text(
-                    'Seat $seat',
-                    style: const TextStyle(
-                      color: AppColors.muted,
-                      fontSize: 11,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            TextButton(onPressed: onUseSaved, child: const Text('Use saved')),
-          ],
+        PassengerCardHeading(
+          number: index + 1,
+          seat: seat,
+          onUseSaved: onUseSaved,
         ),
-        const SizedBox(height: 16),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 18),
+          child: Divider(height: 1, color: Color(0xFFE2EBE4)),
+        ),
         _LabelledField(
           label: 'Full name',
+          icon: Icons.person_outline_rounded,
           controller: data.name,
+          textCapitalization: TextCapitalization.words,
+          autofillHints: const [AutofillHints.name],
           onChanged: (_) => onEdited(),
           validator: (value) => value == null || value.trim().isEmpty
               ? 'Full name is required.'
@@ -1562,6 +1450,7 @@ class _PassengerCard extends StatelessWidget {
         const SizedBox(height: 12),
         _LabelledField(
           label: 'CNIC',
+          icon: Icons.badge_outlined,
           controller: data.cnic,
           hint: '#####-#######-#',
           keyboardType: TextInputType.number,
@@ -1574,8 +1463,11 @@ class _PassengerCard extends StatelessWidget {
         const SizedBox(height: 12),
         _LabelledField(
           label: 'Mobile number',
+          icon: Icons.phone_outlined,
           controller: data.mobile,
           keyboardType: TextInputType.phone,
+          autofillHints: const [AutofillHints.telephoneNumber],
+          textInputAction: TextInputAction.done,
           onChanged: (_) => onEdited(),
           validator: (value) {
             final digits = value?.replaceAll(RegExp(r'\D'), '') ?? '';
@@ -1604,35 +1496,48 @@ class _PassengerCard extends StatelessWidget {
             ],
           ],
         ),
-        const SizedBox(height: 10),
-        if (data.loadedFromSaved)
-          const ListTile(
-            contentPadding: EdgeInsets.zero,
-            dense: true,
-            leading: Icon(
-              Icons.check_circle_outline_rounded,
-              color: AppColors.primary,
-            ),
-            title: Text(
-              'Already saved to your account',
-              style: TextStyle(fontWeight: FontWeight.w700),
-            ),
-          )
-        else
-          CheckboxListTile(
-            contentPadding: EdgeInsets.zero,
-            controlAffinity: ListTileControlAffinity.leading,
-            value: data.saveForFuture,
-            onChanged: (value) => onSaveForFutureChanged(value ?? false),
-            title: const Text(
-              'Save this passenger for future use',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-            ),
-            subtitle: const Text(
-              'Available in Account and the Use saved list.',
-              style: TextStyle(fontSize: 11),
-            ),
+        const SizedBox(height: 18),
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFFF0F5F0),
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: const Color(0xFFE0EAE1)),
           ),
+          child: data.loadedFromSaved
+              ? const ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  leading: Icon(
+                    Icons.check_circle_outline_rounded,
+                    color: AppColors.primary,
+                  ),
+                  title: Text(
+                    'Already saved to your account',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                )
+              : CheckboxListTile(
+                  contentPadding: const EdgeInsets.only(left: 2, right: 10),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  value: data.saveForFuture,
+                  onChanged: (value) => onSaveForFutureChanged(value ?? false),
+                  activeColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  checkboxShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  title: const Text(
+                    'Save this passenger for future use',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                  ),
+                  subtitle: const Text(
+                    'Available in Account and the Use saved list.',
+                    style: TextStyle(fontSize: 11),
+                  ),
+                ),
+        ),
       ],
     ),
   );
@@ -1643,7 +1548,9 @@ class _SavedPassengerSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final passengers = ref.watch(savedPassengersProvider);
+    final passengers = ref.watch(
+      savedPassengersProvider(ref.watch(passengerSessionProvider)),
+    );
     return SafeArea(
       child: Container(
         constraints: BoxConstraints(
@@ -1751,18 +1658,26 @@ class _SavedPassengerSheet extends ConsumerWidget {
 class _LabelledField extends StatelessWidget {
   const _LabelledField({
     required this.label,
+    required this.icon,
     required this.controller,
     this.hint,
     this.keyboardType,
     this.onChanged,
     this.validator,
+    this.textCapitalization = TextCapitalization.none,
+    this.autofillHints,
+    this.textInputAction = TextInputAction.next,
   });
   final String label;
+  final IconData icon;
   final TextEditingController controller;
   final String? hint;
   final TextInputType? keyboardType;
   final ValueChanged<String>? onChanged;
   final String? Function(String?)? validator;
+  final TextCapitalization textCapitalization;
+  final Iterable<String>? autofillHints;
+  final TextInputAction textInputAction;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -1773,14 +1688,58 @@ class _LabelledField extends StatelessWidget {
         style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
       ),
       const SizedBox(height: 6),
-      TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        onChanged: onChanged,
-        validator: validator,
-        decoration: InputDecoration(
-          hintText: hint,
-          fillColor: AppColors.surface,
+      DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFE8EFE9), Color(0xFFF7FAF7)],
+          ),
+          boxShadow: const [
+            BoxShadow(color: Colors.white, offset: Offset(1, 2), blurRadius: 2),
+          ],
+        ),
+        child: TextFormField(
+          controller: controller,
+          keyboardType: keyboardType,
+          onChanged: onChanged,
+          validator: validator,
+          textCapitalization: textCapitalization,
+          autofillHints: autofillHints,
+          textInputAction: textInputAction,
+          scrollPadding: const EdgeInsets.all(32),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, size: 19, color: const Color(0xFF74947D)),
+            hintText: hint,
+            fillColor: Colors.transparent,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 15,
+            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(color: Color(0xFFD5E1D7)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(
+                color: AppColors.primary,
+                width: 1.5,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(color: AppColors.danger),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
+            ),
+            errorMaxLines: 2,
+          ),
         ),
       ),
     ],
@@ -1798,25 +1757,58 @@ class _GenderPill extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => InkWell(
-    onTap: onTap,
-    borderRadius: AppRadius.button,
-    child: Container(
-      height: 42,
+  Widget build(BuildContext context) => Semantics(
+    selected: selected,
+    button: true,
+    child: AnimatedContainer(
+      duration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : const Duration(milliseconds: 150),
+      constraints: const BoxConstraints(minHeight: 46),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: selected ? AppColors.primarySoft : AppColors.surface,
-        borderRadius: AppRadius.button,
-        border: Border.all(
-          color: selected ? AppColors.primary : AppColors.border,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: selected
+              ? [const Color(0xFF3BA862), const Color(0xFF0B793D)]
+              : [Colors.white, const Color(0xFFF0F5F0)],
         ),
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(
+          color: selected ? const Color(0xFF69BD83) : const Color(0xFFDCE7DE),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: selected ? const Color(0xFF075A30) : const Color(0xFFD6E1D8),
+            offset: const Offset(0, 3),
+          ),
+          if (selected)
+            const BoxShadow(
+              color: Color(0x26386E46),
+              offset: Offset(0, 5),
+              blurRadius: 7,
+            ),
+        ],
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: selected ? AppColors.primary : AppColors.foreground,
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(13),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 14),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: selected ? Colors.white : AppColors.muted,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
         ),
       ),
     ),
@@ -1851,6 +1843,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 
   Future<FareQuote> _loadQuote(BookingFlowState flow) async {
+    final session = ref.read(passengerSessionProvider);
     final requestNumber = ++_quoteRequest;
     final quote = await ref
         .read(travelRepositoryProvider)
@@ -1861,7 +1854,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           passengers: flow.passengers,
           pointsToUse: _pointsToUse,
         );
-    if (mounted && requestNumber == _quoteRequest) {
+    if (mounted &&
+        ref.read(passengerSessionProvider) == session &&
+        requestNumber == _quoteRequest) {
       setState(() {
         if (!quote.paymentMethods.contains(_paymentMethod)) {
           _paymentMethod = quote.paymentMethods.firstOrNull;
@@ -1875,12 +1870,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   @override
   Widget build(BuildContext context) {
     final flow = ref.watch(bookingFlowProvider);
-    final wallet = ref.watch(loyaltyWalletProvider);
+    final wallet = ref.watch(
+      loyaltyWalletProvider(ref.watch(passengerSessionProvider)),
+    );
     if (_request == null || flow.schedule == null || flow.query == null) {
       return const _MissingFlow();
     }
     return Scaffold(
-      appBar: const AppPageHeader(title: 'Checkout'),
+      backgroundColor: checkoutBackground,
+      appBar: const CheckoutHeader(),
       body: FutureBuilder<FareQuote>(
         future: _request,
         builder: (context, snapshot) {
@@ -1901,12 +1899,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           final quote = snapshot.data!;
 
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            padding: const EdgeInsets.fromLTRB(18, 22, 18, 24),
             children: [
-              _BookingSummary(flow: flow, quote: quote),
-              const SizedBox(height: 16),
+              CheckoutBookingSummary(
+                flow: flow,
+                totalLabel: formatPkr(quote.total),
+              ),
+              const SizedBox(height: 28),
               const AppSectionTitle('Payment method'),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               PaymentMethodSelector(
                 availableMethods: quote.paymentMethods,
                 environment: quote.paymentEnvironment,
@@ -1930,25 +1931,22 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               snapshot.hasError) {
             return const SizedBox.shrink();
           }
-          return AppStickyAction(
-            child: FilledButton(
-              onPressed:
-                  snapshot.data!.paymentPreview ||
-                      !snapshot.data!.paymentMethods.contains(_paymentMethod) ||
-                      _submitting
-                  ? null
-                  : () => _book(snapshot.data!),
-              child: Text(
-                snapshot.data!.paymentPreview
-                    ? 'Preview only · Payments disabled'
-                    : _submitting
-                    ? 'Confirming…'
-                    : _paymentMethod == 'counter' ||
-                          _paymentMethod == 'pay_at_branch'
-                    ? 'Reserve · ${formatPkr(snapshot.data!.total)}'
-                    : 'Continue · ${formatPkr(snapshot.data!.total)}',
-              ),
-            ),
+          return CheckoutAction(
+            submitting: _submitting,
+            onPressed:
+                snapshot.data!.paymentPreview ||
+                    !snapshot.data!.paymentMethods.contains(_paymentMethod) ||
+                    _submitting
+                ? null
+                : () => _book(snapshot.data!),
+            label: snapshot.data!.paymentPreview
+                ? 'Preview only · Payments disabled'
+                : _submitting
+                ? 'Confirming…'
+                : _paymentMethod == 'counter' ||
+                      _paymentMethod == 'pay_at_branch'
+                ? 'Reserve · ${formatPkr(snapshot.data!.total)}'
+                : 'Continue · ${formatPkr(snapshot.data!.total)}',
           );
         },
       ),
@@ -2030,6 +2028,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   Future<void> _book(FareQuote quote) async {
     if (quote.paymentPreview) return;
     if (_submitting || !quote.paymentMethods.contains(_paymentMethod)) return;
+    final session = ref.read(passengerSessionProvider);
     setState(() => _submitting = true);
     try {
       final booking = await ref
@@ -2038,6 +2037,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             quoteToken: quote.token,
             paymentMethod: _paymentMethod!,
           );
+      if (!mounted || ref.read(passengerSessionProvider) != session) return;
       ref.read(bookingFlowProvider.notifier).reset();
       ref.invalidate(bookingsProvider);
       ref.invalidate(loyaltyWalletProvider);
@@ -2059,87 +2059,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       if (mounted) setState(() => _submitting = false);
     }
   }
-}
-
-class _BookingSummary extends StatelessWidget {
-  const _BookingSummary({required this.flow, required this.quote});
-  final BookingFlowState flow;
-  final FareQuote quote;
-
-  @override
-  Widget build(BuildContext context) {
-    final schedule = flow.schedule!;
-    return AppCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Booking summary',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 16),
-          _detailRow(
-            flow.selectedSeats.length == 1 ? 'Seat number' : 'Seat numbers',
-            flow.selectedSeats.map((seat) => seat.number).join(', '),
-          ),
-          _detailRow(
-            'Date & time',
-            DateFormat('EEE, d MMM yyyy · h:mm a').format(schedule.departureAt),
-          ),
-          _detailRow('Departure city', schedule.origin.name),
-          _detailRow('Arrival city', schedule.destination.name),
-          _detailRow('Bus type', schedule.busClassName),
-          const Divider(height: 24),
-          Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  'Total amount',
-                  style: TextStyle(fontWeight: FontWeight.w800),
-                ),
-              ),
-              Flexible(
-                child: Text(
-                  formatPkr(quote.total),
-                  textAlign: TextAlign.end,
-                  style: const TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 21,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _detailRow(String label, String value) => Padding(
-    padding: const EdgeInsets.only(bottom: 10),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          flex: 2,
-          child: Text(
-            label,
-            style: const TextStyle(color: AppColors.muted, fontSize: 12),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          flex: 3,
-          child: Text(
-            value,
-            textAlign: TextAlign.end,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-          ),
-        ),
-      ],
-    ),
-  );
 }
 
 class BookingConfirmationScreen extends StatelessWidget {

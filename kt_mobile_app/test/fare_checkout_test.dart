@@ -83,7 +83,7 @@ void main() {
                 _QuoteRepository(scenario.value),
               ),
               loyaltyWalletProvider.overrideWith(
-                (ref) async =>
+                (ref, session) async =>
                     const LoyaltyWallet(active: false, pointsAvailable: 0),
               ),
             ],

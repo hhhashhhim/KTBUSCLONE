@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kt_mobile_app/core/network/api_exception.dart';
+import 'package:kt_mobile_app/features/auth/application/auth_controller.dart';
 import 'package:kt_mobile_app/features/tickets/tickets_screen.dart';
 import 'package:kt_mobile_app/features/travel/application/travel_providers.dart';
 import 'package:kt_mobile_app/features/travel/domain/travel_models.dart';
@@ -27,7 +28,13 @@ class TripsRepository extends FakeTravelRepository {
 Future<void> pumpTrips(WidgetTester tester, TripsRepository repository) async {
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [travelRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        passengerSessionProvider.overrideWithValue((
+          passengerId: 1,
+          generation: 0,
+        )),
+        travelRepositoryProvider.overrideWithValue(repository),
+      ],
       child: const MaterialApp(home: TicketsScreen()),
     ),
   );

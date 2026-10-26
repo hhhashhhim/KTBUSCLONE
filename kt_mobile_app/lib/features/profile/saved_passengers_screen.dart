@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/app_widgets.dart';
+import '../auth/application/auth_controller.dart';
 import '../travel/application/travel_providers.dart';
 import '../travel/domain/travel_models.dart';
 
@@ -12,14 +13,18 @@ class SavedPassengersScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final passengers = ref.watch(savedPassengersProvider);
+    final passengers = ref.watch(
+      savedPassengersProvider(ref.watch(passengerSessionProvider)),
+    );
     return Scaffold(
       appBar: const AppPageHeader(
         title: 'Saved passengers',
         subtitle: 'Use saved details during checkout',
       ),
       body: RefreshIndicator(
-        onRefresh: () => ref.refresh(savedPassengersProvider.future),
+        onRefresh: () => ref.refresh(
+          savedPassengersProvider(ref.read(passengerSessionProvider)).future,
+        ),
         child: passengers.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, _) => ListView(

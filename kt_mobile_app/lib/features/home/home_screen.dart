@@ -6,8 +6,6 @@ import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_gradients.dart';
 import '../../core/theme/app_radius.dart';
-import '../../core/theme/app_shadows.dart';
-import '../../core/widgets/app_widgets.dart';
 import '../auth/application/auth_controller.dart';
 import '../startup/application/startup_controller.dart';
 import '../travel/application/travel_providers.dart';
@@ -27,7 +25,9 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final passenger = ref.watch(authControllerProvider).passenger;
-    final bookings = ref.watch(bookingsProvider);
+    final bookings = ref.watch(
+      bookingsProvider(ref.watch(passengerSessionProvider)),
+    );
     final config = ref.watch(mobileAppConfigProvider);
     final now = ref.watch(homeClockProvider).value ?? DateTime.now();
     BookingSummary? upcoming;
@@ -52,7 +52,9 @@ class HomeScreen extends ConsumerWidget {
             // A trips failure must not prevent new ERP images from loading.
             await Future.wait([
               ref
-                  .refresh(bookingsProvider.future)
+                  .refresh(
+                    bookingsProvider(ref.read(passengerSessionProvider)).future,
+                  )
                   .then<void>((_) {}, onError: (Object _, StackTrace __) {}),
               ref
                   .refresh(fleetGalleryProvider.future)
@@ -79,7 +81,14 @@ class HomeScreen extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    const AppLogo(height: 36),
+                    Image.asset(
+                      'assets/images/kainat-header-logo.png',
+                      width: 100,
+                      height: 56,
+                      fit: BoxFit.contain,
+                      alignment: Alignment.centerLeft,
+                      semanticLabel: 'Kainat Travels',
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Container(
@@ -88,7 +97,10 @@ class HomeScreen extends ConsumerWidget {
                         decoration: const BoxDecoration(
                           gradient: AppGradients.primary,
                           borderRadius: AppRadius.button,
-                          boxShadow: AppShadows.card,
+                          border: Border.fromBorderSide(
+                            BorderSide(color: Color(0x66FFFFFF)),
+                          ),
+                          boxShadow: _HomeCard.compactShadows,
                         ),
                         child: Row(
                           children: [
@@ -144,6 +156,8 @@ class HomeScreen extends ConsumerWidget {
                         children: [
                           Material(
                             color: AppColors.surfaceAlt,
+                            elevation: 4,
+                            shadowColor: const Color(0x4020442E),
                             shape: const CircleBorder(),
                             child: IconButton(
                               onPressed: () => context.go('/notifications'),
@@ -174,7 +188,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             search: Column(
               children: [
-                AppCard(
+                _HomeCard(
                   padding: const EdgeInsets.all(16),
                   onTap: () => context.go('/search'),
                   child: Column(
@@ -209,6 +223,16 @@ class HomeScreen extends ConsumerWidget {
                             decoration: const BoxDecoration(
                               color: AppColors.primary,
                               shape: BoxShape.circle,
+                              border: Border.fromBorderSide(
+                                BorderSide(color: Color(0xFFA6DDB4)),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0x3300551F),
+                                  blurRadius: 9,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
                             ),
                             child: const Icon(
                               Icons.search_rounded,
@@ -249,7 +273,7 @@ class HomeScreen extends ConsumerWidget {
               ),
               error: (error, _) => Padding(
                 padding: const EdgeInsets.only(bottom: 16),
-                child: AppCard(
+                child: _HomeCard(
                   child: _InlineLoadFailure(
                     message: error.toString(),
                     onRetry: () => ref.invalidate(bookingsProvider),
@@ -320,6 +344,83 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
+/// Raised surfaces scoped to Home so other screens keep their own card styling.
+class _HomeCard extends StatelessWidget {
+  const _HomeCard({
+    required this.child,
+    this.padding = const EdgeInsets.all(16),
+    this.onTap,
+    this.gradient,
+    this.compact = false,
+  });
+
+  // A short base edge gives the card thickness; the softer shadows lift it.
+  static const shadows = [
+    BoxShadow(
+      color: Color(0xFFCBD9D0),
+      blurRadius: 1,
+      spreadRadius: -1,
+      offset: Offset(0, 3),
+    ),
+    BoxShadow(
+      color: Color(0x2920442E),
+      blurRadius: 20,
+      spreadRadius: -2,
+      offset: Offset(0, 10),
+    ),
+    BoxShadow(color: Color(0x1F20442E), blurRadius: 5, offset: Offset(0, 3)),
+  ];
+
+  static const compactShadows = [
+    BoxShadow(
+      color: Color(0xFFC9D9CE),
+      blurRadius: 1,
+      spreadRadius: -1,
+      offset: Offset(0, 3),
+    ),
+    BoxShadow(
+      color: Color(0x2420442E),
+      blurRadius: 12,
+      spreadRadius: -2,
+      offset: Offset(0, 6),
+    ),
+    BoxShadow(color: Color(0x1420442E), blurRadius: 3, offset: Offset(0, 2)),
+  ];
+
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final VoidCallback? onTap;
+  final Gradient? gradient;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      gradient:
+          gradient ??
+          const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.white, Color(0xFFF6FAF7)],
+          ),
+      borderRadius: AppRadius.card,
+      border: Border.all(
+        color: gradient == null ? Colors.white : const Color(0x66FFFFFF),
+      ),
+      boxShadow: compact ? compactShadows : shadows,
+    ),
+    child: Material(
+      color: Colors.transparent,
+      borderRadius: AppRadius.card,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppRadius.card,
+        child: Padding(padding: padding, child: child),
+      ),
+    ),
+  );
+}
+
 class _RouteField extends StatelessWidget {
   const _RouteField({required this.label, required this.value});
   final String label;
@@ -327,13 +428,22 @@ class _RouteField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    height: 62,
+    constraints: const BoxConstraints(minHeight: 62),
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
     decoration: const BoxDecoration(
       color: AppColors.surfaceAlt,
       borderRadius: AppRadius.field,
+      border: Border.fromBorderSide(BorderSide(color: Colors.white)),
+      boxShadow: [
+        BoxShadow(
+          color: Color(0x1420442E),
+          blurRadius: 5,
+          offset: Offset(0, 3),
+        ),
+      ],
     ),
     child: Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -370,7 +480,8 @@ class _UpcomingTicket extends StatelessWidget {
       decoration: const BoxDecoration(
         gradient: AppGradients.ticket,
         borderRadius: AppRadius.card,
-        boxShadow: AppShadows.elevated,
+        border: Border.fromBorderSide(BorderSide(color: Color(0x66FFFFFF))),
+        boxShadow: _HomeCard.shadows,
       ),
       child: Column(
         children: [
@@ -512,39 +623,29 @@ class _QuickAction extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => Material(
-    color: AppColors.surface,
-    borderRadius: AppRadius.card,
-    child: InkWell(
-      onTap: onTap,
-      borderRadius: AppRadius.card,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 88),
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
-        decoration: const BoxDecoration(
-          borderRadius: AppRadius.card,
-          boxShadow: AppShadows.card,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: AppColors.primarySoft,
-              foregroundColor: AppColors.primary,
-              child: Icon(icon, size: 21),
-            ),
-            const SizedBox(height: 7),
-            Text(
-              label,
-              maxLines: 1,
-              style: const TextStyle(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
+  Widget build(BuildContext context) => _HomeCard(
+    compact: true,
+    padding: EdgeInsets.zero,
+    onTap: onTap,
+    child: Container(
+      constraints: const BoxConstraints(minHeight: 88),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: AppColors.primarySoft,
+            foregroundColor: AppColors.primary,
+            child: Icon(icon, size: 21),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            label,
+            maxLines: 1,
+            style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700),
+          ),
+        ],
       ),
     ),
   );
@@ -558,40 +659,41 @@ class _FleetCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     width: 222,
     margin: const EdgeInsets.only(right: 10),
-    clipBehavior: Clip.antiAlias,
-    decoration: const BoxDecoration(
-      color: AppColors.surface,
-      borderRadius: AppRadius.card,
-      boxShadow: AppShadows.card,
-    ),
-    child: Stack(
-      fit: StackFit.expand,
-      children: [
-        FleetPhotoImage(photo: photo),
-        const DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.transparent, Color(0xB0000000)],
-              stops: [.55, 1],
+    child: _HomeCard(
+      padding: EdgeInsets.zero,
+      onTap: () => context.push('/fleet'),
+      child: ClipRRect(
+        borderRadius: AppRadius.card,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            FleetPhotoImage(photo: photo),
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Color(0xB0000000)],
+                  stops: [.55, 1],
+                ),
+              ),
             ),
-          ),
-        ),
-        Positioned(
-          left: 13,
-          right: 13,
-          bottom: 11,
-          child: Text(
-            photo.title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
+            Positioned(
+              left: 13,
+              right: 13,
+              bottom: 11,
+              child: Text(
+                photo.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     ),
   );
 }
@@ -646,21 +748,20 @@ class _FleetSectionState extends ConsumerState<_FleetSection> {
           ),
         ),
         SizedBox(
-          height: 158,
+          height: 176,
           child: Scrollbar(
             controller: _controller,
             child: ListView.builder(
               controller: _controller,
               primary: false,
+              clipBehavior: Clip.none,
+              padding: const EdgeInsets.only(top: 2, bottom: 16),
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics(),
               ),
               itemCount: photos.length,
-              itemBuilder: (context, index) => InkWell(
-                onTap: () => context.push('/fleet'),
-                child: _FleetCard(photo: photos[index]),
-              ),
+              itemBuilder: (context, index) => _FleetCard(photo: photos[index]),
             ),
           ),
         ),
@@ -673,16 +774,12 @@ class _BusSeatGuideBanner extends StatelessWidget {
   const _BusSeatGuideBanner();
 
   @override
-  Widget build(BuildContext context) => AppCard(
-    padding: EdgeInsets.zero,
+  Widget build(BuildContext context) => _HomeCard(
+    padding: const EdgeInsets.all(15),
+    gradient: AppGradients.ticket,
     onTap: () => context.push('/fleet'),
-    child: Container(
+    child: SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.all(15),
-      decoration: const BoxDecoration(
-        gradient: AppGradients.ticket,
-        borderRadius: AppRadius.card,
-      ),
       child: Row(
         children: [
           Container(
@@ -735,6 +832,7 @@ class _UpcomingSkeleton extends StatelessWidget {
     decoration: const BoxDecoration(
       color: AppColors.surfaceAlt,
       borderRadius: AppRadius.card,
+      boxShadow: _HomeCard.shadows,
     ),
   );
 }

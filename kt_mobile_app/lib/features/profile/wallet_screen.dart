@@ -6,6 +6,7 @@ import '../../core/theme/app_gradients.dart';
 import '../../core/theme/app_radius.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/app_widgets.dart';
+import '../auth/application/auth_controller.dart';
 import '../travel/application/travel_providers.dart';
 
 class WalletScreen extends ConsumerWidget {
@@ -13,11 +14,15 @@ class WalletScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final wallet = ref.watch(loyaltyWalletProvider);
+    final wallet = ref.watch(
+      loyaltyWalletProvider(ref.watch(passengerSessionProvider)),
+    );
     return Scaffold(
       appBar: AppBar(title: const Text('Wallet')),
       body: RefreshIndicator(
-        onRefresh: () => ref.refresh(loyaltyWalletProvider.future),
+        onRefresh: () => ref.refresh(
+          loyaltyWalletProvider(ref.read(passengerSessionProvider)).future,
+        ),
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.md),
           children: [

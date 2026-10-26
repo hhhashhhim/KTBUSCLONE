@@ -55,6 +55,35 @@ For iOS, it forwards them through Apple's APNs service. This integration uses
    JSON, private key, or server bearer token in the Flutter app.**
 6. Rebuild with that settings file and the existing release-signing process.
 
+For Android, select the client in the downloaded `google-services.json` whose
+`client_info.android_client_info.package_name` matches the application ID. Import
+these public values into the chosen Dart defines file:
+
+| Dart define | Source field |
+| --- | --- |
+| `FIREBASE_PROJECT_ID` | `project_info.project_id` |
+| `FIREBASE_MESSAGING_SENDER_ID` | `project_info.project_number` (as a string) |
+| `FIREBASE_ANDROID_API_KEY` | Matching client's `api_key[0].current_key` |
+| `FIREBASE_ANDROID_APP_ID` | Matching client's `client_info.mobilesdk_app_id` |
+
+The Android Gradle build generates Firebase's native string resources from the
+same four Dart defines. This lets `FirebaseInitProvider` initialize Firebase for
+closed-app notification delivery before Flutter starts, without a separate copy
+of `google-services.json` in the project. Builds without all four values omit
+those resources and keep the inbox-only fallback. The Android manifest enables
+Firebase installation-ID registration; messaging auto-init remains disabled.
+For an Android test build with the production configuration, run:
+
+```sh
+flutter build apk --debug --dart-define-from-file=dart_defines.production.json
+```
+
+Importing Android configuration does not configure the server sender or iOS.
+iOS additionally needs its Firebase app values, APNs key/signing setup, and
+`FirebaseMessagingInstallationIdEnabled=true` in `Runner/Info.plist` for this
+registration API. Enable the backend sender separately on `mobile-backend`, then
+verify delivery on a dedicated passenger's physical device.
+
 No Firebase project is hard-coded. Missing/invalid initialization falls back to
 the inbox. `features.notifications` enables the inbox; `features.push_notifications`
 additionally reports that the backend has push configuration. These flags do not
@@ -100,5 +129,6 @@ of FCM acceptance. Do not broadcast for testing.
 
 Official references:
 [Flutter FCM setup](https://firebase.google.com/docs/cloud-messaging/flutter/get-started),
+[Android native configuration](https://firebase.google.com/docs/projects/multiprojects#support_multiple_environments_in_your_android_application),
 [receiving messages](https://firebase.google.com/docs/cloud-messaging/flutter/receive-messages),
 [HTTP v1 message fields](https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages).

@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kt_mobile_app/core/network/api_client.dart';
 import 'package:kt_mobile_app/core/network/api_exception.dart';
 import 'package:kt_mobile_app/core/storage/token_storage.dart';
+import 'package:kt_mobile_app/core/widgets/privacy_policy_screen.dart';
 import 'package:kt_mobile_app/features/auth/application/auth_controller.dart';
 import 'package:kt_mobile_app/features/auth/data/auth_repository.dart';
 import 'package:kt_mobile_app/features/auth/domain/passenger.dart';
@@ -112,6 +113,35 @@ Future<void> reviewAndContinue(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets('reviewing privacy preserves deletion form without submitting', (
+    tester,
+  ) async {
+    final api = DeletionApi();
+    final tokens = DeletionTokens();
+    final container = session(api, tokens);
+    addTearDown(container.dispose);
+    await showScreen(tester, container);
+    await tester.enterText(find.byType(TextFormField), 'current-password');
+    await tester.ensureVisible(find.byType(CheckboxListTile));
+    await tester.tap(find.byType(CheckboxListTile));
+    await tester.ensureVisible(find.text('Privacy policy'));
+    await tester.tap(find.text('Privacy policy'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PrivacyPolicyScreen), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('current-password'), findsOneWidget);
+    expect(
+      tester.widget<CheckboxListTile>(find.byType(CheckboxListTile)).value,
+      isTrue,
+    );
+    expect(api.calls, 0);
+    expect(tokens.token, 'existing-token');
+    expect(container.read(authControllerProvider).isAuthenticated, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
   test('API failure preserves the token and signed-in passenger', () async {
     final api = DeletionApi()..error = 'The password is incorrect.';
     final tokens = DeletionTokens();
