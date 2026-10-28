@@ -21,6 +21,13 @@ abstract class PushClient {
 }
 
 class FirebasePushClient implements PushClient {
+  FirebasePushClient({FirebaseMessaging? messaging, bool? isIOS})
+    : _messaging = messaging,
+      _isIOS = isIOS ?? Platform.isIOS;
+
+  final FirebaseMessaging? _messaging;
+  final bool _isIOS;
+  int _generation = 0;
   static bool configured = false;
   static Future<void> initialize() async {
     const project = String.fromEnvironment('FIREBASE_PROJECT_ID');
@@ -54,7 +61,7 @@ class FirebasePushClient implements PushClient {
     }
   }
 
-  FirebaseMessaging get _sdk => FirebaseMessaging.instance;
+  FirebaseMessaging get _sdk => _messaging ?? FirebaseMessaging.instance;
   @override
   bool get available => configured;
   @override
@@ -90,12 +97,32 @@ class FirebasePushClient implements PushClient {
       );
   @override
   Future<void> register() async {
-    if (available) await _sdk.register();
+    if (!available) return;
+    final generation = _generation;
+    if (_isIOS) {
+      // The Apple plugin only requests/forwards the APNs token with auto-init
+      // enabled. This runs after permission and authenticated account checks.
+      await _sdk.setAutoInitEnabled(true);
+      for (var attempt = 0; attempt < 20; attempt++) {
+        if (generation != _generation) return;
+        if (await _sdk.getAPNSToken() != null) break;
+        if (attempt == 19) {
+          throw StateError(
+            'Apple notification registration is not ready. Please try again.',
+          );
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+      }
+    }
+    if (generation == _generation) await _sdk.register();
   }
 
   @override
   Future<void> unregister() async {
-    if (available) await _sdk.unregister();
+    _generation++;
+    if (!available) return;
+    await _sdk.setAutoInitEnabled(false);
+    await _sdk.unregister();
   }
 
   @override
@@ -118,30 +145,49 @@ final notificationPushProvider = Provider<NotificationPush>((ref) {
 
 /// Binds a device to the current authenticated passenger, never to a phone number.
 class NotificationPush {
-  NotificationPush(this.api, this.client) {
-    _registration = client.registrations.listen((id) {
-      unawaited(_bind(id));
-    });
+  NotificationPush(
+    this.api,
+    this.client, {
+    Duration registrationTimeout = const Duration(seconds: 30),
+  }) : _registrationTimeout = registrationTimeout {
+    _registration = client.registrations.listen(
+      (id) => unawaited(_bind(id)),
+      // An active registration attempt has its own error listener. Background
+      // SDK failures must leave the inbox usable, rather than escape the zone.
+      onError: (Object error) => _bindingError = error,
+    );
   }
   final ApiClient api;
   final PushClient client;
+  final Duration _registrationTimeout;
   late final StreamSubscription<String> _registration;
   int? _account;
+  int? _sessionGeneration;
   String? _registrationId;
   bool _enabled = false;
   int _generation = 0;
   Future<void> _pending = Future.value();
   Object? _bindingError;
+  Future<void>? _registering;
 
-  Future<void> sync(int? account, bool enabled) async {
-    if (_account != account || _enabled != enabled) _generation++;
+  Future<void> sync(
+    int? account,
+    bool enabled, {
+    int sessionGeneration = 0,
+  }) async {
+    if (_account != account ||
+        _enabled != enabled ||
+        _sessionGeneration != sessionGeneration) {
+      _generation++;
+    }
     _account = account;
+    _sessionGeneration = sessionGeneration;
     _enabled = enabled;
     if (account == null || !enabled || !client.available) return;
     final generation = _generation;
     try {
       if (await client.permitted() && generation == _generation) {
-        await client.register();
+        await _register();
       }
     } catch (_) {
       /* Inbox remains available when push is unavailable. */
@@ -163,10 +209,7 @@ class NotificationPush {
     if (generation != _generation || _account == null || !_enabled) {
       throw StateError('Your session changed. Sign in and try again.');
     }
-    final registration = client.registrations.first.timeout(
-      const Duration(seconds: 30),
-    );
-    await Future.wait<dynamic>([client.register(), registration]);
+    await _register();
     await _pending;
     if (generation != _generation || _account == null || !_enabled) {
       throw StateError('Your session changed. Sign in and try again.');
@@ -175,6 +218,35 @@ class NotificationPush {
       throw StateError(
         'Phone registration could not be saved. Try again when connected.',
       );
+    }
+  }
+
+  Future<void> _register() => _registering ??= _registerOnce().whenComplete(() {
+    _registering = null;
+  });
+
+  Future<void> _registerOnce() async {
+    _bindingError = null;
+    final received = Completer<void>();
+    final subscription = client.registrations.listen(
+      (_) {
+        if (!received.isCompleted) received.complete();
+      },
+      onError: (Object error, StackTrace stack) {
+        if (!received.isCompleted) received.completeError(error, stack);
+      },
+    );
+    try {
+      // Subscribe before registration, fail promptly on an SDK error, and bound
+      // the entire attempt even if the native register call never completes.
+      await Future.wait<void>([
+        received.future,
+        Future.sync(client.register),
+      ], eagerError: true).timeout(_registrationTimeout);
+    } on TimeoutException {
+      throw StateError('Phone registration timed out. Please try again.');
+    } finally {
+      await subscription.cancel();
     }
   }
 
@@ -191,8 +263,9 @@ class NotificationPush {
           '/notifications/device',
           data: {'token': id, 'platform': Platform.isIOS ? 'ios' : 'android'},
         );
+        if (generation == _generation) _bindingError = null;
       } catch (error) {
-        _bindingError = error;
+        if (generation == _generation) _bindingError = error;
         /* Re-register on the next foreground/authentication transition. */
       }
     });

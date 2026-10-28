@@ -57,6 +57,12 @@ flutter build apk --release --dart-define-from-file=dart_defines.production.json
 
 ## Test build
 
+Version 1.0.6 (build 7) improves notification registration, foreground alerts,
+cold-start notification routing, and session isolation. The search screen now
+shows only the supported one-way journey option. This build retains the
+production API settings; iOS Firebase/APNs configuration and release signing
+remain separate setup requirements.
+
 Version 1.0.5 (build 6) includes refreshed schedule cards and booked-seat colours,
 responsive Home and authentication layouts, media refreshes, updated icons and
 startup motion, Android biometric setup guidance, in-app legal pages, and the

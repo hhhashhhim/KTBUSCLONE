@@ -18,6 +18,13 @@ The mobile API lives on `mobile-backend`; ERP endpoints on `api` and screens on
   phone permission. Denial or unavailable push leaves the inbox usable.
 - Lock-screen text is generic. Tapping opens the private message only after
   authentication and any biometric/update/maintenance gate.
+- While the app is open, a generic in-app alert offers **View alerts** and refreshes
+  the inbox. A closed-app tap waits until splash/login navigation has finished,
+  so it is not overwritten by the Home redirect. Switching passengers discards
+  a pending tap for the previous passenger.
+- Device registration errors return promptly, stalled SDK requests time out after
+  30 seconds, and registration can be retried. A new access session rebinds the
+  device even when the same passenger signs in again.
 - Logout unregisters the installation. The server checks the account's controls
   and current access session before push delivery; the normal session expires
   after 10 hours unless renewed through the existing login flow.
@@ -79,9 +86,9 @@ flutter build apk --debug --dart-define-from-file=dart_defines.production.json
 ```
 
 Importing Android configuration does not configure the server sender or iOS.
-iOS additionally needs its Firebase app values, APNs key/signing setup, and
-`FirebaseMessagingInstallationIdEnabled=true` in `Runner/Info.plist` for this
-registration API. Enable the backend sender separately on `mobile-backend`, then
+iOS additionally needs its Firebase app values and APNs key/signing setup.
+`FirebaseMessagingInstallationIdEnabled=true` is included in `Runner/Info.plist`
+for this registration API. Enable the backend sender separately on `mobile-backend`, then
 verify delivery on a dedicated passenger's physical device.
 
 No Firebase project is hard-coded. Missing/invalid initialization falls back to
@@ -93,7 +100,11 @@ The current Firebase Apple SDK requires **iOS 15 or newer**. Push and Background
 Modes capabilities and the `aps-environment` entitlement are present; the Apple
 App ID and signing profile must also permit push. Android requests notification
 permission where required. Native auto-init is disabled so installation
-registration follows the passenger's permission and authenticated state.
+registration follows the passenger's permission and authenticated state. On iOS,
+the app enables SDK auto-init only when registering after those checks, allowing
+the plugin to request/forward the APNs token. It waits for that token before
+explicit FCM registration. Logout disables auto-init and unregisters the device;
+a logout during the APNs wait prevents the delayed explicit registration.
 
 ## Runtime contract
 
@@ -126,6 +137,110 @@ inbox refresh, background/closed-app delivery, tap after biometric lock, expiry,
 logout/account switching, and revocation/blacklist. Send a test announcement only
 to a dedicated test passenger. Confirm the inbox and ERP read count independently
 of FCM acceptance. Do not broadcast for testing.
+
+### Verification on 26 October 2026
+
+- Repository `hhhashhhim/KTBUSCLONE`, branch `mobile-frontend`; changes are inside
+  `kt_mobile_app/`. The separate `mobile-backend` checkout was inspected and tested
+  without source changes.
+- The live `GET /api/mobile/v1/app/config` returned HTTP 200 with
+  `features.notifications=true` and `features.push_notifications=true`.
+  Firebase Console showed Cloud Messaging API V1 enabled. Its Android package,
+  app ID and project match this app's ignored production Dart defines.
+- The earlier QA report describes an older configuration snapshot. The current
+  production defines contain Android Firebase settings; local development defines
+  and iOS Firebase values remain unconfigured. Firebase Console currently lists
+  only the Android app.
+- Reproduced and fixed dropped cold-start/gated notification taps, delayed SDK
+  failures, and unhandled registration-stream errors. Added a visible foreground
+  alert, session-aware inbox refresh/rebinding, and Apple registration prerequisites.
+- `flutter test --no-pub --reporter expanded`: **213 passed**. The 22 focused
+  notification checks include timeout/retry, SDK/stream failures, APNs readiness,
+  logout during registration, account changes, cold start, login/update gates,
+  and foreground presentation.
+- `flutter analyze --no-pub`: no issues. Android debug APK built with production
+  Dart defines; generated and packaged native Firebase resources match those
+  defines. Packaged notification permission, Firebase initialization provider,
+  messaging receiver and FID opt-in are present. APK signature verification passed
+  using Android Studio's bundled JDK (the shell's default Java was unavailable).
+- iOS simulator debug build passed with the same production defines. This verifies
+  compilation, not iOS delivery; the iOS Firebase values/APNs setup remain pending.
+- On `mobile-backend`, `php -d error_reporting=22527 vendor/bin/phpunit
+  tests/Feature/MobileNotificationsTest.php`: **18 passed, 77 assertions** using
+  disposable SQLite and fake provider HTTP. These are not real-device sends.
+- Physical-device acceptance is still pending. The requested recipient is Hashim
+  on Android. No Android phone was connected during these checks, and the cPanel
+  session required sign-in. No test push, production mutation, deployment, commit,
+  or push to Git was performed.
+
+For the Android acceptance run, install the updated
+`build/app/outputs/flutter-apk/app-debug.apk`, sign in as the agreed test passenger,
+open **Alerts → Enable**, and allow Android notification permission. Confirm the
+device binding on the server, send one announcement only to that passenger, and
+check foreground, background/closed-app display and tap-through. Check the worker's
+last run and provider acceptance separately; do not run the whole production
+notification worker merely to test one passenger.
+
+### Live follow-up on 27 October 2026
+
+- The user selected an Android emulator for the targeted Hashim acceptance test.
+  The existing `medium_phone` AVD uses an Android 36 Google Play system image.
+  It booted successfully, has Google Play services installed, and accepted the
+  updated debug APK (`1.0.5`, build `6`). Live FCM delivery and notification
+  tap-through passed on this emulator.
+- The signed-in cPanel terminal confirmed that `/home/wwwkaina/kt-mobile-api`
+  uses `hhhashhhim/KTBUSCLONE` on `mobile-backend`. Existing server changes were
+  left intact. Firebase sender configuration is enabled, the service-account
+  project matches the Android app, and its private key parses successfully.
+  No credential values were copied into this report.
+- At the initial server check, the agreed passenger account was verified but had
+  no registered push device. The company's device count was zero and its
+  notification-runtime row was absent.
+- The initial cron ran the ERP scheduler in `api.kainattravels.net`; that
+  scheduler does not invoke `mobile:notifications`. There was no cron for the
+  mobile API checkout. The deployed mobile notification command exists and
+  `/usr/local/bin/php` is PHP 8.2.35.
+- With the user's explicit approval, the existing crontab was backed up and a
+  once-per-minute `mobile:notifications` job was added for the mobile checkout.
+  The ERP cron was preserved. A second complete Laravel scheduler was avoided
+  because it would duplicate unrelated ERP jobs. The first mobile run completed
+  at 16:55:11 PKT and subsequent scheduled runs advanced `last_run_at`.
+- Hashim was already signed in on the emulator. **Alerts → Enable** and Android
+  permission consent registered one Android device for that account. No account
+  credentials were changed and no session was minted through the server.
+- One idempotent test inbox message was recorded through the existing
+  `MobileNotificationInbox` service after checking the exact account, account
+  controls, verification, device count/platform and current access session. Its
+  event key is `qa:android:2026-10-27:hashim:one`, notification ID `1`. The normal
+  scheduled worker submitted it to Firebase, which accepted it on attempt 1 at
+  16:57:06 PKT. No broad test announcement was created.
+- The emulator had resumed an old saved state whose logs contained Google
+  messaging connection timeouts. Delivery was delayed until after a reboot and
+  Google messaging reconnection. The same queued message reached the app receiver
+  at 17:01:10 PKT; no second test was sent. Android displayed the generic preview
+  while the app UI was closed. Tapping it launched the app and opened the correct
+  private test message. The server recorded `read_at=2026-10-27 17:02:21` and the
+  delivery remained accepted with one attempt. This verifies the native delivery,
+  cold-start routing, authenticated detail fetch and read-receipt path together.
+- Screenshot evidence is in the ignored `build/notification-qa/` directory:
+  `cron-enabled.png`, `android-enabled.png`, `android-delivery.png`,
+  `android-opened.png`, `provider-accepted.png`, `server-read-confirmed.png`.
+- Physical-phone acceptance remains pending. Foreground, account-switching and
+  gate behavior are covered by automated tests, not additional live sends in this
+  run. iOS Firebase app/APNs configuration and device acceptance remain pending.
+  No source was deployed, committed or pushed; the approved production changes
+  were the worker cron, emulator device binding and single test inbox message.
+
+Files changed for this verification/fix (relative to `kt_mobile_app/`):
+
+- `lib/app/app.dart`
+- `lib/features/notifications/notification_push.dart`
+- `lib/features/notifications/notification_providers.dart`
+- `ios/Runner/Info.plist`
+- `test/notifications_test.dart`
+- `test/notification_delivery_test.dart`
+- `test/firebase_push_client_test.dart`
+- `docs/NOTIFICATIONS.md`
 
 Official references:
 [Flutter FCM setup](https://firebase.google.com/docs/cloud-messaging/flutter/get-started),

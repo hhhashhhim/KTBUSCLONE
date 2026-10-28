@@ -25,7 +25,10 @@ class _KainatTravelsAppState extends ConsumerState<KainatTravelsApp>
   Timer? _updateTimer;
   StreamSubscription<int>? _pushOpened;
   StreamSubscription<void>? _pushMessages;
+  final _messengerKey = GlobalKey<ScaffoldMessengerState>();
   int? _pendingNotice;
+  int? _pendingNoticeAccount;
+  bool _openingNotice = false;
   bool _resuming = false;
   DateTime? _backgroundedAt;
 
@@ -33,21 +36,32 @@ class _KainatTravelsAppState extends ConsumerState<KainatTravelsApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    appRouter.routerDelegate.addListener(_openPendingNotice);
     final push = ref.read(pushClientProvider);
-    _pushOpened = push.opened.listen((id) {
-      _pendingNotice = id;
-      _openPendingNotice();
-    });
+    _pushOpened = push.opened.listen(_queueNotice);
     _pushMessages = push.messages.listen((_) {
       ref.invalidate(notificationPageProvider);
+      if (!_canOpenNotice) return;
+      _messengerKey.currentState
+        ?..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: const Text('You have a new update.'),
+            action: SnackBarAction(
+              label: 'View alerts',
+              onPressed: () {
+                if (_canOpenNotice) appRouter.go('/notifications');
+              },
+            ),
+          ),
+        );
     });
     unawaited(
       push
           .initialNotice()
           .then((id) {
             if (mounted && id != null) {
-              _pendingNotice = id;
-              _openPendingNotice();
+              _queueNotice(id);
             }
           })
           .catchError((Object _) {}),
@@ -70,6 +84,7 @@ class _KainatTravelsAppState extends ConsumerState<KainatTravelsApp>
     _pushOpened?.cancel();
     _pushMessages?.cancel();
     _updateTimer?.cancel();
+    appRouter.routerDelegate.removeListener(_openPendingNotice);
     WidgetsBinding.instance.removeObserver(this);
     _unauthorizedSubscription.cancel();
     super.dispose();
@@ -114,65 +129,102 @@ class _KainatTravelsAppState extends ConsumerState<KainatTravelsApp>
   }
 
   void _syncPush() {
+    final auth = ref.read(authControllerProvider);
     unawaited(
       ref
           .read(notificationPushProvider)
           .sync(
-            ref.read(authControllerProvider).passenger?.id,
+            auth.passenger?.mobileVerified == true ? auth.passenger?.id : null,
             ref.read(mobileAppConfigProvider)?.features.pushNotifications ==
                 true,
+            sessionGeneration: auth.sessionGeneration,
           ),
     );
   }
 
-  void _openPendingNotice() {
+  void _queueNotice(int id) {
+    _pendingNotice = id;
+    _pendingNoticeAccount = ref.read(authControllerProvider).passenger?.id;
+    _openPendingNotice();
+  }
+
+  bool get _canOpenNotice {
     if (!mounted ||
         _resuming ||
         _backgroundedAt != null ||
-        _pendingNotice == null ||
-        !ref.read(authControllerProvider).isAuthenticated) {
-      return;
+        ref.read(authControllerProvider).passenger?.mobileVerified != true) {
+      return false;
     }
     final decision = ref.read(startupControllerProvider).value;
     if (decision == null ||
         decision.destination == StartupDestination.maintenance ||
         decision.destination == StartupDestination.forceUpdate) {
+      return false;
+    }
+    return true;
+  }
+
+  void _openPendingNotice() {
+    if (_pendingNotice == null || _openingNotice || !_canOpenNotice) return;
+    // Let splash/login finish their own navigation first. Otherwise their
+    // post-frame redirect can replace the notification with the home screen.
+    final path = appRouter.routeInformationProvider.value.uri.path;
+    if (const [
+      '/',
+      '/login',
+      '/verify-otp',
+      '/maintenance',
+      '/update-required',
+    ].contains(path)) {
       return;
     }
-    final id = _pendingNotice!;
-    _pendingNotice = null;
+    _openingNotice = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && ref.read(authControllerProvider).isAuthenticated) {
+      _openingNotice = false;
+      if (_pendingNotice != null && _canOpenNotice) {
+        final id = _pendingNotice!;
+        _pendingNotice = null;
+        _pendingNoticeAccount = null;
         appRouter.go('/notifications/$id');
       }
     });
+    WidgetsBinding.instance.ensureVisualUpdate();
   }
 
   @override
   Widget build(BuildContext context) {
     ref.listen(passengerSessionProvider, (previous, next) {
+      if (_pendingNoticeAccount != null &&
+          next.passengerId != null &&
+          _pendingNoticeAccount != next.passengerId) {
+        _pendingNotice = null;
+        _pendingNoticeAccount = null;
+      }
       if (previous?.passengerId != null && previous != next) {
         // Discard private routes and their local forms/WebViews on logout,
         // expiry, biometric lock, or a direct switch to another login session.
-        _pendingNotice = null;
+        // Preserve a tap through the resume-time biometric lock for this same
+        // passenger; explicit logout/expiry still discards the pending tap.
+        if (!(_resuming && next.passengerId == null)) {
+          _pendingNotice = null;
+          _pendingNoticeAccount = null;
+        }
+        _messengerKey.currentState?.removeCurrentSnackBar();
         appRouter.go(next.passengerId == null ? '/login' : '/home');
       }
-    });
-    ref.listen(authControllerProvider.select((state) => state.passenger?.id), (
-      _,
-      _,
-    ) {
       _syncPush();
       _openPendingNotice();
     });
     ref.listen(startupControllerProvider, (_, next) {
       final decision = next.value;
       if (decision != null) appAccessDecision.value = decision;
+      if (!_canOpenNotice) _messengerKey.currentState?.removeCurrentSnackBar();
       _syncPush();
       _openPendingNotice();
     });
     return MaterialApp.router(
       title: 'Kainat Travels',
+      scaffoldMessengerKey: _messengerKey,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       routerConfig: appRouter,

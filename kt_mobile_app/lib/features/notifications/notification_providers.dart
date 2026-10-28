@@ -9,9 +9,7 @@ final notificationRepositoryProvider = Provider(
 );
 final notificationPageProvider = FutureProvider.autoDispose
     .family<NotificationPage, int>((ref, page) async {
-      final account = ref.watch(
-        authControllerProvider.select((state) => state.passenger?.id),
-      );
+      final account = ref.watch(passengerSessionProvider).passengerId;
       if (account == null ||
           ref.watch(mobileAppConfigProvider)?.features.notifications != true) {
         return const NotificationPage();
@@ -20,9 +18,7 @@ final notificationPageProvider = FutureProvider.autoDispose
     });
 final notificationDetailProvider = FutureProvider.autoDispose
     .family<AppNotification, int>((ref, id) async {
-      final account = ref.watch(
-        authControllerProvider.select((state) => state.passenger?.id),
-      );
+      final account = ref.watch(passengerSessionProvider).passengerId;
       if (account == null) {
         throw StateError('Sign in to read this notification.');
       }

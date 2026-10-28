@@ -3,6 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>FirebaseMessagingAutoInitEnabled</key><false/>
+	<key>FirebaseMessagingInstallationIdEnabled</key><true/>
 	<key>UIBackgroundModes</key><array><string>remote-notification</string></array>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Use Face ID to securely sign in to your Kainat Travels account.</string>

@@ -67,25 +67,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       borderRadius: AppRadius.button,
                       border: Border.all(color: const Color(0xFF3C9760)),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Flexible(
-                          child: _TripTypePill(
-                            label: 'One way',
-                            selected: true,
-                          ),
-                        ),
-                        Flexible(
-                          child: _TripTypePill(
-                            label: 'Round trip',
-                            onTap: () => _message(
-                              'Round trips are not available from the mobile API yet.',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: const _OneWayBadge(),
                   ),
                 ),
                 Padding(
@@ -226,59 +208,33 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   ).showSnackBar(SnackBar(content: Text(value)));
 }
 
-class _TripTypePill extends StatelessWidget {
-  const _TripTypePill({required this.label, this.selected = false, this.onTap});
-  final String label;
-  final bool selected;
-  final VoidCallback? onTap;
+class _OneWayBadge extends StatelessWidget {
+  const _OneWayBadge();
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    selected: selected,
-    button: true,
-    child: Container(
-      decoration: BoxDecoration(
-        borderRadius: AppRadius.button,
-        boxShadow: selected
-            ? const [
-                BoxShadow(
-                  color: Color(0x55002816),
-                  offset: Offset(0, 2),
-                  blurRadius: 4,
-                ),
-              ]
-            : null,
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+    decoration: BoxDecoration(
+      borderRadius: AppRadius.button,
+      gradient: const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Colors.white, Color(0xFFE2F0E6)],
       ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: AppRadius.button,
-        clipBehavior: Clip.antiAlias,
-        child: Ink(
-          decoration: BoxDecoration(
-            gradient: selected
-                ? const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.white, Color(0xFFE2F0E6)],
-                  )
-                : null,
-            borderRadius: AppRadius.button,
-          ),
-          child: InkWell(
-            onTap: onTap,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: selected ? AppColors.primaryDeep : Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x55002816),
+          offset: Offset(0, 2),
+          blurRadius: 4,
         ),
+      ],
+    ),
+    child: const Text(
+      'One way',
+      style: TextStyle(
+        color: AppColors.primaryDeep,
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
       ),
     ),
   );

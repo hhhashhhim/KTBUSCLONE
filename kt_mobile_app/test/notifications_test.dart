@@ -89,6 +89,9 @@ class TestPush implements PushClient {
   bool configured = true;
   int registerCalls = 0;
   int unregisterCalls = 0;
+  Object? registerError;
+  bool emitRegistration = true;
+  Completer<void>? registration;
   @override
   bool get available => configured;
   @override
@@ -105,7 +108,9 @@ class TestPush implements PushClient {
   @override
   Future<void> register() async {
     registerCalls++;
-    stream.add('cTestFirebaseInstallationId');
+    await registration?.future;
+    if (registerError != null) throw registerError!;
+    if (emitRegistration) stream.add('cTestFirebaseInstallationId');
   }
 
   @override
@@ -134,6 +139,11 @@ PassengerAccount passenger(int id) => PassengerAccount.fromJson({
 class SignedIn extends AuthController {
   @override
   AuthState build() => AuthState(passenger: passenger(1));
+
+  void renewSession() => state = AuthState(
+    passenger: state.passenger,
+    sessionGeneration: state.sessionGeneration + 1,
+  );
 }
 
 void main() {
@@ -203,6 +213,86 @@ void main() {
     push.dispose();
     await client.stream.close();
   });
+  test('SDK failure is returned immediately and can be retried', () async {
+    final api = NoticeApi();
+    final client = TestPush()
+      ..registerError = StateError('network unavailable');
+    final push = NotificationPush(api, client);
+    addTearDown(push.dispose);
+    addTearDown(client.stream.close);
+    await push.sync(1, true);
+    client.allowed = true;
+    await expectLater(
+      push.enable().timeout(const Duration(seconds: 1)),
+      throwsStateError,
+    );
+    expect(api.calls, isEmpty);
+    client.registerError = null;
+    await push.enable();
+    expect(api.calls, ['PUT /notifications/device']);
+  });
+  test('registration stream errors do not escape into the app', () async {
+    final api = NoticeApi();
+    final client = TestPush();
+    final push = NotificationPush(api, client);
+    addTearDown(push.dispose);
+    addTearDown(client.stream.close);
+    await push.sync(1, true);
+    client.stream.addError(StateError('registration unavailable'));
+    await Future<void>.delayed(Duration.zero);
+    client.allowed = true;
+    await push.enable();
+    expect(api.calls, ['PUT /notifications/device']);
+  });
+  test('a stalled native call times out and a later retry succeeds', () async {
+    final api = NoticeApi();
+    final client = TestPush()..registration = Completer<void>();
+    final push = NotificationPush(
+      api,
+      client,
+      registrationTimeout: const Duration(milliseconds: 50),
+    );
+    addTearDown(push.dispose);
+    addTearDown(client.stream.close);
+    await push.sync(1, true);
+    client.allowed = true;
+    await expectLater(
+      push.enable(),
+      throwsA(
+        isA<StateError>().having(
+          (error) => error.message,
+          'message',
+          contains('timed out'),
+        ),
+      ),
+    );
+    expect(api.calls, isEmpty);
+    client.emitRegistration = false;
+    client.registration!.complete();
+    await Future<void>.delayed(Duration.zero);
+    client.registration = null;
+    client.emitRegistration = true;
+    await push.enable();
+    expect(api.calls, ['PUT /notifications/device']);
+  });
+  test(
+    'session renewal invalidates an outstanding permission request',
+    () async {
+      final api = NoticeApi();
+      final client = TestPush()..permission = Completer<bool>();
+      final push = NotificationPush(api, client);
+      addTearDown(push.dispose);
+      addTearDown(client.stream.close);
+      await push.sync(1, true, sessionGeneration: 1);
+      final enabling = push.enable();
+      final expected = expectLater(enabling, throwsStateError);
+      await push.sync(1, true, sessionGeneration: 2);
+      client.permission!.complete(true);
+      await expected;
+      expect(api.calls, isEmpty);
+      expect(client.registerCalls, 0);
+    },
+  );
   test(
     'logout while permission is open does not register or report success',
     () async {
@@ -262,6 +352,10 @@ void main() {
           .replacePassenger(passenger(2));
       await container.read(notificationPageProvider(1).future);
       expect(api.calls.length, 2);
+      (container.read(authControllerProvider.notifier) as SignedIn)
+          .renewSession();
+      await container.read(notificationPageProvider(1).future);
+      expect(api.calls.length, 3);
       container.read(authControllerProvider.notifier).expireSession();
       expect(
         (await container.read(notificationPageProvider(1).future)).items,
