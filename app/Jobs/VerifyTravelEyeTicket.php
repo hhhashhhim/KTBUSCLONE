@@ -21,6 +21,15 @@ class VerifyTravelEyeTicket
 
     public function handle(TravelEyeService $travelEyeService)
     {
-        $travelEyeService->verifyTicket($this->ticketId);
+        try {
+            $travelEyeService->verifyTicket($this->ticketId);
+        } catch (\Throwable $exception) {
+            // Missing log tables, invalid encrypted settings, or payload errors
+            // must not escape the after-response callback for a booked ticket.
+            \Illuminate\Support\Facades\Log::error('Travel Eye background verification could not complete.', [
+                'ticket_id' => $this->ticketId,
+                'exception' => get_class($exception),
+            ]);
+        }
     }
 }

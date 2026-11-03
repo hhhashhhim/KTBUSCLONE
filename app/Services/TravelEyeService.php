@@ -28,7 +28,7 @@ class TravelEyeService
         }
 
         $terminal = $ticket->terminal;
-        if (!$this->terminalIsConfigured($terminal)) {
+        if ((int) $terminal->company_id !== (int) $ticket->company_id || !$this->terminalIsConfigured($terminal)) {
             return;
         }
 
@@ -66,18 +66,24 @@ class TravelEyeService
         }
 
         try {
-            $request = Http::asForm()
+            // Match the successful Postman request: multipart form-data, not JSON.
+            $request = Http::asMultipart()
                 ->acceptJson()
+                ->withOptions(['connect_timeout' => 5])
                 ->timeout(max(1, (int) config('services.travel_eye.timeout', 15)));
 
             $response = $request->post($endpoint, $payload);
-            $successful = $response->successful();
+            $status = $response->json('status');
+            $successful = $response->successful()
+                && ($status === true || $status === 1 || (is_string($status) && in_array(strtolower(trim($status)), ['true', '1'], true)));
 
             $apiLog->update([
                 'status' => $successful ? 'success' : 'failed',
                 'http_status' => $response->status(),
-                'response_payload' => $this->limitResponse($response->body()),
-                'exception_message' => $successful ? null : 'Travel Eye returned HTTP ' . $response->status(),
+                'response_payload' => $this->safeResponse($response->body(), $payload),
+                'exception_message' => $successful ? null : ($response->successful()
+                    ? 'Travel Eye did not confirm success. See the response payload.'
+                    : 'Travel Eye returned HTTP ' . $response->status()),
             ]);
 
             if (!$successful) {
@@ -90,13 +96,13 @@ class TravelEyeService
         } catch (\Throwable $exception) {
             $apiLog->update([
                 'status' => 'failed',
-                'exception_message' => $this->limitResponse($exception->getMessage()),
+                'exception_message' => $this->safeResponse($exception->getMessage(), $payload),
             ]);
 
             Log::error('Travel Eye verification request encountered an exception.', [
                 'ticket_id' => $ticket->id,
                 'terminal_id' => $terminal->id,
-                'exception' => $exception->getMessage(),
+                'exception' => get_class($exception),
             ]);
         }
     }
@@ -154,10 +160,10 @@ class TravelEyeService
 
     private function voucherFor(Ticket $ticket): string
     {
-        $date = Carbon::parse($ticket->schedule_date ?: $ticket->date)->format('Ymd');
-        $time = Carbon::parse($ticket->schedule_time_exact ?: $ticket->schedule_time)->format('Hi');
-
-        return sprintf('KT-%d-S%d-%s-%s', $ticket->company_id, $ticket->schedule_id, $date, $time);
+        // One remote record per ticket, even when an invoice contains multiple
+        // passengers or the same seat is sold on two non-overlapping segments.
+        // Stable on retries: never generate a random/new voucher for an attempt.
+        return sprintf('KT-C%d-T%d', $ticket->company_id, $ticket->id);
     }
 
     private function departureDateTime(Ticket $ticket): ?string
@@ -170,7 +176,7 @@ class TravelEyeService
         }
 
         try {
-            return Carbon::parse($date . ' ' . $time)->format('Y-m-d H:i');
+            return Carbon::parse($date . ' ' . $time)->format('Y-m-d H:i:s');
         } catch (\Throwable $exception) {
             return null;
         }
@@ -210,5 +216,16 @@ class TravelEyeService
     private function limitResponse(string $value): string
     {
         return mb_substr($value, 0, 20000);
+    }
+
+    private function safeResponse(string $value, array $payload): string
+    {
+        foreach (['usrName', 'usrPass'] as $field) {
+            $secret = (string) ($payload[$field] ?? '');
+            if ($secret !== '') {
+                $value = str_replace([$secret, rawurlencode($secret), urlencode($secret)], '[redacted]', $value);
+            }
+        }
+        return $this->limitResponse($value);
     }
 }
