@@ -40,8 +40,10 @@ class ScheduleQuotaDiscountService
                 $base = max(0, (float) ($seat['fare'] ?? 0));
                 $special = $percentage > 0 && !empty($seat['quota_reuse']) && empty($seat['type'])
                     && !empty($seat['reserved']) && (!isset($seat['terminal_allow']) || $seat['terminal_allow']) && $base > 0;
-                // Whole-rupee rounding preserves small percentages instead of rounding them away to Rs 50/100.
-                $saving = $special ? min($base, round($base * $percentage / 100)) : 0;
+                // Round the payable fare per seat, not the discount or invoice total.
+                // Keep the effective saving aligned with the fare persisted by all channels.
+                $payable = $special ? min($base, max(0, round($base * (1 - $percentage / 100), -2, PHP_ROUND_HALF_UP))) : $base;
+                $saving = $base - $payable;
                 $seat['fare_before_quota_discount'] = $base;
                 $seat['quota_discount'] = $saving;
                 $seat['quota_discount_percentage'] = $saving > 0 ? $percentage : 0;

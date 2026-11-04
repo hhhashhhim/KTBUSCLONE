@@ -51,7 +51,7 @@ class ScheduleQuotaDiscountTest extends TestCase
         }
         DB::table('roles')->insert(['id'=>1,'permissions'=>json_encode([['allow'=>true,'childs'=>[['name'=>'schedules','allow'=>true,'buttons'=>[['name'=>'edit-schedule','allow'=>true]]]]]])]);
         Auth::setUser((new User)->forceFill(['id'=>1,'company_id'=>1,'hide'=>0,'role_id'=>1,'terminal_id'=>1]));
-        DB::table('schedule_quota_terminal_discounts')->insert(['company_id'=>1,'schedule_id'=>1,'terminal_id'=>1,'percentage'=>2,'updated_by'=>1]);
+        DB::table('schedule_quota_terminal_discounts')->insert(['company_id'=>1,'schedule_id'=>1,'terminal_id'=>1,'percentage'=>10,'updated_by'=>1]);
         $this->service = new ScheduleQuotaDiscountService;
         $this->ticket('1'); $this->ticket('2');
     }
@@ -66,11 +66,11 @@ class ScheduleQuotaDiscountTest extends TestCase
 
     public function test_only_reused_seats_receive_user_discount_and_partner_flags(): void {
         $map=$this->preview();
-        $this->assertEquals([980,980,1000],array_column($map[0],'fare'));
+        $this->assertEquals([900,900,1000],array_column($map[0],'fare'));
         $this->assertSame(['Yes','Yes','No'],array_column($map[0],'is_special'));
         $this->assertSame(['Yes','Yes','No'],array_column($map[0],'is_speacial'));
-        $this->assertEquals(120,$map[0][0]['discount']); // 100 existing + 20 quota, not 2% twice.
-        $this->assertEquals(20,$map[0][0]['quota_discount']);
+        $this->assertEquals(200,$map[0][0]['discount']); // 100 existing + 100 quota, not 10% twice.
+        $this->assertEquals(100,$map[0][0]['quota_discount']);
         $this->assertEquals(1100,$map[0][0]['original_fare']);
         $this->assertEquals(1000,$map[0][0]['fare_before_quota_discount']);
     }
@@ -80,6 +80,26 @@ class ScheduleQuotaDiscountTest extends TestCase
         DB::table('tickets')->where('seat_no','1')->update(['deleted_at'=>now()]);
         DB::table('tickets')->where('seat_no','2')->update(['type'=>'advance booking']);
         $this->assertSame(['No','No','No'],array_column($this->preview()[0],'is_special'));
+    }
+    public function test_quota_payable_fare_rounds_to_nearest_hundred_and_preserves_accounting(): void {
+        foreach ([[2506,15,2100], [2840,25,2100], [2700,15,2300], [3000,15,2600],
+            [1000,2,1000], [1080,1,1080], [2700,100,0], [2130,0,2130]] as [$base,$percentage,$expected]) {
+            DB::table('schedule_quota_terminal_discounts')->update(['percentage'=>$percentage]);
+            $map = $this->map();
+            $map[0][0]['fare'] = $base;
+            $map[0][0]['original_fare'] = $base + 100;
+            $map[0][2]['fare'] = 2130; // A non-quota seat must not be rounded.
+            $result = $this->preview(3, $map);
+            $seat = $result[0][0];
+            $this->assertEquals($expected, $seat['fare']);
+            $this->assertEquals($base - $expected, $seat['quota_discount']);
+            $this->assertEquals($base + 100 - $expected, $seat['discount']);
+            $this->assertEquals($base, $seat['fare'] + $seat['quota_discount']);
+            $this->assertEquals(2130, $result[0][2]['fare']);
+            $this->assertSame($expected < $base ? 'Yes' : 'No', $seat['is_special']);
+            $quotes = $this->service->validateSelection($result, ['1'], [1], [$expected]);
+            $this->assertEquals($expected, $quotes[0]['fare']);
+        }
     }
     public function test_before_and_after_segments_qualify_but_other_dates_and_post_departure_sales_do_not(): void {
         DB::table('tickets')->update(['departure_city_id'=>20,'destination_city_id'=>30]);
@@ -105,10 +125,10 @@ class ScheduleQuotaDiscountTest extends TestCase
     }
     public function test_server_validates_each_seat_class_and_net_price(): void {
         $map=$this->preview();
-        $quotes=$this->service->validateSelection($map,['1','3'],[1,1],[980,1000]);
-        $this->assertEquals(20,$quotes[0]['quota_discount']);
+        $quotes=$this->service->validateSelection($map,['1','3'],[1,1],[900,1000]);
+        $this->assertEquals(100,$quotes[0]['quota_discount']);
         $this->assertEquals(0,$quotes[1]['quota_discount']);
-        foreach ([[['1','3'],[1,1],[980,980]],[['1'],[2],[980]],[['1','1'],[1,1],[980,980]],[['9'],[1],[980]]] as $case) {
+        foreach ([[['1','3'],[1,1],[900,900]],[['1'],[2],[900]],[['1','1'],[1,1],[900,900]],[['9'],[1],[900]],[['1'],[1],[980]]] as $case) {
             try { $this->service->validateSelection($map,...$case); $this->fail('Invalid selection accepted'); }
             catch (ValidationException $e) { $this->assertArrayHasKey('quota_discount',$e->errors()); }
         }
@@ -119,7 +139,7 @@ class ScheduleQuotaDiscountTest extends TestCase
         $this->assertEquals([1,2],array_column($data['terminals'],'id'));
         $c->save($this->request(['id'=>1,'discounts'=>[['terminal_id'=>1,'percentage'=>2],['terminal_id'=>2,'percentage'=>3.5]]]));
         $this->assertSame(2,DB::table('schedule_quota_terminal_discounts')->count());
-        $this->assertSame(1,DB::table('activity_logs')->count());
+        $this->assertSame(2,DB::table('activity_logs')->count());
         $c->save($this->request(['id'=>1,'discounts'=>[]]));
         $this->assertSame(0,DB::table('schedule_quota_terminal_discounts')->where('active',true)->count());
         $this->assertSame(2,DB::table('schedule_quota_terminal_discounts')->count());
@@ -133,7 +153,7 @@ class ScheduleQuotaDiscountTest extends TestCase
         }
         $this->assertArrayNotHasKey('users', $data);
         $this->assertSame(1, count($data['discounts']));
-        $this->assertEquals(2, $data['discounts'][0]['percentage']);
+        $this->assertEquals(10, $data['discounts'][0]['percentage']);
     }
     public function test_large_list_only_updates_and_audits_changed_terminal(): void {
         $controller = new ScheduleQuotaDiscountController;
@@ -173,14 +193,14 @@ class ScheduleQuotaDiscountTest extends TestCase
     }
     public function test_users_share_terminal_rule_and_portal_selection_is_company_scoped(): void {
         Auth::setUser((new User)->forceFill(['id'=>99,'company_id'=>1,'hide'=>0,'terminal_id'=>1]));
-        $this->assertEquals(980, $this->preview()[0][0]['fare']);
+        $this->assertEquals(900, $this->preview()[0][0]['fare']);
         $detail = ScheduleDetail::find(3);
-        $this->assertEquals(2, $this->service->percentage($detail, Auth::user(), 1));
+        $this->assertEquals(10, $this->service->percentage($detail, Auth::user(), 1));
         $this->assertEquals(0, $this->service->percentage($detail, Auth::user(), 2));
         Auth::user()->terminal_id = 2;
         $this->assertEquals(1000, $this->preview()[0][0]['fare']);
         $portalMap = $this->service->preview($detail, Ticket::all(), $this->map(), Auth::user(), 1);
-        $this->assertEquals(980, $portalMap[0][0]['fare']);
+        $this->assertEquals(900, $portalMap[0][0]['fare']);
         DB::table('schedule_quota_terminal_discounts')->insert(['company_id'=>1,'schedule_id'=>1,'terminal_id'=>3,'percentage'=>10,'updated_by'=>1]);
         $this->assertEquals(0, $this->service->percentage($detail, Auth::user(), 3));
         DB::table('terminals')->where('id',1)->update(['deleted_at'=>now()]);

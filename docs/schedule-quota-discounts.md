@@ -24,7 +24,11 @@ company), falling back to the logged-in user's terminal when not supplied.
 - Full-route/overlapping/blocked seats, unpaid or cancelled qualifying bookings,
   other dates, other companies, and terminals without a rule do not receive offers.
 - The percentage applies to the current net fare after existing discounts and
-  surcharges, rounded to the nearest rupee. Rs 1,000 at 2% becomes Rs 980.
+  surcharges. The resulting payable fare is rounded per seat to the nearest
+  Rs 100 (Rs 2,130 becomes Rs 2,100; Rs 2,295 becomes Rs 2,300; halfway rounds up).
+  The payable amount never exceeds its pre-quota fare. The recorded saving is
+  the difference after rounding; small discounts may round away. Non-quota
+  fares are unchanged. Portal and both partner APIs share this calculation.
 - The discount remains available after departure on seats that were already
   counted in advance quota; post-departure initial sales do not qualify a seat.
 - Booking rechecks the actual seat, class, eligibility and fare while holding
