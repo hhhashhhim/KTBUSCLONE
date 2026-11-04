@@ -46,19 +46,46 @@ class ScheduleQuotaDiscountController extends Controller
         return DB::transaction(function () use ($input, $request, $company) {
             $schedule = Schedule::where('company_id', $company)->whereKey($input['id'])->lockForUpdate()->firstOrFail();
             $query = DB::table('schedule_quota_terminal_discounts')->where('company_id', $company)->where('schedule_id', $schedule->id);
-            $before = (clone $query)->get(['terminal_id', 'percentage', 'active', 'migration_note'])->toArray();
-            // Keep an inactive marker so a cached discounted quote is still revalidated after removal.
-            $query->update(['active' => false, 'migration_note' => null, 'updated_by' => $request->user()->id, 'updated_at' => now()]);
+            $existing = (clone $query)->get()->keyBy('terminal_id');
+            $submitted = collect($input['discounts'])->keyBy('terminal_id');
+            $changes = [];
             foreach ($input['discounts'] as $row) {
-                DB::table('schedule_quota_terminal_discounts')->updateOrInsert([
-                    'company_id' => $company, 'schedule_id' => $schedule->id, 'terminal_id' => $row['terminal_id'],
-                ], [
+                $old = $existing->get($row['terminal_id']);
+                if ($old && $old->active && (float) $old->percentage === (float) $row['percentage'] && $old->migration_note === null) {
+                    continue;
+                }
+                $values = [
                     'percentage' => $row['percentage'], 'active' => true, 'updated_by' => $request->user()->id,
-                    'created_at' => now(), 'updated_at' => now(),
-                ]);
+                    'migration_note' => null, 'updated_at' => now(),
+                ];
+                if ($old) {
+                    (clone $query)->where('terminal_id', $row['terminal_id'])->update($values);
+                } else {
+                    DB::table('schedule_quota_terminal_discounts')->insert(array_merge($values, [
+                        'company_id' => $company, 'schedule_id' => $schedule->id,
+                        'terminal_id' => $row['terminal_id'], 'created_at' => now(),
+                    ]));
+                }
+                $changes[] = [$row['terminal_id'], $old, (float) $row['percentage'], true];
             }
-            ActivityLog::create(['company_id' => $company, 'activity_by' => $request->user()->id, 'requested_host' => $request->ip(),
-                'message' => 'Schedule ' . $schedule->id . ' quota discounts changed: ' . json_encode(['before' => $before, 'after' => $input['discounts']])]);
+            foreach ($existing as $terminalId => $old) {
+                if (!$submitted->has($terminalId) && ($old->active || $old->migration_note !== null)) {
+                    // Retain inactive markers to revalidate previously discounted quotes.
+                    (clone $query)->where('terminal_id', $terminalId)->update([
+                        'active' => false, 'migration_note' => null,
+                        'updated_by' => $request->user()->id, 'updated_at' => now(),
+                    ]);
+                    $changes[] = [$terminalId, $old, (float) $old->percentage, false];
+                }
+            }
+            foreach ($changes as [$terminalId, $old, $percentage, $active]) {
+                // One bounded audit entry per changed terminal, not the entire list.
+                ActivityLog::create(['company_id' => $company, 'activity_by' => $request->user()->id, 'requested_host' => $request->ip(),
+                    'message' => 'Schedule ' . $schedule->id . ' quota discount terminal ' . $terminalId . ' changed: ' . json_encode([
+                        'before' => $old ? ['percentage' => (float) $old->percentage, 'active' => (bool) $old->active] : null,
+                        'after' => ['percentage' => $percentage, 'active' => $active],
+                    ])]);
+            }
             return response()->json(['message' => 'Quota discounts saved.']);
         });
     }

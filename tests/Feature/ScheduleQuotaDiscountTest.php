@@ -33,7 +33,10 @@ class ScheduleQuotaDiscountTest extends TestCase
         $this->table('users', ['company_id','hide','terminal_id'], ['name','email','password']);
         $this->table('terminals', ['company_id','hide'], ['name']);
         $this->table('roles', [], ['permissions']);
-        $this->table('activity_logs', ['company_id','activity_by'], ['message','requested_host']);
+        require_once database_path('migrations/2022_09_12_095623_create_activity_logs_table.php');
+        (new \CreateActivityLogsTable)->up();
+        // SQLite does not enforce VARCHAR lengths; reproduce MySQL's 1,000-character limit.
+        DB::unprepared("CREATE TRIGGER enforce_activity_message_length BEFORE INSERT ON activity_logs WHEN length(NEW.message) > 1000 BEGIN SELECT RAISE(ABORT, 'Activity message too long'); END");
         require_once database_path('migrations/2026_10_21_000001_create_schedule_quota_discounts.php');
         (new \CreateScheduleQuotaDiscounts)->up();
         require_once database_path('migrations/2026_10_24_000001_create_schedule_quota_terminal_discounts.php');
@@ -131,6 +134,42 @@ class ScheduleQuotaDiscountTest extends TestCase
         $this->assertArrayNotHasKey('users', $data);
         $this->assertSame(1, count($data['discounts']));
         $this->assertEquals(2, $data['discounts'][0]['percentage']);
+    }
+    public function test_large_list_only_updates_and_audits_changed_terminal(): void {
+        $controller = new ScheduleQuotaDiscountController;
+        $discounts = [];
+        for ($id = 100; $id < 600; $id++) {
+            DB::table('terminals')->insert(['id'=>$id, 'company_id'=>1, 'hide'=>0, 'name'=>'Terminal '.$id]);
+            $discounts[] = ['terminal_id'=>$id, 'percentage'=>15];
+        }
+        $controller->save($this->request(['id'=>1, 'discounts'=>$discounts]));
+        $this->assertSame(501, DB::table('activity_logs')->count()); // 500 added, old rule removed.
+        $unchanged = (array) DB::table('schedule_quota_terminal_discounts')->where('terminal_id',101)->first();
+        Carbon::setTestNow('2026-10-21 11:00:00');
+        $discounts[0]['percentage'] = 10;
+        $response = $controller->save($this->request(['id'=>1, 'discounts'=>$discounts]));
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(1, DB::table('schedule_quota_terminal_discounts')->where('active',true)->where('percentage',10)->count());
+        $this->assertSame(499, DB::table('schedule_quota_terminal_discounts')->where('active',true)->where('percentage',15)->count());
+        $this->assertSame($unchanged, (array) DB::table('schedule_quota_terminal_discounts')->where('terminal_id',101)->first());
+        $this->assertSame(502, DB::table('activity_logs')->count());
+        $message = DB::table('activity_logs')->orderByDesc('id')->value('message');
+        $this->assertSame('Schedule 1 quota discount terminal 100 changed: '.json_encode([
+            'before'=>['percentage'=>15,'active'=>true], 'after'=>['percentage'=>10,'active'=>true],
+        ]), $message);
+        $this->assertLessThanOrEqual(1000, strlen($message));
+        $this->assertSame('2026-10-21 10:00:00', DB::table('schedule_quota_terminal_discounts')->where('terminal_id',100)->value('created_at'));
+        $discounts[0]['percentage'] = '10.00';
+        $controller->save($this->request(['id'=>1, 'discounts'=>$discounts]));
+        $this->assertSame(502, DB::table('activity_logs')->count());
+        array_shift($discounts);
+        $controller->save($this->request(['id'=>1, 'discounts'=>$discounts]));
+        $this->assertSame(503, DB::table('activity_logs')->count());
+        $this->assertEquals(0, DB::table('schedule_quota_terminal_discounts')->where('terminal_id',100)->value('active'));
+        $discounts[] = ['terminal_id'=>100, 'percentage'=>10];
+        $controller->save($this->request(['id'=>1, 'discounts'=>$discounts]));
+        $this->assertSame(504, DB::table('activity_logs')->count());
+        $this->assertEquals(1, DB::table('schedule_quota_terminal_discounts')->where('terminal_id',100)->value('active'));
     }
     public function test_users_share_terminal_rule_and_portal_selection_is_company_scoped(): void {
         Auth::setUser((new User)->forceFill(['id'=>99,'company_id'=>1,'hide'=>0,'terminal_id'=>1]));
