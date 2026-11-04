@@ -158780,7 +158780,7 @@ var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 
 var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
   "class": "small text-muted"
-}, "Select the Website, Sasta Ticket or Bookkaru terminal to enable its API offers. APIs use the terminal assigned to their login; portal bookings use the selected booking terminal. The percentage applies after existing fare discounts, rounded to the nearest rupee. Both non-overlapping earlier and onward journeys qualify. An unlimited/blank quota disables these offers; 0% disables a terminal's discount.", -1
+}, "Select the Website, Sasta Ticket or Bookkaru terminal to enable its API offers. APIs use the terminal assigned to their login; portal bookings use the selected booking terminal. The percentage applies after existing fare discounts; the payable fare per seat is rounded to the nearest Rs 100, without exceeding its pre-quota fare. Small discounts may round away. Both non-overlapping earlier and onward journeys qualify. An unlimited/blank quota disables these offers; 0% disables a terminal's discount.", -1
 /* HOISTED */
 );
 
