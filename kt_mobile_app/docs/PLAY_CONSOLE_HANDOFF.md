@@ -1,8 +1,9 @@
 # Play Console handoff — 6 November 2026
 
 > See [the later 1.0.8+9 follow-up](BUILD_REPORT_1.0.8_2026-11-06.md) for the booking
-> pagination fix, fresh live backend/account checks and remaining gates. The new
-> build is not yet uploaded; the Console history below concerns 1.0.7 (8).
+> pagination fix, pushed source, deployed mobile backend and remaining gates.
+> A 1.0.8 draft with notes is saved, but its AAB is not uploaded; 1.0.7 (8) remains
+> active. The Console history below concerns the earlier 1.0.7 preparation.
 
 ## Confirmed identity and signing
 

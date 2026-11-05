@@ -6,9 +6,13 @@ This file prepares answers; it does not submit or certify a Console declaration.
 
 ## Release and Console facts
 
-- The live mobile API was verified at **b78d1cc1** in this task. Migrations were recorded in batches **103, 104 and 105**. This supersedes the earlier `cc2e21d2` deployment observation, but does not establish that every subsequently prepared source change is deployed. See `mobile-backend:MOBILE_RELEASE_2026-11-06.md`.
+- Frontend source **9fbe332e** was pushed to `mobile-frontend`. Backend **8abbda840b4e4b171a0c8eeccb20b25e6b9fe584** was pushed to `mobile-backend` and deployed by a fast-forward-only update. The mobile API is up and `/api/mobile/v1/app/config` returned HTTP 200 after deployment. See [the current build/rollout report](BUILD_REPORT_1.0.8_2026-11-06.md) and `mobile-backend:MOBILE_RELEASE_2026-11-06.md`.
+- **Historical preflight baseline:** `b78d1cc1` had snapshot-linking, schema-hardening and first-login migrations in batches **103, 104 and 105**. The follow-up quote-index repair is now recorded in **batch 106**; the existing index already matched `used_at, expires_at, id`, so no index DDL was needed.
+- `MOBILE_SCHEDULER_ONLY=true` is deployed and the schedule contains exactly **six mobile commands**. Only the mobile notification-only cron was replaced with `schedule:run`; the separate ERP cron was preserved byte for byte. Four normal launches each of reconciliation and notifications were observed, with zero generic scheduler error markers and zero active mobile PHP jobs at the final observation. Maintenance was false and approved cron bytes matched. No manual scheduler was invoked; redirected command output means these observations do **not** prove provider outcomes. Force-update remains false. Sanitized proof: `build/play-release/1.0.8-9/backend-rollout-proof.jpg`.
 - **Scheduled personal-data retention remains disabled.** Configured 90-day periods are not evidence of active expiry. Immediate account deletion and scheduled retention are separate operations.
+- The protected rollout backup at `/home/wwwkaina/private-release-backups/mobile-20261106-em5e8J` requires manual deletion after **2026-11-13T00:00:00Z**. This seven-day rollout copy is separate from the owner-confirmed **30-day hosting backups**; neither establishes expiry for every export, replica or provider copy. No automatic deletion of the rollout copy is claimed.
 - The deployed ERP notification writer still has the deletion race documented below. The owner explicitly requested **Keep ERP read-only**; no ERP fix was applied.
+- Play internal release **1.0.7 (8)** remains active for three authorized testers. A **1.0.8 draft with release notes** is saved, but no AAB was uploaded because Chrome local-file access was blocked. The owner's intent to enable permission is not evidence that it is effective. No 1.0.8 rollout or production submission is complete.
 - The Data safety form remains a **step-2 draft**: collection **Yes**, username/password/other authentication selected, deletion URL supplied; the all-data-in-transit answer and complete category mapping remain unanswered. This worksheet changes no form fields.
 - The owner states that SAR Zone and Bank Alfalah retain no data. Record this as an **owner assertion about those providers**, not independently verified provider evidence and not an assertion about Firebase, hosting, Kainat's database or backups.
 
@@ -75,14 +79,20 @@ Before final submission, resolve these five decisions:
 1. Approve accurate per-destination sharing classifications, covering the provider handling above and actual marketing use.
 2. Establish FID collection optionality and provider deletion behavior; retain the published Firebase retention qualification.
 3. Decide how to close the ERP writer race while honoring the current read-only instruction, and test deletion using a disposable approved account.
-4. Approve and activate the applicable retention/scheduling policy, or disclose current retention truthfully. Do not turn configured 90-day values into an active deletion promise. Reconcile the policy's financial-year language with actual ERP retention.
+4. Approve and activate the applicable retention policy, or disclose current retention truthfully. The mobile-only scheduler is deployed and normal cron launches are observed, but retention remains disabled. Do not turn configured 90-day values into an active deletion promise. Reconcile the policy's financial-year language with actual ERP retention and record deletion of the separate seven-day rollout copy when performed.
 5. Verify the final release's real payment/provider path and the existence of no additional data destination before confirming the transit answer; determine search-log persistence and support/email processor coverage.
 
 These are precise declaration/operation gaps. Local analysis/tests, migration batches and successful signed builds do not answer them, and this worksheet supplies no invented retention period or certification.
 
 ## Source index
 
-Frontend paths are relative to `kt_mobile_app/`; backend citations refer to `mobile-backend` commit **b78d1cc18b4580853f224dc43ec1d8ef489b65b4** unless the current deployment report is named. No credentials or passenger records are included.
+Frontend paths are relative to `kt_mobile_app/`. The source audit's backend line
+citations below refer to historical baseline `mobile-backend` commit
+**b78d1cc18b4580853f224dc43ec1d8ef489b65b4**, rather than claiming that revision is
+still deployed. The current deployed follow-up is
+**8abbda840b4e4b171a0c8eeccb20b25e6b9fe584**; use the current rollout report for
+migration, configuration and cron evidence. No credentials or passenger records
+are included.
 
 - **F1:** [privacy policy](../lib/core/legal/privacy_policy.dart), lines 44–48 and 127–139; [authentication payload](../lib/features/auth/data/auth_repository.dart), lines 35–52.
 - **F2:** [hosted checkout](../lib/features/payments/presentation/payment_checkout_screen.dart), lines 7–8 and 30–84.
