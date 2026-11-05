@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -63,7 +64,7 @@ class FakeTravelRepository implements TravelRepository {
   }
 
   @override
-  Future<List<BookingSummary>> bookings() async {
+  Future<List<BookingSummary>> bookings({CancelToken? cancelToken}) async {
     listReads++;
     return [result];
   }

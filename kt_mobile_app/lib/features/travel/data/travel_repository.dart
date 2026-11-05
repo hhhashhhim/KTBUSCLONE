@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_exception.dart';
 import '../../payments/domain/booking_payment.dart';
@@ -128,12 +130,60 @@ class TravelRepository {
     );
   }
 
-  Future<List<BookingSummary>> bookings() async {
-    final raw = await _api.get('/bookings');
-    final values = raw is Map && raw['items'] is List
-        ? raw['items'] as List
-        : _list(raw);
-    return values.map((item) => BookingSummary.fromJson(_map(item))).toList();
+  Future<List<BookingSummary>> bookings({CancelToken? cancelToken}) async {
+    const perPage = 50;
+    final bookings = <int, BookingSummary>{};
+    int? expectedTotal;
+    var page = 1;
+    while (true) {
+      if (cancelToken?.isCancelled == true) {
+        throw const ApiException('The request was cancelled.');
+      }
+      final raw = await _api.get(
+        '/bookings',
+        queryParameters: {'page': page, 'per_page': perPage},
+        cancelToken: cancelToken,
+      );
+      if (cancelToken?.isCancelled == true) {
+        throw const ApiException('The request was cancelled.');
+      }
+      // Older API deployments returned the complete list without an envelope.
+      if (raw is List && page == 1) {
+        return raw.map((item) => BookingSummary.fromJson(_map(item))).toList();
+      }
+      final response = _map(raw);
+      final values = _list(response['items']);
+      final pagination = _map(response['pagination']);
+      final total = pagination['total'];
+      final lastPage = pagination['last_page'];
+      if (total is! int ||
+          total < 0 ||
+          lastPage is! int ||
+          lastPage < 1 ||
+          pagination['current_page'] != page ||
+          pagination['per_page'] != perPage ||
+          lastPage != (total == 0 ? 1 : (total / perPage).ceil()) ||
+          (expectedTotal != null && total != expectedTotal) ||
+          values.length != (total - (page - 1) * perPage).clamp(0, perPage)) {
+        throw const ApiException(
+          'Your trips could not be fully loaded. Please try again.',
+        );
+      }
+      expectedTotal = total;
+      for (final value in values) {
+        final booking = BookingSummary.fromJson(_map(value));
+        if (bookings.containsKey(booking.id)) {
+          // A concurrent insert/delete can shift offset-based pages. Never
+          // present duplicated or incomplete pages as a complete trip history.
+          throw const ApiException(
+            'Your bookings changed while loading. Please try again.',
+          );
+        }
+        bookings[booking.id] = booking;
+      }
+      if (page == lastPage) return bookings.values.toList();
+      page++;
+    }
   }
 
   Future<BookingSummary> refreshPayment(int id) async =>

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -65,7 +66,11 @@ final bookingsProvider = FutureProvider.autoDispose
     .family<List<BookingSummary>, PassengerSession>(
       (ref, session) {
         if (!_isCurrentSession(ref, session)) return const [];
-        return ref.watch(travelRepositoryProvider).bookings();
+        final cancelToken = CancelToken();
+        ref.onDispose(cancelToken.cancel);
+        return ref
+            .watch(travelRepositoryProvider)
+            .bookings(cancelToken: cancelToken);
       },
       // Surface failures immediately so My Trips can offer an explicit retry.
       retry: (retryCount, error) => null,

@@ -1,5 +1,9 @@
 # Play Store readiness — 6 November 2026
 
+> Later follow-up: [Android 1.0.8+9 fixes and fresh checks](BUILD_REPORT_1.0.8_2026-11-06.md).
+> That candidate is built locally; 1.0.7 (8) remains the uploaded internal release.
+> The follow-up also corrects the older backend deployment observation below.
+
 Repository: `hhhashhhim/KTBUSCLONE`. Branch: `mobile-frontend`.
 Internal release: **1.0.7+8**, package **com.kainattravels.kt_mobile_app**.
 The owner confirmed this is a **new Play listing**.
