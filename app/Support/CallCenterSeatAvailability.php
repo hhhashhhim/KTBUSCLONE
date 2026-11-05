@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 class CallCenterSeatAvailability
 {
     /** Read-only counts for the same service date, seat map and journey used by booking. */
-    public function forDepartures(Collection $details, $user, $terminal): array
+    public function forDepartures(Collection $details, $user, $terminal, bool $partner = false): array
     {
         if ($details->isEmpty()) { return []; }
 
@@ -29,22 +29,24 @@ class CallCenterSeatAvailability
         $routeFares = RouteFare::where('company_id', $user->company_id)
             ->whereIn('route_id', $details->pluck('schedule.route_id')->unique())->orderBy('id')
             ->get(['route_id', 'departure_city_id', 'destination_city_id'])->groupBy('route_id');
-        $allowed = (int) $user->check_allowed_seats === 1 ? $terminal->available_seats : null;
+        $allowed = $partner || (int) $user->check_allowed_seats === 1 ? $terminal->available_seats : null;
         $counts = [];
         foreach ($details as $detail) {
             $fares = $routeFares->get($detail->schedule->route_id, collect());
             $cities = $fares->pluck('departure_city_id')->unique()->values()->all();
             if ($fares->isNotEmpty()) { $cities[] = $fares->last()->destination_city_id; }
+            $seatMap = $partner ? optional($detail->bus_class_map)->seat_map : optional($detail->bus_class)->seat_map;
+            $choices = $partner ? optional(optional($detail->schedule)->route)->online_seat_choices : null;
             $counts[$detail->id] = $this->count(
-                optional($detail->bus_class)->seat_map,
+                $seatMap,
                 $tickets->get($detail->schedule_id . ':' . $detail->schedule_date, collect()),
-                $cities, $detail->departure_id, $detail->destination_id, $allowed
+                $cities, $detail->departure_id, $detail->destination_id, $allowed, $choices
             );
         }
         return $counts;
     }
 
-    private function count($seatMap, Collection $tickets, array $cities, $departure, $destination, ?string $allowed): ?int
+    private function count($seatMap, Collection $tickets, array $cities, $departure, $destination, ?string $allowed, ?string $choices = null): ?int
     {
         $from = array_search($departure, $cities);
         $to = array_search($destination, $cities);
@@ -60,7 +62,9 @@ class CallCenterSeatAvailability
                 if (!in_array($seat['type'] ?? 0, [0, '0', null, ''], true)) { continue; }
                 // Sleeper labels identify different physical seats (e.g. 1-UP and 1-DN).
                 $number = SeatNumber::normalize($seat['seatNo']);
-                if ($number !== '' && $number !== '0' && ($allowed === null || $this->allowed((int) $number, $allowed))) {
+                $numericSeat = (int) preg_replace('/[^0-9]/', '', $number);
+                if ($number !== '' && $number !== '0' && ($allowed === null || $this->allowed($numericSeat, $allowed))
+                    && ($choices === null || $this->allowed($numericSeat, $choices))) {
                     $seats[$number] = true;
                 }
             }
@@ -77,6 +81,12 @@ class CallCenterSeatAvailability
             if ($ticketFrom < $to && $ticketTo > $from) { unset($seats[$number]); }
         }
         return count($seats);
+    }
+
+    /** The partner list uses the same journey overlap rule as the call-center preview. */
+    public function forPartnerSchedules(Collection $details, $user, $terminal): array
+    {
+        return $this->forDepartures($details, $user, $terminal, true);
     }
 
     private function allowed(int $seat, ?string $restriction): bool

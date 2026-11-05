@@ -42,6 +42,7 @@ use Illuminate\Support\Facades\Cache;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use App\Support\SeatNumber;
+use App\Support\CallCenterSeatAvailability;
 use App\Services\UpcomingScheduleService;
 
 class BookingApiController extends Controller
@@ -154,7 +155,8 @@ class BookingApiController extends Controller
             $terminalId = Auth::user()->terminal_id;
             // Data
             $visibleScheduleIds = ScheduleTerminalVisibility::where(["company_id" => Auth::user()->company_id, "terminal_id" => $request->terminal ?? Auth::user()->terminal_id, "visibility" => 1])->pluck("schedule_id");
-            $advanceBookingDays = Terminal::where("id", Auth::user()->terminal_id)->first()->advance_booking;
+            $bookingTerminal = Terminal::where('id', $terminalId)->firstOrFail();
+            $advanceBookingDays = $bookingTerminal->advance_booking;
 
             $data = app(UpcomingScheduleService::class)->query($request->date, (int) $companyId)
                 ->whereIn("schedule_id", $visibleScheduleIds)
@@ -162,7 +164,7 @@ class BookingApiController extends Controller
                     $q->where("hide", 0);
                 })
                 ->with("departure_city:id,name", "destination_city:id,name", "bus_class:id,name,front_icons", "bus_class_map:id,name,seat_map")
-                ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id')
+                ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id', 'schedule.route:id,online_seat_choices')
                 ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => date('Y-m-d', strtotime($request->date)), 'company_id' => $companyId])
                 ->when($advanceBookingDays != null, function ($q) use ($advanceBookingDays) {
                     $q->where("departure_date", '<', now()->addDays($advanceBookingDays)->format("Y-m-d"));
@@ -199,11 +201,7 @@ class BookingApiController extends Controller
                 return new EmptyResource(collect());
             }
 
-            $bookedCounts = Ticket::where('company_id', $companyId)
-                ->whereIn('schedule_id', $data->pluck('schedule_id')->unique())
-                ->whereIn('schedule_date', $data->pluck('schedule_date')->unique())
-                ->select('schedule_id', 'schedule_date')->selectRaw('COUNT(*) AS booked_count')
-                ->groupBy('schedule_id', 'schedule_date')->get()->keyBy($tripKey);
+            $availableSeats = app(CallCenterSeatAvailability::class)->forPartnerSchedules($data, Auth::user(), $bookingTerminal);
             $terminalTimes = TerminalTimeDifference::where([
                 'company_id' => $companyId, 'terminal_id' => $terminalId,
             ])->whereIn('route_id', $routeIds)->get()->unique('route_id')->keyBy('route_id');
@@ -239,7 +237,7 @@ class BookingApiController extends Controller
                 'to_city_id' => $request->destination_city_id,
             ])->first()->time_difference ?? '00:00';
 
-            $data->each(function ($single) use ($bookedCounts, $tripKey, $terminalTimes, $fareClasses, $fares, $surcharges, $discounts, $terminalDiscounts, $fareTableTime) {
+            $data->each(function ($single) use ($availableSeats, $terminalTimes, $fareClasses, $fares, $surcharges, $discounts, $terminalDiscounts, $fareTableTime) {
                 $sub = 0;
                 $terminalTime = $terminalTimes->get($single->schedule->route_id);
                 if ($terminalTime) {
@@ -275,10 +273,8 @@ class BookingApiController extends Controller
 
                 unset($single->bus_class_map);
 
-                $booked = (int) optional($bookedCounts->get($tripKey($single)))->booked_count;
-
                 $single->total_seats = $count;
-                $single->available_seats = $count - $booked;
+                $single->available_seats = $availableSeats[$single->id] ?? null;
 
 
                 $original_fare = [];
