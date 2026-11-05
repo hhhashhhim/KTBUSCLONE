@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
-/** Portal quota: distinct advance-paid intermediate seats across every terminal of a dated trip. */
+/** Portal quota: distinct paid intermediate seats across every terminal of a dated trip. */
 class ScheduleQuotaService
 {
     public function context(ScheduleDetail $detail, bool $lock = false): array
@@ -78,9 +78,10 @@ class ScheduleQuotaService
     {
         $cities = $context['cities'];
         return $ticket->type === 'booked' && !$ticket->deleted_at
+            // Paid midway tickets qualify for reuse even when sold after departure.
+            // The advance booking cap still lifts at departure in assertAvailable().
             && ((int) $ticket->departure_city_id !== (int) $cities[0]
-                || (int) $ticket->destination_city_id !== (int) end($cities))
-            && (!$ticket->booked_time || (string) $ticket->booked_time < $context['departure_at']);
+                || (int) $ticket->destination_city_id !== (int) end($cities));
     }
 
     public function preview(ScheduleDetail $detail, $tickets, array $seatMap): array

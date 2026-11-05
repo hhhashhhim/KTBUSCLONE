@@ -101,13 +101,33 @@ class ScheduleQuotaDiscountTest extends TestCase
             $this->assertEquals($expected, $quotes[0]['fare']);
         }
     }
-    public function test_before_and_after_segments_qualify_but_other_dates_and_post_departure_sales_do_not(): void {
+    public function test_before_and_after_segments_and_post_departure_sales_qualify_but_other_dates_do_not(): void {
         DB::table('tickets')->update(['departure_city_id'=>20,'destination_city_id'=>30]);
         $this->assertSame('Yes',$this->preview(2)[0][0]['is_special']);
         $this->assertSame('Yes',$this->preview(4)[0][0]['is_special']);
         DB::table('tickets')->where('seat_no','1')->update(['schedule_date'=>'2026-10-22']);
         DB::table('tickets')->where('seat_no','2')->update(['booked_time'=>'2026-10-21 23:05:00']);
-        $this->assertSame(['No','No','No'],array_column($this->preview(4)[0],'is_special'));
+        $this->assertSame(['No','Yes','No'],array_column($this->preview(4)[0],'is_special'));
+    }
+    public function test_ticket_sold_at_1409_after_1400_departure_is_pink_and_discounted_onward(): void {
+        Carbon::setTestNow('2026-11-05 14:10:00');
+        DB::table('schedules')->update(['time'=>'14:00:00']);
+        DB::table('schedule_details')->update(['schedule_date'=>'2026-11-05', 'departure_date'=>'2026-11-05', 'departure_time'=>'14:00:00']);
+        DB::table('schedule_details')->where('id',4)->update(['departure_time'=>'21:00:00']);
+        DB::table('tickets')->update(['schedule_date'=>'2026-11-05', 'booked_time'=>'2026-11-05 14:09:00', 'destination_city_id'=>30]);
+        DB::table('tickets')->where('seat_no','1')->update(['seat_no'=>'18']);
+        DB::table('tickets')->where('seat_no','2')->update(['seat_no'=>'26']);
+        $detail = ScheduleDetail::findOrFail(4); // Multan -> Karachi.
+        $map = [[['seatNo'=>'18','class'=>1,'reserved'=>true,'fare'=>2700], ['seatNo'=>'26','class'=>1,'reserved'=>true,'fare'=>2700]]];
+        DB::table('schedule_quota_terminal_discounts')->update(['percentage'=>15]);
+        $quota = app(\App\Services\ScheduleQuotaService::class)->preview($detail, Ticket::all(), $map);
+        $this->assertSame([true,true], array_column($quota['seat_map'][0], 'quota_reuse'));
+        $this->assertSame(2, $quota['quota']['used']);
+        $this->assertTrue($quota['quota']['departed']);
+        $result = $this->service->preview($detail, Ticket::all(), $map, Auth::user());
+        $this->assertSame(['Yes','Yes'], array_column($result[0], 'is_special'));
+        $this->assertEquals([2300,2300], array_column($result[0], 'fare'));
+        $this->assertEquals([400,400], array_column($result[0], 'quota_discount'));
     }
     public function test_user_company_permissions_and_blank_quota_bound_discount(): void {
         foreach ([2,3,4] as $id) { Auth::setUser(User::find($id)); $this->assertSame('No',$this->preview()[0][0]['is_special']); }

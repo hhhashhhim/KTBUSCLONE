@@ -16,9 +16,9 @@ company), falling back to the logged-in user's terminal when not supplied.
 ## Eligibility and accounting
 
 - A finite quota must be configured. Blank/unlimited disables quota discounts.
-- The seat must already count in quota: a live, paid midway ticket booked before
-  the starting-city departure time. Existing legacy tickets with no booking time
-  follow the established quota counting rule.
+- The seat must already count in quota: a live, paid midway ticket, including
+  tickets sold or confirmed after the starting-city departure time. Booking time
+  does not disqualify a paid midway seat from pink-seat reuse or quota discounts.
 - The selected journey must be non-overlapping with all active bookings of the
   same seat on that dated departure. Earlier and onward segments both qualify.
 - Full-route/overlapping/blocked seats, unpaid or cancelled qualifying bookings,
@@ -29,8 +29,9 @@ company), falling back to the logged-in user's terminal when not supplied.
   The payable amount never exceeds its pre-quota fare. The recorded saving is
   the difference after rounding; small discounts may round away. Non-quota
   fares are unchanged. Portal and both partner APIs share this calculation.
-- The discount remains available after departure on seats that were already
-  counted in advance quota; post-departure initial sales do not qualify a seat.
+- The discount remains available after departure, including seats first sold
+  after departure. The quota usage count includes distinct paid midway seats;
+  the booking cap still lifts at the starting-city departure time.
 - Booking rechecks the actual seat, class, eligibility and fare while holding
   the schedule lock. Stale prices are rejected with a refresh-seat-map message.
 - Ticket `seat_fare` retains the amount before the quota discount. `discount`

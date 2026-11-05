@@ -245,10 +245,10 @@ class ScheduleQuotaTest extends TestCase
             ['seatNo' => '5', 'type' => 'not_for_sale'], ['seatNo' => '6', 'type' => 'booked', 'gender' => 0],
             ['seatNo' => '7', 'selected' => true], ['driver' => true]]];
         $preview = $this->service->preview(ScheduleDetail::find(3), Ticket::all(), $map);
-        $this->assertSame([true, false, false, false, false, false, true, false], array_column($preview['seat_map'][0], 'quota_reuse'));
+        $this->assertSame([true, false, false, true, false, false, true, false], array_column($preview['seat_map'][0], 'quota_reuse'));
         $this->assertSame('booked', $preview['seat_map'][0][5]['type']);
         $this->assertTrue($preview['seat_map'][0][6]['selected']); // UI selection colour takes priority.
-        $this->assertSame(5, $preview['quota']['used']);
+        $this->assertSame(6, $preview['quota']['used']);
         $before = $this->service->preview(ScheduleDetail::find(2), Ticket::all(), [[['seatNo' => '1-DN']]]);
         $this->assertFalse($before['seat_map'][0][0]['quota_reuse']);
     }
