@@ -4377,12 +4377,13 @@ export default {
         },
 
         getTitle: function (col) {
-            if (col.quota_reuse && !col.type) {
-                return 'Available for this selected journey, before or after the existing booking. Prefer this seat: it is already counted in the quota, so reusing it does not use additional quota.';
-            }
+            const reuseMessage = col.quota_reuse && !col.type
+                ? 'Available for this selected journey, before or after the existing booking. Prefer this seat: it is already counted in the quota, so reusing it does not use additional quota.'
+                : '';
             if (col.type == 'booked' || col.type == 'advance booking' || col.type == 'over-issue' || col.id) {
-                return "Name : " + col.customer_name + '\n' + "Phone : " + (this.auth_terminal.other_terminal_passenger_detail == 1 || col.terminal == this.auth_terminal.id ? col.customer_phone : "---") + '\n' + "Seat Fare : " + col.seat_fare + '\n' + "Remarks : " + col.remarks + '\n' + "Terminal : " + (col.terminal_name || "N/A") + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
+                return (reuseMessage ? reuseMessage + '\n\nPrevious booking\n' : '') + "Name : " + col.customer_name + '\n' + "Phone : " + (this.auth_terminal.other_terminal_passenger_detail == 1 || col.terminal == this.auth_terminal.id ? col.customer_phone : "---") + '\n' + "Seat Fare : " + col.seat_fare + '\n' + "Remarks : " + col.remarks + '\n' + "Terminal : " + (col.terminal_name || "N/A") + '\n' + "Booked By : " + col.booked_by + '\n' + "Dept City : " + col.departure_city_name + '\n' + "Dest City : " + col.destination_city_name;
             }
+            return reuseMessage || undefined;
         },
 
         getStyle: function (col) {

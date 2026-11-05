@@ -29,6 +29,28 @@ assert.match(rescheduleClasses({ quota_reuse: true }), /quota-reuse-seat/);
 assert.doesNotMatch(rescheduleClasses({ quota_reuse: true, alreadyBooked: true }), /quota-reuse-seat/);
 assert.match(seatMethod('getTitle')({ quota_reuse: true }), /does not use additional quota/);
 assert.match(seatMethod('getTitle')({ quota_reuse: true }), /before or after/);
+const title = seatMethod('getTitle');
+const viewer = { auth_terminal: { id: 4, other_terminal_passenger_detail: 0 } };
+const previousBooking = {
+    id: 123, quota_reuse: true, seatNo: '18', terminal: 1,
+    customer_name: 'Test passenger', customer_phone: '03000000000', seat_fare: 2100,
+    remarks: 'Test booking', terminal_name: 'Rawalpindi terminal', booked_by: 'Test operator',
+    departure_city_name: 'Rawalpindi', destination_city_name: 'Multan',
+};
+const pinkTitle = title.call(viewer, previousBooking);
+for (const detail of ['Previous booking', 'Name : Test passenger', 'Seat Fare : 2100',
+    'Remarks : Test booking', 'Terminal : Rawalpindi terminal', 'Booked By : Test operator',
+    'Dept City : Rawalpindi', 'Dest City : Multan', 'Phone : ---']) {
+    assert.ok(pinkTitle.includes(detail), detail);
+}
+assert.ok(!pinkTitle.includes(previousBooking.customer_phone));
+assert.match(title.call(viewer, { ...previousBooking, terminal: 4 }), /Phone : 03000000000/);
+assert.match(title.call({ auth_terminal: { id: 4, other_terminal_passenger_detail: 1 } }, previousBooking), /Phone : 03000000000/);
+const normalTitle = title.call(viewer, { ...previousBooking, type: 'booked' });
+assert.ok(normalTitle.startsWith('Name : Test passenger'));
+assert.ok(!normalTitle.includes('Previous booking'));
+assert.equal(title.call(viewer, {}), undefined);
+assert.equal(previousBooking.type, undefined); // Hover must not mark the available seat booked.
 const bookingSource = fs.readFileSync(files[0], 'utf8');
 assert.ok(bookingSource.includes('Available segment — reuse first'));
 assert.ok(!bookingSource.includes('Available onward — reuse first'));
