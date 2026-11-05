@@ -67,6 +67,14 @@ return [
             'days' => 14,
         ],
 
+        // Opt in with LOG_CHANNEL=mobile_daily on the isolated mobile API host.
+        'mobile_daily' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/mobile.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => max(1, (int) env('MOBILE_LOG_RETENTION_DAYS', 30)),
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

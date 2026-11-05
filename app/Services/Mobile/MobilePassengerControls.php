@@ -26,6 +26,9 @@ class MobilePassengerControls
     {
         $row = Schema::hasTable('mobile_app_policies') ? DB::table('mobile_app_policies')->where('company_id', $company)->first() : null;
         $settings = array_replace(self::DEFAULTS, $row ? (json_decode($row->settings, true) ?: []) : []);
+        foreach (['daily_seat_limit' => 20, 'monthly_seat_limit' => 100] as $key => $default) {
+            $settings[$key] = $settings[$key] ?? config('mobile.' . $key, $default);
+        }
         foreach (self::DEFAULTS as $key => $default) {
             $settings[$key] = is_bool($default) ? (bool) $settings[$key] : ($settings[$key] === null ? null : (int) $settings[$key]);
         }
@@ -164,6 +167,18 @@ class MobilePassengerControls
         if (!$policy['bookings_enabled'] || !$control['bookings_enabled']) {
             throw new RuntimeException('New mobile bookings are disabled. Please contact passenger support.', 403);
         }
+        $maximumPending = max(1, (int) config('mobile.maximum_pending_reservations', 2));
+        $pending = DB::table('invoices as i')
+            ->where('i.company_id', $account->company_id)->where('i.passenger_account_id', $account->id)
+            ->whereNull('i.deleted_at')->whereExists(function ($query) use ($account) {
+                $query->selectRaw('1')->from('tickets as t')->whereColumn('t.invoice_id', 'i.id')
+                    ->where('t.company_id', $account->company_id)->whereNull('t.deleted_at')
+                    ->whereIn('t.type', ['advance booking', 'reserved', 'pending booking'])
+                    ->where('t.date', '>=', Carbon::now('Asia/Karachi')->toDateString());
+            })->limit($maximumPending)->pluck('i.id')->count();
+        if ($pending >= $maximumPending) {
+            throw new RuntimeException('Please complete your existing reservations before making another booking.', 409);
+        }
         $limits = ['daily' => $control['daily_seat_limit'] ?? $policy['daily_seat_limit'],
             'monthly' => $control['monthly_seat_limit'] ?? $policy['monthly_seat_limit']];
         if ($limits['daily'] === null && $limits['monthly'] === null) { return; }
@@ -178,7 +193,7 @@ class MobilePassengerControls
     // Must be the first read in the booking transaction: concurrent schedules share this account lock.
     public static function lockForBooking(PassengerAccount $account, int $seats): void
     {
-        if (self::installed()) {
+        if (Schema::hasTable('passenger_accounts')) {
             $account = PassengerAccount::where('company_id', $account->company_id)->whereKey($account->id)->lockForUpdate()->first();
             if (!$account) { throw new RuntimeException('Passenger account not found.', 403); }
         }

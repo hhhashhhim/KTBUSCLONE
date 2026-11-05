@@ -26,8 +26,13 @@ class MobileNotificationInbox
     }
     public static function record(int $company, int $account, string $key, string $kind, string $title, string $body, ?int $invoice = null): void
     {
-        DB::table('mobile_notifications')->insertOrIgnore(['company_id' => $company, 'passenger_account_id' => $account,
-            'event_key' => $key, 'kind' => $kind, 'title' => $title, 'body' => $body, 'invoice_id' => $invoice, 'created_at' => now()]);
+        DB::transaction(function () use ($company, $account, $key, $kind, $title, $body, $invoice) {
+            // Serialize with deletion; a previously selected recipient may no longer exist.
+            $recipient = PassengerAccount::where('company_id', $company)->whereKey($account)->lockForUpdate()->first();
+            if (!$recipient) { return; }
+            DB::table('mobile_notifications')->insertOrIgnore(['company_id' => $company, 'passenger_account_id' => $account,
+                'event_key' => $key, 'kind' => $kind, 'title' => $title, 'body' => $body, 'invoice_id' => $invoice, 'created_at' => now()]);
+        });
     }
     public static function present($row): array
     {

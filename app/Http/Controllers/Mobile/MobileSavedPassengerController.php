@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Mobile\Concerns\RespondsWithMobileApi;
 use App\Http\Requests\Mobile\SavePassengerRequest;
 use App\Http\Resources\Mobile\SavedPassengerResource;
+use App\Models\PassengerAccount;
 use App\Models\SavedPassenger;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MobileSavedPassengerController extends Controller
 {
@@ -30,46 +32,54 @@ class MobileSavedPassengerController extends Controller
 
     public function store(SavePassengerRequest $request)
     {
-        $account = $request->user();
-        $existing = SavedPassenger::query()
-            ->where('passenger_account_id', $account->id)
-            ->where('cnic', $request->cnic)
-            ->first();
-        $item = SavedPassenger::updateOrCreate(
-            [
-                'passenger_account_id' => $account->id,
-                'cnic' => $request->cnic,
-            ],
-            [
-                'company_id' => $account->company_id,
-                'full_name' => $request->full_name,
-                'mobile' => $request->mobile,
-                'gender' => $request->gender,
-            ]
-        );
+        return DB::transaction(function () use ($request) {
+            $account = $this->lockAccount($request);
+            $item = SavedPassenger::updateOrCreate(
+                [
+                    'passenger_account_id' => $account->id,
+                    'company_id' => $account->company_id,
+                    'cnic' => $request->cnic,
+                ],
+                $request->only(['full_name', 'mobile', 'gender'])
+            );
 
-        return $this->success(
-            (new SavedPassengerResource($item))->resolve(),
-            $existing ? 'Saved passenger updated.' : 'Passenger saved.',
-            $existing ? 200 : 201
-        );
+            return $this->success(
+                (new SavedPassengerResource($item))->resolve(),
+                $item->wasRecentlyCreated ? 'Passenger saved.' : 'Saved passenger updated.',
+                $item->wasRecentlyCreated ? 201 : 200
+            );
+        });
     }
 
     public function update(SavePassengerRequest $request, $savedPassenger)
     {
-        $item = $this->findOwned($request, $savedPassenger);
-        $item->update($request->only(['full_name', 'cnic', 'mobile', 'gender']));
+        return DB::transaction(function () use ($request, $savedPassenger) {
+            $this->lockAccount($request);
+            $item = $this->findOwned($request, $savedPassenger);
+            $item->update($request->only(['full_name', 'cnic', 'mobile', 'gender']));
 
-        return $this->success(
-            (new SavedPassengerResource($item->fresh()))->resolve(),
-            'Saved passenger updated.'
-        );
+            return $this->success(
+                (new SavedPassengerResource($item->fresh()))->resolve(),
+                'Saved passenger updated.'
+            );
+        });
     }
 
     public function destroy(Request $request, $savedPassenger)
     {
-        $this->findOwned($request, $savedPassenger)->delete();
-        return $this->success(null, 'Saved passenger removed.');
+        return DB::transaction(function () use ($request, $savedPassenger) {
+            $this->lockAccount($request);
+            $this->findOwned($request, $savedPassenger)->delete();
+            return $this->success(null, 'Saved passenger removed.');
+        });
+    }
+
+    private function lockAccount(Request $request): PassengerAccount
+    {
+        $account = PassengerAccount::where('company_id', $request->user()->company_id)
+            ->whereKey($request->user()->id)->lockForUpdate()->first();
+        abort_unless($account, 401);
+        return $account;
     }
 
     private function findOwned(Request $request, $id): SavedPassenger

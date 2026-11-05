@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\MobilePayment;
+use App\Jobs\Mobile\ReconcilePayment;
+use App\Services\Mobile\MobileBackgroundQueue;
 use App\Services\Mobile\MobilePaymentService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Schema;
@@ -16,16 +18,20 @@ class ReconcileMobilePayments extends Command
     public function handle(MobilePaymentService $payments): int
     {
         if (config('mobile_payments.preview_only') || !Schema::hasTable('mobile_payments')) { return 0; }
-        MobilePayment::where(function ($query) {
+        $queued = MobileBackgroundQueue::enabled();
+        MobilePayment::where('company_id', (int) config('mobile.company_id'))->where(function ($query) {
             $query->where('status', 'pending')->orWhere(function ($query) {
                 $query->where('status', 'expired')->whereNotNull('started_at')
                     ->where('created_at', '>=', now()->subDays(7))->where(function ($query) {
                         $query->whereNull('checked_at')->orWhere('checked_at', '<=', now()->subMinutes(30));
                     });
             });
-        })->chunkById(100, function ($rows) use ($payments) {
+        })->chunkById(100, function ($rows) use ($payments, $queued) {
             foreach ($rows as $payment) {
-                try { $payments->refresh($payment); }
+                try {
+                    if ($queued) { ReconcilePayment::dispatch($payment->id, $payment->company_id); }
+                    else { $payments->refresh($payment); }
+                }
                 catch (\Throwable $e) {
                     Log::warning('Mobile payment reconciliation needs attention.', ['payment_id' => $payment->public_id]);
                 }

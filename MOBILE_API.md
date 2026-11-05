@@ -4,6 +4,37 @@ Base path: `/api/mobile/v1`
 
 The mobile API is isolated from the staff-facing `/api/web/v1` routes. Full passenger tokens are issued to verified `PassengerAccount` records; temporary signup tokens belong to `PendingPassengerRegistration`. Both types are rejected by staff authentication middleware. `MOBILE_COMPANY_ID`, `MOBILE_TERMINAL_ID`, and `MOBILE_BOOKING_USER_ID` must all point to records in the same company.
 
+## Mobile booking hardening (29 October 2026)
+
+Mobile bookings preserve existing shared customer name/contact records when a
+passenger supplies a matching CNIC. Submitted passenger details stay in the
+consumed mobile quote, linked to its invoice by the new nullable, unique
+`mobile_booking_quotes.invoice_id` column. New booking creation requires the
+`2026_10_29_000001_link_mobile_booking_snapshots.php` migration. Creation and
+history responses keep the same passenger fields, read from the booking snapshot;
+changing a shared customer later does not expose those changes through a new
+mobile booking. History created before this migration retains its existing
+customer-backed presentation. This change does not repair earlier customer edits.
+
+The default mobile allowances are 20 seats/day, 100 seats/month, and two active
+unpaid reservations per account. `MOBILE_DAILY_SEAT_LIMIT`,
+`MOBILE_MONTHLY_SEAT_LIMIT` and `MOBILE_MAXIMUM_PENDING_RESERVATIONS` configure
+these defaults; existing numeric company/passenger overrides remain effective.
+A null company limit now inherits the environment default. Daily/monthly counts
+use existing Pakistan-calendar usage accounting; cancellation does not reset them.
+The unpaid limit considers only that account/company's undeleted invoices with
+active, nondeleted reservation tickets dated today or later. It is checked both
+when quoting and inside the booking transaction while holding the account lock.
+Paying/issuing or cancelling reservations releases unpaid reservation slots.
+
+Exhausted daily/monthly allowances return the existing 403 mobile error envelope.
+The unpaid reservation limit returns 409 with a passenger-facing message. These
+controls are server-authoritative; Flutter should display the API error message.
+No Flutter fare, wallet, payment, or seat-authority logic is added.
+
+`mobile:prune-booking-quotes` runs daily through the existing scheduler. It removes
+only unused quotes expired for over one day. Consumed booking snapshots are kept.
+
 ## Registration security (21 October 2026)
 
 Registration stores submitted details and a password hash in the separate
@@ -426,13 +457,13 @@ WhatsApp mode never logs OTPs, API keys, full phone numbers, or provider respons
 
 `DELETE /api/mobile/v1/account` requires a passenger Sanctum bearer token for the configured company, `Accept: application/json`, and JSON `{ "password": "<current password>", "confirmation": "DELETE" }`. Throttled to 5 requests/minute. Staff tokens and other-company accounts are rejected (403); missing/expired tokens return 401. Invalid fields or wrong password return 422 in the normal `{success, message, data, errors}` envelope. A wrong password does not sign the passenger out. Rate limiting returns 429.
 
-Success: HTTP 200, `{ "success": true, "message": "Your mobile account has been deleted.", "data": null, "errors": null }`. A single transaction records an audit event (account ID, company ID, timestamp), physically deletes the passenger account, saved passengers and mobile booking quotes, and revokes all its tokens. Failure rolls everything back. Passwords, OTP/reset digests and email are removed with the account. No OTP is sent for deletion; the current password provides fresh verification.
+Success: HTTP 200, `{ "success": true, "message": "Your mobile account has been deleted.", "data": null, "errors": null }`. A single transaction records a minimal audit event (account ID, company ID, timestamp), physically deletes the passenger account, saved passengers, unused/unlinked booking drafts, biometric sessions and refresh tokens, push registrations and deliveries, inbox messages, login telemetry, account controls and seat-usage counters, and revokes all its access tokens. Failure rolls everything back. Passwords, OTP/reset digests, email and the first-login marker are removed with the account. No OTP is sent for deletion; the current password provides fresh verification. The changed mobile API writers recheck and lock the account before saving; stale mobile requests cannot recreate these records after deletion. The separate ERP campaign writer still needs the coordinated fix documented in MOBILE_DEPLOYMENT.md. An external push already accepted or in flight cannot be recalled.
 
-Shared ERP customer details (including name, contact and CNIC), invoices/tickets, payment records and loyalty records are retained. Account deletion does not cancel bookings, refund payments or erase loyalty balances. Payment reconciliation remains independent of the deleted account. Passengers should save ticket references before proceeding and contact support for existing trips or data retained by the business. A new signup can use the same number, requires normal verification and receives a new account ID; old mobile invoices are not reassigned to it. Customer-linked loyalty records may be available again after signup.
+Shared ERP customer details (including name, contact and CNIC), invoices/tickets, payment records, used or invoice-linked booking passenger snapshots and loyalty records are retained for separate business/legal review. Identity-hash blacklist entries are retained as an explicit anti-abuse exception so deleting an account cannot bypass an existing restriction; hashes remain personal data, not anonymous data. Account deletion does not cancel bookings, refund payments or erase loyalty balances. Payment reconciliation remains independent of the deleted account. Passengers should save ticket references before proceeding and contact support for existing trips or data retained by the business. A new signup can use the same number subject to existing restrictions, requires normal verification and receives a new account ID; old mobile invoices are not reassigned to it. Customer-linked loyalty records may be available again after signup.
 
 Deploy the new `mobile_account_deletions` migration and API before releasing the Flutter flow. No production migration is run by this implementation. The app must display API failures without claiming deletion, and clear its session and passenger caches after confirmed success. If a response is lost, the next request may return 401 because deletion already revoked the token; do not infer success from a network error.
 
-Business follow-up: define and publish retention periods for the shared ERP records and deletion audit. This feature deletes the mobile account; it does not claim complete erasure of all customer data or implement a public web deletion-request page.
+Business follow-up: approve and publish the scoped policy in [MOBILE_DEPLOYMENT.md](MOBILE_DEPLOYMENT.md#data-retention-and-play-data-safety-release-gate). The prepared retention job defaults to dry-run and scheduled execution is disabled. ERP records and fraud restrictions need an owner-approved necessity/expiry review; this is not a claim that all retained fields are legally required. The public deletion-request page and processor deletion workflow remain separate deployment responsibilities.
 
 
 ## Booking history query batching

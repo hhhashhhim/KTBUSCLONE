@@ -30,9 +30,18 @@ class MobileAppTelemetry
         if ((int) $account->company_id !== (int) config('mobile.company_id') || !$this->syncRuntime()) { return; }
         DB::transaction(function () use ($account, $kind) {
             // Serialize first-login classification with login/token changes for this account.
-            PassengerAccount::whereKey($account->id)->where('company_id', $account->company_id)->lockForUpdate()->firstOrFail();
-            $previous = DB::table('mobile_app_login_events')->where('company_id', $account->company_id)
-                ->where('passenger_account_id', $account->id)->exists();
+            $locked = PassengerAccount::whereKey($account->id)->where('company_id', $account->company_id)->lockForUpdate()->firstOrFail();
+            $hasMarker = Schema::hasColumn('passenger_accounts', 'first_mobile_login_at');
+            $first = $hasMarker ? $locked->first_mobile_login_at : null;
+            if (!$first) {
+                $first = DB::table('mobile_app_login_events')->where('company_id', $account->company_id)
+                    ->where('passenger_account_id', $account->id)->min('occurred_at');
+            }
+            $previous = $first !== null;
+            if ($hasMarker && !$locked->first_mobile_login_at) {
+                // Account-lifetime marker prevents history expiry from counting returning users as new.
+                $locked->forceFill(['first_mobile_login_at' => $first ?: now('UTC')])->save();
+            }
             DB::table('mobile_app_login_events')->insert([
                 'company_id' => $account->company_id, 'passenger_account_id' => $account->id,
                 'kind' => $kind, 'first_login' => !$previous, 'occurred_at' => now('UTC'),

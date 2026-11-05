@@ -19,6 +19,7 @@ class MobileNotificationsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config()->set('mobile.background_queue_connection', null);
         config(['database.default' => 'notice_test', 'database.connections.notice_test' => ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => ''],
             'cache.default' => 'array', 'mobile.company_id' => 1, 'mobile_notifications.enabled' => true, 'sanctum.expiration' => 600]);
         Schema::create('passenger_accounts', function (Blueprint $t) { $t->id(); $t->integer('company_id'); $t->string('mobile'); $t->timestamp('mobile_verified_at')->nullable(); $t->timestamps(); });
@@ -30,13 +31,66 @@ class MobileNotificationsTest extends TestCase
         $this->account = PassengerAccount::create(['company_id' => 1, 'mobile' => '03001234567', 'mobile_verified_at' => now()]);
         $this->token = $this->account->createToken('passenger-mobile')->plainTextToken;
     }
+    public function test_mobile_push_jobs_are_private_deduplicated_and_recheck_token_revocation(): void
+    {
+        $this->register(); $this->notice();
+        config()->set('mobile.background_queue_connection', 'database');
+        \Illuminate\Support\Facades\Queue::fake();
+        $service = new MobileNotificationDelivery;
+        $service->run($this->gateway('accepted', 0));
+        $service->run($this->gateway('accepted', 0));
+        \Illuminate\Support\Facades\Queue::assertPushed(\App\Jobs\Mobile\DeliverNotification::class, 1);
+        $job = \Illuminate\Support\Facades\Queue::pushed(\App\Jobs\Mobile\DeliverNotification::class)->first();
+        $this->assertStringNotContainsString('cExampleFirebaseInstallation1', serialize($job));
+        $this->account->tokens()->delete();
+        $job->handle($service, $this->gateway('accepted', 0));
+        $this->assertDatabaseHas('mobile_notification_deliveries', ['id' => $job->deliveryId, 'status' => 'skipped']);
+    }
+
+    public function test_mobile_push_job_delivers_once_and_ignores_foreign_company(): void
+    {
+        $this->register(); $this->notice();
+        config()->set('mobile.background_queue_connection', 'database');
+        \Illuminate\Support\Facades\Queue::fake();
+        $service = new MobileNotificationDelivery;
+        $service->run($this->gateway('accepted', 0));
+        $job = \Illuminate\Support\Facades\Queue::pushed(\App\Jobs\Mobile\DeliverNotification::class)->first();
+        (new \App\Jobs\Mobile\DeliverNotification($job->deliveryId, 2))->handle($service, $this->gateway('accepted', 0));
+        $job->handle($service, $this->gateway());
+        $job->handle($service, $this->gateway('accepted', 0));
+        $this->assertDatabaseHas('mobile_notification_deliveries', ['id' => $job->deliveryId, 'status' => 'accepted']);
+    }
+
+    public function test_mobile_queued_push_waits_while_the_mobile_feature_is_paused(): void
+    {
+        $this->register(); $this->notice();
+        config()->set('mobile.background_queue_connection', 'database');
+        \Illuminate\Support\Facades\Queue::fake();
+        $service = new MobileNotificationDelivery;
+        $service->run($this->gateway('accepted', 0));
+        $job = \Illuminate\Support\Facades\Queue::pushed(\App\Jobs\Mobile\DeliverNotification::class)->first();
+        config()->set('mobile_notifications.enabled', false);
+        $job->handle($service, $this->gateway('accepted', 0));
+        $this->assertDatabaseHas('mobile_notification_deliveries', ['id' => $job->deliveryId, 'status' => 'pending']);
+        config()->set('mobile_notifications.enabled', true);
+        $job->handle($service, $this->gateway());
+        $this->assertDatabaseHas('mobile_notification_deliveries', ['id' => $job->deliveryId, 'status' => 'accepted']);
+    }
+
     protected function tearDown(): void { $this->travelBack(); DB::purge('notice_test'); parent::tearDown(); }
     private function request(string $method, string $path, array $data = [], ?string $token = null) {
         $this->app['auth']->forgetGuards();
         return $this->json($method, '/api/mobile/v1/' . $path, $data, ['Authorization' => 'Bearer ' . ($token ?? $this->token)]);
     }
     private function notice(int $account = 1, int $company = 1, string $key = 'test'): int {
-        Inbox::record($company, $account, $key, 'announcement', 'An update', 'Private passenger message');
+        if (PassengerAccount::whereKey($account)->where('company_id', $company)->exists()) {
+            Inbox::record($company, $account, $key, 'announcement', 'An update', 'Private passenger message');
+        } else {
+            // Historical/mismatched rows are deliberate IDOR fixtures, never valid writer inputs.
+            DB::table('mobile_notifications')->insert(['company_id' => $company, 'passenger_account_id' => $account,
+                'event_key' => $key, 'kind' => 'announcement', 'title' => 'An update',
+                'body' => 'Private passenger message', 'created_at' => now()]);
+        }
         return DB::table('mobile_notifications')->where('event_key', $key)->where('company_id', $company)->where('passenger_account_id', $account)->value('id');
     }
     private function register(string $fid = 'cExampleFirebaseInstallation1'): int {

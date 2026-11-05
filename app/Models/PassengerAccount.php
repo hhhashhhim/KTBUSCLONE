@@ -19,6 +19,7 @@ class PassengerAccount extends Authenticatable
         'otp_digest',
         'password_reset_otp_digest',
         'password_reset_token_digest',
+        'first_mobile_login_at',
     ];
 
     protected $casts = [
@@ -26,6 +27,7 @@ class PassengerAccount extends Authenticatable
         'otp_expires_at' => 'datetime',
         'password_reset_otp_expires_at' => 'datetime',
         'password_reset_token_expires_at' => 'datetime',
+        'first_mobile_login_at' => 'datetime',
     ];
 
     public function customer()

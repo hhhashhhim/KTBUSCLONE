@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Mobile;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Mobile\Concerns\RespondsWithMobileApi;
 use App\Http\Requests\Mobile\DeletePassengerAccountRequest;
-use App\Models\MobileBookingQuote;
 use App\Models\PassengerAccount;
+use App\Services\Mobile\MobileAccountDataDeletion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -35,9 +35,7 @@ class MobileAccountDeletionController extends Controller
                 'company_id' => $account->company_id,
                 'deleted_at' => now(),
             ]);
-            $account->savedPassengers()->delete();
-            MobileBookingQuote::where('passenger_account_id', $account->id)->delete();
-            $account->tokens()->delete();
+            app(MobileAccountDataDeletion::class)->deletePrivateData((int) $account->company_id, (int) $account->id);
             $account->delete();
 
             // Shared ERP customer, ticket, payment and loyalty records remain intact.

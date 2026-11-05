@@ -123,7 +123,13 @@ class MobileBookingService
             )
             : ['points' => 0, 'amount' => 0.0];
 
-        return MobileBookingQuote::create([
+        return DB::transaction(function () use ($account, $input, $detail, $selected, $breakdown, $wallet, $baseFare) {
+            // Recheck after fare lookup: deletion may have completed while this request was reading.
+            $locked = PassengerAccount::whereKey($account->id)->where('company_id', $this->travel->companyId())
+                ->lockForUpdate()->first();
+            if (!$locked) throw new RuntimeException('Your account is no longer available. Please sign in again.', 401);
+            MobilePassengerControls::assertBooking($locked, count($input['seats']));
+            return MobileBookingQuote::create([
             'token' => Str::random(64),
             'passenger_account_id' => $account->id,
             'company_id' => $this->travel->companyId(),
@@ -146,7 +152,8 @@ class MobileBookingService
             'fees' => 0,
             'total' => max(0, $baseFare - $wallet['amount']),
             'expires_at' => now()->addMinutes(10),
-        ]);
+            ]);
+        });
     }
 
     public function create(
@@ -163,9 +170,13 @@ class MobileBookingService
         }
 
         $systemUser = $this->bookingUser();
+        if (!Schema::hasColumn('mobile_booking_quotes', 'invoice_id')) {
+            throw new RuntimeException('Mobile booking is temporarily unavailable. Please contact support.', 503);
+        }
         $quote = MobileBookingQuote::query()
             ->where('token', $quoteToken)
             ->where('passenger_account_id', $account->id)
+            ->where('company_id', $account->company_id)
             ->first();
         if (!$quote) {
             throw new RuntimeException('The fare quote was not found.', 404);
@@ -281,12 +292,15 @@ class MobileBookingService
                         'company_id' => $this->travel->companyId(),
                         'cnic' => $passenger['cnic'],
                     ]);
-                    $customer->fill([
-                        'name' => $passenger['full_name'],
-                        'contact' => $passenger['mobile'],
-                        'added_by' => $customer->exists ? $customer->added_by : $systemUser->id,
-                        'updated_by' => $systemUser->id,
-                    ])->save();
+                    // A CNIC supplied by a booker does not authorize editing its owner.
+                    if (!$customer->exists) {
+                        $customer->fill([
+                            'name' => $passenger['full_name'],
+                            'contact' => $passenger['mobile'],
+                            'added_by' => $systemUser->id,
+                            'updated_by' => $systemUser->id,
+                        ])->save();
+                    }
                     $isLastSeat = $index === $seatCount - 1;
                     $ticketWalletDeduction = $isLastSeat
                         ? $remainingWalletDeduction
@@ -388,7 +402,7 @@ class MobileBookingService
                         'wallet_card_id' => optional($walletCard)->id, 'wallet_points' => $walletPoints,
                     ]);
                 }
-                $quote->update(['used_at' => now()]);
+                $quote->update(['used_at' => now(), 'invoice_id' => $invoice->id]);
                 ActivityLog::create([
                     'activity_by' => $systemUser->id,
                     'message' => 'Passenger mobile advance booking created | invoice id: ' . $invoice->id,
@@ -449,6 +463,11 @@ class MobileBookingService
         if ($invoiceIds->isEmpty()) {
             return [];
         }
+        $snapshots = Schema::hasColumn('mobile_booking_quotes', 'invoice_id')
+            ? MobileBookingQuote::where('company_id', $account->company_id)
+                ->where('passenger_account_id', $account->id)->whereIn('invoice_id', $invoiceIds)
+                ->whereNotNull('used_at')->get()->keyBy('invoice_id')
+            : collect();
         $payments = Schema::hasTable('mobile_payments')
             ? MobilePayment::whereIn('invoice_id', $invoiceIds)
                 ->where('company_id', $account->company_id)
@@ -465,16 +484,17 @@ class MobileBookingService
             ->orderBy('id')
             ->get()->groupBy('invoice_id');
 
-        return $invoiceIds->map(function ($invoiceId) use ($tickets, $payments) {
+        return $invoiceIds->map(function ($invoiceId) use ($tickets, $payments, $snapshots) {
             return $this->presentInvoiceTickets(
                 (int) $invoiceId,
                 $tickets->get($invoiceId, collect()),
-                $payments->get($invoiceId)
+                $payments->get($invoiceId),
+                $snapshots->get($invoiceId)
             );
         })->all();
     }
 
-    private function presentInvoiceTickets(int $invoiceId, Collection $tickets, ?MobilePayment $payment): array
+    private function presentInvoiceTickets(int $invoiceId, Collection $tickets, ?MobilePayment $payment, ?MobileBookingQuote $snapshot = null): array
     {
         if ($tickets->isEmpty()) {
             throw new RuntimeException('The booking was not found.', 404);
@@ -509,11 +529,13 @@ class MobileBookingService
                 return (float) $ticket->seat_fare - (float) $ticket->discount;
             }),
             'qr_value' => $payment && (!$confirmed || $payment->status !== 'paid') ? null : 'KAINAT:' . $invoiceId,
-            'passengers' => $tickets->map(function ($ticket) {
+            'passengers' => $tickets->map(function ($ticket) use ($snapshot) {
+                $passenger = $snapshot ? collect($snapshot->payload['passengers'] ?? [])
+                    ->firstWhere('seat_number', (string) $ticket->seat_no) : null;
                 return [
-                    'full_name' => optional($ticket->customer)->name,
-                    'cnic' => optional($ticket->customer)->cnic,
-                    'mobile' => optional($ticket->customer)->contact,
+                    'full_name' => $snapshot ? ($passenger['full_name'] ?? null) : optional($ticket->customer)->name,
+                    'cnic' => $snapshot ? ($passenger['cnic'] ?? null) : optional($ticket->customer)->cnic,
+                    'mobile' => $snapshot ? ($passenger['mobile'] ?? null) : optional($ticket->customer)->contact,
                     'seat_number' => (string) $ticket->seat_no,
                     'gender' => array_flip(self::TICKET_GENDERS)[(string) $ticket->gender] ?? null,
                 ];

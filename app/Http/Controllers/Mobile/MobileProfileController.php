@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Mobile\Concerns\RespondsWithMobileApi;
 use App\Http\Requests\Mobile\UpdatePassengerProfileRequest;
 use App\Http\Resources\Mobile\PassengerResource;
+use App\Models\PassengerAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -21,8 +22,10 @@ class MobileProfileController extends Controller
 
     public function update(UpdatePassengerProfileRequest $request)
     {
-        $account = $request->user();
-        DB::transaction(function () use ($request, $account) {
+        return DB::transaction(function () use ($request) {
+            $account = PassengerAccount::where('company_id', $request->user()->company_id)
+                ->whereKey($request->user()->id)->lockForUpdate()->first();
+            abort_unless($account, 401);
             $account->update($request->only(['email', 'gender']));
             $account->customer->update(array_filter([
                 'name' => $request->input('full_name'),
@@ -30,11 +33,10 @@ class MobileProfileController extends Controller
             ], function ($value) {
                 return !is_null($value);
             }));
+            return $this->success(
+                (new PassengerResource($account->fresh('customer')))->resolve(),
+                'Passenger profile updated.'
+            );
         });
-
-        return $this->success(
-            (new PassengerResource($account->fresh('customer')))->resolve(),
-            'Passenger profile updated.'
-        );
     }
 }

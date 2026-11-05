@@ -60,9 +60,16 @@ class MobileNotificationController extends Controller
         $input = $request->validate(['token' => 'required|string|min:20|max:4096|regex:/^[A-Za-z0-9_:.-]+$/', 'platform' => ['required', Rule::in(['android', 'ios'])]]);
         $access = $account->currentAccessToken();
         abort_unless($access && $access->id, 401);
-        DB::table('mobile_push_devices')->updateOrInsert(['token_hash' => hash('sha256', $input['token'])],
-            ['company_id' => $account->company_id, 'passenger_account_id' => $account->id, 'access_token_id' => $access->id,
-                'token' => Crypt::encryptString($input['token']), 'platform' => $input['platform'], 'updated_at' => now(), 'created_at' => now()]);
+        DB::transaction(function () use ($account, $access, $input) {
+            // Authentication can precede a concurrent deletion or token revocation.
+            $current = PassengerAccount::where('company_id', $account->company_id)->whereKey($account->id)->lockForUpdate()->first();
+            abort_unless($current, 401);
+            $token = $current->tokens()->whereKey($access->id)->lockForUpdate()->first();
+            abort_unless($token, 401);
+            DB::table('mobile_push_devices')->updateOrInsert(['token_hash' => hash('sha256', $input['token'])],
+                ['company_id' => $current->company_id, 'passenger_account_id' => $current->id, 'access_token_id' => $token->id,
+                    'token' => Crypt::encryptString($input['token']), 'platform' => $input['platform'], 'updated_at' => now(), 'created_at' => now()]);
+        });
         return $this->success(['registered' => true]);
     }
     public function unregisterDevice(Request $request)

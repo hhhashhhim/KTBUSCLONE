@@ -17,6 +17,7 @@ class MobileSchedulingRulesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config()->set('mobile.background_queue_connection', null);
         config()->set('mobile_payments.preview_only', false);
         // These are real model/service/HTTP tests against a disposable connection.
         // Never run the legacy ERP migrations against a developer's configured database.
@@ -33,7 +34,11 @@ class MobileSchedulingRulesTest extends TestCase
         Carbon::setTestNow(Carbon::parse('2026-09-12 12:00:00', 'Asia/Karachi'));
         $this->createSchema();
         $this->seedJourney();
-        Sanctum::actingAs(new PassengerAccount([
+        Schema::create('passenger_accounts', function (Blueprint $table) {
+            $table->id(); $table->integer('company_id'); $table->string('mobile');
+            $table->timestamp('mobile_verified_at')->nullable(); $table->timestamps();
+        });
+        Sanctum::actingAs(PassengerAccount::create([
             'id' => 99, 'company_id' => 1, 'mobile' => '03001234567', 'mobile_verified_at' => now(),
         ]));
     }
@@ -1035,7 +1040,8 @@ class MobileSchedulingRulesTest extends TestCase
         $this->assertCount(1, $single['items']);
         $this->assertCount(20, $many['items']);
         $this->assertSame($singleQueries, $manyQueries, "History queries: one invoice=$singleQueries, twenty=$manyQueries");
-        $this->assertLessThanOrEqual(10, $manyQueries);
+        // One additional batch query loads passenger snapshots.
+        $this->assertLessThanOrEqual(11, $manyQueries);
         $this->assertSame(20, $many['pagination']['total']);
         foreach ($many['items'] as $item) {
             $this->assertSame('pending', $item['status']);
@@ -1458,6 +1464,20 @@ class MobileSchedulingRulesTest extends TestCase
         $this->assertQuoteAddsUp($quote->json('data'));
     }
 
+    public function test_account_deleted_during_quote_lookup_cannot_recreate_passenger_data(): void
+    {
+        config()->set('mobile.features.wallet', true);
+        $loyalty = \Mockery::mock(\App\Services\Mobile\MobileLoyaltyService::class);
+        $loyalty->shouldReceive('deductionFor')->once()->andReturnUsing(function () {
+            // Simulate deletion completing after authentication, before quote persistence.
+            DB::table('passenger_accounts')->where('id', 99)->delete();
+            return ['points' => 0, 'amount' => 0.0];
+        });
+        $this->app->instance(\App\Services\Mobile\MobileLoyaltyService::class, $loyalty);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertUnauthorized();
+        $this->assertDatabaseCount('mobile_booking_quotes', 0);
+    }
+
     public function test_discounts_changed_under_active_surcharge_do_not_change_erp_fare()
     {
         $this->seedSearchAdjustments();
@@ -1629,14 +1649,153 @@ class MobileSchedulingRulesTest extends TestCase
         }
         require_once base_path('database/migrations/2026_07_18_000003_create_mobile_booking_quotes_table.php');
         (new \CreateMobileBookingQuotesTable())->up();
+        require_once database_path('migrations/2026_10_29_000001_link_mobile_booking_snapshots.php');
+        (new \LinkMobileBookingSnapshots())->up();
+    }
+
+    public function test_mobile_booking_preserves_shared_customer_and_uses_submitted_passenger_snapshot(): void
+    {
+        DB::table('customers')->insert(['id' => 700, 'company_id' => 1,
+            'cnic' => '3520212345671', 'name' => 'Existing private customer', 'contact' => '03009999999']);
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        $booking = $this->postJson('/api/mobile/v1/bookings', [
+            'quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter',
+        ])->assertCreated();
+        $this->assertDatabaseHas('customers', ['id' => 700, 'name' => 'Existing private customer', 'contact' => '03009999999']);
+        $this->assertDatabaseCount('customers', 1);
+        $booking->assertJsonPath('data.passengers.0.full_name', 'Test Passenger')
+            ->assertJsonPath('data.passengers.0.mobile', '03001234567');
+        DB::table('customers')->where('id', 700)->update(['name' => 'Later staff edit', 'contact' => '03008888888']);
+        $this->getJson('/api/mobile/v1/bookings/' . $booking->json('data.id'))->assertOk()
+            ->assertJsonPath('data.passengers.0.full_name', 'Test Passenger')
+            ->assertJsonPath('data.passengers.0.mobile', '03001234567');
+        $this->getJson('/api/mobile/v1/bookings')->assertOk()
+            ->assertJsonPath('data.items.0.passengers.0.full_name', 'Test Passenger');
+        Sanctum::actingAs(new PassengerAccount(['id' => 100, 'company_id' => 1, 'mobile_verified_at' => now()]));
+        $this->getJson('/api/mobile/v1/bookings/' . $booking->json('data.id'))->assertNotFound();
+    }
+
+    public function test_missing_mobile_snapshot_migration_prevents_any_booking_writes(): void
+    {
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        Schema::table('mobile_booking_quotes', function (Blueprint $table) {
+            $table->dropUnique(['invoice_id']);
+            $table->dropColumn('invoice_id');
+        });
+        $this->postJson('/api/mobile/v1/bookings', ['quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter'])->assertStatus(503);
+        $this->assertDatabaseCount('customers', 0);
+        $this->assertDatabaseCount('invoices', 0);
+        $this->assertDatabaseCount('tickets', 0);
+    }
+
+    public function test_mobile_pending_limit_rechecks_already_issued_quotes_and_releases_paid_slots(): void
+    {
+        $inputs = [];
+        foreach (['1', '2', '3'] as $seat) {
+            $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput([$seat]))->assertOk();
+            $inputs[] = ['quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter'];
+        }
+        $this->postJson('/api/mobile/v1/bookings', $inputs[0])->assertCreated();
+        $this->postJson('/api/mobile/v1/bookings', $inputs[1])->assertCreated();
+        $this->postJson('/api/mobile/v1/bookings', $inputs[2])->assertStatus(409);
+        $this->assertDatabaseCount('invoices', 2);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput(['3']))->assertStatus(409);
+        DB::table('tickets')->where('seat_no', '1')->update(['type' => 'booked']);
+        $this->postJson('/api/mobile/v1/bookings', $inputs[2])->assertCreated();
+    }
+
+    public function test_mobile_default_daily_limit_applies_to_existing_null_policy(): void
+    {
+        $this->installPassengerQuota();
+        DB::table('mobile_app_policies')->insert(['company_id' => 1,
+            'settings' => json_encode(['daily_seat_limit' => null, 'monthly_seat_limit' => null])]);
+        DB::table('mobile_app_seat_usage')->insert(['company_id' => 1, 'passenger_account_id' => 99,
+            'invoice_id' => 900, 'seats' => 20, 'booked_at' => now()]);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertForbidden()
+            ->assertJsonPath('message', 'Your daily seat limit has been reached. Please contact passenger support.');
+    }
+
+    public function test_mobile_pending_limit_ignores_other_accounts_companies_and_cancelled_tickets(): void
+    {
+        config()->set('mobile.maximum_pending_reservations', 1);
+        foreach ([['passenger_account_id' => 100], ['company_id' => 2], []] as $index => $changes) {
+            $id = 900 + $index;
+            DB::table('invoices')->insert(array_merge(['id' => $id, 'company_id' => 1, 'passenger_account_id' => 99], $changes));
+            DB::table('tickets')->insert(['company_id' => $changes['company_id'] ?? 1, 'invoice_id' => $id,
+                'type' => $index === 2 ? 'canceled' : 'advance booking', 'date' => '2026-09-13']);
+        }
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+    }
+
+    public function test_mobile_quote_pruning_preserves_booked_snapshots_and_recent_quotes(): void
+    {
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        $this->postJson('/api/mobile/v1/bookings', ['quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter'])->assertCreated();
+        DB::table('mobile_booking_quotes')->update(['expires_at' => now()->subDays(2)]);
+        $abandoned = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput(['2']))->assertOk();
+        DB::table('mobile_booking_quotes')->where('token', $abandoned->json('data.quote_token'))->update(['expires_at' => now()->subDays(2)]);
+        $recent = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput(['3']))->assertOk();
+        $this->artisan('mobile:prune-booking-quotes')->assertExitCode(0);
+        $this->assertDatabaseHas('mobile_booking_quotes', ['token' => $quote->json('data.quote_token')]);
+        $this->assertDatabaseHas('mobile_booking_quotes', ['token' => $recent->json('data.quote_token')]);
+        $this->assertDatabaseMissing('mobile_booking_quotes', ['token' => $abandoned->json('data.quote_token')]);
+    }
+
+    public function test_mobile_payment_workers_are_queued_once_and_cannot_process_another_company(): void
+    {
+        $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
+        $payment = \App\Models\MobilePayment::firstOrFail();
+        $foreign = $payment->replicate();
+        $foreign->forceFill(['company_id' => 2, 'public_id' => (string) \Illuminate\Support\Str::uuid(),
+            'quote_id' => 9999, 'invoice_id' => 9999, 'transaction_reference' => 'test-foreign-payment'])->save();
+        config()->set('mobile.background_queue_connection', 'database');
+        \Illuminate\Support\Facades\Queue::fake();
+        $this->artisan('mobile:reconcile-payments')->assertExitCode(0);
+        $this->artisan('mobile:reconcile-payments')->assertExitCode(0);
+        \Illuminate\Support\Facades\Queue::assertPushed(\App\Jobs\Mobile\ReconcilePayment::class, 1);
+        $queued = \Illuminate\Support\Facades\Queue::pushed(\App\Jobs\Mobile\ReconcilePayment::class)->first();
+        $this->assertSame('database', $queued->connection);
+        $this->assertSame('mobile', $queued->queue);
+        $payments = \Mockery::mock(\App\Services\Mobile\MobilePaymentService::class);
+        $payments->shouldReceive('refresh')->once()->with(\Mockery::on(function ($row) use ($payment) {
+            return $row->id === $payment->id && $row->company_id === 1;
+        }))->andReturn($payment);
+        $queued->handle($payments);
+        (new \App\Jobs\Mobile\ReconcilePayment($foreign->id, 1))->handle($payments);
+        (new \App\Jobs\Mobile\ReconcilePayment($payment->id, 2))->handle($payments);
+    }
+
+    public function test_mobile_background_queue_refuses_sync_or_unknown_connections(): void
+    {
+        foreach (['sync', 'not-configured'] as $connection) {
+            config()->set('mobile.background_queue_connection', $connection);
+            try {
+                \App\Services\Mobile\MobileBackgroundQueue::enabled();
+                $this->fail('A non-durable queue connection was accepted.');
+            } catch (\RuntimeException $exception) {
+                $this->assertSame('Mobile background work requires a durable queue connection.', $exception->getMessage());
+            }
+        }
+    }
+
+    public function test_mobile_snapshot_migration_can_repeat_without_changing_shared_schema(): void
+    {
+        $before = [];
+        foreach (['customers', 'tickets', 'invoices'] as $table) {
+            $before[$table] = Schema::getColumnListing($table);
+        }
+        (new \LinkMobileBookingSnapshots())->up();
+        (new \LinkMobileBookingSnapshots())->up();
+        $this->assertTrue(Schema::hasColumn('mobile_booking_quotes', 'invoice_id'));
+        foreach ($before as $table => $columns) {
+            $this->assertSame($columns, Schema::getColumnListing($table));
+        }
     }
 
     private function installPassengerQuota(array $limits = []): void
     {
         require_once database_path('migrations/2026_10_20_000005_create_mobile_passenger_control_policies.php');
         (new \CreateMobilePassengerControlPolicies())->up();
-        Schema::create('passenger_accounts', function (Blueprint $table) { $table->id(); $table->integer('company_id'); $table->string('mobile'); });
-        DB::table('passenger_accounts')->insert(['id' => 99, 'company_id' => 1, 'mobile' => '03001234567']);
         DB::table('mobile_app_passenger_controls')->insert(['company_id' => 1, 'passenger_account_id' => 99] + $limits);
     }
 

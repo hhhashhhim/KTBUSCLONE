@@ -26,6 +26,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('mobile:reconcile-payments')->everyMinute()->withoutOverlapping();
         $schedule->command('mobile:prune-biometric-sessions')->daily()->withoutOverlapping();
         $schedule->command('mobile:prune-pending-registrations')->hourly()->withoutOverlapping();
+        $schedule->command('mobile:prune-booking-quotes')->daily()->withoutOverlapping();
+        $schedule->command('mobile:prune-personal-data --execute')->daily()->withoutOverlapping()
+            ->when(function () { return (bool) config('mobile.retention.enabled', false); });
         $schedule->command('mobile:notifications')->everyMinute()->withoutOverlapping();
         $schedule->command('daily:report')->dailyAt("11:00");
     }

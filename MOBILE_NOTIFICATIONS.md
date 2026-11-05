@@ -140,8 +140,15 @@ deduplication, retries, historical baselining, recent-booking priority, reschedu
 history, sandbox exclusion and migration recovery/MySQL SQL generation.
 No real credentials, production migrations or actual passenger sends are required.
 Real-device delivery remains a separate check after Firebase/APNs and signed builds
-are configured. Retention of notification/audit history is currently unchanged;
-no automatic purge removes historical inbox or campaign records.
+are configured. The prepared `mobile:prune-personal-data` command defaults to a
+dry-run; after explicit activation it expires ordinary inbox/delivery history and
+stale device registrations after 90 days. Confirmed account deletion removes them
+earlier. Active delivery leases are protected during routine age pruning.
+Campaign definitions and booking-notification state remain intact to avoid
+replaying past announcements or booking alerts. Retention changes historical
+message/delivery metrics; do not treat those metrics as lifetime totals.
+Deleting the local FCM token does not delete Firebase installation data. See the
+provider and frontend follow-up in [MOBILE_DEPLOYMENT.md](MOBILE_DEPLOYMENT.md#data-retention-and-play-data-safety-release-gate).
 
 Official references: [FCM Flutter setup](https://firebase.google.com/docs/cloud-messaging/flutter/get-started),
 [HTTP v1 sending](https://firebase.google.com/docs/cloud-messaging/send/v1-api),

@@ -8,6 +8,24 @@ return [
     'terminal_id' => env('MOBILE_TERMINAL_ID'),
     'booking_user_id' => env('MOBILE_BOOKING_USER_ID'),
     'maximum_selectable_seats' => (int) env('MOBILE_MAXIMUM_SELECTABLE_SEATS', 5),
+    'daily_seat_limit' => max(1, (int) env('MOBILE_DAILY_SEAT_LIMIT', 20)),
+    'monthly_seat_limit' => max(1, (int) env('MOBILE_MONTHLY_SEAT_LIMIT', 100)),
+    'maximum_pending_reservations' => max(1, (int) env('MOBILE_MAXIMUM_PENDING_RESERVATIONS', 2)),
+    // A separate connection keeps mobile workers independent of existing ERP jobs.
+    'background_queue_connection' => env('MOBILE_BACKGROUND_QUEUE_CONNECTION'),
+    'background_queue_name' => env('MOBILE_BACKGROUND_QUEUE_NAME', 'mobile'),
+    'notification_batch_size' => max(1, min(5000, (int) env('MOBILE_NOTIFICATION_BATCH_SIZE', 1000))),
+    // Proposed retention policy: preview first, then explicitly enable on the mobile API host.
+    'retention' => [
+        'enabled' => (bool) env('MOBILE_RETENTION_ENABLED', false),
+        'notifications_days' => env('MOBILE_RETENTION_NOTIFICATIONS_DAYS', 90),
+        'login_events_days' => env('MOBILE_RETENTION_LOGIN_EVENTS_DAYS', 90),
+        'push_devices_days' => env('MOBILE_RETENTION_PUSH_DEVICES_DAYS', 90),
+        'deletion_audit_days' => env('MOBILE_RETENTION_DELETION_AUDIT_DAYS', 365),
+        // Unconfirmed until all host, replica, export and backup copies are inventoried.
+        'backup_max_days' => env('MOBILE_RETENTION_BACKUP_MAX_DAYS'),
+        'batch_size' => env('MOBILE_RETENTION_BATCH_SIZE', 500),
+    ],
     'latest_version' => env('MOBILE_LATEST_VERSION', '1.0.0'),
     'minimum_supported_version' => env('MOBILE_MINIMUM_SUPPORTED_VERSION', '1.0.0'),
     'force_update' => (bool) env('MOBILE_FORCE_UPDATE', false),
