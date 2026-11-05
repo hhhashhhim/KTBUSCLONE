@@ -8,19 +8,34 @@ import '../storage/token_storage.dart';
 import 'api_exception.dart';
 
 class ApiClient {
-  ApiClient(this._tokenStorage)
+  ApiClient(this._tokenStorage, {HttpClientAdapter? httpClientAdapter})
     : _dio = Dio(
         BaseOptions(
           baseUrl: AppEnvironmentConfig.apiBaseUrl,
           connectTimeout: const Duration(seconds: 15),
           receiveTimeout: const Duration(seconds: 20),
           sendTimeout: const Duration(seconds: 20),
+          followRedirects: false,
           headers: const {'Accept': 'application/json'},
         ),
       ) {
+    if (httpClientAdapter != null) _dio.httpClientAdapter = httpClientAdapter;
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
+          if (!isTrustedPassengerApiUri(
+            options.uri,
+            Uri.parse(AppEnvironmentConfig.apiBaseUrl),
+          )) {
+            handler.reject(
+              DioException(
+                requestOptions: options,
+                type: DioExceptionType.cancel,
+                error: 'Untrusted passenger API destination.',
+              ),
+            );
+            return;
+          }
           final token = await _tokenStorage.read();
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';

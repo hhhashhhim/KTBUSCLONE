@@ -1186,9 +1186,8 @@ class _PassengerData {
     name.text = fullName;
     cnic.text = cnicValue;
     mobile.text = mobileValue;
-    gender = ['male', 'female', 'other'].contains(genderValue)
-        ? genderValue
-        : 'male';
+    // Preserve saved/profile values; never substitute another identity to book.
+    gender = genderValue;
     loadedFromSaved = fromSaved;
     saveForFuture = false;
   }
@@ -1307,6 +1306,13 @@ class _PassengerDetailsScreenState
   }
 
   Future<void> _continue() async {
+    if (_submitting) return;
+    if (_forms.any((form) => !isSupportedBookingGender(form.gender))) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(UnsupportedBookingGenderNotice.message)),
+      );
+      return;
+    }
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -1452,6 +1458,8 @@ class _PassengerCard extends StatelessWidget {
             ],
           ],
         ),
+        if (!isSupportedBookingGender(data.gender))
+          const UnsupportedBookingGenderNotice(),
         const SizedBox(height: 18),
         Container(
           decoration: BoxDecoration(

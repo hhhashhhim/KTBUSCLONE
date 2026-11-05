@@ -7,14 +7,16 @@ an upload key. Release network traffic must use HTTPS.
 
 ## Upload key
 
-Confirm the Play Console application ID and its registered upload key before
-preparing an update. On 19 October 2026 the public website linked to
-`com.techhord.kainattravels`, which differs from this Flutter project's
-`com.kainattravels.kt_mobile_app`. That public link returned 404 during review.
-Do not use the legacy listing as this app's update URL or silently change the
-Flutter application ID. The owner must confirm whether this is a new listing or
-an update to a registered application. Use the matching existing key; do not
-generate a replacement for an existing listing. Configure it from `kt_mobile_app/`:
+On 6 November 2026 the owner confirmed a **new listing** for
+`com.kainattravels.kt_mobile_app`. A new RSA upload key was generated locally at
+`android/upload-keystore.jks`, alias `upload`, with private credentials in
+`android/key.properties`. Both files are Git-ignored and have owner-only file
+permissions. Back up both securely before uploading. Reuse this key for future
+updates; do not regenerate it. The legacy `com.techhord.kainattravels` app is a
+different listing and was observed as removed in Console.
+
+On another machine, restore the existing upload key and configure it from
+`kt_mobile_app/` (do not overwrite an already configured file):
 
 ```bash
 cp android/key.properties.example android/key.properties
@@ -56,6 +58,16 @@ flutter build apk --release --dart-define-from-file=dart_defines.production.json
   uninstall the test app first (this removes its local session/preferences).
 
 ## Test build
+
+Version 1.0.7 (build 8) adds supported-input validation before passenger saving
+and checkout, preserves unsupported saved/profile gender values, and offers
+call-centre booking assistance. It includes the existing API-origin security
+guards. Signed release artifacts are under `build/play-release/1.0.7-8/`; see
+`PLAY_STORE_READINESS.md` for verification and remaining acceptance gates.
+
+For subsequent builds, update `pubspec.yaml` with a version code greater than any
+already uploaded, then run `bash tool/build_android_release.sh`. This runs
+analysis, tests, and signed AAB/APK builds without uploading them.
 
 Version 1.0.6 (build 7) improves notification registration, foreground alerts,
 cold-start notification routing, and session isolation. The search screen now

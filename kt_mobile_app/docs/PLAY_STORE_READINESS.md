@@ -1,100 +1,170 @@
-# Play Store readiness — 26 October 2026
+# Play Store readiness — 6 November 2026
 
-Repository: `hhhashhhim/KTBUSCLONE`, branch `mobile-frontend`.
+Repository: `hhhashhhim/KTBUSCLONE`. Branch: `mobile-frontend`.
+Internal release: **1.0.7+8**, package **com.kainattravels.kt_mobile_app**.
+The owner confirmed this is a **new Play listing**.
 
-This is a release checklist, not a claim of Google Play approval. Preserve the
-separate frontend, backend and public-website work units.
+## Decision
 
-## Step 1: native privacy policy
+The signed AAB is uploaded and the internal test track is **Active**, with three
+authorized tester accounts selected. Play App Signing is active. Public release
+still requires reviewer-access verification, production acceptance and Play Console
+completion below. No public production release, backend deployment, commit or
+push was performed.
+This report supersedes the readiness checklist dated 26 October; historical QA
+and build reports remain available under their original filenames.
 
-Implemented in the current Flutter source. Every `LegalDocument.privacy` action
-(signup, Account and account deletion) now opens bundled Flutter text. Reading
-does not require authentication, a browser, a WebView, a network or a permission.
-Text is selectable and scrollable, with semantic headings and a bounded reading
-width. Terms retain their existing behavior.
+## Implemented and checked
 
-Content is adapted from <https://www.kainattravels.com/privacy>, retrieved on
-26 October 2026. It preserves the website's data categories, uses, sharing,
-security, updates and contact information, and expands them for the mobile app.
-`lib/core/legal/privacy_policy.dart` is the canonical in-app text. Update its date
-when the policy changes. This is bundled content; website changes will not
-automatically change installed apps.
+- Booking input now explains the confirmed backend gender limitation before
+  checkout, offers call-centre assistance and blocks unsupported values before
+  saving passengers or navigating. Saved/profile values are preserved rather than
+  silently changed. No backend business rule or contract was changed.
+- Six regression tests cover profile Other/unknown, a manually selected Other
+  with saving enabled, saved Other, and valid male/female continuation.
+- Included the pre-existing working-tree API URL/token-origin security guards.
+- Generated a new local RSA upload key for the confirmed new listing; private
+  signing files have permissions 0600 and remain ignored by Git.
+- Built signed AAB and APK with the existing production HTTPS API and Android
+  Firebase settings. Production configuration disables development network logs.
+- Added a repeatable build command: `bash tool/build_android_release.sh`.
 
-Evidence for mobile disclosures:
+| Check actually run | Result |
+| --- | --- |
+| `flutter analyze --no-pub` | Passed; no issues |
+| Full `flutter test --no-pub --reporter expanded` | **225 passed** |
+| New passenger regression suite | **6 passed**; included in full suite |
+| Release AAB build | Passed |
+| Release APK build | Passed |
+| AAB `jarsigner -verify` | `jar verified`; self-signed certificate/no timestamp and ZIP stream-order warnings retained in artifact log |
+| APK `apksigner verify --verbose --print-certs` | Passed; v2 signature, new upload certificate |
+| Official bundletool 1.18.3 `validate` | Passed |
+| Bundle manifest | Correct package, 1.0.7/build 8, target API 36, min API 24; non-debuggable; cleartext and backups disabled |
+| Bundle config | `PAGE_ALIGNMENT_16K` |
+| All eight arm64-v8a/x86_64 native libraries in AAB | PT_LOAD alignment at least 16 KB and matching offset/address alignment |
+| Release APK `zipalign -c -P 16 -v 4` | Passed |
+| Build script `bash -n` and `git diff --check` | Passed |
 
-- Account/profile fields: `lib/features/auth/data/auth_repository.dart`.
-- Booking/payment/loyalty records: travel models and `docs/PAYMENTS.md`.
-- WhatsApp verification: `docs/WHATSAPP_OTP.md`.
-- Optional device registration: `lib/features/notifications/notification_push.dart`.
-- Device-local biometric authentication: `docs/BIOMETRIC_LOGIN.md` and native vaults.
-- Mobile deletion and retained ERP records: `docs/ACCOUNT_DELETION.md` and the
-  existing account-deletion screen. Live deletion has not been verified here.
-- Owner confirmation in this chat on 26 October 2026: mobile-account deletion
-  is immediate; ticket/payment records are kept for the full financial year for
-  tax reporting; call-centre and `info@kainattravels.com` requests result in account
-  deletion. These statements are now included in the native policy. The call-centre
-  number is the published `03-111-777-333`.
+Toolchain: Flutter 3.35.7, Dart 3.9.2, Android build-tools 36.0.0,
+Android Studio bundled JDK 21. Bundletool was downloaded from google/bundletool's
+GitHub release; its download SHA-256 matched the published asset digest.
+Flutter doctor reports some Android SDK licenses unaccepted; installed SDKs were
+sufficient for these successful builds. No new license terms were accepted here.
 
-Privacy is **not fully cleared for submission** yet:
+## Artifacts
 
-1. Ticket/payment retention purpose and period are owner-confirmed. Verify the
-   deployed retention/purge process and clarify the exact financial-year boundary
-   before promising a specific deletion date. Customer details, loyalty records,
-   deletion audit, backups and service-provider copies still need defined retention
-   periods/criteria and legitimate reasons. The app accurately discloses the
-   existing deletion boundary. Implement any necessary changes separately on
-   `mobile-backend`.
-2. Call/email deletion is owner-confirmed and described in the app. Publish the
-   same readily discoverable instructions on an external page and verify their
-   fulfillment. No real support request or production deletion was sent here.
-3. Publish matching text at the public policy URL in the approved website work
-   unit and enter it in Play Console. A native policy does not replace that URL.
-4. Reconcile the release's enabled services and actual backend/provider handling
-   with the policy and Data safety form before declaring compliance.
+Files are in `build/play-release/1.0.7-8/`. The existing build symlink resolves to
+`/Users/malik/development/kt_mobile_app_build/play-release/1.0.7-8/`.
 
-Google policy: <https://support.google.com/googleplay/android-developer/answer/10144311>
+| File | SHA-256 |
+| --- | --- |
+| Kainat-Travels-1.0.7-8.aab | 274dbeeaffab7a69172e591255770cc312cdeee9179002ef2cf1f0386d6528b2 |
+| Kainat-Travels-1.0.7-8.apk | 5fe4edd71b1b5674ec347a70d1917896fb59bd22421bf200dc6f25da3a8ff272 |
 
-### Changed files and verification
+The same directory contains public `upload-certificate.pem`, certificate details,
+verification logs and SHA256SUMS.txt. Private key/password files are NOT copied
+into this artifact directory. Upload certificate SHA-256:
+`2C:3E:E4:67:12:40:1A:67:20:72:CC:8E:47:85:44:06:BB:C9:99:E9:12:3E:76:12:C3:14:AE:B4:A6:08:AB:38`.
 
-- `lib/core/legal/privacy_policy.dart`: bundled policy text and version date.
-- `lib/core/widgets/privacy_policy_screen.dart`: native reading screen.
-- `lib/core/widgets/legal_links.dart`: route all privacy actions to native text.
-- `test/privacy_policy_test.dart`: offline reading, responsive text and signup
-  form/consent preservation.
-- `test/account_deletion_test.dart`: reading privacy preserves the deletion form
-  and sends no deletion request.
-- `docs/PLAY_STORE_READINESS.md`: this release checklist.
+The AAB is the Play upload. The APK is for direct device testing. A debug-signed
+installation cannot be updated with this upload-signed APK. Use a spare device
+or an approved disposable emulator; do not delete an existing installation's data
+without its owner's approval. Play-installed APKs use the Play app signing key.
 
-Checks run for this change:
+## Observed live and Console state
 
-- `flutter analyze --no-pub`: passed, no issues.
-- `flutter test --no-pub test/privacy_policy_test.dart test/account_deletion_test.dart test/auth_layout_test.dart --reporter expanded`:
-  **12 passed**. Includes small phone and landscape at 200% text size, and tablet.
-- `git diff --check`: passed.
+- Public app/config responded HTTP 200; latest/minimum versions were 1.0.0 and
+  Android store URL was empty. Payment environment was live, preview false,
+  and push enabled. This does not prove provider acceptance or correct deployment.
+- Both public privacy and account-deletion pages responded HTTP 200. The deletion
+  page describes in-app, email and call-centre requests. Their fulfillment and
+  retained-data handling have not been tested against production.
+- Chrome confirmed **Tech Hord / Personal**. Contact verification indicators are
+  present; trader status is unset and the account requests a declaration by
+  February 2027. Production has **Create new release** enabled and no explicit
+  12-tester/14-day production-access gate was observed; the dashboard still locks
+  the workflow until initial setup is complete.
+- The displayed app list contains the legacy removed app and a separate rejected
+  draft alongside the new package. The legacy removal reason is missing Data safety;
+  API/16 KB warnings also remain on that old artifact/listing.
+- New Console app ID: `4973980219327601890`, in developer account
+  `5051456537957291644` (**Tech Hord / Personal**). Internal release 1.0.7 (8) is
+  active. [Tester opt-in](https://play.google.com/apps/internaltest/4701697187779665820).
+  Play accepted the AAB with no blocking release errors. Three authorized testers
+  are selected; tester installation access is separate from passenger login.
+- Privacy URL is saved in Console. Public support email, phone and website were
+  saved and verified in Store settings. Listing text, 512 × 512 icon, 1024 × 500
+  feature graphic and two 1080 × 1920 phone screenshots are uploaded and saved
+  in the review queue. The graphic's AI label is set; screenshots are faithful
+  Flutter renders, not physical-device captures. Travel and local category is saved.
+- Saved declarations: Government apps No; Ads No (owner-confirmed own promotions
+  only); no health features; financial rewards/points for Travel Points; target
+  audience 18 and over because adults book for passengers of any age.
+- App access sign-in details are saved. The owner entered the password directly
+  in Console and confirmed a verified account, approved data, no OTP and full
+  feature access without a real purchase. These claims await independent testing.
+  Optional Google credential reuse on trusted partner devices remains off.
+- Pakistan-only production availability is saved and queued for review. Initial
+  setup shows **10 of 11 tasks complete**, with only Data safety pending. Content
+  rating is saved under explicit owner IARC approval: ESRB Everyone, PEGI 3 and
+  IARC Generic 3+, no content descriptors.
+- The Data safety partial draft saves collection Yes, username/password/other
+  authentication and the deletion URL; transport and full category mapping are
+  unanswered. **Send app for review** remains disabled until dashboard setup is
+  complete. Listed changes are queued; no production release is created/submitted.
+- Read-only audit of `mobile-backend` commit
+  `cc2e21d298f194d25fa745b8f9a781a39663aa14` identifies SAR Zone OTP processing,
+  backend sign-in/IP collection and retained ERP identities after account deletion.
+  Notification/device/login records also remain, without an established purge
+  period. The policy's financial-year statement lacks a verified matching purge
+  process. Live deployment, logging, backups, transport and provider purposes/
+  retention require operator confirmation. See the source citations in
+  [PLAY_CONSOLE_HANDOFF.md](PLAY_CONSOLE_HANDOFF.md#backend-audit-findings-blocking-final-declarations).
 
-No new APK/AAB was built or installed for this change. The existing two seat-layout
-failures were reproduced during the preceding review, not rerun or fixed by this
-privacy-only work. No live account deletion or payment was performed.
+## Remaining gates and owners
 
-## Remaining steps
+1. Owner: securely back up `android/upload-keystore.jks` and `android/key.properties`.
+2. Console owner: complete trader/account tasks and accurate Data safety after
+   resolving the backend/operator findings, then review queued listing/country changes
+   and any remaining Console requirements. Do not infer closed-testing gates from
+   account type alone. See [PLAY_CONSOLE_HANDOFF.md](PLAY_CONSOLE_HANDOFF.md).
+3. Owner/backend operator: verify the saved reviewer access and approved journeys;
+   supply a separate disposable account and approved payment/deletion acceptance
+   setup. See [REVIEWER_ACCESS.md](REVIEWER_ACCESS.md). No production test data
+   or authentication bypass was created by this work.
+4. QA: accept OTP → booking → payment/branch confirmation → ticket, failure and
+   recovery cases, notifications, biometrics, deletion, account isolation and
+   Play-installed behavior on physical Android devices. Binary 16 KB checks pass;
+   actual 16 KB runtime testing remains pending. The available emulator reports
+   4096-byte pages; no runtime acceptance is claimed.
+5. Backend deployment work unit (`mobile-backend`): verify deployed security/auth/
+   payment/deletion migrations, provider callbacks and reconciliation, retention
+   and purge rules. Align latest version and new listing URL once available;
+   choose the minimum supported version deliberately and keep force-update off
+   until the destination is usable. No Laravel or server configuration was edited.
 
-| Order | Work | Status / owner |
-| --- | --- | --- |
-| 2 | External account-deletion request page and fulfilled deletion/retention process | Call/email route owner-confirmed; public page and production acceptance unverified. Publish these instructions on the approved website and enter the URL in Play Console. Verify backend retention/deletion separately on `mobile-backend`. |
-| 3 | Data safety, content rating, audience, ads and reviewer access | Play Console owner; audit data handling including providers, and supply a working review account/access instructions. |
-| 4 | Resolve application identity and upload signing; build current release AAB | App currently uses `com.kainattravels.kt_mobile_app`; intended new vs existing listing unresolved. `android/key.properties` absent at review. Existing APK 1.0.2 is debug-signed and not the current 1.0.5+6 source. |
-| 5 | Release quality and device compatibility | Both layout failures were fixed during build preparation; all 201 Flutter tests now pass. Resolve the booking gender contract mismatch from `QA_REPORT_2026-10-26.md`; verify complete deployed booking/payment/deletion flows and 16 KB native-library/bundle compatibility. API 36 target is already configured. |
-| 6 | Developer verification, package registration, listing and required testing | Confirm in Play Console. Personal accounts created after 13 November 2023 require at least 12 testers continuously opted in for 14 days before applying for production access. |
+## Files changed in this preparation
 
-References:
+- `lib/features/travel/presentation/lovable_search_flow.dart`
+- `lib/features/travel/presentation/passenger_details_widgets.dart`
+- `test/passenger_booking_gender_test.dart`
+- `pubspec.yaml`
+- `tool/build_android_release.sh`
+- `docs/ANDROID_RELEASE.md`
+- `docs/PLAY_STORE_READINESS.md`
+- `docs/PLAY_CONSOLE_HANDOFF.md`
+- `docs/REVIEWER_ACCESS.md`
 
-- Account deletion: <https://support.google.com/googleplay/android-developer/answer/13327111>
-- Review setup: <https://support.google.com/googleplay/android-developer/answer/9859455>
-- Release: <https://support.google.com/googleplay/android-developer/answer/9859348>
-- API target: <https://support.google.com/googleplay/android-developer/answer/11926878>
-- 16 KB compatibility: <https://developer.android.com/guide/practices/page-sizes>
-- Registration: <https://support.google.com/googleplay/android-developer/answer/16984799>
-- Personal-account testing: <https://support.google.com/googleplay/android-developer/answer/14151465>
+Generated signing files and release outputs are ignored. Existing edits in
+`lib/core/config/app_environment.dart`, `lib/core/network/api_client.dart`,
+`test/api_security_test.dart` and `docs/SECURITY.md` were preserved and included in
+verification; this work did not author those earlier changes. Unrelated root,
+Laravel and web files were left untouched. Nothing was committed or pushed.
 
-No backend, public website, Play Console, signing key, commit or deployment is
-changed by the native privacy-screen implementation.
+## Primary references
+
+- [API target](https://support.google.com/googleplay/android-developer/answer/11926878)
+- [16 KB compatibility](https://developer.android.com/guide/practices/page-sizes)
+- [Android signing](https://docs.flutter.dev/deployment/android)
+- [Data safety](https://support.google.com/googleplay/android-developer/answer/10787469)
+- [Personal-account testing](https://support.google.com/googleplay/android-developer/answer/14151465)

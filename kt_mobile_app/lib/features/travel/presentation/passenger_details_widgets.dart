@@ -2,6 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/support_links.dart';
+
+// Confirmed against mobile-backend QuoteBookingRequest. The API remains the
+// authority; this prevents an unsupported input reaching checkout.
+bool isSupportedBookingGender(String value) =>
+    value == 'male' || value == 'female';
+
+class UnsupportedBookingGenderNotice extends StatelessWidget {
+  const UnsupportedBookingGenderNotice({super.key});
+
+  static const message =
+      'Online booking currently supports Male and Female only. '
+      'For this passenger, please call 03-111-777-333 for booking assistance.';
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(top: 12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Semantics(liveRegion: true, child: const Text(message)),
+        TextButton.icon(
+          onPressed: () => SupportLinks.open(
+            context,
+            Uri(scheme: 'tel', path: '03111777333'),
+          ),
+          icon: const Icon(Icons.phone_outlined),
+          label: const Text('Call for booking assistance'),
+        ),
+      ],
+    ),
+  );
+}
 
 class PassengerDetailsHeader extends StatelessWidget {
   const PassengerDetailsHeader({super.key});
