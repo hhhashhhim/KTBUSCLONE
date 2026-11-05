@@ -1,5 +1,10 @@
 # Backend upload, then local app testing
 
+For the current 6 November release follow-up, use
+[the scoped release runbook](MOBILE_RELEASE_2026-11-06.md). The earlier hosting
+inspection below is historical: a later read-only check confirmed the mobile API
+at `b78d1cc1`. Always verify the live revision and migration status again.
+
 ## Upload source
 
 Use `/Users/malik/Desktop/Codes/KTBUSCLONE-mobile-backend` on branch

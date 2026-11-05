@@ -20,9 +20,12 @@ class Kernel extends ConsoleKernel
 
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
-        $schedule->command('reserved:cancel')->everyFifteenMinutes();
-        $schedule->command('jazzcash:check-pending-payment')->everyMinute();
+        // The dedicated mobile host shares ERP data but must not duplicate its cron jobs.
+        if (!config('mobile.scheduler_only', false)) {
+            $schedule->command('reserved:cancel')->everyFifteenMinutes();
+            $schedule->command('jazzcash:check-pending-payment')->everyMinute();
+            $schedule->command('daily:report')->dailyAt("11:00");
+        }
         $schedule->command('mobile:reconcile-payments')->everyMinute()->withoutOverlapping();
         $schedule->command('mobile:prune-biometric-sessions')->daily()->withoutOverlapping();
         $schedule->command('mobile:prune-pending-registrations')->hourly()->withoutOverlapping();
@@ -30,7 +33,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('mobile:prune-personal-data --execute')->daily()->withoutOverlapping()
             ->when(function () { return (bool) config('mobile.retention.enabled', false); });
         $schedule->command('mobile:notifications')->everyMinute()->withoutOverlapping();
-        $schedule->command('daily:report')->dailyAt("11:00");
     }
 
     /**

@@ -11,6 +11,8 @@ return [
     'daily_seat_limit' => max(1, (int) env('MOBILE_DAILY_SEAT_LIMIT', 20)),
     'monthly_seat_limit' => max(1, (int) env('MOBILE_MONTHLY_SEAT_LIMIT', 100)),
     'maximum_pending_reservations' => max(1, (int) env('MOBILE_MAXIMUM_PENDING_RESERVATIONS', 2)),
+    // Enable only on a separate mobile API host whose ERP already has its own cron.
+    'scheduler_only' => (bool) env('MOBILE_SCHEDULER_ONLY', false),
     // A separate connection keeps mobile workers independent of existing ERP jobs.
     'background_queue_connection' => env('MOBILE_BACKGROUND_QUEUE_CONNECTION'),
     'background_queue_name' => env('MOBILE_BACKGROUND_QUEUE_NAME', 'mobile'),
