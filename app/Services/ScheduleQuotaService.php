@@ -43,6 +43,10 @@ class ScheduleQuotaService
             'departed' => now()->greaterThanOrEqualTo($departure),
             'intermediate' => (int) $detail->departure_id !== (int) $cities[0]
                 || (int) $detail->destination_id !== (int) end($cities),
+            'exempt' => collect($schedule->quota_exempt_routes ?? [])->contains(function ($pair) use ($detail) {
+                return (int) ($pair['departure_city_id'] ?? 0) === (int) $detail->departure_id
+                    && (int) ($pair['destination_city_id'] ?? 0) === (int) $detail->destination_id;
+            }),
             'cities' => $cities,
         ];
     }
@@ -50,7 +54,7 @@ class ScheduleQuotaService
     public function assertAvailable(ScheduleDetail $detail, array $paidSeats, array $replacedIds = []): array
     {
         $context = $this->context($detail, true);
-        if (!$paidSeats || $context['limit'] === null || $context['departed'] || !$context['intermediate']) {
+        if (!$paidSeats || $context['limit'] === null || $context['departed'] || !$context['intermediate'] || $context['exempt']) {
             return $context;
         }
         // A locking/current read avoids an older REPEATABLE READ snapshot after waiting for the schedule lock.
@@ -67,6 +71,43 @@ class ScheduleQuotaService
             throw ValidationException::withMessages(['quota' => 'Quota for midway routes is completed.']);
         }
         return $context;
+    }
+
+    /** Apply the same paid-seat rule when a partner confirms an unpaid invoice. */
+    public function assertConfirmation($reservations): void
+    {
+        foreach ($reservations->groupBy(function ($ticket) {
+            return $ticket->schedule_id . ':' . $ticket->schedule_date . ':' .
+                $ticket->departure_city_id . ':' . $ticket->destination_city_id;
+        }) as $group) {
+            $first = $group->first();
+            $detail = ScheduleDetail::where('company_id', $first->company_id)
+                ->where('schedule_id', $first->schedule_id)
+                ->where('schedule_date', $first->schedule_date)
+                ->where('departure_id', $first->departure_city_id)
+                ->where('destination_id', $first->destination_city_id)->firstOrFail();
+            $this->assertAvailable($detail, $group->pluck('seat_no')->all());
+        }
+    }
+
+    /** Partner previews must not offer new quota seats after a non-exempt route fills up. */
+    public function partnerPreview(ScheduleDetail $detail, $tickets, array $seatMap): array
+    {
+        $result = $this->preview($detail, $tickets, $seatMap);
+        $quota = $result['quota'];
+        if ($quota['limit'] !== null && !$quota['departed'] && $quota['intermediate']
+            && !$quota['exempt'] && $quota['remaining'] === 0) {
+            foreach ($result['seat_map'] as &$row) {
+                foreach ($row as &$seat) {
+                    if (!empty($seat['reserved']) && empty($seat['type']) && empty($seat['quota_reuse'])) {
+                        $seat['terminal_allow'] = false;
+                    }
+                }
+                unset($seat);
+            }
+            unset($row);
+        }
+        return $result;
     }
 
     private function seatNumbers(array $seats): array

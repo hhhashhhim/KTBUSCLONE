@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Support\CallCenterSeatAvailability;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -24,7 +25,8 @@ class PartnerScheduleAvailabilityTest extends TestCase
         Schema::create('tickets', function (Blueprint $table) {
             $table->id(); $table->integer('company_id'); $table->integer('schedule_id');
             $table->date('schedule_date'); $table->string('seat_no');
-            $table->integer('departure_city_id'); $table->integer('destination_city_id'); $table->softDeletes();
+            $table->integer('departure_city_id'); $table->integer('destination_city_id');
+            $table->string('type')->default('booked'); $table->softDeletes();
         });
         DB::table('routes_fares')->insert([
             ['company_id' => 1, 'route_id' => 1, 'departure_city_id' => 1, 'destination_city_id' => 2],
@@ -46,7 +48,8 @@ class PartnerScheduleAvailabilityTest extends TestCase
         return (object) ['id' => 10, 'schedule_id' => 1, 'schedule_date' => '2026-11-06',
             'departure_id' => 2, 'destination_id' => 3,
             'bus_class_map' => (object) ['seat_map' => $map],
-            'schedule' => (object) ['route_id' => 1, 'route' => (object) ['online_seat_choices' => $choices]]];
+            'schedule' => (object) ['route_id' => 1, 'time' => '23:00:00', 'intermediate_quota' => null,
+                'quota_exempt_routes' => [], 'route' => (object) ['online_seat_choices' => $choices]]];
     }
 
     public function test_midway_sales_do_not_make_onward_journey_appear_sold_out(): void
@@ -72,5 +75,27 @@ class PartnerScheduleAvailabilityTest extends TestCase
             'schedule_date' => '2026-11-06', 'seat_no' => '3',
             'departure_city_id' => 1, 'destination_city_id' => 3]);
         $this->assertSame(0, $service->forPartnerSchedules(collect([$this->detail('3,4')]), $user, $terminal)[10]);
+    }
+
+    public function test_partner_count_uses_only_reusable_seats_at_full_quota_unless_journey_is_exempt(): void
+    {
+        Carbon::setTestNow('2026-11-05 12:00:00');
+        try {
+            foreach ([1, 2] as $seat) {
+                DB::table('tickets')->insert(['company_id' => 1, 'schedule_id' => 1,
+                    'schedule_date' => '2026-11-06', 'seat_no' => (string) $seat,
+                    'departure_city_id' => 1, 'destination_city_id' => 2]);
+            }
+            $detail = $this->detail();
+            $detail->schedule->intermediate_quota = 2;
+            $user = (object) ['company_id' => 1, 'check_allowed_seats' => 0];
+            $terminal = (object) ['available_seats' => null];
+            $service = new CallCenterSeatAvailability;
+            $this->assertSame(2, $service->forPartnerSchedules(collect([$detail]), $user, $terminal)[10]);
+            $detail->schedule->quota_exempt_routes = [['departure_city_id' => 2, 'destination_city_id' => 3]];
+            $this->assertSame(6, $service->forPartnerSchedules(collect([$detail]), $user, $terminal)[10]);
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 }

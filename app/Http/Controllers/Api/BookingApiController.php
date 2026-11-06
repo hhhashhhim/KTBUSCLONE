@@ -164,7 +164,7 @@ class BookingApiController extends Controller
                     $q->where("hide", 0);
                 })
                 ->with("departure_city:id,name", "destination_city:id,name", "bus_class:id,name,front_icons", "bus_class_map:id,name,seat_map")
-                ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id', 'schedule.route:id,online_seat_choices')
+                ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id,intermediate_quota,quota_exempt_routes,time', 'schedule.route:id,online_seat_choices')
                 ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => date('Y-m-d', strtotime($request->date)), 'company_id' => $companyId])
                 ->when($advanceBookingDays != null, function ($q) use ($advanceBookingDays) {
                     $q->where("departure_date", '<', now()->addDays($advanceBookingDays)->format("Y-m-d"));
@@ -275,6 +275,7 @@ class BookingApiController extends Controller
 
                 $single->total_seats = $count;
                 $single->available_seats = $availableSeats[$single->id] ?? null;
+                $single->schedule->makeHidden(['intermediate_quota', 'quota_exempt_routes', 'time']);
 
 
                 $original_fare = [];
@@ -648,7 +649,10 @@ class BookingApiController extends Controller
                     }
                 }
             }
-            $schedule->bus_class->seat_map = app(\App\Services\ScheduleQuotaDiscountService::class)->preview($scheduleDetail, $tickets, $seatMap, Auth::user());
+            $discountedMap = app(\App\Services\ScheduleQuotaDiscountService::class)->preview($scheduleDetail, $tickets, $seatMap, Auth::user());
+            $quotaPreview = app(\App\Services\ScheduleQuotaService::class)->partnerPreview($scheduleDetail, $tickets, $discountedMap);
+            $schedule->bus_class->seat_map = $quotaPreview['seat_map'];
+            $schedule->bus_class->quota = $quotaPreview['quota'];
             $data = $schedule->bus_class;
             $data->total_seats = $count;
             $data->terminal_times = terminalTimes($scheduleDetail, $schedule->route_id);
@@ -751,6 +755,8 @@ class BookingApiController extends Controller
                                 ]);
                             return 'Transaction id updated';
                         }
+                        DB::beginTransaction();
+                        app(\App\Services\ScheduleQuotaService::class)->assertConfirmation($checkAlreadyBooked);
                         Ticket::where("invoice_id", $request->invoice_id)
                             ->where('company_id', $companyId)
                             ->whereIn('type', $pendingSeatTypes)
@@ -760,6 +766,7 @@ class BookingApiController extends Controller
                                 'transaction_id' => $request->transaction_id,
                                 'booked_time'    => date("Y-m-d H:i:s"),
                             ]);
+                        DB::commit();
 
                         Log::info('Ticket booking updated successfully', [
                             'invoice_id'     => $request->invoice_id,
@@ -867,6 +874,10 @@ class BookingApiController extends Controller
                 }
 
                 $request->merge(['selected_seats' => $canonicalSeats]);
+
+                if ($request->book_type === 'booked') {
+                    app(\App\Services\ScheduleQuotaService::class)->assertAvailable($detail, $canonicalSeats);
+                }
 
                 $quotaDiscountQuotes = app(\App\Services\ScheduleQuotaDiscountService::class)->bookingQuotes($detail, $request, 'api');
                 if (!$quotaDiscountQuotes && ($fareValidation = seatFareIsWrong($request))) {

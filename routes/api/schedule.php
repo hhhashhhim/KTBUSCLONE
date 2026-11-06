@@ -8,6 +8,7 @@ Route::group(['prefix' => 'web/v1/schedule','middleware' => ['auth:sanctum']], f
     Route::post('/', [ScheduleController::class, 'index']);
     Route::post('/sync-upcoming', [ScheduleController::class, 'syncUpcomingSchedules']);
     Route::post('/quota', [ScheduleController::class, 'updateQuota']);
+    Route::post('/quota/options', [ScheduleController::class, 'quotaOptions']);
     Route::post('/quota-discount/get', [\App\Http\Controllers\Schedule\ScheduleQuotaDiscountController::class, 'show']);
     Route::post('/quota-discount/save', [\App\Http\Controllers\Schedule\ScheduleQuotaDiscountController::class, 'save']);
     Route::post('/store', [ScheduleController::class, 'storeSchedule']);

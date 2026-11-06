@@ -163,7 +163,7 @@ class TicketingApiController extends Controller
                 ->whereIn("schedule_id",$visibleScheduleIds)
                 ->whereHas('schedule', function($q){$q->where("hide",0);})
                 ->with("departure_city:id,name","destination_city:id,name","bus_class:id,name","bus_class_map:id,name,seat_map")
-                ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id', 'schedule.route:id,online_seat_choices')
+                ->with('schedule:id,name,bus_class_id,route_id,discount_id,surcharge_id,intermediate_quota,quota_exempt_routes,time', 'schedule.route:id,online_seat_choices')
                 ->where(['departure_id' => $request->departure_city_id, 'destination_id' => $request->destination_city_id, 'departure_date' => $request->date,'company_id' => $companyId])
                 ->when($advanceBookingDays!=null, function($q) use ($advanceBookingDays){
                     $q->where("departure_date",'<',now()->addDays($advanceBookingDays)->format("Y-m-d"));
@@ -212,6 +212,7 @@ class TicketingApiController extends Controller
 
                     $single->total_seats = $count;
                     $single->available_seats = $availableSeats[$single->id] ?? null;
+                    $single->schedule->makeHidden(['intermediate_quota', 'quota_exempt_routes', 'time']);
 
 
                     // this loop get all fare classes from seat map and fetch original fare and discount fare
@@ -561,7 +562,10 @@ class TicketingApiController extends Controller
                         $seatMap[$i][$j]['fare'] = customRound($seatMap[$i][$j]['fare']??0);
                     }
                 }
-                $schedule->bus_class->seat_map = app(\App\Services\ScheduleQuotaDiscountService::class)->preview($scheduleDetail, $tickets, $seatMap, Auth::user());
+                $discountedMap = app(\App\Services\ScheduleQuotaDiscountService::class)->preview($scheduleDetail, $tickets, $seatMap, Auth::user());
+                $quotaPreview = app(\App\Services\ScheduleQuotaService::class)->partnerPreview($scheduleDetail, $tickets, $discountedMap);
+                $schedule->bus_class->seat_map = $quotaPreview['seat_map'];
+                $schedule->bus_class->quota = $quotaPreview['quota'];
                 $data = $schedule->bus_class;
 
 
@@ -602,11 +606,14 @@ class TicketingApiController extends Controller
                     $checkAlreadyBooked = Ticket::where("invoice_id",$request->invoice_id)->where(['company_id' => $companyId, "type" => "advance booking"])->get();
                     if($checkAlreadyBooked->count() > 0 )
                     {
-                        Ticket::where("invoice_id",$request->invoice_id)->update([
+                        DB::beginTransaction();
+                        app(\App\Services\ScheduleQuotaService::class)->assertConfirmation($checkAlreadyBooked);
+                        Ticket::where("invoice_id",$request->invoice_id)->where('company_id', $companyId)->where('type', 'advance booking')->update([
                             'type' => 'booked',
                             'updated_by' => Auth::user()->id,
                             'booked_time' => date("Y-m-d H:i:s"),
                         ]);
+                        DB::commit();
                         ActivityLog::create([
                             "activity_by" => Auth::user()->id,
                             "message" => Auth::user()->name." | update ticket (advance to confirm) | time : ".$checkAlreadyBooked[0]->schedule_date." ".$checkAlreadyBooked[0]->schedule_time." | invoice id :".$request->invoice_id,
@@ -701,6 +708,9 @@ class TicketingApiController extends Controller
                 }
 
                 $request->merge(['selected_seats' => $canonicalSeats]);
+                if ($request->book_type === 'booked') {
+                    app(\App\Services\ScheduleQuotaService::class)->assertAvailable($detail, $canonicalSeats);
+                }
                 $quotaDiscountQuotes = app(\App\Services\ScheduleQuotaDiscountService::class)->bookingQuotes($detail, $request, 'legacy');
                 
                 $schedule_time_exact = ScheduleDetail::where(["schedule_id"=>$detail->schedule_id,"schedule_date"=>$detail->schedule_date])->first();

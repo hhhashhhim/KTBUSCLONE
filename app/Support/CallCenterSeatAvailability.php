@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Route\RouteFare;
 use App\Models\Ticket;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Carbon;
 
 class CallCenterSeatAvailability
 {
@@ -22,7 +23,7 @@ class CallCenterSeatAvailability
                         $trip->where('schedule_id', $detail->schedule_id)->where('schedule_date', $detail->schedule_date);
                     });
                 }
-            })->get(['schedule_id', 'schedule_date', 'seat_no', 'departure_city_id', 'destination_city_id'])
+            })->get(['schedule_id', 'schedule_date', 'seat_no', 'departure_city_id', 'destination_city_id', 'type'])
             ->groupBy(function ($ticket) { return $ticket->schedule_id . ':' . $ticket->schedule_date; });
 
         // BookingController::selected/store derive city order from route fares in this order.
@@ -37,16 +38,39 @@ class CallCenterSeatAvailability
             if ($fares->isNotEmpty()) { $cities[] = $fares->last()->destination_city_id; }
             $seatMap = $partner ? optional($detail->bus_class_map)->seat_map : optional($detail->bus_class)->seat_map;
             $choices = $partner ? optional(optional($detail->schedule)->route)->online_seat_choices : null;
+            $quotaUsed = $partner ? $this->restrictedQuotaSeats($detail, $tickets->get($detail->schedule_id . ':' . $detail->schedule_date, collect()), $cities) : null;
             $counts[$detail->id] = $this->count(
                 $seatMap,
                 $tickets->get($detail->schedule_id . ':' . $detail->schedule_date, collect()),
-                $cities, $detail->departure_id, $detail->destination_id, $allowed, $choices
+                $cities, $detail->departure_id, $detail->destination_id, $allowed, $choices, $quotaUsed
             );
         }
         return $counts;
     }
 
-    private function count($seatMap, Collection $tickets, array $cities, $departure, $destination, ?string $allowed, ?string $choices = null): ?int
+    private function restrictedQuotaSeats($detail, Collection $tickets, array $cities): ?array
+    {
+        $schedule = $detail->schedule;
+        if ($schedule->intermediate_quota === null || !$cities) return null;
+        if ((int) $detail->departure_id === (int) $cities[0]
+            && (int) $detail->destination_id === (int) end($cities)) return null;
+        if (collect($schedule->quota_exempt_routes ?? [])->contains(function ($pair) use ($detail) {
+            return (int) ($pair['departure_city_id'] ?? 0) === (int) $detail->departure_id
+                && (int) ($pair['destination_city_id'] ?? 0) === (int) $detail->destination_id;
+        })) return null;
+        $departure = Carbon::parse($detail->schedule_date . ' ' . $schedule->time, config('app.timezone'));
+        if (now()->greaterThanOrEqualTo($departure)) return null;
+        $used = [];
+        foreach ($tickets as $ticket) {
+            if ($ticket->type !== 'booked') continue;
+            if ((int) $ticket->departure_city_id === (int) $cities[0]
+                && (int) $ticket->destination_city_id === (int) end($cities)) continue;
+            $used[SeatNumber::normalize($ticket->seat_no)] = true;
+        }
+        return count($used) >= (int) $schedule->intermediate_quota ? $used : null;
+    }
+
+    private function count($seatMap, Collection $tickets, array $cities, $departure, $destination, ?string $allowed, ?string $choices = null, ?array $quotaUsed = null): ?int
     {
         $from = array_search($departure, $cities);
         $to = array_search($destination, $cities);
@@ -64,7 +88,8 @@ class CallCenterSeatAvailability
                 $number = SeatNumber::normalize($seat['seatNo']);
                 $numericSeat = (int) preg_replace('/[^0-9]/', '', $number);
                 if ($number !== '' && $number !== '0' && ($allowed === null || $this->allowed($numericSeat, $allowed))
-                    && ($choices === null || $this->allowed($numericSeat, $choices))) {
+                    && ($choices === null || $this->allowed($numericSeat, $choices))
+                    && ($quotaUsed === null || isset($quotaUsed[$number]))) {
                     $seats[$number] = true;
                 }
             }

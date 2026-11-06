@@ -70,7 +70,7 @@ class UpcomingScheduleProjectionTest extends TestCase
     private function createFixtures()
     {
         $this->table('schedule_details', ['company_id', 'schedule_id', 'departure_id', 'destination_id', 'bus_class_id'], ['departure_time', 'extra_fixture_field'], ['schedule_date', 'departure_date']);
-        $this->table('schedules', ['company_id', 'route_id', 'bus_class_id', 'discount_id', 'surcharge_id', 'hide'], ['name', 'time']);
+        $this->table('schedules', ['company_id', 'route_id', 'bus_class_id', 'discount_id', 'surcharge_id', 'hide', 'intermediate_quota'], ['name', 'time', 'quota_exempt_routes']);
         $this->table('cities', [], ['name']);
         $this->table('companies', [], ['name']);
         $this->table('customers', [], ['name']);
@@ -308,7 +308,6 @@ class UpcomingScheduleProjectionTest extends TestCase
         (new \CreateScheduleQuotaDiscounts)->up();
         require_once database_path('migrations/2026_10_24_000001_create_schedule_quota_terminal_discounts.php');
         (new \CreateScheduleQuotaTerminalDiscounts)->up();
-        Schema::table('schedules', function (Blueprint $table) { $table->integer('intermediate_quota')->nullable(); });
         DB::table('schedules')->where('id',1)->update(['intermediate_quota'=>10]);
         DB::table('cities')->insert(['id'=>3,'name'=>'Onward city']);
         DB::table('routes_fares')->insert(['route_id'=>1,'departure_city_id'=>2,'destination_city_id'=>3]);
