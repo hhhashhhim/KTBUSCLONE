@@ -1,8 +1,9 @@
 # Play Store readiness — 6 November 2026
 
 > Later follow-up: [Android 1.0.8+9 fixes and fresh checks](BUILD_REPORT_1.0.8_2026-11-06.md).
-> Frontend source is pushed and the mobile backend follow-up is deployed. A Play
-> 1.0.8 draft is saved, but its AAB is not uploaded; 1.0.7 (8) remains active.
+> Frontend source is pushed, the mobile backend follow-up is deployed, and Play
+> internal release 1.0.8 (9) is Active and available to the unchanged three testers
+> (not reviewed). Public production and declaration/acceptance gates remain pending.
 > The 1.0.7 preparation snapshot below is historical; use the follow-up for current
 > deployment, commit and publication status.
 

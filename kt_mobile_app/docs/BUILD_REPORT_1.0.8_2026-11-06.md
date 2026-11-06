@@ -3,13 +3,12 @@
 Repository: `hhhashhhim/KTBUSCLONE`, branch `mobile-frontend`.
 Package: `com.kainattravels.kt_mobile_app`.
 
-**Status:** signed release candidate built and verified locally. Frontend source
-commit `9fbe332e` was pushed to `mobile-frontend`. A Play internal release draft
-named 1.0.8 is saved with release notes, but no AAB was uploaded: Chrome's local-file
-access permission blocked file selection. The owner intends to enable that
-permission; effective access has not yet been verified. The active internal
-release remains 1.0.7 (8), with three authorized testers. This candidate has not
-been submitted, and production remains inactive.
+**Status:** Android **1.0.8 (9)** is uploaded and published to the Play internal
+track, which shows **Active**, latest release **1.0.8**, and **Available to internal
+testers (not reviewed)**. The existing three authorized testers and support
+details are unchanged. Frontend source commit `9fbe332e` was pushed to
+`mobile-frontend`. Public production, Data safety and account/trader declarations
+remain pending.
 
 ## Implemented
 
@@ -39,6 +38,8 @@ Changed frontend source: `lib/features/travel/data/travel_repository.dart`,
 | Android manifest | Correct package/version; min API 24, target API 36; debugging, backups and cleartext disabled |
 | Bundle/native alignment | `PAGE_ALIGNMENT_16K`; all eight arm64/x86_64 libraries have aligned LOAD segments |
 | 16 KB Android runtime startup | Signed APK installed and cold-launched on a fresh API 36 emulator; actual page size 16384; activity resumed and process stable with no app entry in the crash buffer |
+| Play release review | Bundle 9 (1.0.8), min API 24, target API 36; mapping file and native debug symbols attached; no blocking errors or warnings shown |
+| Play internal publication | Save and publish confirmed; track Active, latest release 1.0.8, available to internal testers (not reviewed) |
 | `git diff --check` | Passed |
 
 The build uses existing ignored production settings and upload signing material.
@@ -52,6 +53,12 @@ resolves to `/Users/malik/development/kt_mobile_app_build/`).
 | --- | --- |
 | `Kainat-Travels-1.0.8-9.aab` | `b42ba743a27c421d5ed3147dd2986254c738f3b5635f22bad1abf5b7b9b58c8c` |
 | `Kainat-Travels-1.0.8-9.apk` | `e37b3ffe7f8b07f10c2a449111cb71d6cff88de3481b589fd0b25e55b2b7f344` |
+
+The uploaded AAB is the exact verified artifact above; no rebuild was needed.
+The native file picker worked after selecting the correct Chrome app/tab, without
+changing the extension's file-URL permission. Publication proof:
+`build/play-release/1.0.8-9/play-internal-1.0.8-active.jpg`.
+[Internal tester opt-in](https://play.google.com/apps/internaltest/4701697187779665820).
 
 The directory includes the build log, hashes, artifact checks and signature,
 alignment, manifest and bundletool verification evidence, plus `runtime-16kb.json`
@@ -141,16 +148,16 @@ directory is review material, not an installed fix.
   Keep ERP read-only unless the owner
   changes that instruction; its deletion race remains a release dependency.
   Do not deploy an entire unrelated ERP branch.
-- Upload this new candidate to the intended test track, verify installation, then
-  submit production only after the remaining gates are resolved. Configure latest
+- Verify installation of 1.0.8 from the active internal track, then submit
+  production only after the remaining gates are resolved. Configure latest
   version/store URL when the intended listing is accessible; keep force-update
   off until installation/update works. The current public config still reports
   1.0.0 with empty store URLs and force-update false.
 
-The owner authorized the frontend/backend commits and pushes and the scoped
-mobile server rollout recorded above. The Play change so far is the saved 1.0.8
-draft and its notes; no 1.0.8 AAB upload, test-track rollout or public submission
-is claimed. ERP source and cron were not changed.
+The owner-authorized frontend/backend commits and pushes, scoped mobile server
+rollout, and Play internal publication of 1.0.8 are complete. No public production
+submission or completed functional acceptance is claimed. ERP source and cron
+were not changed.
 
 References: [Google Data safety](https://support.google.com/googleplay/android-developer/answer/10787469),
 [Firebase retention](https://firebase.google.com/support/privacy),
