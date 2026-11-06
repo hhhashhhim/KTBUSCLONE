@@ -165,7 +165,7 @@
 
             <QuotaDiscountModal ref="quotaDiscount" />
             <div class="modal fade" id="scheduleQuotaModal" tabindex="-1" aria-labelledby="scheduleQuotaTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
                     <form class="modal-content" @submit.prevent="saveQuota">
                         <div class="modal-header">
                             <h5 id="scheduleQuotaTitle" class="modal-title">Schedule Quota</h5>
@@ -180,6 +180,14 @@
                             <input id="intermediateQuota" v-model="quotaForm.limit" type="number" min="0" max="100000" step="1"
                                    class="form-control" placeholder="Unlimited" :disabled="quotaSaving" aria-describedby="quotaHelp" />
                             <small id="quotaHelp" class="form-text text-muted">Leave blank for unlimited. Enter 0 to prevent advance paid intermediate bookings.</small>
+                            <div class="mt-3">
+                                <label for="quotaExcludedRoutes">Intermediate journeys exempt from the limit</label>
+                                <div v-if="quotaLoading" class="text-muted" role="status">Loading route journeys...</div>
+                                <select2 v-else id="quotaExcludedRoutes" :key="quotaForm.id" v-model="quotaForm.excluded"
+                                         :options="quotaRouteOptions" :settings="{ multiple: true, width: '100%', dropdownParent: '#scheduleQuotaModal', placeholder: 'Select journeys (optional)', allowClear: true }"
+                                         :disabled="quotaSaving || !quotaLoaded" />
+                                <small class="form-text text-muted">These exact From → To journeys can book paid seats beyond the limit. Their seats still count toward quota usage and appear pink for reuse on non-overlapping journeys.</small>
+                            </div>
                             <div class="alert alert-info mt-3 mb-0">
                                 <p class="mb-2">Shared across all terminals, separately for each dated departure. Each seat number counts once. Reusing seats 1 and 2 for onward journeys still uses only 2 quota seats.</p>
                                 <p class="mb-0">Full-route tickets and unpaid reservations are exempt. The limit ends at the main starting-city departure time. A seat's quota is released when all its qualifying tickets are cancelled or moved.</p>
@@ -188,7 +196,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal" :disabled="quotaSaving">Close</button>
-                            <button type="submit" class="btn btn-primary" :disabled="quotaSaving">{{ quotaSaving ? 'Saving...' : 'Save Quota' }}</button>
+                            <button type="submit" class="btn btn-primary" :disabled="quotaSaving || quotaLoading || !quotaLoaded">{{ quotaSaving ? 'Saving...' : 'Save Quota' }}</button>
                         </div>
                     </form>
                 </div>
@@ -922,7 +930,11 @@ export default {
             },
             loading: false,
             syncingUpcoming: false,
-            quotaForm: { id: null, name: '', route: '', limit: '' },
+            quotaForm: { id: null, name: '', route: '', limit: '', excluded: [] },
+            quotaRouteOptions: [],
+            quotaLoading: false,
+            quotaLoaded: false,
+            quotaRequestId: 0,
             quotaSaving: false,
             quotaError: '',
             upcomingSyncMessage: '',
@@ -1062,18 +1074,39 @@ export default {
         this.destroyScheduleTable();
     },
     methods: {
-        openQuota(schedule) {
+        async openQuota(schedule) {
+            const requestId = ++this.quotaRequestId;
             this.quotaForm = {
                 id: schedule.id,
                 name: schedule.name,
                 route: schedule.route ? schedule.route.name : '',
                 limit: schedule.intermediate_quota == null ? '' : schedule.intermediate_quota,
+                excluded: [],
             };
+            this.quotaRouteOptions = [];
+            this.quotaLoaded = false;
+            this.quotaLoading = true;
             this.quotaError = '';
             $('#scheduleQuotaModal').modal('show');
+            try {
+                const res = await this.callApi('post', 'schedule/quota/options', { id: schedule.id });
+                if (requestId !== this.quotaRequestId) return;
+                if (res.status !== 200) throw new Error(res.data?.message || 'Unable to load route journeys.');
+                this.quotaRouteOptions = res.data.routes.map(pair => ({
+                    id: `${pair.departure_city_id}:${pair.destination_city_id}`, text: pair.name,
+                }));
+                this.quotaForm.excluded = res.data.exempt_routes.map(pair => `${pair.departure_city_id}:${pair.destination_city_id}`);
+                this.quotaLoaded = true;
+            } catch (error) {
+                if (requestId === this.quotaRequestId) {
+                    this.quotaError = error.response?.data?.message || 'Unable to load route journeys. Close and reopen the quota settings to retry.';
+                }
+            } finally {
+                if (requestId === this.quotaRequestId) this.quotaLoading = false;
+            }
         },
         async saveQuota() {
-            if (this.quotaSaving) return;
+            if (this.quotaSaving || !this.quotaLoaded) return;
             const limit = this.quotaForm.limit === '' ? null : Number(this.quotaForm.limit);
             if (limit !== null && (!Number.isInteger(limit) || limit < 0 || limit > 100000)) {
                 this.quotaError = 'Enter a whole number from 0 to 100000, or leave blank for unlimited.';
@@ -1082,7 +1115,14 @@ export default {
             this.quotaSaving = true;
             this.quotaError = '';
             try {
-                const res = await this.callApi('post', 'schedule/quota', { id: this.quotaForm.id, intermediate_quota: limit });
+                const res = await this.callApi('post', 'schedule/quota', {
+                    id: this.quotaForm.id,
+                    intermediate_quota: limit,
+                    quota_exempt_routes: this.quotaForm.excluded.map(value => {
+                        const [departure_city_id, destination_city_id] = value.split(':').map(Number);
+                        return { departure_city_id, destination_city_id };
+                    }),
+                });
                 if (res.status === 200) {
                     $('#scheduleQuotaModal').modal('hide');
                     this.upcomingSyncMessage = res.data.message;
