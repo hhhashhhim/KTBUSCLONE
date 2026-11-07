@@ -46,17 +46,25 @@ class ScheduleQuotaTest extends TestCase
         $this->table('schedules', ['company_id', 'route_id', 'updated_by'], ['time']);
         require_once database_path('migrations/2026_10_16_000001_add_intermediate_quota_to_schedules.php');
         (new \AddIntermediateQuotaToSchedules())->up();
+        require_once database_path('migrations/2026_11_06_000001_add_quota_exempt_routes_to_schedules.php');
+        (new \AddQuotaExemptRoutesToSchedules())->up();
         $this->table('routes');
-        $this->table('routes_fares', ['route_id', 'departure_city_id', 'destination_city_id']);
+        $this->table('routes_fares', ['company_id', 'route_id', 'departure_city_id', 'destination_city_id']);
+        $this->table('cities', ['company_id'], ['name']);
         $this->table('schedule_details', ['company_id', 'schedule_id', 'departure_id', 'destination_id'], ['schedule_date', 'departure_date', 'departure_time']);
         $this->table('tickets', ['company_id', 'schedule_id', 'terminal_id', 'departure_city_id', 'destination_city_id', 'schedule_details_id'], ['schedule_date', 'type', 'seat_no', 'booked_time']);
         $this->table('roles', [], ['permissions']);
         $this->table('activity_logs', ['company_id', 'activity_by'], ['message', 'requested_host']);
         DB::table('schedules')->insert(['id' => 1, 'company_id' => 1, 'route_id' => 1, 'time' => '23:00:00', 'intermediate_quota' => 2]);
         DB::table('routes')->insert(['id' => 1]);
+        DB::table('cities')->insert([
+            ['id' => 10, 'company_id' => 1, 'name' => 'Rawalpindi'],
+            ['id' => 20, 'company_id' => 1, 'name' => 'Hyderabad'],
+            ['id' => 30, 'company_id' => 1, 'name' => 'Karachi'],
+        ]);
         DB::table('routes_fares')->insert([
-            ['route_id' => 1, 'departure_city_id' => 10, 'destination_city_id' => 20],
-            ['route_id' => 1, 'departure_city_id' => 20, 'destination_city_id' => 30],
+            ['company_id' => 1, 'route_id' => 1, 'departure_city_id' => 10, 'destination_city_id' => 20],
+            ['company_id' => 1, 'route_id' => 1, 'departure_city_id' => 20, 'destination_city_id' => 30],
         ]);
         $this->detail(1, 10, 30, '2026-10-20', '23:00:00');
         $this->detail(2, 10, 20, '2026-10-20', '23:00:00');
@@ -142,6 +150,83 @@ class ScheduleQuotaTest extends TestCase
         $this->rejects(3, 1);
         $this->rejects(3, ['1-DN', '3']);
         $this->assertFalse($this->guard(1, 40)['intermediate']);
+    }
+
+    public function test_exempt_midway_journey_bypasses_limit_but_paid_seats_count_and_reuse_pink()
+    {
+        DB::table('schedules')->where('id', 1)->update([
+            'intermediate_quota' => 1,
+            'quota_exempt_routes' => json_encode([['departure_city_id' => 10, 'destination_city_id' => 20]]),
+        ]);
+        $this->assertTrue($this->guard(2, ['1-DN', '2', '3'])['exempt']);
+        $this->ticket(['seat_no' => '1-DN']);
+        $this->ticket(['seat_no' => '2', 'terminal_id' => 99]);
+        $this->ticket(['seat_no' => '3', 'type' => 'advance booking']);
+        $preview = $this->service->preview(ScheduleDetail::find(3), Ticket::all(), [[
+            ['seatNo' => '1-DN'], ['seatNo' => '2'], ['seatNo' => '3'],
+        ]]);
+        $this->assertSame(2, $preview['quota']['used']);
+        $this->assertSame(0, $preview['quota']['remaining']);
+        $this->assertSame([true, true, false], array_column($preview['seat_map'][0], 'quota_reuse'));
+        $partner = $this->service->partnerPreview(ScheduleDetail::find(3), Ticket::all(), [[
+            ['seatNo' => '1-DN', 'reserved' => true], ['seatNo' => '2', 'reserved' => true],
+            ['seatNo' => '4', 'reserved' => true],
+        ]]);
+        $this->assertArrayNotHasKey('terminal_allow', $partner['seat_map'][0][0]);
+        $this->assertArrayNotHasKey('terminal_allow', $partner['seat_map'][0][1]);
+        $this->assertFalse($partner['seat_map'][0][2]['terminal_allow']);
+        $exemptPartner = $this->service->partnerPreview(ScheduleDetail::find(2), Ticket::all(), [[
+            ['seatNo' => '4', 'reserved' => true],
+        ]]);
+        $this->assertTrue($exemptPartner['quota']['exempt']);
+        $this->assertArrayNotHasKey('terminal_allow', $exemptPartner['seat_map'][0][0]);
+        $this->assertFalse($this->service->context(ScheduleDetail::find(3))['exempt']);
+        $this->assertSame(1, $this->guard(3, ['1-DN', '2'])['limit']);
+        $this->rejects(3, ['3']);
+        $this->assertFalse($this->guard(1, ['4'])['intermediate']);
+    }
+
+    public function test_quota_options_and_invalid_exempt_journeys_are_checked_against_the_schedule_route()
+    {
+        $controller = app(ScheduleController::class);
+        $options = $controller->quotaOptions(Request::create('/', 'POST', ['id' => 1]))->getData(true);
+        $this->assertCount(2, $options['routes']);
+        $this->assertSame('Rawalpindi → Hyderabad', $options['routes'][0]['name']);
+        $payload = ['id' => 1, 'intermediate_quota' => 0, 'quota_exempt_routes' => [
+            ['departure_city_id' => 10, 'destination_city_id' => 20],
+        ]];
+        $saved = $controller->updateQuota(Request::create('/', 'POST', $payload));
+        $this->assertSame(200, $saved->status());
+        $this->assertSame($payload['quota_exempt_routes'], $saved->getData(true)['quota_exempt_routes']);
+        $this->assertTrue($this->guard(2, ['1'])['exempt']);
+        foreach ([[10, 30], [20, 10], [99, 30]] as $bad) {
+            $payload['quota_exempt_routes'] = [['departure_city_id' => $bad[0], 'destination_city_id' => $bad[1]]];
+            $this->assertSame(422, $controller->updateQuota(Request::create('/', 'POST', $payload))->status());
+        }
+        $this->assertSame([['departure_city_id' => 10, 'destination_city_id' => 20]],
+            \App\Models\Schedule\Schedule::find(1)->quota_exempt_routes);
+    }
+
+    public function test_partner_reservation_confirmation_obeys_the_same_exemption()
+    {
+        DB::table('schedules')->where('id', 1)->update(['intermediate_quota' => 1]);
+        $this->ticket(['seat_no' => '1']);
+        $pending = $this->ticket(['seat_no' => '2', 'type' => 'advance booking']);
+        try {
+            DB::transaction(function () use ($pending) {
+                $this->service->assertConfirmation(collect([$pending]));
+            });
+            $this->fail('Confirmation exceeded the quota.');
+        } catch (ValidationException $e) {
+            $this->assertSame('Quota for midway routes is completed.', $e->errors()['quota'][0]);
+        }
+        DB::table('schedules')->where('id', 1)->update(['quota_exempt_routes' => json_encode([
+            ['departure_city_id' => 10, 'destination_city_id' => 20],
+        ])]);
+        DB::transaction(function () use ($pending) {
+            $this->service->assertConfirmation(collect([$pending]));
+        });
+        $this->assertSame(1, DB::table('tickets')->where('type', 'advance booking')->count());
     }
 
     public function test_seat_is_released_only_after_its_last_qualifying_ticket_is_removed()
@@ -245,10 +330,10 @@ class ScheduleQuotaTest extends TestCase
             ['seatNo' => '5', 'type' => 'not_for_sale'], ['seatNo' => '6', 'type' => 'booked', 'gender' => 0],
             ['seatNo' => '7', 'selected' => true], ['driver' => true]]];
         $preview = $this->service->preview(ScheduleDetail::find(3), Ticket::all(), $map);
-        $this->assertSame([true, false, false, false, false, false, true, false], array_column($preview['seat_map'][0], 'quota_reuse'));
+        $this->assertSame([true, false, false, true, false, false, true, false], array_column($preview['seat_map'][0], 'quota_reuse'));
         $this->assertSame('booked', $preview['seat_map'][0][5]['type']);
         $this->assertTrue($preview['seat_map'][0][6]['selected']); // UI selection colour takes priority.
-        $this->assertSame(5, $preview['quota']['used']);
+        $this->assertSame(6, $preview['quota']['used']);
         $before = $this->service->preview(ScheduleDetail::find(2), Ticket::all(), [[['seatNo' => '1-DN']]]);
         $this->assertFalse($before['seat_map'][0][0]['quota_reuse']);
     }

@@ -180,8 +180,8 @@ class MobileAppAccessTest extends TestCase
         $staff = $this->staff($modules, $role);
         $request = new Request();
         $request->setUserResolver(function () use ($staff) { return $staff; });
-        $this->assertSame([1], MobileAppScope::tickets($request)->pluck('tickets.id')->all());
+        $this->assertSame([1], MobileAppScope::tickets($request)->pluck('tickets.id')->map(function ($id) { return (int) $id; })->all());
         $staff->role->permissions = $modules;
-        $this->assertSame([1, 2], MobileAppScope::tickets($request)->orderBy('tickets.id')->pluck('tickets.id')->all());
+        $this->assertSame([1, 2], MobileAppScope::tickets($request)->orderBy('tickets.id')->pluck('tickets.id')->map(function ($id) { return (int) $id; })->all());
     }
 }

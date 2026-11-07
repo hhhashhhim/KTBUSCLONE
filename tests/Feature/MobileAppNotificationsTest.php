@@ -16,6 +16,9 @@ class MobileAppNotificationsTest extends TestCase
     private const BASE='/api/web/v1/mobile-app/notifications';
     protected function setUp(): void {
         parent::setUp(); config(['database.default'=>'erp_notice_test','database.connections.erp_notice_test'=>['driver'=>'sqlite','database'=>':memory:','prefix'=>''],'cache.default'=>'array']);
+        $this->app['url']->forceRootUrl('http://localhost');
+        DB::purge('erp_notice_test');
+        Schema::clearResolvedInstance('db.schema');
         foreach(['companies','customers','routes'] as $name) Schema::create($name,function(Blueprint $t){$t->id();$t->integer('company_id')->nullable();$t->string('name')->nullable();$t->string('cnic')->nullable();$t->softDeletes();});
         DB::table('companies')->insert(['id'=>1]);
         Schema::create('passenger_accounts',function(Blueprint $t){$t->id();$t->integer('company_id');$t->integer('customer_id')->nullable();$t->string('mobile');$t->string('email')->nullable();$t->timestamp('mobile_verified_at')->nullable();$t->timestamps();});

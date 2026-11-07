@@ -309,7 +309,7 @@ class MobileAppAdminTest extends TestCase
         }
         $this->postJson(self::BASE . '/users/1/revoke-sessions', [])->assertUnprocessable();
         $this->postJson(self::BASE . '/users/1/revoke-sessions', ['reason' => 'Passenger lost their device'])->assertOk();
-        $this->assertSame([2, 3], DB::table('personal_access_tokens')->orderBy('id')->pluck('id')->all());
+        $this->assertSame([2, 3], DB::table('personal_access_tokens')->orderBy('id')->pluck('id')->map(function ($id) { return (int) $id; })->all());
         $this->assertDatabaseHas('mobile_app_admin_audits', ['company_id' => 1, 'actor_id' => 1, 'reason' => 'Passenger lost their device']);
     }
 

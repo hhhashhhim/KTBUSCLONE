@@ -91,22 +91,33 @@ class MobileAppUserReports
     {
         $summary = DB::query()->fromSub((clone $query)->reorder(), 'r');
         if ($request->report === 'user_registrations') {
-            return (array) $summary->selectRaw('COALESCE(SUM(users),0) as users, COALESCE(SUM(verified_users),0) as verified_users,
+            return $this->normalizeCounts((array) $summary->selectRaw('COALESCE(SUM(users),0) as users, COALESCE(SUM(verified_users),0) as verified_users,
                 COALESCE(SUM(unverified_users),0) as unverified_users, COALESCE(SUM(blocked_users),0) as blocked_users,
-                COALESCE(SUM(blacklisted_users),0) as blacklisted_users')->first();
+                COALESCE(SUM(blacklisted_users),0) as blacklisted_users')->first());
         }
         if (in_array($request->report, ['user_bookings', 'users_without_bookings'], true)) {
-            return (array) $summary->selectRaw('COUNT(*) as users,
+            return $this->normalizeCounts((array) $summary->selectRaw('COUNT(*) as users,
                 COALESCE(SUM(CASE WHEN bookings > 0 THEN 1 ELSE 0 END),0) as users_with_bookings,
                 COALESCE(SUM(CASE WHEN bookings > 1 THEN 1 ELSE 0 END),0) as repeat_bookers,
                 COALESCE(SUM(CASE WHEN bookings = 0 THEN 1 ELSE 0 END),0) as users_without_bookings,
-                COALESCE(SUM(bookings),0) as bookings, COALESCE(SUM(confirmed_sales),0) as confirmed_sales')->first();
+                COALESCE(SUM(bookings),0) as bookings, COALESCE(SUM(confirmed_sales),0) as confirmed_sales')->first());
         }
-        return (array) $summary->selectRaw("COUNT(*) as users,
+        return $this->normalizeCounts((array) $summary->selectRaw("COUNT(*) as users,
             COALESCE(SUM(CASE WHEN mobile_verified_at IS NOT NULL THEN 1 ELSE 0 END),0) as verified_users,
             COALESCE(SUM(CASE WHEN mobile_verified_at IS NULL THEN 1 ELSE 0 END),0) as unverified_users,
             COALESCE(SUM(CASE WHEN status = 'blocked' THEN 1 ELSE 0 END),0) as blocked_users,
-            COALESCE(SUM(CASE WHEN status = 'blacklisted' THEN 1 ELSE 0 END),0) as blacklisted_users")->first();
+            COALESCE(SUM(CASE WHEN status = 'blacklisted' THEN 1 ELSE 0 END),0) as blacklisted_users")->first());
+    }
+
+    private function normalizeCounts(array $summary): array
+    {
+        // PDO drivers can return aggregate counts as strings, including empty-result zeroes.
+        foreach ($summary as $field => $value) {
+            if ($field !== 'confirmed_sales') {
+                $summary[$field] = (int) $value;
+            }
+        }
+        return $summary;
     }
 
     public function note(Request $request): string

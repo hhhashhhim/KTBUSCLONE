@@ -373,6 +373,7 @@ class BookingController extends Controller
                 if (!$detail) {
                     throw ValidationException::withMessages(['schedule' => 'The selected departure no longer exists. Please refresh schedules.']);
                 }
+                $quotaDiscountQuotes = $request->flag == 1 ? [] : app(\App\Services\ScheduleQuotaDiscountService::class)->bookingQuotes($detail, $request, 'portal');
                 if ($request->flag == 1 || $request->type === 'booked') {
                     $field = $request->flag == 1 ? 'alreadyBookedId' : 'selectedSeats';
                     $request->validate([$field => ['required', 'array', 'min:1'], $field . '.*' => ['required', 'distinct']]);
@@ -673,7 +674,7 @@ class BookingController extends Controller
                             'destination_city_id' => $request->destinationCity,
                             'seat_no'             => $seat,
                             'bus_class_id'        => $detail->bus_class_id,
-                            'seat_fare'           => $request->selectedSeatsFare[$i],
+                            'seat_fare'           => $request->selectedSeatsFare[$i] + ($quotaDiscountQuotes[$i]['quota_discount'] ?? 0),
                             'is_partial'          => $isPartial,
                             'booking_no'          => $bookingNo,
                             'invoice_id'          => $invoice->id,
@@ -698,12 +699,15 @@ class BookingController extends Controller
                             'booked_time'         => date("Y-m-d H:i:s"),
                             'added_by'            => Auth::user()->id,
                             'updated_by'          => Auth::user()->id,
-                            'discount'            => ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($finalAmountDiscount ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
+                            'discount'            => ($quotaDiscountQuotes[$i]['quota_discount'] ?? 0) + ($request->discount ? round($request->discount / count($request->selectedSeats)) : ($finalAmountDiscount ? ($finalAmountDiscount / count($request->selectedSeats)) : 0)),
                             'schedule_discount'   => max(0, (float) ($checkDiscount->schedule_discount ?? 0)),
                             'terminal_discount'   => max(0, (float) ($checkDiscount->terminal_discount ?? 0)),
                             'surcharge'            => $surcharge,
                             'points_usage'        => bookingUsesPoints($request) ? (($request->pointsUseInput ?? 0) / count($request->selectedSeats)) : 0,
                         ]);
+                        if (!empty($quotaDiscountQuotes[$i]['quota_discount'])) {
+                            $ticket->update(['quota_discount' => $quotaDiscountQuotes[$i]['quota_discount']]);
+                        }
                         if ($isPartial == 1) {
                             TicketIsPartial::create([
                                 'company_id'          => Auth::user()->company_id,
@@ -1864,7 +1868,7 @@ class BookingController extends Controller
         $quotaPreview = app(ScheduleQuotaService::class)->preview($scheduleDetail, $tickets, $seatMap);
         $schedule->quota = $quotaPreview['quota'];
         $schedule->departure_passenger_summary = app(PassengerSummaryService::class)->byDepartureCity($tickets);
-        $scheduleDetail->bus_class->seat_map = $quotaPreview['seat_map'];
+        $scheduleDetail->bus_class->seat_map = app(\App\Services\ScheduleQuotaDiscountService::class)->preview($scheduleDetail, $tickets, $quotaPreview['seat_map'], Auth::user(), $request->dropTerminal);
         $schedule->setRelation('bus_class', $scheduleDetail->bus_class);
         $assignedBus = $this->assignedBus($scheduleDetail->schedule_id, $scheduleDetail->schedule_date);
         $schedule->bus_no = $assignedBus ? $assignedBus->bus_number : "N/A";

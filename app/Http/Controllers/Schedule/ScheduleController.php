@@ -29,6 +29,41 @@ use Illuminate\Support\Facades\Log;
 
 class ScheduleController extends Controller
 {
+    public function quotaOptions(Request $request)
+    {
+        if (!checkForSubmenu('schedules') || !checkPermissionButtons('edit-schedule')) {
+            return response()->json(['message' => 'You are not authorized to manage schedule quotas.'], 403);
+        }
+        $data = $request->validate(['id' => ['required', 'integer']]);
+        $schedule = Schedule::where('company_id', Auth::user()->company_id)->whereKey($data['id'])->firstOrFail();
+        return response()->json([
+            'routes' => $this->quotaRouteOptions($schedule),
+            'exempt_routes' => $schedule->quota_exempt_routes ?? [],
+        ]);
+    }
+
+    private function quotaRouteOptions(Schedule $schedule): array
+    {
+        $fares = RouteFare::where('company_id', $schedule->company_id)->where('route_id', $schedule->route_id)
+            ->orderBy('id')->get(['departure_city_id', 'destination_city_id']);
+        if ($fares->isEmpty()) return [];
+        $cities = $fares->unique('departure_city_id')->pluck('departure_city_id')->values()->all();
+        $cities[] = $fares->last()->destination_city_id;
+        $names = City::whereIn('id', $cities)->pluck('name', 'id');
+        $options = [];
+        foreach ($cities as $fromIndex => $fromId) {
+            foreach ($cities as $toIndex => $toId) {
+                if ($toIndex <= $fromIndex || ($fromIndex === 0 && $toIndex === count($cities) - 1)) continue;
+                $options[] = [
+                    'departure_city_id' => (int) $fromId,
+                    'destination_city_id' => (int) $toId,
+                    'name' => ($names[$fromId] ?? $fromId) . ' → ' . ($names[$toId] ?? $toId),
+                ];
+            }
+        }
+        return $options;
+    }
+
     public function updateQuota(Request $request)
     {
         if (!checkForSubmenu('schedules') || !checkPermissionButtons('edit-schedule')) {
@@ -37,19 +72,37 @@ class ScheduleController extends Controller
         $data = $request->validate([
             'id' => ['required', 'integer'],
             'intermediate_quota' => ['present', 'nullable', 'integer', 'min:0', 'max:100000'],
+            'quota_exempt_routes' => ['sometimes', 'array'],
+            'quota_exempt_routes.*.departure_city_id' => ['required', 'integer'],
+            'quota_exempt_routes.*.destination_city_id' => ['required', 'integer'],
         ]);
         return DB::transaction(function () use ($data, $request) {
             $schedule = Schedule::where('company_id', Auth::user()->company_id)->whereKey($data['id'])->lockForUpdate()->firstOrFail();
+            $valid = collect($this->quotaRouteOptions($schedule))->map(function ($pair) {
+                return $pair['departure_city_id'] . ':' . $pair['destination_city_id'];
+            })->all();
+            $requestedExempt = $data['quota_exempt_routes'] ?? ($schedule->quota_exempt_routes ?? []);
+            $selected = collect($requestedExempt)->map(function ($pair) {
+                return (int) $pair['departure_city_id'] . ':' . (int) $pair['destination_city_id'];
+            })->all();
+            if (count($selected) !== count(array_unique($selected)) || array_diff($selected, $valid)) {
+                return response()->json(['errors' => ['quota_exempt_routes' => ['Select unique intermediate journeys on this schedule route.']]], 422);
+            }
             $old = $schedule->intermediate_quota;
-            $schedule->update(['intermediate_quota' => $data['intermediate_quota'], 'updated_by' => Auth::id()]);
+            $oldExempt = $schedule->quota_exempt_routes ?? [];
+            $exempt = collect($requestedExempt)->map(function ($pair) {
+                return ['departure_city_id' => (int) $pair['departure_city_id'], 'destination_city_id' => (int) $pair['destination_city_id']];
+            })->all();
+            $schedule->update(['intermediate_quota' => $data['intermediate_quota'], 'quota_exempt_routes' => $exempt, 'updated_by' => Auth::id()]);
             ActivityLog::create([
                 'company_id' => Auth::user()->company_id,
                 'activity_by' => Auth::id(),
                 'requested_host' => $request->ip(),
-                'message' => 'Schedule ' . $schedule->id . ' intermediate quota changed from ' . ($old ?? 'unlimited') .
-                    ' to ' . ($schedule->intermediate_quota ?? 'unlimited') . ' by ' . Auth::user()->name,
+                'message' => 'Schedule ' . $schedule->id . ' quota ' . ($old ?? 'unlimited') .
+                    ' to ' . ($schedule->intermediate_quota ?? 'unlimited') . '; exempt journey count ' .
+                    count($oldExempt) . ' to ' . count($exempt) . ' by user ' . Auth::id(),
             ]);
-            return response()->json(['message' => 'Schedule quota saved.', 'intermediate_quota' => $schedule->intermediate_quota]);
+            return response()->json(['message' => 'Schedule quota saved.', 'intermediate_quota' => $schedule->intermediate_quota, 'quota_exempt_routes' => $exempt]);
         });
     }
 

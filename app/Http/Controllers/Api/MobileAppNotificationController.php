@@ -88,7 +88,7 @@ class MobileAppNotificationController extends Controller
         $existing = DB::table('mobile_notification_campaigns')->where('company_id', $company)->where('request_key', $input['request_key'])->first();
         if ($existing) {
             abort_unless((int) $existing->actor_id === (int) $r->user()->id && hash_equals($existing->payload_hash, $hash), 409, 'This send reference has already been used.');
-            return $this->result(['id' => $existing->id, 'recipient_count' => $existing->recipient_count, 'already_sent' => true]);
+            return $this->result(['id' => $existing->id, 'recipient_count' => (int) $existing->recipient_count, 'already_sent' => true]);
         }
         $r->validate(['preview_token' => 'required|string|max:10000']);
         try { $preview = json_decode(Crypt::decryptString($r->preview_token), true); } catch (\Throwable $e) { abort(422, 'Preview this announcement again.'); }
@@ -125,7 +125,7 @@ class MobileAppNotificationController extends Controller
         $items = $page->getCollection()->map(function ($campaign) {
             $base = DB::table('mobile_notifications')->where('company_id', $campaign->company_id)->where('campaign_id', $campaign->id);
             return ['id' => $campaign->id, 'title' => $campaign->title, 'body' => $campaign->body, 'created_at' => $campaign->created_at,
-                'audience' => json_decode($campaign->audience, true), 'inbox_count' => $campaign->recipient_count,
+                'audience' => json_decode($campaign->audience, true), 'inbox_count' => (int) $campaign->recipient_count,
                 'read_count' => (clone $base)->whereNotNull('read_at')->count(),
                 'push_accepted' => DB::table('mobile_notification_deliveries as d')->join('mobile_notifications as n', 'n.id', '=', 'd.notification_id')
                     ->where('n.company_id', $campaign->company_id)->where('n.campaign_id', $campaign->id)->where('d.status', 'accepted')->distinct()->count('n.passenger_account_id'),
