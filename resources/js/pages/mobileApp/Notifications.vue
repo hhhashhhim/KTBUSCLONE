@@ -8,7 +8,7 @@
                 <h3>New announcement</h3>
                 <form @submit.prevent="previewMessage"><fieldset :disabled="busy" style="border:0;padding:0;margin:0">
                     <div class="ma-form-grid">
-                        <label>Send to<select v-model="form.audience" class="form-control" @change="invalidatePreview"><option v-if="options.permissions.users_view" value="selected">Selected passengers</option><option v-if="options.permissions.bookings_view" value="trip">Passengers on a departure</option><option v-if="options.permissions.notifications_broadcast" value="all">All active app users</option></select></label>
+                        <label for="ma-notification-audience">Send to<select v-ma-select2 id="ma-notification-audience" aria-label="Send to" v-model="form.audience" class="form-control" :disabled="busy" @change="invalidatePreview"><option v-if="options.permissions.users_view" value="selected">Selected passengers</option><option v-if="options.permissions.bookings_view" value="trip">Passengers on a departure</option><option v-if="options.permissions.notifications_broadcast" value="all">All active app users</option></select></label>
                         <label v-if="form.audience === 'selected'">Passenger IDs<input v-model="passengerText" class="form-control" placeholder="e.g. 12, 35, 48" @input="invalidatePreview"><small class="ma-muted">Use the passenger # shown in App Users. Maximum 200.</small></label>
                         <label v-if="form.audience === 'trip'">Schedule departure ID<input v-model="form.schedule_detail_id" type="number" min="1" class="form-control" required @input="invalidatePreview"><small class="ma-muted">Use the departure ID from Routes &amp; Schedules. Only passengers in your permitted routes and terminals are included.</small></label>
                     </div>
@@ -34,11 +34,13 @@
     </div>
 </template>
 <script>
+import mobileAppSelect2 from './mobileAppSelect2';
 import MobilePagination from './MobilePagination.vue';
 import MobileDialog from './MobileDialog.vue';
 import {request, displayTime} from './mobileApp';
 function requestKey() { return crypto.randomUUID(); }
 export default {
+    directives: { maSelect2: mobileAppSelect2 },
     components: {MobilePagination, MobileDialog}, props: {options: Object},
     data: () => ({form: {audience: '', title: '', body: '', reason: '', schedule_detail_id: ''}, passengerText: '', key: requestKey(), preview: null, prepared: null, busy: false, sendError: '', success: '', items: [], pagination: null, loading: false, error: '', delivery: null, sequence: 0}),
     computed: {deliveryMessage() { if (!this.delivery?.last_run_at) return 'The mobile notification worker has not reported yet.'; if (Date.now() - new Date(String(this.delivery.last_run_at).replace(' ', 'T') + (/[Z+-]\d\d:\d\d$|Z$/.test(this.delivery.last_run_at) ? '' : '+05:00')).getTime() > 10 * 60000) return 'The notification worker has not checked in recently. Ask your administrator to check the scheduler.'; return this.delivery.push_configured ? 'Push delivery is configured.' : 'Inbox delivery is available. Phone push delivery still needs configuration.';}},

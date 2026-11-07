@@ -2,8 +2,8 @@
     <div class="ma-panel">
         <div class="ma-panel-head"><div><h2>Mobile App Reports</h2><p class="ma-muted">Review app users, registrations, booking activity, account restrictions, sales and payments.</p></div><button v-if="options.permissions.reports_export" class="btn btn-outline-success" :disabled="loading || exporting || !data" @click="download"><i class="fas fa-file-csv mr-1"></i>{{ exporting ? 'Exporting…' : 'Export filtered report' }}</button></div>
         <MobileFilters id="ma-reports" v-model="filters" :options="options" dates :environments="usesEnvironment" terminals routes :search="userReport ? searchLabel : ''" :statuses="userReport ? accountStatuses : []" :busy="loading" @apply="load(1,true)">
-            <div class="ma-field"><label for="ma-report-type">Report</label><select id="ma-report-type" class="form-control" v-model="filters.report" @change="reportChanged"><optgroup label="Booking & payment reports"><option v-for="report in reports.filter(item => !item.userReport)" :key="report.value" :value="report.value">{{ report.label }}</option></optgroup><optgroup v-if="options.permissions.users_view" label="App user reports"><option v-for="report in reports.filter(item => item.userReport)" :key="report.value" :value="report.value">{{ report.label }}</option></optgroup></select></div>
-            <div v-if="userReport" class="ma-field"><label for="ma-report-verification">Mobile verification</label><select id="ma-report-verification" class="form-control" v-model="filters.verification"><option value="">All verification states</option><option value="verified">Verified</option><option value="unverified">Unverified</option></select></div>
+            <div class="ma-field"><label for="ma-report-type">Report</label><select v-ma-select2 id="ma-report-type" class="form-control" v-model="filters.report" @change="reportChanged"><optgroup label="Booking & payment reports"><option v-for="report in reports.filter(item => !item.userReport)" :key="report.value" :value="report.value">{{ report.label }}</option></optgroup><optgroup v-if="options.permissions.users_view" label="App user reports"><option v-for="report in reports.filter(item => item.userReport)" :key="report.value" :value="report.value">{{ report.label }}</option></optgroup></select></div>
+            <div v-if="userReport" class="ma-field"><label for="ma-report-verification">Mobile verification</label><select v-ma-select2 id="ma-report-verification" class="form-control" v-model="filters.verification"><option value="">All verification states</option><option value="verified">Verified</option><option value="unverified">Unverified</option></select></div>
         </MobileFilters>
         <p class="ma-note m-3">{{ selectedReport?.hint }} Select your filters, then click Apply filters.</p>
         <div v-if="error" class="ma-error m-3" role="alert">{{ error }} <button class="btn btn-outline-danger btn-sm ml-2" @click="load()">Retry</button></div>
@@ -21,11 +21,13 @@
     </div>
 </template>
 <script>
+import mobileAppSelect2 from './mobileAppSelect2';
 import MobileFilters from './MobileFilters.vue';
 import MobilePagination from './MobilePagination.vue';
 import { request,today,label,number,money,displayTime,formatCnic } from './mobileApp';
 
 export default {
+    directives: { maSelect2: mobileAppSelect2 },
     components:{MobileFilters,MobilePagination}, props:{options:Object},
     data:()=>({
         filters:{from:today(),to:today(),environment:'live',report:'sales',terminal_id:'',route_id:'',search:'',status:'',verification:''},

@@ -1,7 +1,7 @@
 <template>
     <div class="ma-monitor-grid">
         <section class="ma-panel" aria-labelledby="ma-login-title">
-            <div class="ma-panel-head"><div><h2 id="ma-login-title">App logins</h2><p class="ma-muted">Successful sign-ins, including sign-in after registration.</p></div><div class="ma-actions"><label for="ma-login-days">Period</label><select id="ma-login-days" class="form-control" v-model="days" @change="load"><option :value="7">Last 7 days</option><option :value="30">Last 30 days</option></select></div></div>
+            <div class="ma-panel-head"><div><h2 id="ma-login-title">App logins</h2><p class="ma-muted">Successful sign-ins, including sign-in after registration.</p></div><div class="ma-actions"><label for="ma-login-days">Period</label><select v-ma-select2 id="ma-login-days" class="form-control" v-model="days" @change="load"><option :value="7">Last 7 days</option><option :value="30">Last 30 days</option></select></div></div>
             <div class="ma-panel-body" :aria-busy="loading">
                 <p v-if="error" class="ma-error" role="alert">{{ error }} <button class="btn btn-outline-danger btn-sm" @click="load">Retry</button></p>
                 <p v-else-if="loading" class="ma-muted" role="status">Loading login activity…</p>
@@ -29,8 +29,10 @@
     </div>
 </template>
 <script>
+import mobileAppSelect2 from './mobileAppSelect2';
 import { request, number, displayTime } from './mobileApp';
 export default {
+    directives: { maSelect2: mobileAppSelect2 },
     props: { scope: Object },
     data: () => ({ days: 7, data: null, loading: false, error: '', sequence: 0 }),
     computed: {

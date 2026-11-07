@@ -8,7 +8,7 @@
             <CompanySideBar v-if="$store.state.user.is_super_admin == 0" />
             <!-- Main Content -->
             <div class="main-content">
-                <transition mode="out-in" :enter-active-class="isCallCenterRoute ? 'cc-route-enter' : 'loader'" :leave-active-class="isCallCenterRoute ? 'cc-route-leave' : 'loader'">
+                <transition mode="out-in" :enter-active-class="isModuleWorkspaceRoute ? 'cc-route-enter' : 'loader'" :leave-active-class="isModuleWorkspaceRoute ? 'cc-route-leave' : 'loader'">
                     <router-view></router-view>
                 </transition>
             </div>
@@ -39,8 +39,11 @@ export default {
     },
     computed: {
         // The legacy asset script hides .loader on window load. Never apply that
-        // splash-screen class to a call center page arriving through a route.
-        isCallCenterRoute() { return String(this.$route.name || '').startsWith('call-center'); },
+        // splash-screen class to a module workspace arriving through a route.
+        isModuleWorkspaceRoute() {
+            const name = String(this.$route.name || '');
+            return name.startsWith('call-center') || name.startsWith('mobile-app');
+        },
     },
     created(){
         this.$store.commit('updateAppUrl',this.app_url);

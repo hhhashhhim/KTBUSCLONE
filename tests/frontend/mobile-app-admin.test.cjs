@@ -4,6 +4,15 @@ const path = require('node:path');
 const vm = require('node:vm');
 const { parse, compileTemplate } = require('@vue/compiler-sfc');
 const parser = require('@babel/parser');
+const { Blob } = require('node:buffer');
+// Node 16 lacks browser FormData. This test-only container captures submitted
+// fields; network/multipart encoding is outside these component unit tests.
+const FormData = globalThis.FormData || class FormData {
+    constructor() { this.fields = new Map(); }
+    append(key, value) { const values = this.fields.get(key) || []; values.push(value instanceof Blob ? value : String(value)); this.fields.set(key, values); }
+    get(key) { return this.fields.get(key)?.[0] ?? null; }
+    has(key) { return this.fields.has(key); }
+};
 
 const directory = 'resources/js/pages/mobileApp';
 let requestHandler = async () => { throw new Error('Unexpected request'); };
@@ -19,7 +28,7 @@ function load(name) {
     parser.parse(parsed.descriptor.script.content, { sourceType: 'module' });
     const context = {
         URL, FormData, Blob, crypto: require('node:crypto'), ...api, module: { exports: {} }, request: (...args) => requestHandler(...args),
-        AppControls: {}, PassengerLimits: {}, PassengerWallet: {}, MobileFilters: {}, MobilePagination: {}, MobileDialog: {},
+        AppControls: {}, PassengerLimits: {}, PassengerWallet: {}, MobileFilters: {}, MobilePagination: {}, MobileDialog: {}, mobileAppSelect2: {},
         Availability: {}, LoginActivity: {}, Overview: {}, Passengers: {}, Bookings: {}, Payments: {}, Reports: {}, Settings: {}, Content: {}, Activity: {}, Notifications: {},
         window: { confirm: () => true },
     };
@@ -36,6 +45,16 @@ function state(component, extra = {}) {
 
 (async () => {
     for (const filename of fs.readdirSync(directory).filter(name => name.endsWith('.vue'))) load(filename.replace('.vue', ''));
+
+    const app = parse(fs.readFileSync('resources/js/layouts/adminPanel/App.vue', 'utf8'));
+    const appContext = { module: { exports: {} }, NavBar: {}, SideBar: {}, SettingSideBar: {}, Login: {}, CompanyNavBar: {}, CompanySideBar: {} };
+    vm.runInNewContext(app.descriptor.script.content.replace(/import[\s\S]*?;/g, '').replace('export default', 'module.exports ='), appContext);
+    const workspaceRoute = appContext.module.exports.computed.isModuleWorkspaceRoute;
+    for (const name of ['mobile-app', 'mobile-app-users', 'mobile-app-notifications', 'call-center']) {
+        assert.equal(workspaceRoute.call({ $route: { name } }), true, 'Module workspaces must not receive the legacy hidden loader class');
+    }
+    assert.equal(workspaceRoute.call({ $route: { name: 'bookings' } }), false);
+    assert.ok(app.descriptor.template.content.includes("isModuleWorkspaceRoute ? 'cc-route-enter' : 'loader'"));
 
     const walletEvents = [];
     const wallet = state(load('PassengerWallet'), { userId: 1, permissions: { users_wallet: true }, busy: false, $emit: (...args) => walletEvents.push(args) });
