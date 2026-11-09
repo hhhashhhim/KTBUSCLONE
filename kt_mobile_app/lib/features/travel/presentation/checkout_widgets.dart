@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../application/travel_providers.dart';
+import '../domain/travel_models.dart';
 
 const checkoutBackground = Color(0xFFEFF5F0);
 
@@ -112,12 +113,12 @@ class CheckoutHeader extends StatelessWidget implements PreferredSizeWidget {
 class CheckoutBookingSummary extends StatelessWidget {
   const CheckoutBookingSummary({
     required this.flow,
-    required this.totalLabel,
+    required this.quote,
     super.key,
   });
 
   final BookingFlowState flow;
-  final String totalLabel;
+  final FareQuote quote;
 
   @override
   Widget build(BuildContext context) {
@@ -285,31 +286,64 @@ class CheckoutBookingSummary extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 9, 20, 20),
-              child: Row(
+              child: Column(
                 children: [
-                  const Expanded(
-                    flex: 2,
-                    child: Text(
-                      'Total amount',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                  _FareLine(
+                    label: 'Original fare',
+                    amount: quote.baseFare,
+                    crossedOut: quote.discount > 0,
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 3,
-                    child: Text(
-                      totalLabel,
-                      textAlign: TextAlign.end,
-                      style: const TextStyle(
-                        color: AppColors.primaryDark,
-                        fontSize: 25,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -.7,
-                      ),
+                  if (quote.regularDiscount > 0)
+                    _FareLine(
+                      label: 'Discount',
+                      amount: -quote.regularDiscount,
                     ),
+                  if (quote.quotaDiscount > 0)
+                    _FareLine(
+                      label: 'Special seat discount',
+                      amount: -quote.quotaDiscount,
+                    ),
+                  if (quote.surcharge != 0)
+                    _FareLine(label: 'Surcharge', amount: quote.surcharge),
+                  if (quote.roundingAdjustment != 0)
+                    _FareLine(
+                      label: 'Rounding adjustment',
+                      amount: quote.roundingAdjustment,
+                    ),
+                  if (quote.taxes != 0)
+                    _FareLine(label: 'Taxes', amount: quote.taxes),
+                  if (quote.fees != 0)
+                    _FareLine(label: 'Service fees', amount: quote.fees),
+                  if (quote.walletDeduction > 0)
+                    _FareLine(label: 'Wallet', amount: -quote.walletDeduction),
+                  const Divider(height: 22, color: Color(0xFFE4ECE6)),
+                  Row(
+                    children: [
+                      const Expanded(
+                        flex: 2,
+                        child: Text(
+                          'Total amount',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          _formatFare(quote.total),
+                          textAlign: TextAlign.end,
+                          style: const TextStyle(
+                            color: AppColors.primaryDark,
+                            fontSize: 25,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -.7,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -319,6 +353,54 @@ class CheckoutBookingSummary extends StatelessWidget {
       ),
     );
   }
+}
+
+String _formatFare(num value) => NumberFormat.currency(
+  locale: 'en_PK',
+  symbol: 'Rs. ',
+  decimalDigits: value % 1 == 0 ? 0 : 2,
+).format(value);
+
+class _FareLine extends StatelessWidget {
+  const _FareLine({
+    required this.label,
+    required this.amount,
+    this.crossedOut = false,
+  });
+
+  final String label;
+  final double amount;
+  final bool crossedOut;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(color: AppColors.muted, fontSize: 12),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            _formatFare(amount),
+            textAlign: TextAlign.end,
+            semanticsLabel: '$label ${_formatFare(amount)}',
+            style: TextStyle(
+              color: amount < 0 ? AppColors.primaryDark : AppColors.muted,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              decoration: crossedOut ? TextDecoration.lineThrough : null,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _City extends StatelessWidget {

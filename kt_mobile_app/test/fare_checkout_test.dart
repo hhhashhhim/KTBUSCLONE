@@ -54,6 +54,11 @@ void main() {
       'rounding_adjustment': 25,
       'total': 2150,
     },
+    'wallet only is not an online discount': {
+      'base_fare': 2500,
+      'wallet_deduction': 100,
+      'total': 2400,
+    },
     'surcharge only': {'base_fare': 2500, 'surcharge': 100, 'total': 2600},
     'fractional discount, rounding and wallet': {
       'base_fare': 2500,
@@ -64,6 +69,21 @@ void main() {
       'total': 2349.75,
     },
     'older response keeps server total': {'base_fare': 2500, 'total': 2600},
+    'special seat discount is included once alongside regular discount': {
+      'base_fare': 2500,
+      'discount': 625,
+      'quota_discount': 250,
+      'rounding_adjustment': 25,
+      'total': 1900,
+    },
+    'special seat discount with surcharge and wallet': {
+      'base_fare': 2500,
+      'discount': 500,
+      'quota_discount': 500,
+      'surcharge': 100,
+      'wallet_deduction': 100,
+      'total': 2000,
+    },
   };
 
   for (final useLegacy in [false, true]) {
@@ -146,9 +166,13 @@ void main() {
           );
           await tester.pumpAndSettle();
           final format = useLegacy ? legacy.formatPkr : current.formatPkr;
-          if (useLegacy) {
+          {
             for (final entry in {
-              'Discount': -(scenario.value['discount'] as num? ?? 0),
+              'Discount':
+                  -((scenario.value['discount'] as num? ?? 0) -
+                      (scenario.value['quota_discount'] as num? ?? 0)),
+              'Special seat discount':
+                  -(scenario.value['quota_discount'] as num? ?? 0),
               'Surcharge': scenario.value['surcharge'] as num? ?? 0,
               'Rounding adjustment':
                   scenario.value['rounding_adjustment'] as num? ?? 0,
@@ -172,7 +196,8 @@ void main() {
                 findsOneWidget,
               );
             }
-          } else {
+          }
+          if (!useLegacy) {
             expect(find.text('Booking summary'), findsOneWidget);
             for (final entry in {
               'Seat number': '1',
@@ -194,18 +219,25 @@ void main() {
             expect(find.text('Date & time'), findsOneWidget);
             expect(find.textContaining('12 Sep 2099 · 11:00'), findsOneWidget);
             expect(find.text('Total amount'), findsOneWidget);
-            for (final label in [
-              'Fare summary',
-              'Fare',
-              'Taxes',
-              'Service fee',
-              'Discount',
-              'Surcharge',
-              'Rounding adjustment',
-              'Wallet',
-            ]) {
-              expect(find.text(label), findsNothing);
-            }
+            final original = find.descendant(
+              of: find
+                  .ancestor(
+                    of: find.text('Original fare'),
+                    matching: find.byType(Row),
+                  )
+                  .first,
+              matching: find.text(format(scenario.value['base_fare'] as num)),
+            );
+            expect(
+              tester.widget<Text>(original).style?.decoration,
+              (scenario.value['discount'] as num? ?? 0) > 0
+                  ? TextDecoration.lineThrough
+                  : isNull,
+            );
+            expect(
+              tester.getTopLeft(original).dy,
+              lessThan(tester.getTopLeft(find.text('Total amount')).dy),
+            );
           }
           final total = format(scenario.value['total'] as num);
           expect(find.text(total), findsOneWidget);

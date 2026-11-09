@@ -65,6 +65,7 @@ class TravelSchedule {
     required this.totalSeats,
     required this.fares,
     this.arrivalAt,
+    this.availableSpecialSeats = 0,
   });
 
   final int id;
@@ -75,6 +76,7 @@ class TravelSchedule {
   final DateTime? arrivalAt;
   final String busClassName;
   final int availableSeats;
+  final int availableSpecialSeats;
   final int totalSeats;
   final List<FareOption> fares;
 
@@ -127,6 +129,8 @@ class TravelSchedule {
           : DateTime.parse(json['arrival_at'].toString()).toLocal(),
       busClassName: (busClass['name'] ?? 'Kainat Travels').toString(),
       availableSeats: (json['available_seats'] as num?)?.toInt() ?? 0,
+      availableSpecialSeats:
+          (json['available_special_seats'] as num?)?.toInt() ?? 0,
       totalSeats: (json['total_seats'] as num?)?.toInt() ?? 0,
       fares: ((json['fares'] as List?) ?? const [])
           .map(
@@ -158,26 +162,38 @@ class TravelSeat {
     required this.status,
     required this.price,
     required this.classId,
+    double? baseFare,
     this.className,
     this.type,
     this.deck,
     this.bookedGender,
     this.genderRestriction,
-  });
+    this.isSpecial = false,
+    this.quotaDiscount = 0,
+    this.quotaDiscountPercentage = 0,
+    this.fareBeforeQuotaDiscount,
+  }) : baseFare = baseFare ?? price;
 
   final String number;
   final int row;
   final int column;
   final SeatAvailability status;
   final double price;
+  final double baseFare;
   final int classId;
   final String? className;
   final String? type;
   final String? deck;
   final String? bookedGender;
   final String? genderRestriction;
+  final bool isSpecial;
+  final double quotaDiscount;
+  final double quotaDiscountPercentage;
+  final double? fareBeforeQuotaDiscount;
 
   bool get selectable => status == SeatAvailability.available;
+  // Only a confirmed server flag and saving earn the special-fare treatment.
+  bool get hasSpecialFare => selectable && isSpecial && quotaDiscount > 0;
 
   factory TravelSeat.fromJson(Map<String, dynamic> json) => TravelSeat(
     number: json['number'].toString(),
@@ -188,12 +204,19 @@ class TravelSeat {
       orElse: () => SeatAvailability.unavailable,
     ),
     price: (json['price'] as num?)?.toDouble() ?? 0,
+    baseFare: (json['base_fare'] as num?)?.toDouble(),
     classId: (json['class_id'] as num?)?.toInt() ?? 0,
     className: json['class_name']?.toString(),
     type: json['type']?.toString(),
     deck: json['deck']?.toString(),
     bookedGender: json['booked_gender']?.toString(),
     genderRestriction: json['gender_restriction']?.toString(),
+    isSpecial: json['is_special'] == true,
+    quotaDiscount: (json['quota_discount'] as num?)?.toDouble() ?? 0,
+    quotaDiscountPercentage:
+        (json['quota_discount_percentage'] as num?)?.toDouble() ?? 0,
+    fareBeforeQuotaDiscount: (json['fare_before_quota_discount'] as num?)
+        ?.toDouble(),
   );
 }
 
@@ -274,6 +297,7 @@ class FareQuote {
     required this.taxes,
     required this.fees,
     required this.discount,
+    this.quotaDiscount = 0,
     this.surcharge = 0,
     this.roundingAdjustment = 0,
     required this.walletDeduction,
@@ -290,6 +314,11 @@ class FareQuote {
   final double taxes;
   final double fees;
   final double discount;
+
+  /// Included in [discount]; never subtract this from the total again.
+  final double quotaDiscount;
+  double get regularDiscount =>
+      discount > quotaDiscount ? discount - quotaDiscount : 0;
   final double surcharge;
   final double roundingAdjustment;
   final double walletDeduction;
@@ -306,6 +335,7 @@ class FareQuote {
     taxes: (json['taxes'] as num?)?.toDouble() ?? 0,
     fees: (json['fees'] as num?)?.toDouble() ?? 0,
     discount: (json['discount'] as num?)?.toDouble() ?? 0,
+    quotaDiscount: (json['quota_discount'] as num?)?.toDouble() ?? 0,
     surcharge: (json['surcharge'] as num?)?.toDouble() ?? 0,
     roundingAdjustment: (json['rounding_adjustment'] as num?)?.toDouble() ?? 0,
     walletDeduction: (json['wallet_deduction'] as num?)?.toDouble() ?? 0,

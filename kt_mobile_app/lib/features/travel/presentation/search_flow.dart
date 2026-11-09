@@ -9,7 +9,9 @@ import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_widgets.dart';
 import '../application/travel_providers.dart';
+import '../application/travel_calendar.dart';
 import '../domain/travel_models.dart';
+import 'special_fare_widgets.dart';
 
 String formatPkr(num amount) => NumberFormat.currency(
   locale: 'en_PK',
@@ -27,11 +29,13 @@ class SearchScreen extends ConsumerStatefulWidget {
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   CityOption? _origin;
   CityOption? _destination;
-  DateTime _date = DateTime.now();
+  DateTime? _date;
+  bool _checkingDate = false;
 
   @override
   Widget build(BuildContext context) {
     final cities = ref.watch(citiesProvider);
+    final calendar = ref.watch(travelCalendarProvider);
     final destinations = _origin == null
         ? const AsyncValue<List<CityOption>>.data([])
         : ref.watch(destinationsProvider(_origin!.id));
@@ -133,15 +137,28 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
-                    InkWell(
-                      borderRadius: AppRadius.field,
-                      onTap: _pickDate,
-                      child: InputDecorator(
-                        decoration: const InputDecoration(
-                          labelText: 'Departure date',
-                          prefixIcon: Icon(Icons.calendar_month_rounded),
+                    calendar.when(
+                      skipLoadingOnRefresh: false,
+                      loading: () => const LinearProgressIndicator(),
+                      error: (_, _) => TextButton.icon(
+                        onPressed: () => ref.invalidate(travelCalendarProvider),
+                        icon: const Icon(Icons.refresh_rounded),
+                        label: const Text('Could not load travel date. Retry'),
+                      ),
+                      data: (value) => InkWell(
+                        borderRadius: AppRadius.field,
+                        onTap: _pickDate,
+                        child: InputDecorator(
+                          decoration: const InputDecoration(
+                            labelText: 'Departure date',
+                            prefixIcon: Icon(Icons.calendar_month_rounded),
+                          ),
+                          child: Text(
+                            DateFormat(
+                              'EEEE, d MMMM',
+                            ).format(value.selection(_date)),
+                          ),
                         ),
-                        child: Text(DateFormat('EEEE, d MMMM').format(_date)),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -161,32 +178,55 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   Future<void> _pickDate() async {
+    if (_checkingDate) return;
+    final calendar = await _refreshCalendar();
+    if (!mounted || calendar == null) return;
     final value = await showDatePicker(
       context: context,
-      initialDate: _date,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 90)),
+      initialDate: calendar.selection(_date),
+      currentDate: calendar.today,
+      firstDate: calendar.today,
+      lastDate: calendar.lastDate,
     );
-    if (value != null) setState(() => _date = value);
+    if (mounted && value != null) setState(() => _date = value);
   }
 
-  void _search() {
-    if (_origin == null || _destination == null) {
+  Future<void> _search() async {
+    if (_checkingDate) return;
+    final origin = _origin;
+    final destination = _destination;
+    if (origin == null || destination == null) {
       _message('Choose both origin and destination.');
       return;
     }
-    if (_origin!.id == _destination!.id) {
+    if (origin.id == destination.id) {
       _message('Origin and destination must be different.');
       return;
     }
+    final calendar = await _refreshCalendar();
+    if (!mounted || calendar == null) return;
+    // City refresh/selection can change while the server date request is pending.
+    if (_origin != origin || _destination != destination) return;
     context.push(
       '/search/results',
       extra: SearchQuery(
-        origin: _origin!,
-        destination: _destination!,
-        date: _date,
+        origin: origin,
+        destination: destination,
+        date: calendar.selection(_date),
       ),
     );
+  }
+
+  Future<TravelCalendar?> _refreshCalendar() async {
+    setState(() => _checkingDate = true);
+    try {
+      return await ref.refresh(travelCalendarProvider.future);
+    } catch (_) {
+      if (mounted) _message('Could not load the travel date. Please retry.');
+      return null;
+    } finally {
+      if (mounted) setState(() => _checkingDate = false);
+    }
   }
 
   void _message(String value) => ScaffoldMessenger.of(
@@ -209,6 +249,7 @@ class ScheduleResultsScreen extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: () => ref.refresh(schedulesProvider(query).future),
         child: schedules.when(
+          skipLoadingOnRefresh: false,
           loading: () =>
               const AppLoadingView(label: 'Finding available buses…'),
           error: (error, _) => ListView(
@@ -289,6 +330,15 @@ class _ScheduleCard extends StatelessWidget {
             ),
           ],
         ),
+        if (schedule.availableSeats > 0 &&
+            schedule.availableSpecialSeats > 0 &&
+            schedule.lowestFare != null) ...[
+          const SizedBox(height: 5),
+          Align(
+            alignment: Alignment.centerRight,
+            child: SpecialSeatCount(count: schedule.availableSpecialSeats),
+          ),
+        ],
         const SizedBox(height: AppSpacing.md),
         Row(
           children: [
@@ -435,6 +485,8 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
           return Column(
             children: [
               const _SeatLegend(),
+              if (result.seats.any((seat) => seat.hasSpecialFare))
+                const SpecialFareLegend(),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(AppSpacing.md),
@@ -568,7 +620,8 @@ class _SeatCell extends StatelessWidget {
           };
     return Semantics(
       button: value.selectable,
-      label: 'Seat ${value.number}, ${value.status.name}',
+      label:
+          'Seat ${value.number}, ${value.status.name}${value.hasSpecialFare ? ', special fare, save ${formatPkr(value.quotaDiscount)}, fare ${formatPkr(value.price)}' : ''}',
       child: InkWell(
         onTap: value.selectable || selected ? () => onTap(value) : null,
         borderRadius: BorderRadius.circular(10),
@@ -581,21 +634,36 @@ class _SeatCell extends StatelessWidget {
             color: color,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: selected
+              color: value.hasSpecialFare
+                  ? specialFareColor
+                  : selected
                   ? AppColors.primary
                   : value.selectable
                   ? AppColors.border
                   : Colors.transparent,
-              width: 1.4,
+              width: value.hasSpecialFare ? 2.2 : 1.4,
             ),
           ),
-          child: Text(
-            value.number,
-            style: TextStyle(
-              color: selected ? Colors.white : AppColors.foreground,
-              fontWeight: FontWeight.w700,
-              fontSize: 12,
-            ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Center(
+                child: Text(
+                  value.number,
+                  style: TextStyle(
+                    color: selected ? Colors.white : AppColors.foreground,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              if (value.hasSpecialFare)
+                Positioned(
+                  top: 3,
+                  left: 3,
+                  child: SpecialFareMark(selected: selected),
+                ),
+            ],
           ),
         ),
       ),
@@ -1105,7 +1173,10 @@ class _FareSummary extends StatelessWidget {
         _line('Base fare', quote.baseFare),
         _line('Taxes', quote.taxes),
         _line('Service fees', quote.fees),
-        if (quote.discount > 0) _line('Discount', -quote.discount),
+        if (quote.regularDiscount > 0)
+          _line('Discount', -quote.regularDiscount),
+        if (quote.quotaDiscount > 0)
+          _line('Special seat discount', -quote.quotaDiscount),
         if (quote.surcharge != 0) _line('Surcharge', quote.surcharge),
         if (quote.roundingAdjustment != 0)
           _line('Rounding adjustment', quote.roundingAdjustment),

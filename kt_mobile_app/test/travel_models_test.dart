@@ -2,6 +2,101 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kt_mobile_app/features/travel/domain/travel_models.dart';
 
 void main() {
+  test(
+    'schedule reads the special count and defaults older responses to zero',
+    () {
+      final payload = <String, dynamic>{
+        'id': 1,
+        'schedule_detail_id': 2,
+        'origin': {'id': 1, 'name': 'Multan'},
+        'destination': {'id': 2, 'name': 'Rawalpindi'},
+        'departure_at': '2026-11-08T13:44:00',
+        'available_seats': 20,
+      };
+      expect(TravelSchedule.fromJson(payload).availableSpecialSeats, 0);
+      final schedule = TravelSchedule.fromJson({
+        ...payload,
+        'available_special_seats': 3,
+      });
+      expect(schedule.availableSpecialSeats, 3);
+      expect(schedule.availableSeats, 20);
+    },
+  );
+
+  test(
+    'special fare requires an explicit server flag, a saving and an available seat',
+    () {
+      final ordinary = <String, dynamic>{
+        'number': '12',
+        'row': 0,
+        'column': 0,
+        'class_id': 1,
+        'status': 'available',
+        'price': 2000,
+        'base_fare': 2500,
+      };
+      expect(TravelSeat.fromJson(ordinary).hasSpecialFare, isFalse);
+      final special = {
+        ...ordinary,
+        'is_special': true,
+        'quota_discount': 500,
+        'quota_discount_percentage': 20,
+        'fare_before_quota_discount': 2500,
+      };
+      final seat = TravelSeat.fromJson(special);
+      expect(seat.hasSpecialFare, isTrue);
+      expect(seat.quotaDiscountPercentage, 20);
+      expect(seat.fareBeforeQuotaDiscount, 2500);
+      for (final change in [
+        {'is_special': false},
+        {'is_special': 'Yes'},
+        {'quota_discount': 0},
+        {'status': 'booked'},
+        {'status': 'unavailable'},
+        {'status': 'unknown'},
+      ]) {
+        expect(
+          TravelSeat.fromJson({...special, ...change}).hasSpecialFare,
+          isFalse,
+        );
+      }
+    },
+  );
+
+  test(
+    'special savings split the reported discount without changing server totals',
+    () {
+      final quote = FareQuote.fromJson({
+        'quote_token': 'special',
+        'base_fare': 2500,
+        'discount': 625,
+        'quota_discount': 250,
+        'total': 1900,
+      });
+      expect(quote.regularDiscount, 375);
+      expect(quote.quotaDiscount, 250);
+      expect(quote.discount, 625);
+      expect(quote.total, 1900);
+    },
+  );
+  test(
+    'seat keeps the API original fare and defaults old responses to price',
+    () {
+      final payload = <String, dynamic>{
+        'number': '1',
+        'row': 0,
+        'column': 0,
+        'class_id': 1,
+        'status': 'available',
+        'price': 2150,
+      };
+      expect(TravelSeat.fromJson(payload).baseFare, 2150);
+      final seat = TravelSeat.fromJson({...payload, 'base_fare': 2500});
+      expect(seat.baseFare, 2500);
+      expect(seat.price, 2150);
+    },
+  );
+
   test('journey duration rounds to half hours and preserves arrival', () {
     final departure = DateTime(2099, 10, 30, 23, 59);
     for (final (minutes, rounded) in [
@@ -107,6 +202,7 @@ void main() {
 
     expect(quote.surcharge, 0);
     expect(quote.roundingAdjustment, 0);
+    expect(quote.quotaDiscount, 0);
     expect(quote.total, 2600);
   });
 

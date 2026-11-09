@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../domain/travel_models.dart';
+import 'special_fare_widgets.dart';
 
 class ScheduleResultCard extends StatelessWidget {
   const ScheduleResultCard({
@@ -27,6 +28,7 @@ class ScheduleResultCard extends StatelessWidget {
     final price = _SchedulePrice(fare: fare);
     final action = _ScheduleAction(
       availableSeats: schedule.availableSeats,
+      availableSpecialSeats: schedule.availableSpecialSeats,
       enabled: canSelect,
       onTap: onTap,
     );
@@ -245,11 +247,13 @@ class _JourneyEndpoint extends StatelessWidget {
 class _ScheduleAction extends StatelessWidget {
   const _ScheduleAction({
     required this.availableSeats,
+    required this.availableSpecialSeats,
     required this.enabled,
     required this.onTap,
   });
 
   final int availableSeats;
+  final int availableSpecialSeats;
   final bool enabled;
   final VoidCallback onTap;
 
@@ -278,6 +282,10 @@ class _ScheduleAction extends StatelessWidget {
           ),
         ],
       ),
+      if (enabled && availableSpecialSeats > 0) ...[
+        const SizedBox(height: 5),
+        SpecialSeatCount(count: availableSpecialSeats),
+      ],
       const SizedBox(height: 8),
       Container(
         padding: const EdgeInsets.only(bottom: 4),

@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,6 +12,8 @@ import 'package:kt_mobile_app/features/travel/application/travel_providers.dart'
 import 'package:kt_mobile_app/features/travel/domain/travel_models.dart';
 import 'package:kt_mobile_app/features/travel/presentation/lovable_search_flow.dart';
 import 'package:kt_mobile_app/features/travel/presentation/schedule_result_card.dart';
+import 'package:kt_mobile_app/features/travel/presentation/search_flow.dart'
+    as legacy;
 
 const _origin = CityOption(id: 1, name: 'Karachi');
 const _destination = CityOption(id: 2, name: 'Rawalpindi');
@@ -20,6 +24,8 @@ TravelSchedule _schedule({
   double amount = 12950,
   double original = 13950,
   bool noFare = false,
+  int availableSeats = 25,
+  int availableSpecialSeats = 0,
   Duration? journey,
 }) => TravelSchedule(
   id: id,
@@ -29,7 +35,8 @@ TravelSchedule _schedule({
   departureAt: DateTime(2099, 10, 30, hour),
   arrivalAt: journey == null ? null : DateTime(2099, 10, 30, hour).add(journey),
   busClassName: '2*1 Business & 2*2 Executive | 42 seats',
-  availableSeats: 25,
+  availableSeats: availableSeats,
+  availableSpecialSeats: availableSpecialSeats,
   totalSeats: 42,
   fares: noFare
       ? []
@@ -61,7 +68,20 @@ Future<void> _showCard(
   addTearDown(tester.view.resetDevicePixelRatio);
   await tester.pumpWidget(
     MaterialApp(
-      theme: AppTheme.light,
+      theme: AppTheme.light.copyWith(
+        textTheme: AppTheme.light.textTheme.apply(fontFamily: 'Roboto'),
+        filledButtonTheme: FilledButtonThemeData(
+          style: AppTheme.light.filledButtonTheme.style!.copyWith(
+            textStyle: const WidgetStatePropertyAll(
+              TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+      ),
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(
           context,
@@ -71,7 +91,10 @@ Future<void> _showCard(
       home: Scaffold(
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          child: ScheduleResultCard(schedule: schedule, onTap: () {}),
+          child: RepaintBoundary(
+            key: const ValueKey('schedule-card-preview'),
+            child: ScheduleResultCard(schedule: schedule, onTap: () {}),
+          ),
         ),
       ),
     ),
@@ -94,6 +117,13 @@ void main() {
       );
     }
     await loader.load();
+    final icons = FontLoader('MaterialIcons');
+    icons.addFont(
+      File.fromUri(
+        fonts.resolve('MaterialIcons-Regular.otf'),
+      ).readAsBytes().then((bytes) => ByteData.sublistView(bytes)),
+    );
+    await icons.load();
   });
 
   testWidgets(
@@ -170,7 +200,85 @@ void main() {
     );
   });
 
-  for (final size in [(width: 360.0, scale: 1.0), (width: 320.0, scale: 1.8)]) {
+  for (final count in [1, 3]) {
+    testWidgets('shows $count available special discount seats', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      await _showCard(tester, _schedule(availableSpecialSeats: count));
+      final label = '$count special discount ${count == 1 ? 'seat' : 'seats'}';
+      expect(find.text('25 seats left'), findsOneWidget);
+      expect(find.text(label), findsOneWidget);
+      expect(
+        find.bySemanticsLabel(RegExp(RegExp.escape('$label available'))),
+        findsOneWidget,
+      );
+      semantics.dispose();
+      expect(find.text('PKR 12,950'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      final previewPath = Platform.environment['SCHEDULE_CARD_PREVIEW'];
+      if (count == 3 && previewPath != null) {
+        final boundary = tester.renderObject<RenderRepaintBoundary>(
+          find.byKey(const ValueKey('schedule-card-preview')),
+        );
+        await tester.runAsync(() async {
+          final image = await boundary.toImage(pixelRatio: 2);
+          final data = await image.toByteData(format: ui.ImageByteFormat.png);
+          await File(previewPath).writeAsBytes(data!.buffer.asUint8List());
+          image.dispose();
+        });
+      }
+    });
+  }
+
+  testWidgets('hides special count for ordinary, sold out or unpriced trips', (
+    tester,
+  ) async {
+    for (final schedule in [
+      _schedule(),
+      _schedule(availableSeats: 0, availableSpecialSeats: 3),
+      _schedule(noFare: true, availableSpecialSeats: 3),
+    ]) {
+      await _showCard(tester, schedule);
+      expect(find.textContaining('special discount'), findsNothing);
+    }
+  });
+
+  testWidgets('original search flow also shows only positive special counts', (
+    tester,
+  ) async {
+    final query = SearchQuery(
+      origin: _origin,
+      destination: _destination,
+      date: DateTime(2099, 10, 30),
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          schedulesProvider(query).overrideWith(
+            (ref) async => [
+              _schedule(availableSpecialSeats: 3),
+              _schedule(id: 2),
+              _schedule(id: 3, availableSeats: 0, availableSpecialSeats: 3),
+            ],
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: legacy.ScheduleResultsScreen(query: query),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('3 special discount seats'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final size in [
+    (width: 360.0, scale: 1.0),
+    (width: 390.0, scale: 1.3),
+    (width: 320.0, scale: 1.8),
+  ]) {
     testWidgets(
       'fare and action fit at width ${size.width}, scale ${size.scale}',
       (tester) async {
@@ -178,12 +286,14 @@ void main() {
           tester,
           _schedule(
             amount: 12950.75,
+            availableSpecialSeats: 12,
             journey: const Duration(hours: 18, minutes: 20),
           ),
           width: size.width,
           scale: size.scale,
         );
         expect(find.text('PKR 12,950.75'), findsOneWidget);
+        expect(find.text('12 special discount seats'), findsOneWidget);
         await tester.ensureVisible(find.text('Select seats'));
         expect(tester.takeException(), isNull);
       },

@@ -11,7 +11,8 @@ final travelRepositoryProvider = Provider<TravelRepository>(
   (ref) => TravelRepository(ref.watch(apiClientProvider)),
 );
 
-final citiesProvider = FutureProvider<List<CityOption>>(
+// ERP sharing can change while the app is running. Reload on a new search visit.
+final citiesProvider = FutureProvider.autoDispose<List<CityOption>>(
   (ref) => ref.watch(travelRepositoryProvider).cities(),
 );
 
@@ -51,12 +52,14 @@ final loyaltyWalletProvider = FutureProvider.autoDispose
       return ref.watch(travelRepositoryProvider).wallet();
     });
 
-final destinationsProvider = FutureProvider.family<List<CityOption>, int>(
-  (ref, originId) => ref.watch(travelRepositoryProvider).destinations(originId),
-);
+final destinationsProvider = FutureProvider.autoDispose
+    .family<List<CityOption>, int>(
+      (ref, originId) =>
+          ref.watch(travelRepositoryProvider).destinations(originId),
+    );
 
-final schedulesProvider =
-    FutureProvider.family<List<TravelSchedule>, SearchQuery>(
+final schedulesProvider = FutureProvider.autoDispose
+    .family<List<TravelSchedule>, SearchQuery>(
       (ref, query) => ref.watch(travelRepositoryProvider).schedules(query),
       // Show search failures immediately; the screen offers an explicit retry.
       retry: (retryCount, error) => null,

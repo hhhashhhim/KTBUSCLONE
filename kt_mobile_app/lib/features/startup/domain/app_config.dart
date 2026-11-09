@@ -36,6 +36,7 @@ class MobileAppConfig {
     this.supportPhone,
     this.supportWhatsapp,
     this.supportEmail,
+    this.serverDate,
   });
 
   final String latestVersion;
@@ -48,6 +49,7 @@ class MobileAppConfig {
   final String? supportPhone;
   final String? supportWhatsapp;
   final String? supportEmail;
+  final String? serverDate;
   final AppFeatureFlags features;
 
   factory MobileAppConfig.fromJson(Map<String, dynamic> json) =>
@@ -63,6 +65,7 @@ class MobileAppConfig {
         supportPhone: _nonEmpty(json['support_phone']),
         supportWhatsapp: _nonEmpty(json['support_whatsapp']),
         supportEmail: _nonEmpty(json['support_email']),
+        serverDate: _nonEmpty(json['server_date']),
         features: AppFeatureFlags.fromJson(
           (json['features'] as Map?)?.cast<String, dynamic>() ?? const {},
         ),

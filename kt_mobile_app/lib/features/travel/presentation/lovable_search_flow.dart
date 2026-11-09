@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/network/api_exception.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_gradients.dart';
 import '../../../core/theme/app_radius.dart';
@@ -13,12 +14,15 @@ import '../../../core/widgets/app_widgets.dart';
 import '../../auth/application/auth_controller.dart';
 import '../../payments/presentation/payment_method_selector.dart';
 import '../application/travel_providers.dart';
+import '../application/travel_calendar.dart';
 import '../domain/travel_models.dart';
 import 'checkout_widgets.dart';
 import 'journey_search_widgets.dart';
 import 'passenger_details_widgets.dart';
+import 'points_entry_dialog.dart';
 import 'schedule_result_card.dart';
 import 'schedule_results_widgets.dart';
+import 'special_fare_widgets.dart';
 
 String formatPkr(num amount) => NumberFormat.currency(
   locale: 'en_PK',
@@ -36,11 +40,13 @@ class SearchScreen extends ConsumerStatefulWidget {
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   CityOption? _origin;
   CityOption? _destination;
-  DateTime _date = DateTime.now();
+  DateTime? _date;
+  bool _checkingDate = false;
 
   @override
   Widget build(BuildContext context) {
     final cities = ref.watch(citiesProvider);
+    final calendar = ref.watch(travelCalendarProvider);
     final destinations = _origin == null
         ? const AsyncValue<List<CityOption>>.data([])
         : ref.watch(destinationsProvider(_origin!.id));
@@ -80,17 +86,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              const Padding(
-                                padding: EdgeInsets.only(bottom: 18),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 18),
                                 child: Row(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.route_rounded,
                                       color: AppColors.primary,
                                       size: 20,
                                     ),
-                                    SizedBox(width: 9),
-                                    Expanded(
+                                    const SizedBox(width: 9),
+                                    const Expanded(
                                       child: Text(
                                         'Your travel details',
                                         style: TextStyle(
@@ -98,6 +104,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                           fontWeight: FontWeight.w800,
                                         ),
                                       ),
+                                    ),
+                                    IconButton(
+                                      tooltip: 'Refresh cities',
+                                      icon: const Icon(Icons.refresh_rounded),
+                                      onPressed: () {
+                                        ref.invalidate(citiesProvider);
+                                        ref.invalidate(destinationsProvider);
+                                        setState(() {
+                                          _origin = null;
+                                          _destination = null;
+                                        });
+                                      },
                                     ),
                                   ],
                                 ),
@@ -144,7 +162,22 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 ),
                               ),
                               const SizedBox(height: 14),
-                              _DateTile(date: _date, onTap: _pickDate),
+                              calendar.when(
+                                skipLoadingOnRefresh: false,
+                                loading: () => const LinearProgressIndicator(),
+                                error: (_, _) => TextButton.icon(
+                                  onPressed: () =>
+                                      ref.invalidate(travelCalendarProvider),
+                                  icon: const Icon(Icons.refresh_rounded),
+                                  label: const Text(
+                                    'Could not load travel date. Retry',
+                                  ),
+                                ),
+                                data: (value) => _DateTile(
+                                  date: value.selection(_date),
+                                  onTap: _pickDate,
+                                ),
+                              ),
                               const SizedBox(height: 24),
                               JourneySearchButton(onPressed: _search),
                             ],
@@ -175,32 +208,55 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   Future<void> _pickDate() async {
+    if (_checkingDate) return;
+    final calendar = await _refreshCalendar();
+    if (!mounted || calendar == null) return;
     final value = await showDatePicker(
       context: context,
-      initialDate: _date,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 90)),
+      initialDate: calendar.selection(_date),
+      currentDate: calendar.today,
+      firstDate: calendar.today,
+      lastDate: calendar.lastDate,
     );
-    if (value != null) setState(() => _date = value);
+    if (mounted && value != null) setState(() => _date = value);
   }
 
-  void _search() {
-    if (_origin == null || _destination == null) {
+  Future<void> _search() async {
+    if (_checkingDate) return;
+    final origin = _origin;
+    final destination = _destination;
+    if (origin == null || destination == null) {
       _message('Choose both origin and destination.');
       return;
     }
-    if (_origin!.id == _destination!.id) {
+    if (origin.id == destination.id) {
       _message('Origin and destination must be different.');
       return;
     }
+    final calendar = await _refreshCalendar();
+    if (!mounted || calendar == null) return;
+    // City refresh/selection can change while the server date request is pending.
+    if (_origin != origin || _destination != destination) return;
     context.push(
       '/search/results',
       extra: SearchQuery(
-        origin: _origin!,
-        destination: _destination!,
-        date: _date,
+        origin: origin,
+        destination: destination,
+        date: calendar.selection(_date),
       ),
     );
+  }
+
+  Future<TravelCalendar?> _refreshCalendar() async {
+    setState(() => _checkingDate = true);
+    try {
+      return await ref.refresh(travelCalendarProvider.future);
+    } catch (_) {
+      if (mounted) _message('Could not load the travel date. Please retry.');
+      return null;
+    } finally {
+      if (mounted) setState(() => _checkingDate = false);
+    }
   }
 
   void _message(String value) => ScaffoldMessenger.of(
@@ -480,6 +536,7 @@ class _ScheduleResultsScreenState extends ConsumerState<ScheduleResultsScreen> {
               child: RefreshIndicator(
                 onRefresh: () => ref.refresh(schedulesProvider(query).future),
                 child: schedules.when(
+                  skipLoadingOnRefresh: false,
                   loading: () =>
                       const AppLoadingView(label: 'Finding available buses…'),
                   error: (error, _) => ListView(
@@ -647,6 +704,8 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
           return Column(
             children: [
               const _SeatLegend(),
+              if (result.seats.any((seat) => seat.hasSpecialFare))
+                const SpecialFareLegend(),
               Expanded(
                 child: _SeatGrid(
                   seats: result.seats,
@@ -1006,7 +1065,9 @@ class _SeatCell extends StatelessWidget {
               ? _femaleSeatAccent
               : _maleSeatAccent
         : AppColors.foreground;
-    final borderColor = selected
+    final borderColor = value.hasSpecialFare
+        ? specialFareColor
+        : selected
         ? AppColors.primaryDark
         : booked
         ? foreground.withValues(alpha: .38)
@@ -1017,7 +1078,7 @@ class _SeatCell extends StatelessWidget {
               ? 'selected'
               : hasBookedGender
               ? '$bookedGender booked'
-              : value.status.name}',
+              : value.status.name}${value.hasSpecialFare ? ', special fare, save ${formatPkr(value.quotaDiscount)}, fare ${formatPkr(value.price)}' : ''}',
       button: value.selectable,
       selected: selected,
       child: InkWell(
@@ -1034,7 +1095,14 @@ class _SeatCell extends StatelessWidget {
               top: Radius.circular(12),
               bottom: Radius.circular(9),
             ),
-            border: Border.all(color: borderColor, width: selected ? 1.5 : 1),
+            border: Border.all(
+              color: borderColor,
+              width: value.hasSpecialFare
+                  ? 2.2
+                  : selected
+                  ? 1.5
+                  : 1,
+            ),
             boxShadow: selected
                 ? [
                     BoxShadow(
@@ -1048,6 +1116,12 @@ class _SeatCell extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
+              if (value.hasSpecialFare)
+                Positioned(
+                  top: 3,
+                  left: 3,
+                  child: SpecialFareMark(selected: selected),
+                ),
               Center(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 4),
@@ -1102,6 +1176,10 @@ class _SeatFooter extends StatelessWidget {
       0,
       (sum, seat) => sum + seat.price,
     );
+    final originalTotal = flow.selectedSeats.fold<double>(
+      0,
+      (sum, seat) => sum + seat.baseFare,
+    );
     return Column(
       children: [
         Row(
@@ -1136,6 +1214,16 @@ class _SeatFooter extends StatelessWidget {
                   'Total',
                   style: TextStyle(color: AppColors.muted, fontSize: 10.5),
                 ),
+                if (originalTotal > total)
+                  Text(
+                    formatPkr(originalTotal),
+                    semanticsLabel: 'Original fare ${formatPkr(originalTotal)}',
+                    style: const TextStyle(
+                      color: AppColors.muted,
+                      fontSize: 12,
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
                 Text(
                   formatPkr(total),
                   style: const TextStyle(
@@ -1850,14 +1938,29 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             return const AppLoadingView(label: 'Confirming the latest fare…');
           }
           if (snapshot.hasError) {
+            final error = snapshot.error;
+            final pendingReservations =
+                error is ApiException &&
+                error.statusCode == 409 &&
+                error.message ==
+                    'Please complete your existing reservations before making another booking.';
             return AppStateView(
-              icon: Icons.receipt_long_outlined,
-              title: 'Could not confirm fare',
-              message: snapshot.error.toString(),
-              actionLabel: 'Try again',
-              onAction: () => setState(() {
-                _request = _loadQuote(flow);
-              }),
+              icon: pendingReservations
+                  ? Icons.confirmation_number_outlined
+                  : Icons.receipt_long_outlined,
+              title: pendingReservations
+                  ? 'Complete your existing reservations'
+                  : 'Could not confirm fare',
+              message: error.toString(),
+              actionLabel: pendingReservations ? 'View my trips' : 'Try again',
+              onAction: pendingReservations
+                  ? () {
+                      ref.invalidate(bookingsProvider);
+                      context.go('/tickets');
+                    }
+                  : () => setState(() {
+                      _request = _loadQuote(flow);
+                    }),
             );
           }
           final quote = snapshot.data!;
@@ -1865,10 +1968,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(18, 22, 18, 24),
             children: [
-              CheckoutBookingSummary(
-                flow: flow,
-                totalLabel: formatPkr(quote.total),
-              ),
+              CheckoutBookingSummary(flow: flow, quote: quote),
               const SizedBox(height: 28),
               const AppSectionTitle('Payment method'),
               const SizedBox(height: 12),
@@ -1930,55 +2030,74 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         return Padding(
           padding: const EdgeInsets.only(top: 6, bottom: 10),
           child: AppCard(
-            child: Row(
+            child: Column(
               children: [
-                const CircleAvatar(
-                  backgroundColor: AppColors.primarySoft,
-                  foregroundColor: AppColors.primary,
-                  child: Icon(Icons.stars_rounded),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Use Kainat Points',
-                        style: TextStyle(fontWeight: FontWeight.w800),
+                Row(
+                  children: [
+                    const CircleAvatar(
+                      backgroundColor: AppColors.primarySoft,
+                      foregroundColor: AppColors.primary,
+                      child: Icon(Icons.stars_rounded),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Use Kainat Points',
+                            style: TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                          Text(
+                            '${data.pointsAvailable} available · ${data.redemptionLabel}',
+                            style: const TextStyle(
+                              color: AppColors.muted,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '${data.pointsAvailable} available · ${data.redemptionLabel}',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppColors.muted,
-                          fontSize: 11,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    IconButton(
+                      tooltip: 'Use fewer points',
+                      onPressed: !_submitting && selected > 0
+                          ? () => setState(() {
+                              _pointsToUse = selected - 1;
+                              _request = _loadQuote(flow);
+                            })
+                          : null,
+                      icon: const Icon(Icons.remove_circle_outline_rounded),
+                    ),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _submitting
+                            ? null
+                            : () => _editPoints(data, flow),
+                        icon: const Icon(Icons.edit_outlined, size: 18),
+                        label: Text(
+                          '$selected',
+                          semanticsLabel:
+                              '$selected points. Enter points manually',
+                          style: const TextStyle(fontWeight: FontWeight.w800),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: !_submitting && selected > 0
-                      ? () => setState(() {
-                          _pointsToUse = selected - 1;
-                          _request = _loadQuote(flow);
-                        })
-                      : null,
-                  icon: const Icon(Icons.remove_circle_outline_rounded),
-                ),
-                Text(
-                  '$selected',
-                  style: const TextStyle(fontWeight: FontWeight.w800),
-                ),
-                IconButton(
-                  onPressed: !_submitting && selected < data.pointsAvailable
-                      ? () => setState(() {
-                          _pointsToUse = selected + 1;
-                          _request = _loadQuote(flow);
-                        })
-                      : null,
-                  icon: const Icon(Icons.add_circle_outline_rounded),
+                    ),
+                    IconButton(
+                      tooltip: 'Use more points',
+                      onPressed: !_submitting && selected < data.pointsAvailable
+                          ? () => setState(() {
+                              _pointsToUse = selected + 1;
+                              _request = _loadQuote(flow);
+                            })
+                          : null,
+                      icon: const Icon(Icons.add_circle_outline_rounded),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -1987,6 +2106,39 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       },
       orElse: () => const SizedBox.shrink(),
     );
+  }
+
+  Future<void> _editPoints(LoyaltyWallet wallet, BookingFlowState flow) async {
+    final session = ref.read(passengerSessionProvider);
+    final points = await showDialog<int>(
+      context: context,
+      builder: (_) => PointsEntryDialog(
+        selected: _pointsToUse.clamp(0, wallet.pointsAvailable),
+        available: wallet.pointsAvailable,
+      ),
+    );
+    if (!mounted ||
+        points == null ||
+        _submitting ||
+        ref.read(passengerSessionProvider) != session) {
+      return;
+    }
+    final latestWallet = ref.read(loyaltyWalletProvider(session)).asData?.value;
+    if (latestWallet == null ||
+        !latestWallet.active ||
+        points > latestWallet.pointsAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Your available points changed. Please try again.'),
+        ),
+      );
+      return;
+    }
+    if (points == _pointsToUse) return;
+    setState(() {
+      _pointsToUse = points;
+      _request = _loadQuote(flow);
+    });
   }
 
   Future<void> _book(FareQuote quote) async {

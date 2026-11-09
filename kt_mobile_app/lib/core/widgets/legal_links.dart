@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../legal/privacy_policy.dart';
-import 'legal_document_screen.dart';
+import '../legal/terms_and_conditions.dart';
 import 'privacy_policy_screen.dart';
+import 'terms_and_conditions_screen.dart';
 
 enum LegalDocument {
-  terms('Terms & conditions', 'https://www.kainattravels.com/Terms'),
+  terms('Terms & conditions', TermsAndConditions.sourceUrl),
   privacy('Privacy policy', PrivacyPolicy.sourceUrl);
 
   const LegalDocument(this.label, this.url);
@@ -16,9 +17,10 @@ enum LegalDocument {
   Future<void> open(BuildContext context) async {
     await Navigator.of(context, rootNavigator: true).push<void>(
       MaterialPageRoute(
-        builder: (_) => this == LegalDocument.privacy
-            ? const PrivacyPolicyScreen()
-            : LegalDocumentScreen(title: label, uri: Uri.parse(url)),
+        builder: (_) => switch (this) {
+          LegalDocument.terms => const TermsAndConditionsScreen(),
+          LegalDocument.privacy => const PrivacyPolicyScreen(),
+        },
       ),
     );
   }

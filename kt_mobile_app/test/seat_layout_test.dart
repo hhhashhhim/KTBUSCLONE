@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +13,7 @@ import 'package:kt_mobile_app/features/travel/application/travel_providers.dart'
 import 'package:kt_mobile_app/features/travel/data/travel_repository.dart';
 import 'package:kt_mobile_app/features/travel/domain/travel_models.dart';
 import 'package:kt_mobile_app/features/travel/presentation/lovable_search_flow.dart';
+import 'package:kt_mobile_app/features/travel/presentation/special_fare_widgets.dart';
 
 class _SeatRepository implements TravelRepository {
   _SeatRepository(this.layout);
@@ -105,6 +108,27 @@ Future<ProviderContainer> _showSeats(
   addTearDown(tester.view.resetDevicePixelRatio);
   addTearDown(tester.view.resetPhysicalSize);
   final layout = seats ?? _mixedLayout();
+  final theme = AppTheme.light;
+  final previewTheme = Platform.environment['SEAT_MAP_PREVIEW_PATH'] == null
+      ? theme
+      : theme.copyWith(
+          appBarTheme: theme.appBarTheme.copyWith(
+            titleTextStyle: theme.appBarTheme.titleTextStyle?.copyWith(
+              fontFamily: 'Roboto',
+            ),
+          ),
+          filledButtonTheme: FilledButtonThemeData(
+            style: theme.filledButtonTheme.style?.copyWith(
+              textStyle: const WidgetStatePropertyAll(
+                TextStyle(
+                  fontFamily: 'Roboto',
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        );
   final container = ProviderContainer(
     overrides: [
       travelRepositoryProvider.overrideWithValue(_SeatRepository(layout)),
@@ -143,16 +167,20 @@ Future<ProviderContainer> _showSeats(
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
-      child: MaterialApp.router(
-        theme: AppTheme.light,
-        routerConfig: router,
-        builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            padding: EdgeInsets.only(top: topInset, bottom: bottomInset),
-            viewPadding: EdgeInsets.only(top: topInset, bottom: bottomInset),
-            textScaler: TextScaler.linear(textScale),
+      child: RepaintBoundary(
+        key: const ValueKey('seat-preview'),
+        child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          theme: previewTheme,
+          routerConfig: router,
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              padding: EdgeInsets.only(top: topInset, bottom: bottomInset),
+              viewPadding: EdgeInsets.only(top: topInset, bottom: bottomInset),
+              textScaler: TextScaler.linear(textScale),
+            ),
+            child: child!,
           ),
-          child: child!,
         ),
       ),
     ),
@@ -178,7 +206,131 @@ void main() {
       );
     }
     await loader.load();
+    final icons = FontLoader('MaterialIcons')
+      ..addFont(
+        File.fromUri(
+          fontDirectory.resolve('MaterialIcons-Regular.otf'),
+        ).readAsBytes().then((bytes) => ByteData.sublistView(bytes)),
+      );
+    await icons.load();
   });
+
+  for (final original in [2500.0, 2150.0, 2000.0]) {
+    testWidgets('selected seat shows original $original only for a reduction', (
+      tester,
+    ) async {
+      await _showSeats(
+        tester,
+        size: const Size(360, 800),
+        seats: [
+          TravelSeat(
+            number: '1',
+            row: 0,
+            column: 0,
+            status: SeatAvailability.available,
+            price: 2150,
+            baseFare: original,
+            classId: 1,
+          ),
+        ],
+      );
+      await tester.tap(_seat('1'));
+      await tester.pumpAndSettle();
+      expect(find.text('Rs. 2,150'), findsOneWidget);
+      final crossed = find.byWidgetPredicate(
+        (widget) =>
+            widget is Text &&
+            widget.style?.decoration == TextDecoration.lineThrough,
+      );
+      expect(crossed, original > 2150 ? findsOneWidget : findsNothing);
+      if (original > 2150) {
+        expect(tester.widget<Text>(crossed).data, 'Rs. 2,500');
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final phone in [const Size(360, 800), const Size(320, 568)]) {
+    testWidgets(
+      'special fare ring survives selection on $phone without marking booked seats',
+      (tester) async {
+        final seats = _mixedLayout()
+            .map(
+              (seat) => TravelSeat(
+                number: seat.number,
+                row: seat.row,
+                column: seat.column,
+                status: seat.status,
+                bookedGender: seat.bookedGender,
+                classId: seat.classId,
+                baseFare: 2500,
+                price: const ['1', '20', '24'].contains(seat.number)
+                    ? 2000
+                    : 2500,
+                isSpecial: const ['1', '20', '24'].contains(seat.number),
+                quotaDiscount: const ['1', '20', '24'].contains(seat.number)
+                    ? 500
+                    : 0,
+                quotaDiscountPercentage: 20,
+                fareBeforeQuotaDiscount: 2500,
+              ),
+            )
+            .toList();
+        final container = await _showSeats(tester, size: phone, seats: seats);
+        expect(find.text('Special fare'), findsOneWidget);
+        expect(
+          find.byType(SpecialFareMark),
+          findsNWidgets(3),
+        ); // Legend and the two available special seats.
+        final label = tester.widget<Semantics>(_seat('20')).properties.label!;
+        expect(label, contains('special fare, save Rs. 500, fare Rs. 2,000'));
+        expect(
+          tester.widget<Semantics>(_seat('1')).properties.label,
+          'Seat 1, male booked',
+        );
+        BoxDecoration decoration() =>
+            tester
+                    .widget<AnimatedContainer>(
+                      find.descendant(
+                        of: _seat('20'),
+                        matching: find.byType(AnimatedContainer),
+                      ),
+                    )
+                    .decoration!
+                as BoxDecoration;
+        expect((decoration().border! as Border).top.color, specialFareColor);
+        expect(decoration().color, Colors.white);
+        await tester.ensureVisible(_seat('20'));
+        await tester.tap(_seat('20'));
+        await tester.pumpAndSettle();
+        expect(
+          container.read(bookingFlowProvider).selectedSeats.single.price,
+          2000,
+        );
+        expect((decoration().border! as Border).top.color, specialFareColor);
+        expect(decoration().color, isNot(Colors.white));
+        expect(find.text('Rs. 2,000'), findsOneWidget);
+        expect(find.byIcon(Icons.percent_rounded), findsNWidgets(3));
+        expect(tester.takeException(), isNull);
+        final previewPath = Platform.environment['SEAT_MAP_PREVIEW_PATH'];
+        if (previewPath != null && phone.width == 360) {
+          final boundary = tester.renderObject<RenderRepaintBoundary>(
+            find.byKey(const ValueKey('seat-preview')),
+          );
+          await tester.runAsync(() async {
+            final image = await boundary.toImage(pixelRatio: 2);
+            final data = await image.toByteData(format: ui.ImageByteFormat.png);
+            await File(previewPath).writeAsBytes(data!.buffer.asUint8List());
+            image.dispose();
+          });
+        }
+        await tester.tap(_seat('20'));
+        await tester.pumpAndSettle();
+        expect(container.read(bookingFlowProvider).selectedSeats, isEmpty);
+        expect((decoration().border! as Border).top.color, specialFareColor);
+      },
+    );
+  }
 
   for (final phone in [
     (size: const Size(360, 800), top: 24.0, bottom: 24.0),

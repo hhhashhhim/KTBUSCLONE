@@ -8,6 +8,7 @@ import '../core/theme/app_theme.dart';
 import '../features/auth/application/auth_controller.dart';
 import '../features/startup/application/startup_controller.dart';
 import '../features/travel/application/travel_providers.dart';
+import '../features/travel/application/travel_calendar.dart';
 import 'router.dart';
 import '../features/notifications/notification_push.dart';
 import '../features/notifications/notification_providers.dart';
@@ -68,6 +69,9 @@ class _KainatTravelsAppState extends ConsumerState<KainatTravelsApp>
     );
     _updateTimer = Timer.periodic(const Duration(minutes: 1), (_) {
       if (WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
+        // Only listened-to searches refetch; departed runs are removed by the API.
+        ref.invalidate(schedulesProvider);
+        ref.invalidate(travelCalendarProvider);
         ref.read(startupControllerProvider.notifier).checkForUpdates();
       }
     });
@@ -106,6 +110,8 @@ class _KainatTravelsAppState extends ConsumerState<KainatTravelsApp>
         await _lockQuickLogin();
       }
       if (!mounted) return;
+      ref.invalidate(schedulesProvider);
+      ref.invalidate(travelCalendarProvider);
       await ref.read(startupControllerProvider.notifier).checkForUpdates();
       if (!mounted) return;
       ref.invalidate(fleetGalleryProvider);
