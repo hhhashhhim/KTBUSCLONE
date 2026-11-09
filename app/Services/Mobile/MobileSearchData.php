@@ -29,6 +29,8 @@ class MobileSearchData
     public $discounts;
     public $terminalDiscounts;
     public $surcharges;
+    public $quotaPercentages;
+    private $mainDepartures;
     private $tickets;
 
     public function __construct(Collection $details, int $companyId, int $terminalId, int $originId, int $destinationId)
@@ -75,7 +77,7 @@ class MobileSearchData
         // One fresh read supplies both overlapping seats and the run-wide online quota.
         $runsByDate = $details->groupBy('schedule_date');
         $this->tickets = Ticket::query()->where('company_id', $companyId)
-            ->whereNotIn('type', ['cancelled'])
+            ->whereNotIn('type', ['cancelled', 'canceled'])
             ->where(function ($runs) use ($runsByDate) {
                 foreach ($runsByDate as $runDetails) {
                     // Preserve NULL for legacy runs; Collection group keys turn it into an empty string.
@@ -89,10 +91,29 @@ class MobileSearchData
             ->groupBy(function ($ticket) {
                 return $ticket->schedule_id . ':' . substr((string) $ticket->schedule_date, 0, 10);
             });
+        $quotaDetails = $details->filter(function ($detail) { return $detail->schedule->intermediate_quota !== null; });
+        $this->quotaPercentages = collect();
+        $this->mainDepartures = collect();
+        if ($quotaDetails->isNotEmpty()) {
+            $this->quotaPercentages = app(MobileQuotaService::class)->percentages($quotaDetails, $companyId, $terminalId);
+            $this->mainDepartures = ScheduleDetail::where('company_id', $companyId)
+                ->whereIn('schedule_id', $quotaDetails->pluck('schedule_id')->unique())
+                ->whereIn('schedule_date', $quotaDetails->pluck('schedule_date')->unique())
+                ->orderBy('id')->get()->groupBy(function ($detail) {
+                    return $detail->schedule_id . ':' . substr((string) $detail->schedule_date, 0, 10);
+                });
+        }
     }
 
     public function ticketsFor(ScheduleDetail $detail): Collection
     {
         return $this->tickets->get($detail->schedule_id . ':' . substr((string) $detail->schedule_date, 0, 10), collect());
+    }
+
+    public function mainDepartureFor(ScheduleDetail $detail): ?ScheduleDetail
+    {
+        $firstCity = optional($detail->schedule->route->fares->sortBy('id')->first())->departure_city_id;
+        return $this->mainDepartures->get($detail->schedule_id . ':' . substr((string) $detail->schedule_date, 0, 10), collect())
+            ->firstWhere('departure_id', $firstCity);
     }
 }

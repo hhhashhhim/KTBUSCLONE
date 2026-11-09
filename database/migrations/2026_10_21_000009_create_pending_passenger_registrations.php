@@ -20,7 +20,9 @@ class CreatePendingPassengerRegistrations extends Migration
             $table->string('otp_digest')->nullable();
             $table->timestamp('otp_expires_at')->nullable();
             $table->unsignedTinyInteger('otp_attempts')->default(0);
-            $table->timestamp('expires_at')->index();
+            // Legacy MySQL/MariaDB TIMESTAMP defaults can reject this table in strict mode.
+            // Keep the application-assigned deadline required and free of automatic updates.
+            $table->dateTime('expires_at')->index();
             $table->timestamps();
             $table->index(['company_id', 'mobile']);
         });

@@ -93,7 +93,8 @@ class MobilePaymentService
         $lock = Cache::lock('stayLock:' . $invoice->schedule_id, 15);
         if (!$lock->get()) { throw new RuntimeException('The booking is being updated. Please check again.', 409); }
         try {
-            return DB::transaction(function () use ($payment, $paid) {
+            return DB::transaction(function () use ($payment, $paid, $invoice) {
+                app(MobileQuotaService::class)->lockSchedule($payment->company_id, $invoice->schedule_id);
                 $payment = MobilePayment::whereKey($payment->id)->lockForUpdate()->firstOrFail();
                 if (in_array($payment->status, ['paid', 'review_required'], true)) { return $payment; }
                 $tickets = Ticket::withTrashed()->where('company_id', $payment->company_id)
@@ -105,11 +106,23 @@ class MobilePaymentService
                     $confirm = $payment->status === 'pending' && $payment->expires_at->isFuture()
                         && $active->count() === $payment->ticket_count && $amount === $payment->amount_minor;
                     if ($confirm) {
+                        try {
+                            app(MobileQuotaService::class)->assertConfirmation($active);
+                        } catch (RuntimeException $exception) {
+                            if (get_class($exception) !== RuntimeException::class || $exception->getCode() !== 409) { throw $exception; }
+                            // Money is already received. Use the existing review workflow;
+                            // never issue an over-quota ticket or silently change its price.
+                            $confirm = false;
+                            $this->audit($payment, 'Quota or special fare changed; payment needs review');
+                        }
+                    }
+                    if ($confirm) {
                         Ticket::whereIn('id', $active->pluck('id'))->update([
                             'type' => 'booked', 'transaction_id' => $payment->transaction_reference,
                             'booked_time' => now(), 'updated_by' => config('mobile.booking_user_id'),
                         ]);
                         TicketIsPartial::whereIn('ticket_id', $active->pluck('id'))->update(['type' => 'booked']);
+                        app(MobileLoyaltyEarningService::class)->awardPayment($payment, $active);
                     } else { $this->release($payment, $active); }
                     $payment->update(['status' => $confirm ? 'paid' : 'review_required', 'paid_at' => now()]);
                     $this->audit($payment, $confirm ? 'Payment verified; tickets confirmed' : 'Payment received; head office review required');

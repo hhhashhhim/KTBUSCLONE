@@ -6,6 +6,7 @@ use App\Models\MobileBookingQuote;
 use App\Models\PassengerAccount;
 use App\Services\Mobile\MobileBookingService;
 use App\Services\Mobile\MobileTravelService;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Mockery;
@@ -15,6 +16,7 @@ class MobileApiContractTest extends TestCase
 {
     protected function tearDown(): void
     {
+        Carbon::setTestNow();
         DB::purge('mobile_contract_testing');
         parent::tearDown();
     }
@@ -54,6 +56,24 @@ class MobileApiContractTest extends TestCase
             ],
             'errors' => null,
         ]);
+    }
+
+    public function test_app_calendar_uses_pakistan_server_date_across_midnight()
+    {
+        config()->set('mobile.company_id', null);
+        config()->set('app.timezone', 'Asia/Karachi');
+        Carbon::setTestNow(Carbon::parse('2026-11-07T18:59:59Z'));
+
+        $before = $this->getJson('/api/mobile/v1/app/config');
+        $before->assertOk()->assertJsonPath('data.server_time', '2026-11-07T23:59:59+05:00')
+            ->assertJsonPath('data.server_date', '2026-11-07')
+            ->assertJsonPath('data.timezone', 'Asia/Karachi');
+        $this->assertStringContainsString('no-store', $before->headers->get('Cache-Control'));
+
+        Carbon::setTestNow(Carbon::parse('2026-11-07T19:00:00Z'));
+        $this->getJson('/api/mobile/v1/app/config?date=2000-01-01')
+            ->assertOk()->assertJsonPath('data.server_time', '2026-11-08T00:00:00+05:00')
+            ->assertJsonPath('data.server_date', '2026-11-08');
     }
 
     public function test_registration_validation_uses_mobile_error_contract()
@@ -125,6 +145,7 @@ class MobileApiContractTest extends TestCase
                 'arrival_at' => null,
                 'bus_class' => ['id' => 3, 'name' => 'Business'],
                 'available_seats' => 12,
+                'available_special_seats' => 3,
                 'total_seats' => 36,
                 'fares' => [['class_id' => 3, 'amount' => 2500]],
             ],
@@ -138,6 +159,7 @@ class MobileApiContractTest extends TestCase
                 'data' => [[
                     'schedule_detail_id' => 19,
                     'available_seats' => 12,
+                    'available_special_seats' => 3,
                 ]],
             ]);
     }

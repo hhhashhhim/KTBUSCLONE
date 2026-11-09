@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\PassengerAccount;
 use App\Models\PendingPassengerRegistration;
 use App\Services\Mobile\MobileOtpService;
+use App\Services\Mobile\MobileRegistrationService;
 use App\Services\Mobile\MobileTravelService;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\DB;
@@ -131,6 +133,94 @@ class MobileOtpTest extends TestCase
         $this->fakeHttp(['*' => Http::response(['success' => true], 200)]);
         $this->postJson('/api/mobile/v1/auth/resend-otp')->assertOk();
         $this->assertTrue(Hash::check($this->sentCode(), $account->fresh()->otp_digest));
+    }
+
+    /** @dataProvider signupDebugModes */
+    public function test_missing_registration_table_returns_safe_error_and_migration_restores_signup(bool $debug): void
+    {
+        config()->set('app.debug', $debug);
+        Schema::drop('pending_passenger_registrations');
+
+        $this->postJson('/api/mobile/v1/auth/register', $this->signup())
+            ->assertStatus(500)->assertExactJson([
+                'success' => false, 'message' => 'Something went wrong. Please try again.',
+                'data' => null, 'errors' => [],
+            ])->assertSee('"errors":{}', false);
+        Log::shouldHaveReceived('error')->once()->withArgs(function ($message, $context) {
+            return ($context['exception'] ?? null) instanceof QueryException;
+        });
+        Http::assertNothingSent();
+        $this->assertDatabaseCount('passenger_accounts', 0);
+        $this->assertDatabaseCount('customers', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+
+        (new \CreatePendingPassengerRegistrations())->up();
+        $token = $this->postJson('/api/mobile/v1/auth/register', $this->signup())
+            ->assertCreated()->assertJsonPath('data.verification_delivery_sent', true)->json('data.token');
+        $this->bearer('POST', 'mobile/v1/auth/verify-otp', $token, ['code' => $this->sentCode()])
+            ->assertOk()->assertJsonPath('data.passenger.mobile_verified', true);
+    }
+
+    public static function signupDebugModes(): array
+    {
+        return ['production' => [false], 'debug' => [true]];
+    }
+
+    public function test_database_error_while_preparing_otp_is_not_returned_as_a_delivery_message(): void
+    {
+        config()->set('app.debug', true);
+        $exception = new QueryException('update pending_passenger_registrations set otp_digest = ?',
+            ['private-otp-digest'], new \PDOException('private-database-details', 422));
+        $registrations = Mockery::mock(MobileRegistrationService::class)->makePartial();
+        $registrations->shouldReceive('send')->once()->andThrow($exception);
+        $this->app->instance(MobileRegistrationService::class, $registrations);
+
+        $this->postJson('/api/mobile/v1/auth/register', $this->signup())
+            ->assertStatus(500)->assertExactJson([
+                'success' => false, 'message' => 'Something went wrong. Please try again.',
+                'data' => null, 'errors' => [],
+            ]);
+        Log::shouldHaveReceived('error')->once()->withArgs(function ($message, $context) use ($exception) {
+            return ($context['exception'] ?? null) === $exception;
+        });
+        Http::assertNothingSent();
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+        $this->assertDatabaseCount('passenger_accounts', 0);
+    }
+
+    public function test_signup_token_storage_failure_is_logged_without_exposing_database_details(): void
+    {
+        config()->set('app.debug', true);
+        Schema::drop('personal_access_tokens');
+
+        $this->postJson('/api/mobile/v1/auth/register', $this->signup())
+            ->assertStatus(500)->assertExactJson([
+                'success' => false, 'message' => 'Something went wrong. Please try again.',
+                'data' => null, 'errors' => [],
+            ]);
+        Log::shouldHaveReceived('error')->once()->withArgs(function ($message, $context) {
+            return ($context['exception'] ?? null) instanceof QueryException;
+        });
+        $this->assertDatabaseCount('passenger_accounts', 0);
+    }
+
+    public function test_unexpected_signup_failure_is_logged_and_hidden_even_in_debug_mode(): void
+    {
+        config()->set('app.debug', true);
+        $exception = new \TypeError('private-internal-details');
+        $registrations = Mockery::mock(MobileRegistrationService::class);
+        $registrations->shouldReceive('start')->once()->andThrow($exception);
+        $this->app->instance(MobileRegistrationService::class, $registrations);
+
+        $this->postJson('/api/mobile/v1/auth/register', $this->signup())
+            ->assertStatus(500)->assertExactJson([
+                'success' => false, 'message' => 'Something went wrong. Please try again.',
+                'data' => null, 'errors' => [],
+            ]);
+        Log::shouldHaveReceived('error')->once()->withArgs(function ($message, $context) use ($exception) {
+            return ($context['exception'] ?? null) === $exception;
+        });
+        Http::assertNothingSent();
     }
 
     public function test_password_reset_whatsapp_code_is_separate_and_revokes_sessions()

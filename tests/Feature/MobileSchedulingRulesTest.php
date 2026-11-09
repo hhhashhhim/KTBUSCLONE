@@ -453,6 +453,7 @@ class MobileSchedulingRulesTest extends TestCase
 
     public function test_departure_date_passing_midnight_invalidates_a_previously_valid_quote()
     {
+        DB::table('schedule_details')->update(['departure_time' => '23:59:30']);
         Carbon::setTestNow(Carbon::parse('2026-09-13 23:59:00'));
         $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
         Carbon::setTestNow(Carbon::parse('2026-09-14 00:01:00'));
@@ -460,6 +461,45 @@ class MobileSchedulingRulesTest extends TestCase
             'quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter',
         ])->assertNotFound();
         $this->assertDatabaseCount('tickets', 0);
+    }
+
+    /** @dataProvider departedTimes */
+    public function test_departed_segments_are_hidden_and_cannot_be_previewed_or_quoted(string $time, int $checkMinutes): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-09-13 ' . $time, 'Asia/Karachi'));
+        DB::table('users')->update(['check_booking_minutes' => $checkMinutes]);
+        DB::table('terminal_visibilities')->update(['booking_minutes' => -1]);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data', []);
+        $this->getJson($this->seatsUrl())->assertNotFound();
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertNotFound();
+        $this->assertDatabaseCount('mobile_booking_quotes', 0);
+        $this->assertDatabaseCount('tickets', 0);
+    }
+
+    public function departedTimes(): array
+    {
+        return [['12:00:00', 0], ['12:00:01', 0], ['23:59:59', 0], ['12:00:00', 1], ['12:00:01', 1]];
+    }
+
+    public function test_departure_boundary_invalidates_a_quote_before_seats_are_created(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-09-13 11:59:59', 'Asia/Karachi'));
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonCount(1, 'data');
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        Carbon::setTestNow(Carbon::parse('2026-09-13 12:00:00', 'Asia/Karachi'));
+        $this->postJson('/api/mobile/v1/bookings', [
+            'quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter',
+        ])->assertNotFound();
+        $this->assertDatabaseCount('tickets', 0);
+    }
+
+    public function test_search_keeps_future_boarding_times_in_pakistan_timezone(): void
+    {
+        $detail = (array) DB::table('schedule_details')->where('id', 50)->first();
+        DB::table('schedule_details')->insert(array_merge($detail, ['id' => 51, 'departure_time' => '12:00:01']));
+        Carbon::setTestNow(Carbon::parse('2026-09-13 07:00:00', 'UTC'));
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.schedule_detail_id', 51);
     }
 
     public function test_terminal_and_route_seat_restrictions_agree_with_search_count()
@@ -1119,6 +1159,8 @@ class MobileSchedulingRulesTest extends TestCase
         (new \CreateMobilePaymentsTable())->up();
         require_once base_path('database/migrations/2026_09_12_000009_add_environment_to_mobile_payments.php');
         (new \AddEnvironmentToMobilePayments())->up();
+        require_once database_path('migrations/2026_11_08_000001_create_mobile_loyalty_awards_table.php');
+        (new \CreateMobileLoyaltyAwardsTable())->up();
         config()->set('mobile_payments.environment', 'sandbox');
         Schema::table('tickets', function (Blueprint $table) { $table->string('transaction_id')->nullable(); });
         Schema::create('booking_cancels', function (Blueprint $table) {
@@ -1464,6 +1506,44 @@ class MobileSchedulingRulesTest extends TestCase
         $this->assertQuoteAddsUp($quote->json('data'));
     }
 
+    public function test_company_wallet_override_applies_real_points_to_each_quote_without_spending_them(): void
+    {
+        Schema::create('mobile_app_configs', function (Blueprint $table) {
+            $table->id(); $table->integer('company_id'); $table->text('features'); $table->timestamps();
+        });
+        Schema::table('passenger_accounts', function (Blueprint $table) { $table->integer('customer_id')->nullable(); });
+        Schema::create('card_categories', function (Blueprint $table) {
+            $table->id(); $table->integer('company_id'); $table->string('name'); $table->string('discount_type');
+            $table->decimal('flat_discount', 10, 2); $table->decimal('percentage_discount', 10, 2);
+            $table->timestamps(); $table->softDeletes();
+        });
+        Schema::create('card_assigns', function (Blueprint $table) {
+            $table->id(); $table->integer('company_id'); $table->integer('customer_id'); $table->integer('card_category_id');
+            $table->integer('starting_points'); $table->date('expiry_date'); $table->timestamps(); $table->softDeletes();
+        });
+        auth()->user()->forceFill(['customer_id' => 99])->save();
+        DB::table('card_categories')->insert([
+            'id' => 1, 'company_id' => 1, 'name' => 'Test points', 'discount_type' => 'flat',
+            'flat_discount' => 1, 'percentage_discount' => 0,
+        ]);
+        DB::table('card_assigns')->insert([
+            'id' => 1, 'company_id' => 1, 'customer_id' => 99, 'card_category_id' => 1,
+            'starting_points' => 250, 'expiry_date' => '2026-12-31',
+        ]);
+        // The company override must enable redemption even if the environment default is off.
+        \App\Models\MobileAppConfig::create(['company_id' => 1, 'features' => ['wallet' => true]]);
+        foreach ([0 => 2500, 50 => 2450, 125 => 2375, 250 => 2250] as $points => $payable) {
+            $response = $this->postJson('/api/mobile/v1/bookings/quote', array_merge($this->quoteInput(), ['points_to_use' => $points]))
+                ->assertOk()->assertJsonPath('data.wallet_points_used', $points)
+                ->assertJsonPath('data.wallet_deduction', $points)->assertJsonPath('data.total', $payable);
+            $this->assertQuoteAddsUp($response->json('data'));
+            $this->assertDatabaseHas('card_assigns', ['id' => 1, 'starting_points' => 250]);
+        }
+        $this->postJson('/api/mobile/v1/bookings/quote', array_merge($this->quoteInput(), ['points_to_use' => 251]))
+            ->assertStatus(422)->assertJsonPath('message', 'You do not have enough loyalty points.');
+        $this->assertDatabaseCount('mobile_booking_quotes', 4);
+    }
+
     public function test_account_deleted_during_quote_lookup_cannot_recreate_passenger_data(): void
     {
         config()->set('mobile.features.wallet', true);
@@ -1575,6 +1655,315 @@ class MobileSchedulingRulesTest extends TestCase
         DB::table('terminal_visibilities')->update(['booking_minutes' => 1440]);
         DB::table('terminal_time_differences')->insert(['company_id' => 1, 'terminal_id' => 10, 'route_id' => 30, 'time_difference' => 0]);
         $this->limitOnlineSeats(3);
+    }
+
+    private function installMidwayQuota(?int $limit = 1, float $percentage = 20): void
+    {
+        require_once database_path('migrations/2026_11_07_000001_support_mobile_schedule_quota_rules.php');
+        (new \SupportMobileScheduleQuotaRules())->up();
+        DB::table('schedules')->where('id', 40)->update(['intermediate_quota' => $limit]);
+        // Requested leg is 1 -> 2. The same bus then travels 2 -> 3.
+        DB::table('cities')->insert(['id' => 3, 'company_id' => 1, 'name' => 'Last city']);
+        DB::table('routes_fares')->insert(['route_id' => 30, 'company_id' => 1, 'departure_city_id' => 2, 'destination_city_id' => 3]);
+        DB::table('schedule_quota_terminal_discounts')->insert([
+            'company_id' => 1, 'schedule_id' => 40, 'terminal_id' => 10,
+            'percentage' => $percentage, 'active' => true, 'updated_by' => 20,
+        ]);
+    }
+
+    private function addReusableSeat(string $seat = '1', array $overrides = []): void
+    {
+        $this->addOnlineTicket($seat, array_merge([
+            'departure_city_id' => 2, 'destination_city_id' => 3, 'type' => 'booked', 'online_terminal' => 0,
+        ], $overrides));
+    }
+
+    public function test_midway_quota_discounts_only_eligible_seats_and_keeps_booking_totals_and_audit(): void
+    {
+        $this->installMidwayQuota(2);
+        $this->addReusableSeat();
+        $layout = $this->getJson($this->seatsUrl())->assertOk();
+        $layout->assertJsonPath('data.seats.0.price', 2000)->assertJsonPath('data.seats.0.is_special', true)
+            ->assertJsonPath('data.seats.0.quota_discount', 500)->assertJsonPath('data.seats.0.quota_reuse', true)
+            ->assertJsonPath('data.seats.1.price', 2500)->assertJsonPath('data.seats.1.is_special', false)
+            ->assertJsonPath('data.maximum_selectable_seats', 2);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_seats', 2)
+            ->assertJsonPath('data.0.available_special_seats', 1);
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput(['1', '2']))->assertOk()
+            ->assertJsonPath('data.base_fare', 5000)->assertJsonPath('data.discount', 500)
+            ->assertJsonPath('data.quota_discount', 500)->assertJsonPath('data.total', 4500);
+        $this->assertQuoteAddsUp($quote->json('data'));
+        $created = $this->postJson('/api/mobile/v1/bookings', ['quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter'])->assertCreated();
+        $this->assertDatabaseHas('tickets', ['invoice_id' => $created->json('data.id'), 'seat_no' => '1',
+            'seat_fare' => 2500, 'discount' => 500, 'quota_discount' => 500]);
+        $this->getJson('/api/mobile/v1/bookings/' . $created->json('data.id'))->assertOk()->assertJsonPath('data.total', 4500);
+    }
+
+    public function test_midway_quota_rejects_too_many_new_seats_even_when_reusable_seats_increase_the_limit(): void
+    {
+        $this->installMidwayQuota(2);
+        $this->addReusableSeat();
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput(['2', '3']))->assertStatus(409);
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput(['1', '2']))->assertOk();
+        $this->addReusableSeat('3');
+        $this->postJson('/api/mobile/v1/bookings', ['quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter'])->assertStatus(409);
+        $this->assertDatabaseCount('invoices', 0);
+    }
+
+    public function test_search_special_seat_count_respects_online_capacity_overlap_and_allowed_seats(): void
+    {
+        $this->installMidwayQuota(3);
+        foreach (['1', '2', '3'] as $seat) { $this->addReusableSeat($seat); }
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_special_seats', 3);
+        $this->limitOnlineSeats(2);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_seats', 2)
+            ->assertJsonPath('data.0.available_special_seats', 2);
+        $this->addOnlineTicket('1', ['online_terminal' => 0]);
+        DB::table('routes')->update(['online_seat_choices' => '1,2']);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_seats', 1)
+            ->assertJsonPath('data.0.available_special_seats', 1);
+        DB::table('terminals')->where('id', 10)->update(['available_seats' => '1']);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_seats', 0)
+            ->assertJsonPath('data.0.available_special_seats', 0);
+    }
+
+    public function test_exhausted_midway_quota_allows_reuse_but_not_new_seats_and_preserves_online_limit(): void
+    {
+        $this->installMidwayQuota();
+        $this->addReusableSeat();
+        $this->addReusableSeat('1'); // Multiple paid segments of one seat consume one slot.
+        $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.seats.0.status', 'available')
+            ->assertJsonPath('data.seats.1.status', 'unavailable')->assertJsonPath('data.maximum_selectable_seats', 1);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_seats', 1);
+        $this->limitOnlineSeats(0);
+        $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.seats.0.status', 'unavailable')
+            ->assertJsonPath('data.seats.0.is_special', false)->assertJsonPath('data.maximum_selectable_seats', 0);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_special_seats', 0);
+    }
+
+    /** @dataProvider nonQualifyingQuotaTickets */
+    public function test_quota_ignores_unpaid_cancelled_deleted_other_runs_and_companies(array $attributes): void
+    {
+        $this->installMidwayQuota();
+        $this->addReusableSeat('1', $attributes);
+        $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.seats.0.is_special', false)
+            ->assertJsonPath('data.midway_quota.remaining', 1);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_special_seats', 0);
+    }
+
+    public static function nonQualifyingQuotaTickets(): array
+    {
+        return [
+            [['type' => 'advance booking']], [['type' => 'cancelled']], [['type' => 'canceled']],
+            [['deleted_at' => '2026-09-12 10:00:00']], [['company_id' => 2]],
+            [['schedule_date' => '2026-09-12']], [['schedule_id' => 41]],
+            [['departure_city_id' => 1, 'destination_city_id' => 3]],
+        ];
+    }
+
+    public function test_quota_exemption_is_directional_lifts_only_the_cap_and_does_not_invent_a_discount(): void
+    {
+        $this->installMidwayQuota(0);
+        $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.maximum_selectable_seats', 0);
+        DB::table('schedules')->update(['quota_exempt_routes' => json_encode([['departure_city_id' => 2, 'destination_city_id' => 1]])]);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertStatus(409);
+        DB::table('schedules')->update(['quota_exempt_routes' => json_encode([['departure_city_id' => 1, 'destination_city_id' => 2]])]);
+        $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.midway_quota.restricted', false)
+            ->assertJsonPath('data.seats.0.is_special', false);
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        DB::table('schedules')->update(['quota_exempt_routes' => null]);
+        $this->postJson('/api/mobile/v1/bookings', ['quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter'])->assertStatus(409);
+    }
+
+    public function test_quota_cap_lifts_at_main_departure_and_reused_discount_still_applies(): void
+    {
+        $this->installMidwayQuota(0);
+        // The passenger boards later; only the starting city has departed.
+        DB::table('cities')->insert(['id' => 4, 'company_id' => 1, 'name' => 'Starting city']);
+        DB::table('routes_fares')->insert(['id' => 0, 'company_id' => 1, 'route_id' => 30, 'departure_city_id' => 4, 'destination_city_id' => 1]);
+        $main = (array) DB::table('schedule_details')->where('id', 50)->first();
+        DB::table('schedule_details')->insert(array_merge($main, ['id' => 49, 'departure_id' => 4, 'destination_id' => 3]));
+        DB::table('schedule_details')->where('id', 50)->update(['departure_time' => '13:00:00']);
+        $this->addReusableSeat();
+        Carbon::setTestNow(Carbon::parse('2026-09-13 11:59:59'));
+        $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.seats.1.status', 'unavailable');
+        Carbon::setTestNow(Carbon::parse('2026-09-13 12:00:00'));
+        $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.midway_quota.restricted', false)
+            ->assertJsonPath('data.seats.1.status', 'available')->assertJsonPath('data.seats.0.price', 2000);
+    }
+
+    public function test_null_quota_and_inactive_or_wrong_terminal_assignment_never_discount_seats(): void
+    {
+        $this->installMidwayQuota(null);
+        $this->addReusableSeat();
+        $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.seats.0.is_special', false);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_special_seats', 0);
+        DB::table('schedules')->update(['intermediate_quota' => 2]);
+        foreach ([['active' => false], ['active' => true, 'terminal_id' => 11], ['terminal_id' => 10, 'company_id' => 2]] as $changes) {
+            DB::table('schedule_quota_terminal_discounts')->update($changes);
+            $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.seats.0.price', 2500)
+                ->assertJsonPath('data.seats.0.is_special', false);
+            $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_special_seats', 0);
+        }
+    }
+
+    public function test_quota_reuse_normalizes_seat_names_and_never_overrides_overlapping_bookings(): void
+    {
+        $this->installMidwayQuota(2);
+        $this->addReusableSeat(' 1 ');
+        $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.seats.0.is_special', true);
+        $this->addOnlineTicket(' 1 ');
+        $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.seats.0.status', 'booked')
+            ->assertJsonPath('data.seats.0.is_special', false);
+    }
+
+    public function test_quota_rounding_and_regular_discounts_reconcile_without_double_deduction(): void
+    {
+        $this->installMidwayQuota(2, 10);
+        $this->addReusableSeat();
+        $this->seedSearchAdjustments();
+        DB::table('schedules')->update(['surcharge_id' => null]);
+        // Normal ERP fare: 2500 - 375 + 25 = 2150. Quota fare: round(1935, -2) = 1900.
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk()
+            ->assertJsonPath('data.discount', 625)->assertJsonPath('data.quota_discount', 250)
+            ->assertJsonPath('data.rounding_adjustment', 25)->assertJsonPath('data.total', 1900);
+        $this->assertQuoteAddsUp($quote->json('data'));
+        DB::table('schedule_quota_terminal_discounts')->update(['percentage' => 0.01]);
+        DB::table('schedules')->update(['discount_id' => null]);
+        DB::table('terminal_discounts')->delete();
+        $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.seats.0.is_special', false)
+            ->assertJsonPath('data.seats.0.quota_discount', 0);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_special_seats', 0);
+    }
+
+    public function test_quota_discount_changes_invalidate_quotes_without_creating_a_ticket(): void
+    {
+        $this->installMidwayQuota();
+        $this->addReusableSeat();
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+        DB::table('schedule_quota_terminal_discounts')->update(['active' => false]);
+        $this->postJson('/api/mobile/v1/bookings', ['quote_token' => $quote->json('data.quote_token'), 'payment_method' => 'counter'])->assertStatus(409);
+        $this->assertDatabaseCount('invoices', 0);
+        $this->assertDatabaseCount('tickets', 1);
+    }
+
+    public function test_quota_confirmation_uses_current_paid_seats_and_reviews_received_payment_if_full(): void
+    {
+        $this->installMidwayQuota();
+        $booking = $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
+        $this->addReusableSeat('2');
+        $payment = \App\Models\MobilePayment::first();
+        $payment->update(['started_at' => now()]);
+        $this->fakePaidPayment($payment);
+        $this->postJson('/api/mobile/v1/bookings/' . $booking->json('data.id') . '/payment/refresh')->assertOk()
+            ->assertJsonPath('data.payment.status', 'review_required')->assertJsonPath('data.qr_value', null);
+        $this->assertSoftDeleted('tickets', ['invoice_id' => $booking->json('data.id')]);
+        $this->assertDatabaseHas('tickets', ['seat_no' => '2', 'type' => 'booked', 'deleted_at' => null]);
+    }
+
+    public function test_reused_quota_payment_confirms_at_exhausted_cap_and_uses_discounted_amount_once(): void
+    {
+        $this->installMidwayQuota();
+        $this->addReusableSeat();
+        $booking = $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
+        $payment = \App\Models\MobilePayment::first();
+        $this->assertEquals(200000, $payment->amount_minor);
+        $payment->update(['started_at' => now()]);
+        $this->fakePaidPayment($payment);
+        $url = '/api/mobile/v1/bookings/' . $booking->json('data.id') . '/payment/refresh';
+        $this->postJson($url)->assertOk()->assertJsonPath('data.payment.status', 'paid');
+        $this->postJson($url)->assertOk()->assertJsonPath('data.total', 2000);
+        $this->assertDatabaseHas('tickets', ['invoice_id' => $booking->json('data.id'), 'type' => 'booked', 'quota_discount' => 500]);
+    }
+
+    public function test_lost_quota_discount_after_payment_start_requires_review(): void
+    {
+        $this->installMidwayQuota();
+        $this->addReusableSeat();
+        $booking = $this->postJson('/api/mobile/v1/bookings', $this->paymentInput())->assertCreated();
+        $payment = \App\Models\MobilePayment::first();
+        $payment->update(['started_at' => now()]);
+        $this->fakePaidPayment($payment);
+        DB::table('schedule_quota_terminal_discounts')->update(['active' => false]);
+        $this->postJson('/api/mobile/v1/bookings/' . $booking->json('data.id') . '/payment/refresh')->assertOk()
+            ->assertJsonPath('data.payment.status', 'review_required')->assertJsonPath('data.qr_value', null);
+    }
+
+    public function test_quota_schema_is_idempotent_and_preserves_existing_erp_settings_on_rollback(): void
+    {
+        $this->installMidwayQuota(3, 12.5);
+        $before = (array) DB::table('schedule_quota_terminal_discounts')->first();
+        $migration = new \SupportMobileScheduleQuotaRules();
+        $migration->up();
+        $migration->down();
+        $this->assertEquals($before, (array) DB::table('schedule_quota_terminal_discounts')->first());
+        $this->assertDatabaseHas('schedules', ['id' => 40, 'intermediate_quota' => 3]);
+        $this->assertTrue(Schema::hasColumn('tickets', 'quota_discount'));
+    }
+
+    public function test_overnight_quota_uses_starting_city_departure_not_the_later_segment_time(): void
+    {
+        $this->installMidwayQuota(0);
+        DB::table('cities')->insert(['id' => 4, 'company_id' => 1, 'name' => 'Starting city']);
+        DB::table('routes_fares')->insert(['id' => 0, 'company_id' => 1, 'route_id' => 30, 'departure_city_id' => 4, 'destination_city_id' => 1]);
+        DB::table('schedule_details')->update(['schedule_date' => '2026-09-12']);
+        $main = (array) DB::table('schedule_details')->where('id', 50)->first();
+        DB::table('schedule_details')->insert(array_merge($main, ['id' => 49, 'departure_id' => 4,
+            'destination_id' => 3, 'departure_date' => '2026-09-12', 'departure_time' => '23:50:00']));
+        Carbon::setTestNow(Carbon::parse('2026-09-12 23:49:59'));
+        $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.maximum_selectable_seats', 0);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_seats', 0);
+        Carbon::setTestNow(Carbon::parse('2026-09-13 00:00:00'));
+        $this->getJson($this->seatsUrl())->assertOk()->assertJsonPath('data.midway_quota.restricted', false);
+        $this->getJson($this->searchUrl())->assertOk()->assertJsonPath('data.0.available_seats', 3);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertOk();
+    }
+
+    public function test_quota_search_batches_dated_departures_and_assignments_across_buses(): void
+    {
+        $this->installMidwayQuota(2);
+        $this->addReusableSeat();
+        $service = app(\App\Services\Mobile\MobileTravelService::class);
+        $measure = function () use ($service) {
+            DB::flushQueryLog(); DB::enableQueryLog();
+            try { return [$service->schedules(1, 2, $this->date), count(DB::getQueryLog())]; }
+            finally { DB::disableQueryLog(); DB::flushQueryLog(); }
+        };
+        [$one, $oneCount] = $measure();
+        for ($i = 1; $i < 20; $i++) { $this->copySearchRun(100 + $i, 200 + $i, $this->date); }
+        [$many, $manyCount] = $measure();
+        $this->assertCount(20, $many);
+        $this->assertLessThanOrEqual($oneCount + 1, $manyCount);
+        $this->assertLessThanOrEqual(26, $manyCount);
+        foreach ($many as $row) { $this->assertSame(2, $row['available_seats']); }
+        $this->assertSame(1, $many->first()['available_special_seats']);
+        foreach ($many->slice(1) as $row) { $this->assertSame(0, $row['available_special_seats']); }
+        $this->assertEquals($one->first()['fares'], $many->first()['fares']);
+    }
+
+    public function test_quota_saving_is_applied_before_wallet_redemption(): void
+    {
+        $this->installMidwayQuota();
+        $this->addReusableSeat();
+        config()->set('mobile.features.wallet', true);
+        $loyalty = \Mockery::mock(\App\Services\Mobile\MobileLoyaltyService::class);
+        $loyalty->shouldReceive('deductionFor')->once()->withArgs(function ($account, $points, $amount) {
+            return $account->id === 99 && $points === 2 && $amount === 2000.0;
+        })->andReturn(['points' => 2, 'amount' => 100]);
+        $this->app->instance(\App\Services\Mobile\MobileLoyaltyService::class, $loyalty);
+        $quote = $this->postJson('/api/mobile/v1/bookings/quote', array_merge($this->quoteInput(), ['points_to_use' => 2]))->assertOk()
+            ->assertJsonPath('data.quota_discount', 500)->assertJsonPath('data.wallet_deduction', 100)->assertJsonPath('data.total', 1900);
+        $this->assertQuoteAddsUp($quote->json('data'));
+    }
+
+    public function test_special_fare_cannot_be_offered_without_its_ticket_audit_column(): void
+    {
+        $this->installMidwayQuota();
+        $this->addReusableSeat();
+        Schema::table('tickets', function (Blueprint $table) { $table->dropColumn('quota_discount'); });
+        $this->getJson($this->seatsUrl())->assertStatus(503);
+        $this->postJson('/api/mobile/v1/bookings/quote', $this->quoteInput())->assertStatus(503);
+        $this->assertDatabaseCount('invoices', 0);
     }
 
     private function seedJourney(): void

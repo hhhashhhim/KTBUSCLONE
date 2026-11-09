@@ -22,7 +22,7 @@ class MobileSchedulePolicy
         return $this->visibleDetails($companyId, $terminalId)
             ->with([
                 'departure_city:id,name', 'destination_city:id,name', 'bus_class:id,name,seat_map',
-                'schedule:id,route_id,bus_class_id,discount_id,surcharge_id,hide',
+                'schedule',
                 'schedule.route:id,name,online_seat_choices,online_seats,hide',
                 'schedule.route.fares:id,route_id,departure_city_id,destination_city_id',
             ])
@@ -39,9 +39,17 @@ class MobileSchedulePolicy
             throw new RuntimeException('Configure an active online terminal for mobile bookings.', 503);
         }
 
+        $now = now();
         $query = ScheduleDetail::query()
             ->where('company_id', $companyId)
-            ->where('departure_date', '>=', now()->toDateString())
+            // Use this passenger's boarding segment, not the bus's first stop.
+            ->where(function ($upcoming) use ($now) {
+                $upcoming->where('departure_date', '>', $now->toDateString())
+                    ->orWhere(function ($today) use ($now) {
+                        $today->where('departure_date', $now->toDateString())
+                            ->where('departure_time', '>', $now->toTimeString());
+                    });
+            })
             // An empty permission set must never expose every schedule.
             ->whereIn('schedule_id', ScheduleTerminalVisibility::query()
                 ->select('schedule_id')->where('company_id', $companyId)
@@ -85,6 +93,13 @@ class MobileSchedulePolicy
 
     public function bookingIsOpen(ScheduleDetail $detail, int $companyId, int $terminalId, ?MobileSearchData $search = null): bool
     {
+        // Recheck after the query, including when the ERP opening-window switch
+        // is disabled. That switch never authorizes a departed mobile journey.
+        if (Carbon::parse($detail->departure_date . ' ' . $detail->departure_time, config('app.timezone'))
+            ->lessThanOrEqualTo(now())) {
+            return false;
+        }
+
         $user = $search ? $search->user : User::query()->whereKey((int) config('mobile.booking_user_id'))
             ->where('company_id', $companyId)->where('hide', 0)->first();
         if (!$user) {
@@ -113,7 +128,7 @@ class MobileSchedulePolicy
         return now()->greaterThanOrEqualTo($opensAt);
     }
 
-    public function remainingOnlineSeats(ScheduleDetail $detail, int $companyId, ?MobileSearchData $search = null): ?int
+    public function remainingOnlineSeats(ScheduleDetail $detail, int $companyId, ?MobileSearchData $search = null, ?\Illuminate\Support\Collection $tickets = null): ?int
     {
         $limited = $search ? $search->limitedRoutes->has($detail->schedule->route_id) : LimitedSeat::query()->where('company_id', $companyId)
             ->where('route_id', $detail->schedule->route_id)
@@ -124,7 +139,8 @@ class MobileSchedulePolicy
         }
 
         // ERP's online quota covers the whole run, across online terminals and city pairs.
-        $sold = $search ? $search->ticketsFor($detail)->where('online_terminal', 1)->count() : Ticket::query()->where('company_id', $companyId)
+        $tickets = $tickets ?? ($search ? $search->ticketsFor($detail) : null);
+        $sold = $tickets !== null ? $tickets->where('online_terminal', 1)->count() : Ticket::query()->where('company_id', $companyId)
             ->where('schedule_id', $detail->schedule_id)->where('schedule_date', $detail->schedule_date)
             ->where('online_terminal', 1)->whereNotIn('type', ['cancelled'])->count();
 

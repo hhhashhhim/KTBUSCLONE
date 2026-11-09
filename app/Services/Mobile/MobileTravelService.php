@@ -10,7 +10,6 @@ use App\Models\Schedule\ScheduleDetail;
 use App\Models\Surcharge\Surcharge;
 use App\Models\Terminal;
 use App\Models\TerminalDiscount;
-use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use RuntimeException;
@@ -57,15 +56,7 @@ class MobileTravelService
     private function cityOptions(?int $originId = null): Collection
     {
         $companyId = $this->companyId();
-        $now = now();
-        $details = $this->policy->visibleDetails($companyId, $this->terminalId())
-            ->where(function ($upcoming) use ($now) {
-                $upcoming->where('departure_date', '>', $now->toDateString())
-                    ->orWhere(function ($today) use ($now) {
-                        $today->where('departure_date', $now->toDateString())
-                            ->where('departure_time', '>', $now->toTimeString());
-                    });
-            });
+        $details = $this->policy->visibleDetails($companyId, $this->terminalId());
 
         if (is_null($originId)) {
             $details->select('departure_id');
@@ -130,6 +121,9 @@ class MobileTravelService
                     'name' => optional($detail->bus_class)->name,
                 ],
                 'available_seats' => is_null($quota) ? $available : min($available, $quota),
+                'available_special_seats' => is_null($quota)
+                    ? $layout['available_special_seats']
+                    : min($layout['available_special_seats'], $quota),
                 'total_seats' => $layout['total_seats'],
                 'fares' => $fares,
             ];
@@ -160,9 +154,10 @@ class MobileTravelService
         $detail = $this->findDetail($scheduleDetailId, $originId, $destinationId, $date);
 
         $fares = $this->faresForDetail($detail, $originId, $destinationId);
-        $quota = $this->policy->remainingOnlineSeats($detail, $this->companyId());
+        $tickets = app(MobileQuotaService::class)->tickets($detail);
+        $quota = $this->policy->remainingOnlineSeats($detail, $this->companyId(), null, $tickets);
 
-        return $this->layoutForDetail($detail, $originId, $destinationId, $fares, $quota);
+        return $this->layoutForDetail($detail, $originId, $destinationId, $fares, $quota, null, false, $tickets);
     }
 
     private function layoutForDetail(
@@ -172,17 +167,25 @@ class MobileTravelService
         array $fares,
         ?int $quota,
         ?MobileSearchData $search = null,
-        bool $countsOnly = false
+        bool $countsOnly = false,
+        ?Collection $tickets = null
     ): array {
         $maximum = (int) config('mobile.maximum_selectable_seats', 5);
-        $blocked = $this->blockedTickets($detail, $originId, $destinationId, $search)->keyBy(function ($ticket) {
-            return (string) $ticket->seat_no;
+        $quotaService = app(MobileQuotaService::class);
+        $tickets = $tickets ?? ($search ? $search->ticketsFor($detail) : $quotaService->tickets($detail));
+        $midway = $quotaService->context($detail, $tickets, $search ? $search->mainDepartureFor($detail) : null, $search !== null);
+        $percentage = $midway ? (float) ($search ? $search->quotaPercentages :
+            $quotaService->percentages(collect([$detail]), $this->companyId(), $this->terminalId()))->get($detail->schedule_id, 0) : 0;
+        $blocked = $this->blockedTickets($detail, $originId, $destinationId, $tickets)->keyBy(function ($ticket) {
+            return MobileQuotaService::seatKey($ticket->seat_no);
         });
         $fares = collect($fares)->keyBy('class_id');
         $allowedNumbers = $this->allowedSeatNumbers($detail, $search);
         $seats = [];
         $total = 0;
         $available = 0;
+        $reusable = 0;
+        $specialAvailable = 0;
 
         foreach ((array) optional($detail->bus_class)->seat_map as $rowIndex => $row) {
             foreach ((array) $row as $columnIndex => $column) {
@@ -194,19 +197,32 @@ class MobileTravelService
 
                 $classId = (int) ($column['class'] ?? 0);
                 $fare = $fares->get($classId);
-                $ticket = $blocked->get($number);
+                $ticket = $blocked->get(MobileQuotaService::seatKey($number));
+                $reuse = !$ticket && $midway && in_array(MobileQuotaService::seatKey($number), $midway['used_seats'], true);
                 $allowed = (is_null($quota) || $quota > 0)
-                    && (is_null($allowedNumbers) || in_array($this->numericSeat($number), $allowedNumbers, true));
+                    && (is_null($allowedNumbers) || in_array($this->numericSeat($number), $allowedNumbers, true))
+                    && (!$midway || !$midway['restricted'] || $midway['remaining'] > 0 || $reuse);
                 $status = $ticket ? 'booked' : ($allowed ? 'available' : 'unavailable');
 
                 $total++;
                 if ($status === 'available') {
                     $available++;
+                    if ($reuse) { $reusable++; }
                 }
                 if ($countsOnly) {
+                    if ($status === 'available' && $reuse && $percentage > 0) {
+                        // Use the seat map's pricing rules: reuse alone is not a saving,
+                        // and a small percentage can disappear after fare rounding.
+                        $specialFare = $quotaService->adjustSeat([
+                            'price' => (float) ($fare['amount'] ?? 0),
+                            'discount' => (float) ($fare['discount'] ?? 0),
+                            'status' => $status,
+                        ], true, $percentage);
+                        if ($specialFare['is_special']) { $specialAvailable++; }
+                    }
                     continue;
                 }
-                $seats[] = [
+                $seats[] = $quotaService->adjustSeat([
                     'number' => $number,
                     'row' => (int) $rowIndex,
                     'column' => (int) $columnIndex,
@@ -224,18 +240,27 @@ class MobileTravelService
                         ? ([1 => 'male', 0 => 'female'][(string) $ticket->gender] ?? null)
                         : null,
                     'gender_restriction' => $column['gender'] ?? null,
-                ];
+                ], (bool) $reuse, $percentage);
             }
         }
 
+        if ($midway && $midway['restricted']) {
+            $available = min($available, $reusable + $midway['remaining']);
+            $maximum = min($maximum, $available);
+        }
         if ($countsOnly) {
-            return ['total_seats' => $total, 'available_seats' => $available];
+            return [
+                'total_seats' => $total,
+                'available_seats' => $available,
+                'available_special_seats' => min($specialAvailable, $available),
+            ];
         }
 
         return [
             'schedule_id' => $detail->schedule_id,
             'schedule_detail_id' => $detail->id,
             'maximum_selectable_seats' => is_null($quota) ? $maximum : min($maximum, $quota),
+            'midway_quota' => $midway ? ['restricted' => $midway['restricted'], 'remaining' => $midway['remaining']] : null,
             'seats' => $seats,
         ];
     }
@@ -340,7 +365,7 @@ class MobileTravelService
         ScheduleDetail $detail,
         int $originId,
         int $destinationId,
-        ?MobileSearchData $search = null
+        Collection $tickets
     ): Collection {
         $sequence = $this->routeSequence($detail);
         $originIndex = array_search($originId, $sequence, true);
@@ -348,13 +373,6 @@ class MobileTravelService
         if ($originIndex === false || $destinationIndex === false || $originIndex >= $destinationIndex) {
             throw new RuntimeException('The requested city pair is not valid for this route.', 422);
         }
-
-        $tickets = $search ? $search->ticketsFor($detail) : Ticket::query()
-            ->where('company_id', $this->companyId())
-            ->where('schedule_id', $detail->schedule_id)
-            ->where('schedule_date', $detail->schedule_date)
-            ->whereNotIn('type', ['cancelled'])
-            ->get(['id', 'seat_no', 'departure_city_id', 'destination_city_id', 'gender', 'type']);
 
         return $tickets->filter(function ($ticket) use ($sequence, $originIndex, $destinationIndex) {
                 $ticketOrigin = array_search((int) $ticket->departure_city_id, $sequence, true);
@@ -370,7 +388,7 @@ class MobileTravelService
 
     private function routeSequence(ScheduleDetail $detail): array
     {
-        $fares = optional(optional($detail->schedule)->route)->fares ?: collect();
+        $fares = (optional(optional($detail->schedule)->route)->fares ?: collect())->sortBy('id');
         $sequence = $fares->pluck('departure_city_id')->map(function ($id) {
             return (int) $id;
         })->unique()->values()->all();

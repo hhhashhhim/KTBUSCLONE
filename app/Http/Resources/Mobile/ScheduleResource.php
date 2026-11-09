@@ -18,6 +18,7 @@ class ScheduleResource extends JsonResource
             'arrival_at' => $this['arrival_at'],
             'bus_class' => $this['bus_class'],
             'available_seats' => $this['available_seats'],
+            'available_special_seats' => $this['available_special_seats'] ?? 0,
             'total_seats' => $this['total_seats'],
             'fares' => $this['fares'],
         ];

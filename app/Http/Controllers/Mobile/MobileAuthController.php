@@ -23,6 +23,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use RuntimeException;
+use Throwable;
 
 class MobileAuthController extends Controller
 {
@@ -42,6 +43,13 @@ class MobileAuthController extends Controller
                 $registrations->send($pending, $otp);
                 $sent = true;
             } catch (RuntimeException $exception) {
+                // Only intentional delivery/business failures may be shown to the passenger.
+                // QueryException also extends RuntimeException and may carry a string SQLSTATE.
+                if (get_class($exception) !== RuntimeException::class
+                    || $exception->getPrevious() !== null
+                    || $this->exceptionStatus($exception) === 500) {
+                    throw $exception;
+                }
                 $message = $exception->getMessage();
             }
             return $this->success([
@@ -52,8 +60,16 @@ class MobileAuthController extends Controller
                 'verification_message' => $message,
                 'registration_expires_at' => $pending->expires_at->toIso8601String(),
             ], 'Verify your mobile number to complete registration.', 201);
-        } catch (RuntimeException $exception) {
-            return $this->failure($exception->getMessage(), [], $exception->getCode() ?: 422);
+        } catch (Throwable $exception) {
+            $isBusinessException = get_class($exception) === RuntimeException::class
+                && $exception->getPrevious() === null;
+            $status = $isBusinessException ? $this->exceptionStatus($exception) : 500;
+            if ($isBusinessException && $status >= 400 && $status < 500) {
+                return $this->failure($exception->getMessage(), [], $status);
+            }
+
+            report($exception);
+            return $this->failure('Something went wrong. Please try again.', [], $status);
         }
     }
 

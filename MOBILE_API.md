@@ -85,6 +85,14 @@ and these backend files together, then release the matching Flutter token/sessio
 changes. Old apps do not save the replacement verification token and must be updated.
 The schema migration creates a table only; it does not erase historical accounts.
 
+Signup database failures (including a missing pending-registration table or token
+storage failure) and unexpected exceptions are reported server-side and return
+HTTP 500 with the standard `Something went wrong. Please try again.` error
+envelope, even with debug enabled. SQLSTATE strings are never used as HTTP status
+codes, and database details are not returned as OTP delivery messages. Intentional
+4xx business failures keep their status/message; handled OTP delivery failures
+still return 201 with a verification-only token and `verification_delivery_sent: false`.
+
 ## Public endpoints
 
 - `GET /app/config`
@@ -93,6 +101,16 @@ The schema migration creates a table only; it does not erase historical accounts
 - `POST /auth/forgot-password`
 - `POST /auth/verify-reset-otp`
 - `POST /auth/reset-password`
+
+`GET /app/config` also returns `server_time` (ISO-8601 with offset), `server_date`
+(`YYYY-MM-DD`) and `timezone` (`Asia/Karachi`). All three come from one server-clock
+snapshot per request. This public endpoint uses the usual success/error envelope,
+needs no passenger token, and sends `Cache-Control: no-store, private` so calendars
+do not reuse a cached day. The Flutter departure calendar uses `server_date` for
+its default day, today marker and first selectable day, refreshing before opening
+the picker or submitting a search. Missing/unavailable server dates show retry UI;
+the device clock is never a fallback. These are additive fields; no migration or
+booking-rule change is required.
 
 ## Authenticated passenger endpoints
 
@@ -237,6 +255,99 @@ entries each. The previous unfiltered lookups took 0.67 ms and 0.97 ms, returnin
 102 and 101 entries. Each filtered lookup uses two queries independent of the
 number of cities/runs. These figures measure local service overhead, not deployed
 MySQL or phone/network latency.
+
+## Midway quotas and special reused-seat fares (7 November 2026)
+
+Mobile search, seat lookup, quoting, reservation creation and online payment
+confirmation now read the ERP schedule quota configuration. The mobile adapter
+is aligned with `ScheduleQuotaService` and `ScheduleQuotaDiscountService` in the
+read-only `source/api` reference at `56f9448d8f4b3f8363d23dd9598c7aee1d5a9177`.
+
+- `schedules.intermediate_quota = null` disables this quota. Zero allows no new
+  midway seats before the run's starting-city departure; already counted seats
+  remain reusable on non-overlapping journey segments.
+- Usage counts distinct, normalized seat numbers with active **paid/booked**
+  midway tickets across all terminals for the same company, schedule and run
+  date. Reservations, cancellations and deleted tickets do not consume this
+  paid-seat quota. Overlapping reservations still block seat availability.
+- `schedules.quota_exempt_routes` contains directional city pairs. A matching
+  pair, a full-route journey, or the starting-city departure having occurred
+  removes the midway cap. This does not grant a discount or bypass the separate
+  online quota, terminal permissions, allowed seats or overlapping bookings.
+- A special fare requires a configured schedule quota, an available reused
+  seat, and an active percentage in `schedule_quota_terminal_discounts` for the
+  configured mobile company, schedule and selling terminal. Paid midway seats
+  sold after departure can also qualify for reuse.
+- Apply the ordinary ERP fare adjustments first, then the quota percentage.
+  Round the **payable seat fare** to the nearest Rs. 100 using half-up rounding,
+  without increasing the pre-quota fare or reducing it below zero. A seat is
+  marked special only when this produces an actual saving. Wallet redemption
+  applies afterward.
+
+Existing methods, URLs, headers and authentication are unchanged. No client
+discount, percentage, quota eligibility or payable price is accepted as authority.
+### Available special-seat count (8 November 2026)
+
+Authenticated `GET /schedules?origin_id={id}&destination_id={id}&date=YYYY-MM-DD`
+adds integer `available_special_seats` to each schedule. It counts available seats
+with a positive quota saving for this exact journey, date and mobile selling
+terminal, using the same pricing/rounding and eligibility rules as the seat map.
+Booked, unavailable, non-reusable and zero-saving seats do not count. The count
+is capped by the remaining online quota and never exceeds `available_seats`.
+Ordinary schedule/terminal discounts alone do not qualify.
+
+For example, `available_seats: 20, available_special_seats: 3` means three of
+the twenty available seats have a special quota fare. Clients should display
+the special count only when positive, default a missing field to zero for older
+servers, and refresh the seat map before selection. Counts are a snapshot, not
+a reservation. The existing method, authentication, validation and error envelope
+are unchanged; no database migration is required. Search uses its existing
+batched data, with no per-schedule or per-seat database queries added.
+
+`GET /schedules/{schedule_detail_id}/seats` adds:
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `seats[].is_special` | boolean | An applied special quota saving exists on this available seat |
+| `seats[].quota_discount` | number | Effective saving after quota rounding; included in `discount` |
+| `seats[].quota_discount_percentage` | number | Configured percentage when a saving applies, otherwise zero |
+| `seats[].fare_before_quota_discount` | number | Ordinary adjusted fare before the special saving |
+| `seats[].quota_reuse` | boolean | This available seat reuses an already counted paid midway seat |
+| `midway_quota` | object or null | `restricted` boolean and `remaining` number of new distinct seats allowed |
+
+`price` is the final seat fare. `maximum_selectable_seats` and search
+`available_seats` account for the midway cap and available reusable seats, as well
+as the online quota. The server also validates the selected mix: a maximum of two
+seats may mean one reusable seat plus one new seat, not two new seats. A stale or
+invalid selection returns the existing mobile error envelope with `409`; refresh
+availability and quote again. Search `fares[]` remain ordinary class fares; a
+seat-specific offer is confirmed on the seat map.
+
+`POST /bookings/quote` adds numeric `quota_discount`, which is **already included
+in `discount`**. The total formula below is unchanged. A client may show separate
+regular and special discount rows by splitting that reported discount; it must
+not subtract `quota_discount` from the total again. Older clients receive the
+correct final prices and total without needing the new display fields.
+
+Reservation creation acquires the existing cache lock plus the ERP schedule row
+lock and rechecks current seats, quota and saving. Tickets store the pre-quota
+fare in `seat_fare`, quota saving plus wallet deduction in `discount`, and the
+quota saving separately in `quota_discount` for audit. Therefore existing invoice
+and payment calculations (`seat_fare - discount`) remain correct.
+
+Online payment confirmation rechecks the paid-seat quota, conflicts and continued
+special-fare eligibility under the schedule row lock. If money is received after
+eligibility is lost, the existing `review_required` workflow releases the
+reservation, returns applicable wallet points, records an audit event and issues
+no confirmed QR. The server never silently increases the charged amount.
+Branch/counter confirmation continues through the existing ERP confirmation
+workflow and depends on that system's quota enforcement being deployed.
+
+Install `2026_11_07_000001_support_mobile_schedule_quota_rules.php` before rollout.
+It adds missing shared ERP schema only and preserves existing settings. It does
+not enable quotas, invent percentages, or convert old per-user discount settings;
+legacy per-user assignments must use the ERP's terminal-discount migration.
+An active quota discount without the ticket audit column returns `503`.
 
 ## Fare adjustments and quote breakdown
 
@@ -403,7 +514,7 @@ The scheduling suite creates its own disposable SQLite in-memory connection; it 
 - Hidden/deleted cities, schedules, and routes cannot be booked. Dropped runs are excluded using the company, schedule ID, and **schedule date**, including for journeys whose departure date differs from the run's first departure date.
 - A matching `terminal_visibilities.online_visibilty = 1` blocks that route's origin/destination pair online. The inverted flag and its spelling are inherited from ERP; `0` permits online visibility. Physical-counter visibility does not grant mobile access.
 - Where company-specific `route_online_terminals` assignments exist, the mobile terminal must be assigned. A route without assignments keeps the existing online API's unrestricted-terminal behavior, subject to all other rules.
-- `terminals.advance_booking` uses the same exclusive upper date as ERP: `departure_date < today + advance_booking`. A value of `1` allows today only; `null` means no upper date limit. Past departure dates are rejected again at booking time.
+- `terminals.advance_booking` uses the same exclusive upper date as ERP: `departure_date < today + advance_booking`. A value of `1` allows today only; `null` means no upper date limit. A journey must depart strictly after the current time in `Asia/Karachi`, using the requested boarding segment's `departure_date` and `departure_time`. Departed segments, including the exact departure second, are excluded from cities, search, seat lookup, quotes and new bookings. Previously issued quotes are checked again when booking. This applies even when the ERP booking-opening window is disabled; a bus that left its starting city can still be offered from a later, upcoming boarding stop.
 - When the service user's `check_booking_minutes` is enabled and the city pair has a non-negative `booking_minutes`, sales open at departure time plus the mobile terminal's route-specific `terminal_time_differences.time_difference`, minus `booking_minutes`. This is an **opening window**, not a pre-departure closing cutoff. The boundary uses the Laravel application timezone.
 - Terminal `available_seats` and route `online_seat_choices` restrict selectable seats. Search counts use those restrictions as well as occupied seats.
 - For city pairs with `limited_seats.limited_seat = 1`, the remaining quota is the route's `online_seats` minus active online tickets for the entire run, across online terminals and city pairs. Cancelled/deleted tickets do not consume it. `maximum_selectable_seats` is capped by that remaining quota and may be `0`; exhausted seats are `unavailable`. Quote and booking requests cannot exceed the current limit.
@@ -420,12 +531,61 @@ Regression coverage: `tests/Feature/MobileSchedulingRulesTest.php` exercises rea
 - Quotes expire after ten minutes and booking creation rechecks live seats and fares under a cache lock.
 - Counter reservations use the existing advance-reservation workflow. JazzCash and Bank Alfalah hosted payments are available when explicitly enabled and configured; see [mobile payment setup](MOBILE_PAYMENTS.md).
 - Mobile gateway credentials are read from server configuration, independently of the legacy website. Online payments are disabled by default.
-- Wallet reads the existing loyalty-card balance (`card_assigns.starting_points`) for the signed-in passenger. A quote may include an optional `points_to_use` integer; the server calculates and revalidates the discount when the booking is created. The existing ticket `points_usage` field is preserved so the current cancellation workflow can return points.
+- Wallet reads the existing loyalty-card balance (`card_assigns.starting_points`) for the signed-in passenger. A quote may include an optional `points_to_use` integer; the server calculates and revalidates the discount when the booking is created. Online mobile cancellation uses the original earning/redemption records to adjust that card; other ERP tickets retain their existing cancellation workflow.
+- Redemption is controlled by the company's `mobile_app_configs.features.wallet` override, falling back to `mobile.features.wallet`. Reading an active wallet does not itself mean redemption is enabled. When enabled, the quote returns `wallet_points_used`, `wallet_deduction`, and the reduced `total` for both the summary and checkout action. Existing flat/percentage category rates apply, with the deduction capped at the payable fare. Quoting does not spend points; booking creation locks and revalidates the card. When disabled, the current quote path returns zero points/deduction even if points were requested.
 - `GET /fleet` returns active `mobile_fleet_media` records for the configured company. Each record may be linked to a bus class and has a `media_type` such as `exterior`, `interior`, or `seats`. Images are never bundled into the app: the URL is stored in the database. Management/upload screens for these records belong in the staff system and are not part of the passenger mobile API.
 - Notifications use an account-scoped durable inbox after the notification migration is installed. Optional Firebase phone delivery requires separate configuration. See [MOBILE_NOTIFICATIONS.md](MOBILE_NOTIFICATIONS.md) for endpoints, flags, scheduler behavior and rollout.
 - Signup, resend, and password-reset OTPs support SAR Zone WhatsApp delivery. See configuration below. `MOBILE_OTP_DRIVER=log` remains limited to local/testing environments.
 - Password reset uses a short-lived OTP followed by a one-time, 15-minute reset token. Existing passenger API tokens are revoked when the password changes.
 - Cancellation, refund, and rescheduling are deliberately not exposed to passengers.
+
+## Mobile loyalty earning
+
+Online mobile bookings earn points when authenticated payment verification confirms
+their tickets. The credit is part of the same database transaction as ticket
+issuance and payment settlement. Quotes, unpaid reservations, expired payments,
+and payments requiring head-office review do not earn points. Repeated payment
+refreshes/callbacks/reconciliation cannot award the same booking twice.
+
+The recipient is the booking account's linked customer/card in the same company,
+matching `GET /wallet`, even when the seats are booked for other passengers. The
+card must be unexpired and not deleted, with a valid category in the same company.
+No card, missing/deleted category, unknown earning type, missing distance, or a
+zero/negative earning divisor means zero points without blocking payment.
+
+The existing ERP category settings at confirmation determine the award:
+
+| Category setting | Online booking earning rule |
+| --- | --- |
+| `point_type = flatPoints` | Verified net amount paid / `point_flat` (rupees needed for one point). Discounts, including redeemed points and special fares, have already reduced this amount. |
+| `point_type = distancePoints` | The company's directional `fare_tables.distance_in_km` / `point_distance` (km needed for one point), once per booking, as in ERP. Seat count does not multiply the distance award. |
+
+The total rounds once to the nearest whole point, with halves rounded up, matching
+the ERP integer card balance. For example, Rs. 5,000 paid with `point_flat = 500`
+earns 10 points; a 500 km booking with `point_distance = 100` earns 5 points.
+Earning is independent of the wallet-redemption feature switch. Card starting
+points and redemption rates are not changed by this feature.
+
+`mobile_loyalty_awards` records each ticket's share, original card/category,
+earning rate, booking amount/distance, redeemed points, and reversal timestamp.
+Amount-based awards are allocated by each ticket's net fare; distance-based
+awards are allocated evenly, with rounding reconciled to the booking total.
+Zero awards are recorded too. ERP/head-office cancellation reverses the recorded
+share and returns redeemed points to the original wallet card, once, rather than
+recalculating from later settings. The existing ERP reschedule history links
+replacement tickets back to their original award. Rescheduling itself does not
+award new points. A correction can make a balance negative if earned points were
+already spent; wallet availability continues to report at least zero.
+
+Pay-at-branch reservations already earn through the existing ERP confirmation
+flow using its customer/CNIC and category rules. They receive no additional
+mobile credit at reservation time. Previously settled online payments are not
+backfilled automatically.
+
+Install `2026_11_08_000001_create_mobile_loyalty_awards_table.php` before deploying
+the earning service and payment/cancellation hooks. No new endpoint, response
+field, Flutter build, or card-category setting is required. Existing wallet reads
+return the updated balance after confirmation.
 
 ## Mobile payment contract
 

@@ -89,6 +89,7 @@ class MobileBookingService
             $input['date']
         );
         $this->assertSeatLimit($layout, count($input['seats']));
+        app(MobileQuotaService::class)->assertSelection($layout, $input['seats']);
         $available = collect($layout['seats'])->where('status', 'available')->keyBy('number');
         $selected = collect($input['seats'])->map(function ($number) use ($available) {
             $seat = $available->get((string) $number);
@@ -112,7 +113,7 @@ class MobileBookingService
         // Use the same per-seat snapshot as the selected prices. A second fare
         // query could produce a different breakdown if the tariff changes mid-request.
         $breakdown = [];
-        foreach (['base_fare', 'discount', 'surcharge', 'rounding_adjustment'] as $field) {
+        foreach (['base_fare', 'discount', 'surcharge', 'rounding_adjustment', 'quota_discount'] as $field) {
             $breakdown[$field] = round((float) $selected->sum($field), 2);
         }
         $wallet = $this->walletEnabled()
@@ -206,7 +207,8 @@ class MobileBookingService
         }
 
         try {
-            return DB::transaction(function () use ($account, $quote, $payload, $systemUser, $paymentMethod) {
+            return DB::transaction(function () use ($account, $quote, $payload, $systemUser, $paymentMethod, $scheduleId) {
+                app(MobileQuotaService::class)->lockSchedule($this->travel->companyId(), $scheduleId);
                 MobilePassengerControls::lockForBooking($account, count($payload['seats']));
                 $quote->refresh();
                 if ($quote->used_at || $quote->expires_at->isPast()) {
@@ -220,10 +222,12 @@ class MobileBookingService
                     $payload['date']
                 );
                 $this->assertSeatLimit($layout, count($payload['seats']));
+                app(MobileQuotaService::class)->assertSelection($layout, array_column($payload['seats'], 'number'));
                 $available = collect($layout['seats'])->where('status', 'available')->keyBy('number');
                 foreach ($payload['seats'] as $quotedSeat) {
                     $current = $available->get((string) $quotedSeat['number']);
-                    if (!$current || (float) $current['price'] !== (float) $quotedSeat['price']) {
+                    if (!$current || (float) $current['price'] !== (float) $quotedSeat['price']
+                        || (float) $current['quota_discount'] !== (float) ($quotedSeat['quota_discount'] ?? 0)) {
                         throw new RuntimeException('Seat availability or fare changed. Request a new quote.', 409);
                     }
                 }
@@ -316,7 +320,7 @@ class MobileBookingService
                         'destination_city_id' => (int) $payload['destination_id'],
                         'seat_no' => $quotedSeat['number'],
                         'bus_class_id' => $detail->bus_class_id,
-                        'seat_fare' => $quotedSeat['price'],
+                        'seat_fare' => $quotedSeat['price'] + ($quotedSeat['quota_discount'] ?? 0),
                         'is_partial' => $isPartial,
                         'booking_no' => $bookingNumber,
                         'invoice_id' => $invoice->id,
@@ -337,11 +341,15 @@ class MobileBookingService
                         'booked_time' => now(),
                         'added_by' => $systemUser->id,
                         'updated_by' => $systemUser->id,
-                        'discount' => $ticketWalletDeduction,
+                        'discount' => $ticketWalletDeduction + ($quotedSeat['quota_discount'] ?? 0),
                         'schedule_discount' => 0,
                         'terminal_discount' => 0,
                         'points_usage' => $ticketWalletPoints,
                     ]);
+                    if (($quotedSeat['quota_discount'] ?? 0) > 0) {
+                        // Preserve the ERP quota audit amount without deducting it twice.
+                        $ticket->update(['quota_discount' => $quotedSeat['quota_discount']]);
+                    }
 
                     TicketAdvancedBooked::create([
                         'company_id' => $ticket->company_id,

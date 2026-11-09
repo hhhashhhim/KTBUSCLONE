@@ -91,6 +91,65 @@ curl --fail --silent --show-error https://mobile-api.kainattravels.com/api/mobil
 
 ## Pending registration security rollout (21 October 2026)
 
+### Signup outage repair (6 November 2026)
+
+The live signup failure at 18:05:12 Asia/Karachi was traced to an absent
+`pending_passenger_registrations` table. The migration source was present but its
+name was absent from `migrations`. The controller then passed the string SQLSTATE
+as an HTTP status, causing a second exception instead of reporting the database
+failure. The signup handler now logs unexpected failures and returns a safe 500.
+
+The first repair attempt exposed MariaDB error 1067 (`Invalid default value for
+expires_at`): the original required TIMESTAMP conflicted with legacy implicit
+defaults under strict SQL mode. The still-pending creation migration now uses a
+required DATETIME deadline, consistent with the existing mobile payment expiry
+repair. No null/default/automatic-update behavior is introduced. This change
+affects new table creation only; it does not alter already-installed tables.
+
+Apply only the pending-registration migration below on the dedicated mobile API.
+Verify both its migration record and table/columns; later migration batch numbers
+do not prove that this earlier migration was installed. Preserve existing OTP
+rate-limit caches. After deployment, verify public validation, then complete a
+real phone signup and WhatsApp OTP before claiming end-to-end acceptance.
+
+The regression suite reproduces a missing table, applies this migration, and
+completes signup/OTP in disposable SQLite with provider HTTP faked. It also covers
+OTP preparation and token storage errors without exposing internal details.
+
+Live repair completed at 22:22 Asia/Karachi on 6 November 2026 in
+`/home/wwwkaina/kt-mobile-api` (`mobile-backend`, baseline `8abbda84`). The corrected
+creation migration is recorded in batch **108**. The table exists and its indexed
+`expires_at` is `datetime NOT NULL`, with no default or automatic-update attribute.
+Only the controller and this migration source were deployed as uncommitted file
+changes; no Git commit, push, branch switch or ERP source change was performed.
+The original two source files are backed up under
+`/home/wwwkaina/private-release-backups/signup-20261106-_pcntps4` (code only).
+Configuration, shared application caches and existing server-local files were
+preserved; the migration adds the registration table and its migration record.
+
+Validation: 66 targeted tests / 420 assertions passed using an isolated source
+copy with locked Composer dependencies, disposable SQLite, and an explicitly
+created local MySQL test database that was removed after the run. The MySQL test
+reproduced error 1067 with the old schema, installed the corrected schema, and
+confirmed OTP updates preserve expiry. PHP syntax and Git whitespace checks
+passed. The ordinary worktree vendor directory could not boot because its
+installed Symfony/Laravel versions were inconsistent; it was left untouched.
+The locked runtime emits an existing PHP 8.4 dependency deprecation.
+
+Live public checks: `GET /app/config` returned 200; an empty
+`POST /auth/register` returned the expected 422 validation envelope. WhatsApp
+remains the configured OTP driver. The owner retried on the phone and confirmed
+that **signup and WhatsApp OTP verification both succeeded**. At 22:24:43
+Asia/Karachi, a read-only aggregate check confirmed one new verified passenger
+account since the repair. No passenger details, passwords, tokens or OTP values
+were exposed by the checks. No extra live test account or OTP was created by the
+diagnostic. There is no pending frontend change for this signup repair.
+
+Changed files: `app/Http/Controllers/Mobile/MobileAuthController.php`,
+`database/migrations/2026_10_21_000009_create_pending_passenger_registrations.php`,
+`tests/Feature/MobileOtpTest.php`, `tests/Feature/MobileRegistrationSchemaTest.php`,
+`MOBILE_API.md`, and this deployment document.
+
 Deploy the backend authentication files and the matching Flutter build together.
 The app now restores sessions through `GET /auth/session` and persists the new
 full token returned by OTP verification. Older builds retain a revoked pending
@@ -856,3 +915,370 @@ source branch, review Firebase installation deletion and enabled products, obtai
 SAR Zone/payment-provider retention commitments, and approve the financial/CNIC
 retention policy. The hosting dashboard also displayed an unpaid-invoice notice;
 the owner should review billing separately to maintain service continuity.
+# Quota and special-seat release — 7 November 2026
+
+This work is on `hhhashhhim/KTBUSCLONE`, branch `mobile-backend`, in the separate
+`KTBUSCLONE-mobile-backend` worktree. Existing authentication and deployment edits
+in this worktree were preserved. The user authorized deployment separately after
+implementation; the deployment below is complete. Nothing was committed or pushed.
+
+For subsequent environments, deploy the backend and run
+`2026_11_07_000001_support_mobile_schedule_quota_rules.php` through the normal
+migration process before releasing the Flutter update. This compatibility
+migration uses the existing ERP column/table names; it leaves installed columns,
+percentages and exemptions intact. Its rollback preserves these shared settings
+and ticket audit history. No quota/percentage is enabled automatically. Ensure
+the intended schedules have the existing ERP quota and terminal discount settings
+for the mobile selling terminal. Legacy per-user assignments require the ERP's
+existing migration to terminal assignments. Existing ERP/counter confirmation
+must have its own quota rules deployed; this release changes mobile paths only.
+
+Files changed for this work (relative to this backend worktree):
+
+- `app/Services/Mobile/MobileQuotaService.php` (new)
+- `app/Services/Mobile/MobileTravelService.php`
+- `app/Services/Mobile/MobileSearchData.php`
+- `app/Services/Mobile/MobileSchedulePolicy.php`
+- `app/Services/Mobile/MobileBookingService.php`
+- `app/Services/Mobile/MobilePaymentService.php`
+- `app/Http/Controllers/Mobile/MobileBookingController.php`
+- `database/migrations/2026_11_07_000001_support_mobile_schedule_quota_rules.php` (new)
+- `tests/Feature/MobileSchedulingRulesTest.php`
+- `MOBILE_API.md` and `MOBILE_DEPLOYMENT.md`
+
+Validation: **229 tests, 1,747 assertions passed** across
+`MobileSchedulingRulesTest`, `MobileApiContractTest`, and `MobilePaymentGatewayTest`.
+Coverage includes per-seat rounding, regular discounts and wallet ordering,
+quota exhaustion and reuse, directional exemptions, overnight main departures,
+stale quotes, payment confirmation/review, schema compatibility, company/run
+isolation, and bounded search queries.
+
+The initial test command could not boot because the worktree's installed
+Laravel/Symfony files were incompatible. Installing the unchanged `composer.lock`
+into an isolated temporary vendor directory allowed the real current application
+tests to run. Neither the repository's vendor tree nor dependency manifests were
+changed. Tests used their disposable SQLite databases and fake payment HTTP;
+no production booking/payment or real MySQL concurrency test was performed.
+
+### Production deployment completed — 7 November 2026
+
+Deployed the eight runtime/migration files listed above to the dedicated
+`/home/wwwkaina/kt-mobile-api` checkout on `mobile-backend`, based on revision
+`8abbda840b4e4b171a0c8eeccb20b25e6b9fe584`. This was a scoped deployment of the
+authorized working-tree changes, not a whole-repository archive or Git pull.
+Each existing target matched its base-revision SHA-256 before replacement; all
+eight deployed checksums matched the prepared manifest afterward. The unrelated
+deployed registration fix and other server files were preserved.
+
+- Release package SHA-256:
+  `b7b24b2f16072e78722a5d670c485e17579569d28c318b46f9946c293b6c1924`.
+- Private staging/log: `/home/wwwkaina/private-release-staging/quota-20261107-v11/`.
+- Rollback backup: `/home/wwwkaina/private-release-backups/quota-20261107-v11-155700/`.
+  Contains original target files, schema definitions, migration ledger and cron
+  snapshot; no passenger-row export was needed for this additive compatibility migration.
+- All three quota columns and the terminal-discount table already existed. Only
+  `2026_11_07_000001_support_mobile_schedule_quota_rules.php` was run, with
+  `artisan migrate --force --path=...`; it completed in 3.42 ms and is recorded.
+  Existing ERP quota settings and discount assignments were preserved.
+- Mobile maintenance mode and a brief pause of its scheduler covered replacement.
+  The app returned online, the exact cron contents were restored, the separate
+  ERP scheduler was preserved, and the `.env` checksum was unchanged. No broad
+  cache clear, dependency update or authentication-setting change was performed.
+- Server PHP 8.2.35 syntax checks passed. A live read-only service smoke check
+  returned one future schedule and 40 seats, verifying `midway_quota` and all
+  new per-seat discount fields. Public app/config returned HTTP 200 afterward.
+  The 229-test / 1,747-assertion backend suite also passed before deployment.
+
+**Configuration dependency:** company 1 / mobile terminal 24 currently has zero
+active positive terminal-quota discount assignments. The support is deployed,
+but special-fare markers appear only after existing ERP configuration assigns a
+discount to an eligible schedule for this terminal. No rate was invented or
+enabled during deployment. Real booking/payment acceptance remains unperformed.
+
+## Departed-schedule fix — 7 November 2026
+
+Follow-up on the same repository and `mobile-backend` worktree: the mobile
+visibility query only checked the departure date, and the booking-opening-window
+switch did not impose a departure-time cutoff. `MobileSchedulePolicy.php` now
+requires a future departure from the requested boarding city, in Pakistan time,
+and rechecks the cutoff independently of that switch. `MobileTravelService.php`
+uses the shared rule for city catalogs. No schema or API response fields changed.
+
+Both runtime files were deployed after verifying their before-checksums against
+the preceding quota release. Live departed segments returned by the visibility
+policy fell from **122 to 0**. A future journey still returned one search result
+and 45 seats, including the quota fields. PHP syntax and after-checksums passed;
+the app returned online, exact cron was restored and `.env` stayed unchanged.
+
+Private backup: `/home/wwwkaina/private-release-backups/departure-20261107-v12-161731/`.
+Staging/log: `/home/wwwkaina/private-release-staging/departure-20261107-v12/`.
+Archive SHA-256: `16ad89a26f511c23431dca65b8c971f4f15cb58ed7fcb72329f0ae0cbddef56b`.
+No migration was run; previous quota/authentication overlays were preserved.
+
+Backend suites passed **236 tests / 1,785 assertions**, including exact departure,
+timezone, stale quote and overnight boarding cases. Changed source/test/docs:
+the two services above, `tests/Feature/MobileSchedulingRulesTest.php`,
+`MOBILE_API.md`, and this file. Nothing was committed or pushed.
+
+The owner explicitly requested mandatory latest-version updates. The matching
+Android `1.0.11+12` build passes 253 Flutter tests and was verified **Active /
+Available to internal testers** in Google Play at 21:24 Asia/Karachi. After that
+verification, company 1's existing `mobile_app_configs` row was updated to
+`latest_version: 1.0.11`, `minimum_supported_version: 1.0.11`, `force_update: true`,
+and Android store URL
+`https://play.google.com/store/apps/details?id=com.kainattravels.kt_mobile_app`.
+Other configuration fields were preserved. Public app/config returned HTTP 200
+with these exact values at 21:25. The previous configuration was backed up to
+`/home/wwwkaina/private-release-backups/departure-update-policy-20261107-v12.json`
+before the transactional update. The app still requires the tester's Play
+installation consent; opening it alone does not silently install a new binary.
+No public production release or tester-access change was made. No deployment
+or policy activation remains pending.
+
+## Server-based mobile calendar — 7 November 2026
+
+`MobileAppController.php` now adds `server_time`, `server_date` and `timezone`
+to the existing public app/config contract using one server-clock snapshot.
+The response sends `Cache-Control: no-store, private`. No migration is needed.
+Backend validation passed **237 tests / 1,793 assertions** across the contract,
+scheduling and payment suites, including Pakistan midnight rollover with a UTC
+clock and a client-supplied date that cannot override the server day.
+
+Deployed only that controller to the existing `mobile-backend` checkout, after
+checking branch/revision, the original checksum and PHP syntax. The replacement
+was atomic, with private rollback backup
+`/home/wwwkaina/private-release-backups/calendar-20261107-v13-163851/`.
+Staging/log: `/home/wwwkaina/private-release-staging/calendar-20261107-v13/`.
+Archive SHA-256: `c51d79d5aceab7d9643cd638d4ab9842bdf07beddf207e0be969417ab70e17b1`.
+The environment, cron and earlier deployed changes were preserved. Public HTTP
+verification returned 200, the three consistent clock fields, `Asia/Karachi` /
+`+05:00`, and the no-store header.
+
+At **21:38:23 Asia/Karachi**, direct NTP comparisons from the hosting server
+measured reference-minus-server offsets of **+0.000426 seconds** against
+`time.google.com` and **+0.001048 seconds** against `time.cloudflare.com`.
+Round-trip times were 0.002929 and 0.001185 seconds respectively. No clock
+adjustment was necessary or made. `timedatectl` and `chronyc` are unavailable
+in the hosting account; this verifies current accuracy, not access to the
+host's ongoing synchronization configuration. The JSON result is saved in
+private staging as `clock-check.json`.
+
+Changed backend files for this follow-up: the controller,
+`tests/Feature/MobileApiContractTest.php`, `MOBILE_API.md`, and this document.
+Android **1.0.12 (13)** was verified **Active / Available to internal testers**
+at **21:44 Asia/Karachi**. After publication, company 1's latest and minimum
+supported versions were both set to `1.0.12`, retaining `force_update: true`
+and the existing store URL/other configuration. The previous row was saved in
+`/home/wwwkaina/private-release-backups/calendar-update-policy-20261107-v13.json`.
+The public endpoint returned HTTP 200 with these values and the clock fields
+at 21:45:24. No release/deployment dependency remains pending. No Git commit
+or push was made.
+
+## Special discount seat count — deployed 8 November 2026
+
+Repository `hhhashhhim/KTBUSCLONE`, backend branch `mobile-backend`.
+The separately built Flutter `mobile-frontend` release is **1.0.13 (14)** and
+also includes the owner's requested native offline terms-and-conditions page.
+
+Deployed only `app/Services/Mobile/MobileTravelService.php` and
+`app/Http/Resources/Mobile/ScheduleResource.php`. The authenticated schedule
+contract now includes `available_special_seats`, computed with the existing
+quota adjustment and batched search data, capped by online availability. Missing
+resource counts default to zero. No migration, environment or cron change was
+needed. Base revision remains `8abbda840b4e4b171a0c8eeccb20b25e6b9fe584` with
+existing release overlays. Branch, remote, original checksums, payload hashes
+and PHP syntax were checked before replacement.
+
+Private staging: `/home/wwwkaina/private-release-staging/special-count-20261108-v14/`.
+Final rollback backup:
+`/home/wwwkaina/private-release-backups/special-count-20261108-v14-200158/`.
+The deployment script restored originals on initial diagnostic failures: an
+explicit read-only transaction triggered the quota reader's existing row-lock
+behavior. Removing that diagnostic transaction allowed the ordinary read-only
+schedule/seat-map verification to pass. No booking or token was created.
+
+Live verification at **01:02:02 Asia/Karachi** checked Multan (4) → Rawalpindi (1)
+for **2026-11-08**. Schedule 1563/detail 2391802 at 13:44 had 20 available seats
+and 20 special discount seats; the count matched the seat map. Schedule 1469 at
+03:45 had 8 available / 0 special, and 1536 at 05:45 had 18 available / 0 special.
+The resource serialized the field for all three. Public app/config returned
+HTTP 200, while unauthenticated cities/schedules returned HTTP 401.
+
+Validation: backend scheduling, contract and payment suites ran 240 cases,
+**238 passed and 2 optional MySQL tests skipped**, with **1,853 assertions**.
+The isolated locked dependency runtime was used; the existing PHP 8.4 dependency
+deprecation remains. Flutter passed **272 tests**, analysis, signed release builds,
+certificate/bundle validation and static 16 KB alignment checks.
+
+Play internal release 7 was confirmed **Active / Available to internal testers**
+at **01:03 PKT**, version **1.0.13 (14)**. Only then was company 1's existing
+latest/minimum policy advanced to 1.0.13, retaining `force_update: true` and all
+other configuration. Policy backup:
+`/home/wwwkaina/private-release-backups/special-count-update-policy-20261108-v14.json`.
+Public verification at **01:03:48** returned HTTP 200, latest/minimum 1.0.13,
+force update true, maintenance disabled, and `Cache-Control: no-store, private`.
+
+Changed backend files for the feature: the two deployed files,
+`tests/Feature/MobileSchedulingRulesTest.php`, `tests/Feature/MobileApiContractTest.php`,
+`MOBILE_API.md`, and this document. No commit or push was made. No release dependency
+remains pending; physical-device installation remains the tester's acceptance step.
+
+## Wallet redemption enabled — 8 November 2026, 01:52 PKT
+
+The user requested that applied checkout points reduce the amount on the
+proceed button. Live inspection found `mobile.features.wallet` true but company
+1's database override `features.wallet` false. The wallet endpoint still
+returned an active loyalty card, while quoting returned zero deduction.
+
+The deployed `MobileLoyaltyService`, `MobileBookingService` and
+`MobileBookingController` SHA-256 hashes matched the reviewed `mobile-backend`
+worktree. Read-only calculations used existing category settings and unsaved
+card objects; no real passenger record, quote, booking, payment or balance was
+created or modified for testing. Existing category rates were retained.
+
+Only company 1's `features.wallet` was set to **true**. The update checked the
+deployed hashes and prior setting, locked the configuration row, backed up its
+prior attributes privately, and verified that all other features and settings
+were preserved before commit. No application files, environment, migration,
+cron, version policy or store release were changed.
+
+- Backup: `/home/wwwkaina/private-release-backups/wallet-enable-20261108-v15.json`
+- Script: `/home/wwwkaina/private-release-staging/wallet-20261108-v15/enable_wallet.php`
+- Public HTTP 200 at **01:52:08 PKT**: wallet true, latest 1.0.14, maintenance false.
+- Local evidence: `/Users/malik/development/kt_mobile_app_build/wallet-verification-2026-11-08/`.
+
+Tests: **3 passed / 38 assertions** for company-override redemption using real
+loyalty models, balance rejection, unchanged points during quotes, fare
+adjustment order and quota/loyalty composition. The existing isolated
+Composer-locked runtime was used; its pre-existing PHP 8.4 dependency
+deprecation remains. PHP syntax and `git diff --check` passed. Flutter checkout,
+fare and payment coverage passed **36 tests**, including both button labels at
+multiple applied point amounts and restoring the fare with zero points.
+
+Changed backend files: `tests/Feature/MobileSchedulingRulesTest.php`,
+`MOBILE_API.md`, and this document, on `hhhashhhim/KTBUSCLONE` / `mobile-backend`.
+Frontend test/documentation edits remain on `mobile-frontend`. Existing app
+1.0.14 already refreshes its summary and Continue/Reserve amount from the quote;
+no new binary or deployment dependency is required. Passengers with a stale
+checkout should reopen it for a fresh quote. Nothing was committed or pushed.
+
+## Mandatory-update rollback for unavailable Play update — 8 November 2026
+
+After Android 1.0.15 (16) was published to internal testing at 02:18 PKT and
+the requirement raised at 02:19, the user reported that Google Play did not
+offer the update. Console “Active / Available to internal testers” status
+was insufficient evidence of availability on the affected device/account.
+
+Repository `hhhashhhim/KTBUSCLONE`, branch `mobile-backend`; production checkout
+`/home/wwwkaina/kt-mobile-api` and the separate local backend worktree were
+verified before this configuration-only work. No Laravel application file,
+booking restriction, payment rule or wallet setting was changed.
+
+Company 1's `mobile_app_configs.latest_version` and
+`minimum_supported_version` were restored from 1.0.15 to **1.0.14**, retaining
+`force_update: true`. The transaction locked the row, checked the exact prior
+versions, made an exclusive private backup, and verified all unrelated fields
+were unchanged. Restoring only the minimum would not unblock 1.0.14 while
+the force flag and latest version still required 1.0.15.
+
+- Backup: `/home/wwwkaina/private-release-backups/checkout-update-delay-20261108-v16.json`.
+- Script: `/home/wwwkaina/private-release-staging/checkout-20261108-v16/rollback_update_requirement.php`.
+- PHP syntax check passed locally and on the server.
+- Existing Flutter update-policy suite passed all **9 tests**; both worktree
+  diff checks passed. No application code changed for this correction.
+- Public API HTTP 200 at **02:23:51 Asia/Karachi** verified both version fields
+  at 1.0.14, force update enabled, wallet enabled, maintenance disabled and
+  `Cache-Control: no-store, private`.
+
+The published 1.0.15 Play release remains active. Its requirement must stay
+deferred until an enrolled target device/account actually offers and can
+install it. The precise Play device/account cause remains unverified; no
+passenger account, tester membership, credentials or app data were changed.
+The Flutter update-policy documentation was corrected separately on
+`mobile-frontend`. Nothing was committed or pushed.
+
+The user subsequently confirmed that the app opens after this rollback.
+The update loop is resolved on their device; installation of 1.0.15 remains
+unconfirmed and its mandatory requirement remains deferred.
+
+## Mobile online booking loyalty earning — 8 November 2026 (local implementation)
+
+Repository: `hhhashhhim/KTBUSCLONE`, existing `mobile-backend` worktree at
+`/Users/malik/Desktop/Codes/KTBUSCLONE-mobile-backend`. Existing uncommitted work
+was preserved. This change has not been deployed, committed, or pushed.
+
+Verified online payments now award the booking account's active loyalty card
+using ERP `point_type`, `point_flat`, `point_distance`, and directional fare-table
+distance. Credit occurs atomically with confirmation, once per booking. The
+shared ERP cancellation service handles online mobile awards through recorded
+ticket allocations, including replacement tickets in ERP reschedule history.
+Counter confirmation continues to use its existing ERP earning logic. See
+`MOBILE_API.md` for net-amount, whole-point rounding, recipient, and cancellation
+semantics. No historical online-payment backfill is performed.
+
+Files for this work unit:
+
+- `app/Services/Mobile/MobileLoyaltyEarningService.php` (new)
+- `app/Services/Mobile/MobilePaymentService.php` (confirmation hook)
+- `app/Services/TicketCancellationService.php` (online mobile reversal hook)
+- `database/migrations/2026_11_08_000001_create_mobile_loyalty_awards_table.php` (new)
+- `tests/Feature/MobileLoyaltyEarningTest.php` (new)
+- `tests/Feature/MobileSchedulingRulesTest.php` (payment fixture installs ledger)
+- `MOBILE_API.md` and `MOBILE_DEPLOYMENT.md`
+
+Validation:
+
+- **301 tests / 2,162 assertions passed** across `MobileLoyaltyEarningTest`,
+  `MobileSchedulingRulesTest`, `MobileApiContractTest`, `MobilePaymentGatewayTest`,
+  and `ErpCancellationPermissionTest`.
+- **6 tests / 34 assertions passed** using a temporary MySQL adaptation of the
+  loyalty fixture against a newly created local MySQL 9.6 database, removed after
+  the run. These covered net-amount earning, distance earning, integer rounding,
+  original-card cancellation, reschedule-chain cancellation, and migration/retry.
+- The SQLite suite also covers duplicate/stale refreshes, transaction rollback,
+  ineligible cards, invalid settings, unpaid/expired/review payments, company
+  isolation, and zero-award cancellation. Actual concurrent MySQL sessions were
+  not exercised; settlement retains its payment/ticket row locks and the ledger
+  has a unique ticket constraint.
+- PHP syntax checks and `git diff --check` passed.
+
+The worktree's existing vendor tree cannot boot due to inconsistent Laravel and
+Symfony files. Tests ran from a temporary source copy using the previously
+installed Composer-locked dependency runtime, no copied `.env` or cached config,
+disposable databases, and fake gateways. The existing PHP 8.4 dependency
+deprecation remains. No live payment, booking, or loyalty balance was changed.
+
+Deployment remains pending: install the new additive ledger migration first,
+then deploy the earning service and payment/cancellation hooks together and
+restart the relevant long-running workers. The app uses its existing wallet
+endpoint; no Flutter release is needed. Payment confirmation fails closed with
+503 if the ledger migration is missing, leaving the reservation/payment pending
+for retry within its existing deadline. Do not remove the ledger or reversal
+handling while awarded tickets remain; migration rollback refuses to drop a
+nonempty ledger because card balances have already been affected.
+
+## Git build validation — 9 November 2026
+
+The pending mobile backend work was validated separately from the Flutter
+`mobile-frontend` branch. It includes registration expiry compatibility, schedule
+visibility and quota rules, special-fare response fields, and mobile loyalty
+earning with cancellation reversal. No production deployment or migration was
+performed by this build-and-push task.
+
+- Full PHPUnit suite: 463 tests, 3,016 assertions, zero failures/errors;
+  460 passed and 3 optional MySQL integration cases skipped because no disposable
+  MySQL test database was configured.
+- PHP syntax checks passed for 110 mobile source, migration, and test files,
+  including the shared cancellation hook.
+- Dependencies were installed from the unchanged `composer.lock` in an isolated
+  temporary source snapshot. No worktree `.env`, cached configuration, or live
+  database was used. Existing Composer PSR-4 warnings in legacy classes remain.
+- The optional global `artisan route:list` command hits the pre-existing duplicate
+  `App\Http\Controllers\Inventory\MYPDF` declaration in inventory controllers.
+  This unrelated ERP issue was not changed on the mobile branch; the mobile API
+  contract tests passed.
+
+Deploy the additive loyalty ledger migration and payment/cancellation hooks
+together as described above before enabling the new earning behavior. Git pushes
+alone do not deploy the API, apply migrations, publish an app-store build, or
+change the minimum-supported app version.

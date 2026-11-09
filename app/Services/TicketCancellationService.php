@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\FareTable;
 use App\Models\LoyaltyCard\CardAssign;
 use App\Models\Ticket;
+use App\Services\Mobile\MobileLoyaltyEarningService;
 
 class TicketCancellationService
 {
@@ -67,6 +68,9 @@ class TicketCancellationService
 
     private function reverseLoyaltyPoints(Ticket $ticket)
     {
+        if (app(MobileLoyaltyEarningService::class)->reverseTicket($ticket)) {
+            return;
+        }
         $customer = Customer::find($ticket->customer_id);
 
         if (!$customer) {

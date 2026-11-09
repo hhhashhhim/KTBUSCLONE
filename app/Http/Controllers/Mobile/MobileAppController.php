@@ -30,7 +30,13 @@ class MobileAppController extends Controller
         $features['promotions'] = false;
         $features['online_payments'] = !config('mobile_payments.preview_only') && count(array_diff($paymentMethods, ['counter'])) > 0;
 
+        // One server-clock snapshot keeps the timestamp and calendar day consistent.
+        $serverNow = now(config('app.timezone'));
+
         return $this->success([
+            'server_time' => $serverNow->toIso8601String(),
+            'server_date' => $serverNow->toDateString(),
+            'timezone' => config('app.timezone'),
             'latest_version' => optional($row)->latest_version ?: config('mobile.latest_version'),
             'minimum_supported_version' => optional($row)->minimum_supported_version ?: config('mobile.minimum_supported_version'),
             'force_update' => $row ? (bool) $row->force_update : (bool) config('mobile.force_update'),
@@ -44,6 +50,6 @@ class MobileAppController extends Controller
             'payment_environment' => config('mobile_payments.environment'),
             'payment_preview' => (bool) config('mobile_payments.preview_only'),
             'features' => $features,
-        ], 'App configuration retrieved.');
+        ], 'App configuration retrieved.')->header('Cache-Control', 'no-store, private');
     }
 }
